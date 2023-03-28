@@ -8,14 +8,14 @@ library(jheem)
 
 if (1==2)
 {
-    idu2016 = read.idu.manager('../data2/IDU/NSDUH_2016', 2016)
-    idu2015 = read.idu.manager('../data2/IDU/NSDUH_2015', 2015)
-#    idu2014 = read.idu.manager('../data2/IDU/NSDUH_2014', 2014)
+    idu2016 = read.idu.manager('../v1_data/IDU/NSDUH_2016', 2016)
+    idu2015 = read.idu.manager('../v1_data/IDU/NSDUH_2015', 2015)
+#    idu2014 = read.idu.manager('../v1_data/IDU/NSDUH_2014', 2014)
 
     idu.manager = combine.idu.managers(idu2016, idu2015)
 
     counties = c("24510", "24005")
-    load('../data2/parsed/full_age_census_msm.Rdata')
+    load('../v1_data/parsed/full_age_census_msm.Rdata')
 
     counties = counties[1]
 
@@ -562,7 +562,7 @@ combine.idu.managers <- function(...)
     rv
 }
 
-read.idu.manager <- function(dir='../data2/IDU/NSDUH_2016',
+read.idu.manager <- function(dir='../v1_data/IDU/NSDUH_2016',
                              year=2016, verbose=T)
 {
     rv = list(years=year)
@@ -897,7 +897,7 @@ parse.percent.value <- function(values)
 ##-- FRACTION USE BY AGE --##
 ##-------------------------##
 
-get.idu.by.age.counts <- function(dir='../data2/IDU', years=2015:2018)
+get.idu.by.age.counts <- function(dir='../v1_data/IDU', years=2015:2018)
 {
     age.mapping = c('1 - Respondent is 12 years old'='12 yo',
                     '2 - Respondent is 13 years old'='13 yo',
@@ -951,7 +951,7 @@ get.idu.by.age.counts <- function(dir='../data2/IDU', years=2015:2018)
     rv
 }
 
-get.idu.13.24.frac.24 <- function(dir='../data2/IDU', years=2015:2018)
+get.idu.13.24.frac.24 <- function(dir='../v1_data/IDU', years=2015:2018)
 {
     arr = get.idu.by.age.counts(dir=dir, years=years)
 
@@ -968,7 +968,7 @@ get.idu.13.24.frac.24 <- function(dir='../data2/IDU', years=2015:2018)
     rv['24',] / colSums(rv, na.rm=T)
 }
 
-get.idu.availability.13.24 <- function(dir='../data2/IDU', years=2015:2018)
+get.idu.availability.13.24 <- function(dir='../v1_data/IDU', years=2015:2018)
 {
     arr = get.idu.by.age.counts(dir=dir, years=years)
 
@@ -1000,9 +1000,9 @@ if (1==2) #DEPRECATED - now in locale mappings
 {
 print('Reading in Substate-Region-to-County Mapping')
 keep.cols = c('sbst16n','sbst16','sbsta16n', 'sbstag16', 'county','state')
-mapping.44 = read.sas7bdat('../data2/IDU/substate_county141516.sas7bdat')
+mapping.44 = read.sas7bdat('../v1_data/IDU/substate_county141516.sas7bdat')
 mapping.44 = mapping.44[,keep.cols]
-mapping.7 = read.sas7bdat('../data2/IDU/substate_tract141516.sas7bdat')
+mapping.7 = read.sas7bdat('../v1_data/IDU/substate_tract141516.sas7bdat')
 mapping.7 = mapping.7[,keep.cols]
 mapping.7 = unique(mapping.7)
 
