@@ -1,55 +1,64 @@
-# For testing
-if (1==2)
-{
+
+#-- For now - source code and load data --#
+# These 'source' calls are equivalent to loading the jheem2 package
+source('../jheem2/R/HELPERS_misc_helpers.R')
+source('../jheem2/R/HELPERS_dim_names_helpers.R')
+source('../jheem2/R/HELPERS_array_helpers.R')
+Rcpp::sourceCpp('../jheem2/src/array_helpers.cpp')
+
+source('../jheem2/R/ONTOLOGY_ontology_mappings.R')
+
+source('../jheem2/R/SPECIFICATION_scales.R')
+source('../jheem2/R/SPECIFICATION_model_specification.R')
+source('../jheem2/R/SPECIFICATION_compiled_specification.R')
+
+source('../jheem2/R/SPECIFICATION_functional_forms.R')
+source('../jheem2/R/SPECIFICATION_functional_form_alphas.R')
+Rcpp::sourceCpp('../jheem2/src/functional_forms.cpp')
+source('../jheem2/R/SPECIFICATION_links.R')
+source('../jheem2/R/SPECIFICATION_evaluatable_value.R')
+
+source('../jheem2/R/VERSIONS_version_manager.R')
+
+source('../jheem2/R/ONTOLOGY_ontology_mappings.R')
+Rcpp::sourceCpp('../jheem2/src/ontology_mappings.cpp')
+
+source('../jheem2/R/JHEEM_entity.R')
+source('../jheem2/R/JHEEM_engine.R')
+source('../jheem2/R/SPECIFICATION_specification_info.R')
+
+Rcpp::sourceCpp('../jheem2/src/misc_helpers.cpp')
+    
+    
+# Load the data
+if (!exists('ALL.DATA.MANAGERS'))
     load('../jheem_analyses/cached/ALL.DATA.MANAGERS.Rdata')
+if (!exists('DEFAULT.LOCALE.MAPPING'))
     load('../jheem_analyses/cached/DEFAULT.LOCALE.MAPPING.Rdata')
+if (!exists('msa.surveillance'))
     load('../jheem_analyses/cached/msa.surveillance.Rdata')
     
-    source('../jheem2/R/HELPERS_misc_helpers.R')
-    source('../jheem2/R/HELPERS_dim_names_helpers.R')
-    source('../jheem2/R/HELPERS_array_helpers.R')
-    Rcpp::sourceCpp('../jheem2/src/array_helpers.cpp')
     
-    source('../jheem2/R/ONTOLOGY_ontology_mappings.R')
-    
-    source('../jheem2/R/SPECIFICATION_scales.R')
-    source('../jheem2/R/SPECIFICATION_model_specification.R')
-    source('../jheem2/R/SPECIFICATION_compiled_specification.R')
-    
-    source('../jheem_analyses/data_managers/census_manager.R')
-    source('../jheem_analyses/data_managers/prep_manager_2.R')
-    source('../jheem_analyses/data_managers/continuum_manager_3.R')
-    source('../jheem_analyses/data_managers/idu_manager.R')
-    source('../jheem_analyses/data_managers/locale_mappings.R')
-    source('../jheem_analyses/data_managers/hiv_surveillance_manager.R')
-    source('../jheem_analyses/data_managers/mortality_manager.R')
-    source('../jheem_analyses/data_managers/natality_manager.R')
-    source('../jheem_analyses/data_managers/pairing_manager.R')
-    
-    source('../jheem2/R/SPECIFICATION_functional_forms.R')
-    source('../jheem2/R/SPECIFICATION_functional_form_alphas.R')
-    Rcpp::sourceCpp('../jheem2/src/functional_forms.cpp')
-    source('../jheem2/R/SPECIFICATION_links.R')
-    source('../jheem2/R/SPECIFICATION_evaluatable_value.R')
-    
-    source('../jheem_analyses/EHE/ehe_base_parameters.R')
-    
-    source('../jheem_analyses/EHE/ehe_specification_helpers.R')
-    
-    source('../jheem2/R/VERSIONS_version_manager.R')
-    
-    source('../jheem2/R/ONTOLOGY_ontology_mappings.R')
-    Rcpp::sourceCpp('../jheem2/src/ontology_mappings.cpp')
-    
-    source('../jheem2/R/JHEEM_entity.R')
-    source('../jheem2/R/JHEEM_engine.R')
-    source('../jheem2/R/SPECIFICATION_specification_info.R')
-    
-    Rcpp::sourceCpp('../jheem2/src/misc_helpers.cpp')
-}
+# Source supporting files
 
+# These supporting files are hold-overs from the previous version, and will eventually need to be replaced
+source('../jheem_analyses/data_managers/census_manager.R')
+source('../jheem_analyses/data_managers/prep_manager_2.R')
+source('../jheem_analyses/data_managers/continuum_manager_3.R')
+source('../jheem_analyses/data_managers/idu_manager.R')
+source('../jheem_analyses/data_managers/locale_mappings.R')
+source('../jheem_analyses/data_managers/hiv_surveillance_manager.R')
+source('../jheem_analyses/data_managers/mortality_manager.R')
+source('../jheem_analyses/data_managers/natality_manager.R')
+source('../jheem_analyses/data_managers/pairing_manager.R')
 
-EHE.SPECIFICATION = create.jheem.specification('ehe',
+# These are the real supporting files that will be in the final version
+source('../jheem_analyses/EHE/ehe_base_parameters.R')
+source('../jheem_analyses/EHE/ehe_specification_helpers.R')
+    
+    
+
+EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
                                                iteration = 1,
                                                description = "The initial JHEEM version, set up to address achieving EHE goals",
                                                
@@ -1353,4 +1362,10 @@ register.model.specification(EHE.SPECIFICATION)
 
 # Test code to get the Engine up and built
 engine = create.jheem.engine(location = '12580', version='ehe')
+start1 = Sys.time()
 crunch.jheem.engine(engine, 1970, 2020)
+end1 = Sys.time()
+
+d1 = as.numeric(end1)-as.numeric(start1)
+d2 = as.numeric(end2)-as.numeric(start2)
+d1/d2
