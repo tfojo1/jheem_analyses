@@ -1362,10 +1362,3 @@ register.model.specification(EHE.SPECIFICATION)
 
 # Test code to get the Engine up and built
 engine = create.jheem.engine(location = '12580', version='ehe')
-start1 = Sys.time()
-crunch.jheem.engine(engine, 1970, 2020)
-end1 = Sys.time()
-
-d1 = as.numeric(end1)-as.numeric(start1)
-d2 = as.numeric(end2)-as.numeric(start2)
-d1/d2
