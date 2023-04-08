@@ -6,6 +6,7 @@ source('../jheem2/R/HELPERS_dim_names_helpers.R')
 source('../jheem2/R/HELPERS_array_helpers.R')
 Rcpp::sourceCpp('../jheem2/src/array_helpers.cpp')
 
+source('../jheem2/R/ONTOLOGY_ontology.R')
 source('../jheem2/R/ONTOLOGY_ontology_mappings.R')
 
 source('../jheem2/R/SPECIFICATION_scales.R')
@@ -121,7 +122,7 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'oral.prep.msm.rr',
                        scale = 'ratio',
-                       functional.form = create.static.functional.form(value=BASE_PARAMETER_VALUES['prep.rr.msm'],
+                       functional.form = create.static.functional.form(value=EHE_BASE_PARAMETER_VALUES['prep.rr.msm'],
                                                                        link='log')
 )
 
@@ -129,14 +130,14 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'oral.prep.heterosexual.rr',
                        scale = 'ratio',
-                       functional.form = create.static.functional.form(value=BASE_PARAMETER_VALUES['prep.rr.heterosexual'],
+                       functional.form = create.static.functional.form(value=EHE_BASE_PARAMETER_VALUES['prep.rr.heterosexual'],
                                                                        link='log')
 )
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'oral.prep.idu.rr',
                        scale = 'ratio',
-                       functional.form = create.static.functional.form(value=BASE_PARAMETER_VALUES['prep.rr.idu'],
+                       functional.form = create.static.functional.form(value=EHE_BASE_PARAMETER_VALUES['prep.rr.idu'],
                                                                        link='log')
 )
 
@@ -159,7 +160,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'oral.prep.persistence',
                        scale = 'proportion',
-                       value = BASE_PARAMETER_VALUES['prep.persistence'])
+                       value = EHE_BASE_PARAMETER_VALUES['prep.persistence'])
 
 ##-- LAI PrEP --##
 register.model.element(EHE.SPECIFICATION, 
@@ -324,7 +325,7 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name='needle.exchange.rr',
                        scale = 'ratio',
-                       value = BASE_PARAMETER_VALUES['needle.exchange.rr'])
+                       value = EHE_BASE_PARAMETER_VALUES['needle.exchange.rr'])
 
 
 ##----------------------##
@@ -344,7 +345,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'acute.transmissibility.rr',
-                       value = BASE_PARAMETER_VALUES['acute.transmissibility.rr'],
+                       value = EHE_BASE_PARAMETER_VALUES['acute.transmissibility.rr'],
                        scale = 'ratio')
 
 #-- IDU Transmissibility --#
@@ -364,7 +365,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'diagnosed.needle.sharing.rr',
                        scale = 'ratio',
-                       value = BASE_PARAMETER_VALUES['diagnosed.needle.sharing.rr'])
+                       value = EHE_BASE_PARAMETER_VALUES['diagnosed.needle.sharing.rr'])
 
 
 #-- Sexual Transmissibility --#
@@ -385,13 +386,13 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'diagnosed.sexual.transmission.rr',
                        scale = 'ratio',
-                       value = as.numeric(BASE_PARAMETER_VALUES['diagnosed.msm.condomless.rr']))
+                       value = as.numeric(EHE_BASE_PARAMETER_VALUES['diagnosed.msm.condomless.rr']))
 #register.model.element(EHE.SPECIFICATION,
 #                                                name = 'diagnosed.sexual.transmission.rr',
 #                                                scale = 'ratio',
-#                                                model = create.static.model(value = array(c(heterosexual_male = as.numeric(BASE_PARAMETER_VALUES['diagnosed.het.male.condomless.rr']),
-#                                                                                            msm = as.numeric(BASE_PARAMETER_VALUES['diagnosed.msm.condomless.rr']),
-#                                                                                            female = as.numeric(BASE_PARAMETER_VALUES['diagnosed.female.condomless.rr'])),
+#                                                model = create.static.model(value = array(c(heterosexual_male = as.numeric(EHE_BASE_PARAMETER_VALUES['diagnosed.het.male.condomless.rr']),
+#                                                                                            msm = as.numeric(EHE_BASE_PARAMETER_VALUES['diagnosed.msm.condomless.rr']),
+#                                                                                            female = as.numeric(EHE_BASE_PARAMETER_VALUES['diagnosed.female.condomless.rr'])),
 #                                                                                          dim=c(sex=3), dimnames=list(sex=c('heterosexual_male','msm','female')) ),
 #                                                                            scale = 'log'))
 
@@ -474,7 +475,7 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'needle.exchange.remission.rate.ratio',
                        scale = 'ratio',
-                       value = BASE_PARAMETER_VALUES['needle.exchange.remission.rate.ratio'])
+                       value = EHE_BASE_PARAMETER_VALUES['needle.exchange.remission.rate.ratio'])
 
 
 ##-------------------##
@@ -489,10 +490,10 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'unsuppressed.hiv.mortality.rate',
                        scale = 'rate',
-                       functional.form = create.logistic.spline.functional.form(knot.values = list(time0=1,
-                                                                                                   time1=1), #placeholder
-                                                                                knot.times = c(time0=2000,
-                                                                                               time1=2010),
+                       functional.form = create.logistic.spline.functional.form(knot.values = list(rate0=1,
+                                                                                                   rate2=1), #placeholder
+                                                                                knot.times = c(rate0=2000,
+                                                                                               rate2=2010),
                                                                                 fraction.of.asymptote.after.end=0.025,
                                                                                 fraction.of.asymptote.before.start=0.025,
                                                                                 fraction.of.asymptote.for.change.dir=0.02,
@@ -519,7 +520,7 @@ register.transition(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'acute.hiv.duration',
                        scale = 'time',
-                       value = BASE_PARAMETER_VALUES['acute.infection.duration'])
+                       value = EHE_BASE_PARAMETER_VALUES['acute.infection.duration'])
 
 ##-----------------------##
 ##-- BIRTH PROPORTIONS --##
@@ -592,16 +593,16 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'hiv.positive.aging.rates',
                        get.functional.form.function = function(location, specification.info){
                            rates = get.default.aging.rates(location, specification.info)
-                           create.natural.spline.functional.form(knot.times=c(time.pre.spike=1980, 
-                                                                              time0=2000, 
-                                                                              time1=2010, 
-                                                                              time2=2020, 
-                                                                              time3=2030),
-                                                                 knot.values=list(time.pre.spike=rates,
-                                                                                  time0=rates,
-                                                                                  time1=rates,
-                                                                                  time2=rates,
-                                                                                  time3=rates),
+                           create.natural.spline.functional.form(knot.times=c(rate.pre.spike=1980, 
+                                                                              rate0=2000, 
+                                                                              rate1=2010, 
+                                                                              rate2=2020, 
+                                                                              rate3=2030),
+                                                                 knot.values=list(rate.pre.spike=rates,
+                                                                                  rate0=rates,
+                                                                                  rate1=rates,
+                                                                                  rate2=rates,
+                                                                                  rate3=rates),
                                                                  overwrite.knot.values.with.alphas = T
                            )
                        },
@@ -641,7 +642,7 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.mortality.rate',
-                       value = BASE_PARAMETER_VALUES['idu.mortality'],
+                       value = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
                        scale = 'rate')
 
 
@@ -1119,7 +1120,7 @@ register.model.element.values(EHE.SPECIFICATION,
                               scale = 'ratio',
                               never.idu.sexual.oe = 1,
                               idu.sexual.oe = 1,
-                              oe.never.idu.pairings.with.idu = BASE_PARAMETER_VALUES['oe.never.idu.pairings.with.idu'])
+                              oe.never.idu.pairings.with.idu = EHE_BASE_PARAMETER_VALUES['oe.never.idu.pairings.with.idu'])
 
 #-------------------------------#
 #-- Sexual Transmission Rates --#
@@ -1325,7 +1326,6 @@ register.model.element(EHE.SPECIFICATION,
                                                                                after.modifier = 1,
                                                                                after.modifier.application = 'additive.on.link.scale',
                                                                                
-                                                                               overwrite.knot.values.with.alphas = T,
                                                                                overwrite.after.modifier.with.alphas = T
                        ),
                        functional.form.from.time = 2000,
@@ -1343,8 +1343,7 @@ register.model.element(EHE.SPECIFICATION,
                                                                                                  peak.start=1,
                                                                                                  peak.end=1,
                                                                                                  post.peak=1),
-                                                                              link = 'identity',
-                                                                              overwrite.knot.values.with.alphas = T),
+                                                                              link = 'log'),
                        functional.form.from.time = 1970,
                        functional.form.to.time = TRATE.KNOT.TIMES[1]
 )
@@ -1360,5 +1359,3 @@ register.model.specification(EHE.SPECIFICATION)
 
 
 
-# Test code to get the Engine up and built
-engine = create.jheem.engine(location = '12580', version='ehe')

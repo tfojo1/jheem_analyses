@@ -330,7 +330,7 @@ get.surveillance.data.rate <- function(surv,
     {
         if (race)
         {
-            mapping = get.ontology.mapping(from.dim.names = dimnames(denominators)['race'], to.dim.names = dimnames(numerators)['race'])
+            mapping = get.ontology.mapping(from.ontology = dimnames(denominators)['race'], to.ontology = dimnames(numerators)['race'])
             denominators = mapping$apply(denominators)
 #            denominators = collapse.races(denominators, races=dimnames(numerators)$race)
         }
