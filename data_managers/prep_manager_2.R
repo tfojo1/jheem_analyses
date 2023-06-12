@@ -946,6 +946,8 @@ make.prep.model.logistic.tail <- function(specification.info,
                                          anchor.year = anchor.year,
                                          min = min.proportion,
                                          max = max.proportion, 
+                                         intercept.link = 'logistic',
+                                         slope.link = 'logistic',
                                          parameters.are.on.transformed.scale = T,
                                          #  log.ors = log.or.vector, 
                                          logistic.after.frac.of.span = logistic.after.frac.of.p.span)

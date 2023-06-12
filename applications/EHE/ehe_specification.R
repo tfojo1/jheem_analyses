@@ -494,6 +494,7 @@ register.model.element(EHE.SPECIFICATION,
                                                                                                    rate2=1), #placeholder
                                                                                 knot.times = c(rate0=2000,
                                                                                                rate2=2010),
+                                                                                knot.link = 'identity',
                                                                                 fraction.of.asymptote.after.end=0.025,
                                                                                 fraction.of.asymptote.before.start=0.025,
                                                                                 fraction.of.asymptote.for.change.dir=0.02,
@@ -603,6 +604,8 @@ register.model.element(EHE.SPECIFICATION,
                                                                                   rate1=rates,
                                                                                   rate2=rates,
                                                                                   rate3=rates),
+                                                                 knot.link = 'identity',
+                                                                 min = 0,
                                                                  overwrite.knot.values.with.alphas = T
                            )
                        },
@@ -1165,8 +1168,8 @@ register.model.element(EHE.SPECIFICATION,
                                                                                link = 'log',
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
-                                                                               after.modifier.application = 'additive.on.link.scale',
-                                                                               overwrite.after.modifier.with.alphas = T
+                                                                               modifiers.apply.to.change = T,
+                                                                               overwrite.modifiers.with.alphas = T
                        ),
                        functional.form.from.time = 2000,
                        ramp.times = c(1960, 1970, 1980, 1990),
@@ -1183,8 +1186,9 @@ register.model.element(EHE.SPECIFICATION,
                                                                                link = 'log',
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
-                                                                               after.modifier.application = 'additive.on.link.scale',
-                                                                               overwrite.after.modifier.with.alphas = T
+                                                                               modifiers.apply.to.change = T,
+                                                                            #   after.modifier.application = 'additive.on.link.scale',
+                                                                               overwrite.modifiers.with.alphas = T
                        ),
                        functional.form.from.time = 2000,
                        ramp.times = c(1970, 1980, 1990),
@@ -1324,9 +1328,9 @@ register.model.element(EHE.SPECIFICATION,
                                                                                
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
-                                                                               after.modifier.application = 'additive.on.link.scale',
-                                                                               
-                                                                               overwrite.after.modifier.with.alphas = T
+                                                                               modifiers.apply.to.change = T,
+                                                                             #  after.modifier.application = 'multiplicative.of.change.on.value.scale',
+                                                                               overwrite.modifiers.with.alphas = T
                        ),
                        functional.form.from.time = 2000,
                        ramp.times = c(1970, 1980, 1990),
@@ -1343,7 +1347,9 @@ register.model.element(EHE.SPECIFICATION,
                                                                                                  peak.start=1,
                                                                                                  peak.end=1,
                                                                                                  post.peak=1),
-                                                                              link = 'log'),
+                                                                              link = 'identity',
+                                                                              knot.link = 'log'
+                                                                              ),
                        functional.form.from.time = 1970,
                        functional.form.to.time = TRATE.KNOT.TIMES[1]
 )

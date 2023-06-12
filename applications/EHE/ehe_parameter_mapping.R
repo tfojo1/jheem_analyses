@@ -45,7 +45,8 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
     
     
     jheem.engine$set.element.ramp.values(element.name = 'testing',
-                                         values = parameters['testing.ramp.up.vs.current.rr'],
+                                         values = parameters['testing.ramp.up.vs.current.rr'] * c(TESTING.FIRST.YEAR.FRACTION.OF.RAMP,1),
+                                         indices = 2:3,
                                          check.consistency = check.consistency)
     
     if (check.consistency)
@@ -53,10 +54,20 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
     
     #-- PrEP --#
     
-    # parameters for PrEP x age and race
+    # parameters for PrEP x age and race - are used for both interecept and slope
     used.names = set.element.functional.form.alphas.from.parameters(jheem.engine = jheem.engine,
                                                                     element.name = 'oral.prep',
                                                                     alpha.name = 'intercept',
+                                                                    parameters = parameters,
+                                                                    parameter.name.prefix = '',
+                                                                    parameter.name.suffix = '.prep.or',
+                                                                    dimensions.with.values.referred.to.by.name = 'race',
+                                                                    dimensions.with.values.referred.to.by.index = 'age',
+                                                                    check.consistency = check.consistency)
+    
+    used.names = set.element.functional.form.alphas.from.parameters(jheem.engine = jheem.engine,
+                                                                    element.name = 'oral.prep',
+                                                                    alpha.name = 'slope',
                                                                     parameters = parameters,
                                                                     parameter.name.prefix = '',
                                                                     parameter.name.suffix = '.prep.or',
@@ -73,6 +84,7 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
     non.idu.states = setdiff(specification.info$dim.names$risk, idu.states)
     names(non.idu.states) = rep("risk", length(non.idu.states))
     
+    
     # Intercepts (only for msm vs non-msm)
     jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep',
                                                                 alpha.name = 'intercept',
@@ -86,11 +98,12 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
                                                                 applies.to.dimension.values = c('heterosexual_male','female'),
                                                                 dimensions = 'sex',
                                                                 check.consistency = check.consistency)
+    
 
     # Slopes x3 - msm slope applies to all msm regardless of IDU status (a main effect)
     #             wherease heterosexual and idu slopes are an interaction between sex and risk
     jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep',
-                                                                alpha.name = 'intercept',
+                                                                alpha.name = 'slope',
                                                                 values = parameters['msm.prep.slope.or'],
                                                                 applies.to.dimension.values = 'msm',
                                                                 dimensions = 'sex',
@@ -278,8 +291,8 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
                                                                 check.consistency = check.consistency)
     
     jheem.engine$set.element.ramp.values(element.name = 'unsuppressed.hiv.mortality.rate',
-                                         values = rep(parameters['peak.hiv.mortality'], 2),
-                                         indices = c('peak.start','peak.end'),
+                                         values = c(parameters['hiv.mortality.0'], rep(parameters['peak.hiv.mortality'], 2)),
+                                         indices = c('pre.peak', 'peak.start', 'peak.end'),
                                          check.consistency = check.consistency)
     
     if (check.consistency)
@@ -581,7 +594,8 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
         jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                     alpha.name = alpha.name,
                                                                     value = parameters['msm.age1.aging.base'],
-                                                                    applies.to.dimension.values=list(sex='msm', age=1),
+                                                                    applies.to.dimension.values=list(sex='msm', age=1, risk = non.idu.states),
+                                                           #         applies.to.dimension.values=list(sex='msm', age=1),
                                                                     check.consistency = check.consistency)
         
         jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
@@ -593,7 +607,8 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
         jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                     alpha.name = alpha.name,
                                                                     value = parameters['idu.age1.aging.base'],
-                                                                    applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=idu.states),
+                                                                    applies.to.dimension.values=list(age=1, risk=idu.states),
+                                                               #     applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=idu.states),
                                                                     check.consistency = check.consistency)
         
         if (check.consistency)
@@ -612,7 +627,8 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
                 jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
-                                                                            applies.to.dimension.values=list(sex='msm', age=age.index),
+                                                                            applies.to.dimension.values=list(sex='msm', age=age.index, risk=non.idu.states),
+                                                                    #        applies.to.dimension.values=list(sex='msm', age=age.index),
                                                                             check.consistency = check.consistency)
                 
                 if (check.consistency)
@@ -628,7 +644,7 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
                 jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
-                                                                            applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=non.idu.states),
+                                                                            applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=age.index, risk=non.idu.states),
                                                                             check.consistency = check.consistency)
                 
                 if (check.consistency)
@@ -643,7 +659,8 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
                 jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
-                                                                            applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=idu.states),
+                                                                            applies.to.dimension.values=list(age=age.index, risk=idu.states),
+                                                                       #     applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=age.index, risk=idu.states),
                                                                             check.consistency = check.consistency)
                 
                 if (check.consistency)

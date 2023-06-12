@@ -87,8 +87,7 @@ get.incident.idu.model <- function(idu.manager,
                                               link='log',
                                               after.modifier = .025 / (1-.05-.025),
                                               before.modifier = .05 / (1-.05-.025),
-                                              after.modifier.application = 'multiplicative.of.change.on.value.scale',
-                                              before.modifier.application = 'multiplicative.of.change.on.value.scale')
+                                              modifiers.apply.to.change = T)
     }
 }
 
@@ -119,8 +118,7 @@ get.idu.remission.model <- function(idu.manager,
                                               link='log',
                                               after.modifier = .025 / (1-.05-.025),
                                               before.modifier = .05 / (1-.05-.025),
-                                              after.modifier.application = 'multiplicative.of.change.on.value.scale',
-                                              before.modifier.application = 'multiplicative.of.change.on.value.scale')
+                                              modifiers.apply.to.change = T)
     }
 }
 
@@ -150,8 +148,7 @@ get.idu.relapse.model <- function(idu.manager,
                                               link='log',
                                               after.modifier = .025 / (1-.05-.025),
                                               before.modifier = .05 / (1-.05-.025),
-                                              after.modifier.application = 'multiplicative.of.change.on.value.scale',
-                                              before.modifier.application = 'multiplicative.of.change.on.value.scale')
+                                              modifiers.apply.to.change = T)
     }
 }
 

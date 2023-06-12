@@ -1,4 +1,11 @@
 
+# This code depends on
+# commoncode/age_smoothers.R
+
+##--------------------##
+##-- Some Constants --##
+##--------------------##
+
 DEFAULT.POPULATION.YEARS = 2007
 
 TRATE.KNOT.TIMES = c(rate0=2000, rate1=2010, rate2=2020)
@@ -68,8 +75,10 @@ get.best.guess.msm.proportions.by.race <- function(fips,
                             aggregate.races = F,
                             aggregate.sexes = T)
     
-    males = CENSUS.BHO.RACE.MAPPING$apply(males)
-
+    to.dim.names = dimnames(males)
+    to.dim.names$race = names(msm.proportions.by.race)
+    males = CENSUS.BHO.RACE.MAPPING$apply(males, to.dim.names = to.dim.names)
+    
     iterated.msm.proportions.by.race = rep(msm.proportions.by.race, each=prod(dim(males))/dim(males)['race'])
     numerators = props * iterated.msm.proportions.by.race * males *
         rowSums(males) / rowSums(males * iterated.msm.proportions.by.race) 
@@ -247,6 +256,36 @@ get.seed.rate.per.stratum <- function(location, specification.info, population.y
     }
     
     min.prevalence
+}
+
+#-----------------#
+#-- Aging Rates --#
+#-----------------#
+
+#assumes that the n in each age = m*a + b
+# if we set a=0 for the last age in the two brackets, then
+# -35*m + 5*b = n.first.5
+#    and
+# -10*m + 5*b = n.second.5 ( = (-4*m + b) + (-3*m + b) + (-2*m + b) + (-1*m + b) + (0*m + b) )s
+get.aging.rate.last.of.10 <- function(n.first.5, n.second.5)
+{
+    m = (n.second.5 - n.first.5) / 25
+    b = (n.second.5 + 10*m) / 5
+    
+    b / (n.first.5 + n.second.5)
+}
+
+#assumes that the n in each age = m*a + b
+# if we set a=0 for the last of the first 10 age brackets, then
+# -45*m + 10*b = n.first.10
+#    and
+# 55*m + 10*b = n.second.10
+get.aging.rate.mid.of.20 <- function(n.first.10, n.second.10)
+{
+    m = (n.second.10 - n.first.10) / 100
+    b = (n.first.10 + 45*m) / 10
+    
+    b / n.first.10
 }
 
 
