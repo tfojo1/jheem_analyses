@@ -27,7 +27,6 @@ data.manager$register.ontology(
     race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Mutiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
-    #outcome= c('HIV diagnoses', 'HIV deaths', 'HIV prevalence', 'Linkage to HIV care', 'Receipt of HIV medical care', 'HIV viral suppression', 'Knowledge of Status') 
     ))
 
 
@@ -71,7 +70,6 @@ data.list.clean = lapply(data.list, function(data){
   # This introduces NAs for the other outcomes, but we remove that data anyways
   
   data$outcome = outcome.mappings[data$Indicator]
-  #names(data)[names(data)=='Indicator'] = 'outcome' #this is renaming the indicator col to outcome which is redundant to first line#
   data = data[!is.na(data$outcome),]
   
   names(data)[names(data)=='Year'] = 'year'   
@@ -118,7 +116,7 @@ data.list.clean = lapply(data.list, function(data){
     data = data,
     ontology.name = 'cdc',
     source = 'cdc',
-    dimension.values = list(),                        #Update this section- Do I need to add more here? This is optional- more info i tutorial for arrays#
+    dimension.values = list(),                        #optional#
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Reporting')                                                  #Methodology footnotes here if there is substantial change#
   
@@ -126,9 +124,7 @@ data.list.clean = lapply(data.list, function(data){
  locations = union(locations, unlist(unique(data['location'])))                 #Question: How is this section used?#
  years = union(years, unlist(unique(data['year'])))
 
- data    #will return whatever data is, expression or name of var, etc.#
- 
-} )
+
 
 ################################################################################
 ###MSA Level Data###
