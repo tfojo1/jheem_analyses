@@ -15,7 +15,9 @@ DATA.DIR.PREVALENCE="../../data_raw/prevalence"
 DATA.DIR.SLE="../../data_raw/sle"
 DATA.DIR.KNOWLEDGE="../../data_raw/knowledge"
 
+##Should I put everything in one folder or have it organized like it is now?##
 
+#---HIV Diagnoses---#
 diagnoses_files <- Sys.glob(paste0(DATA.DIR.DIAGNOSES, '/*.csv'))
 #creating a list with sublists of filename, data#
 data.list.diagnoses <- lapply(diagnoses_files, function(x){
@@ -23,16 +25,31 @@ data.list.diagnoses <- lapply(diagnoses_files, function(x){
   list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
   })
 
-
+#---HIV Deaths---#
 deaths_files <- Sys.glob(paste0(DATA.DIR.DEATHS, '/*.csv'))
-data.list.deaths <- lapply(deaths_files, read.csv, skip=10, header=TRUE)
+data.list.deaths <- lapply(deaths_files, function(x){
+  skip=10
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+})
 
+#---HIV Prevalence---#
 prevalence_files <- Sys.glob(paste0(DATA.DIR.PREVALENCE, '/*.csv'))
-data.list.prevalence <- lapply(prevalence_files, read.csv, skip=10, header=TRUE)
+data.list.prevalence <- lapply(prevalence_files, function(x){
+  skip=10
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+})
 
+#---Suppression, Linkage, Receipt of Care---#
 sle_files <- Sys.glob(paste0(DATA.DIR.SLE, '/*.csv'))
-data.list.sle <- lapply(sle_files, read.csv, skip=11, header=TRUE)
+data.list.sle <- lapply(sle_files, function(x){
+  skip=11
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+})
 
+#---Linkage to Care---#
 knowledge_files <- Sys.glob(paste0(DATA.DIR.KNOWLEDGE, '/*.csv'))
-data.list.knowledge <- lapply(knowledge_files, read.csv, skip=10, header=TRUE)
+data.list.knowledge <- lapply(knowledge_files, function(x){
+  skip=10
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+})
 
