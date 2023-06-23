@@ -91,7 +91,8 @@ outcome.mappings = c('HIV diagnoses'='diagnoses',
                      'HIV prevalence' = 'prevalence',
                      'Linkage to HIV care' = 'linkage',
                      'Receipt of HIV medical care' = 'care',
-                     'HIV viral suppression' = 'suppression')
+                     'HIV viral suppression' = 'suppression',
+                     'Knowledge of Status' = 'knowledge')
 
 
 risk.mappings = c('Heterosexual contact' = 'heterosexual',
@@ -202,9 +203,10 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
   
   if(grepl("state", filename)) {
     names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
     data$location = state.abb[data$state]                                         
-    data$location[data$state %in% c("District of Columbia")] = "DC"
+    data$location[data$location %in% c("District of Columbia")] = "DC"
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
