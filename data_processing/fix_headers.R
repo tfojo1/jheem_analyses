@@ -17,7 +17,12 @@ DATA.DIR.KNOWLEDGE="../../data_raw/knowledge"
 
 
 diagnoses_files <- Sys.glob(paste0(DATA.DIR.DIAGNOSES, '/*.csv'))
-data.list.diagnoses <- lapply(diagnoses_files, read.csv, skip=8, header=TRUE)
+#creating a list with sublists of filename, data#
+data.list.diagnoses <- lapply(diagnoses_files, function(x){
+  skip=8
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+  })
+
 
 deaths_files <- Sys.glob(paste0(DATA.DIR.DEATHS, '/*.csv'))
 data.list.deaths <- lapply(deaths_files, read.csv, skip=10, header=TRUE)

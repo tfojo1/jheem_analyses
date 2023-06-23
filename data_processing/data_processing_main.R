@@ -115,37 +115,73 @@ years = c()
 
 ### "Clean" data from Atlas Plus###
 
-data.list.clean = lapply(data.list.diagnoses, function(data){
+data.list.clean = lapply(data.list.diagnoses, function(file){
   
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  #Universal Cleaning#
   data$outcome = outcome.mappings[data$Indicator]
   data = data[!is.na(data$outcome),]
   
   names(data)[names(data)=='Year'] = 'year'   
   data$year = substring(data$year,1, 4)                                          
   data$year = as.character(data$year)
- 
-  names(state.abb) <- state.name 
-  names(data)[names(data)=='Geography'] = 'state'
-  data$location = state.abb[data$state]                                         
-  data$location[data$state %in% c("District of Columbia")] = "DC"
   
-  data$age = age.mappings[data$Age.Group]
+  data$Cases[data$Cases %in% c("Data suppressed")] = NA    
+  data$Cases[data$Cases %in% c("Data not available")] = NA  
+  data$value = as.numeric(gsub(",", '', data$Cases))   
   
-  names(data)[names(data)=='Race.Ethnicity'] = 'race'
+  #Location conditionals#
   
-  names(data)[names(data)=='Sex'] = 'sex'
-  data$sex = tolower(data$sex)
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name 
+    names(data)[names(data)=='Geography'] = 'state'
+    data$location = state.abb[data$state]                                         
+    data$location[data$state %in% c("District of Columbia")] = "DC"
+  }
+  if(grepl("ehe", filename)) {
+    data$location = data$County
+  }
+  if(grepl("msa", filename)) {
+    data$location = data$Geography
+  }
   
-  data$risk = risk.mappings[data$Transmission.Category]
+  # Add this back once you have county data saved#
+  #  if(grepl("county", filename)) {
+  #    #data$age = age.mappings[data$Age.Group]
+  #  }
+  #  
   
-  data$Cases[data$Cases %in% c("Data suppressed")] = NA                          
-  data$value = as.numeric(gsub(",", '', data$Cases))     
+  ##Demographic conditionals##
+  
+  if(grepl("age", filename)) {
+    data$age = age.mappings[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    names(data)[names(data)=='Race.Ethnicity'] = 'race'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("male", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("female", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("risk", filename)) {
+    data$risk = risk.mappings[data$Transmission.Category]
+  }
   
   
-  data 
+  
+  list(filename, data) #what to return#
   
 } )
-  
 
 ################################################################################
 
