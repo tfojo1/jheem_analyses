@@ -7,14 +7,60 @@ library(tidyverse)
 ###Initialize data manager (surveillance manager) and establish ontology###
 
 data.manager = create.data.manager('test', description='a data manager to test with')
+
 data.manager$register.outcome(
-  'new',
+  'diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'New Diagnoses',
     axis.name = 'New Diagnoses (n)',
     units = 'cases',
     description = "New HIV Cases Diagnosed in a Year"))
+
+data.manager$register.outcome(
+'deaths',
+metadata = create.outcome.metadata(
+  scale = 'non.negative.number',
+  display.name = 'Deaths',
+  axis.name = 'Deaths (n)',
+  units = 'cases',
+  description = "HIV Deaths"))
+
+data.manager$register.outcome(
+  'prevalence',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Prevalence',
+    axis.name = 'Prevalence (n)',
+    units = 'cases',
+    description = "HIV Prevalence"))
+
+data.manager$register.outcome(
+  'linkage',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Linkage',
+    axis.name = 'Linkage (n)',
+    units = 'cases',
+    description = "Linkage to HIV care"))
+
+data.manager$register.outcome(
+  'care',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Care',
+    axis.name = 'Care (n)',
+    units = 'cases',
+    description = "Receipt of HIV medical care"))
+
+data.manager$register.outcome(
+  'suppression',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Suppression',
+    axis.name = 'Suppression (n)',
+    units = 'cases',
+    description = "HIV Viral suppression"))
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
 
@@ -31,25 +77,21 @@ data.manager$register.ontology(
 
 
 ################################################################################
-###State Level Data###
 
-DATA.DIR.STATE.DIAGNOSES="../../data_raw/state/diagnoses"
-DATA.DIR.STATE.DEATHSPREVALENCE="../../data_raw/state/deaths_prevalence"
-DATA.DIR.STATE.SLE="../../data_raw/state/sle"
-DATA.DIR.STATE.KNOWLEDGE="../../data_raw/state/knowledge"
+###Source in File that reads .csvs and removes headers###
 
+source('data_processing/fix_headers.R')
 
-atlas_state_files <- Sys.glob(paste0(DATA.DIR.STATE.DIAGNOSES, '/*.csv'))
+###############################################################################
 
-data.list <- lapply(atlas_state_files, read.csv, skip=8, header=TRUE)
+###Define the 'mappings' for Atlas plus data###
 
-
-
-
-
-###Define and apply the 'mappings'###
-
-outcome.mappings = c('HIV diagnoses'='new') #Removing this bc ontology should match what is in CDC said Todd
+outcome.mappings = c('HIV diagnoses'='diagnoses',
+                     'HIV deaths' = 'deaths',
+                     'HIV prevalence' = 'prevalence',
+                     'Linkage to HIV care' = 'linkage',
+                     'Receipt of HIV medical care' = 'care',
+                     'HIV viral suppression' = 'suppression')
 
 
 risk.mappings = c('Heterosexual contact' = 'heterosexual',
@@ -58,16 +100,22 @@ risk.mappings = c('Heterosexual contact' = 'heterosexual',
                   'Male-to-male sexual contact' = 'msm',
                   'Male-to-male sexual contact and injection drug use' = 'msm_idu')
 
+age.mappings = c('13-24' = '12-24 years',
+                  '25-34' = '25-34 years',
+                  '35-44' = '35-44 years',
+                  '45-54' = '45-54 years',
+                  '55+' = '55+ years')
+
 
 #record possible values for the incomplete dimensions, year and location
 locations = c()
 years = c()
 
+################################################################################
+
 ### "Clean" data from Atlas Plus###
 
-data.list.clean = lapply(data.list, function(data){
-  
-  # This introduces NAs for the other outcomes, but we remove that data anyways
+data.list.clean = lapply(data.list.diagnoses, function(data){
   
   data$outcome = outcome.mappings[data$Indicator]
   data = data[!is.na(data$outcome),]
@@ -79,36 +127,27 @@ data.list.clean = lapply(data.list, function(data){
   names(state.abb) <- state.name 
   names(data)[names(data)=='Geography'] = 'state'
   data$location = state.abb[data$state]                                         
-  
   data$location[data$state %in% c("District of Columbia")] = "DC"
   
- # names(data)[names(data)=='Sex'] = 'sex'
-# data$sex = tolower(data$sex)
+  data$age = age.mappings[data$Age.Group]
   
- # data$risk = risk.mappings[data$Transmission.Category]                         
-        
-  names(data)[names(data)=='Race.Ethnicity'] = 'race.ethnicity'
- data$race.ethnicity = tolower(data$race.ethnicity)
+  names(data)[names(data)=='Race.Ethnicity'] = 'race'
   
-  # MIGHT NEED TO CONVERT SOME TO NA
+  names(data)[names(data)=='Sex'] = 'sex'
+  data$sex = tolower(data$sex)
+  
+  data$risk = risk.mappings[data$Transmission.Category]
+  
   data$Cases[data$Cases %in% c("Data suppressed")] = NA                          
   data$value = as.numeric(gsub(",", '', data$Cases))     
   
-  #Check how this should be coded#
-  data$rate = (data$Rate.per.100000)
-  data$rate[data$Rate.per.100000 %in% c("Data not available")] = NA       
-
-  
-  #Check out this should be coded#
-  data$Population[data$Population %in% c("NA")] = NA                             
-  data$population = as.numeric(gsub(",", '', data$Population)) 
   
   data 
   
 } )
   
 
-
+################################################################################
 
 ###Put in data manager### 
 
@@ -126,47 +165,9 @@ data.list.clean = lapply(data.list, function(data){
 
 
 
-################################################################################
-###MSA Level Data###
-
-DATA.DIR.MSA.DEATHSPREVALENCE="../../data_raw/major_msa/deaths_prevalence"
-DATA.DIR.MSA.DIGANOSES="../../data_raw/major_msa/diagnoses"
-
-atlas_msa_files_deaths_prevalence <- Sys.glob(paste0(DATA.DIR.MSA.DEATHSPREVALENCE, '/*.csv'))
-data.list.one <- lapply(atlas_msa_files_deaths_prevalence, read.csv, skip=10, header=TRUE)
-
-atlas_msa_files_diagnoses <- Sys.glob(paste0(DATA.DIR.MSA.DIGANOSES, '/*.csv'))
-data.list.two <- lapply(atlas_msa_files_diagnoses, read.csv, skip=8, header=TRUE)
-
 
 
 ################################################################################
-
-################################################################################
-###EHE County Level Data###
-
-DATA.DIR="../../data_raw"
-DATA.DIR.STATE="../../data_raw/state/diagnoses"
-
-atlas_state_files <- Sys.glob(paste0(DATA.DIR.STATE, '/*.csv'))
-
-data.list <- lapply(atlas_state_files, read.csv, skip=8, header=TRUE)
-
-################################################################################
-
-################################################################################
-###All County Level Data###
-
-DATA.DIR="../../data_raw"
-DATA.DIR.STATE="../../data_raw/state/diagnoses"
-
-atlas_state_files <- Sys.glob(paste0(DATA.DIR.STATE, '/*.csv'))
-
-data.list <- lapply(atlas_state_files, read.csv, skip=8, header=TRUE)
-
-################################################################################
-
-
 ###Save surveillance manager####
   
   surveilance.manager= data.manager #Add this here so you don't have to change data.manager throughout entire code#
