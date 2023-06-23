@@ -136,9 +136,10 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
   
   if(grepl("state", filename)) {
     names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
     data$location = state.abb[data$state]                                         
-    data$location[data$state %in% c("District of Columbia")] = "DC"
+    data$location[data$location %in% c("District of Columbia")] = "DC"
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
@@ -264,9 +265,10 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
   
   if(grepl("state", filename)) {
     names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
     data$location = state.abb[data$state]                                         
-    data$location[data$state %in% c("District of Columbia")] = "DC"
+    data$location[data$location %in% c("District of Columbia")] = "DC"
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
@@ -327,9 +329,10 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   
   if(grepl("state", filename)) {
     names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
     data$location = state.abb[data$state]                                         
-    data$location[data$state %in% c("District of Columbia")] = "DC"
+    data$location[data$location %in% c("District of Columbia")] = "DC"
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
@@ -372,7 +375,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
 
 #---Clean Knowledge---#
 
-data.list.clean.Knowledge = lapply(data.list.Knowledge, function(file){
+data.list.clean.Knowledge = lapply(data.list.knowledge, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
@@ -391,9 +394,10 @@ data.list.clean.Knowledge = lapply(data.list.Knowledge, function(file){
   
   if(grepl("state", filename)) {
     names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
     data$location = state.abb[data$state]                                         
-    data$location[data$state %in% c("District of Columbia")] = "DC"
+    data$location[data$location %in% c("District of Columbia")] = "DC"
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
