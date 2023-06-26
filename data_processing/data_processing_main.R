@@ -542,8 +542,21 @@ for (data in deaths_state) {
  
  
 ################################################################################
- ###Test that data you put in is correct###
+ ###Use various pull statements to check that data you put in is correct###
  
+ z= (data.manager$pull(
+   outcome = 'diagnoses',
+   keep.dimensions = c('location', 'year')))
+ 
+ x =(data.manager$pull(
+   outcome='deaths',
+   keep.dimensions = c('location', 'year')))
+
+ y= (data.manager$pull(
+     outcome = 'diagnoses',
+  keep.dimensions = c('location', 'year', 'age'),
+  dimension.values = list(sex=c('male'))))
+
  
 ################################################################################
 ###Save surveillance manager####
