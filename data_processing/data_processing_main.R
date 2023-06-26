@@ -62,6 +62,15 @@ data.manager$register.outcome(
     units = 'cases',
     description = "HIV Viral suppression"))
 
+data.manager$register.outcome(
+  'knowledge',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'knowledge',
+    axis.name = 'knowledge (n)',
+    units = 'cases',
+    description = "Knowledge of Status"))
+
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
 
 data.manager$register.ontology(
@@ -101,7 +110,7 @@ risk.mappings = c('Heterosexual contact' = 'heterosexual',
                   'Male-to-male sexual contact' = 'msm',
                   'Male-to-male sexual contact and injection drug use' = 'msm_idu')
 
-age.mappings = c('13-24' = '12-24 years',
+age.mappings = c('13-24' = '13-24 years',
                   '25-34' = '25-34 years',
                   '35-44' = '35-44 years',
                   '45-54' = '45-54 years',
@@ -134,13 +143,11 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
   data$value = as.numeric(gsub(",", '', data$Cases))   
   
   #Location conditionals#
-  
   if(grepl("state", filename)) {
     names(state.abb) <- state.name 
     data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
-    data$location = state.abb[data$state]                                         
-    data$location[data$location %in% c("District of Columbia")] = "DC"
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
@@ -205,8 +212,7 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
     names(state.abb) <- state.name 
     data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
-    data$location = state.abb[data$state]                                         
-    data$location[data$location %in% c("District of Columbia")] = "DC"
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
@@ -269,8 +275,7 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     names(state.abb) <- state.name 
     data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
-    data$location = state.abb[data$state]                                         
-    data$location[data$location %in% c("District of Columbia")] = "DC"
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
@@ -333,8 +338,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
     names(state.abb) <- state.name 
     data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
-    data$location = state.abb[data$state]                                         
-    data$location[data$location %in% c("District of Columbia")] = "DC"
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
@@ -398,8 +402,7 @@ data.list.clean.Knowledge = lapply(data.list.knowledge, function(file){
     names(state.abb) <- state.name 
     data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
-    data$location = state.abb[data$state]                                         
-    data$location[data$location %in% c("District of Columbia")] = "DC"
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
     data$location = data$County
@@ -443,8 +446,8 @@ data.list.clean.Knowledge = lapply(data.list.knowledge, function(file){
 
 ################################################################################
 
-###Put in data manager### 
 
+###Put in data manager### 
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
@@ -452,12 +455,10 @@ data.list.clean.Knowledge = lapply(data.list.knowledge, function(file){
     dimension.values = list(),                        #optional#
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Reporting')                                                  #Methodology footnotes here if there is substantial change#
-  
+
   #Record years and locations
  locations = union(locations, unlist(unique(data['location'])))                 #Question: How is this section used?#
  years = union(years, unlist(unique(data['year'])))
-
-
 
 
 
