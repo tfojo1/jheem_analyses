@@ -79,7 +79,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Mutiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -381,7 +381,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
 
 #---Clean Knowledge---#
 
-data.list.clean.Knowledge = lapply(data.list.knowledge, function(file){
+data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
@@ -447,21 +447,104 @@ data.list.clean.Knowledge = lapply(data.list.knowledge, function(file){
 ################################################################################
 
 
-###Put in data manager### 
+# ###Put in data manager### 
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'cdc',
+#     source = 'cdc',
+#     dimension.values = list(),                        #optional#
+#     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
+#     details = 'CDC Reporting')                                                  #Methodology footnotes here if there is substantial change#
+
+#Record years and locations
+locations = union(locations, unlist(unique(data['location'])))                 #Question: How is this section used?#
+years = union(years, unlist(unique(data['year'])))
+
+##################################################################################
+###Working on put statements for datasets###
+##This will need to fixed bc of issue with location (cannot put MSA or EHE into data.manager)
+
+##Outcome=diagnoses; Location=State into data.manager
+diagnoses_state = lapply(data.list.clean.diagnoses, `[[`, 2)  
+diagnoses_state = diagnoses_state[-c(1:27)]
+
+for (data in diagnoses_state) {
+  
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
     source = 'cdc',
-    dimension.values = list(),                        #optional#
-    url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
-    details = 'CDC Reporting')                                                  #Methodology footnotes here if there is substantial change#
+    dimension.values = list(),
+    url = 'www.example.gov',
+    details = 'CDC Reporting')
+}
+ 
+##Outcome=prevalence; Location=State into data.manager
+prevalence_state = lapply(data.list.clean.prevalence, `[[`, 2)  
+prevalence_state = prevalence_state[-c(1:27)]
 
-  #Record years and locations
- locations = union(locations, unlist(unique(data['location'])))                 #Question: How is this section used?#
- years = union(years, unlist(unique(data['year'])))
+for (data in prevalence_state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'www.example.gov',
+    details = 'CDC Reporting')
+}
 
+##Outcome=deaths; Location=State into data.manager
+deaths_state = lapply(data.list.clean.deaths, `[[`, 2)  
+deaths_state = deaths_state[-c(1:11)]
 
+for (data in deaths_state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'www.example.gov',
+    details = 'CDC Reporting')
+}
 
+ ##Outcome=SLE; Location=State into data.manager
+ sle_state = lapply(data.list.clean.sle, `[[`, 2)  
+ sle_state= sle_state[-c(1:11)]
+ 
+ for (data in sle_state) {
+   
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc',
+     dimension.values = list(),
+     url = 'www.example.gov',
+     details = 'CDC Reporting')
+ }
+ 
+
+ ##Outcome=knowledge; Location=State into data.manager
+ knowledge_state = lapply(data.list.clean.knowledge, `[[`, 2)  
+ knowledge_state= knowledge_state[-c(1)]
+ 
+ for (data in knowledge_state) {
+   
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc',
+     dimension.values = list(),
+     url = 'www.example.gov',
+     details = 'CDC Reporting')
+ }
+ 
+ 
+################################################################################
+ ###Test that data you put in is correct###
+ 
+ 
 ################################################################################
 ###Save surveillance manager####
   
