@@ -150,18 +150,15 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$County
-  }
-  if(grepl("msa", filename)) {
-    data$location = data$Geography
-  }
-  
-  # Add this back once you have county data saved#
-  #  if(grepl("county", filename)) {
-  #    #data$age = age.mappings[data$Age.Group]
-  #  }
-  #  
-  
+     data$location = data$FIPS
+   }
+   if(grepl("msa", filename)) {
+     data$location = data$FIPS
+   }
+    if(grepl("county", filename)) {
+      data$location = data$FIPS
+    }
+    
   ##Demographic conditionals##
   
   if(grepl("age", filename)) {
@@ -215,17 +212,14 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$County
+    data$location = data$FIPS
   }
   if(grepl("msa", filename)) {
-    data$location = data$Geography
+    data$location = data$FIPS
   }
-  
-  # Add this back once you have county data saved#
-  #  if(grepl("county", filename)) {
-  #    #data$age = age.mappings[data$Age.Group]
-  #  }
-  #  
+  if(grepl("county", filename)) {
+    data$location = data$FIPS
+  }
 
   if(grepl("age", filename)) {
     data$age = age.mappings[data$Age.Group]
@@ -278,17 +272,14 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$County
+    data$location = data$FIPS
   }
   if(grepl("msa", filename)) {
-    data$location = data$Geography
+    data$location = data$FIPS
   }
-  
-  # Add this back once you have county data saved#
-  #  if(grepl("county", filename)) {
-  #    #data$age = age.mappings[data$Age.Group]
-  #  }
-  #  
+  if(grepl("county", filename)) {
+    data$location = data$FIPS
+  } 
   
   if(grepl("age", filename)) {
     data$age = age.mappings[data$Age.Group]
@@ -341,17 +332,14 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$County
+    data$location = data$FIPS
   }
   if(grepl("msa", filename)) {
-    data$location = data$Geography
+    data$location = data$FIPS
   }
-  
-  # Add this back once you have county data saved#
-  #  if(grepl("county", filename)) {
-  #    #data$age = age.mappings[data$Age.Group]
-  #  }
-  #  
+  if(grepl("county", filename)) {
+    data$location = data$FIPS
+  }  
   
   if(grepl("age", filename)) {
     data$age = age.mappings[data$Age.Group]
@@ -405,17 +393,14 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$County
+    data$location = data$FIPS
   }
   if(grepl("msa", filename)) {
-    data$location = data$Geography
+    data$location = data$FIPS
   }
-  
-  # Add this back once you have county data saved#
-  #  if(grepl("county", filename)) {
-  #    #data$age = age.mappings[data$Age.Group]
-  #  }
-  #  
+  if(grepl("county", filename)) {
+    data$location = data$FIPS
+  }  
   
   if(grepl("age", filename)) {
     data$age = age.mappings[data$Age.Group]
@@ -445,8 +430,6 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
 
 
 ################################################################################
-
-
 # ###Put in data manager### 
 #   data.manager$put.long.form(
 #     data = data,
