@@ -1,4 +1,4 @@
-#Source this file into data_processing_main to remove the long headers from the CDC Atlas Plus data
+#Source this file into data_processing_main to remove headers from the CDC Atlas Plus data
 #Note each group of files has a different length header
 
 #diagnoses - skip 8
@@ -22,34 +22,34 @@ diagnoses_files <- Sys.glob(paste0(DATA.DIR.DIAGNOSES, '/*.csv'))
 #creating a list with sublists of filename, data#
 data.list.diagnoses <- lapply(diagnoses_files, function(x){
   skip=8
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
   })
 
 #---HIV Deaths---#
 deaths_files <- Sys.glob(paste0(DATA.DIR.DEATHS, '/*.csv'))
 data.list.deaths <- lapply(deaths_files, function(x){
   skip=10
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 
 #---HIV Prevalence---#
 prevalence_files <- Sys.glob(paste0(DATA.DIR.PREVALENCE, '/*.csv'))
 data.list.prevalence <- lapply(prevalence_files, function(x){
   skip=10
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 
 #---Suppression, Linkage, Receipt of Care---#
 sle_files <- Sys.glob(paste0(DATA.DIR.SLE, '/*.csv'))
 data.list.sle <- lapply(sle_files, function(x){
   skip=11
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 
-#---Linkage to Care---#
+#---Knowledge to Care---#
 knowledge_files <- Sys.glob(paste0(DATA.DIR.KNOWLEDGE, '/*.csv'))
 data.list.knowledge <- lapply(knowledge_files, function(x){
   skip=10
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE))
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 

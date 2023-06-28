@@ -150,13 +150,13 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-     data$location = data$FIPS
+     data$location = as.character(data$FIPS)
    }
    if(grepl("msa", filename)) {
-     data$location = data$FIPS
+     data$location = as.character(data$FIPS)
    }
     if(grepl("county", filename)) {
-      data$location = data$FIPS
+      data$location = as.character(data$FIPS)
     }
     
   ##Demographic conditionals##
@@ -212,13 +212,13 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
   if(grepl("county", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
 
   if(grepl("age", filename)) {
@@ -272,13 +272,13 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
   if(grepl("county", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   } 
   
   if(grepl("age", filename)) {
@@ -332,13 +332,13 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
   if(grepl("county", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }  
   
   if(grepl("age", filename)) {
@@ -393,13 +393,13 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
   }
   if(grepl("ehe", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }
   if(grepl("county", filename)) {
-    data$location = data$FIPS
+    data$location = as.character(data$FIPS)
   }  
   
   if(grepl("age", filename)) {
