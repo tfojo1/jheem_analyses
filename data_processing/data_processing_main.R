@@ -445,13 +445,13 @@ years = union(years, unlist(unique(data['year'])))
 
 ##################################################################################
 ###Working on put statements for datasets###
-##This will need to fixed bc of issue with location (cannot put MSA or EHE into data.manager)
+##This will need to fixed bc of issue with location (cannot put MSA into data.manager)
 
 ##Outcome=diagnoses; Location=State into data.manager
-diagnoses_state = lapply(data.list.clean.diagnoses, `[[`, 2)  
-diagnoses_state = diagnoses_state[-c(1:27)]
+diagnoses_state_ehe = lapply(data.list.clean.diagnoses, `[[`, 2)  
+diagnoses_state_ehe = diagnoses_state_ehe[-c(17:27)]
 
-for (data in diagnoses_state) {
+for (data in diagnoses_state_ehe) {
   
   data.manager$put.long.form(
     data = data,
@@ -463,10 +463,10 @@ for (data in diagnoses_state) {
 }
  
 ##Outcome=prevalence; Location=State into data.manager
-prevalence_state = lapply(data.list.clean.prevalence, `[[`, 2)  
-prevalence_state = prevalence_state[-c(1:27)]
+prevalence_state_ehe = lapply(data.list.clean.prevalence, `[[`, 2)  
+prevalence_state_ehe = prevalence_state_ehe[-c(17:27)]
 
-for (data in prevalence_state) {
+for (data in prevalence_state_ehe) {
   
   data.manager$put.long.form(
     data = data,
@@ -492,11 +492,10 @@ for (data in deaths_state) {
     details = 'CDC Reporting')
 }
 
- ##Outcome=SLE; Location=State into data.manager
- sle_state = lapply(data.list.clean.sle, `[[`, 2)  
- sle_state= sle_state[-c(1:11)]
+ ##Outcome=SLE into data.manager
+ sle_all = lapply(data.list.clean.sle, `[[`, 2)  
  
- for (data in sle_state) {
+ for (data in sle_all) {
    
    data.manager$put.long.form(
      data = data,
@@ -508,11 +507,10 @@ for (data in deaths_state) {
  }
  
 
- ##Outcome=knowledge; Location=State into data.manager
- knowledge_state = lapply(data.list.clean.knowledge, `[[`, 2)  
- knowledge_state= knowledge_state[-c(1)]
+ ##Outcome=knowledge into data.manager
+ knowledge_all = lapply(data.list.clean.knowledge, `[[`, 2)  
  
- for (data in knowledge_state) {
+ for (data in knowledge_all) {
    
    data.manager$put.long.form(
      data = data,
