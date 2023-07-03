@@ -126,7 +126,6 @@ years = c()
 #---Clean Diagnoses---#
 
 data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
-  
   data=file[["data"]]
   filename = file[["filename"]]
   
@@ -153,7 +152,7 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
      data$location = as.character(data$FIPS)
    }
    if(grepl("msa", filename)) {
-     data$location = as.character(data$FIPS)
+     data$location = locations::get.cbsa.for.msa.name(data$Geography)
    }
     if(grepl("county", filename)) {
       data$location = as.character(data$FIPS)
@@ -215,7 +214,7 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
     data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = as.character(data$FIPS)
+    data$location = locations::get.cbsa.for.msa.name(data$Geography)
   }
   if(grepl("county", filename)) {
     data$location = as.character(data$FIPS)
@@ -275,7 +274,7 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = as.character(data$FIPS)
+    data$location = locations::get.cbsa.for.msa.name(data$Geography)
   }
   if(grepl("county", filename)) {
     data$location = as.character(data$FIPS)
@@ -335,7 +334,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
     data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = as.character(data$FIPS)
+    data$location = locations::get.cbsa.for.msa.name(data$Geography)
   }
   if(grepl("county", filename)) {
     data$location = as.character(data$FIPS)
@@ -396,7 +395,7 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
     data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = as.character(data$FIPS)
+    data$location = locations::get.cbsa.for.msa.name(data$Geography)
   }
   if(grepl("county", filename)) {
     data$location = as.character(data$FIPS)
