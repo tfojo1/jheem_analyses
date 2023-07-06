@@ -255,8 +255,8 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
   }
   if(grepl("risk", filename)) {
     data$risk = risk.mappings[data$Transmission.Category]
-  }
   
+  }
   list(filename, data) 
   
 } )
@@ -480,10 +480,9 @@ years = union(years, unlist(unique(data['year'])))
 ##This will need to fixed bc of issue with location (cannot put MSA into data.manager)
 
 ##Outcome=diagnoses; Location=State into data.manager
- diagnoses_state = lapply(data.list.clean.diagnoses, `[[`, 2)  
-# diagnoses_state_ehe = diagnoses_state_ehe[-c(17:27)]
+ diagnoses_all = lapply(data.list.clean.diagnoses, `[[`, 2)  
 
-for (data in diagnoses_state) {
+for (data in diagnoses_all) {
   
   data.manager$put.long.form(
     data = data,
@@ -495,10 +494,9 @@ for (data in diagnoses_state) {
 }
  
 ##Outcome=prevalence; Location=State into data.manager
-prevalence_state_ehe = lapply(data.list.clean.prevalence, `[[`, 2)  
-prevalence_state_ehe = prevalence_state_ehe[-c(17:27)]
+prevalence_all = lapply(data.list.clean.prevalence, `[[`, 2) 
 
-for (data in prevalence_state_ehe) {
+for (data in prevalence_all) {
   
   data.manager$put.long.form(
     data = data,
@@ -509,11 +507,10 @@ for (data in prevalence_state_ehe) {
     details = 'CDC Reporting')
 }
 
-##Outcome=deaths; Location=State into data.manager
-deaths_state = lapply(data.list.clean.deaths, `[[`, 2)  
-deaths_state = deaths_state[-c(1:11)]
+##Outcome=deaths into data.manager
+deaths_all = lapply(data.list.clean.deaths, `[[`, 2)  
 
-for (data in deaths_state) {
+for (data in deaths_all) {
   
   data.manager$put.long.form(
     data = data,
@@ -525,7 +522,7 @@ for (data in deaths_state) {
 }
 
  ##Outcome=SLE into data.manager
- sle_all = lapply(data.list.clean.sle, `[[`, 2)  
+ sle_all = lapply(data.list.clean.sle, `[[`, 2) 
  
  for (data in sle_all) {
    
