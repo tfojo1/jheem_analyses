@@ -42,7 +42,11 @@ data.list.prevalence <- lapply(prevalence_files, function(x){
 #---Suppression, Linkage, Receipt of Care---#
 sle_files <- Sys.glob(paste0(DATA.DIR.SLE, '/*.csv'))
 data.list.sle <- lapply(sle_files, function(x){
-  skip=11
+  if(grepl("allcounty", x)) {
+    skip=9
+    list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+  }
+  else  skip=11
   list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 
