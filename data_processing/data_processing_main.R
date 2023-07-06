@@ -126,6 +126,7 @@ years = c()
 #---Clean Diagnoses---#
 
 data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
+  
   data=file[["data"]]
   filename = file[["filename"]]
   
@@ -150,11 +151,19 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
   }
   if(grepl("ehe", filename)) {
      data$location = as.character(data$FIPS)
-   }
-   if(grepl("msa", filename)) {
-     data$location = locations::get.cbsa.for.msa.name(data$Geography)
-   }
-    if(grepl("county", filename)) {
+  }
+
+  if(grepl("msa", filename)) {
+      data$msa_indicator= substring(data$FIPS, 6, 10)
+           
+         data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+         data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+        
+         data$cbsa = substring(data$FIPS, 1, 5)
+         data$location = paste("C", data$cbsa, sep=".")
+        }
+    
+    if(grepl("allcounty", filename)) {
       data$location = as.character(data$FIPS)
     }
     
@@ -214,9 +223,15 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
     data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = locations::get.cbsa.for.msa.name(data$Geography)
+    data$msa_indicator= substring(data$FIPS, 6, 10)
+    
+    data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+    data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    
+    data$cbsa = substring(data$FIPS, 1, 5)
+    data$location = paste("C", data$cbsa, sep=".")
   }
-  if(grepl("county", filename)) {
+  if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
   }
 
@@ -274,9 +289,15 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = locations::get.cbsa.for.msa.name(data$Geography)
+    data$msa_indicator= substring(data$FIPS, 6, 10)
+    
+     data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+      data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    
+     data$cbsa = substring(data$FIPS, 1, 5)
+     data$location = paste("C", data$cbsa, sep=".")
   }
-  if(grepl("county", filename)) {
+  if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
   } 
   
@@ -334,9 +355,15 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
     data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = locations::get.cbsa.for.msa.name(data$Geography)
+    data$msa_indicator= substring(data$FIPS, 6, 10)
+    
+      data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+      data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    
+     data$cbsa = substring(data$FIPS, 1, 5)
+      data$location = paste("C", data$cbsa, sep=".")
   }
-  if(grepl("county", filename)) {
+  if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
   }  
   
@@ -395,9 +422,15 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
     data$location = as.character(data$FIPS)
   }
   if(grepl("msa", filename)) {
-    data$location = locations::get.cbsa.for.msa.name(data$Geography)
+    data$msa_indicator= substring(data$FIPS, 6, 10)
+    
+      data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+      data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    
+     data$cbsa = substring(data$FIPS, 1, 5)
+     data$location = paste("C", data$cbsa, sep=".")
   }
-  if(grepl("county", filename)) {
+  if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
   }  
   
@@ -447,10 +480,10 @@ years = union(years, unlist(unique(data['year'])))
 ##This will need to fixed bc of issue with location (cannot put MSA into data.manager)
 
 ##Outcome=diagnoses; Location=State into data.manager
-diagnoses_state_ehe = lapply(data.list.clean.diagnoses, `[[`, 2)  
-diagnoses_state_ehe = diagnoses_state_ehe[-c(17:27)]
+ diagnoses_state = lapply(data.list.clean.diagnoses, `[[`, 2)  
+# diagnoses_state_ehe = diagnoses_state_ehe[-c(17:27)]
 
-for (data in diagnoses_state_ehe) {
+for (data in diagnoses_state) {
   
   data.manager$put.long.form(
     data = data,
