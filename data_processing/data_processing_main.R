@@ -490,18 +490,7 @@ years = union(years, unlist(unique(data['year'])))
 ##This will need to fixed bc of issue with location (cannot put MSA into data.manager)
 
 ##Outcome=diagnoses; Location=State into data.manager
- diagnoses_all = lapply(data.list.clean.diagnoses, `[[`, 2)  
-
-for (data in diagnoses_all) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'cdc',
-    source = 'cdc',
-    dimension.values = list(),
-    url = 'www.example.gov',
-    details = 'CDC Reporting')
-}
+ 
  
 ##Outcome=prevalence; Location=State into data.manager
 prevalence_all = lapply(data.list.clean.prevalence, `[[`, 2) 
