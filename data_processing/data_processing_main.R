@@ -471,28 +471,27 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
 } )
 
 
-################################################################################
-# ###Put in data manager### 
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc',
-#     source = 'cdc',
-#     dimension.values = list(),                        #optional#
-#     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
-#     details = 'CDC Reporting')                                                  #Methodology footnotes here if there is substantial change#
 
-#Record years and locations
-locations = union(locations, unlist(unique(data['location'])))                 #Question: How is this section used?#
-years = union(years, unlist(unique(data['year'])))
+#########################################
+##Put data into data manager###
 
-##################################################################################
-###Working on put statements for datasets###
-##This will need to fixed bc of issue with location (cannot put MSA into data.manager)
 
-##Outcome=diagnoses; Location=State into data.manager
+##Outcome=diagnoses
+
+diagnoses_all = lapply(data.list.clean.diagnoses, `[[`, 2)  
+
+for (data in diagnoses_all) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'www.example.gov',
+    details = 'CDC Reporting')
+}
  
- 
-##Outcome=prevalence; Location=State into data.manager
+##Outcome=prevalence
 prevalence_all = lapply(data.list.clean.prevalence, `[[`, 2) 
 
 for (data in prevalence_all) {
@@ -506,7 +505,7 @@ for (data in prevalence_all) {
     details = 'CDC Reporting')
 }
 
-##Outcome=deaths into data.manager
+##Outcome=deaths 
 deaths_all = lapply(data.list.clean.deaths, `[[`, 2)  
 
 for (data in deaths_all) {
@@ -520,7 +519,7 @@ for (data in deaths_all) {
     details = 'CDC Reporting')
 }
 
- ##Outcome=SLE into data.manager
+ ##Outcome=SLE 
  sle_all = lapply(data.list.clean.sle, `[[`, 2) 
  
  for (data in sle_all) {
@@ -535,7 +534,7 @@ for (data in deaths_all) {
  }
  
 
- ##Outcome=knowledge into data.manager
+ ##Outcome=knowledge 
  knowledge_all = lapply(data.list.clean.knowledge, `[[`, 2)  
  
  for (data in knowledge_all) {
@@ -553,24 +552,40 @@ for (data in deaths_all) {
 ################################################################################
  ###Use various pull statements to check that data you put in is correct###
  
- z= (data.manager$pull(
+ x = (data.manager$pull(
    outcome = 'diagnoses',
-   keep.dimensions = c('location', 'year')))
+   keep.dimensions = c('year', 'age'),
+   dimension.values = list(sex=c('male', 'female'))))
  
- x =(data.manager$pull(
+ y =(data.manager$pull(
    outcome='deaths',
    keep.dimensions = c('location', 'year')))
+ 
+ z =(data.manager$pull(
+   outcome='prevalence',
+   keep.dimensions = c('location', 'year')))
 
- y= (data.manager$pull(
-     outcome = 'diagnoses',
-  keep.dimensions = c('location', 'year', 'age'),
-  dimension.values = list(sex=c('male'))))
+ xx = (data.manager$pull(
+   outcome = 'linkage',
+   keep.dimensions = c('location', 'year')))
 
+yy = (data.manager$pull(
+   outcome = 'care',
+   keep.dimensions = c('location', 'year')))
+
+zz = (data.manager$pull(
+  outcome = 'suppression',
+  keep.dimensions = c('location', 'year')))
+
+zz = (data.manager$pull(
+  outcome = 'knowledge',
+  keep.dimensions = c('location', 'year')))
+ 
  
 ################################################################################
 ###Save surveillance manager####
   
-  surveilance.manager= data.manager #Add this here so you don't have to change data.manager throughout entire code#
+ surveillance.manager= data.manager #Add this here so you don't have to change data.manager throughout entire code#
   
   save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
 
