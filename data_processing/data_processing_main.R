@@ -580,6 +580,7 @@ zz = (data.manager$pull(
 zz = (data.manager$pull(
   outcome = 'knowledge',
   keep.dimensions = c('location', 'year')))
+
  
  
 ################################################################################
