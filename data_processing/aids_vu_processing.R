@@ -3,7 +3,8 @@ library(jheem2)
 library(tidyverse)
 library(readxl)
 
-##Adding AIDS Vu data###
+###Read in Aids Vu PrEP Excel Datasets###
+
 DATA.DIR.PREP="../../data_raw/prep/aidsvu"
 
 prep_files <- Sys.glob(paste0(DATA.DIR.PREP, '/*.xlsx'))
@@ -12,10 +13,9 @@ data.list.prep <- lapply(prep_files, function(x){
   list(filename=x, data=read_excel(x, sheet= 1, skip=skip, col_types= "text"))
 })
 
+###############################################################################
 
-
-
-###Total PrEP Use###
+###Create list- Total PrEP Use###
 data.list.prep.total = lapply(data.list.prep, function(file){
   
   data=file[["data"]]
@@ -57,14 +57,28 @@ data.list.prep.total = lapply(data.list.prep, function(file){
     
 })
 
-
-
-###PrEP Use by Sex###
+###Create list- PrEP Use by Sex###
 
 data.list.prep.sex = lapply(data.list.prep, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
+  
+  #Formatting all files will need#
+  data$year = data$Year 
+  data$outcome = "prep"
+  
+  #Location conditional formatting
+  if(grepl("state", filename)) {
+    data$location = data$`State Abbreviation`
+    subset(data, data$location != "PR")
+  }
+  
+  if(grepl("county", filename)) {
+    data$FIPS = as.numeric(data$`GEO ID`)
+    data$location= str_pad(data$FIPS, width=5, side="left", pad="0")
+    subset(data, data$State != "PR")
+  }
   
   data$male=data$`Male PrEP Users`
   data$female =data$`Female PrEP Users` 
@@ -74,16 +88,37 @@ data.list.prep.sex = lapply(data.list.prep, function(file){
                  names_to = "sex",
                  values_to = "value")
   
+  data$value[data$value %in% c("-1")] = NA  #data suppressed#
+  data$value[data$value %in% c("-2")] = NA  #data suppressed#
+  data$value[data$value %in% c("-4")] = NA  #data not available at county level#
+  data$value[data$value %in% c("-8")] = NA  #data undefined#
+  data$value[data$value %in% c("-9")] = NA  #data unavailable#
+  
   list(filename, data)
   
 })
 
-###############################################################################
-###PrEP Use by Age###
+###Create list-PrEP Use by Age###
 data.list.prep.age = lapply(data.list.prep, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
+  
+  #Formatting all files will need#
+  data$year = data$Year 
+  data$outcome = "prep"
+  
+  #Location conditional formatting
+  if(grepl("state", filename)) {
+    data$location = data$`State Abbreviation`
+    subset(data, data$location != "PR")
+  }
+  
+  if(grepl("county", filename)) {
+    data$FIPS = as.numeric(data$`GEO ID`)
+    data$location= str_pad(data$FIPS, width=5, side="left", pad="0")
+    subset(data, data$State != "PR")
+  }
   
   data$`under 25 years`= data$`Age LE 24 PrEP Users`
   data$`25-34 years`= data$`Age 25-34 PrEP Users`
@@ -97,55 +132,62 @@ data.list.prep.age = lapply(data.list.prep, function(file){
                   names_to = "age",
                   values_to = "value")
   
+  data$value[data$value %in% c("-1")] = NA  #data suppressed#
+  data$value[data$value %in% c("-2")] = NA  #data suppressed#
+  data$value[data$value %in% c("-4")] = NA  #data not available at county level#
+  data$value[data$value %in% c("-8")] = NA  #data undefined#
+  data$value[data$value %in% c("-9")] = NA  #data unavailable#
   
   list(filename, data)
   
 })
 
 
+###Create list- PrEP Use by Race###
+###Note race is not available at the county level###
 
-##############################################################################
-
-###PrEP Use by Race###
-data.list.prep.race = lapply(data.list.prep.total, function(file){
+data.list.prep.race = lapply(data.list.prep, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$male=data$`Male PrEP Users`
-  data$female =data$`Female PrEP Users` 
+  #Formatting all files will need#
+  data$year = data$Year 
+  data$outcome = "prep"
+  
+  #Location conditional formatting
+  if(grepl("state", filename)) {
+    data$location = data$`State Abbreviation`
+    subset(data, data$location != "PR")
+  }
+  
+  if(grepl("county", filename)) {
+    data$FIPS = as.numeric(data$`GEO ID`)
+    data$location= str_pad(data$FIPS, width=5, side="left", pad="0")
+    subset(data, data$State != "PR")
+  }
+  
+  data$black=data$`Black PrEP Users`
+  data$hispanic =data$`Hispanic PrEP Users`
+  data$white =data$`White PrEP Users` 
   
   data <- data %>%
-    pivot_longer(cols=c("male", "female"),
-                 names_to = "sex",
+    pivot_longer(cols=c("black", "hispanic", "white"),
+                 names_to = "race",
                  values_to = "value")
+  
+  data$value[data$value %in% c("-1")] = NA  #data suppressed#
+  data$value[data$value %in% c("-2")] = NA  #data suppressed#
+  data$value[data$value %in% c("-4")] = NA  #data not available at county level#
+  data$value[data$value %in% c("-8")] = NA  #data undefined#
+  data$value[data$value %in% c("-9")] = NA  #data unavailable#
   
   list(filename, data)
   
 })
 
-###########################archive################################################
 
-
-# 
-# ####Can I make a bunch of functions (that use tidyverse) and then lapply them over lsits
-# 
-# f1 <- function(data) {
-#   rename(male=`Male PrEP Users`)%>%
-#     rename(female =`Female PrEP Users`) %>%
-#     select(location, year, outcome, male, female) %>%
-#     pivot_longer(cols=c("male", "female"),
-#                  names_to = "sex",
-#                  values_to = "value")
-# }
-# 
-# test.clean = lapply(data.list.prep, f1{
-#   data=x[["data"]]
-#   })
-#     
-# zoe = lapply(data.list.prep, `[[`, 2) 
-# zoe_1 = lapply(zoe, f1)
-
+###Put AIDS Vu Files into Data.Manager###
 
 
 
