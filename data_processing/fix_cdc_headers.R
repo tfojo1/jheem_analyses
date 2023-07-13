@@ -8,7 +8,6 @@
 #knowledge - skip 10
 
 library(jheem2)
-library(readxl)
 
 DATA.DIR.DIAGNOSES="../../data_raw/diagnoses"
 DATA.DIR.DEATHS="../../data_raw/deaths"
@@ -56,15 +55,3 @@ data.list.knowledge <- lapply(knowledge_files, function(x){
   skip=10
   list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
-
-##Adding AIDS Vu data###
-DATA.DIR.PREP="../../data_raw/prep/aidsvu"
-
-prep_files <- Sys.glob(paste0(DATA.DIR.PREP, '/*.xlsx'))
-data.list.prep <- lapply(prep_files, function(x){
-  skip=3
-  list(filename=x, data=read_excel(x, sheet= 1, skip=skip, col_types= "text"))
-})
-
-
-

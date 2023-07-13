@@ -6,6 +6,8 @@ library(tidyverse)
 
 ###Initialize data manager (surveillance manager) and establish ontology###
 
+###CDC Atlas Plus Data###
+
 data.manager = create.data.manager('test', description='a data manager to test with')
 
 data.manager$register.outcome(
@@ -84,12 +86,39 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
 
+###Adding in AIDS Vu to Data Manager#####
+
+data.manager$register.outcome(
+  'prep',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'prep',
+    axis.name = 'prep (n)',
+    units = 'cases',
+    description = "PrEP Use"))
+
+data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
+
+data.manager$register.ontology(
+  'aidsvu',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    race=c('Black', 'Hispanic', 'White'),
+    sex=c('male','female'),
+    
+  ))
 
 ################################################################################
 
 ###Source in File that reads .csvs and removes headers###
 
-source('data_processing/fix_headers.R')
+source('data_processing/fix_cdc_headers.R')
+
+###Source in AIDS Vu data and cleaning###
+
+source('data_processing/aids_vu_processing.R')
 
 ################################################################################
 
