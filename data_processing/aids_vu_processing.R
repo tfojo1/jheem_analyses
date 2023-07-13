@@ -3,6 +3,30 @@ library(jheem2)
 library(tidyverse)
 library(readxl)
 
+###Adding in AIDS Vu to Data Manager#####
+
+data.manager$register.outcome(
+  'prep',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'prep',
+    axis.name = 'prep (n)',
+    units = 'cases',
+    description = "PrEP Use"))
+
+data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
+
+data.manager$register.ontology(
+  'aidsvu',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    race=c('Black', 'Hispanic', 'White'),
+    sex=c('male','female'),
+    
+  ))
+
 ###Read in Aids Vu PrEP Excel Datasets###
 
 DATA.DIR.PREP="../../data_raw/prep/aidsvu"
@@ -159,13 +183,6 @@ data.list.prep.race = lapply(data.list.prep, function(file){
   if(grepl("state", filename)) {
     data$location = data$`State Abbreviation`
     subset(data, data$location != "PR")
-  }
-  
-  if(grepl("county", filename)) {
-    data$FIPS = as.numeric(data$`GEO ID`)
-    data$location= str_pad(data$FIPS, width=5, side="left", pad="0")
-    subset(data, data$State != "PR")
-  }
   
   data$black=data$`Black PrEP Users`
   data$hispanic =data$`Hispanic PrEP Users`
@@ -181,6 +198,7 @@ data.list.prep.race = lapply(data.list.prep, function(file){
   data$value[data$value %in% c("-4")] = NA  #data not available at county level#
   data$value[data$value %in% c("-8")] = NA  #data undefined#
   data$value[data$value %in% c("-9")] = NA  #data unavailable#
+  }
   
   list(filename, data)
   
@@ -189,6 +207,20 @@ data.list.prep.race = lapply(data.list.prep, function(file){
 
 ###Put AIDS Vu Files into Data.Manager###
 
+##Total PrEP Use State + County##
+
+prep_total = lapply(data.list.prep.total, `[[`, 2)  
+
+for (data in prep_total) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'www.example.gov',
+    details = 'CDC Reporting')
+}
 
 
   

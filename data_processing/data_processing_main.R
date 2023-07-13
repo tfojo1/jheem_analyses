@@ -86,29 +86,6 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
 
-###Adding in AIDS Vu to Data Manager#####
-
-data.manager$register.outcome(
-  'prep',
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'prep',
-    axis.name = 'prep (n)',
-    units = 'cases',
-    description = "PrEP Use"))
-
-data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
-
-data.manager$register.ontology(
-  'aidsvu',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-    race=c('Black', 'Hispanic', 'White'),
-    sex=c('male','female'),
-    
-  ))
 
 ################################################################################
 
