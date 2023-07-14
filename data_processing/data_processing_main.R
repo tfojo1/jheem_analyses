@@ -104,7 +104,7 @@ data.manager$register.ontology(
     location= NULL,
     age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
     race=c('Black', 'Hispanic', 'White'),
-    sex=c('male','female'),
+    sex=c('male','female')
     
   ))
 
@@ -192,8 +192,6 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
     
     if(grepl("allcounty", filename)) {
       data$location = as.character(data$FIPS)
-      data = subset(data,data$location != "02063") #Removing counties that are not valid locations#
-      data = subset(data,data$location != "02066") 
     }
     
   ##Demographic conditionals##
@@ -262,8 +260,6 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
   }
   if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
-    data = subset(data,data$location != "02063") 
-    data = subset(data,data$location != "02066") 
   }
 
   if(grepl("age", filename)) {
@@ -330,8 +326,6 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
   }
   if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
-    data = subset(data,data$location != "02063") 
-    data = subset(data,data$location != "02066") 
   } 
   
   if(grepl("age", filename)) {
@@ -398,8 +392,6 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   }
   if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
-    data = subset(data,data$location != "02063") 
-    data = subset(data,data$location != "02066") 
   }  
   
   if(grepl("age", filename)) {
@@ -467,8 +459,6 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
   }
   if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
-    data = subset(data,data$location != "02063") 
-    data = subset(data,data$location != "02066") 
   }  
   
   if(grepl("age", filename)) {
