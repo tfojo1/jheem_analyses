@@ -73,6 +73,17 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Knowledge of Status"))
 
+data.manager$register.outcome(
+  'prep',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'prep',
+    axis.name = 'prep (n)',
+    units = 'cases',
+    description = "PrEP Use"))
+
+data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
+
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
 
 data.manager$register.ontology(
@@ -86,6 +97,16 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
 
+data.manager$register.ontology(
+  'aidsvu',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    race=c('Black', 'Hispanic', 'White'),
+    sex=c('male','female'),
+    
+  ))
 
 ################################################################################
 
@@ -493,7 +514,7 @@ for (data in diagnoses_all) {
     ontology.name = 'cdc',
     source = 'cdc',
     dimension.values = list(),
-    url = 'www.example.gov',
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Reporting')
 }
  
@@ -507,7 +528,7 @@ for (data in prevalence_all) {
     ontology.name = 'cdc',
     source = 'cdc',
     dimension.values = list(),
-    url = 'www.example.gov',
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Reporting')
 }
 
@@ -521,7 +542,7 @@ for (data in deaths_all) {
     ontology.name = 'cdc',
     source = 'cdc',
     dimension.values = list(),
-    url = 'www.example.gov',
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Reporting')
 }
 
@@ -535,7 +556,7 @@ for (data in deaths_all) {
      ontology.name = 'cdc',
      source = 'cdc',
      dimension.values = list(),
-     url = 'www.example.gov',
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Reporting')
  }
  
@@ -550,7 +571,7 @@ for (data in deaths_all) {
      ontology.name = 'cdc',
      source = 'cdc',
      dimension.values = list(),
-     url = 'www.example.gov',
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Reporting')
  }
  

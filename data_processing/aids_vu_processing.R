@@ -3,29 +3,6 @@ library(jheem2)
 library(tidyverse)
 library(readxl)
 
-###Adding in AIDS Vu to Data Manager#####
-
-data.manager$register.outcome(
-  'prep',
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'prep',
-    axis.name = 'prep (n)',
-    units = 'cases',
-    description = "PrEP Use"))
-
-data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
-
-data.manager$register.ontology(
-  'aidsvu',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-    race=c('Black', 'Hispanic', 'White'),
-    sex=c('male','female'),
-    
-  ))
 
 ###Read in Aids Vu PrEP Excel Datasets###
 
@@ -169,8 +146,9 @@ data.list.prep.age = lapply(data.list.prep, function(file){
 
 ###Create list- PrEP Use by Race###
 ###Note race is not available at the county level###
+data.list.prep.state = data.list.prep[11:20] #Subset to just have state level data#
 
-data.list.prep.race = lapply(data.list.prep, function(file){
+data.list.prep.race = lapply(data.list.prep.state, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
@@ -206,6 +184,7 @@ data.list.prep.race = lapply(data.list.prep, function(file){
 
 
 ###Put AIDS Vu Files into Data.Manager###
+##Right now this won't work bc of the age ontology discrepancy##
 
 ##Total PrEP Use State + County##
 
@@ -215,12 +194,54 @@ for (data in prep_total) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
-    source = 'cdc',
+    ontology.name = 'aidsvu',
+    source = 'aidsvu',
     dimension.values = list(),
-    url = 'www.example.gov',
+    url = 'https://aidsvu.org/',
     details = 'CDC Reporting')
 }
 
+##Total PrEP Use Sex##
 
+prep_sex = lapply(data.list.prep.sex, `[[`, 2)  
+
+for (data in prep_sex) {
   
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'aidsvu',
+    source = 'aidsvu',
+    dimension.values = list(),
+    url = 'https://aidsvu.org/',
+    details = 'CDC Reporting')
+}
+
+##Total PrEP Use Age##
+
+prep_age = lapply(data.list.prep.age, `[[`, 2)  
+
+for (data in prep_age) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'aidsvu',
+    source = 'aidsvu',
+    dimension.values = list(),
+    url = 'https://aidsvu.org/',
+    details = 'CDC Reporting')
+}
+
+##Total PrEP Use Race##
+
+prep_race = lapply(data.list.prep.race, `[[`, 2)  
+
+for (data in prep_race) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'aidsvu',
+    source = 'aidsvu',
+    dimension.values = list(),
+    url = 'https://aidsvu.org/',
+    details = 'CDC Reporting')
+}
