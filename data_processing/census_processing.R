@@ -53,10 +53,95 @@ data.list.msa.pop <- lapply(census_msa_files, function(x){
   list(filename=x, data=read.csv(x, header=TRUE))
 })
 
+
 ################################################################################
-                ###State Population Estimates###
+                ###National Population Estimates###
 ################################################################################
 
+################################################################################
+                ###State Population Estimates 2000-2022###
+################################################################################
+#Pull 200-2009 state population estimates from county files#
+state.county = data.list.county.pop[[1]]
+state.county = state.county[[2]]
+names(state.abb) <- state.name
+
+state.county.00.09 <- state.county %>%
+  filter(COUNTY == "0") %>% #select states only#
+  mutate(location = ifelse (STNAME == "District of Columbia", "DC", state.abb[STNAME]))
+ 
+
+#State population 2000 df
+state_2000_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2000) %>%
+  mutate(year= "2000") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2000")
+
+#State population 2001 df
+state_2001_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2001) %>%
+  mutate(year= "2001") %>%
+  mutate(outcome = "population") %>%
+
+#State population 2002 df
+state_2002_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2002) %>%
+  mutate(year= "2002") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2002")
+
+#State population 2003 df
+state_2003_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2003) %>%
+  mutate(year= "2003") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2003")
+
+#State population 2004 df
+state_2004_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2004) %>%
+  mutate(year= "2004") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2004")
+
+#State population 2005 df
+state_2005_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2005) %>%
+  mutate(year= "2005") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2005")
+
+#State population 2006 df
+state_2006_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2006) %>%
+  mutate(year= "2006") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2006")
+
+#State population 2007 df
+state_2007_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2007) %>%
+  mutate(year= "2007") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2007")
+
+#State population 2008 df
+state_2008_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2008) %>%
+  mutate(year= "2008") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2008")
+
+#State population 2009 df
+state_2009_pop <- state.county.00.09 %>%
+  select(location, POPESTIMATE2009) %>%
+  mutate(year= "2009") %>%
+  mutate(outcome = "population") %>%
+  rename(value = "POPESTIMATE2009")
+  
+
+#For State populations 2010-2022#
 #establish locations for all state files#
 
 data.list.state.pop.clean = lapply(data.list.state.pop, function(file){
@@ -173,17 +258,17 @@ state_2022_pop <- state.20.22 %>%
   rename(value = "POPESTIMATE2022")
 
 #Create list of state population by year to put into Census Manager
-state_pop_list = list(state_2010_pop, state_2011_pop, state_2012_pop, state_2013_pop, 
-                       state_2014_pop,state_2015_pop, state_2016_pop, state_2017_pop, state_2018_pop, state_2019_pop, state_2020_pop, 
-                       state_2021_pop, state_2022_pop)
+state_pop_list = list(state_2000_pop, state_2001_pop, state_2002_pop, state_2003_pop, state_2004_pop, state_2005_pop, state_2006_pop, state_2007_pop,
+                      state_2008_pop, state_2009_pop, state_2010_pop, state_2011_pop, state_2012_pop, state_2013_pop, state_2014_pop,state_2015_pop, 
+                      state_2016_pop, state_2017_pop, state_2018_pop, state_2019_pop, state_2020_pop, state_2021_pop, state_2022_pop)
 
-rm(data.list.state.pop, state.10.19, state.20.22, state_2010_pop, state_2011_pop, state_2012_pop, state_2013_pop, 
-   state_2014_pop,state_2015_pop, state_2016_pop, state_2017_pop, state_2018_pop, state_2019_pop, state_2020_pop, 
-   state_2021_pop, state_2022_pop)
+rm(data.list.state.pop, state.county, state.county.00.09, state.10.19, state.20.22, state_2000_pop, state_2001_pop, state_2002_pop, state_2003_pop, 
+   state_2004_pop, state_2005_pop, state_2006_pop, state_2007_pop,state_2008_pop, state_2009_pop, state_2010_pop, state_2011_pop, state_2012_pop, 
+   state_2013_pop, state_2014_pop,state_2015_pop, state_2016_pop, state_2017_pop, state_2018_pop, state_2019_pop, state_2020_pop, state_2021_pop, state_2022_pop)
 
 
 ################################################################################
-                ###county Population Estimates###
+                ###county Population Estimates 2000-2022###
 ################################################################################
 
 #establish locations for all county files#
@@ -193,16 +278,16 @@ data.list.county.pop.clean = lapply(data.list.county.pop, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$county_code = as.numeric(data$county)
-  data$county_code = as.numeric(data$county)
+  data$county_code = as.numeric(data$COUNTY)
+  data$state_code = as.numeric(data$STATE)
 
-  data= subset(data, data$county != "0")   #Remove county=0 (represents the county population)#
+  data= subset(data, data$COUNTY != "0")   #Remove county=0 (represents the county population)#
   
-  data$county_code_clean= str_pad(data$county_code, width=2, side="left", pad="0")
+  data$state_code_clean= str_pad(data$state_code, width=2, side="left", pad="0")
   data$county_code_clean= str_pad(data$county_code, width=3, side="left", pad="0")
   
   #Combine county and county codes into FIPS- change FIPS to 'location'
-  data$FIPS= paste(data$county_code_clean, data$county_code_clean, sep="")
+  data$FIPS= paste(data$state_code_clean, data$county_code_clean, sep="")
   
    data$location = data$FIPS
    
