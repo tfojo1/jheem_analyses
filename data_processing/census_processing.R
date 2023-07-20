@@ -16,6 +16,24 @@ census.manager$register.outcome(
     units = 'population',
     description = "Population Estimate"))
 
+census.manager$register.outcome(
+  'births',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Births',
+    axis.name = 'Births',
+    units = 'births',
+    description = "Births"))
+
+census.manager$register.outcome(
+  'deaths',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Deaths',
+    axis.name = 'Deaths',
+    units = 'deaths',
+    description = "Deaths"))
+
 census.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
 ###Update the ontology once you know what these values should be###
@@ -278,8 +296,9 @@ data.list.msa.pop.clean = lapply(data.list.msa.pop, function(file){
 
   
   data$location = paste("C", data$CBSA, sep=".")
-
   
+  data= subset(data, data$LSAD != "County or equivalent")  #DOUBLE CHECK how to handle this- Division, Metro/Micro, County#
+
   #Begin set up for pivot longer
   # data$"2000" = data$POPESTIMATE2000
   # data$"2001" = data$POPESTIMATE2001 
@@ -329,10 +348,215 @@ data.list.msa.pop.clean = lapply(data.list.msa.pop, function(file){
 })
 
 ################################################################################
+                ###National Births 2010-2022###
+################################################################################
+###Pull National data from State Files; filter by US###
+
+data.list.nat.births.clean = lapply(data.list.state.pop, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data= subset(data, data$NAME== "United States")   #National values#
+  data$location = "US"
+  
+  #Begin set up for pivot longer
+  # data$"2000" = data$BIRTHS2000
+  # data$"2001" = data$BIRTHS2001 
+  # data$"2002" = data$BIRTHS2002 
+  # data$"2003" = data$BIRTHS2003
+  # data$"2004" = data$BIRTHS2004
+  # data$"2005" = data$BIRTHS2005
+  # data$"2006" = data$BIRTHS2006
+  # data$"2007" = data$BIRTHS2007
+  # data$"2008" = data$BIRTHS2008
+  # data$"2009" = data$BIRTHS2009
+  data$"2010" = data$BIRTHS2010
+  data$"2011" = data$BIRTHS2011
+  data$"2012" = data$BIRTHS2012
+  data$"2013" = data$BIRTHS2013
+  data$"2014" = data$BIRTHS2014
+  data$"2015" = data$BIRTHS2015
+  data$"2016" = data$BIRTHS2016
+  data$"2017" = data$BIRTHS2017
+  data$"2018" = data$BIRTHS2018
+  data$"2019" = data$BIRTHS2019
+  data$"2020" = data$BIRTHS2020
+  data$"2021" = data$BIRTHS2021
+  data$"2022" = data$BIRTHS2022
+  
+  data$outcome= "births"
+  
+  ##this will give warning that it doesn't see these vars across all dfs##
+  data<- data %>%
+    select(outcome, location, (one_of("2010","2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
+                                      "2020", "2021", "2022")))
+  
+  data <- data %>%
+    pivot_longer(cols=c(one_of("2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
+                               "2020", "2021", "2022")),
+                 names_to = "year",
+                 names_transform = list(year = as.integer),
+                 values_to = "value")
+  
+  data$year = as.character(data$year) 
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) #what to return# 
+  
+})
+################################################################################
+                ###State BIRTH Estimates###
+###START WITH 2010-2022, NEED TO REVISIT 2000 LATER###
+################################################################################
+
+data.list.state.births.clean = lapply(data.list.state.pop, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data= subset(data, data$STATE != "0")   #0 represents various regions#
+  data= subset(data, data$NAME != "Puerto Rico") #remove Puerto Rico
+  
+  names(state.abb) <- state.name 
+  data$location =ifelse(data$NAME == "District of Columbia", "DC", state.abb[data$NAME])
+  
+  #Begin set up for pivot longer
+  # data$"2000" = data$BIRTHS2000
+  # data$"2001" = data$BIRTHS2001 
+  # data$"2002" = data$BIRTHS2002 
+  # data$"2003" = data$BIRTHS2003
+  # data$"2004" = data$BIRTHS2004
+  # data$"2005" = data$BIRTHS2005
+  # data$"2006" = data$BIRTHS2006
+  # data$"2007" = data$BIRTHS2007
+  # data$"2008" = data$BIRTHS2008
+  # data$"2009" = data$BIRTHS2009
+  data$"2010" = data$BIRTHS2010
+  data$"2011" = data$BIRTHS2011
+  data$"2012" = data$BIRTHS2012
+  data$"2013" = data$BIRTHS2013
+  data$"2014" = data$BIRTHS2014
+  data$"2015" = data$BIRTHS2015
+  data$"2016" = data$BIRTHS2016
+  data$"2017" = data$BIRTHS2017
+  data$"2018" = data$BIRTHS2018
+  data$"2019" = data$BIRTHS2019
+  data$"2020" = data$BIRTHS2020
+  data$"2021" = data$BIRTHS2021
+  data$"2022" = data$BIRTHS2022
+  
+  data$outcome= "births"
+  
+  ##this will give warning that it doesn't see these vars across all dfs##
+  data<- data %>%
+    select(outcome, location, (one_of("2010","2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
+                                      "2020", "2021", "2022")))
+  
+  data <- data %>%
+    pivot_longer(cols=c(one_of("2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
+                               "2020", "2021", "2022")),
+                 names_to = "year",
+                 names_transform = list(year = as.integer),
+                 values_to = "value")
+  
+  data$year = as.character(data$year)
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) #what to return# 
+  
+})
+################################################################################
+              ###county BIRTH Estimates 2010-2022###
+################################################################################
+data.list.county.pop.births = data.list.county.pop[2:3]  #Adding this bc I dont have birth rates in the 00.19 file#
+data.list.county.births.clean = lapply(data.list.county.pop.births, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$county_code = as.numeric(data$COUNTY)
+  data$state_code = as.numeric(data$STATE)
+  
+  data= subset(data, data$COUNTY != "0")   #Remove county=0 (represents the county population)#
+  
+  data$state_code_clean= str_pad(data$state_code, width=2, side="left", pad="0")
+  data$county_code_clean= str_pad(data$county_code, width=3, side="left", pad="0")
+  
+  #Combine county and county codes into FIPS- change FIPS to 'location'
+  data$FIPS= paste(data$state_code_clean, data$county_code_clean, sep="")
+  
+  data$location = data$FIPS
+  
+  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
+  data=subset(data, data$location != "09120")  #Update 7/20/23: temporarily removing counties causing location error:
+  data=subset(data, data$location != "09130")
+  data=subset(data, data$location != "09140")
+  data=subset(data, data$location != "09150")
+  data=subset(data, data$location != "09160")
+  data=subset(data, data$location != "09170")
+  data=subset(data, data$location != "09180")
+  data=subset(data, data$location != "09190")
+  
+  data=subset(data, data$location != "02270")
+  data=subset(data, data$location != "46113")
+  data=subset(data, data$location != "51515")
+  
+  
+  #Begin set up for pivot longer
+  # data$"2000" = data$BIRTHS2000
+  # data$"2001" = data$BIRTHS2001 
+  # data$"2002" = data$BIRTHS2002 
+  # data$"2003" = data$BIRTHS2003
+  # data$"2004" = data$BIRTHS2004
+  # data$"2005" = data$BIRTHS2005
+  # data$"2006" = data$BIRTHS2006
+  # data$"2007" = data$BIRTHS2007
+  # data$"2008" = data$BIRTHS2008
+  # data$"2009" = data$BIRTHS2009
+  data$"2010" = data$BIRTHS2010
+  data$"2011" = data$BIRTHS2011
+  data$"2012" = data$BIRTHS2012
+  data$"2013" = data$BIRTHS2013
+  data$"2014" = data$BIRTHS2014
+  data$"2015" = data$BIRTHS2015
+  data$"2016" = data$BIRTHS2016
+  data$"2017" = data$BIRTHS2017
+  data$"2018" = data$BIRTHS2018
+  data$"2019" = data$BIRTHS2019
+  data$"2020" = data$BIRTHS2020
+  data$"2021" = data$BIRTHS2021
+  data$"2022" = data$BIRTHS2022
+  
+  data$outcome= "births"
+  
+  ##this will give warning that it doesn't see these vars across all dfs##
+  data<- data %>%
+    select(outcome, location, (one_of("2010","2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
+                                      "2020", "2021", "2022")))
+  
+  
+  data <- data %>%
+    pivot_longer(cols=c(one_of("2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
+                               "2020", "2021", "2022")),
+                 names_to = "year",
+                 names_transform = list(year = as.integer),
+                 values_to = "value")
+  
+  data$year = as.character(data$year) 
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) #what to return# 
+  
+})
+################################################################################
                 ###Put data into Census Manager###
 ################################################################################    
 
-#National Population values
+#National POPULATION values
 national_pop = lapply(data.list.nat.pop.clean, `[[`, 2)
 
 for (data in national_pop) {
@@ -346,7 +570,7 @@ for (data in national_pop) {
     details = 'Census Reporting')
 }
 
-#State Population Values
+#State POPULATION Values
 state_pop = lapply(data.list.state.pop.clean, `[[`, 2)
 
 for (data in state_pop) {
@@ -360,7 +584,7 @@ for (data in state_pop) {
     details = 'Census Reporting')
 }
 
-#County Population Values
+#County POPULATION Values
 county_pop = lapply(data.list.county.pop.clean, `[[`, 2)
 
 for (data in county_pop) {
@@ -374,7 +598,7 @@ for (data in county_pop) {
     details = 'Census Reporting')
 }
 
-#MSA Population Values
+#MSA POPULATION Values
 msa_pop = lapply(data.list.msa.pop.clean, `[[`, 2)
 
 for (data in msa_pop) {
@@ -388,6 +612,47 @@ for (data in msa_pop) {
     details = 'Census Reporting')
 }
 
+#National BIRTH values
+national_births = lapply(data.list.nat.births.clean, `[[`, 2)
+
+for (data in national_births) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+#State BIRTH values
+state_births = lapply(data.list.state.births.clean, `[[`, 2)
+
+for (data in state_births) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+#County BIRTH values
+county_births = lapply(data.list.county.births.clean, `[[`, 2)
+
+for (data in county_births) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
 ################################################################################
                   ###Save Census Manager###
 ################################################################################ 
