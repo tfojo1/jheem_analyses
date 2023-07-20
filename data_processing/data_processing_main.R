@@ -103,7 +103,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-    race=c('Black', 'Hispanic', 'White'),
+    race=c('black', 'hispanic', 'white'),
     sex=c('male','female')
     
   ))

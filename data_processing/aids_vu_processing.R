@@ -58,7 +58,9 @@ data.list.prep.total = lapply(data.list.prep, function(file){
     }
     
     data$value = as.numeric(data$count)
-
+    data$year = as.character(data$year)
+    
+    data= as.data.frame(data)
     
     list(filename, data)
     
@@ -96,12 +98,15 @@ data.list.prep.sex = lapply(data.list.prep, function(file){
                  values_to = "value")
   
   data$value = as.numeric(data$value)
+  data$year = as.character(data$year)
   
   data$value[data$value %in% c("-1")] = NA  #data suppressed#
   data$value[data$value %in% c("-2")] = NA  #data suppressed#
   data$value[data$value %in% c("-4")] = NA  #data not available at county level#
   data$value[data$value %in% c("-8")] = NA  #data undefined#
   data$value[data$value %in% c("-9")] = NA  #data unavailable#
+  
+  data= as.data.frame(data)
   
   list(filename, data)
   
@@ -141,12 +146,15 @@ data.list.prep.age = lapply(data.list.prep, function(file){
                   values_to = "value")
   
   data$value = as.numeric(data$value)
+  data$year = as.character(data$year)
   
   data$value[data$value %in% c("-1")] = NA  #data suppressed#
   data$value[data$value %in% c("-2")] = NA  #data suppressed#
   data$value[data$value %in% c("-4")] = NA  #data not available at county level#
   data$value[data$value %in% c("-8")] = NA  #data undefined#
   data$value[data$value %in% c("-9")] = NA  #data unavailable#
+  
+  data= as.data.frame(data)
   
   list(filename, data)
   
@@ -187,7 +195,9 @@ data.list.prep.race = lapply(data.list.prep.state, function(file){
   data$count[data$count %in% c("-9")] = NA  #data unavailable#
   
   data$value = as.numeric(data$count)
+  data$year = as.character(data$year)
   
+  data= as.data.frame(data)
   }
   
   list(filename, data)
