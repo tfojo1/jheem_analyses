@@ -52,7 +52,7 @@ census.manager$register.ontology(
 ################################################################################
 DATA.DIR.CENSUS.STATE="../../data_raw/population/state"
 DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county"
-DATA.DIR.CENSUS.MSA="../../data_raw/population/msa"
+DATA.DIR.CENSUS.MSA="../../data_raw/population/msa" 
 
 census_state_files <- Sys.glob(paste0(DATA.DIR.CENSUS.STATE, '/*.csv'))
 census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
