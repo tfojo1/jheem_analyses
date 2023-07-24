@@ -1426,7 +1426,6 @@ track.quantity.outcome(EHE.SPECIFICATION,
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'cumulative.uninfected',
                          outcome.metadata = NULL,
-                         scale = 'non.negative.number',
                          outcome.name.to.integrate = 'uninfected',
                          keep.dimensions = c('age','race','sex','risk'),
                          save = F)
