@@ -63,14 +63,15 @@ DEFAULT.YEAR = 2016
 get.incident.idu.model <- function(idu.manager,
                                    census,
                                    location,
-                                   specification.info,
+                                   specification.metadata,
                                    static,
                                    knot.times=c(2000,2016))
 {
     rates = get.incident.idu.rates(idu.manager,
                                    census=census,
-                                   counties=counties.for.msa(location),
-                                   age.cutoffs=specification.info$age.endpoints,
+                                   counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T),
+                                  # counties=counties.for.msa(location),
+                                   age.cutoffs=specification.metadata$age.endpoints,
                                    race.mapping=BLACK.HISPANIC.OTHER.MAPPING,
                                    years=idu.manager$years)
     
@@ -94,14 +95,15 @@ get.incident.idu.model <- function(idu.manager,
 get.idu.remission.model <- function(idu.manager,
                              census,
                              location,
-                             specification.info,
+                             specification.metadata,
                              static,
                              knot.times=c(2000,2016))
 {
     rates = get.idu.remission.rates(idu.manager,
                            census=census,
-                           counties=counties.for.msa(location),
-                           age.cutoffs=specification.info$age.endpoints,
+                           counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T),
+#                           counties=counties.for.msa(location),
+                           age.cutoffs=specification.metadata$age.endpoints,
                            race.mapping=BLACK.HISPANIC.OTHER.MAPPING,
                            years=idu.manager$years)
 
@@ -125,14 +127,15 @@ get.idu.remission.model <- function(idu.manager,
 get.idu.relapse.model <- function(idu.manager,
                               census,
                               location,
-                              specification.info,
+                              specification.metadata,
                               static,
                               knot.times=c(2000,2016))
 {
     rates = get.idu.relapse.rates(idu.manager,
                             census=census,
-                            counties=counties.for.msa(location),
-                            age.cutoffs=specification.info$age.endpoints,
+                            counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T),
+                        #    counties=counties.for.msa(location),
+                            age.cutoffs=specification.metadata$age.endpoints,
                             race.mapping=BLACK.HISPANIC.OTHER.MAPPING,
                             years=idu.manager$years)
     if (static)

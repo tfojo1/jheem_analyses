@@ -6,7 +6,7 @@
 EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
                                    check.consistency = !jheem.engine$has.been.crunched())
 {
-    specification.info = get.specification.info(jheem.engine)
+    specification.metadata = jheem.engine$specification.metadata
     
     if (check.consistency)
         used.parameter.names = character()
@@ -79,9 +79,9 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
         used.parameter.names = c(used.parameter.names, used.names)
     
     # parameters for PrEP x sex/risk
-    idu.states = specification.info$compartment.aliases$active.idu.states
+    idu.states = specification.metadata$compartment.aliases$active.idu.states
     names(idu.states) = rep("risk", length(idu.states))
-    non.idu.states = setdiff(specification.info$dim.names$risk, idu.states)
+    non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
     names(non.idu.states) = rep("risk", length(non.idu.states))
     
     
@@ -357,7 +357,7 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
         # @need to do
     }
     
-    specification.info = jheem.engine$get.specification.info()
+    specification.metadata = jheem.engine$specification.metadata
     
     #-- Invert Parameter values if requested --#
     if (transformation=='reciprocal')
@@ -368,11 +368,11 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
     
     #-- Set up idu/non-idu states --#
     if (idu.applies.to.in.remission)
-        idu.states = specification.info$compartment.aliases$idu.states
+        idu.states = specification.metadata$compartment.aliases$idu.states
     else
-        idu.states = specification.info$compartment.aliases$active.idu.states
+        idu.states = specification.metadata$compartment.aliases$active.idu.states
     
-    non.idu.states = setdiff(specification.info$dim.names$risk, idu.states)
+    non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
     
     names(idu.states) = rep('risk', length(idu.states))
     names(non.idu.states) = rep('risk', length(non.idu.states))
@@ -479,13 +479,13 @@ set.ehe.trate.alphas.from.parameters <- function(jheem.engine,
     elem.name = paste0(category, '.trates')
     used.parameter.names = character()
     
-    specification.info = jheem.engine$get.specification.info()
+    specification.metadata = jheem.engine$specification.metadata
     for (time in times)
     {
         alpha.name = paste0('rate', time)
         
         #-- The race effects --#
-        for (race in specification.info$dim.names$race)
+        for (race in specification.metadata$dim.names$race)
         {
             param.name = paste0(race, '.', category, '.trate.', time)
             jheem.engine$set.element.functional.form.main.effect.alphas(element.name = elem.name,
@@ -501,7 +501,7 @@ set.ehe.trate.alphas.from.parameters <- function(jheem.engine,
         
         
         #-- The age effects --#
-        for (age.index in 1:specification.info$n.ages)
+        for (age.index in 1:specification.metadata$n.ages)
         {
             # First check for one time-specific parameter for age
             param.name = paste0('age',age.index, '.', age.multiplier.infix, '.', time)
@@ -576,14 +576,14 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
 {
     #-- Some set-up --#
     used.parameter.names = character()
-    specification.info = jheem.engine$get.specification.info()
+    specification.metadata = jheem.engine$specification.metadata
     
     if (idu.applies.to.in.remission)
-        idu.states = specification.info$compartment.aliases$idu.states
+        idu.states = specification.metadata$compartment.aliases$idu.states
     else
-        idu.states = specification.info$compartment.aliases$active.idu.states
+        idu.states = specification.metadata$compartment.aliases$active.idu.states
     
-    non.idu.states = setdiff(specification.info$dim.names$risk, idu.states)
+    non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
     
     names(idu.states) = rep('risk', length(idu.states))
     names(non.idu.states) = rep('risk', length(non.idu.states))
@@ -617,7 +617,7 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
                                      'heterosexual.age1.aging.base',
                                      'idu.age1.aging.base')
         
-        for (age.index in 2:specification.info$n.ages)
+        for (age.index in 2:specification.metadata$n.ages)
         {
             param.name = paste0('msm.age',age.index,'.aging.',time)
             param.value = parameters[param.name]
@@ -680,12 +680,12 @@ set.ehe.idu.from.parameters = function(jheem.engine,
                                        check.consistency)
 {
     used.parameter.names = character()
-    specification.info = jheem.engine$get.specification.info()
+    specification.metadata = jheem.engine$specification.metadata
     
     for (time in times)
     {
         alpha.name = paste0('time',time)
-        for (race in specification.info$dim.names$race)
+        for (race in specification.metadata$dim.names$race)
         {
             param.name = paste0(race, '.incident.idu.multiplier.', time)
             jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',

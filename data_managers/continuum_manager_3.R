@@ -38,7 +38,7 @@ get.continuum.model <- function(continuum.manager,
 
 get.suppression.model <- function(continuum.manager,
                                   location,
-                                  specification.info)
+                                  specification.metadata)
 {
     get.continuum.model(continuum.manager, type='suppression', location)
 }
@@ -51,7 +51,7 @@ get.suppression.model <- function(continuum.manager,
 
 get.testing.model <- function(continuum.manager,
                               location,
-                              specification.info)
+                              specification.metadata)
 {
     
     get.continuum.model(continuum.manager=continuum.manager, type='testing', location=location)

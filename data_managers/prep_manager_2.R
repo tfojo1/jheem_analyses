@@ -5,7 +5,7 @@
 
 get.prep.model <- function(prep.manager,
                            location,
-                           specification.info,
+                           specification.metadata,
                            anchor.year=2014,
                            max.proportion=0.333,
                            apply.age.ors.to.max=F,
@@ -18,7 +18,7 @@ get.prep.model <- function(prep.manager,
                                                use.logistic.tail=use.logistic.tail,
                                                logistic.after.frac.of.p.span=logistic.after.frac.of.p.span,
                                                as.proportion.of.indicated=as.proportion.of.indicated,
-                                               specification.info=specification.info)
+                                               specification.metadata=specification.metadata)
 }
 
 
@@ -248,11 +248,11 @@ convert.prep.rx.to.true.prep <- function(x,
 #   p 42, 43, 45
 get.prep.indications.estimate <- function(prep.manager=ALL.DATA.MANAGERS$prep,
                                           location,
-                                          specification.info)
+                                          specification.metadata)
 {
     #-- Get probability of PrEP Indication (conditioned on sexual activity for MSM and HET) --#
     data = get.prep.lit.data(as.proportion.of.indicated = T,
-                             specification.info=specification.info)
+                             specification.metadata=specification.metadata)
     msm = make.marginal.rr.array(p=data$nhbs$msm.2017$p.indicated,
                                  n=data$nhbs$msm.2017$n)
     idu = make.marginal.rr.array(p=data$nhbs$idu.2018$p.indicated,
@@ -292,7 +292,7 @@ get.prep.indications.estimate <- function(prep.manager=ALL.DATA.MANAGERS$prep,
     
     #-- Put it together into a big array --#
     
-    dim.names = specification.info$dim.names[c('age','race','sex','risk')]
+    dim.names = specification.metadata$dim.names[c('age','race','sex','risk')]
     rv = array(0, dim=sapply(dim.names, length), dimnames=dim.names)
     
     rv[,,'msm','never_IDU'] = rv[,,'msm','IDU_in_remission'] = msm
@@ -460,7 +460,7 @@ read.prep.file <- function(file)
 ##------------------------------------##
 
 make.prep.model <- function(anchor.year,
-                            specification.info,
+                            specification.metadata,
                             max.proportion,
                             apply.age.ors.to.max=T,
                             apply.race.ors.to.max=T,
@@ -672,7 +672,7 @@ make.prep.model <- function(anchor.year,
     
     #-- Put It Together --#
     
-    dim.names = specification.info$dim.names[c('age','race','sex','risk')]
+    dim.names = specification.metadata$dim.names[c('age','race','sex','risk')]
     model$intercept = model$slope = 
         model$max.p.lors = array(0, dim=sapply(dim.names, length), dimnames=dim.names)
     
@@ -742,7 +742,7 @@ make.prep.model <- function(anchor.year,
 }
 
 
-make.prep.model.logistic.tail <- function(specification.info,
+make.prep.model.logistic.tail <- function(specification.metadata,
                                          as.proportion.of.indicated=T,
                                          min.proportion=0,
                                          max.proportion=0.4,
@@ -760,7 +760,7 @@ make.prep.model.logistic.tail <- function(specification.info,
 )
 {
     anchor.year=2014
-    data = get.prep.lit.data(as.proportion.of.indicated=as.proportion.of.indicated, specification.info=specification.info)
+    data = get.prep.lit.data(as.proportion.of.indicated=as.proportion.of.indicated, specification.metadata=specification.metadata)
   
     log.or.vector = numeric()
     
@@ -885,7 +885,7 @@ make.prep.model.logistic.tail <- function(specification.info,
     
     #-- Put It Together --#
     
-    dim.names = specification.info$dim.names[c('age','race','sex','risk')]
+    dim.names = specification.metadata$dim.names[c('age','race','sex','risk')]
     intercept = slope = array(0, dim=sapply(dim.names, length), dimnames=dim.names)
     
     # Slopes - Risk
@@ -1010,7 +1010,7 @@ make.marginal.rr.array <- function(p, n)
 }
     
 get.prep.lit.data <- function(as.proportion.of.indicated=T,
-                              specification.info)
+                              specification.metadata)
 {
     rv = list()
     
@@ -1174,7 +1174,7 @@ get.prep.lit.data <- function(as.proportion.of.indicated=T,
     
     if (!as.proportion.of.indicated)
     {
-        p.indicated.msm = get.prep.indications.estimate(specification.info=specification.info)['msm','never_IDU']
+        p.indicated.msm = get.prep.indications.estimate(specification.metadata=specification.metadata)['msm','never_IDU']
         rv$mmwr$msm.2014$p = rv$mmwr$msm.2014$p / p.indicated.msm
         rv$mmwr$msm.2017$p = rv$mmwr$msm.2017$p / p.indicated.msm
     }
@@ -1305,7 +1305,7 @@ get.prep.lit.data <- function(as.proportion.of.indicated=T,
 
 calculate.msm.prep.correction.rr <- function(prep.manager = ALL.DATA.MANAGERS$prep,
                                              census = ALL.DATA.MANAGERS$census.collapsed.msm,
-                                             specification.info)
+                                             specification.metadata)
 {
     msa.fips = counties.for.msa(dimnames(msa.surveillance$new.all)[['location']])
 #    msa.fips = counties.for.msa(TARGET.MSAS)
@@ -1337,12 +1337,12 @@ calculate.msm.prep.correction.rr <- function(prep.manager = ALL.DATA.MANAGERS$pr
     pop = collapse.races(pop)
     
     # Multiply pop by p indicated
-    p.indicated = get.prep.indications.estimate(specification.info=specification.info)[,,c('msm','heterosexual_male'),'never_IDU']
+    p.indicated = get.prep.indications.estimate(specification.metadata=specification.metadata)[,,c('msm','heterosexual_male'),'never_IDU']
     denominator = sum(pop[,,'msm'] * p.indicated[,,'msm'])
     
     # Compare
     rx.proportion = rx/denominator
-    nhbs.proportion = get.prep.lit.data(specification.info=specification.info)$nhbs$msm.2017$p['total']
+    nhbs.proportion = get.prep.lit.data(specification.metadata=specification.metadata)$nhbs$msm.2017$p['total']
     
     rr = rx.proportion / nhbs.proportion
     rr
@@ -1351,7 +1351,7 @@ calculate.msm.prep.correction.rr <- function(prep.manager = ALL.DATA.MANAGERS$pr
 
 calculate.female.prep.correction.rr <- function(prep.manager = ALL.DATA.MANAGERS$prep,
                                              census = ALL.DATA.MANAGERS$census.collapsed.msm,
-                                             specification.info)
+                                             specification.metadata)
 {
     msa.fips = counties.for.msa(dimnames(msa.surveillance$new.all)[['location']])
     fips = intersect(msa.fips, intersect(prep.manager$locations, census$combined.fips))
@@ -1382,12 +1382,12 @@ calculate.female.prep.correction.rr <- function(prep.manager = ALL.DATA.MANAGERS
     pop = collapse.races(pop)
     
     # Multiply pop by p indicated
-    p.indicated = get.prep.indications.estimate(specification.info=specification.info)[,,'female','never_IDU']
+    p.indicated = get.prep.indications.estimate(specification.metadata=specification.metadata)[,,'female','never_IDU']
     denominator = sum(pop * p.indicated)
     
     # Compare
     rx.proportion = rx/denominator
-    nhbs.proportion = get.prep.lit.data(specification.info=specification.info)$nhbs$het.2016$p['female']
+    nhbs.proportion = get.prep.lit.data(specification.metadata=specification.metadata)$nhbs$het.2016$p['female']
     
     rr = rx.proportion / nhbs.proportion
     rr
@@ -1397,7 +1397,7 @@ calculate.female.prep.correction.rr <- function(prep.manager = ALL.DATA.MANAGERS
 calculate.age.prep.correction.rr <- function(prep.manager = ALL.DATA.MANAGERS$prep,
                                                 census = ALL.DATA.MANAGERS$census.collapsed.msm,
                                              relative.to.age = 3,
-                                             specification.info)
+                                             specification.metadata)
 {
     msa.fips = counties.for.msa(dimnames(msa.surveillance$new.all)[['location']])
     fips = intersect(msa.fips, intersect(prep.manager$locations, census$combined.fips))
@@ -1430,12 +1430,12 @@ calculate.age.prep.correction.rr <- function(prep.manager = ALL.DATA.MANAGERS$pr
     pop = collapse.races(pop)
     
     # Multiply pop by p indicated
-    p.indicated = get.prep.indications.estimate(specification.info=specification.info)[,,,'never_IDU']
+    p.indicated = get.prep.indications.estimate(specification.metadata=specification.metadata)[,,,'never_IDU']
     denominator = rowSums(pop * p.indicated)
     
     # Compare
     rx.proportion = rx/denominator
-    nhbs.proportion = get.prep.lit.data(specification.info=specification.info)$nhbs$msm$p.indicated[paste0('age',1:5)]
+    nhbs.proportion = get.prep.lit.data(specification.metadata=specification.metadata)$nhbs$msm$p.indicated[paste0('age',1:5)]
     
     rr = rx.proportion / nhbs.proportion
     if (!is.null(relative.to.age))
