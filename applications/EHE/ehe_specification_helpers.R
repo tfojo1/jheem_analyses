@@ -19,16 +19,18 @@ CENSUS.BHO.RACE.MAPPING = create.other.catchall.ontology.mapping('race',
 ##-- Aging --##
 ##-----------##
 
-get.default.aging.rates <- function(location, specification.info,
+get.default.aging.rates <- function(location, specification.metadata,
                                     active.idu.proportion.youngest.stratum.aging.up=0.25,
                                     prior.idu.proportion.youngest.stratum.aging.up=0.25)
 {
-    rv = array(1 / specification.info$age.spans,
-               dim=sapply(specification.info$dim.names[c('age','risk')], length),
-               dimnames=specification.info$dim.names[c('age','risk')])
+    dim.names = specification.metadata$dim.names[c('age','risk')]
+    dim.names$age = dim.names$age[-length(dim.names$age)]
+    rv = array(1 / specification.metadata$age.spans[-specification.metadata$n.ages],
+               dim=sapply(dim.names, length),
+               dimnames=dim.names)
     
-    rv[1,specification.info$compartment.aliases$active.idu.states] = active.idu.proportion.youngest.stratum.aging.up
-    rv[1,specification.info$compartment.aliases$prior.idu.states] = prior.idu.proportion.youngest.stratum.aging.up
+    rv[1,specification.metadata$compartment.aliases$active.idu.states] = active.idu.proportion.youngest.stratum.aging.up
+    rv[1,specification.metadata$compartment.aliases$prior.idu.states] = prior.idu.proportion.youngest.stratum.aging.up
     
     rv
 }
@@ -38,12 +40,12 @@ get.default.aging.rates <- function(location, specification.info,
 ##-- Proportion MSM --##
 ##--------------------##
 
-get.proportion.msm.of.male.by.race.functional.form <- function(location, specification.info)
+get.proportion.msm.of.male.by.race.functional.form <- function(location, specification.metadata)
 {
-    best.guess.proportions = get.best.guess.msm.proportions.by.race(counties.for.msa(location),
+    best.guess.proportions = get.best.guess.msm.proportions.by.race(get.sub.locations(location, 'county', limit.to.completely.enclosing = T),
                                                                     census = ALL.DATA.MANAGERS$census.full,
                                                                     years = DEFAULT.POPULATION.YEARS,
-                                                                    min.age = specification.info$age.lower.bounds[1])
+                                                                    min.age = specification.metadata$age.lower.bounds[1])
     
     best.guess.proportions = array(best.guess.proportions, 
                                    dim=c(race=length(best.guess.proportions)),
@@ -94,9 +96,9 @@ get.best.guess.msm.proportions.by.race <- function(fips,
 ##-- Fertility --##
 ##---------------##
 
-get.model.fertility.rates <- function(location, specification.info, population.years=DEFAULT.POPULATION.YEARS)
+get.model.fertility.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     
     # Get the population (to weight as we aggregate across races)
     county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
@@ -123,12 +125,14 @@ get.model.fertility.rates <- function(location, specification.info, population.y
 ##-- MORTALITY --##
 ##---------------##
 
-get.non.idu.general.mortality.rates <- function(location, specification.info, population.years=DEFAULT.POPULATION.YEARS)
+get.non.idu.general.mortality.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     
     # Get the raw rates
-    raw.mortality.rates = get.mortality.rates(ALL.DATA.MANAGERS$mortality, states=states.for.msa(location), verbose=F)
+    raw.mortality.rates = get.mortality.rates(ALL.DATA.MANAGERS$mortality, 
+                                              states=get.super.locations(location, 'state', limit.to.completely.enclosing = F), 
+                                              verbose=F)
     
     # Get the population (to weight as we aggregate across races)
     county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
@@ -137,7 +141,8 @@ get.non.idu.general.mortality.rates <- function(location, specification.info, po
     
     # Weight rates by population
     mortality.numerators = rowSums(sapply(counties, function(county){
-        county.populations[county,,,] * raw.mortality.rates[state.for.county(county),,,]
+        county.populations[county,,,] * 
+            raw.mortality.rates[get.super.locations(county, 'state', limit.to.completely.enclosing = T),,,]
     }))
     mortality.rates.all.counties = mortality.numerators / population
     
@@ -154,12 +159,12 @@ get.non.idu.general.mortality.rates <- function(location, specification.info, po
 ##-- Initial Population --##
 ##------------------------##
 
-get.base.initial.male.population <- function(location, specification.info, years=DEFAULT.POPULATION.YEARS)
+get.base.initial.male.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
 {
-    if (length(specification.info$dim.names$location)>1)
+    if (length(specification.metadata$dim.names$location)>1)
         stop("We need to specify what to do with more than one location")
     
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     
     county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
                                          sexes = 'male', aggregate.sexes = T,
@@ -169,12 +174,12 @@ get.base.initial.male.population <- function(location, specification.info, years
     CENSUS.BHO.RACE.MAPPING$apply(county.populations)
 }
 
-get.base.initial.female.population <- function(location, specification.info, years=DEFAULT.POPULATION.YEARS)
+get.base.initial.female.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
 {
-    if (length(specification.info$dim.names$location)>1)
+    if (length(specification.metadata$dim.names$location)>1)
         stop("We need to specify what to do with more than one location")
     
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     
     county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
                                          sexes = 'female', aggregate.sexes = T,
@@ -184,13 +189,13 @@ get.base.initial.female.population <- function(location, specification.info, yea
     CENSUS.BHO.RACE.MAPPING$apply(county.populations)
 }
 
-get.location.ever.idu.prevalence <- function(location, specification.info)
+get.location.ever.idu.prevalence <- function(location, specification.metadata)
 {
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     
     idu.ever.prevalence = get.idu.prevalence(ALL.DATA.MANAGERS$idu, 
                                              ALL.DATA.MANAGERS$census.full.msm, 
-                                             age.cutoffs = specification.info$age.endpoints,
+                                             age.cutoffs = specification.metadata$age.endpoints,
                                              use.ever=T, 
                                              counties=counties, 
                                              aggregate.counties = T)
@@ -198,13 +203,13 @@ get.location.ever.idu.prevalence <- function(location, specification.info)
     idu.ever.prevalence
 }
 
-get.location.active.idu.prevalence <- function(location, specification.info)
+get.location.active.idu.prevalence <- function(location, specification.metadata)
 {
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     
     idu.30d.prevalence = get.idu.prevalence(ALL.DATA.MANAGERS$idu, 
                                             ALL.DATA.MANAGERS$census.full.msm, 
-                                            age.cutoffs = specification.info$age.endpoints,
+                                            age.cutoffs = specification.metadata$age.endpoints,
                                             use.30d=T, 
                                             counties=counties,
                                             aggregate.counties = T)
@@ -212,8 +217,11 @@ get.location.active.idu.prevalence <- function(location, specification.info)
     idu.30d.prevalence
 }
 
-get.seed.rate.per.stratum <- function(location, specification.info, population.year=DEFAULT.POPULATION.YEARS)
+get.seed.rate.per.stratum <- function(location, specification.metadata, population.year=DEFAULT.POPULATION.YEARS)
 {
+    # A hack for now to harmonize with old locations codes
+    location = gsub('^c\\.','',location)
+        
     prevalence.sex.age = get.surveillance.data.rate(msa.surveillance,
                                                     location.codes=location,
                                                     data.type='prevalence',
@@ -295,7 +303,7 @@ get.aging.rate.mid.of.20 <- function(n.first.10, n.second.10)
 
 get.female.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     rv = get.census.data(ALL.DATA.MANAGERS$census.full, 
                          fips = counties,
                          years = population.years,
@@ -308,10 +316,10 @@ get.female.single.year.age.counts <- function(location, population.years=DEFAULT
     array(rv, dim=c(age=length(rv)), dimnames=list(age=names(rv)))
 }
 
-get.msm.single.year.age.counts <- function(location, specification.info,
+get.msm.single.year.age.counts <- function(location, specification.metadata,
                                            population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     rv = rowSums(get.best.guess.msm.proportions.by.race(fips=counties,
                                                         census = ALL.DATA.MANAGERS$census.full, 
                                                         years = population.years,
@@ -326,10 +334,10 @@ get.msm.single.year.age.counts <- function(location, specification.info,
     rv
 }
 
-get.heterosexual.male.single.year.age.counts <- function(location, specification.info,
+get.heterosexual.male.single.year.age.counts <- function(location, specification.metadata,
                                                          population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = counties.for.msa(location)
+    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
     get.census.data(ALL.DATA.MANAGERS$census.full,
                     fips=counties,
                     years = population.years,
@@ -339,7 +347,7 @@ get.heterosexual.male.single.year.age.counts <- function(location, specification
                     aggregate.ages = F,
                     aggregate.races = T,
                     aggregate.sexes = T) / length(population.years) - 
-        get.msm.single.year.age.counts(location=location, specification.info=specification.info,
+        get.msm.single.year.age.counts(location=location, specification.metadata=specification.metadata,
                                        population.years=population.years)
 }
 
@@ -347,9 +355,9 @@ get.heterosexual.male.single.year.age.counts <- function(location, specification
 get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
                                                    single.year.msm.age.counts,
                                                    single.year.age.sexual.availability,
-                                                   specification.info)
+                                                   specification.metadata)
 {
-    do.get.age.contact.proportions.for.model(specification.info=specification.info,
+    do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                              location=location,
                                              age.mixing.sd.mult = age.mixing.sd.mult,
                                              age.model = ALL.DATA.MANAGERS$pairing$sex.age.models$msm,
@@ -360,9 +368,9 @@ get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
 get.heterosexual.male.sexual.age.contact.proportions <- function(age.mixing.sd.mult, 
                                                                  single.year.heterosexual.male.age.counts,
                                                                  single.year.age.sexual.availability,
-                                                                 specification.info)
+                                                                 specification.metadata)
 {
-    do.get.age.contact.proportions.for.model(specification.info=specification.info,
+    do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                              location=location,
                                              age.mixing.sd.mult = age.mixing.sd.mult,
                                              age.model = ALL.DATA.MANAGERS$pairing$sex.age.models$heterosexual_male,
@@ -373,9 +381,9 @@ get.heterosexual.male.sexual.age.contact.proportions <- function(age.mixing.sd.m
 get.female.sexual.age.contact.proportions <- function(age.mixing.sd.mult, 
                                                       single.year.female.age.counts,
                                                       single.year.age.sexual.availability,
-                                                      specification.info)
+                                                      specification.metadata)
 {
-    do.get.age.contact.proportions.for.model(specification.info=specification.info,
+    do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                              location=location,
                                              age.mixing.sd.mult = age.mixing.sd.mult,
                                              age.model = ALL.DATA.MANAGERS$pairing$sex.age.models$female,
@@ -386,9 +394,9 @@ get.female.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
 get.idu.age.contact.proportions <- function(age.mixing.sd.mult,
                                             single.year.age.counts,
                                             single.year.age.idu.availability,
-                                            specification.info)
+                                            specification.metadata)
 {
-    do.get.age.contact.proportions.for.model(specification.info=specification.info,
+    do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                              location=location,
                                              age.mixing.sd.mult = age.mixing.sd.mult,
                                              age.model = ALL.DATA.MANAGERS$pairing$idu.age.model,
@@ -404,7 +412,7 @@ get.idu.sex.contact.proportions <- function(idu.transmission.sex.oes,
 }
 
 
-do.get.age.contact.proportions.for.model <- function(specification.info,
+do.get.age.contact.proportions.for.model <- function(specification.metadata,
                                                      location,
                                                      age.mixing.sd.mult,
                                                      age.model,
@@ -413,7 +421,7 @@ do.get.age.contact.proportions.for.model <- function(specification.info,
     
 {
     #-- Call the function --#
-    age.cutoffs = specification.info$age.endpoints
+    age.cutoffs = specification.metadata$age.endpoints
     age.cutoffs[length(age.cutoffs)] = min(age.cutoffs[length(age.cutoffs)],
                                            max(as.numeric(names(age.counts))))
     
@@ -422,7 +430,7 @@ do.get.age.contact.proportions.for.model <- function(specification.info,
                                age.delta.intercept.sd=age.model['sd.intercept'],
                                age.delta.slope.sd=age.model['sd.slope'],
                                age.cutoffs=age.cutoffs,
-                               age.labels=specification.info$dim.names$age,
+                               age.labels=specification.metadata$dim.names$age,
                                single.year.age.counts=age.counts*availability,
                                sd.multiplier=age.mixing.sd.mult)
 }
