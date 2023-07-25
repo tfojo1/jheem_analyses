@@ -51,7 +51,7 @@ census.manager$register.ontology(
                   ###Read in Census Files###
 ################################################################################
 
-DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county"
+DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county_00.22"
 
 census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
 
@@ -64,9 +64,7 @@ data.list.county.pop <- lapply(census_county_files, function(x){
 ###SOURCE OTHER FILES FOR OTHER DOC TYPES HERE###
 ################################################################################
 
-
-
-
+source('data_processing/census_other_file_structures.R')
 
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###

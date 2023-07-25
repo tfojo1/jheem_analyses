@@ -1,17 +1,25 @@
 
 #Separating these years because file structure varies prior to 2000
 library(readr)
+library(readxl)
 ################################################################################
-            ###Read 90-99 State and County Files###
+            ###Read 90-99 County Files###
 ################################################################################
-DATA.DIR.CENSUS.90="../../data_raw/population/state_county_90.99"
+DATA.DIR.CENSUS.90="../../data_raw/population/county_90.99"
 
 ninties_files <- list.files(DATA.DIR.CENSUS.90, pattern = "txt", full.names = TRUE, recursive = TRUE)
 
-#creating a list with sublists of filename, data#
-data.list.state.county.90 <- lapply(ninties_files, function(x) {
+#90.99 County Data#
+data.list.county.90 <- lapply(ninties_files, function(x) {
     list(filename=x, data=read.table(x, quote="\"", comment.char="", colClasses=c(V2="character")))
   })
+
+#1980's County data
+sheets <- excel_sheets("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls")
+county_80.89 <- lapply(sheets, function(x) read_excel("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls", sheet = x, skip=5))
+
+#1970's County Data
+county_70.79 <- read.csv("~/JHEEM/data_raw/population/county_70.89/county_70.79.csv", header=FALSE, colClasses=c(V2="character"))
 
 ################################################################################
 ###Create Mappings for 90-99 Files###
@@ -63,7 +71,7 @@ ethnicity.mappings = c('1' = 'non-hispanic',
                     ###COUNTY 1990-1999 POPULATION###
 ################################################################################
 
-data.list.90.county = lapply(data.list.state.county.90 , function(file){
+data.list.90.county = lapply(data.list.county.90 , function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
@@ -95,37 +103,40 @@ data.list.90.county = lapply(data.list.state.county.90 , function(file){
   list(filename, data)  
 
 })
+################################################################################
+###COUNTY 1980-1989 POPULATION###
+################################################################################
 
 ################################################################################
+###COUNTY 1970-1979 POPULATION###
+################################################################################
+
+county_70.79_clean <- county_70.79 %>%
+  rename(year = V1)%>%
+  rename(fips = V2) %>%  
+  rename(race_sex_code = V3) %>%
+  rename ("0-4 year olds" = V4)%>%
+  rename ("5-9 year olds" = V5) %>%
+  rename ("10-14 year olds"= V6) %>%
+  rename ("15-19 year olds" = V7) %>%
+  rename ("20-24 year olds" = V8) %>%
+  rename ("25-29 year olds" = V9) %>%
+  rename ("30-34 year olds" = V10) %>%
+  rename ("35-39 year olds" = V11) %>%
+  rename ("40-44 year olds" = V12) %>%
+  rename ("45-49 year olds" = V13) %>%
+  rename ("50-54 year olds" = V14) %>%
+  rename ("55-59 year olds" = V15) %>%
+  rename ("60-64 year olds" = V16) %>%
+  rename ("65-69 year olds" = V17) %>%
+  rename ("70-74 year olds" = V18) %>%
+  rename ("75-79 year olds" = V19) %>%
+  rename ("80-84 year olds" = V20) %>%
+  rename ("85 years old and older" = V21) 
+  
+  
+################################################################################
                   ###PUT INTO CENSUS MANAGER###
-
-#STATE POPULATION VALUES 1970-1979
-state_70_pop = lapply(state_70_79_clean_list, `[[`, 2)  #I think this doesnt work bc it's not a list anymore#
-
-for (data in state_70_pop) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
-
-#STATE POPULATION VALUES 1990-1999
-state_90_pop = lapply(data.list.90.state, `[[`, 2)
-
-for (data in state_90_pop) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
 
 #COUNTY POPULATION VALUES 1990-1999
 county_90_pop = lapply(data.list.90.county, `[[`, 2)
