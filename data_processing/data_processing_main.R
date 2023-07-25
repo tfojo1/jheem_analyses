@@ -20,11 +20,11 @@ data.manager$register.outcome(
     description = "New HIV Cases Diagnosed in a Year"))
 
 data.manager$register.outcome(
-'deaths',
+'hiv deaths',
 metadata = create.outcome.metadata(
   scale = 'non.negative.number',
-  display.name = 'Deaths',
-  axis.name = 'Deaths (n)',
+  display.name = 'HIV Deaths',
+  axis.name = 'HIV Deaths (n)',
   units = 'cases',
   description = "HIV Deaths"))
 
@@ -123,7 +123,7 @@ source('data_processing/aids_vu_processing.R')
 ###Define the 'mappings' for Atlas plus data###
 
 outcome.mappings = c('HIV diagnoses'='diagnoses',
-                     'HIV deaths' = 'deaths',
+                     'HIV deaths' = 'hiv deaths',
                      'HIV prevalence' = 'prevalence',
                      'Linkage to HIV care' = 'linkage',
                      'Receipt of HIV medical care' = 'care',
@@ -575,7 +575,7 @@ for (data in deaths_all) {
    dimension.values = list(sex=c('male', 'female'))))
  
  y =(data.manager$pull(
-   outcome='deaths',
+   outcome='hiv deaths',
    keep.dimensions = c('location', 'year')))
  
  z =(data.manager$pull(
