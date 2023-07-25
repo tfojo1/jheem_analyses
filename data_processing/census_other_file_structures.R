@@ -97,7 +97,7 @@ data.list.90.county = lapply(data.list.county.90 , function(file){
               .groups='drop')
   
   data$value= data$sum_population
-  data$year = "1990"
+  data$year = "1990" 
   data$outcome = "population" 
   
   list(filename, data)  

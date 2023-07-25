@@ -62,7 +62,7 @@ data.list.county.pop <- lapply(census_county_files, function(x){
 
 ################################################################################
 ###SOURCE OTHER FILES FOR OTHER DOC TYPES HERE###
-################################################################################
+################################################################################ 
 
 source('data_processing/census_other_file_structures.R')
 
