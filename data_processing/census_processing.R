@@ -50,206 +50,21 @@ census.manager$register.ontology(
 ################################################################################
                   ###Read in Census Files###
 ################################################################################
-DATA.DIR.CENSUS.STATE="../../data_raw/population/state"
-DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county"
-DATA.DIR.CENSUS.MSA="../../data_raw/population/msa"
 
-census_state_files <- Sys.glob(paste0(DATA.DIR.CENSUS.STATE, '/*.csv'))
+DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county_00.22"
+
 census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
-census_msa_files <- Sys.glob(paste0(DATA.DIR.CENSUS.MSA, '/*.csv'))
 
 #creating a list with sublists of filename, data#
-data.list.state.pop <- lapply(census_state_files, function(x){
-  list(filename=x, data=read.csv(x, header=TRUE))
-})
-
 data.list.county.pop <- lapply(census_county_files, function(x){
   list(filename=x, data=read.csv(x, header=TRUE))
 })
 
-data.list.msa.pop <- lapply(census_msa_files, function(x){
-  list(filename=x, data=read.csv(x, header=TRUE))
-})
-
 ################################################################################
-          ###NATIONAL POPULATION, BIRTHS, DEATHS 2010-2022###
-################################################################################
-###Pull National data from State Files; filter by US###
+###SOURCE OTHER FILES FOR OTHER DOC TYPES HERE###
+################################################################################ 
 
-data.list.national = lapply(data.list.state.pop, function(file){
-  
-  data=file[["data"]]
-  filename = file[["filename"]]
-  
-  data= subset(data, data$NAME== "United States")   #National values#
-  data$location = "US"
-  
-  #Begin set up for pivot longer
-  
-  data$"population_2010" = data$POPESTIMATE2010
-  data$"population_2011" = data$POPESTIMATE2011
-  data$"population_2012" = data$POPESTIMATE2012
-  data$"population_2013" = data$POPESTIMATE2013
-  data$"population_2014" = data$POPESTIMATE2014
-  data$"population_2015" = data$POPESTIMATE2015
-  data$"population_2016" = data$POPESTIMATE2016
-  data$"population_2017" = data$POPESTIMATE2017
-  data$"population_2018" = data$POPESTIMATE2018
-  data$"population_2019" = data$POPESTIMATE2019
-  data$"population_2020" = data$POPESTIMATE2020
-  data$"population_2021" = data$POPESTIMATE2021
-  data$"population_2022" = data$POPESTIMATE2022
-  
-  data$"births_2010" = data$BIRTHS2010
-  data$"births_2011" = data$BIRTHS2011
-  data$"births_2012" = data$BIRTHS2012
-  data$"births_2013" = data$BIRTHS2013
-  data$"births_2014" = data$BIRTHS2014
-  data$"births_2015" = data$BIRTHS2015
-  data$"births_2016" = data$BIRTHS2016
-  data$"births_2017" = data$BIRTHS2017
-  data$"births_2018" = data$BIRTHS2018
-  data$"births_2019" = data$BIRTHS2019
-  data$"births_2020" = data$BIRTHS2020
-  data$"births_2021" = data$BIRTHS2021
-  data$"births_2022" = data$BIRTHS2022
-  
-  data$"deaths_2010" = data$DEATHS2010
-  data$"deaths_2011" = data$DEATHS2011
-  data$"deaths_2012" = data$DEATHS2012
-  data$"deaths_2013" = data$DEATHS2013
-  data$"deaths_2014" = data$DEATHS2014
-  data$"deaths_2015" = data$DEATHS2015
-  data$"deaths_2016" = data$DEATHS2016
-  data$"deaths_2017" = data$DEATHS2017
-  data$"deaths_2018" = data$DEATHS2018
-  data$"deaths_2019" = data$DEATHS2019
-  data$"deaths_2020" = data$DEATHS2020
-  data$"deaths_2021" = data$DEATHS2021
-  data$"deaths_2022" = data$DEATHS2022
-  
-  
-  ##this will give warning that it doesn't see these vars across all dfs##
-  
-  data<- data %>%
-    select(location,(one_of("population_2010", "population_2011", "population_2012", "population_2013", "population_2014", "population_2015",
-                            "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", "population_2021", "population_2022",
-                            "births_2010", "births_2011", "births_2012", "births_2013", "births_2014", "births_2015", "births_2016", "births_2017", 
-                            "births_2018", "births_2019", "births_2020", "births_2021", "births_2022", "deaths_2010", "deaths_2011", 
-                            "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                            "deaths_2020", "deaths_2021", "deaths_2022")))
-  
-  
-  
-  data <- data %>%
-    pivot_longer(cols=c(one_of("population_2010", "population_2011", "population_2012", "population_2013", "population_2014", "population_2015",
-                               "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", "population_2021", "population_2022",
-                               "births_2010", "births_2011", "births_2012", "births_2013", "births_2014", "births_2015", "births_2016", "births_2017", 
-                               "births_2018", "births_2019", "births_2020", "births_2021", "births_2022", "deaths_2010", "deaths_2011", 
-                               "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                               "deaths_2020", "deaths_2021", "deaths_2022")),
-                 names_to = c("outcome", "year"),
-                 names_sep = "_",
-                 values_to = "value")
-  
-  data$year = as.character(data$year) 
-  
-  data= as.data.frame(data)
-  
-  list(filename, data) #what to return# 
-  
-})
-
-################################################################################
-             ###STATE POPULATION, BIRTHS, DEATHS 2010-2022###
-###START WITH 2010-2022, NEED TO REVISIT 2000 LATER###
-################################################################################
-
-data.list.state = lapply(data.list.state.pop, function(file){
-  
-  data=file[["data"]]
-  filename = file[["filename"]]
-  
-  data= subset(data, data$STATE != "0")   #0 represents various regions
-  data= subset(data, data$NAME != "Puerto Rico") #remove Puerto Rico
-  
-  names(state.abb) <- state.name 
-  data$location =ifelse(data$NAME == "District of Columbia", "DC", state.abb[data$NAME])
-  
-  #Begin set up for pivot longer
-  data$"population_2010" = data$POPESTIMATE2010
-  data$"population_2011" = data$POPESTIMATE2011
-  data$"population_2012" = data$POPESTIMATE2012
-  data$"population_2013" = data$POPESTIMATE2013
-  data$"population_2014" = data$POPESTIMATE2014
-  data$"population_2015" = data$POPESTIMATE2015
-  data$"population_2016" = data$POPESTIMATE2016
-  data$"population_2017" = data$POPESTIMATE2017
-  data$"population_2018" = data$POPESTIMATE2018
-  data$"population_2019" = data$POPESTIMATE2019
-  data$"population_2020" = data$POPESTIMATE2020
-  data$"population_2021" = data$POPESTIMATE2021
-  data$"population_2022" = data$POPESTIMATE2022
-  
-  data$"births_2010" = data$BIRTHS2010
-  data$"births_2011" = data$BIRTHS2011
-  data$"births_2012" = data$BIRTHS2012
-  data$"births_2013" = data$BIRTHS2013
-  data$"births_2014" = data$BIRTHS2014
-  data$"births_2015" = data$BIRTHS2015
-  data$"births_2016" = data$BIRTHS2016
-  data$"births_2017" = data$BIRTHS2017
-  data$"births_2018" = data$BIRTHS2018
-  data$"births_2019" = data$BIRTHS2019
-  data$"births_2020" = data$BIRTHS2020
-  data$"births_2021" = data$BIRTHS2021
-  data$"births_2022" = data$BIRTHS2022
-  
-  data$"deaths_2010" = data$DEATHS2010
-  data$"deaths_2011" = data$DEATHS2011
-  data$"deaths_2012" = data$DEATHS2012
-  data$"deaths_2013" = data$DEATHS2013
-  data$"deaths_2014" = data$DEATHS2014
-  data$"deaths_2015" = data$DEATHS2015
-  data$"deaths_2016" = data$DEATHS2016
-  data$"deaths_2017" = data$DEATHS2017
-  data$"deaths_2018" = data$DEATHS2018
-  data$"deaths_2019" = data$DEATHS2019
-  data$"deaths_2020" = data$DEATHS2020
-  data$"deaths_2021" = data$DEATHS2021
-  data$"deaths_2022" = data$DEATHS2022
-  
-  
-  ##this will give warning that it doesn't see these vars across all dfs##
-  
-  data<- data %>%
-    select(location,(one_of("population_2010", "population_2011", "population_2012", "population_2013", "population_2014", "population_2015",
-                            "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", "population_2021", "population_2022",
-                            "births_2010", "births_2011", "births_2012", "births_2013", "births_2014", "births_2015", "births_2016", "births_2017", 
-                            "births_2018", "births_2019", "births_2020", "births_2021", "births_2022", "deaths_2010", "deaths_2011", 
-                            "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                            "deaths_2020", "deaths_2021", "deaths_2022")))
-  
-  
-  
-  data <- data %>%
-    pivot_longer(cols=c(one_of("population_2010", "population_2011", "population_2012", "population_2013", "population_2014", "population_2015",
-                               "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", "population_2021", "population_2022",
-                               "births_2010", "births_2011", "births_2012", "births_2013", "births_2014", "births_2015", "births_2016", "births_2017", 
-                               "births_2018", "births_2019", "births_2020", "births_2021", "births_2022", "deaths_2010", "deaths_2011", 
-                               "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                               "deaths_2020", "deaths_2021", "deaths_2022")),
-                 names_to = c("outcome", "year"),
-                 names_sep = "_",
-                 values_to = "value")
-  
-  data$year = as.character(data$year) 
-  
-  data= as.data.frame(data)
-  
-  list(filename, data) #what to return# 
-  
-})
+source('data_processing/census_other_file_structures.R')
 
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
@@ -402,99 +217,11 @@ data.list.county = lapply(data.list.county.pop, function(file){
 })
 
 
-################################################################################
-          ###MSA Population Estimates 2010-2022###
-################################################################################
-
-data.list.msa.pop.clean = lapply(data.list.msa.pop, function(file){
-  
-  data=file[["data"]]
-  filename = file[["filename"]]
-
-  
-  data$location = paste("C", data$CBSA, sep=".")
-  
-  data= subset(data, data$LSAD != "County or equivalent")  #DOUBLE CHECK how to handle this- Division, Metro/Micro, County#
-
-  #Begin set up for pivot longer
-  # data$"2000" = data$POPESTIMATE2000
-  # data$"2001" = data$POPESTIMATE2001 
-  # data$"2002" = data$POPESTIMATE2002 
-  # data$"2003" = data$POPESTIMATE2003
-  # data$"2004" = data$POPESTIMATE2004
-  # data$"2005" = data$POPESTIMATE2005
-  # data$"2006" = data$POPESTIMATE2006
-  # data$"2007" = data$POPESTIMATE2007
-  # data$"2008" = data$POPESTIMATE2008
-  # data$"2009" = data$POPESTIMATE2009
-  data$"2010" = data$POPESTIMATE2010
-  data$"2011" = data$POPESTIMATE2011
-  data$"2012" = data$POPESTIMATE2012
-  data$"2013" = data$POPESTIMATE2013
-  data$"2014" = data$POPESTIMATE2014
-  data$"2015" = data$POPESTIMATE2015
-  data$"2016" = data$POPESTIMATE2016
-  data$"2017" = data$POPESTIMATE2017
-  data$"2018" = data$POPESTIMATE2018
-  data$"2019" = data$POPESTIMATE2019
-  data$"2020" = data$POPESTIMATE2020
-  data$"2021" = data$POPESTIMATE2021
-  data$"2022" = data$POPESTIMATE2022
-  
-  data$outcome= "population"
-  
-  ##this will give warning that it doesn't see these vars across all dfs##
-  data<- data %>%
-    select(outcome, location, (one_of("2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
-                                      "2020", "2021", "2022")))
-  
-  
-  data <- data %>%
-    pivot_longer(cols=c(one_of("2010","2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019",
-                               "2020", "2021", "2022")),
-                 names_to = "year",
-                 names_transform = list(year = as.integer),
-                 values_to = "value")
-  
-  data$year = as.character(data$year)
-  data$value = as.numeric(data$value)
-  
-  data= as.data.frame(data)
-  
-  list(filename, data) #what to return# 
-})
 
 ################################################################################
                 ###Put data into Census Manager###
 ################################################################################    
 
-#NATIONAL POPULATION, BIRTHS, DEATHS VALUES
-national_pop = lapply(data.list.national, `[[`, 2)
-
-for (data in national_pop) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
-
-#STATE POPULATION, BIRTHS, DEATHS VALUES
-state_pop = lapply(data.list.state, `[[`, 2)
-
-for (data in state_pop) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
 
 #County POPULATION Values
 county_pop = lapply(data.list.county, `[[`, 2)
@@ -510,25 +237,10 @@ for (data in county_pop) {
     details = 'Census Reporting')
 }
 
-#MSA POPULATION Values
-msa_pop = lapply(data.list.msa.pop.clean, `[[`, 2)
-
-for (data in msa_pop) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
-
 ################################################################################
                   ###Save Census Manager###
 ################################################################################ 
 
 save(census.manager, file="../../cached/census.manager.rdata")
-
 
 
