@@ -465,8 +465,8 @@ register.natality(specification = EHE.SPECIFICATION,
                   all.births.into.compartments = list(age=1, risk=1))
 
 register.natality(specification = EHE.SPECIFICATION,
-                  from.groups = 'uninfected',
-                  to.groups = 'infected',
+                  from.groups = 'infected',
+                  to.groups = 'uninfected',
                   fertility.rate.value = 'fertility',
                   birth.proportions.value = 'birth.proportions',
                   parent.child.concordant.dimensions = 'race',
@@ -1379,7 +1379,7 @@ register.model.element(EHE.SPECIFICATION,
                                                                                                  post.peak=1),
                                                                               link = 'identity',
                                                                               knot.link = 'log'
-                                                                              ),
+                                                                           ),
                        functional.form.from.time = 1970,
                        functional.form.to.time = TRATE.KNOT.TIMES[1]
 )
@@ -1437,9 +1437,21 @@ track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
                                                                                  scale = 'proportion',
                                                                                  axis.name = 'Proportion Tested',
                                                                                  units = '%'),
-                                      rate.quantity.name = 'testing',
+                                      rate.value = 'testing',
                                       denominator.outcome = 'cumulative.uninfected',
                                       keep.dimensions = c('age','race','sex','risk'))
+
+track.dynamic.outcome(EHE.SPECIFICATION,
+                      name = 'hiv.mortality',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Mortality in PWH',
+                                                                 description = "Number of People with HIV who Died of Any Cause in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Deaths',
+                                                                 units = 'deaths'),
+                      dynamic.quantity.name = 'mortality',
+                      groups = 'infected',
+                      tags = NULL,
+                      keep.dimensions = c('sex'))
 
 ##--------------------------------##
 ##--------------------------------##
