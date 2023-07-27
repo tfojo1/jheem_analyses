@@ -328,7 +328,7 @@ for (data in county_80_pop) {
 #COUNTY TOTAL POPULATIONS VALUES 1970-1979 
 county_70_pop = lapply(county_70.79_list_clean , `[[`, 2)
 
-for (data in county_70_pop) {
+for (data in county_70_pop) {  
   
   census.manager$put.long.form(
     data = data,
