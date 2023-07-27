@@ -465,8 +465,8 @@ register.natality(specification = EHE.SPECIFICATION,
                   all.births.into.compartments = list(age=1, risk=1))
 
 register.natality(specification = EHE.SPECIFICATION,
-                  from.groups = 'uninfected',
-                  to.groups = 'infected',
+                  from.groups = 'infected',
+                  to.groups = 'uninfected',
                   fertility.rate.value = 'fertility',
                   birth.proportions.value = 'birth.proportions',
                   parent.child.concordant.dimensions = 'race',
