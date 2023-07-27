@@ -126,16 +126,54 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
               .groups='drop')
   
   data$value= data$sum_population
-  data$year = "1990" 
   data$outcome = "population"
+  
+  
+  if(grepl("1990", filename)) {
+    data$year = "1990"
+  }
+  if(grepl("1991", filename)) {
+    data$year = "1991"
+  }
+  if(grepl("1992", filename)) {
+    data$year = "1992"
+  }
+  if(grepl("1993", filename)) {
+    data$year = "1993"
+  }
+  if(grepl("1994", filename)) {
+    data$year = "1994"
+  }
+  if(grepl("1995", filename)) {
+    data$year = "1995"
+  }
+  if(grepl("1996", filename)) {
+    data$year = "1996"
+  }
+  if(grepl("1997", filename)) {
+    data$year = "1997"
+  }
+  if(grepl("1998", filename)) {
+    data$year = "1998"
+  }
+  if(grepl("1999", filename)) {
+    data$year = "1999"
+  }
   
   data = as.data.frame(data)
   
   list(filename, data)  
 
 })
+
 ################################################################################
-###COUNTY 1980-1989 POPULATION###
+                    ###COUNTY 1990-1999 DEMOGRAPHICS###
+################################################################################
+
+#SAVED this on desktop- need to recode race to include ethinicity before put
+
+################################################################################
+                  ###COUNTY 1980-1989 TOTAL POPULATION###
 ################################################################################
 data.list.80.county.clean = lapply(county_80.89 , function(file){
   
@@ -193,8 +231,71 @@ data.list.80.county.clean = lapply(county_80.89 , function(file){
   list(sheet, data)  
   
 })
+
 ################################################################################
-###COUNTY 1970-1979 POPULATION###
+              ###COUNTY 1980-1989 DEMOGRAPHICS###
+################################################################################
+
+###this may be redundant###
+data.list.80.county.demos = lapply(county_80.89 , function(file){
+  
+  data=file[["data"]]
+  sheet = file[["sheet"]]
+  
+  data$year = as.character(data$`Year of Estimate`)
+  data$fips = data$`FIPS State and County Codes`
+  
+  data= subset(data, data$year != "NA") 
+  
+  data$location= data$fips
+  
+  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
+  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
+  data=subset(data, data$location != "09130")
+  data=subset(data, data$location != "09140")
+  data=subset(data, data$location != "09150")
+  data=subset(data, data$location != "09160")
+  data=subset(data, data$location != "09170")
+  data=subset(data, data$location != "09180")
+  data=subset(data, data$location != "09190")
+  
+  data=subset(data, data$location != "02270")
+  data=subset(data, data$location != "46113")
+  data=subset(data, data$location != "51515")
+  
+  data=subset(data, data$location != "02201")
+  data=subset(data, data$location != "02280")
+  data=subset(data, data$location != "02232")
+  data=subset(data, data$location != "51560")
+  
+  data=subset(data, data$location != "02231")
+  data=subset(data, data$location != "12025")
+  data=subset(data, data$location != "30113")
+  data=subset(data, data$location != "51780")
+  
+  data$outcome = "population"
+  data= as.data.frame(data)
+
+  data <- data %>%
+    select(-c(`Year of Estimate`, `FIPS State and County Codes`, fips)) %>%
+    pivot_longer(cols=c(one_of("Under 5 years", "5 to 9 years", "10 to 14 years", "15 to 19 years", "20 to 24 years", "25 to 29 years", "30 to 34 years",
+                               "35 to 39 years", "40 to 44 years", "45 to 49 years", "50 to 54 years", "55 to 59 years", "60 to 64 years",
+                               "65 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years", "85 years and over")),
+                 names_to = "age",
+                 values_to = "value") %>%
+      
+    mutate(sex= ifelse(grepl("female", `Race/Sex Indicator`), "female", "male")) %>%
+    mutate(race= ifelse(grepl("White", `Race/Sex Indicator`), "White",
+                        ifelse(grepl("Black", `Race/Sex Indicator`), "Black", "other race")))%>%
+    select(-c(`Race/Sex Indicator`))
+  
+  
+  list(sheet, data)  
+  
+})
+
+################################################################################
+                ###COUNTY 1970-1979 POPULATION###
 ################################################################################
 county_70.79_list  <- split(county_70.79, f = county_70.79$V1) #change from dataframe to list of dfs by year#
 
@@ -288,10 +389,104 @@ data <- data %>%
 
 data$outcome = "population"
 data= as.data.frame(data)
-
   
 list(filename, data)  
 
+})
+
+################################################################################
+                  ###COUNTY 1970-1979 DEMOGRAPHICS###
+################################################################################
+county_70.79_list_demos = lapply(county_70.79_list_2, function(file){
+  
+  data=file[["data"]] #apply the function to the data element#
+  filename = file[["filename"]] #apply the function to the filename element#
+  
+  data$year = data$V1
+  data$fips = data$V2 
+  data$race_sex_code = data$V3
+  data$"0-4 year olds" = data$V4
+  data$"5-9 year olds" = data$V5
+  data$"10-14 year olds"= data$V6
+  data$"15-19 year olds" = data$V7
+  data$"20-24 year olds" = data$V8
+  data$"25-29 year olds" = data$V9
+  data$"30-34 year olds" = data$V10
+  data$"35-39 year olds" = data$V11
+  data$"40-44 year olds" = data$V12
+  data$"45-49 year olds" = data$V13
+  data$"50-54 year olds" = data$V14
+  data$"55-59 year olds" = data$V15
+  data$"60-64 year olds" = data$V16
+  data$"65-69 year olds" = data$V17
+  data$"70-74 year olds" = data$V18
+  data$"75-79 year olds" = data$V19
+  data$"80-84 year olds" = data$V20
+  data$"85 years old and older" = data$V21
+  
+  data$year = as.character(data$year)
+  data$location= data$fips
+  data$race_sex = race.sex.70s.mappings[data$race_sex]
+  
+  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
+  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
+  data=subset(data, data$location != "09130")
+  data=subset(data, data$location != "09140")
+  data=subset(data, data$location != "09150")
+  data=subset(data, data$location != "09160")
+  data=subset(data, data$location != "09170")
+  data=subset(data, data$location != "09180")
+  data=subset(data, data$location != "09190")
+  
+  data=subset(data, data$location != "02270")
+  data=subset(data, data$location != "46113")
+  data=subset(data, data$location != "51515")
+  
+  data=subset(data, data$location != "02201")
+  data=subset(data, data$location != "02280")
+  data=subset(data, data$location != "02232")
+  data=subset(data, data$location != "51560")
+  
+  data=subset(data, data$location != "02231")
+  data=subset(data, data$location != "12025")
+  data=subset(data, data$location != "30113")
+  data=subset(data, data$location != "51780")
+  
+  data=subset(data, data$location != "02010")
+  data=subset(data, data$location != "02030")
+  data=subset(data, data$location != "02040")
+  data=subset(data, data$location != "02080")
+  data=subset(data, data$location != "02120")
+  data=subset(data, data$location != "02140")
+  data=subset(data, data$location != "02160")
+  data=subset(data, data$location != "02190")
+  data=subset(data, data$location != "02200")
+  data=subset(data, data$location != "02210")
+  data=subset(data, data$location != "02250")
+  data=subset(data, data$location != "02260")
+  data=subset(data, data$location != "29193")
+  data=subset(data, data$location != "46131")
+  data=subset(data, data$location != "51123")
+  
+  data$outcome = "population"
+  data= as.data.frame(data)
+  
+  data <- data %>%
+    select(-c(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16, V17, V18, V19, V20, V21, fips, race_sex_code)) %>%
+    pivot_longer(cols=c(one_of("0-4 year olds", "5-9 year olds", "10-14 year olds", "15-19 year olds", "20-24 year olds", 
+                               "25-29 year olds", "30-34 year olds", "35-39 year olds", "40-44 year olds", "45-49 year olds",
+                               "50-54 year olds", "55-59 year olds", "60-64 year olds", "65-69 year olds", "70-74 year olds", 
+                               "75-79 year olds", "80-84 year olds", "85 years old and older")),
+                 names_to = "age",
+                 values_to = "value") %>%
+    
+    mutate(sex= ifelse(grepl("female", race_sex), "female", "male")) %>%
+    mutate(race= ifelse(grepl("White", race_sex), "White",
+                        ifelse(grepl("Black", race_sex), "Black", "other race")))%>%
+    select(-c(race_sex))
+  
+  list(filename, data)  
+  
 })
 
 ################################################################################
@@ -339,3 +534,46 @@ for (data in county_70_pop) {
     details = 'Census Reporting')
 }
 
+##############################################
+#COUNTY DEMOGRAPHICS  1990-1999
+county_90_demo = lapply(data.list.90.county.demos, `[[`, 2)
+
+for (data in county_90_demo) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+
+#COUNTY DEMOGRAPHICS  1980-1989 
+county_80_demo = lapply(data.list.80.county.demos, `[[`, 2)
+
+for (data in county_80_demo) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+#COUNTY DEMOGRAPHICS  1970-1979
+county_70_demo = lapply(county_70.79_list_demos, `[[`, 2)
+
+for (data in county_70_demo) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
