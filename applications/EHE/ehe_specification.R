@@ -1437,7 +1437,7 @@ track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
                                                                                  scale = 'proportion',
                                                                                  axis.name = 'Proportion Tested',
                                                                                  units = '%'),
-                                      rate.quantity.name = 'testing',
+                                      rate.value = 'testing',
                                       denominator.outcome = 'cumulative.uninfected',
                                       keep.dimensions = c('age','race','sex','risk'))
 
