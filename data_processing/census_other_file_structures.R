@@ -16,7 +16,9 @@ data.list.county.90 <- lapply(ninties_files, function(x) {
 
 #1980's County data
 sheets <- excel_sheets("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls")
-county_80.89 <- lapply(sheets, function(x) read_excel("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls", sheet = x, skip=5))
+county_80.89 <- lapply(sheets, function(x) {
+  list(sheet=x, data=read_excel("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls", sheet = x, skip=5))
+})
 
 #1970's County Data
 county_70.79 <- read.csv("~/JHEEM/data_raw/population/county_70.89/county_70.79.csv", header=FALSE, colClasses=c(V2="character"))
@@ -55,7 +57,7 @@ age.mappings.1 = c(	'0' = 'under 1 year',
                     '17' = '80-84 years',
                     '18' = '85 years and over')
 
-race.sex.mappings = c('1' = 'White male',
+race.sex.90s.mappings = c('1' = 'White male',
                       '2' = 'White female',
                       '3' = 'Black male',
                       '4' = 'Black female',
@@ -67,14 +69,22 @@ race.sex.mappings = c('1' = 'White male',
 ethnicity.mappings = c('1' = 'non-hispanic',
                        '2' = 'hispanic or latino')
 
+race.sex.70s.mappings= c('1' = 'White male',
+                         '2' = 'White female',
+                         '3' = 'Black male',
+                         '4' = 'Black female',
+                         '5' = 'other race male',
+                         '6' = 'other race female')
+                        
+
 ################################################################################
                     ###COUNTY 1990-1999 POPULATION###
 ################################################################################
 
-data.list.90.county = lapply(data.list.county.90 , function(file){
+data.list.county.90.clean = lapply(data.list.county.90 , function(file){
   
-  data=file[["data"]]
-  filename = file[["filename"]]
+  data=file[["data"]] #apply the function to the data element#
+  filename = file[["filename"]] #apply the function to the filename element#
   
   data$year = as.character(data$V1)    #you could take a lot of this out and just use it in the demos#
   data$location = data$V2
@@ -85,20 +95,41 @@ data.list.90.county = lapply(data.list.county.90 , function(file){
   
   data$year = year.mappings[data$year]
   data$age_group = age.mappings.1[data$age_group]
-  data$race_sex = race.sex.mappings[data$race_sex]
+  data$race_sex = race.sex.90s.mappings[data$race_sex]
   data$ethnicity = ethnicity.mappings[data$ethnicity]
+  
+  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
+  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
+  data=subset(data, data$location != "09130")
+  data=subset(data, data$location != "09140")
+  data=subset(data, data$location != "09150")
+  data=subset(data, data$location != "09160")
+  data=subset(data, data$location != "09170")
+  data=subset(data, data$location != "09180")
+  data=subset(data, data$location != "09190")
+  
+  data=subset(data, data$location != "02270")
+  data=subset(data, data$location != "46113")
+  data=subset(data, data$location != "51515")
+  
+  data=subset(data, data$location != "02201")
+  data=subset(data, data$location != "02280")
+  data=subset(data, data$location != "02232")
+  data=subset(data, data$location != "51560")
   
   data <- data %>%
     select(year, location, age_group, race_sex, ethnicity, population)
   
   data <- data %>%
-    group_by(location) %>%
+    group_by(location) %>%   #don't need to group by year bc each df is a separate year#
     summarise(sum_population = sum(population),
               .groups='drop')
   
   data$value= data$sum_population
   data$year = "1990" 
-  data$outcome = "population" 
+  data$outcome = "population"
+  
+  data = as.data.frame(data)
   
   list(filename, data)  
 
@@ -106,40 +137,168 @@ data.list.90.county = lapply(data.list.county.90 , function(file){
 ################################################################################
 ###COUNTY 1980-1989 POPULATION###
 ################################################################################
-
+data.list.80.county.clean = lapply(county_80.89 , function(file){
+  
+  data=file[["data"]]
+  sheet = file[["sheet"]]
+  
+  data$year = as.character(data$`Year of Estimate`)
+  data$fips = data$`FIPS State and County Codes`
+  
+  data= subset(data, data$year != "NA") 
+  
+  data$row_sum = rowSums(data[,c("Under 5 years", "5 to 9 years", "10 to 14 years", "15 to 19 years", "20 to 24 years", "25 to 29 years", "30 to 34 years",
+                                 "35 to 39 years", "40 to 44 years", "45 to 49 years", "50 to 54 years", "55 to 59 years", "60 to 64 years",
+                                 "65 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years", "85 years and over")])
+  
+  data$total_population = data$row_sum
+  data$location= data$fips
+  
+  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
+  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
+  data=subset(data, data$location != "09130")
+  data=subset(data, data$location != "09140")
+  data=subset(data, data$location != "09150")
+  data=subset(data, data$location != "09160")
+  data=subset(data, data$location != "09170")
+  data=subset(data, data$location != "09180")
+  data=subset(data, data$location != "09190")
+  
+  data=subset(data, data$location != "02270")
+  data=subset(data, data$location != "46113")
+  data=subset(data, data$location != "51515")
+  
+  data=subset(data, data$location != "02201")
+  data=subset(data, data$location != "02280")
+  data=subset(data, data$location != "02232")
+  data=subset(data, data$location != "51560")
+  
+  data=subset(data, data$location != "02231")
+  data=subset(data, data$location != "12025")
+  data=subset(data, data$location != "30113")
+  data=subset(data, data$location != "51780")
+  
+   data <- data %>%
+     select(year, location, total_population)
+   
+   data <- data %>%
+     group_by(year, location) %>%  
+     summarise(value = sum(total_population),
+               .groups='drop')
+  
+  data$outcome = "population"
+  data= as.data.frame(data)
+  
+  
+  list(sheet, data)  
+  
+})
 ################################################################################
 ###COUNTY 1970-1979 POPULATION###
 ################################################################################
+county_70.79_list  <- split(county_70.79, f = county_70.79$V1) #change from dataframe to list of dfs by year#
 
-county_70.79_clean <- county_70.79 %>%
-  rename(year = V1)%>%
-  rename(fips = V2) %>%  
-  rename(race_sex_code = V3) %>%
-  rename ("0-4 year olds" = V4)%>%
-  rename ("5-9 year olds" = V5) %>%
-  rename ("10-14 year olds"= V6) %>%
-  rename ("15-19 year olds" = V7) %>%
-  rename ("20-24 year olds" = V8) %>%
-  rename ("25-29 year olds" = V9) %>%
-  rename ("30-34 year olds" = V10) %>%
-  rename ("35-39 year olds" = V11) %>%
-  rename ("40-44 year olds" = V12) %>%
-  rename ("45-49 year olds" = V13) %>%
-  rename ("50-54 year olds" = V14) %>%
-  rename ("55-59 year olds" = V15) %>%
-  rename ("60-64 year olds" = V16) %>%
-  rename ("65-69 year olds" = V17) %>%
-  rename ("70-74 year olds" = V18) %>%
-  rename ("75-79 year olds" = V19) %>%
-  rename ("80-84 year olds" = V20) %>%
-  rename ("85 years old and older" = V21) 
+county_70.79_list_2  <- lapply(county_70.79_list , function(x) {
+  list(filename="70s", data=x)
+})
+
+
+county_70.79_list_clean = lapply(county_70.79_list_2, function(file){
+  
+  data=file[["data"]] #apply the function to the data element#
+  filename = file[["filename"]] #apply the function to the filename element#
+
+
+  data$year = data$V1
+  data$fips = data$V2 
+  data$race_sex_code = data$V3
+  data$"0-4 year olds" = data$V4
+  data$"5-9 year olds" = data$V5
+  data$"10-14 year olds"= data$V6
+  data$"15-19 year olds" = data$V7
+  data$"20-24 year olds" = data$V8
+  data$"25-29 year olds" = data$V9
+  data$"30-34 year olds" = data$V10
+  data$"35-39 year olds" = data$V11
+  data$"40-44 year olds" = data$V12
+  data$"45-49 year olds" = data$V13
+  data$"50-54 year olds" = data$V14
+  data$"55-59 year olds" = data$V15
+  data$"60-64 year olds" = data$V16
+  data$"65-69 year olds" = data$V17
+  data$"70-74 year olds" = data$V18
+  data$"75-79 year olds" = data$V19
+  data$"80-84 year olds" = data$V20
+  data$"85 years old and older" = data$V21
+  
+  data$year = as.character(data$year)
+  data$location= data$fips
+  
+  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
+  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
+  data=subset(data, data$location != "09130")
+  data=subset(data, data$location != "09140")
+  data=subset(data, data$location != "09150")
+  data=subset(data, data$location != "09160")
+  data=subset(data, data$location != "09170")
+  data=subset(data, data$location != "09180")
+  data=subset(data, data$location != "09190")
+  
+  data=subset(data, data$location != "02270")
+  data=subset(data, data$location != "46113")
+  data=subset(data, data$location != "51515")
+  
+  data=subset(data, data$location != "02201")
+  data=subset(data, data$location != "02280")
+  data=subset(data, data$location != "02232")
+  data=subset(data, data$location != "51560")
+  
+  data=subset(data, data$location != "02231")
+  data=subset(data, data$location != "12025")
+  data=subset(data, data$location != "30113")
+  data=subset(data, data$location != "51780")
+  
+  data=subset(data, data$location != "02010")
+  data=subset(data, data$location != "02030")
+  data=subset(data, data$location != "02040")
+  data=subset(data, data$location != "02080")
+  data=subset(data, data$location != "02120")
+  data=subset(data, data$location != "02140")
+  data=subset(data, data$location != "02160")
+  data=subset(data, data$location != "02190")
+  data=subset(data, data$location != "02200")
+  data=subset(data, data$location != "02210")
+  data=subset(data, data$location != "02250")
+  data=subset(data, data$location != "02260")
+  data=subset(data, data$location != "29193")
+  data=subset(data, data$location != "46131")
+  data=subset(data, data$location != "51123")
   
   
+  data$total_population = rowSums(data[,c("0-4 year olds", "5-9 year olds", "10-14 year olds", "15-19 year olds", "20-24 year olds", 
+                                                             "25-29 year olds", "30-34 year olds", "35-39 year olds", "40-44 year olds", "45-49 year olds",
+                                                             "50-54 year olds", "55-59 year olds", "60-64 year olds", "65-69 year olds", "70-74 year olds", 
+                                                             "75-79 year olds", "80-84 year olds", "85 years old and older")])
+
+data <- data %>%
+  select(year, location, total_population) %>%
+  group_by(year, location) %>%  
+  summarise(value = sum(total_population),
+            .groups='drop')
+
+data$outcome = "population"
+data= as.data.frame(data)
+
+  
+list(filename, data)  
+
+})
+
 ################################################################################
                   ###PUT INTO CENSUS MANAGER###
 
-#COUNTY POPULATION VALUES 1990-1999
-county_90_pop = lapply(data.list.90.county, `[[`, 2)
+#COUNTY TOTAL POPULATION VALUES 1990-1999
+county_90_pop = lapply(data.list.county.90.clean, `[[`, 2)
 
 for (data in county_90_pop) {
   
@@ -151,3 +310,32 @@ for (data in county_90_pop) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
+
+#COUNTY TOTAL POPULATIONS VALUES 1980-1989 
+county_80_pop = lapply(data.list.80.county.clean, `[[`, 2)
+
+for (data in county_80_pop) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+#COUNTY TOTAL POPULATIONS VALUES 1970-1979 
+county_70_pop = lapply(county_70.79_list_clean , `[[`, 2)
+
+for (data in county_70_pop) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
