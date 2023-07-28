@@ -98,8 +98,6 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
   data$race_sex = race.sex.90s.mappings[data$race_sex]
   data$ethnicity = ethnicity.mappings[data$ethnicity]
   
-  data=subset(data, data$location != "02232") #Removing FIPS codes that are causing error in data manager#
-  
   data <- data %>%
     select(year, location, age_group, race_sex, ethnicity, population) %>%
     group_by(location) %>%   #don't need to group by year bc each df is a separate year#
@@ -165,8 +163,6 @@ data.list.county.90.demos = lapply(data.list.county.90 , function(file){
   data$year = year.mappings[data$year]
   data$age_group = age.mappings.1[data$age_group]
   data$race_sex = race.sex.90s.mappings[data$race_sex]
-  
-  data=subset(data, data$location != "02232") #Removing FIPS codes that are causing error in data manager#
   
   data <- data %>%
     select(year, location, age_group, race_sex, ethnicity, population) %>%

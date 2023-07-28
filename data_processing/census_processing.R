@@ -59,7 +59,6 @@ census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
 data.list.county.pop <- lapply(census_county_files, function(x){
   list(filename=x, data=read.csv(x, header=TRUE))
 })
-
 ################################################################################
 ###SOURCE OTHER FILES FOR OTHER DOC TYPES HERE###
 ################################################################################ 
@@ -68,7 +67,7 @@ source('data_processing/census_other_file_structures.R')
 
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
-          ##County BIRTH AND DEATH ESTIMATES 2010-2022
+          ##County BIRTH AND DEATH ESTIMATES 2010-2022##
 ################################################################################
 
 data.list.county = lapply(data.list.county.pop, function(file){
@@ -200,8 +199,6 @@ data.list.county = lapply(data.list.county.pop, function(file){
   
   list(filename, data) #what to return# 
 })
-
-
 
 ################################################################################
                 ###Put data into Census Manager###
