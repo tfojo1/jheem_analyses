@@ -150,8 +150,41 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
                     ###COUNTY 1990-1999 DEMOGRAPHICS###
 ################################################################################
 
-#SAVED this on desktop- need to recode race to include ethinicity before put
-
+data.list.county.90.demos = lapply(data.list.county.90 , function(file){
+  
+  data=file[["data"]] #apply the function to the data element#
+  filename = file[["filename"]] #apply the function to the filename element#
+  
+  data$year = as.character(data$V1)    #you could take a lot of this out and just use it in the demos#
+  data$location = data$V2
+  data$age_group = as.character(data$V3)
+  data$race_sex = data$V4
+  data$ethnicity = data$V5
+  data$population = as.numeric(data$V6)
+  
+  data$year = year.mappings[data$year]
+  data$age_group = age.mappings.1[data$age_group]
+  data$race_sex = race.sex.90s.mappings[data$race_sex]
+  
+  data=subset(data, data$location != "02232") #Removing FIPS codes that are causing error in data manager#
+  
+  data <- data %>%
+    select(year, location, age_group, race_sex, ethnicity, population) %>%
+    mutate(sex= ifelse(grepl("female", race_sex), "female", "male")) %>%
+    
+    
+    mutate(race_alone= ifelse(grepl("White", race_sex), "White",
+                              ifelse(grepl("Black", race_sex), "Black",
+                                     ifelse(grepl("American Indian or Alaska Native", race_sex), "American Indian or Alaska Native", "Asian or Pacific Islander")))) %>%
+    
+    
+    mutate(race = ifelse( ethnicity == 2, "Hispanic", race_alone))
+  
+  data = as.data.frame(data)
+  
+  list(filename, data)  
+  
+})
 ################################################################################
                   ###COUNTY 1980-1989 TOTAL POPULATION###
 ################################################################################
@@ -180,7 +213,6 @@ data.list.80.county.clean = lapply(county_80.89 , function(file){
   
   data$outcome = "population"
   data= as.data.frame(data)
-  
   
   list(sheet, data)  
   
@@ -384,7 +416,7 @@ for (data in county_70_pop) {
 
 ##############################################
 #COUNTY DEMOGRAPHICS  1990-1999
-county_90_demo = lapply(data.list.90.county.demos, `[[`, 2)
+county_90_demo = lapply(data.list.county.90.demos, `[[`, 2)
 
 for (data in county_90_demo) {
   
