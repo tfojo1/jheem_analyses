@@ -205,3 +205,31 @@ data.list.demos.00.10.clean = lapply(data.list.demos.00.10, function(file){
 ################################################################################
 ###Put data into Census Manager###
 ################################################################################
+
+#County DEMOGRAPHICS 2010-2022
+demos_10.22 = lapply(data.list.demos.10.22.clean, `[[`, 2)
+
+for (data in county_pop) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+#County DEMOGRAPHICS 2000-2010
+demos_10.22 = lapply(data.list.demos.00.10.clean, `[[`, 2)
+
+for (data in demos_00.10) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}

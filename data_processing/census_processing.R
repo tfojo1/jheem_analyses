@@ -64,6 +64,7 @@ data.list.county.pop <- lapply(census_county_files, function(x){
 ################################################################################ 
 
 source('data_processing/census_other_file_structures.R')
+source('data_processing/census_demographics_processing_00.22.R')
 
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
