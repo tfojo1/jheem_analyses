@@ -3,7 +3,7 @@
 library(readr)
 library(readxl)
 ################################################################################
-            ###Read 90-99 County Files###
+            ###Read 1970-1990 County Files###
 ################################################################################
 DATA.DIR.CENSUS.90="../../data_raw/population/county_90.99"
 
@@ -24,7 +24,7 @@ county_80.89 <- lapply(sheets, function(x) {
 county_70.79 <- read.csv("~/JHEEM/data_raw/population/county_70.89/county_70.79.csv", header=FALSE, colClasses=c(V2="character"))
 
 ################################################################################
-###Create Mappings for 90-99 Files###
+                  ###Create Mappings###
 ################################################################################
 year.mappings = c('90' = '1990',
                   '91' = '1991',
@@ -98,36 +98,16 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
   data$race_sex = race.sex.90s.mappings[data$race_sex]
   data$ethnicity = ethnicity.mappings[data$ethnicity]
   
-  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
-  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
-  data=subset(data, data$location != "09130")
-  data=subset(data, data$location != "09140")
-  data=subset(data, data$location != "09150")
-  data=subset(data, data$location != "09160")
-  data=subset(data, data$location != "09170")
-  data=subset(data, data$location != "09180")
-  data=subset(data, data$location != "09190")
-  
-  data=subset(data, data$location != "02270")
-  data=subset(data, data$location != "46113")
-  data=subset(data, data$location != "51515")
-  
-  data=subset(data, data$location != "02201")
-  data=subset(data, data$location != "02280")
-  data=subset(data, data$location != "02232")
-  data=subset(data, data$location != "51560")
+  data=subset(data, data$location != "02232") #Removing FIPS codes that are causing error in data manager#
   
   data <- data %>%
-    select(year, location, age_group, race_sex, ethnicity, population)
-  
-  data <- data %>%
+    select(year, location, age_group, race_sex, ethnicity, population) %>%
     group_by(location) %>%   #don't need to group by year bc each df is a separate year#
     summarise(sum_population = sum(population),
               .groups='drop')
   
   data$value= data$sum_population
   data$outcome = "population"
-  
   
   if(grepl("1990", filename)) {
     data$year = "1990"
@@ -191,35 +171,9 @@ data.list.80.county.clean = lapply(county_80.89 , function(file){
   
   data$total_population = data$row_sum
   data$location= data$fips
-  
-  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
-  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
-  data=subset(data, data$location != "09130")
-  data=subset(data, data$location != "09140")
-  data=subset(data, data$location != "09150")
-  data=subset(data, data$location != "09160")
-  data=subset(data, data$location != "09170")
-  data=subset(data, data$location != "09180")
-  data=subset(data, data$location != "09190")
-  
-  data=subset(data, data$location != "02270")
-  data=subset(data, data$location != "46113")
-  data=subset(data, data$location != "51515")
-  
-  data=subset(data, data$location != "02201")
-  data=subset(data, data$location != "02280")
-  data=subset(data, data$location != "02232")
-  data=subset(data, data$location != "51560")
-  
-  data=subset(data, data$location != "02231")
-  data=subset(data, data$location != "12025")
-  data=subset(data, data$location != "30113")
-  data=subset(data, data$location != "51780")
-  
-   data <- data %>%
-     select(year, location, total_population)
    
    data <- data %>%
+     select(year, location, total_population)%>%
      group_by(year, location) %>%  
      summarise(value = sum(total_population),
                .groups='drop')
@@ -249,30 +203,6 @@ data.list.80.county.demos = lapply(county_80.89 , function(file){
   
   data$location= data$fips
   
-  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
-  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
-  data=subset(data, data$location != "09130")
-  data=subset(data, data$location != "09140")
-  data=subset(data, data$location != "09150")
-  data=subset(data, data$location != "09160")
-  data=subset(data, data$location != "09170")
-  data=subset(data, data$location != "09180")
-  data=subset(data, data$location != "09190")
-  
-  data=subset(data, data$location != "02270")
-  data=subset(data, data$location != "46113")
-  data=subset(data, data$location != "51515")
-  
-  data=subset(data, data$location != "02201")
-  data=subset(data, data$location != "02280")
-  data=subset(data, data$location != "02232")
-  data=subset(data, data$location != "51560")
-  
-  data=subset(data, data$location != "02231")
-  data=subset(data, data$location != "12025")
-  data=subset(data, data$location != "30113")
-  data=subset(data, data$location != "51780")
-  
   data$outcome = "population"
   data= as.data.frame(data)
 
@@ -288,7 +218,6 @@ data.list.80.county.demos = lapply(county_80.89 , function(file){
     mutate(race= ifelse(grepl("White", `Race/Sex Indicator`), "White",
                         ifelse(grepl("Black", `Race/Sex Indicator`), "Black", "other race")))%>%
     select(-c(`Race/Sex Indicator`))
-  
   
   list(sheet, data)  
   
@@ -334,47 +263,6 @@ county_70.79_list_clean = lapply(county_70.79_list_2, function(file){
   
   data$year = as.character(data$year)
   data$location= data$fips
-  
-  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
-  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
-  data=subset(data, data$location != "09130")
-  data=subset(data, data$location != "09140")
-  data=subset(data, data$location != "09150")
-  data=subset(data, data$location != "09160")
-  data=subset(data, data$location != "09170")
-  data=subset(data, data$location != "09180")
-  data=subset(data, data$location != "09190")
-  
-  data=subset(data, data$location != "02270")
-  data=subset(data, data$location != "46113")
-  data=subset(data, data$location != "51515")
-  
-  data=subset(data, data$location != "02201")
-  data=subset(data, data$location != "02280")
-  data=subset(data, data$location != "02232")
-  data=subset(data, data$location != "51560")
-  
-  data=subset(data, data$location != "02231")
-  data=subset(data, data$location != "12025")
-  data=subset(data, data$location != "30113")
-  data=subset(data, data$location != "51780")
-  
-  data=subset(data, data$location != "02010")
-  data=subset(data, data$location != "02030")
-  data=subset(data, data$location != "02040")
-  data=subset(data, data$location != "02080")
-  data=subset(data, data$location != "02120")
-  data=subset(data, data$location != "02140")
-  data=subset(data, data$location != "02160")
-  data=subset(data, data$location != "02190")
-  data=subset(data, data$location != "02200")
-  data=subset(data, data$location != "02210")
-  data=subset(data, data$location != "02250")
-  data=subset(data, data$location != "02260")
-  data=subset(data, data$location != "29193")
-  data=subset(data, data$location != "46131")
-  data=subset(data, data$location != "51123")
-  
   
   data$total_population = rowSums(data[,c("0-4 year olds", "5-9 year olds", "10-14 year olds", "15-19 year olds", "20-24 year olds", 
                                                              "25-29 year olds", "30-34 year olds", "35-39 year olds", "40-44 year olds", "45-49 year olds",
@@ -427,46 +315,6 @@ county_70.79_list_demos = lapply(county_70.79_list_2, function(file){
   data$year = as.character(data$year)
   data$location= data$fips
   data$race_sex = race.sex.70s.mappings[data$race_sex]
-  
-  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
-  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
-  data=subset(data, data$location != "09130")
-  data=subset(data, data$location != "09140")
-  data=subset(data, data$location != "09150")
-  data=subset(data, data$location != "09160")
-  data=subset(data, data$location != "09170")
-  data=subset(data, data$location != "09180")
-  data=subset(data, data$location != "09190")
-  
-  data=subset(data, data$location != "02270")
-  data=subset(data, data$location != "46113")
-  data=subset(data, data$location != "51515")
-  
-  data=subset(data, data$location != "02201")
-  data=subset(data, data$location != "02280")
-  data=subset(data, data$location != "02232")
-  data=subset(data, data$location != "51560")
-  
-  data=subset(data, data$location != "02231")
-  data=subset(data, data$location != "12025")
-  data=subset(data, data$location != "30113")
-  data=subset(data, data$location != "51780")
-  
-  data=subset(data, data$location != "02010")
-  data=subset(data, data$location != "02030")
-  data=subset(data, data$location != "02040")
-  data=subset(data, data$location != "02080")
-  data=subset(data, data$location != "02120")
-  data=subset(data, data$location != "02140")
-  data=subset(data, data$location != "02160")
-  data=subset(data, data$location != "02190")
-  data=subset(data, data$location != "02200")
-  data=subset(data, data$location != "02210")
-  data=subset(data, data$location != "02250")
-  data=subset(data, data$location != "02260")
-  data=subset(data, data$location != "29193")
-  data=subset(data, data$location != "46131")
-  data=subset(data, data$location != "51123")
   
   data$outcome = "population"
   data= as.data.frame(data)

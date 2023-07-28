@@ -89,21 +89,6 @@ data.list.county = lapply(data.list.county.pop, function(file){
   
   data$location = data$FIPS
   
-  data=subset(data, data$location != "09110") #Removing FIPS codes that are causing error in data manager#
-  data=subset(data, data$location != "09120") #Update 7/20/23: temporarily removing counties causing location error:
-  data=subset(data, data$location != "09130")
-  data=subset(data, data$location != "09140")
-  data=subset(data, data$location != "09150")
-  data=subset(data, data$location != "09160")
-  data=subset(data, data$location != "09170")
-  data=subset(data, data$location != "09180")
-  data=subset(data, data$location != "09190")
-  
-  data=subset(data, data$location != "02270")
-  data=subset(data, data$location != "46113")
-  data=subset(data, data$location != "51515")
-  
-  
   #Begin set up for pivot longer
   data$"population_2000" = data$POPESTIMATE2000
   data$"population_2001" = data$POPESTIMATE2001 
