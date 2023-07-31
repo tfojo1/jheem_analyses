@@ -37,26 +37,6 @@ year.mappings = c('90' = '1990',
                   '98' = '1998',
                   '99' = '1999')
 
-age.mappings.1 = c(	'0' = 'under 1 year',
-                    '1' = '1-4 years',
-                    '2' = '5-9 years',
-                    '3' = '10-14 years',
-                    '4' = '15-19 years',
-                    '5' = '20-24 years',
-                    '6' = '25-29 years',
-                    '7' = '30-34 years',
-                    '8' = '35-39 years',
-                    '9' = '40-44 years',
-                    '10' = '45-49 years',
-                    '11' = '50-54 years',
-                    '12' = '55-59 years',
-                    '13' = '60-64 years',
-                    '14' = '65-69 years',
-                    '15' = '70-74 years',
-                    '16' = '75-79 years',
-                    '17' = '80-84 years',
-                    '18' = '85 years and over')
-
 race.sex.90s.mappings = c('1' = 'White male',
                       '2' = 'White female',
                       '3' = 'Black male',
@@ -94,7 +74,6 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
   data$population = as.numeric(data$V6)
   
   data$year = year.mappings[data$year]
-  data$age_group = age.mappings.1[data$age_group]
   data$race_sex = race.sex.90s.mappings[data$race_sex]
   data$ethnicity = ethnicity.mappings[data$ethnicity]
   
@@ -155,17 +134,19 @@ data.list.county.90.demos = lapply(data.list.county.90 , function(file){
   
   data$year = as.character(data$V1)    #you could take a lot of this out and just use it in the demos#
   data$location = data$V2
-  data$age_group = as.character(data$V3)
+  data$age = as.character(data$V3)
   data$race_sex = data$V4
   data$ethnicity = data$V5
   data$population = as.numeric(data$V6)
   
   data$year = year.mappings[data$year]
-  data$age_group = age.mappings.1[data$age_group]
+  
   data$race_sex = race.sex.90s.mappings[data$race_sex]
   
+  data$age = ifelse(data$age == "0", "1", data$age)  #consolidating the age groups to align with other census data#
+  
   data <- data %>%
-    select(year, location, age_group, race_sex, ethnicity, population) %>%
+    select(year, location, age, race_sex, ethnicity, population) %>%
     mutate(sex= ifelse(grepl("female", race_sex), "female", "male")) %>%
     
     
@@ -175,6 +156,8 @@ data.list.county.90.demos = lapply(data.list.county.90 , function(file){
     
     
     mutate(race = ifelse( ethnicity == 2, "Hispanic", race_alone))
+  
+  data$age = age.mappings.universal[data$age]
   
   data = as.data.frame(data)
   
@@ -246,6 +229,10 @@ data.list.80.county.demos = lapply(county_80.89 , function(file){
     mutate(race= ifelse(grepl("White", `Race/Sex Indicator`), "White",
                         ifelse(grepl("Black", `Race/Sex Indicator`), "Black", "other race")))%>%
     select(-c(`Race/Sex Indicator`))
+  
+  data$age = ifelse(data$age == "Under 5 years", "0-4 years", data$age)
+  
+  data$age = (str_replace(data$age," to ", "-"))
   
   list(sheet, data)  
   

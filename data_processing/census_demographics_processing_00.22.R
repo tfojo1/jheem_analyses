@@ -28,26 +28,6 @@ year.mapping.20.22 = c('2' = '2020',
                        '3' = '2021',
                        '4' = '2022')
 
-age.mappings.10.22 = c('0' = 'Total',
-                       '1' = 'Age 0 to 4 years',
-                       '2' = 'Age 5 to 9 years',
-                       '3' = 'Age 10 to 14 years',
-                       '4' = 'Age 15 to 19 years',
-                       '5' = 'Age 20 to 24 years',
-                       '6' = 'Age 25 to 29 years',
-                       '7' = 'Age 30 to 34 years',
-                       '8' = 'Age 35 to 39 years',
-                       '9' = 'Age 40 to 44 years',
-                       '10' = 'Age 45 to 49 years',
-                       '11' = 'Age 50 to 54 years',
-                       '12' = 'Age 55 to 59 years',
-                       '13' = 'Age 60 to 64 years',
-                       '14' = 'Age 65 to 69 years',
-                       '15' = 'Age 70 to 74 years',
-                       '16' = 'Age 75 to 79 years',
-                       '17' = 'Age 80 to 84 years',
-                       '18' = 'Age 85 years or older')
-
 race.mapping.10.22 = c('WA' = 'White alone',
                        'BA' = 'Black alone',
                        'IA'= 'American Indian and Alaska Native alone',
@@ -124,7 +104,7 @@ data.list.demos.10.22.clean = lapply(data.list.demos.10.22, function(file){
   
   data$location = paste(data$STATE, data$COUNTY, sep="")
   
-  data$age_group = age.mappings.10.22[data$AGEGRP]
+  data= subset(data, data$AGEGRP != "0") #Removing total age group column#
   
   if(grepl("10.19", filename)) {
     data= subset(data, data$YEAR != "1")  #REMOVE CENSUS AND USE POP ESTIMATE#
@@ -135,6 +115,8 @@ data.list.demos.10.22.clean = lapply(data.list.demos.10.22, function(file){
     data= subset(data, data$YEAR != "1")  #REMOVE CENSUS AND USE POP ESTIMATE#
     data$year = year.mapping.20.22[data$YEAR]
   }
+  
+  data$age = age.mappings.universal[data$AGEGRP]
   
   data <- data %>%
     pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE",
@@ -174,7 +156,9 @@ data.list.demos.00.10.clean = lapply(data.list.demos.00.10, function(file){
   
   data$location = paste(data$STATE, data$COUNTY, sep="")
   
-  data$age_group = year.mappings.00.10[data$AGEGRP]
+  data= subset(data, data$AGEGRP != "99") #Removing total age group data#
+  
+  data$age = ifelse(data$AGEGRP == "0", "1", data$AGEGRP)  #consolidating the age groups to align with other census data#
   
   data= subset(data, data$YEAR != "1")  #REMOVE CENSUS AND USE POP ESTIMATE#
   data= subset(data, data$YEAR != "12")  
@@ -196,6 +180,7 @@ data.list.demos.00.10.clean = lapply(data.list.demos.00.10, function(file){
   data$sex= tolower(data$sex)
   
   data$race = race.mapping.10.22[data$race]
+  data$age = age.mappings.universal[data$age]
   
   data= as.data.frame(data)
   

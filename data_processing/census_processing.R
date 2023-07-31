@@ -46,6 +46,27 @@ census.manager$register.ontology(
     race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
     sex=c('male','female')
   ))
+################################################################################
+###Create Mappings###
+################################################################################
+age.mappings.universal = c('1' = '0-4 years',
+                     '2' = '5-9 years',
+                     '3' = '10-14 years',
+                     '4' = '15-19 years',
+                     '5' = '20-24 years',
+                     '6' = '25-29 years',
+                     '7' = '30-34 years',
+                     '8' = '35-39 years',
+                     '9' = '40-44 years',
+                     '10' = '45-49 years',
+                     '11' = '50-54 years',
+                     '12' = '55-59 years',
+                     '13' = '60-64 years',
+                     '14' = '65-69 years',
+                     '15' = '70-74 years',
+                     '16' = '75-79 years',
+                     '17' = '80-84 years',
+                     '18' = '85 years and over')
 
 ################################################################################
                   ###Read in Census Files###
