@@ -3,7 +3,7 @@
 library(readr)
 library(readxl)
 ################################################################################
-            ###Read 1970-1990 County Files###
+                  ###Read 1970-1990 County Files###
 ################################################################################
 DATA.DIR.CENSUS.90="../../data_raw/population/county_90.99"
 
@@ -55,8 +55,6 @@ race.sex.70s.mappings= c('1' = 'White male',
                          '4' = 'Black female',
                          '5' = 'other race male',
                          '6' = 'other race female')
-                        
-
 ################################################################################
                     ###COUNTY 1990-1999 POPULATION###
 ################################################################################
@@ -116,9 +114,7 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
   if(grepl("1999", filename)) {
     data$year = "1999"
   }
-  
   data = as.data.frame(data)
-  
   list(filename, data)  
 
 })
@@ -148,13 +144,9 @@ data.list.county.90.demos = lapply(data.list.county.90 , function(file){
   data <- data %>%
     select(year, location, age, race_sex, ethnicity, population) %>%
     mutate(sex= ifelse(grepl("female", race_sex), "female", "male")) %>%
-    
-    
     mutate(race_alone= ifelse(grepl("White", race_sex), "White",
                               ifelse(grepl("Black", race_sex), "Black",
                                      ifelse(grepl("American Indian or Alaska Native", race_sex), "American Indian or Alaska Native", "Asian or Pacific Islander")))) %>%
-    
-    
     mutate(race = ifelse( ethnicity == 2, "Hispanic", race_alone))
   
   data$age = age.mappings.universal[data$age]
@@ -201,7 +193,7 @@ data.list.80.county.clean = lapply(county_80.89 , function(file){
 })
 
 ################################################################################
-              ###COUNTY 1980-1989 DEMOGRAPHICS###
+                ###COUNTY 1980-1989 DEMOGRAPHICS###
 ################################################################################
 
 ###this may be redundant###
@@ -227,7 +219,6 @@ data.list.80.county.demos = lapply(county_80.89 , function(file){
                                "65 to 69 years", "70 to 74 years", "75 to 79 years", "80 to 84 years", "85 years and over")),
                  names_to = "age",
                  values_to = "value") %>%
-      
     mutate(sex= ifelse(grepl("female", `Race/Sex Indicator`), "female", "male")) %>%
     mutate(race= ifelse(grepl("White", `Race/Sex Indicator`), "White",
                         ifelse(grepl("Black", `Race/Sex Indicator`), "Black", "other race")))%>%
@@ -250,12 +241,10 @@ county_70.79_list_2  <- lapply(county_70.79_list , function(x) {
   list(filename="70s", data=x)
 })
 
-
 county_70.79_list_clean = lapply(county_70.79_list_2, function(file){
   
   data=file[["data"]] #apply the function to the data element#
   filename = file[["filename"]] #apply the function to the filename element#
-
 
   data$year = data$V1
   data$fips = data$V2 
@@ -345,7 +334,6 @@ county_70.79_list_demos = lapply(county_70.79_list_2, function(file){
                                "75-79 years", "80-84 years", "85 years and over")),
                  names_to = "age",
                  values_to = "value") %>%
-    
     mutate(sex= ifelse(grepl("female", race_sex), "female", "male")) %>%
     mutate(race= ifelse(grepl("White", race_sex), "White",
                         ifelse(grepl("Black", race_sex), "Black", "other race")))%>%
@@ -357,6 +345,7 @@ county_70.79_list_demos = lapply(county_70.79_list_2, function(file){
 
 ################################################################################
                   ###PUT INTO CENSUS MANAGER###
+################################################################################
 
 #COUNTY TOTAL POPULATION VALUES 1990-1999
 county_90_pop = lapply(data.list.county.90.clean, `[[`, 2)
@@ -400,7 +389,6 @@ for (data in county_70_pop) {
     details = 'Census Reporting')
 }
 
-##############################################
 #COUNTY DEMOGRAPHICS  1990-1999
 county_90_demo = lapply(data.list.county.90.demos, `[[`, 2)
 

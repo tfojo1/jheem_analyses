@@ -48,7 +48,7 @@ census.manager$register.ontology(
     sex=c('male','female')
   ))
 ################################################################################
-###Create Mappings###
+                    ###Create Mappings###
 ################################################################################
 age.mappings.universal = c('1' = '0-4 years',
                      '2' = '5-9 years',
@@ -82,7 +82,7 @@ data.list.county.pop <- lapply(census_county_files, function(x){
   list(filename=x, data=read.csv(x, header=TRUE))
 })
 ################################################################################
-###SOURCE OTHER FILES FOR OTHER DOC TYPES HERE###
+            ###SOURCE OTHER FILES FOR OTHER DOC TYPES HERE###
 ################################################################################ 
 
 source('data_processing/census_other_file_structures.R')
@@ -225,8 +225,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
 
 ################################################################################
                 ###Put data into Census Manager###
-################################################################################    
-
+################################################################################  
 
 #County POPULATION Values
 county_pop = lapply(data.list.county, `[[`, 2)

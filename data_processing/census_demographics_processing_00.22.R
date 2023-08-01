@@ -1,5 +1,8 @@
+#Process Demographic data for 2000-2022#
+
+
 ################################################################################
-###DEMOGRAPHIC MAPPINGS###
+                    ###DEMOGRAPHIC MAPPINGS###
 ################################################################################
 year.mappings.00.10 = c('2' = '2000',
                         '3' = '2001',
@@ -75,7 +78,7 @@ race.mapping.10.22 = c('WA' = 'White alone',
                        'HNAC' = 'Hispanic, Native Hawaiian and Other Pacific Islander alone or in combination')
 
 ################################################################################
-###READ IN County Demographics 2010-2022##
+              ###READ IN County Demographics 2010-2022##
 ################################################################################
 DATA.DIR.CENSUS.DEMOS="../../data_raw/population/demographics_10.22"
 DATA.DIR.CENSUS.DEMOS.STATE="../../data_raw/population/county_demographics_bystate_00.10"
@@ -92,9 +95,7 @@ data.list.demos.00.10 <- lapply(census_demo_files_00.10, function(x){
   list(filename=x, data=read.csv(x, header=TRUE, colClasses=c(STATE="character", COUNTY="character", AGEGRP= "character")))
 })
 ################################################################################
-###County Demographics 2010-2022##
-###FIGURE OUT HOW THIS WILL BE PUT INTO THE MANAGER GIVEN THE POTENTIAL OVERLAP 
-##BETWEEN CATEGORIES- DO YOU NEED TO PARSE IT OUT MORE
+              ###County Demographics 2010-2022##
 ################################################################################
 
 data.list.demos.10.22.clean = lapply(data.list.demos.10.22, function(file){
@@ -137,18 +138,14 @@ data.list.demos.10.22.clean = lapply(data.list.demos.10.22, function(file){
     select(-c(SUMLEV, STATE, COUNTY, STNAME, CTYNAME, YEAR, AGEGRP, TOT_POP, TOT_MALE, TOT_FEMALE))
   
   data$sex= tolower(data$sex)
-  
   data$race = race.mapping.10.22[data$race]
-  
   data= as.data.frame(data)
   
   list(filename, data) #what to return# 
 })
 
 ################################################################################
-###County Demographics 2000-2010##
-###FIGURE OUT HOW THIS WILL BE PUT INTO THE MANAGER GIVEN THE POTENTIAL OVERLAP 
-##BETWEEN CATEGORIES- DO YOU NEED TO PARSE IT OUT MORE
+                  ###County Demographics 2000-2010##
 ################################################################################
 
 data.list.demos.00.10.clean = lapply(data.list.demos.00.10, function(file){
@@ -157,14 +154,11 @@ data.list.demos.00.10.clean = lapply(data.list.demos.00.10, function(file){
   filename = file[["filename"]]
   
   data$location = paste(data$STATE, data$COUNTY, sep="")
-  
   data= subset(data, data$AGEGRP != "99") #Removing total age group data#
-  
   data$age = ifelse(data$AGEGRP == "0", "1", data$AGEGRP)  #consolidating the age groups to align with other census data#
   
   data= subset(data, data$YEAR != "1")  #REMOVE CENSUS AND USE POP ESTIMATE#
   data= subset(data, data$YEAR != "12")  
-  
   data$year = as.character(data$YEAR)
   data$year = year.mappings.00.10[data$year]
   
@@ -181,17 +175,15 @@ data.list.demos.00.10.clean = lapply(data.list.demos.00.10, function(file){
     select(-c(SUMLEV, STATE, COUNTY, STNAME, CTYNAME, YEAR, AGEGRP, TOT_POP, TOT_MALE, TOT_FEMALE))
   
   data$sex= tolower(data$sex)
-  
   data$race = race.mapping.10.22[data$race]
   data$age = age.mappings.universal[data$age]
-  
   data= as.data.frame(data)
   
   list(filename, data) #what to return# 
 })
 
 ################################################################################
-###Put data into Census Manager###
+                  ###Put data into Census Manager###
 ################################################################################
 
 #County DEMOGRAPHICS 2010-2022
