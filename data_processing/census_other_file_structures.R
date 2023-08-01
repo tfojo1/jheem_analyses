@@ -159,6 +159,9 @@ data.list.county.90.demos = lapply(data.list.county.90 , function(file){
   
   data$age = age.mappings.universal[data$age]
   
+  data <- data %>% 
+    select(-c(race_sex, race_alone))
+  
   data = as.data.frame(data)
   
   list(filename, data)  
@@ -308,24 +311,24 @@ county_70.79_list_demos = lapply(county_70.79_list_2, function(file){
   data$year = data$V1
   data$fips = data$V2 
   data$race_sex_code = data$V3
-  data$"0-4 year olds" = data$V4
-  data$"5-9 year olds" = data$V5
-  data$"10-14 year olds"= data$V6
-  data$"15-19 year olds" = data$V7
-  data$"20-24 year olds" = data$V8
-  data$"25-29 year olds" = data$V9
-  data$"30-34 year olds" = data$V10
-  data$"35-39 year olds" = data$V11
-  data$"40-44 year olds" = data$V12
-  data$"45-49 year olds" = data$V13
-  data$"50-54 year olds" = data$V14
-  data$"55-59 year olds" = data$V15
-  data$"60-64 year olds" = data$V16
-  data$"65-69 year olds" = data$V17
-  data$"70-74 year olds" = data$V18
-  data$"75-79 year olds" = data$V19
-  data$"80-84 year olds" = data$V20
-  data$"85 years old and older" = data$V21
+  data$"0-4 years" = data$V4
+  data$"5-9 years" = data$V5
+  data$"10-14 years"= data$V6
+  data$"15-19 years" = data$V7
+  data$"20-24 years" = data$V8
+  data$"25-29 years" = data$V9
+  data$"30-34 years" = data$V10
+  data$"35-39 years" = data$V11
+  data$"40-44 years" = data$V12
+  data$"45-49 years" = data$V13
+  data$"50-54 years" = data$V14
+  data$"55-59 years" = data$V15
+  data$"60-64 years" = data$V16
+  data$"65-69 years" = data$V17
+  data$"70-74 years" = data$V18
+  data$"75-79 years" = data$V19
+  data$"80-84 years" = data$V20
+  data$"85 years and over" = data$V21
   
   data$year = as.character(data$year)
   data$location= data$fips
@@ -336,10 +339,10 @@ county_70.79_list_demos = lapply(county_70.79_list_2, function(file){
   
   data <- data %>%
     select(-c(V1, V2, V3, V4, V5, V6, V7, V8, V9, V10, V11, V12, V13, V14, V15, V16, V17, V18, V19, V20, V21, fips, race_sex_code)) %>%
-    pivot_longer(cols=c(one_of("0-4 year olds", "5-9 year olds", "10-14 year olds", "15-19 year olds", "20-24 year olds", 
-                               "25-29 year olds", "30-34 year olds", "35-39 year olds", "40-44 year olds", "45-49 year olds",
-                               "50-54 year olds", "55-59 year olds", "60-64 year olds", "65-69 year olds", "70-74 year olds", 
-                               "75-79 year olds", "80-84 year olds", "85 years old and older")),
+    pivot_longer(cols=c(one_of("0-4 years", "5-9 years", "10-14 years", "15-19 years", "20-24 years", 
+                               "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years",
+                               "50-54 years", "55-59 years", "60-64 years", "65-69 years", "70-74 years", 
+                               "75-79 years", "80-84 years", "85 years and over")),
                  names_to = "age",
                  values_to = "value") %>%
     

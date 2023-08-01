@@ -107,13 +107,16 @@ data.list.demos.10.22.clean = lapply(data.list.demos.10.22, function(file){
   data= subset(data, data$AGEGRP != "0") #Removing total age group column#
   
   if(grepl("10.19", filename)) {
-    data= subset(data, data$YEAR != "1")  #REMOVE CENSUS AND USE POP ESTIMATE#
-    data= subset(data, data$YEAR != "2")
-    data$year = year.mappings.10.19[data$YEAR]
+    data= subset(data, data$YEAR != 1)  #REMOVE CENSUS AND USE POP ESTIMATE#
+    data= subset(data, data$YEAR != 2)
+    data$year = as.character(data$YEAR)
+    data$year = year.mappings.10.19[data$year]
   }
+  
   if(grepl("20.22", filename)) {
-    data= subset(data, data$YEAR != "1")  #REMOVE CENSUS AND USE POP ESTIMATE#
-    data$year = year.mapping.20.22[data$YEAR]
+    data= subset(data, data$YEAR != 1)  #REMOVE CENSUS AND USE POP ESTIMATE#
+    data$year = as.character(data$YEAR)
+    data$year = year.mapping.20.22[data$year]
   }
   
   data$age = age.mappings.universal[data$AGEGRP]
@@ -135,7 +138,6 @@ data.list.demos.10.22.clean = lapply(data.list.demos.10.22, function(file){
   
   data$sex= tolower(data$sex)
   
-  data$year = as.character(data$year)
   data$race = race.mapping.10.22[data$race]
   
   data= as.data.frame(data)
@@ -164,6 +166,7 @@ data.list.demos.00.10.clean = lapply(data.list.demos.00.10, function(file){
   data= subset(data, data$YEAR != "12")  
   
   data$year = as.character(data$YEAR)
+  data$year = year.mappings.00.10[data$year]
   
   data <- data %>%
     pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE",
