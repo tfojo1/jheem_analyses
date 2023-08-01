@@ -111,6 +111,12 @@ data.list.county = lapply(data.list.county.pop, function(file){
   
   data$location = data$FIPS
   
+  #Remove popestimate2010 from the 2000-2010 file so the more recent estimate from the
+  #2010-2019 file can be used instead
+  if(grepl("00.10", filename)) {
+    data$POPESTIMATE2010= data$old_2010estimate  #REMOVE CENSUS AND USE POP ESTIMATE#
+  }
+  
   #Begin set up for pivot longer
   data$"population_2000" = data$POPESTIMATE2000
   data$"population_2001" = data$POPESTIMATE2001 

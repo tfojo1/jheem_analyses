@@ -13,8 +13,7 @@ year.mappings.00.10 = c('2' = '2000',
                         '8' = '2006',
                         '9' = '2007',
                         '10' = '2008',
-                        '11' = '2009',
-                        '13' = '2010')
+                        '11' = '2009')
 
 year.mappings.10.19 = c('3' = '2010',
                         '4' = '2011',
@@ -158,7 +157,8 @@ data.list.demos.00.10.clean = lapply(data.list.demos.00.10, function(file){
   data$age = ifelse(data$AGEGRP == "0", "1", data$AGEGRP)  #consolidating the age groups to align with other census data#
   
   data= subset(data, data$YEAR != "1")  #REMOVE CENSUS AND USE POP ESTIMATE#
-  data= subset(data, data$YEAR != "12")  
+  data= subset(data, data$YEAR != "12") 
+  data= subset(data, data$YEAR != "13") #Removing 2010 so more recent 2010 estimate can be used#
   data$year = as.character(data$YEAR)
   data$year = year.mappings.00.10[data$year]
   
