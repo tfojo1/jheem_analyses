@@ -97,15 +97,102 @@ data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
   
   if(grepl(pattern= '2014|2015|2016|2018', x=filename)){
 
-    data <- data %>%
-      pivot_longer(cols=c(one_of("male_num", "female_num"),
-                   names_to = c("sex"),
-                   values_to = "value"))
+    data$male_num = as.numeric(data$male_num)
+    
+     data <- data %>%
+       pivot_longer(cols=c(one_of("male_num", "female_num")),
+                    names_to = "sex",
+                    values_to = "value")
   }
   
   #Remove commas from values; Replace dashes with NAs#
  # data$value = as.numeric(gsub(",", '', data$value)) 
   
   list(filename, data)  
+  
+})
+
+###I'm going to move on from this section but the pivot longer wont work and idk why
+################################################################################
+                         ###MSA PREVALENCE TOTAL###
+################################################################################
+data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
+  
+  data=file[["data"]] 
+  filename = file[["filename"]] 
+  
+  data$location = data$MSA
+  
+  # ifelse(data$prevalence_num == "-", NA, data$prevalence_num)
+  # ifelse(data$diagnoses_num == "-", NA, data$diagnoses_num)
+
+  data$diagnoses_num= str_replace_all(data$diagnoses_num, " ", "")  
+  data$diagnoses_num= str_replace_all(data$diagnoses_num, ",", "")
+  
+  data$prevalence_num= str_replace_all(data$prevalence_num, ",", "")
+  data$prevalence_num= str_replace_all(data$prevalence_num, " ", "")  
+
+  
+  data <- data%>%
+    select(location, diagnoses_num, prevalence_num) %>%
+    pivot_longer(cols=c(one_of('diagnoses_num', 'prevalence_num')),
+                        names_to = "outcome",
+                        values_to = "value")
+  
+  #I don't know how to handle the years in this case#
+  data$value = as.numeric(data$value)
+  data$outcome =(gsub("_num", '', data$outcome))
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) 
+  
+  ###Pending changes: how to assign year values, which years to use. ####
+  
+})
+
+################################################################################
+                            ###MSA BY SEX ONLY###
+################################################################################
+data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
+  
+  data=file[["data"]] 
+  filename = file[["filename"]] 
+  
+  data$location = data$MSA
+  
+  if(grepl("male", filename)){
+    data$sex="male"
+  }
+  
+  if(grepl("female", filename)){
+    data$sex="female"
+  }
+  
+  ifelse(data$prevalence_num == "-", NA, data$prevalence_num)
+  ifelse(data$diagnoses_num == "-", NA, data$diagnoses_num)
+   
+   data$diagnoses_num= str_replace_all(data$diagnoses_num, " ", "")  
+   data$diagnoses_num= str_replace_all(data$diagnoses_num, ",", "")
+
+  data$prevalence_num= str_replace_all(data$prevalence_num, ",", "")
+  data$prevalence_num= str_replace_all(data$prevalence_num, " ", "")
+  
+  
+  data <- data%>%
+    select(location, sex, diagnoses_num, prevalence_num) %>%
+    pivot_longer(cols=c(one_of('diagnoses_num', 'prevalence_num')),
+                 names_to = "outcome",
+                 values_to = "value")
+
+  #I don't know how to handle the years in this case#
+  data$value = as.numeric(data$value)
+  data$outcome =(gsub("_num", '', data$outcome))
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) 
+  
+  ###Pending changes: how to assign year values, which years to use. ####
   
 })
