@@ -55,7 +55,7 @@ data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
   
   data=file[["data"]] #apply the function to the data element#
   filename = file[["filename"]] #apply the function to the filename element#
-  
+   
   if(grepl("2009", filename)) {
     data$year = as.character("2009")
     # data$location = data$Area.of.residence
