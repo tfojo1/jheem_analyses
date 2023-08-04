@@ -56,9 +56,14 @@ age.msa.mappings = c('1' = '13-24 years',
                         '4' = '45-54 years',
                         '5' = '55 years and older')
 
+race.msa.mappings = c('1'= 'American Indian/Alaska Native',
+                      '2'='Asian',
+                      '3'= 'Black/African American',
+                      '4'= 'Hispanic/Latino',
+                      '5'= 'White')
+
 ################################################################################
                             ###MSA DEATHS BY SEX### 
-                              ###  DONE  ###
 ################################################################################
 data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
   
@@ -108,9 +113,7 @@ data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
 })
 ################################################################################
                          ###MSA PREVALENCE TOTAL###
-             ###These files have both prevalence and diagnoses values###
-
-                           ### DONE ###
+            ###PENDING: is the correct interpretation of years? ####
 ################################################################################
 data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   
@@ -160,19 +163,13 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   if(grepl("2017 new 2016", filename)){
     data$year = ifelse(data$outcome == "diagnoses", "2017", "2016")
   }
-  
   data= as.data.frame(data)
-  
   list(filename, data) 
   
-  ###Pending changes: make sure this is the correct interpretation of years####
-  
 })
-
 ################################################################################
                             ###MSA BY SEX ONLY###
-          ###These files have both prevalence and diagnoses values###
-                           ### DONE ###
+      ###PENDING: is this the correct interpretation of year esp for 2018?###
 ################################################################################
 data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   
@@ -204,7 +201,6 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
                  names_to = "outcome",
                  values_to = "value")
 
-  #I don't know how to handle the years in this case#
   data$value = as.numeric(data$value)
   data$outcome =(gsub("_num", '', data$outcome))
   
@@ -238,14 +234,11 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   
   list(filename, data) 
   
-  ###Pending changes: is this the correct interpretation of year esp for 2018?###
-  
 })
 
 ################################################################################
                         ###MSA BY SEX AND AGE###
-  ####why can't i figure this out######
-                        ### INCOMPLETE ###
+                     ### PENDING: STUCK ON THIS SECTION ###
 ################################################################################
 ##this worked in an individual dataframe but it won't work here idk what is happening this is crushing my soul
 
@@ -369,7 +362,7 @@ if(grepl("female", filename)){
 
 ################################################################################
                         ###BEFORE 2009 FILES###
-                          ### INCOMPLETE ###
+              ### PENDING:HOW TO DIFFERENTIATE AIDS VS HIV######
 ################################################################################
 data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   
@@ -517,10 +510,70 @@ data <- data %>%
   data= as.data.frame(data)
   
   list(filename, data) 
-  ###STILL NEED TO DO: FIGURE OUT HOW TO DIFFERENTIATE AIDS VS HIV###
+})
+
+################################################################################
+                          ###MSA BY SEX AND RACE###
+                      ####currently working on this section####
+################################################################################
+data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
+  
+  data=file[["data"]] 
+  filename = file[["filename"]] 
+  
+  data$location = data$msa
+  
+  #Create Year#
+  if(grepl("2009", filename)) {
+    data$year = as.character("2009")
+  }
+  if(grepl("2010", filename)) {
+    data$year = as.character("2010")
+  }
+  if(grepl("2011", filename)) {
+    data$year = as.character("2011")
+  }
+  if(grepl("2012", filename)) {
+    data$year = as.character("2012")
+  }
+  if(grepl("2013", filename)) {
+    data$year = as.character("2013")
+  }
+  if(grepl("2014", filename)) {
+    data$year = as.character("2014")
+  }
+  if(grepl("2015", filename)) {
+    data$year = as.character("2015")
+  }
+  if(grepl("2016", filename)) {
+    data$year = as.character("2016")
+  }
+  if(grepl("2017", filename)) {
+    data$year = as.character("2017")
+  }
+  if(grepl("2018", filename)) {
+    data$year = as.character("2018")
+  }
+  
+  #Create Sex# 
+  if(grepl("male", filename)){
+    data$sex="male"
+  }
+  if(grepl("female", filename)){
+    data$sex="female"
+  }
+  
+data$test <- NA
+
+#data$test= str_replace_all(data$diagnoses_num_1, "—", "")
+
+data$test = as.numeric(gsub(data$diagnoses_num_1,"—",''))
+
+data= as.data.frame(data)
+
+list(filename, data) 
 })
 
 
-
-
-
+x <- "—"
+str_replace_all(x, "[^[:alnum:]]", "")
