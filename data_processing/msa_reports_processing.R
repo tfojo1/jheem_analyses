@@ -2,7 +2,7 @@
 library(jheem2) #Remove this once you are sourcing the file#
 library(tidyverse)
 ################################################################################
-###Read in MSA Scraped PDF Files###
+                ###Read in MSA Scraped PDF Files###
 ################################################################################
 DATA.DIR.MSA.TOTAL="../../data_raw/msa_surveillance_reports/total"
 DATA.DIR.MSA.DEATHS="../../data_raw/msa_surveillance_reports/deaths"
@@ -57,7 +57,8 @@ age.msa.mappings = c('1' = '13-24 years',
                         '5' = '55 years and older')
 
 ################################################################################
-                            ###MSA DEATHS BY SEX###
+                            ###MSA DEATHS BY SEX### 
+                              ###  DONE  ###
 ################################################################################
 data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
   
@@ -108,6 +109,8 @@ data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
 ################################################################################
                          ###MSA PREVALENCE TOTAL###
              ###These files have both prevalence and diagnoses values###
+
+                           ### DONE ###
 ################################################################################
 data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   
@@ -169,6 +172,7 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
 ################################################################################
                             ###MSA BY SEX ONLY###
           ###These files have both prevalence and diagnoses values###
+                           ### DONE ###
 ################################################################################
 data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   
@@ -241,6 +245,7 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
 ################################################################################
                         ###MSA BY SEX AND AGE###
   ####why can't i figure this out######
+                        ### INCOMPLETE ###
 ################################################################################
 ##this worked in an individual dataframe but it won't work here idk what is happening this is crushing my soul
 
@@ -364,6 +369,7 @@ if(grepl("female", filename)){
 
 ################################################################################
                         ###BEFORE 2009 FILES###
+                          ### INCOMPLETE ###
 ################################################################################
 data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   
@@ -478,32 +484,35 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
     data$prevalence_2006 = as.numeric(gsub(",",'', data$prevalence_2006)) 
   }
   
-  #################These files have a different format#########################
-  # if(grepl("2008 new 2007", filename)){
-  #   data$year = ifelse(data$outcome == "diagnoses", "2008", "2007")
-  # }
-  # if(grepl("2009 new 2008", filename)){
-  #   data$year = ifelse(data$outcome == "diagnoses", "2009", "2008")
-  # }
-  #
-   data <- data %>%
-     select(location,(one_of("diagnoses_1993", "diagnoses_1994", "diagnoses_1995","diagnoses_1996", "diagnoses_1997", "diagnoses_1998", "diagnoses_1999",
-                                    "diagnoses_2000", "diagnoses_2001", "diagnoses_2002", "diagnoses_2003", "diagnoses_2004", "diagnoses_2005",
-                                    "diagnoses_2006", "diagnoses_2007", "prevalence_1992", "prevalence_1993", "prevalence_1994", "prevalence_1995",
-                                    "prevalence_1996", "prevalence_1997", "prevalence_1998", "prevalence_1999", "prevalence_2000", "prevalence_2001", "prevalence_2002",
-                                    "prevalence_2003", "prevalence_2004", "prevalence_2005","prevalence_2006")))
-# 
-#      data <- data %>%
-#        pivot_longer(cols=c(one_of(diagnoses_1993, diagnoses_1994, diagnoses_1995,diagnoses_1996, diagnoses_1997, diagnoses_1998, diagnoses_1999,
-#                            diagnoses_2000, diagnoses_2001, diagnoses_2002, diagnoses_2003, diagnoses_2004, diagnoses_2005,
-#                            diagnoses_2006, diagnoses_2007, prevalence_1992, prevalence_1993, prevalence_1994, prevalence_1995,
-#                            prevalence_1996, prevalence_1997, prevalence_1998, prevalence_1999, prevalence_2000, prevalence_2001, prevalence_2002,
-#                            prevalence_2003, prevalence_2004, prevalence_2005,prevalence_2006)),
-#        names_to = c("outcome", "year"),
-#        names_sep = "_",
-#       values_to = "value")
+  if(grepl("2008 new 2007", filename)){
+    data$diagnoses_2008 = data$new_num
+    data$prevalence_2007 = data$prev_num
+    data$diagnoses_2008 = as.numeric(gsub(",",'', data$diagnoses_2008)) 
+    data$prevalence_2007 = as.numeric(gsub(",",'', data$prevalence_2007))
+  }
+  if(grepl("2009 new 2008", filename)){
+    data$diagnoses_2009 = data$new_num
+    data$prevalence_2008 = data$prev_num
+    data$diagnoses_2009 = as.numeric(gsub(",",'', data$diagnoses_2009)) 
+    data$prevalence_2008 = as.numeric(gsub(",",'', data$prevalence_2008))
+  }
+  
+data <- data %>%
+  select(location,(one_of("diagnoses_1993", "diagnoses_1994", "diagnoses_1995","diagnoses_1996", "diagnoses_1997", "diagnoses_1998", "diagnoses_1999",
+                                 "diagnoses_2000", "diagnoses_2001", "diagnoses_2002", "diagnoses_2003", "diagnoses_2004", "diagnoses_2005",
+                                 "diagnoses_2006", "diagnoses_2007", "diagnoses_2008", "diagnoses_2009", "prevalence_1992", "prevalence_1993", "prevalence_1994", "prevalence_1995",
+                                 "prevalence_1996", "prevalence_1997", "prevalence_1998", "prevalence_1999", "prevalence_2000", "prevalence_2001", "prevalence_2002",
+                                 "prevalence_2003", "prevalence_2004", "prevalence_2005","prevalence_2006", "prevalence_2007", "prevalence_2008")))
 
-                                   
+     data <- data %>%
+       pivot_longer(cols=c(one_of("diagnoses_1993", "diagnoses_1994", "diagnoses_1995","diagnoses_1996", "diagnoses_1997", "diagnoses_1998", "diagnoses_1999",
+                                 "diagnoses_2000", "diagnoses_2001", "diagnoses_2002", "diagnoses_2003", "diagnoses_2004", "diagnoses_2005",
+                                 "diagnoses_2006", "diagnoses_2007", "diagnoses_2008", "diagnoses_2009", "prevalence_1992", "prevalence_1993", "prevalence_1994", "prevalence_1995",
+                                 "prevalence_1996", "prevalence_1997", "prevalence_1998", "prevalence_1999", "prevalence_2000", "prevalence_2001", "prevalence_2002",
+                                 "prevalence_2003", "prevalence_2004", "prevalence_2005","prevalence_2006", "prevalence_2007", "prevalence_2008")),
+       names_to = c("outcome", "year"),
+       names_sep = "_",
+      values_to = "value")
 
   data= as.data.frame(data)
   
