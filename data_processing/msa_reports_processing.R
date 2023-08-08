@@ -54,7 +54,7 @@ age.msa.mappings = c('1' = '13-24 years',
                         '2' = '25-34 years',
                         '3' = '35-44 years',
                         '4' = '45-54 years',
-                        '5' = '55 years and older')
+                        '5' = '55+ years')
 
 race.msa.mappings = c('1'= 'American Indian/Alaska Native',
                       '2'='Asian',
@@ -64,7 +64,7 @@ race.msa.mappings = c('1'= 'American Indian/Alaska Native',
 
 risk.msa.mappings = c('1'= 'msm',
                       '2'='idu',
-                      '3'= 'msm and idu',
+                      '3'= 'msm_idu',
                       '4'= 'heterosexual',
                       '5'= 'other')
 ################################################################################
@@ -75,7 +75,7 @@ data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
    
-  data$location = data$MSA
+data$location = locations::get.location.code(data$MSA,"CBSA")
   
   #Remove commas from values#
   #Why is this causing NAs introduced by coercion warnings?#
@@ -113,6 +113,9 @@ data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
                     values_to = "value")
 
   data$outcome = "hiv deaths"
+  
+  data= as.data.frame(data)
+  
   list(filename, data)  
   
 })
@@ -125,7 +128,7 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  data$location = data$MSA
+  data$location = locations::get.location.code(data$MSA,"CBSA")
 
   data$diagnoses_num= str_replace_all(data$diagnoses_num, " ", "")  
   data$diagnoses_num= str_replace_all(data$diagnoses_num, ",", "")
@@ -181,7 +184,7 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  data$location = data$MSA
+  data$location = locations::get.location.code(data$MSA,"CBSA")
   
   if(grepl("male", filename)){
     data$sex="male"
@@ -249,7 +252,7 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
 
-  data$location = data$MSA
+  data$location = locations::get.location.code(data$MSA,"CBSA")
   
   #Create Year#
 if(grepl("2009", filename)) {
@@ -355,7 +358,7 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  data$location = data$msa
+  data$location = locations::get.location.code(data$MSA,"CBSA")
   
   ##add year section##
   ##problem is commas and dashes####
@@ -506,7 +509,7 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  data$location = data$MSA
+  data$location = locations::get.location.code(data$MSA,"CBSA")
   
   #Create Year#
   if(grepl("2009", filename)) {
@@ -613,7 +616,7 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  data$location = data$MSA
+  data$location = locations::get.location.code(data$MSA,"CBSA")
   
   #Create Year#
   if(grepl("2009", filename)) {
@@ -649,13 +652,13 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   
   #Create Race# 
   if(grepl("black", filename)){
-    data$race="black"
+    data$race="Black/African American"
   }
   if(grepl("white", filename)){
-    data$race="white"
+    data$race="White"
   }
   if(grepl("hispanic", filename)){
-    data$race="hispanic"
+    data$race="Hispanic/Latino"
   }
   
   if(grepl("new", filename)){
@@ -721,7 +724,7 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  data$location = data$MSA
+  data$location = locations::get.location.code(data$MSA,"CBSA")
   
   #Create Year#
   if(grepl("2009", filename)) {
@@ -855,7 +858,7 @@ for (data in msa_deaths) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
+    ontology.name = 'cdc msa reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -869,7 +872,7 @@ for (data in msa_total) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
+    ontology.name = 'cdc msa reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -883,7 +886,7 @@ for (data in msa_sex) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
+    ontology.name = 'cdc msa reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -897,7 +900,7 @@ for (data in msa_sex_age) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
+    ontology.name = 'cdc msa reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -911,7 +914,7 @@ for (data in msa_2009) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
+    ontology.name = 'cdc msa reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -925,7 +928,7 @@ for (data in msa_sex_race) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
+    ontology.name = 'cdc msa reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -939,8 +942,8 @@ for (data in msa_race_risk) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
-    source = 'cdc',
+    ontology.name = 'cdc msa reports',
+    source = 'cdc msa report',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')
@@ -953,7 +956,7 @@ for (data in msa_sex_risk) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
+    ontology.name = 'cdc msa reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
