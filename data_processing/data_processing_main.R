@@ -108,6 +108,17 @@ data.manager$register.ontology(
     
   ))
 
+data.manager$register.ontology(
+  'cdc msa reports',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'White'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+    
+  ))
 ################################################################################
 
 ###Source in File that reads .csvs and removes headers###
@@ -117,6 +128,10 @@ source('data_processing/fix_cdc_headers.R')
 ###Source in AIDS Vu data and cleaning###
 
 source('data_processing/aids_vu_processing.R')
+
+###Source in CDC MSA PDF Reports data and cleaning###
+
+#source('data_processing/msa_reports_processing.R')
 
 ################################################################################
 
