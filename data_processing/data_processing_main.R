@@ -113,7 +113,7 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('under 25 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years', '55+ years'),
     race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'White'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
