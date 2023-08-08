@@ -62,6 +62,11 @@ race.msa.mappings = c('1'= 'American Indian/Alaska Native',
                       '4'= 'Hispanic/Latino',
                       '5'= 'White')
 
+risk.msa.mappings = c('1'= 'msm',
+                      '2'='idu',
+                      '3'= 'msm and idu',
+                      '4'= 'heterosexual',
+                      '5'= 'other')
 ################################################################################
                             ###MSA DEATHS BY SEX### 
 ################################################################################
@@ -599,4 +604,117 @@ list(filename, data)
 
 })
 
+################################################################################
+                    ###MSA BY RACE AND RISK##
+###Need to do###
+################################################################################
 
+data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
+  
+  data=file[["data"]] 
+  filename = file[["filename"]] 
+  
+  data$location = data$MSA
+  
+  #Create Year#
+  if(grepl("2009", filename)) {
+    data$year = as.character("2009")
+  }
+  if(grepl("2010", filename)) {
+    data$year = as.character("2010")
+  }
+  if(grepl("2011", filename)) {
+    data$year = as.character("2011")
+  }
+  if(grepl("2012", filename)) {
+    data$year = as.character("2012")
+  }
+  if(grepl("2013", filename)) {
+    data$year = as.character("2013")
+  }
+  if(grepl("2014", filename)) {
+    data$year = as.character("2014")
+  }
+  if(grepl("2015", filename)) {
+    data$year = as.character("2015")
+  }
+  if(grepl("2016", filename)) {
+    data$year = as.character("2016")
+  }
+  if(grepl("2017", filename)) {
+    data$year = as.character("2017")
+  }
+  if(grepl("2018", filename)) {
+    data$year = as.character("2018")
+  }
+  
+  #Create Race# 
+  if(grepl("black", filename)){
+    data$race="black"
+  }
+  if(grepl("white", filename)){
+    data$race="white"
+  }
+  if(grepl("hispanic", filename)){
+    data$race="hispanic"
+  }
+  
+  if(grepl("new", filename)){
+    
+    data$diagnoses_1 = (gsub("[[:punct:]]", NA, data$diagnoses_1))
+    data$diagnoses_1 = as.numeric(data$diagnoses_1)
+    
+    data$diagnoses_2 = (gsub("[[:punct:]]", NA, data$diagnoses_2))
+    data$diagnoses_2 = as.numeric(data$diagnoses_2)
+    
+    data$diagnoses_3 = (gsub("[[:punct:]]", NA, data$diagnoses_3))
+    data$diagnoses_3 = as.numeric(data$diagnoses_3)
+    
+    data$diagnoses_4 = (gsub("[[:punct:]]", NA, data$diagnoses_4))
+    data$diagnoses_4 = as.numeric(data$diagnoses_4)
+    
+    data$diagnoses_5 = (gsub("[[:punct:]]", NA, data$diagnoses_5))
+    data$diagnoses_5 = as.numeric(data$diagnoses_5)
+  }
+  
+  if(grepl("prevalence", filename)){
+    
+    data$prevalence_1 = (gsub("[[:punct:]]", NA, data$prevalence_1))
+    data$prevalence_1 = as.numeric(data$prevalence_1)
+    
+    data$prevalence_2 = (gsub("[[:punct:]]", NA, data$prevalence_2))
+    data$prevalence_2 = as.numeric(data$prevalence_2)
+    
+    data$prevalence_3 = (gsub("[[:punct:]]", NA, data$prevalence_3))
+    data$prevalence_3 = as.numeric(data$prevalence_3)
+    
+    data$prevalence_4 = (gsub("[[:punct:]]", NA, data$prevalence_4))
+    data$prevalence_4 = as.numeric(data$prevalence_4)
+    
+    data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_5))
+    data$prevalence_5 = as.numeric(data$prevalence_5)
+  }
+  
+  data <- data %>%
+    select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                       "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
+  
+  data <- data %>%
+    pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                               "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5")),
+                 names_to = c("outcome", "risk"),
+                 names_sep = "_",
+                 values_to = "value")
+  
+  
+  data$risk= risk.msa.mappings[data$risk]
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) 
+  
+})
+################################################################################
+                      ###MSA BY SEX AND RISK###
+##need to do###
+################################################################################
