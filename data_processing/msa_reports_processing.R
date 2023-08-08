@@ -238,16 +238,7 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
 
 ################################################################################
                         ###MSA BY SEX AND AGE###
-                     ### PENDING: STUCK ON THIS SECTION ###
 ################################################################################
-##this worked in an individual dataframe but it won't work here idk what is happening this is crushing my soul
-
-data$diagnoses2 = str_replace_all(data$diagnoses_num_2, ",", "")
-data$diagnoses_2_clean= str_replace_all(data$diagnoses2, "—", "NA")
-data$diagnoses_age2 = as.numeric(data$diagnoses_2_clean)
-#################################################################
-
-
 data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   
   data=file[["data"]] 
@@ -255,27 +246,6 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
 
   data$location = data$MSA
   
-  # data$diagnoses_num_1= str_replace_all(data$diagnoses_num_1, ",", "")
-  # 
-  # data$test = as.numeric(gsub(data$diagnoses_num_2,",",''))
-  
-  
-  # data$diagnoses_num_3= str_replace_all(data$diagnoses_num_3, ",", "")
-  # data$diagnoses_num_4= str_replace_all(data$diagnoses_num_4, ",", "")
-  # data$diagnoses_num_5= str_replace_all(data$diagnoses_num_5, ",", "")
-  # 
-  # data$diagnoses_num_1=as.numeric(data$diagnoses_num_1)
-  # data$diagnoses_num_2=as.numeric(data$diagnoses_num_2)
-  # data$diagnoses_num_3=as.numeric(data$diagnoses_num_3)
-  # data$diagnoses_num_4=as.numeric(data$diagnoses_num_4)
-  # data$diagnoses_num_5=as.numeric(data$diagnoses_num_5)
-  # 
-  # data$prevalence_num_1=as.numeric(data$prevalence_num_1)
-  # data$prevalence_num_2=as.numeric(data$prevalence_num_2)
-  # data$prevalence_num_3=as.numeric(data$prevalence_num_3)
-  # data$prevalence_num_4=as.numeric(data$prevalence_num_4)
-  # data$prevalence_num_5=as.numeric(data$prevalence_num_5)
-  # 
   #Create Year#
 if(grepl("2009", filename)) {
   data$year = as.character("2009")
@@ -316,44 +286,55 @@ if(grepl("female", filename)){
     data$sex="female"
 }
   
-#   #Create Outcome#   
-# if(grepl("new", filename)){
-#     data$outcome="diagnoses"
-#   }
-# if(grepl("prevalence", filename)){
-#     data$outcome="prevalence"
-# }
-
-  ###REMOVE COMMAS AND SPACES; CHANGE ALL TO NUMERIC###
+  if(grepl("new", filename)){
+    
+    data$diagnoses_num_1 = (gsub("[[:punct:]]", NA, data$diagnoses_num_1))
+    data$diagnoses_1 = as.numeric(data$diagnoses_num_1)
+    
+    data$diagnoses_num_2 = (gsub("[[:punct:]]", NA, data$diagnoses_num_2))
+    data$diagnoses_2 = as.numeric(data$diagnoses_num_2)
+    
+    data$diagnoses_num_3 = (gsub("[[:punct:]]", NA, data$diagnoses_num_3))
+    #data$diagnoses_num_3 = (gsub("[^[:alnum:] ]", NA, data$diagnoses_num_3))
+    data$diagnoses_3 = as.numeric(data$diagnoses_num_3)
+    
+    data$diagnoses_num_4 = (gsub("[[:punct:]]", NA, data$diagnoses_num_4))
+    data$diagnoses_4 = as.numeric(data$diagnoses_num_4)
+    
+    data$diagnoses_num_5 = (gsub("[[:punct:]]", NA, data$diagnoses_num_5))
+    data$diagnoses_5 = as.numeric(data$diagnoses_num_5)
+  }
   
-  # ifelse(data$diagnoses_num_1 == "—", NA, data$diagnoses_num_1)
-  # ifelse(data$diagnoses_num_2 == "—", NA, data$diagnoses_num_2)
-  # ifelse(data$diagnoses_num_3 == "—", NA, data$diagnoses_num_3)
-  # ifelse(data$diagnoses_num_4 == "—", NA, data$diagnoses_num_4)
-  # ifelse(data$diagnoses_num_5 == "—", NA, data$diagnoses_num_5)
+  if(grepl("prevalence", filename)){
+    data$prevalence_num_1 = (gsub("[[:punct:]]", NA, data$prevalence_num_1))
+    data$prevalence_1 = as.numeric(data$prevalence_num_1)
+    
+    data$prevalence_num_2 = (gsub("[[:punct:]]", NA, data$prevalence_num_2))
+    data$prevalence_2 = as.numeric(data$prevalence_num_2)
+    
+    data$prevalence_num_3 = (gsub("[[:punct:]]", NA, data$prevalence_num_3))
+    data$prevalence_3 = as.numeric(data$prevalence_num_3)
+    
+    data$prevalence_num_4 = (gsub("[[:punct:]]", NA, data$prevalence_num_4))
+    data$prevalence_4 = as.numeric(data$prevalence_num_4)
+    
+    data$prevalence_num_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5))
+    data$prevalence_5 = as.numeric(data$prevalence_num_5)
+  }
   
-  # 
-  # data$diagnoses_num_1= str_replace_all(data$diagnoses_num_1, " ", "")
-  # data$diagnoses_num_2= str_replace_all(data$diagnoses_num_2, " ", "")  
-  # data$diagnoses_num_3= str_replace_all(data$diagnoses_num_3, " ", "")  
-  # data$diagnoses_num_4= str_replace_all(data$diagnoses_num_4, " ", "")  
-  # data$diagnoses_num_5= str_replace_all(data$diagnoses_num_5, " ", "")
-
-
   data <- data %>%
-     select(location, year, sex,(one_of("diagnoses_num_1", "diagnoses_num_2", "diagnoses_num_3",
-  "diagnoses_num_4", "diagnoses_num_5", "prevalence_num_1", "prevalence_num_2", "prevalence_num_3",
-  "prevalence_num_4", "prevalence_num_5")))
+    select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                       "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
+  
+  data <- data %>%
+    pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                               "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5")),
+                 names_to = c("outcome", "age"),
+                 names_sep = "_",
+                 values_to = "value")
 
-  # data<- data %>%
-  # pivot_longer(cols=c(one_of("diagnoses_num_1", "diagnoses_num_2", "diagnoses_num_3",
-  #                             "diagnoses_num_4", "diagnoses_num_5", "prevalence_num_1", "prevalence_num_2", "prevalence_num_3",
-  #                             "prevalence_num_4", "prevalence_num_5")),
-  #                     names_to = c("outcome", "age"),
-  #                     names_sep = "_",
-  #                     values_to = "value")
-
-  #data$age = age.msa.mappings(data$WHATISTHISVAR)
+  data$age = age.msa.mappings[data$age]
+  
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -514,14 +495,13 @@ data <- data %>%
 
 ################################################################################
                           ###MSA BY SEX AND RACE###
-                      ####currently working on this section####
 ################################################################################
 data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  data$location = data$msa
+  data$location = data$MSA
   
   #Create Year#
   if(grepl("2009", filename)) {
@@ -562,18 +542,61 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   if(grepl("female", filename)){
     data$sex="female"
   }
-  
-data$test <- NA
 
-#data$test= str_replace_all(data$diagnoses_num_1, "—", "")
+   if(grepl("new", filename)){
 
-data$test = as.numeric(gsub(data$diagnoses_num_1,"—",''))
+       data$diagnoses_num_1 = (gsub("[[:punct:]]", NA, data$diagnoses_num_1))
+       data$diagnoses_1 = as.numeric(data$diagnoses_num_1)
 
+        data$diagnoses_num_2 = (gsub("[[:punct:]]", NA, data$diagnoses_num_2))
+        data$diagnoses_2 = as.numeric(data$diagnoses_num_2)
+        
+        data$diagnoses_num_3 = (gsub("[[:punct:]]", NA, data$diagnoses_num_3))
+        #data$diagnoses_num_3 = (gsub("[^[:alnum:] ]", NA, data$diagnoses_num_3))
+        data$diagnoses_3 = as.numeric(data$diagnoses_num_3)
+        
+        data$diagnoses_num_4 = (gsub("[[:punct:]]", NA, data$diagnoses_num_4))
+        data$diagnoses_4 = as.numeric(data$diagnoses_num_4)
+        
+        data$diagnoses_num_5 = (gsub("[[:punct:]]", NA, data$diagnoses_num_5))
+        data$diagnoses_5 = as.numeric(data$diagnoses_num_5)
+   }
+
+  if(grepl("prevalence", filename)){
+    data$prevalence_num_1 = (gsub("[[:punct:]]", NA, data$prevalence_num_1))
+    data$prevalence_1 = as.numeric(data$prevalence_num_1)
+    
+    data$prevalence_num_2 = (gsub("[[:punct:]]", NA, data$prevalence_num_2))
+    data$prevalence_2 = as.numeric(data$prevalence_num_2)
+    
+    data$prevalence_num_3 = (gsub("[[:punct:]]", NA, data$prevalence_num_3))
+    data$prevalence_3 = as.numeric(data$prevalence_num_3)
+    
+    data$prevalence_num_4 = (gsub("[[:punct:]]", NA, data$prevalence_num_4))
+    data$prevalence_4 = as.numeric(data$prevalence_num_4)
+    
+    data$prevalence_num_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5))
+    data$prevalence_5 = as.numeric(data$prevalence_num_5)
+  }
+
+   data <- data %>%
+     select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                        "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
+
+   data <- data %>%
+     pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5")),
+                  names_to = c("outcome", "race"),
+                  names_sep = "_",
+                  values_to = "value")
+
+     
+data$race = race.msa.mappings[data$race]
+   
 data= as.data.frame(data)
 
 list(filename, data) 
+
 })
 
 
-x <- "—"
-str_replace_all(x, "[^[:alnum:]]", "")
