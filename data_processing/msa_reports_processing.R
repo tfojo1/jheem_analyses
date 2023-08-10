@@ -754,13 +754,7 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
     data$year = as.character("2018")
   }
   
-  #Create Race# 
-  if(grepl("female", filename)){
-    data$sex="female"
-  }
-  if(grepl("male", filename)){
-    data$sex="male"
-  }
+  data$sex = ifelse(grepl("female", filename), "female", "male")
 
   if(grepl("new male", filename)){
     
