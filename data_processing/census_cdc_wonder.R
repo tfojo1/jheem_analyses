@@ -58,7 +58,7 @@ for (data in county_demos) {
   
   census.manager$put.long.form(
     data = data,
-    ontology.name = 'census',
+    ontology.name = 'census.cdc.wonder',
     source = 'cdc_wonder',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/',

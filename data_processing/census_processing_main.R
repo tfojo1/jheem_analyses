@@ -1,6 +1,8 @@
 library(jheem2)
 library(tidyverse)
- 
+library(readr)
+library(readxl) 
+
 ################################################################################
       ###Create a separate data manager for the census data###
 ################################################################################
@@ -38,9 +40,8 @@ census.manager$register.source('census', full.name = "US Census Bureau", short.n
 
 census.manager$register.source('cdc_wonder', full.name = "CDC Wonder", short.name='cdc_wonder')
 
-###Update the ontology once you know what these values should be###
 census.manager$register.ontology(
-  'census',
+  'census.cdc.wonder',
   ont = ontology(
     year= NULL,
     location= NULL,
@@ -57,10 +58,6 @@ census.manager$register.ontology(
     ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino'),
     sex=c('male','female')
   ))
-################################################################################
-                    ###Create Mappings###
-################################################################################
-
 
 ################################################################################
                   ###Read in Census Files###
@@ -75,11 +72,13 @@ data.list.county.pop <- lapply(census_county_files, function(x){
   list(filename=x, data=read.csv(x, header=TRUE))
 })
 ################################################################################
-            ###SOURCE OTHER FILES FOR OTHER DOC TYPES HERE###
+            ###Sourcing other files here###
 ################################################################################ 
 
-source('data_processing/census_other_file_structures.R')
+#This pulls population and demographics from 1970-1989#
+source('data_processing/census_1970_1989.R')
 
+#This pulls single year age groups and demographic data from 1990-2020#
 source('data_processing/census_cdc_wonder.R')
 
 ################################################################################

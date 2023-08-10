@@ -1,18 +1,12 @@
 
 #Separating these years because file structure varies prior to 2000
-library(readr)
-library(readxl) 
-################################################################################
-                  ###Read 1970-1990 County Files###
-################################################################################
-DATA.DIR.CENSUS.90="../../data_raw/population/county_90.99"
+#This file includes population totals and demographics for 1970-1989
+#But because the racial groups prior to 2000 are different I'm not sure
+#how much of this we will use
 
-ninties_files <- list.files(DATA.DIR.CENSUS.90, pattern = "txt", full.names = TRUE, recursive = TRUE)
-
-#90.99 County Data#
-data.list.county.90 <- lapply(ninties_files, function(x) {
-    list(filename=x, data=read.table(x, quote="\"", comment.char="", colClasses=c(V2="character")))
-  })
+################################################################################
+                  ###Read 1970-1989 County Files###
+################################################################################
 
 #1980's County data
 sheets <- excel_sheets("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls")
@@ -26,139 +20,13 @@ county_70.79 <- read.csv("~/JHEEM/data_raw/population/county_70.89/county_70.79.
 ################################################################################
                   ###Create Mappings###
 ################################################################################
-year.mappings = c('90' = '1990',
-                  '91' = '1991',
-                  '92' = '1992',
-                  '93' = '1993',
-                  '94' = '1994',
-                  '95' = '1995',
-                  '96' = '1996',
-                  '97' = '1997',
-                  '98' = '1998',
-                  '99' = '1999')
-
-race.sex.90s.mappings = c('1' = 'White male',
-                      '2' = 'White female',
-                      '3' = 'Black male',
-                      '4' = 'Black female',
-                      '5' = 'American Indian or Alaska Native male',
-                      '6' = 'American Indian or Alaska Native female',
-                      '7' = 'Asian or Pacific Islander male',
-                      '8' = 'Asian or Pacific Islander female')
-
-ethnicity.mappings = c('1' = 'non-hispanic',
-                       '2' = 'hispanic or latino')
-
 race.sex.70s.mappings= c('1' = 'White male',
                          '2' = 'White female',
                          '3' = 'Black male',
                          '4' = 'Black female',
                          '5' = 'other race male',
                          '6' = 'other race female')
-################################################################################
-                    ###COUNTY 1990-1999 POPULATION###
-################################################################################
 
-data.list.county.90.clean = lapply(data.list.county.90 , function(file){
-  
-  data=file[["data"]] #apply the function to the data element#
-  filename = file[["filename"]] #apply the function to the filename element#
-  
-  data$year = as.character(data$V1)    #you could take a lot of this out and just use it in the demos#
-  data$location = data$V2
-  data$age_group = as.character(data$V3)
-  data$race_sex = data$V4
-  data$ethnicity = data$V5
-  data$population = as.numeric(data$V6)
-  
-  data$year = year.mappings[data$year]
-  data$race_sex = race.sex.90s.mappings[data$race_sex]
-  data$ethnicity = ethnicity.mappings[data$ethnicity]
-  
-  data <- data %>%
-    select(year, location, age_group, race_sex, ethnicity, population) %>%
-    group_by(location) %>%   #don't need to group by year bc each df is a separate year#
-    summarise(sum_population = sum(population),
-              .groups='drop')
-  
-  data$value= data$sum_population
-  data$outcome = "population"
-  
-  if(grepl("1990", filename)) {
-    data$year = "1990"
-  }
-  if(grepl("1991", filename)) {
-    data$year = "1991"
-  }
-  if(grepl("1992", filename)) {
-    data$year = "1992"
-  }
-  if(grepl("1993", filename)) {
-    data$year = "1993"
-  }
-  if(grepl("1994", filename)) {
-    data$year = "1994"
-  }
-  if(grepl("1995", filename)) {
-    data$year = "1995"
-  }
-  if(grepl("1996", filename)) {
-    data$year = "1996"
-  }
-  if(grepl("1997", filename)) {
-    data$year = "1997"
-  }
-  if(grepl("1998", filename)) {
-    data$year = "1998"
-  }
-  if(grepl("1999", filename)) {
-    data$year = "1999"
-  }
-  data = as.data.frame(data)
-  list(filename, data)  
-
-})
-
-################################################################################
-                    ###COUNTY 1990-1999 DEMOGRAPHICS###
-################################################################################
-
-data.list.county.90.demos = lapply(data.list.county.90 , function(file){
-  
-  data=file[["data"]] #apply the function to the data element#
-  filename = file[["filename"]] #apply the function to the filename element#
-  
-  data$year = as.character(data$V1)    #you could take a lot of this out and just use it in the demos#
-  data$location = data$V2
-  data$age = as.character(data$V3)
-  data$race_sex = data$V4
-  data$ethnicity = data$V5
-  data$population = as.numeric(data$V6)
-  
-  data$year = year.mappings[data$year]
-  
-  data$race_sex = race.sex.90s.mappings[data$race_sex]
-  
-  data$age = ifelse(data$age == "0", "1", data$age)  #consolidating the age groups to align with other census data#
-  
-  data <- data %>%
-    select(year, location, age, race_sex, ethnicity, population) %>%
-    mutate(sex= ifelse(grepl("female", race_sex), "female", "male")) %>%
-    mutate(race_alone= ifelse(grepl("White", race_sex), "White",
-                              ifelse(grepl("Black", race_sex), "Black",
-                                     ifelse(grepl("American Indian or Alaska Native", race_sex), "American Indian or Alaska Native", "Asian or Pacific Islander")))) %>%
-    mutate(race = ifelse( ethnicity == 2, "Hispanic", race_alone))
-  
-  data$age = age.mappings.universal[data$age]
-  
-  data <- data %>% 
-    select(-c(race_sex, race_alone))
-  
-  data = as.data.frame(data)
-  
-  list(filename, data)  
-  
-})
 ################################################################################
                   ###COUNTY 1980-1989 TOTAL POPULATION###
 ################################################################################
@@ -193,7 +61,7 @@ data.list.80.county.clean = lapply(county_80.89 , function(file){
 })
 
 ################################################################################
-                ###COUNTY 1980-1989 DEMOGRAPHICS###
+                  ###COUNTY 1980-1989 DEMOGRAPHICS###
 ################################################################################
 
 ###this may be redundant###
@@ -347,20 +215,6 @@ county_70.79_list_demos = lapply(county_70.79_list_2, function(file){
                   ###PUT INTO CENSUS MANAGER###
 ################################################################################
 
-#COUNTY TOTAL POPULATION VALUES 1990-1999
-county_90_pop = lapply(data.list.county.90.clean, `[[`, 2)
-
-for (data in county_90_pop) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
-
 #COUNTY TOTAL POPULATIONS VALUES 1980-1989 
 county_80_pop = lapply(data.list.80.county.clean, `[[`, 2)
 
@@ -388,21 +242,6 @@ for (data in county_70_pop) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
-
-#COUNTY DEMOGRAPHICS  1990-1999
-county_90_demo = lapply(data.list.county.90.demos, `[[`, 2)
-
-for (data in county_90_demo) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
-
 
 #COUNTY DEMOGRAPHICS  1980-1989 
 county_80_demo = lapply(data.list.80.county.demos, `[[`, 2)
