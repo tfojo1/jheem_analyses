@@ -36,38 +36,31 @@ census.manager$register.outcome(
 
 census.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
+census.manager$register.source('cdc_wonder', full.name = "CDC Wonder", short.name='cdc_wonder')
+
 ###Update the ontology once you know what these values should be###
 census.manager$register.ontology(
   'census',
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('0-4 years', '5-9 years', '10-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years',
-           '45-49 years', '50-54 years', '55-59 years', '60-64 years','65-69 years', '70-74 years', '75-79 years', '80-84 years', '85 years and over'),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    age=c('< 1 year', '1 year', '2 years', '3 years', '4 years', '5 years', '6 years', '7 years', '8 years', '9 years', '10 years',
+          '11 years', '12 years', '13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
+          '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
+          '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
+          '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
+          '51 years', '52 years', '53 years', '54 years', '55 years', '56 years', '57 years', '58 years', '59 years', '60 years',
+          '61 years', '62 years', '63 years', '64 years', '65 years', '66 years', '67 years', '68 years', '69 years', '70 years',
+          '71 years', '72 years', '73 years', '74 years', '75 years', '76 years', '77 years', '78 years', '79 years', '80 years',
+          '81 years', '82 years', '83 years', '84 years', '85+ years'),
+    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White'),
+    ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino'),
     sex=c('male','female')
   ))
 ################################################################################
                     ###Create Mappings###
 ################################################################################
-age.mappings.universal = c('1' = '0-4 years',
-                     '2' = '5-9 years',
-                     '3' = '10-14 years',
-                     '4' = '15-19 years',
-                     '5' = '20-24 years',
-                     '6' = '25-29 years',
-                     '7' = '30-34 years',
-                     '8' = '35-39 years',
-                     '9' = '40-44 years',
-                     '10' = '45-49 years',
-                     '11' = '50-54 years',
-                     '12' = '55-59 years',
-                     '13' = '60-64 years',
-                     '14' = '65-69 years',
-                     '15' = '70-74 years',
-                     '16' = '75-79 years',
-                     '17' = '80-84 years',
-                     '18' = '85 years and over')
+
 
 ################################################################################
                   ###Read in Census Files###
