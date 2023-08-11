@@ -1,6 +1,7 @@
 
 # The file to source to load all necessary packages, cached data, code
 
+library(locations)
 
 # Load the data - this will eventually be replaced with jheem2's native data manager
 if (!exists('ALL.DATA.MANAGERS'))

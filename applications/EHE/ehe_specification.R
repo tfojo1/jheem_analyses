@@ -457,20 +457,20 @@ register.model.element(EHE.SPECIFICATION,
 ##----------------------------##
 
 register.natality(specification = EHE.SPECIFICATION,
-                  from.groups = 'uninfected',
-                  to.groups = 'uninfected',
+                  parent.groups = 'uninfected',
+                  child.groups = 'uninfected',
                   fertility.rate.value = 'fertility',
                   birth.proportions.value = 'birth.proportions',
                   parent.child.concordant.dimensions = 'race',
                   all.births.into.compartments = list(age=1, risk=1))
 
 register.natality(specification = EHE.SPECIFICATION,
-                  from.groups = 'infected',
-                  to.groups = 'uninfected',
+                  parent.groups = 'infected',
+                  child.groups = 'uninfected',
                   fertility.rate.value = 'fertility',
                   birth.proportions.value = 'birth.proportions',
                   parent.child.concordant.dimensions = 'race',
-                  all.births.into.compartments = list(age=1, risk=1, continuum=1, stage=1))
+                  all.births.into.compartments = list(age=1, risk=1))
 
 
 ##---------------##
@@ -1396,11 +1396,13 @@ track.transition(EHE.SPECIFICATION,
                                                             description = "Number of Individuals with a New Diagnosis of HIV in the Past Year",
                                                             scale = 'non.negative.number',
                                                             axis.name = 'Cases',
-                                                            units = 'cases'),
+                                                            units = 'cases',
+                                                            singular.unit = 'case'),
                  dimension = 'continuum',
                  from.compartments = 'undiagnosed.states',
                  to.compartments = 'first.diagnosed.states',
-                 keep.dimensions = c('age','race','sex','risk'))
+                 keep.dimensions = c('location','age','race','sex','risk'),
+                 corresponding.data.outcome = 'new')
 
 track.dynamic.outcome(EHE.SPECIFICATION,
                       name = 'incidence',
@@ -1408,9 +1410,21 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                                                                  description = "Number of Incident HIV Infections in the Past Year",
                                                                  scale = 'non.negative.number',
                                                                  axis.name = 'Infections',
-                                                                 units = 'infections'),
+                                                                 units = 'infections',
+                                                                 singular.unit = 'infection'),
                       dynamic.quantity.name = 'incidence',
-                      keep.dimensions = c('age','race','sex','risk'))
+                      keep.dimensions = c('location','age','race','sex','risk'))
+
+track.quantity.outcome(EHE.SPECIFICATION,
+                       'population',
+                       outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                                                                  description = "The Number of Infected and Uninfected Individuals in the Population",
+                                                                  scale = 'non.negative.number',
+                                                                  axis.name = 'Population',
+                                                                  units = 'people',
+                                                                  singular.unit = 'person'),
+                       value = expression(uninfected+infected),
+                       keep.dimensions = c('location','age','race','sex','risk'))
 
 track.quantity.outcome(EHE.SPECIFICATION,
                        'testing',
@@ -1418,16 +1432,17 @@ track.quantity.outcome(EHE.SPECIFICATION,
                                                                   description = "The average number of HIV tests per year",
                                                                   scale = 'rate',
                                                                   axis.name = 'Tests per Year',
-                                                                  units = 'tests/yr'),
+                                                                  units = 'tests/yr',
+                                                                  singular.unit = 'test/yr'),
                        value = 'testing',
                        denominator.outcome = 'population',
-                       keep.dimensions = c('age','race','sex','risk'))
+                       keep.dimensions = c('location','age','race','sex','risk'))
 
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'cumulative.uninfected',
                          outcome.metadata = NULL,
                          outcome.name.to.integrate = 'uninfected',
-                         keep.dimensions = c('age','race','sex','risk'),
+                         keep.dimensions = c('location','age','race','sex','risk'),
                          save = F)
 
 track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
@@ -1439,7 +1454,8 @@ track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
                                                                                  units = '%'),
                                       rate.value = 'testing',
                                       denominator.outcome = 'cumulative.uninfected',
-                                      keep.dimensions = c('age','race','sex','risk'))
+                                      corresponding.data.outcome = 'proportion.tested',
+                                      keep.dimensions = c('location','age','race','sex','risk'))
 
 track.dynamic.outcome(EHE.SPECIFICATION,
                       name = 'hiv.mortality',
@@ -1447,11 +1463,26 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                                                                  description = "Number of People with HIV who Died of Any Cause in the Past Year",
                                                                  scale = 'non.negative.number',
                                                                  axis.name = 'Deaths',
-                                                                 units = 'deaths'),
+                                                                 units = 'deaths',
+                                                                 singular.unit = 'death'),
                       dynamic.quantity.name = 'mortality',
+                      corresponding.data.outcome = 'hiv.mortality',
                       groups = 'infected',
                       tags = NULL,
-                      keep.dimensions = c('sex'))
+                      keep.dimensions = c('location','sex'))
+
+track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'diagnosed.prevalence',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Prevalence (of Diagnosed PWH)',
+                                                                    description = "The Number of People with HIV Aware of their Diagnosis",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'PrevalenT Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         outcome.name.to.integrate = 'infected',
+                         corresponding.data.outcome = 'diagnosed.prevalence',
+                         keep.dimensions = c('location','age','race','sex','risk')
+                         )
 
 ##--------------------------------##
 ##--------------------------------##
