@@ -74,6 +74,9 @@ data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
   
   data=file[["data"]] 
   filename = file[["filename"]] 
+  
+data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
+data= subset(data, data$division != "1")
    
 data$location = locations::get.location.code(data$MSA,"CBSA")
   
@@ -124,6 +127,9 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   
   data=file[["data"]] 
   filename = file[["filename"]] 
+  
+  data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
+  data= subset(data, data$division != "1")
   
   data$location = locations::get.location.code(data$MSA,"CBSA")
 
@@ -180,6 +186,9 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
+  data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
+  data= subset(data, data$division != "1")
+  
   data$location = locations::get.location.code(data$MSA,"CBSA")
   
   if(grepl("male", filename)){
@@ -189,7 +198,6 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   if(grepl("female", filename)){
     data$sex="female"
   }
-  
   ifelse(data$prevalence_num == "-", NA, data$prevalence_num)
   ifelse(data$diagnoses_num == "-", NA, data$diagnoses_num)
    
@@ -233,11 +241,9 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   if(grepl("2018 new 2018", filename)){
     data$year = "2018"
   }
-  
   data= as.data.frame(data)
   
   list(filename, data) 
-  
 })
 
 ################################################################################
@@ -248,6 +254,9 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
 
+  data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
+  data= subset(data, data$division != "1")
+  
   data$location = locations::get.location.code(data$MSA,"CBSA")
   
   #Create Year#
@@ -289,7 +298,6 @@ if(grepl("male", filename)){
 if(grepl("female", filename)){
     data$sex="female"
 }
-  
   if(grepl("new", filename)){
     
     data$diagnoses_num_1 = (gsub("[[:punct:]]", NA, data$diagnoses_num_1))
@@ -326,9 +334,9 @@ if(grepl("female", filename)){
     data$prevalence_5 = as.numeric(data$prevalence_num_5)
   }
   
-  data <- data %>%
-    select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
-                                       "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
+   data <- data %>%
+     select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                        "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
   
   data <- data %>%
     pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
@@ -354,7 +362,10 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  data$location = locations::get.location.code(data$MSA,"CBSA")
+  data$division= ifelse(grepl("Division", data$msa), "1", "0") #Remove MSA = division
+  #data= subset(data, data$division != "1")
+  
+  data$location = locations::get.location.code(data$msa,"CBSA")
   
   ##add year section##
   ##problem is commas and dashes####
@@ -505,6 +516,9 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   data=file[["data"]] 
   filename = file[["filename"]] 
   
+  data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
+  data= subset(data, data$division != "1")
+  
   data$location = locations::get.location.code(data$MSA,"CBSA")
   
   #Create Year#
@@ -538,7 +552,6 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   if(grepl("2018", filename)) {
     data$year = as.character("2018")
   }
-  
   #Create Sex# 
   if(grepl("male", filename)){
     data$sex="male"
@@ -546,7 +559,6 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   if(grepl("female", filename)){
     data$sex="female"
   }
-
    if(grepl("new", filename)){
 
        data$diagnoses_1 = (gsub("[[:punct:]]", NA, data$diagnoses_num_1))
@@ -582,11 +594,9 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
     data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5))
     data$prevalence_5 = as.numeric(data$prevalence_5)
   }
-
-   data <- data %>%
-     select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
-                                        "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
-
+    data <- data %>%
+      select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                         "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
    data <- data %>%
      pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
                                 "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5")),
@@ -606,11 +616,13 @@ list(filename, data)
 ################################################################################
                     ###MSA BY RACE AND RISK##
 ################################################################################
-
 data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   
   data=file[["data"]] 
   filename = file[["filename"]] 
+  
+  data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
+  data= subset(data, data$division != "1")
   
   data$location = locations::get.location.code(data$MSA,"CBSA")
   
@@ -693,17 +705,15 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
     data$prevalence_5 = as.numeric(data$prevalence_5)
   }
   
-  data <- data %>%
-    select(year, location, race, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
-                                       "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
-  
+   data <- data %>%
+     select(year, location, race, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                        "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
   data <- data %>%
     pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
                                "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5")),
                  names_to = c("outcome", "risk"),
                  names_sep = "_",
                  values_to = "value")
-  
   
   data$risk= risk.msa.mappings[data$risk]
   
@@ -719,6 +729,9 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   
   data=file[["data"]] 
   filename = file[["filename"]] 
+  
+  data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
+  data= subset(data, data$division != "1")
   
   data$location = locations::get.location.code(data$MSA,"CBSA")
   
@@ -816,10 +829,9 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
     data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5))
     data$prevalence_5 = as.numeric(data$prevalence_5)
   }
-  
-  data <- data %>%
-    select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
-                                        "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
+   data <- data %>%
+     select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                         "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
   
   data <- data %>%
     pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
@@ -828,15 +840,12 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
                  names_sep = "_",
                  values_to = "value")
   
-  
   data$risk= risk.msa.mappings[data$risk]
   
   data= as.data.frame(data)
   
   list(filename, data) 
-  
 })
-
 ################################################################################
                   ###Put Data into Data Manager###
 ################################################################################
