@@ -1,8 +1,9 @@
 
 library(readxl)
 
-
-###Read in Aids Vu PrEP Excel Datasets###
+################################################################################
+                  ###Read in Aids Vu PrEP Excel Datasets###
+################################################################################
 
 DATA.DIR.PREP="../../data_raw/prep/aidsvu"
 
@@ -12,15 +13,9 @@ data.list.prep <- lapply(prep_files, function(x){
   list(filename=x, data=read_excel(x, sheet= 1, skip=skip))
 })
 
-# prep_files <- Sys.glob(paste0(DATA.DIR.PREP, '/*.xlsx'))
-# data.list.prep <- lapply(prep_files, function(x){
-#   skip=3
-#   list(filename=x, data=read_excel(x, sheet= 1, skip=skip, col_types= "text"))
-# })
-
-###############################################################################
-
-###Create list- Total PrEP Use###
+################################################################################
+                  ###Create list- Total PrEP Use###
+################################################################################
 data.list.prep.total = lapply(data.list.prep, function(file){
   
   data=file[["data"]]
@@ -29,7 +24,7 @@ data.list.prep.total = lapply(data.list.prep, function(file){
   #Formatting all files will need#
     data$year = data$Year 
     data$outcome = "prep"
-    data= subset(data, data$`State Abbreviation` != "PR")
+    #data= subset(data, data$`State Abbreviation` != "PR") #leaving Puerto Rico in this data#
     
     #Location conditional formatting
     if(grepl("state", filename)) {
@@ -66,8 +61,9 @@ data.list.prep.total = lapply(data.list.prep, function(file){
     
 })
 
-###Create list- PrEP Use by Sex###
-
+################################################################################
+                    ###Create list- PrEP Use by Sex###
+################################################################################
 data.list.prep.sex = lapply(data.list.prep, function(file){
   
   data=file[["data"]]
@@ -76,19 +72,15 @@ data.list.prep.sex = lapply(data.list.prep, function(file){
   #Formatting all files will need#
   data$year = data$Year 
   data$outcome = "prep"
-  data= subset(data, data$`State Abbreviation` != "PR")
   
   #Location conditional formatting
   if(grepl("state", filename)) {
     data$location = data$`State Abbreviation`
-
   }
-  
   if(grepl("county", filename)) {
     data$FIPS = as.numeric(data$`GEO ID`)
     data$location= str_pad(data$FIPS, width=5, side="left", pad="0")
   }
-  
   data$male=data$`Male PrEP Users`
   data$female =data$`Female PrEP Users` 
   
@@ -112,7 +104,10 @@ data.list.prep.sex = lapply(data.list.prep, function(file){
   
 })
 
-###Create list-PrEP Use by Age###
+################################################################################
+                ###Create list-PrEP Use by Age###
+################################################################################
+
 data.list.prep.age = lapply(data.list.prep, function(file){
   
   data=file[["data"]]
@@ -121,7 +116,6 @@ data.list.prep.age = lapply(data.list.prep, function(file){
   #Formatting all files will need#
   data$year = data$Year 
   data$outcome = "prep"
-  data= subset(data, data$`State Abbreviation` != "PR")
   
   #Location conditional formatting
   if(grepl("state", filename)) {
@@ -139,7 +133,6 @@ data.list.prep.age = lapply(data.list.prep, function(file){
   data$`45-54 years`= data$`Age 45-54 PrEP Users`
   data$`55+ years` = data$`Age 55+ PrEP Users`
 
-  
   data <- data %>%
    pivot_longer(cols=c("under 25 years", "25-34 years", "35-44 years", "45-54 years", "55+ years"),
                   names_to = "age",
@@ -159,10 +152,11 @@ data.list.prep.age = lapply(data.list.prep, function(file){
   list(filename, data)
   
 })
+################################################################################
+                 ###Create list- PrEP Use by Race###
+            ###Note race is not available at the county level###
+################################################################################
 
-
-###Create list- PrEP Use by Race###
-###Note race is not available at the county level###
 data.list.prep.state = data.list.prep[11:20] #Subset to just have state level data#
 
 data.list.prep.race = lapply(data.list.prep.state, function(file){
@@ -173,7 +167,6 @@ data.list.prep.race = lapply(data.list.prep.state, function(file){
   #Formatting all files will need#
   data$year = data$Year 
   data$outcome = "prep"
-  data= subset(data, data$`State Abbreviation` != "PR")
   
   #Location conditional formatting
   if(grepl("state", filename)) {
@@ -204,8 +197,9 @@ data.list.prep.race = lapply(data.list.prep.state, function(file){
   
 })
 
-
-###Put AIDS Vu Files into Data.Manager###
+################################################################################
+                ###Put AIDS Vu Files into Data.Manager###
+################################################################################
 
 ##Total PrEP Use State + County##
 
