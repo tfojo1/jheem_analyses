@@ -82,6 +82,24 @@ data.manager$register.outcome(
     units = 'cases',
     description = "PrEP Use"))
 
+data.manager$register.outcome(
+  'aids_prevalence',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'aids_prevalence',
+    axis.name = 'aids_prevalence (n)',
+    units = 'cases',
+    description = "AIDS Prevalence"))
+
+data.manager$register.outcome(
+  'aids_diagnoses',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'aids_diagnoses',
+    axis.name = 'aids_diagnoses (n)',
+    units = 'cases',
+    description = "AIDS Diagnoses"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')

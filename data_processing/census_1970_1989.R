@@ -4,9 +4,24 @@
 #But because the racial groups prior to 2000 are different I'm not sure
 #how much of this we will use
 
+#8/21: I'm adding back in the 1990s data so we can have population totals for
+#1990-1999
+
+#The demographics are commented out/not working bc of the racial ontology issue
+#Decide if you want these in
+
 ################################################################################
                   ###Read 1970-1989 County Files###
 ################################################################################
+#90.99 County Data#
+DATA.DIR.CENSUS.90="../../data_raw/population/county_90.99"
+
+ninties_files <- list.files(DATA.DIR.CENSUS.90, pattern = "txt", full.names = TRUE, recursive = TRUE)
+
+data.list.county.90 <- lapply(ninties_files, function(x) {
+  list(filename=x, data=read.table(x, quote="\"", comment.char="", colClasses=c(V2="character")))
+})
+
 
 #1980's County data
 sheets <- excel_sheets("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls")
@@ -26,6 +41,81 @@ race.sex.70s.mappings= c('1' = 'White male',
                          '4' = 'Black female',
                          '5' = 'other race male',
                          '6' = 'other race female')
+
+year.mappings = c('90' = '1990',
+                  '91' = '1991',
+                  '92' = '1992',
+                  '93' = '1993',
+                  '94' = '1994',
+                  '95' = '1995',
+                  '96' = '1996',
+                  '97' = '1997',
+                  '98' = '1998',
+                  '99' = '1999')
+
+################################################################################
+                  ###COUNTY 1990-1999 POPULATION###
+################################################################################
+
+data.list.county.90.clean = lapply(data.list.county.90 , function(file){
+  
+  data=file[["data"]] #apply the function to the data element#
+  filename = file[["filename"]] #apply the function to the filename element#
+  
+  data$year = as.character(data$V1)    #you could take a lot of this out and just use it in the demos#
+  data$location = data$V2
+  data$age_group = as.character(data$V3)
+  data$race_sex = data$V4
+  data$ethnicity = data$V5
+  data$population = as.numeric(data$V6)
+  
+  data$year = year.mappings[data$year]
+  # data$race_sex = race.sex.90s.mappings[data$race_sex]
+  # data$ethnicity = ethnicity.mappings[data$ethnicity]
+  
+  data <- data %>%
+    select(year, location, age_group, ethnicity, population) %>%
+    group_by(location) %>%   #don't need to group by year bc each df is a separate year#
+    summarise(sum_population = sum(population),
+              .groups='drop')
+  
+  data$value= data$sum_population
+  data$outcome = "population"
+  
+  if(grepl("1990", filename)) {
+    data$year = "1990"
+  }
+  if(grepl("1991", filename)) {
+    data$year = "1991"
+  }
+  if(grepl("1992", filename)) {
+    data$year = "1992"
+  }
+  if(grepl("1993", filename)) {
+    data$year = "1993"
+  }
+  if(grepl("1994", filename)) {
+    data$year = "1994"
+  }
+  if(grepl("1995", filename)) {
+    data$year = "1995"
+  }
+  if(grepl("1996", filename)) {
+    data$year = "1996"
+  }
+  if(grepl("1997", filename)) {
+    data$year = "1997"
+  }
+  if(grepl("1998", filename)) {
+    data$year = "1998"
+  }
+  if(grepl("1999", filename)) {
+    data$year = "1999"
+  }
+  data = as.data.frame(data)
+  list(filename, data)  
+  
+})
 
 ################################################################################
                   ###COUNTY 1980-1989 TOTAL POPULATION###
@@ -214,6 +304,19 @@ county_70.79_list_demos = lapply(county_70.79_list_2, function(file){
 ################################################################################
                   ###PUT INTO CENSUS MANAGER###
 ################################################################################
+#COUNTY TOTAL POPULATION VALUES 1990-1999
+county_90_pop = lapply(data.list.county.90.clean, `[[`, 2)
+
+for (data in county_90_pop) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
 
 #COUNTY TOTAL POPULATIONS VALUES 1980-1989 
 county_80_pop = lapply(data.list.80.county.clean, `[[`, 2)
@@ -243,30 +346,30 @@ for (data in county_70_pop) {
     details = 'Census Reporting')
 }
 
-#COUNTY DEMOGRAPHICS  1980-1989 
-county_80_demo = lapply(data.list.80.county.demos, `[[`, 2)
-
-for (data in county_80_demo) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
-
-#COUNTY DEMOGRAPHICS  1970-1979
-county_70_demo = lapply(county_70.79_list_demos, `[[`, 2)
-
-for (data in county_70_demo) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census',
-    source = 'census',
-    dimension.values = list(),
-    url = 'www.census.gov',
-    details = 'Census Reporting')
-}
+# #COUNTY DEMOGRAPHICS  1980-1989 
+# county_80_demo = lapply(data.list.80.county.demos, `[[`, 2)
+# 
+# for (data in county_80_demo) {
+#   
+#   census.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'census',
+#     source = 'census',
+#     dimension.values = list(),
+#     url = 'www.census.gov',
+#     details = 'Census Reporting')
+# }
+# 
+# #COUNTY DEMOGRAPHICS  1970-1979
+# county_70_demo = lapply(county_70.79_list_demos, `[[`, 2)
+# 
+# for (data in county_70_demo) {
+#   
+#   census.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'census',
+#     source = 'census',
+#     dimension.values = list(),
+#     url = 'www.census.gov',
+#     details = 'Census Reporting')
+# }
