@@ -115,6 +115,8 @@ data$female = (gsub("[[:punct:]]", "", data$female_num))
 
   data$outcome = "hiv deaths"
   
+  data$value = as.numeric(data$value)
+  
   data= as.data.frame(data)
   
   list(filename, data)  
@@ -975,7 +977,7 @@ for (data in msa_deaths) {
     details = 'CDC Reporting')
 }
 
-##MSA Deaths
+##MSA total
 msa_total = lapply(data.list.msa_total.clean, `[[`, 2)  
 
 for (data in msa_total) {
