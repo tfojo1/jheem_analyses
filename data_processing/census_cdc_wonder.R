@@ -10,22 +10,12 @@ DATA.DIR.CDC.WONDER="../../data_raw/cdc_wonder"
 
 cdc_wonder_files <- list.files(DATA.DIR.CDC.WONDER, pattern = ".txt", full.names = "TRUE")
 
-data.list.cdc.wonder.og <- lapply(cdc_wonder_files, function(x) {
-  list(filename=x, data=read_delim(x,  delim = "\t", escape_double = FALSE,
-                                   trim_ws = TRUE))
-})
-
 data.list.cdc.wonder <- lapply(cdc_wonder_files, function(x) {
   list(filename=x, data=read_delim(x,  delim = "\t", escape_double = FALSE, 
-                                   col_types = cols(Population = col_character(), 
-                                                    Notes = col_character(), Age = col_character(), 
-                                                    `Age Code` = col_character(), Race = col_character(), 
-                                                    `Race Code` = col_character(), Ethnicity = col_character(), 
-                                                    `Ethnicity Code` = col_character(), 
-                                                    County = col_character(), `County Code` = col_character(), 
+                                   col_types = cols(Notes = col_skip(), 
                                                     `Yearly July 1st Estimates` = col_character(), 
-                                                    `Yearly July 1st Estimates Code` = col_character()), 
-                                   trim_ws = TRUE))
+                                                    `Yearly July 1st Estimates Code` = col_character(), 
+                                                    Population = col_character()), trim_ws = TRUE))
 })
 
 ################################################################################
