@@ -247,7 +247,6 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   
   list(filename, data) 
 })
-
 ################################################################################
                         ###MSA BY SEX AND AGE###
 ################################################################################
@@ -693,40 +692,59 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   if(grepl("female", filename)){
     data$sex="female"
   }
-   if(grepl("new", filename)){
-
-       data$diagnoses_1 = (gsub("[[:punct:]]", NA, data$diagnoses_num_1))
-       data$diagnoses_1 = as.numeric(data$diagnoses_1)
-
-        data$diagnoses_2 = (gsub("[[:punct:]]", NA, data$diagnoses_num_2))
-        data$diagnoses_2 = as.numeric(data$diagnoses_2)
-        
-        data$diagnoses_3 = (gsub("[[:punct:]]", NA, data$diagnoses_num_3))
-        #data$diagnoses_num_3 = (gsub("[^[:alnum:] ]", NA, data$diagnoses_num_3))
-        data$diagnoses_3 = as.numeric(data$diagnoses_3)
-        
-        data$diagnoses_4 = (gsub("[[:punct:]]", NA, data$diagnoses_num_4))
-        data$diagnoses_4 = as.numeric(data$diagnoses_4)
-        
-        data$diagnoses_5 = (gsub("[[:punct:]]", NA, data$diagnoses_num_5))
-        data$diagnoses_5 = as.numeric(data$diagnoses_5)
-   }
-
+  if(grepl("new", filename)){
+    
+    data$diagnoses_num_1 = (gsub(",", "", data$diagnoses_num_1)) #replace comma with nothing
+    data$diagnoses_num_1 = (gsub(" ", "", data$diagnoses_num_1)) #replace space with nothing
+    data$diagnoses_num_1 = (gsub("[[:punct:]]", NA, data$diagnoses_num_1)) #if there's a dash replace with NA
+    data$diagnoses_1 = as.numeric(data$diagnoses_num_1) #make it a number
+    
+    data$diagnoses_num_2 = (gsub(",", "", data$diagnoses_num_2)) 
+    data$diagnoses_num_2 = (gsub(" ", "", data$diagnoses_num_2)) 
+    data$diagnoses_num_2 = (gsub("[[:punct:]]", NA, data$diagnoses_num_2)) 
+    data$diagnoses_2 = as.numeric(data$diagnoses_num_2)
+    
+    data$diagnoses_num_3 = (gsub(",", "", data$diagnoses_num_3)) 
+    data$diagnoses_num_3 = (gsub(" ", "", data$diagnoses_num_3)) 
+    data$diagnoses_num_3 = (gsub("[[:punct:]]", NA, data$diagnoses_num_3)) 
+    data$diagnoses_3 = as.numeric(data$diagnoses_num_3)
+    
+    data$diagnoses_num_4 = (gsub(",", "", data$diagnoses_num_4)) 
+    data$diagnoses_num_4 = (gsub(" ", "", data$diagnoses_num_4)) 
+    data$diagnoses_num_4 = (gsub("[[:punct:]]", NA, data$diagnoses_num_4)) 
+    data$diagnoses_4 = as.numeric(data$diagnoses_num_4)
+    
+    data$diagnoses_num_5 = (gsub(",", "", data$diagnoses_num_5)) 
+    data$diagnoses_num_5 = (gsub(" ", "", data$diagnoses_num_5)) 
+    data$diagnoses_num_5 = (gsub("[[:punct:]]", NA, data$diagnoses_num_5)) 
+    data$diagnoses_5 = as.numeric(data$diagnoses_num_5)
+  }
+  
   if(grepl("prevalence", filename)){
-    data$prevalence_1 = (gsub("[[:punct:]]", NA, data$prevalence_num_1))
-    data$prevalence_1 = as.numeric(data$prevalence_1)
+    data$prevalence_num_1 = (gsub(",", "", data$prevalence_num_1)) #replace comma with nothing
+    data$prevalence_num_1 = (gsub(" ", "", data$prevalence_num_1)) #replace space with nothing
+    data$prevalence_num_1 = (gsub("[[:punct:]]", NA, data$prevalence_num_1)) #if there's a dash replace with NA
+    data$prevalence_1 = as.numeric(data$prevalence_num_1)
     
-    data$prevalence_2 = (gsub("[[:punct:]]", NA, data$prevalence_num_2))
-    data$prevalence_2 = as.numeric(data$prevalence_2)
+    data$prevalence_num_2 = (gsub(",", "", data$prevalence_num_2)) 
+    data$prevalence_num_2 = (gsub(" ", "", data$prevalence_num_2)) 
+    data$prevalence_num_2 = (gsub("[[:punct:]]", NA, data$prevalence_num_2)) 
+    data$prevalence_2 = as.numeric(data$prevalence_num_2)
     
-    data$prevalence_3 = (gsub("[[:punct:]]", NA, data$prevalence_num_3))
-    data$prevalence_3 = as.numeric(data$prevalence_3)
+    data$prevalence_num_3 = (gsub(",", "", data$prevalence_num_3)) 
+    data$prevalence_num_3 = (gsub(" ", "", data$prevalence_num_3)) 
+    data$prevalence_num_3 = (gsub("[[:punct:]]", NA, data$prevalence_num_3)) 
+    data$prevalence_3 = as.numeric(data$prevalence_num_3)
     
-    data$prevalence_4 = (gsub("[[:punct:]]", NA, data$prevalence_num_4))
-    data$prevalence_4 = as.numeric(data$prevalence_4)
+    data$prevalence_num_4 = (gsub(",", "", data$prevalence_num_4)) 
+    data$prevalence_num_4 = (gsub(" ", "", data$prevalence_num_4)) 
+    data$prevalence_num_4 = (gsub("[[:punct:]]", NA, data$prevalence_num_4)) 
+    data$prevalence_4 = as.numeric(data$prevalence_num_4)
     
-    data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5))
-    data$prevalence_5 = as.numeric(data$prevalence_5)
+    data$prevalence_num_5 = (gsub(",", "", data$prevalence_num_5)) 
+    data$prevalence_num_5 = (gsub(" ", "", data$prevalence_num_5)) 
+    data$prevalence_num_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5)) 
+    data$prevalence_5 = as.numeric(data$prevalence_num_5)
   }
     data <- data %>%
       select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
@@ -805,42 +823,62 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   
   if(grepl("new", filename)){
     
-    data$diagnoses_1 = (gsub("[[:punct:]]", NA, data$diagnoses_1))
-    data$diagnoses_1 = as.numeric(data$diagnoses_1)
+    data$diagnoses_1 = (gsub(",", "", data$diagnoses_1)) #replace comma with nothing
+    data$diagnoses_1 = (gsub(" ", "", data$diagnoses_1)) #replace space with nothing
+    data$diagnoses_1 = (gsub("[[:punct:]]", NA, data$diagnoses_1)) #if there's a dash replace with NA
+    data$diagnoses_1 = as.numeric(data$diagnoses_1) #make it a number
     
-    data$diagnoses_2 = (gsub("[[:punct:]]", NA, data$diagnoses_2))
-    data$diagnoses_2 = as.numeric(data$diagnoses_2)
+    data$diagnoses_2 = (gsub(",", "", data$diagnoses_2)) 
+    data$diagnoses_2 = (gsub(" ", "", data$diagnoses_2)) 
+    data$diagnoses_2 = (gsub("[[:punct:]]", NA, data$diagnoses_2)) 
+    data$diagnoses_2 = as.numeric(data$diagnoses_2) 
     
-    data$diagnoses_3 = (gsub("[[:punct:]]", NA, data$diagnoses_3))
-    data$diagnoses_3 = as.numeric(data$diagnoses_3)
+    data$diagnoses_3 = (gsub(",", "", data$diagnoses_3))
+    data$diagnoses_3 = (gsub(" ", "", data$diagnoses_3)) 
+    data$diagnoses_3 = (gsub("[[:punct:]]", NA, data$diagnoses_3)) 
+    data$diagnoses_3 = as.numeric(data$diagnoses_3) 
     
-    data$diagnoses_4 = (gsub("[[:punct:]]", NA, data$diagnoses_4))
-    data$diagnoses_4 = as.numeric(data$diagnoses_4)
+    data$diagnoses_4 = (gsub(",", "", data$diagnoses_4)) 
+    data$diagnoses_4 = (gsub(" ", "", data$diagnoses_4)) 
+    data$diagnoses_4 = (gsub("[[:punct:]]", NA, data$diagnoses_4)) 
+    data$diagnoses_4 = as.numeric(data$diagnoses_4) 
     
-    data$diagnoses_5 = (gsub("[[:punct:]]", NA, data$diagnoses_5))
-    data$diagnoses_5 = as.numeric(data$diagnoses_5)
+    data$diagnoses_5 = (gsub(",", "", data$diagnoses_5)) 
+    data$diagnoses_5 = (gsub(" ", "", data$diagnoses_5)) 
+    data$diagnoses_5 = (gsub("[[:punct:]]", NA, data$diagnoses_5)) 
+    data$diagnoses_5 = as.numeric(data$diagnoses_5) 
   }
   
   if(grepl("prevalence", filename)){
     
-    data$prevalence_1 = (gsub("[[:punct:]]", NA, data$prevalence_1))
-    data$prevalence_1 = as.numeric(data$prevalence_1)
+    data$prevalence_1 = (gsub(",", "", data$prevalence_1)) #replace comma with nothing
+    data$prevalence_1 = (gsub(" ", "", data$prevalence_1)) #replace space with nothing
+    data$prevalence_1 = (gsub("[[:punct:]]", NA, data$prevalence_1)) #if there's a dash replace with NA
+    data$prevalence_1 = as.numeric(data$prevalence_1) #make it a number
     
-    data$prevalence_2 = (gsub("[[:punct:]]", NA, data$prevalence_2))
-    data$prevalence_2 = as.numeric(data$prevalence_2)
+    data$prevalence_2 = (gsub(",", "", data$prevalence_2)) 
+    data$prevalence_2 = (gsub(" ", "", data$prevalence_2)) 
+    data$prevalence_2 = (gsub("[[:punct:]]", NA, data$prevalence_2)) 
+    data$prevalence_2 = as.numeric(data$prevalence_2) 
     
-    data$prevalence_3 = (gsub("[[:punct:]]", NA, data$prevalence_3))
-    data$prevalence_3 = as.numeric(data$prevalence_3)
+    data$prevalence_3 = (gsub(",", "", data$prevalence_3)) 
+    data$prevalence_3 = (gsub(" ", "", data$prevalence_3)) 
+    data$prevalence_3 = (gsub("[[:punct:]]", NA, data$prevalence_3)) 
+    data$prevalence_3 = as.numeric(data$prevalence_3) 
     
-    data$prevalence_4 = (gsub("[[:punct:]]", NA, data$prevalence_4))
-    data$prevalence_4 = as.numeric(data$prevalence_4)
+    data$prevalence_4 = (gsub(",", "", data$prevalence_4)) 
+    data$prevalence_4 = (gsub(" ", "", data$prevalence_4)) 
+    data$prevalence_4 = (gsub("[[:punct:]]", NA, data$prevalence_4)) 
+    data$prevalence_4 = as.numeric(data$prevalence_4) 
     
-    data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_5))
-    data$prevalence_5 = as.numeric(data$prevalence_5)
+    data$prevalence_5 = (gsub(",", "", data$prevalence_5)) 
+    data$prevalence_5 = (gsub(" ", "", data$prevalence_5)) 
+    data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_5)) 
+    data$prevalence_5 = as.numeric(data$prevalence_5) 
   }
   
-   data <- data %>%
-     select(year, location, race, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+  data <- data %>%
+    select(year, location, race, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
                                         "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
   data <- data %>%
     pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
@@ -902,67 +940,100 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   }
   
   data$sex = ifelse(grepl("female", filename), "female", "male")
-
+  
   if(grepl("new male", filename)){
     
-    data$diagnoses_1 = (gsub("[[:punct:]]", NA, data$diagnoses_num_1))
-    data$diagnoses_1 = as.numeric(data$diagnoses_1)
+    data$diagnoses_num_1 = (gsub(",", "", data$diagnoses_num_1)) #replace comma with nothing
+    data$diagnoses_num_1 = (gsub(" ", "", data$diagnoses_num_1)) #replace space with nothing
+    data$diagnoses_num_1 = (gsub("[[:punct:]]", NA, data$diagnoses_num_1)) #if there's a dash replace with NA
+    data$diagnoses_1 = as.numeric(data$diagnoses_num_1) #make it a number
     
-    data$diagnoses_2 = (gsub("[[:punct:]]", NA, data$diagnoses_num_2))
-    data$diagnoses_2 = as.numeric(data$diagnoses_2)
+    data$diagnoses_num_2 = (gsub(",", "", data$diagnoses_num_2)) 
+    data$diagnoses_num_2 = (gsub(" ", "", data$diagnoses_num_2)) 
+    data$diagnoses_num_2 = (gsub("[[:punct:]]", NA, data$diagnoses_num_2)) 
+    data$diagnoses_2 = as.numeric(data$diagnoses_num_2)
     
-    data$diagnoses_3 = (gsub("[[:punct:]]", NA, data$diagnoses_num_3))
-    data$diagnoses_3 = as.numeric(data$diagnoses_3)
+    data$diagnoses_num_3 = (gsub(",", "", data$diagnoses_num_3)) 
+    data$diagnoses_num_3 = (gsub(" ", "", data$diagnoses_num_3)) 
+    data$diagnoses_num_3 = (gsub("[[:punct:]]", NA, data$diagnoses_num_3)) 
+    data$diagnoses_3 = as.numeric(data$diagnoses_num_3)
     
-    data$diagnoses_4 = (gsub("[[:punct:]]", NA, data$diagnoses_num_4))
-    data$diagnoses_4 = as.numeric(data$diagnoses_4)
+    data$diagnoses_num_4 = (gsub(",", "", data$diagnoses_num_4)) 
+    data$diagnoses_num_4 = (gsub(" ", "", data$diagnoses_num_4)) 
+    data$diagnoses_num_4 = (gsub("[[:punct:]]", NA, data$diagnoses_num_4)) 
+    data$diagnoses_4 = as.numeric(data$diagnoses_num_4)
     
-    data$diagnoses_5 = (gsub("[[:punct:]]", NA, data$diagnoses_num_5))
-    data$diagnoses_5 = as.numeric(data$diagnoses_5)
+    data$diagnoses_num_5 = (gsub(",", "", data$diagnoses_num_5)) 
+    data$diagnoses_num_5 = (gsub(" ", "", data$diagnoses_num_5)) 
+    data$diagnoses_num_5 = (gsub("[[:punct:]]", NA, data$diagnoses_num_5)) 
+    data$diagnoses_5 = as.numeric(data$diagnoses_num_5)
   }
   
   if(grepl("prevalence male", filename)){
     
-    data$prevalence_1 = (gsub("[[:punct:]]", NA, data$prevalence_num_1))
-    data$prevalence_1 = as.numeric(data$prevalence_1)
+    data$prevalence_num_1 = (gsub(",", "", data$prevalence_num_1)) #replace comma with nothing
+    data$prevalence_num_1 = (gsub(" ", "", data$prevalence_num_1)) #replace space with nothing
+    data$prevalence_num_1 = (gsub("[[:punct:]]", NA, data$prevalence_num_1)) #if there's a dash replace with NA
+    data$prevalence_1 = as.numeric(data$prevalence_num_1)
     
-    data$prevalence_2 = (gsub("[[:punct:]]", NA, data$prevalence_num_2))
-    data$prevalence_2 = as.numeric(data$prevalence_2)
+    data$prevalence_num_2 = (gsub(",", "", data$prevalence_num_2)) 
+    data$prevalence_num_2 = (gsub(" ", "", data$prevalence_num_2)) 
+    data$prevalence_num_2 = (gsub("[[:punct:]]", NA, data$prevalence_num_2)) 
+    data$prevalence_2 = as.numeric(data$prevalence_num_2)
     
-    data$prevalence_3 = (gsub("[[:punct:]]", NA, data$prevalence_num_3))
-    data$prevalence_3 = as.numeric(data$prevalence_3)
+    data$prevalence_num_3 = (gsub(",", "", data$prevalence_num_3)) 
+    data$prevalence_num_3 = (gsub(" ", "", data$prevalence_num_3)) 
+    data$prevalence_num_3 = (gsub("[[:punct:]]", NA, data$prevalence_num_3)) 
+    data$prevalence_3 = as.numeric(data$prevalence_num_3)
     
-    data$prevalence_4 = (gsub("[[:punct:]]", NA, data$prevalence_num_4))
-    data$prevalence_4 = as.numeric(data$prevalence_4)
+    data$prevalence_num_4 = (gsub(",", "", data$prevalence_num_4)) 
+    data$prevalence_num_4 = (gsub(" ", "", data$prevalence_num_4)) 
+    data$prevalence_num_4 = (gsub("[[:punct:]]", NA, data$prevalence_num_4)) 
+    data$prevalence_4 = as.numeric(data$prevalence_num_4)
     
-    data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5))
-    data$prevalence_5 = as.numeric(data$prevalence_5)
+    data$prevalence_num_5 = (gsub(",", "", data$prevalence_num_5)) 
+    data$prevalence_num_5 = (gsub(" ", "", data$prevalence_num_5)) 
+    data$prevalence_num_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5)) 
+    data$prevalence_5 = as.numeric(data$prevalence_num_5)
+    
   }
   if(grepl("new female", filename)){
     
-    data$diagnoses_2 = (gsub("[[:punct:]]", NA, data$diagnoses_num_2))
-    data$diagnoses_2 = as.numeric(data$diagnoses_2)
-
-    data$diagnoses_4 = (gsub("[[:punct:]]", NA, data$diagnoses_num_4))
-    data$diagnoses_4 = as.numeric(data$diagnoses_4)
+    data$diagnoses_num_2 = (gsub(",", "", data$diagnoses_num_2)) 
+    data$diagnoses_num_2 = (gsub(" ", "", data$diagnoses_num_2)) 
+    data$diagnoses_num_2 = (gsub("[[:punct:]]", NA, data$diagnoses_num_2)) 
+    data$diagnoses_2 = as.numeric(data$diagnoses_num_2)
     
-    data$diagnoses_5 = (gsub("[[:punct:]]", NA, data$diagnoses_num_5))
-    data$diagnoses_5 = as.numeric(data$diagnoses_5)
+    data$diagnoses_num_4 = (gsub(",", "", data$diagnoses_num_4)) 
+    data$diagnoses_num_4 = (gsub(" ", "", data$diagnoses_num_4)) 
+    data$diagnoses_num_4 = (gsub("[[:punct:]]", NA, data$diagnoses_num_4)) 
+    data$diagnoses_4 = as.numeric(data$diagnoses_num_4)
+    
+    data$diagnoses_num_5 = (gsub(",", "", data$diagnoses_num_5)) 
+    data$diagnoses_num_5 = (gsub(" ", "", data$diagnoses_num_5)) 
+    data$diagnoses_num_5 = (gsub("[[:punct:]]", NA, data$diagnoses_num_5)) 
+    data$diagnoses_5 = as.numeric(data$diagnoses_num_5)
   }
   if(grepl("prevalence female", filename)){
     
-    data$prevalence_2 = (gsub("[[:punct:]]", NA, data$prevalence_num_2))
-    data$prevalence_2 = as.numeric(data$prevalence_2)
+    data$prevalence_num_2 = (gsub(",", "", data$prevalence_num_2)) 
+    data$prevalence_num_2 = (gsub(" ", "", data$prevalence_num_2)) 
+    data$prevalence_num_2 = (gsub("[[:punct:]]", NA, data$prevalence_num_2)) 
+    data$prevalence_2 = as.numeric(data$prevalence_num_2)
     
-    data$prevalence_4 = (gsub("[[:punct:]]", NA, data$prevalence_num_4))
-    data$prevalence_4 = as.numeric(data$prevalence_4)
+    data$prevalence_num_4 = (gsub(",", "", data$prevalence_num_4)) 
+    data$prevalence_num_4 = (gsub(" ", "", data$prevalence_num_4)) 
+    data$prevalence_num_4 = (gsub("[[:punct:]]", NA, data$prevalence_num_4)) 
+    data$prevalence_4 = as.numeric(data$prevalence_num_4)
     
-    data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5))
-    data$prevalence_5 = as.numeric(data$prevalence_5)
+    data$prevalence_num_5 = (gsub(",", "", data$prevalence_num_5)) 
+    data$prevalence_num_5 = (gsub(" ", "", data$prevalence_num_5)) 
+    data$prevalence_num_5 = (gsub("[[:punct:]]", NA, data$prevalence_num_5)) 
+    data$prevalence_5 = as.numeric(data$prevalence_num_5)
   }
-   data <- data %>%
-     select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
-                                         "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
+  data <- data %>%
+    select(year, location, sex, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
+                                       "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
   data <- data %>%
     pivot_longer(cols=c(one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
                                "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5")),
