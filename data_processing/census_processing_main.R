@@ -89,8 +89,11 @@ data.list.county.pop <- lapply(census_county_files, function(x){
 #This pulls population and demographics from 1970-1989#
 source('data_processing/census_1970_1989.R')
 
-#This pulls single year age groups and demographic data from 1990-2020#
+#This pulls single year age groups and demographic data from 2018-2020#
 source('data_processing/census_cdc_wonder.R')
+
+#This pulls single year age groups and demographic data from 2005-2017#
+source('data_processing/census_sas_files.R')
 
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###

@@ -27,10 +27,9 @@ data.list.cdc.wonder.clean = lapply(data.list.cdc.wonder  , function(file){
   filename = file[["filename"]] #apply the function to the filename element#
   
   data$year = as.character(data$`Yearly July 1st Estimates`)
-  data$location= data$`County Code`
+  data$location= as.character(data$`County Code`)
   data$sex = ifelse(grepl("female", filename), "female", "male")
   
-  data= subset(data, data$Population != "NA") #This removes the footers#
   data$outcome= "population"
 
   data$value = ifelse(data$Population == "Missing", NA, data$Population) #Replacing 'missing' with NA
@@ -52,9 +51,9 @@ data.list.cdc.wonder.clean = lapply(data.list.cdc.wonder  , function(file){
                    ###Put into Census Manager###
 ################################################################################
 
-county_demos = lapply(data.list.cdc.wonder.clean, `[[`, 2)
+county_single_year_age = lapply(data.list.cdc.wonder.clean, `[[`, 2)
 
-for (data in county_demos) {
+for (data in county_single_year_age) {
   
   census.manager$put.long.form(
     data = data,
