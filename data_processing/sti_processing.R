@@ -61,7 +61,7 @@ data.list.sti.clean = lapply(data.list.sti, function(file){
   }
   if(grepl("age", filename)) {
     str1= "years"
-    data$age = paste(data$Age.Group, str1, sep= " ")
+    data$age = ifelse(data$Age.Group == "Unknown", "Unknown", paste(data$Age.Group, str1, sep= " "))
     data <- data %>%
       select(year, location, outcome, age, value)
   }
@@ -74,18 +74,16 @@ data.list.sti.clean = lapply(data.list.sti, function(file){
 ################################################################################
                       ###Put Data into Data Manager###
 ################################################################################
+##Create GC as registered outcome#
+sti_data = lapply(data.list.sti.clean, `[[`, 2)
 
-###Update this###
+ for (data in sti_data) {
 
-# knowledge_all = lapply(data.list.clean.knowledge, `[[`, 2)  
-# 
-# for (data in knowledge_all) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc sti',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC Reporting')
-# }
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc sti',
+     source = 'cdc',
+     dimension.values = list(),
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+     details = 'CDC Reporting')
+ }

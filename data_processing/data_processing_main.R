@@ -144,7 +144,7 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('10-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+    age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
           '40-44 years', '45-54 years', '55-64 years', '65+ years', 'Unknown'),
     race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'White', 'Unknown'),
     sex=c('male','female'),
@@ -163,6 +163,8 @@ source('data_processing/aids_vu_processing.R')
 ###Source in CDC MSA PDF Reports data and cleaning###
 
 #source('data_processing/msa_reports_processing.R')
+
+
 
 ################################################################################
 
