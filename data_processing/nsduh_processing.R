@@ -37,6 +37,8 @@ mapping_file <- mapping_file %>%
 ################################################################################
                        ###Clean NSDUH Data###
                           ###REGION###
+##Are places being removed here if they are not in the mapping file but they
+##are in the data file?
 ################################################################################
 data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
   
@@ -68,7 +70,7 @@ data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
     data$year = "2016-2018"
     }
   
-  data= subset(data, data$region_name != "NA")
+  #data= subset(data, data$region_name != "NA")
   
   data$matching_var = paste(data$region_name, data$state_abbrev, sep=" ")
   
@@ -78,8 +80,8 @@ data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
   data$location = data$FIPS
   data$age = data$age_group
   
-  data <- data %>%
-    select(year, outcome, value, location, age)
+  # data <- data %>%
+  #   select(year, outcome, value, location, age)
   
   data= as.data.frame(data)
   
@@ -90,15 +92,87 @@ data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
                             ###STATE###
 ################################################################################
 
-
+data.list.nsduh.state.clean = lapply(data.list.nsduh, function(file){
+  
+  data=file[["data"]] 
+  filename = file[["filename"]] 
+  
+  data= subset(data, data$geography != "South")
+  data= subset(data, data$geography != "West")
+  data= subset(data, data$geography != "Midwest")
+  data= subset(data, data$geography != "Northeast")
+  data= subset(data, data$geography != "United States")
+  
+  data$estimate = if_else(data$estimate == "suppressed", NA, data$estimate)
+  
+  data$outcome = tolower(data$outcome)
+  
+  data <- data%>%
+    mutate(state_name = str_extract(geography, paste(state.name, collapse = "|")))%>%
+    mutate(state_name= ifelse(grepl("District of Columbia", geography), "District of Columbia", state_name))%>%
+    mutate(state_abbrev = state.abb[match(state_name, state.name)]) %>%
+    mutate(region_name = str_extract(geography, paste(substate_regions, collapse = "|")))  ####ISSUE: THERES REGIONS IN THE DATA THAT ARE NOT ON THE MAPPING LIST###
+  
+  data$state_name = if_else(data$geography == "United States", "United States", data$state_name)
+  
+  if(grepl("14.16", filename)) {
+    data$year = "2014-2016"
+  }
+  
+  if(grepl("16.18", filename)) {
+    data$year = "2016-2018"
+  }
+  
+  # data= subset(data, data$region_name == "NA") #Keep only states#
+  
+  
+  data$value = as.numeric(data$estimate)
+  data$location = data$state_abbrev
+  data$age = data$age_group
+  # 
+  # data <- data %>%
+  #   select(year, outcome, value, location, age)
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) 
+})
 
 ################################################################################
                       ###Clean NSDUH Data###
                           ###NATIONAL###
 ################################################################################
 
+data.list.nsduh.national.clean = lapply(data.list.nsduh, function(file){
+  
+  data=file[["data"]] 
+  filename = file[["filename"]] 
+  
+  data= subset(data, data$geography == "United States")
 
+  data$estimate = if_else(data$estimate == "suppressed", NA, data$estimate)
+  
+  data$outcome = tolower(data$outcome)
 
+  if(grepl("14.16", filename)) {
+    data$year = "2014-2016"
+  }
+  
+  if(grepl("16.18", filename)) {
+    data$year = "2016-2018"
+  }
+  
+  data$value = as.numeric(data$estimate)
+  data$location = "US"
+  data$age = data$age_group
+  
+   data <- data %>%
+     select(year, outcome, value, location, age)
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) 
+})
 
 ################################################################################
                     ###Put Data into Data Manager###
@@ -116,7 +190,7 @@ for (data in nsduh_region) {
     details = 'NSDUH Substate Estimates')
 }
 
-nsduh_state = lapply(data.list.nsduh.region.clean, `[[`, 2)
+nsduh_state = lapply(data.list.nsduh.state.clean, `[[`, 2)
 
 for (data in nsduh_state) {
   
@@ -129,7 +203,7 @@ for (data in nsduh_state) {
     details = 'NSDUH Substate Estimates')
 }
 
-nsduh_national = lapply(data.list.nsduh.region.clean, `[[`, 2)
+nsduh_national = lapply(data.list.nsduh.national.clean, `[[`, 2)
 
 for (data in nsduh_national) {
   
