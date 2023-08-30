@@ -98,6 +98,8 @@ data.list.census.sas.clean = lapply(census_sas_data_list, function(file){
 ################################################################################
                   ###Put into Census Manager###
 ################################################################################
+#This is taking a really long time to run#
+
 census_sas_pops = lapply(data.list.census.sas.clean, `[[`, 2)
 
 for (data in census_sas_pops) {

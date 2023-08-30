@@ -74,7 +74,7 @@ data.list.sti.clean = lapply(data.list.sti, function(file){
 ################################################################################
                       ###Put Data into Data Manager###
 ################################################################################
-##Create GC as registered outcome#
+
 sti_data = lapply(data.list.sti.clean, `[[`, 2)
 
  for (data in sti_data) {
