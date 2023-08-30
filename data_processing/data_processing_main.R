@@ -118,9 +118,20 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Primary and Secondary Syphilis"))
 
+data.manager$register.outcome(
+  'heroin use in the past year',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'heroin use in the past year',
+    axis.name = 'heroin use in the past year (n)',
+    units = 'cases',
+    description = "heroin use in the past year"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
+
+data.manager$register.source('nsduh', full.name = "NSDUH", short.name='nsduh')
 
 data.manager$register.ontology(
   'cdc',
@@ -168,6 +179,15 @@ data.manager$register.ontology(
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
+
+data.manager$register.ontology(
+  'nsduh',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('12 or Older', '12 to 17', '18 or Older', '18 to 25', '26 or Older'))
+  )
+
 ################################################################################
 
 ###Source in File that reads .csvs and removes headers###
