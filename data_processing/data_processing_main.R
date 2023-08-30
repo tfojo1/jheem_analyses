@@ -100,6 +100,24 @@ data.manager$register.outcome(
     units = 'cases',
     description = "AIDS Diagnoses"))
 
+data.manager$register.outcome(
+  'gonorrhea',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'gonorrhea',
+    axis.name = 'gonorrhea (n)',
+    units = 'cases',
+    description = "Gonorrhea"))
+
+data.manager$register.outcome(
+  'primary and secondary syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'primary and secondary syphilis',
+    axis.name = 'primary and secondary syphilis (n)',
+    units = 'cases',
+    description = "Primary and Secondary Syphilis"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
@@ -146,7 +164,7 @@ data.manager$register.ontology(
     location= NULL,
     age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
           '40-44 years', '45-54 years', '55-64 years', '65+ years', 'Unknown'),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'White', 'Unknown'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White', 'Unknown'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
