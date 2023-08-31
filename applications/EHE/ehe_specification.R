@@ -1416,15 +1416,12 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       keep.dimensions = c('location','age','race','sex','risk'))
 
 track.quantity.outcome(EHE.SPECIFICATION,
-                       'population',
-                       outcome.metadata = create.outcome.metadata(display.name = 'Population',
-                                                                  description = "The Number of Infected and Uninfected Individuals in the Population",
-                                                                  scale = 'non.negative.number',
-                                                                  axis.name = 'Population',
-                                                                  units = 'people',
-                                                                  singular.unit = 'person'),
+                       'point.population',
+                       outcome.metadata = NULL,
+                       scale = 'non.negative.number',
                        value = expression(uninfected+infected),
-                       keep.dimensions = c('location','age','race','sex','risk'))
+                       keep.dimensions = c('location','age','race','sex','risk'),
+                       save = F)
 
 track.quantity.outcome(EHE.SPECIFICATION,
                        'testing',
@@ -1435,7 +1432,7 @@ track.quantity.outcome(EHE.SPECIFICATION,
                                                                   units = 'tests/yr',
                                                                   singular.unit = 'test/yr'),
                        value = 'testing',
-                       denominator.outcome = 'population',
+                       denominator.outcome = 'point.population',
                        keep.dimensions = c('location','age','race','sex','risk'))
 
 track.integrated.outcome(EHE.SPECIFICATION,
@@ -1444,6 +1441,18 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          outcome.name.to.integrate = 'uninfected',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          save = F)
+
+track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'population',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                                                                    description = "The Number of Infected and Uninfected Individuals in the Population",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Population',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         outcome.name.to.integrate = 'point.population',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = T)
 
 track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
                                       name = 'proportion.tested',
