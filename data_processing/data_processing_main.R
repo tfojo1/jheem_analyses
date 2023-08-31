@@ -82,9 +82,56 @@ data.manager$register.outcome(
     units = 'cases',
     description = "PrEP Use"))
 
+data.manager$register.outcome(
+  'aids_prevalence',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'aids_prevalence',
+    axis.name = 'aids_prevalence (n)',
+    units = 'cases',
+    description = "AIDS Prevalence"))
+
+data.manager$register.outcome(
+  'aids_diagnoses',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'aids_diagnoses',
+    axis.name = 'aids_diagnoses (n)',
+    units = 'cases',
+    description = "AIDS Diagnoses"))
+
+data.manager$register.outcome(
+  'gonorrhea',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'gonorrhea',
+    axis.name = 'gonorrhea (n)',
+    units = 'cases',
+    description = "Gonorrhea"))
+
+data.manager$register.outcome(
+  'primary and secondary syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'primary and secondary syphilis',
+    axis.name = 'primary and secondary syphilis (n)',
+    units = 'cases',
+    description = "Primary and Secondary Syphilis"))
+
+data.manager$register.outcome(
+  'heroin use in the past year',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'heroin use in the past year',
+    axis.name = 'heroin use in the past year (n)',
+    units = 'cases',
+    description = "heroin use in the past year"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
+
+data.manager$register.source('nsduh', full.name = "NSDUH", short.name='nsduh')
 
 data.manager$register.ontology(
   'cdc',
@@ -119,6 +166,28 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
     
   ))
+
+#This is for the Atlas Plus STI data, creating a separate ontology bc age groups are different#
+data.manager$register.ontology(
+  'cdc sti',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+          '40-44 years', '45-54 years', '55-64 years', '65+ years', 'Unknown'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White', 'Unknown'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
+data.manager$register.ontology(
+  'nsduh',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('12 or Older', '12 to 17', '18 or Older', '18 to 25', '26 or Older'))
+  )
+
 ################################################################################
 
 ###Source in File that reads .csvs and removes headers###
@@ -132,6 +201,8 @@ source('data_processing/aids_vu_processing.R')
 ###Source in CDC MSA PDF Reports data and cleaning###
 
 #source('data_processing/msa_reports_processing.R')
+
+
 
 ################################################################################
 
