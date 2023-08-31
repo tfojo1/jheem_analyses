@@ -127,6 +127,25 @@ data.manager$register.outcome(
     units = 'cases',
     description = "heroin use in the past year"))
 
+data.manager$register.outcome(
+  'hiv tests',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'hiv tests',
+    axis.name = 'hiv tests (n)',
+    units = 'cases',
+    description = "hiv tests"))
+
+#What should this outcome be called? Relates to the % pos
+data.manager$register.outcome(
+  'new positives',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'new positives',
+    axis.name = 'new positives (n)',
+    units = 'cases',
+    description = "new positives"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
