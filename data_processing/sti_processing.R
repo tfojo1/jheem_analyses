@@ -29,6 +29,8 @@ data.list.sti.clean = lapply(data.list.sti, function(file){
   data$year = substr(data$Year, 1, 4)
   data$Cases = (gsub(",", "", data$Cases))
   
+  data$outcome = ifelse(data$outcome == "primary and secondary syphilis", "ps.syphilis", data$outcome)
+  
   data <- data %>%
   mutate(value= ifelse(grepl("Data not available", Cases), NA,
                       ifelse(grepl("Data suppressed", Cases), NA, Cases)))

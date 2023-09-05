@@ -37,8 +37,6 @@ mapping_file <- mapping_file %>%
 ################################################################################
                        ###Clean NSDUH Data###
                           ###REGION###
-##Are places being removed here if they are not in the mapping file but they
-##are in the data file?
 ################################################################################
 data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
   
@@ -52,7 +50,7 @@ data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
   
   data$estimate = if_else(data$estimate == "suppressed", NA, data$estimate)
   
-  data$outcome = tolower(data$outcome)
+  data$outcome = "heroin.use.past.year"
   
   data <- data%>%
   mutate(state_name = str_extract(geography, paste(state.name, collapse = "|")))%>%
@@ -74,15 +72,15 @@ data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
   
   data$matching_var = paste(data$region_name, data$state_abbrev, sep=" ")
   
-  data = merge(data, mapping_file, by = "matching_var")
+  #data = merge(data, mapping_file, by = "matching_var")  #in this merge things are being removed#
   
   data$value = as.numeric(data$estimate)
-  data$location = data$FIPS
+   data$location = data$FIPS
   data$age = data$age_group
   
-  # data <- data %>%
-  #   select(year, outcome, value, location, age)
-  
+     # data <- data %>%
+     #   select(year, outcome, value, location, age)
+     
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -105,13 +103,13 @@ data.list.nsduh.state.clean = lapply(data.list.nsduh, function(file){
   
   data$estimate = if_else(data$estimate == "suppressed", NA, data$estimate)
   
-  data$outcome = tolower(data$outcome)
+  data$outcome = "heroin.use.past.year"
   
   data <- data%>%
     mutate(state_name = str_extract(geography, paste(state.name, collapse = "|")))%>%
     mutate(state_name= ifelse(grepl("District of Columbia", geography), "District of Columbia", state_name))%>%
     mutate(state_abbrev = state.abb[match(state_name, state.name)]) %>%
-    mutate(region_name = str_extract(geography, paste(substate_regions, collapse = "|")))  ####ISSUE: THERES REGIONS IN THE DATA THAT ARE NOT ON THE MAPPING LIST###
+   #mutate(region_name = str_extract(geography, paste(substate_regions, collapse = "|")))  
   
   data$state_name = if_else(data$geography == "United States", "United States", data$state_name)
   
@@ -152,7 +150,7 @@ data.list.nsduh.national.clean = lapply(data.list.nsduh, function(file){
 
   data$estimate = if_else(data$estimate == "suppressed", NA, data$estimate)
   
-  data$outcome = tolower(data$outcome)
+  data$outcome = "heroin.use.past.year"
 
   if(grepl("14.16", filename)) {
     data$year = "2014-2016"

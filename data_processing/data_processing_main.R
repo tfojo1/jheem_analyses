@@ -20,7 +20,7 @@ data.manager$register.outcome(
     description = "New HIV Cases Diagnosed in a Year"))
 
 data.manager$register.outcome(
-'hiv deaths',
+'hiv.deaths',
 metadata = create.outcome.metadata(
   scale = 'non.negative.number',
   display.name = 'HIV Deaths',
@@ -83,20 +83,20 @@ data.manager$register.outcome(
     description = "PrEP Use"))
 
 data.manager$register.outcome(
-  'aids_prevalence',
+  'aids.prevalence',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'aids_prevalence',
-    axis.name = 'aids_prevalence (n)',
+    display.name = 'AIDS Prevalence',
+    axis.name = 'AIDS Prevalence (n)',
     units = 'cases',
     description = "AIDS Prevalence"))
 
 data.manager$register.outcome(
-  'aids_diagnoses',
+  'aids.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'aids_diagnoses',
-    axis.name = 'aids_diagnoses (n)',
+    display.name = 'AIDS Diagnoses',
+    axis.name = 'AIDS Diagnoses (n)',
     units = 'cases',
     description = "AIDS Diagnoses"))
 
@@ -110,41 +110,41 @@ data.manager$register.outcome(
     description = "Gonorrhea"))
 
 data.manager$register.outcome(
-  'primary and secondary syphilis',
+  'ps.syphilis',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'primary and secondary syphilis',
-    axis.name = 'primary and secondary syphilis (n)',
+    display.name = 'Primary and Secondary Syphilis',
+    axis.name = 'Primary and Secondary Syphilis (n)',
     units = 'cases',
     description = "Primary and Secondary Syphilis"))
 
 data.manager$register.outcome(
-  'heroin use in the past year',
+  'heroin.use.past.year',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'heroin use in the past year',
-    axis.name = 'heroin use in the past year (n)',
+    display.name = 'Heroin Use in the Past Year',
+    axis.name = 'Heroin Use in the Past Year (n)',
     units = 'cases',
-    description = "heroin use in the past year"))
+    description = "Heroin Use in the Past Year"))
 
 data.manager$register.outcome(
-  'hiv tests',
+  'hiv.tests',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'hiv tests',
-    axis.name = 'hiv tests (n)',
+    display.name = 'HIV Tests',
+    axis.name = 'HIV Tests (n)',
     units = 'cases',
-    description = "hiv tests"))
+    description = "HIV Tests"))
 
 #What should this outcome be called? Relates to the % pos
 data.manager$register.outcome(
-  'new positives',
+  'newly.diagnosed.positives',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'new positives',
-    axis.name = 'new positives (n)',
+    display.name = 'Newly Diagnosed Positives',
+    axis.name = 'Newly Diagnosed Positives (n)',
     units = 'cases',
-    description = "new positives"))
+    description = "Newly Diagnosed Positives"))
 
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
@@ -228,7 +228,7 @@ source('data_processing/aids_vu_processing.R')
 ###Define the 'mappings' for Atlas plus data###
 
 outcome.mappings = c('HIV diagnoses'='diagnoses',
-                     'HIV deaths' = 'hiv deaths',
+                     'HIV deaths' = 'hiv.deaths',
                      'HIV prevalence' = 'prevalence',
                      'Linkage to HIV care' = 'linkage',
                      'Receipt of HIV medical care' = 'care',
@@ -680,7 +680,7 @@ for (data in deaths_all) {
    dimension.values = list(sex=c('male', 'female'))))
  
  y =(data.manager$pull(
-   outcome='hiv deaths',
+   outcome='hiv.deaths',
    keep.dimensions = c('location', 'year')))
  
  z =(data.manager$pull(

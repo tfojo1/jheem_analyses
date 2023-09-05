@@ -31,7 +31,7 @@ data.list.tests.clean = lapply(data.list.tests, function(file){
   data$location =ifelse(data$`CDC Funded Jurisdiction` == "District of Columbia", "DC", data$location) 
   data$location =ifelse(data$`CDC Funded Jurisdiction` == "Puerto Rico", "PR", data$location) 
   
-  data$outcome = "hiv tests"
+  data$outcome = "hiv.tests"
 
   data$value = as.numeric(data$`Number of HIV tests conducted`)
   
@@ -85,7 +85,7 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
     data$year = "2021"
   }
 
-  data$outcome = "new positives"
+  data$outcome = "newly.diagnosed.positivess"
   data$value = as.numeric(data$`Number of persons newly diagnosed with HIV`)
   
   data <- data %>%
