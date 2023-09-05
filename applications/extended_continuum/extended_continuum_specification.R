@@ -1,5 +1,5 @@
 source('applications/EHE/ehe_specification.R')
-
+source('applications/extended_continuum/extended_continuum_specification_helpers.R')
 
 # Melissa to do:
 # redefine suppression quantity
@@ -73,7 +73,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'linkage',
                        scale = 'proportion', # leave this as a proportion (later, multiply (proportion who link)*(3 months))
                        get.functional.form.function= get.linkage.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010 # prior to 2010, flat (if I want to ramp up, set ramp time/value)
                        )
@@ -91,7 +90,6 @@ register.model.element(EXT.SPECIFICATION,
                        name='naive.to.suppressed.proportion',
                        scale='proportion',
                        get.functional.form.function = get.naive.to.suppressed.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
@@ -104,7 +102,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'time.to.start.art',
                        scale = 'time',
                        get.functional.form.function = get.time.to.start.art.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2000,
                        functional.form.to.time = 2012, # when start ART time should *theoretically* be 0 (but wasn't in practice)
@@ -124,7 +121,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'disengagement.naive',
                        scale = 'rate',
                        get.functional.form.function = get.disengagement.naive.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
@@ -132,7 +128,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'disengagement.failing',
                        scale = 'rate',
                        get.functional.form.function = get.disengagement.failing.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
@@ -140,7 +135,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'disengagement.recently.suppressed',
                        scale = 'rate',
                        get.functional.form.function = get.disengagement.recently.suppressed.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
@@ -148,7 +142,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'disengagement.durably.suppressed',
                        scale = 'rate',
                        get.functional.form.function = get.disengagement.durably.suppressed.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
@@ -156,7 +149,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'reengagement',
                        scale = 'rate',
                        get.functional.form.function = get.reengagement.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
@@ -168,7 +160,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'gain.of.suppression',
                        scale = 'rate',
                        get.functional.form.function = get.gain.of.suppression.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
@@ -176,7 +167,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'loss.of.suppression.recent',
                        scale = 'rate',
                        get.functional.form.function = get.loss.of.suppression.recent.model, 
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
@@ -184,7 +174,6 @@ register.model.element(EXT.SPECIFICATION,
                        name = 'loss.of.suppression.durable',
                        scale = 'rate',
                        get.functional.form.function = get.loss.of.suppression.durable.model, 
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010)
 
