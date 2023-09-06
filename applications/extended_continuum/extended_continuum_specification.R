@@ -422,7 +422,7 @@ track.transition(EXT.SPECIFICATION,
 #                        denominator.outcome = 'new',
 #                        keep.dimensions = c('age','race','sex','risk'))
 
-track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
+track.cumulative.proportion.from.rate(EXT.SPECIFICATION,
                                       name = 'proportion.linked',
                                       outcome.metadata = create.outcome.metadata(display.name = 'Linkage to Care',
                                                                                  description = "Proportion of Newly Diagnosed Individuals Linked to Care within 3 months",
