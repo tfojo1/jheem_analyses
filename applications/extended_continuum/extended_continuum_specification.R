@@ -410,16 +410,30 @@ track.transition(EXT.SPECIFICATION,
                  to.compartments = 'engaged_unsuppressed_naive',
                  keep.dimensions = c('age','race','sex','risk'))
 
-track.quantity.outcome(EXT.SPECIFICATION,
-                       name = 'linkage',
-                       outcome.metadata = create.outcome.metadata(display.name = 'Linkage to Care',
-                                                                  description = "Proportion of Newly Diagnosed Individuals Linked to Care within 3 months",
-                                                                  scale = 'proportion',
-                                                                  axis.name = 'Proportion Linked',
-                                                                  units = '%'),
-                       value='linkage',
-                       denominator.outcome = 'new',
-                       keep.dimensions = c('age','race','sex','risk'))
+# old version - doesn't work 
+# track.quantity.outcome(EXT.SPECIFICATION,
+#                        name = 'linkage',
+#                        outcome.metadata = create.outcome.metadata(display.name = 'Linkage to Care',
+#                                                                   description = "Proportion of Newly Diagnosed Individuals Linked to Care within 3 months",
+#                                                                   scale = 'proportion',
+#                                                                   axis.name = 'Proportion Linked',
+#                                                                   units = '%'),
+#                        value='linkage',
+#                        denominator.outcome = 'new',
+#                        keep.dimensions = c('age','race','sex','risk'))
+
+track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
+                                      name = 'proportion.linked',
+                                      outcome.metadata = create.outcome.metadata(display.name = 'Linkage to Care',
+                                                                                 description = "Proportion of Newly Diagnosed Individuals Linked to Care within 3 months",
+                                                                                 scale = 'proportion',
+                                                                                 axis.name = 'Proportion Linked',
+                                                                                 units = '%'),
+                                      rate.value = 'linkage',
+                                      denominator.outcome = 'new',
+                                      corresponding.data.outcome = 'proportion.linked',
+                                      keep.dimensions = c('location','age','race','sex','risk'))
+
 
 # may want to reevaluate how we track retention
 track.transition(EXT.SPECIFICATION,
