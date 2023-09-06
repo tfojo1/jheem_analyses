@@ -422,18 +422,16 @@ track.transition(EXT.SPECIFICATION,
 #                        denominator.outcome = 'new',
 #                        keep.dimensions = c('age','race','sex','risk'))
 
-track.cumulative.proportion.from.rate(EXT.SPECIFICATION,
-                                      name = 'proportion.linked',
-                                      outcome.metadata = create.outcome.metadata(display.name = 'Linkage to Care',
-                                                                                 description = "Proportion of Newly Diagnosed Individuals Linked to Care within 3 months",
-                                                                                 scale = 'proportion',
-                                                                                 axis.name = 'Proportion Linked',
-                                                                                 units = '%'),
-                                      rate.value = 'linkage',
-                                      denominator.outcome = 'new',
-                                      corresponding.data.outcome = 'proportion.linked',
-                                      keep.dimensions = c('location','age','race','sex','risk'))
-
+track.integrated.outcome(EXT.SPECIFICATION,
+                         name = 'cumulative.linkage',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Cumulative Number Linked to Care',
+                                                                    description = "Cumulative Number of Individuals Linked to Care",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Individuals',
+                                                                    units = 'individuals'),
+                         outcome.name.to.integrate = 'number.linked',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = F)
 
 # may want to reevaluate how we track retention
 track.transition(EXT.SPECIFICATION,
