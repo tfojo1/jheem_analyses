@@ -1415,7 +1415,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       dynamic.quantity.name = 'incidence',
                       keep.dimensions = c('location','age','race','sex','risk'))
 
-track.quantity.outcome(EHE.SPECIFICATION,
+track.point.outcome(EHE.SPECIFICATION,
                        'point.population',
                        outcome.metadata = NULL,
                        scale = 'non.negative.number',
@@ -1423,7 +1423,7 @@ track.quantity.outcome(EHE.SPECIFICATION,
                        keep.dimensions = c('location','age','race','sex','risk'),
                        save = F)
 
-track.quantity.outcome(EHE.SPECIFICATION,
+track.point.outcome(EHE.SPECIFICATION,
                        'testing',
                        outcome.metadata = create.outcome.metadata(display.name = 'HIV Testing Rate',
                                                                   description = "The average number of HIV tests per year",
@@ -1438,8 +1438,9 @@ track.quantity.outcome(EHE.SPECIFICATION,
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'cumulative.uninfected',
                          outcome.metadata = NULL,
-                         outcome.name.to.integrate = 'uninfected',
+                         value.to.integrate = 'uninfected',
                          keep.dimensions = c('location','age','race','sex','risk'),
+                         scale = 'non.negative.number',
                          save = F)
 
 track.integrated.outcome(EHE.SPECIFICATION,
@@ -1450,7 +1451,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     axis.name = 'Population',
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
-                         outcome.name.to.integrate = 'point.population',
+                         value.to.integrate = 'point.population',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          save = T)
 
@@ -1488,7 +1489,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     axis.name = 'PrevalenT Cases',
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
-                         outcome.name.to.integrate = 'infected',
+                         value.to.integrate = 'infected',
                          corresponding.data.outcome = 'diagnosed.prevalence',
                          keep.dimensions = c('location','age','race','sex','risk')
                          )

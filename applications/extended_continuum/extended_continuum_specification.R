@@ -411,7 +411,7 @@ track.transition(EXT.SPECIFICATION,
                  keep.dimensions = c('age','race','sex','risk'))
 
 # old version - doesn't work 
-# track.quantity.outcome(EXT.SPECIFICATION,
+# track.point.outcome(EXT.SPECIFICATION,
 #                        name = 'linkage',
 #                        outcome.metadata = create.outcome.metadata(display.name = 'Linkage to Care',
 #                                                                   description = "Proportion of Newly Diagnosed Individuals Linked to Care within 3 months",
@@ -423,15 +423,16 @@ track.transition(EXT.SPECIFICATION,
 #                        keep.dimensions = c('age','race','sex','risk'))
 
 track.integrated.outcome(EXT.SPECIFICATION,
-                         name = 'cumulative.linkage',
+                         name = 'linkage',
                          outcome.metadata = create.outcome.metadata(display.name = 'Cumulative Number Linked to Care',
                                                                     description = "Cumulative Number of Individuals Linked to Care",
-                                                                    scale = 'non.negative.number',
+                                                                    scale = 'proportion',
                                                                     axis.name = 'Individuals',
                                                                     units = 'individuals'),
-                         outcome.name.to.integrate = 'number.linked',
+                         value.to.integrate = 'linkage',
+                         denominator.outcome = 'new',
                          keep.dimensions = c('location','age','race','sex','risk'),
-                         save = F)
+                         save = T)
 
 # may want to reevaluate how we track retention
 track.transition(EXT.SPECIFICATION,
