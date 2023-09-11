@@ -304,6 +304,32 @@ register.transition(EXT.SPECIFICATION,
                     groups = 'infected',
                     value = 'disengagement.durably.suppressed')
 
+# combining disengagement quantities 
+register.model.quantity(EXT.SPECIFICATION,
+                        name='disengagement',
+                        value = 0)
+
+register.model.quantity.subset(EXT.SPECIFICATION,
+                               name='disengagement',
+                               value='disengagement.naive',
+                               applies.to = list(continuum='engaged_unsuppressed_naive'))
+
+register.model.quantity.subset(EXT.SPECIFICATION,
+                               name='disengagement',
+                               value='disengagement.failing',
+                               applies.to = list(continuum='engaged_unsuppressed_failing'))
+
+register.model.quantity.subset(EXT.SPECIFICATION,
+                               name='disengagement',
+                               value='disengagement.recently.suppressed',
+                               applies.to = list(continuum='engaged_recently_suppressed'))
+
+register.model.quantity.subset(EXT.SPECIFICATION,
+                               name='disengagement',
+                               value='disengagement.durably.suppressed',
+                               applies.to = list(continuum='engaged_durably_suppressed'))
+
+
 # reengagement (naive)
 register.transition(EXT.SPECIFICATION,
                     dimension = 'continuum',
@@ -397,55 +423,59 @@ register.transition(EXT.SPECIFICATION,
 
 ## Adding: linkage, disengagement/reengagement, suppression - didn't do suppression yet 
 
-# probably won't use this - want the proportion and run into an issue with the denominator
-track.transition(EXT.SPECIFICATION,
-                 name = 'number.linked',
-                 outcome.metadata = create.outcome.metadata(display.name = 'Number Linked to Care',
-                                                            description = "Number of Individuals Linked to Care in the Past Year",
-                                                            scale = 'non.negative.number',
-                                                            axis.name = 'Individuals',
-                                                            units = 'individuals'),
-                 dimension = 'continuum',
-                 from.compartments = 'unengaged',
-                 to.compartments = 'engaged_unsuppressed_naive',
-                 keep.dimensions = c('age','race','sex','risk'))
+# Overwriting diagnosed.prevalence from previous specification to now keep continuum dimension 
+track.integrated.outcome(EXT.SPECIFICATION,
+                         name = 'diagnosed.prevalence',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Prevalence (of Diagnosed PWH)',
+                                                                    description = "The Number of People with HIV Aware of their Diagnosis",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'PrevalenT Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         value.to.integrate = 'infected',
+                         corresponding.data.outcome = 'diagnosed.prevalence',
+                         keep.dimensions = c('location','age','race','sex','risk','continuum') 
+)
 
-# old version - doesn't work 
-# track.point.outcome(EXT.SPECIFICATION,
-#                        name = 'linkage',
-#                        outcome.metadata = create.outcome.metadata(display.name = 'Linkage to Care',
-#                                                                   description = "Proportion of Newly Diagnosed Individuals Linked to Care within 3 months",
-#                                                                   scale = 'proportion',
-#                                                                   axis.name = 'Proportion Linked',
-#                                                                   units = '%'),
-#                        value='linkage',
-#                        denominator.outcome = 'new',
-#                        keep.dimensions = c('age','race','sex','risk'))
 
 track.integrated.outcome(EXT.SPECIFICATION,
                          name = 'linkage',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Cumulative Number Linked to Care',
-                                                                    description = "Cumulative Number of Individuals Linked to Care",
+                         outcome.metadata = create.outcome.metadata(display.name = 'Cumulative Proportion Linked to Care', # or prop linked in three months
+                                                                    description = "Cumulative Proportion of Individuals Linked to Care",
                                                                     scale = 'proportion',
-                                                                    axis.name = 'Individuals',
-                                                                    units = 'individuals'),
+                                                                    axis.name = 'Proportion Linked',
+                                                                    units = '%'),
                          value.to.integrate = 'linkage',
                          denominator.outcome = 'new',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          save = T)
 
-# may want to reevaluate how we track retention
-track.transition(EXT.SPECIFICATION,
-                 name = 'disengagement',
-                 outcome.metadata = create.outcome.metadata(display.name = 'Disengagement from Care',
-                                                            description = "Number of Individuals Disengaging from Care in the Past Year",
-                                                            scale = 'non.negative.number',
-                                                            axis.name = 'Individuals',
-                                                            units = 'individuals'),
-                 dimension = 'continuum',
-                 from.compartments = 'engaged.states',
-                 to.compartments = 'disengaged.states',
-                 keep.dimensions = c('age','race','sex','risk','continuum.from')) # might remove continuum if we don't need it
+# # may want to reevaluate how we track retention
+# track.transition(EXT.SPECIFICATION,
+#                  name = 'disengagement',
+#                  outcome.metadata = create.outcome.metadata(display.name = 'Disengagement from Care',
+#                                                             description = "Number of Individuals Disengaging from Care in the Past Year",
+#                                                             scale = 'non.negative.number',
+#                                                             axis.name = 'Individuals',
+#                                                             units = 'individuals'),
+#                  dimension = 'continuum',
+#                  from.compartments = 'engaged.states',
+#                  to.compartments = 'disengaged.states',
+#                  keep.dimensions = c('age','race','sex','risk','continuum.from')) # might remove continuum if we don't need it
+
+# retention - defined this to align with calibration target (do this whenever possible)
+# integrate disengagement proportion and then do 1-that
+track.cumulative.proportion.from.rate(EXT.SPECIFICATION,
+                                      name = 'retention',
+                                      outcome.metadata = create.outcome.metadata(display.name = 'Retention in Care',
+                                                                                 description = "Proportion of Individuals Retained in Care in the Past Year",
+                                                                                 scale = 'proportion.staying',
+                                                                                 axis.name = 'Proportion Retained',
+                                                                                 units = '%'),
+                                      rate.value = 'disengagement', # this is the quantity with subsets above; age/race/sex/risk/continuum
+                                      denominator.outcome = 'diagnosed.prevalence', # cumulative; it should know to only use the engaged
+                                      calculate.proportion.leaving=F, # default would calculate the proportion leaving; but this makes it the proportion staying (retained)
+                                      keep.dimensions = c('location','age','race','sex','risk','continuum'))
 
 # might not need to track
 track.transition(EXT.SPECIFICATION,
