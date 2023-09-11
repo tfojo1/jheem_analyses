@@ -108,12 +108,12 @@ data$female = (gsub("[[:punct:]]", "", data$female_num))
      data$year = as.character("2018")
    }
       data <- data %>%
-        select("year", "location", "male", "female") %>%
+   #     select("year", "location", "male", "female") %>%
        pivot_longer(cols=c(one_of("male", "female")),
                     names_to = "sex",
                     values_to = "value")
 
-  data$outcome = "hiv deaths"
+  data$outcome = "hiv.deaths"
   
   data$value = as.numeric(data$value)
   
@@ -377,6 +377,9 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
 
 ###I dont know how to make these locations valid bc they are so inconsistent
 ##Created a whole separate mapping file but it's not good for file 10
+
+
+##Fix this: sept 11 NAs introduced by coercion warning
 ################################################################################
 data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   
@@ -390,7 +393,8 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   #data$location_name = before.2009.msa.mapping[data$msa]
   #data$location = as.character(locations::get.location.code(data$location_name,"CBSA"))
   
-  data$location= data$msa
+  #data$location= data$msa
+  data$location = "pending"
   
   ##add year section##
   if(grepl("1993 new 1992", filename)){
@@ -512,9 +516,11 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   
   if(grepl("2008 new 2007", filename)){
     data$diagnoses_2008 = data$new_num
+    data$diagnoses_2008 = as.numeric(gsub(",","", data$diagnoses_2008))
     data$prevalence_2007 = data$prev_num
-    data$diagnoses_2008 = as.numeric(gsub(",",'', data$diagnoses_2008)) 
-    data$prevalence_2007 = as.numeric(gsub(",",'', data$prevalence_2007))
+    data$prevalence_2007 = gsub(",","", data$prevalence_2007) 
+    data$prevalence_2007 = gsub("[[:punct:]]", NA, data$prevalence_2007)
+    data$prevalence_2007 = as.numeric(data$prevalence_2007)
     data$type = "hiv"
   }
   if(grepl("2009 new 2008", filename)){
@@ -1050,115 +1056,115 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
 ################################################################################
                   ###Put Data into Data Manager###
 ################################################################################
-# 
-# ##MSA Deaths
-# msa_deaths = lapply(data.list.msa_deaths.clean, `[[`, 2)  
-# 
-# for (data in msa_deaths) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc msa reports',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC Reporting')
-# }
-# 
-# ##MSA total
-# msa_total = lapply(data.list.msa_total.clean, `[[`, 2)  
-# 
-# for (data in msa_total) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc msa reports',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC Reporting')
-# }
-# 
-# ##MSA by Sex
-# msa_sex = lapply(data.list.msa_sex.clean , `[[`, 2)  
-# 
-# for (data in msa_sex) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc msa reports',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC MSA Reports')
-# }
-# 
-# ##MSA by Sex and age
-# msa_sex_age = lapply(data.list.msa_sex_age.clean , `[[`, 2)  
-# 
-# for (data in msa_sex_age) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc msa reports',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC MSA Reports')
-# }
-# 
-# ##MSA Data Before 2009
-# msa_2009 = lapply(data.list.msa_2009.clean , `[[`, 2)  
-# 
-# for (data in msa_2009) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc msa reports',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC MSA Reports')
-# }
-# 
-# ##MSA by Sex and Race
-# msa_sex_race = lapply(data.list.msa_sex_race.clean , `[[`, 2)  
-# 
-# for (data in msa_sex_race) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc msa reports',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC MSA Reports')
-# }
-# 
-# ##MSA by Race and Risk
-# msa_race_risk = lapply(data.list.msa_race_risk.clean , `[[`, 2)  
-# 
-# for (data in msa_race_risk) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc msa reports',
-#     source = 'cdc msa report',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC MSA Reports')
-# }
-# 
-# ##MSA by Sex and Risk
-# msa_sex_risk = lapply(data.list.msa_sex_risk.clean, `[[`, 2)  
-# 
-# for (data in msa_sex_risk) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc msa reports',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC MSA Reports')
-# }
+
+##MSA Deaths
+msa_deaths = lapply(data.list.msa_deaths.clean, `[[`, 2)
+
+for (data in msa_deaths) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc msa reports',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC Reporting')
+}
+
+##MSA total
+msa_total = lapply(data.list.msa_total.clean, `[[`, 2)
+
+for (data in msa_total) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc msa reports',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC Reporting')
+}
+
+##MSA by Sex
+msa_sex = lapply(data.list.msa_sex.clean , `[[`, 2)
+
+for (data in msa_sex) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc msa reports',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC MSA Reports')
+}
+
+##MSA by Sex and age
+msa_sex_age = lapply(data.list.msa_sex_age.clean , `[[`, 2)
+
+for (data in msa_sex_age) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc msa reports',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC MSA Reports')
+}
+
+##MSA Data Before 2009
+msa_2009 = lapply(data.list.msa_2009.clean , `[[`, 2)
+
+for (data in msa_2009) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc msa reports',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC MSA Reports')
+}
+
+##MSA by Sex and Race
+msa_sex_race = lapply(data.list.msa_sex_race.clean , `[[`, 2)
+
+for (data in msa_sex_race) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc msa reports',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC MSA Reports')
+}
+
+##MSA by Race and Risk
+msa_race_risk = lapply(data.list.msa_race_risk.clean , `[[`, 2)
+
+for (data in msa_race_risk) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc msa reports',
+    source = 'cdc msa report',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC MSA Reports')
+}
+
+##MSA by Sex and Risk
+msa_sex_risk = lapply(data.list.msa_sex_risk.clean, `[[`, 2)
+
+for (data in msa_sex_risk) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc msa reports',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC MSA Reports')
+}
