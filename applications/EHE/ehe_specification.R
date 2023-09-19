@@ -942,29 +942,29 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.age.sexual.availability',
                        value = get.sexual.availability(),
-                       dimensions = 'age',
                        dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.female.age.counts',
                        get.value.function = get.female.single.year.age.counts,
-                       dimensions = 'age',
                        dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.msm.age.counts',
                        get.value.function = get.msm.single.year.age.counts,
-                       dimensions = 'age',
                        dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.heterosexual.male.age.counts',
                        get.value.function = get.heterosexual.male.single.year.age.counts,
-                       dimensions = 'age',
                        dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
 #----------------------------#
@@ -1251,8 +1251,8 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.age.idu.availability',
                        value = get.idu.availability(),
-                       dimensions = 'age',
                        dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
 register.model.quantity(EHE.SPECIFICATION,
