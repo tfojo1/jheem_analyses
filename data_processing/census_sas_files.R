@@ -1,11 +1,10 @@
 #This code is for the single year age data that Todd has for 2005-2017
 
-
+#library(haven)
 ################################################################################
               ###Read in SAS Census Files for 2005-2017###
 ################################################################################
-library(haven)
-library(tidyverse)
+
 DATA.DIR.CENSUS.SAS="../../data_raw/census_sas"
 
 cdc_sas_files <- list.files(DATA.DIR.CENSUS.SAS, pattern = ".sas7bdat", full.names = "TRUE")

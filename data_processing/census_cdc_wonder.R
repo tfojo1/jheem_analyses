@@ -1,8 +1,8 @@
 #CDC Wonder Demographic data- single year population values
 
-library(readr)
-library(readxl)
-library(tidyverse)
+# library(readr)
+# library(readxl)
+# library(tidyverse)
 ################################################################################
               ###CDC Wonder Single Year Population Files###
 ################################################################################
