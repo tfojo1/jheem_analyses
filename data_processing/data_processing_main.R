@@ -1,8 +1,7 @@
 
-
 library(jheem2)
 library(tidyverse)
-
+library(readxl)
 
 ###Initialize data manager (surveillance manager) and establish ontology###
 
@@ -209,22 +208,23 @@ data.manager$register.ontology(
 
 ################################################################################
 
-###Source in File that reads .csvs and removes headers###
-
+###Source in File that reads .csvs and removes headers
 source('data_processing/fix_cdc_headers.R')
 
-###Source in AIDS Vu data and cleaning###
-
+###Source in AIDS Vu data and cleaning
 source('data_processing/aids_vu_processing.R')
 
-###Source in CDC MSA PDF Reports data and cleaning###
+##Source CDC Test Count Data
+source('data_processing/cdc_test_count_processing.R')
 
+##Source LHD MSA data
+#source('data_processing/lhd_msa_processing.R')
+
+###Source in CDC MSA PDF Reports data and cleaning
+##Pending location package updates
 #source('data_processing/msa_reports_processing.R')
 
-
-
 ################################################################################
-
 ###Define the 'mappings' for Atlas plus data###
 
 outcome.mappings = c('HIV diagnoses'='diagnoses',
@@ -234,7 +234,6 @@ outcome.mappings = c('HIV diagnoses'='diagnoses',
                      'Receipt of HIV medical care' = 'care',
                      'HIV viral suppression' = 'suppression',
                      'Knowledge of Status' = 'knowledge')
-
 
 risk.mappings = c('Heterosexual contact' = 'heterosexual',
                   'Injection drug use' = 'idu',
@@ -248,13 +247,11 @@ age.mappings = c('13-24' = '13-24 years',
                   '45-54' = '45-54 years',
                   '55+' = '55+ years')
 
-
 #record possible values for the incomplete dimensions, year and location
 locations = c()
 years = c()
 
 ################################################################################
-
 #---Clean Diagnoses---#
 
 data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
