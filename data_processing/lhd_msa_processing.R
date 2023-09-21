@@ -1,6 +1,6 @@
-library(jheem2)
-library(readxl)
-library(tidyverse)
+# library(jheem2)
+# library(readxl)
+# library(tidyverse)
 
 ################################################################################
                   ###Read in MSA LHD Data###
@@ -23,6 +23,8 @@ data.list.lhd.clean = lapply(data.list.lhd, function(file){
   data$year = as.character(data$year)
   
   data$value = round(data$value, digits=2)
+  
+  data$location =locations::get.cbsa.for.msa.name(data$msa)
   
   data$race = ifelse(data$demo=="black", "black",
                      ifelse(data$demo =='hispanic', "hispanic",
@@ -52,18 +54,20 @@ data.list.lhd.clean = lapply(data.list.lhd, function(file){
 ################################################################################
 
 ##Need to add details to differentiate months=1 from months =3 for linkage outcome##
+##Balitmore linakge is for new diagnoses#
 
 
 #Ask todd what this should look like- ex. URL
 
-lhd_total = lapply(data.list.lhd.clean, `[[`, 2) 
+
+lhd_total = lapply(data.list.lhd.clean, `[[`, 2)
 
 for (data in lhd_total) {
-  
+
   data.manager$put.long.form(
     data = data,
-    outcome= "prep", 
-    ontology.name = 'aidsvu', 
+    outcome= "prep",
+    ontology.name = 'aidsvu',
     source = 'aidsvu',
     dimension.values = list(),
     url = 'https://aidsvu.org/',

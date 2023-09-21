@@ -37,31 +37,31 @@ data.manager$register.outcome(
     description = "HIV Prevalence"))
 
 data.manager$register.outcome(
-  'linkage',
+  'linkage_1mo',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Linkage',
-    axis.name = 'Linkage (n)',
+    display.name = 'linkage_1mo',
+    axis.name = 'linkage_1mo (n)',
     units = 'cases',
-    description = "Linkage to HIV care"))
+    description = "Linkage to HIV care within 1 Month"))
 
 data.manager$register.outcome(
-  'care',
+  'receipt',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Care',
-    axis.name = 'Care (n)',
+    display.name = 'Receipt',
+    axis.name = 'Receipt (n)',
     units = 'cases',
     description = "Receipt of HIV medical care"))
 
 data.manager$register.outcome(
-  'suppression',
+  'suppressed',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Suppression',
-    axis.name = 'Suppression (n)',
+    display.name = 'Suppressed',
+    axis.name = 'Suppressed (n)',
     units = 'cases',
-    description = "HIV Viral suppression"))
+    description = "HIV Viral Suppression"))
 
 data.manager$register.outcome(
   'knowledge',
@@ -145,11 +145,22 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Newly Diagnosed Positives"))
 
+data.manager$register.outcome(
+  'linkage_3mo',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'linkage_3mo',
+    axis.name = 'linkage_3mo (n)',
+    units = 'cases',
+    description = "Linkage to HIV care within 3 Months"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
 
 data.manager$register.source('nsduh', full.name = "NSDUH", short.name='nsduh')
+
+data.manager$register.source('lhd', full.name = "Local Health Department", short.name='lhd')
 
 data.manager$register.ontology(
   'cdc',
@@ -206,6 +217,17 @@ data.manager$register.ontology(
     age=c('12 or Older', '12 to 17', '18 or Older', '18 to 25', '26 or Older'))
   )
 
+data.manager$register.ontology(
+  'lhd',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years', '55+ years'),
+    race=c('black', 'hispanic', 'other'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual')
+  ))
+
 ################################################################################
 
 ###Source in File that reads .csvs and removes headers
@@ -230,9 +252,9 @@ source('data_processing/cdc_test_count_processing.R')
 outcome.mappings = c('HIV diagnoses'='diagnoses',
                      'HIV deaths' = 'hiv.deaths',
                      'HIV prevalence' = 'prevalence',
-                     'Linkage to HIV care' = 'linkage',
-                     'Receipt of HIV medical care' = 'care',
-                     'HIV viral suppression' = 'suppression',
+                     'Linkage to HIV care' = 'linkage_1mo',
+                     'Receipt of HIV medical care' = 'receipt',
+                     'HIV viral suppression' = 'suppressed',
                      'Knowledge of Status' = 'knowledge')
 
 risk.mappings = c('Heterosexual contact' = 'heterosexual',
