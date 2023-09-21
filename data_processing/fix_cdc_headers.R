@@ -7,14 +7,13 @@
 #SLE -skip 11
 #knowledge - skip 10
 
-library(jheem2)
+#library(jheem2)
 
 DATA.DIR.DIAGNOSES="../../data_raw/diagnoses"
 DATA.DIR.DEATHS="../../data_raw/deaths"
 DATA.DIR.PREVALENCE="../../data_raw/prevalence"
 DATA.DIR.SLE="../../data_raw/sle"
 DATA.DIR.KNOWLEDGE="../../data_raw/knowledge"
-
 
 #---HIV Diagnoses---#
 diagnoses_files <- Sys.glob(paste0(DATA.DIR.DIAGNOSES, '/*.csv'))
