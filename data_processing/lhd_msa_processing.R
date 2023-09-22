@@ -118,7 +118,7 @@ combined_list <- c(data.list.lhd.clean.total, data.list.lhd.clean.sex, data.list
 #C.12940- Baton Rouge
 #C.17460 - Cleveland
 #C.18140 - Columbus
-#C.19100 - DAllas
+#C.19100 - Dallas
 #C.47900 -DC
 #C.19820 - Detroit
 #C.26900 - Indianapolis
@@ -313,7 +313,6 @@ for (data in lhd_detroit) {
 }
 
 ##Put Indianapolis
-####FIND THIS URL################
 lhd_indianapolis = lapply(indianapolis, `[[`, 2)
 
 for (data in lhd_indianapolis) {
@@ -322,7 +321,7 @@ for (data in lhd_indianapolis) {
     ontology.name = 'lhd',
     source = 'lhd',
     dimension.values = list(),
-    url = 'URL',
+    url = 'https://www.in.gov/health/hiv-std-viral-hepatitis/files/Final-STATE-OF-INDIANA-INTEGRATED-PREVENTION-AND-CARE-PLAN-2016a.pdf',
     details = 'Local Health Department Reports')
 }
 
@@ -340,7 +339,6 @@ for (data in lhd_indianapolis) {
 }
 
 #Put San Antonio
-####FIND THIS URL################
 lhd_san_antonio = lapply(san_antonio, `[[`, 2)
 
 for (data in lhd_san_antonio) {
@@ -349,6 +347,6 @@ for (data in lhd_san_antonio) {
     ontology.name = 'lhd',
     source = 'lhd',
     dimension.values = list(),
-    url = 'URL',
+    url = 'https://www.fast-trackcities.org/sites/default/files/San%20Antonio%20Transitional%20Grant%20Area%20Integrated%20HIV%20Prevention%20and%20Care%20Plan%202017-2021.pdf',
     details = 'Local Health Department Reports')
 }
