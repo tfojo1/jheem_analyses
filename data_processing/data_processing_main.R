@@ -154,6 +154,15 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Linkage to HIV care within 3 Months"))
 
+data.manager$register.outcome(
+  'retained',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'retained',
+    axis.name = 'retained',
+    units = 'cases',
+    description = "Retained in Care"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
