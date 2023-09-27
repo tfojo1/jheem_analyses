@@ -83,7 +83,7 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
   }
 
   data$outcome = "hiv.test.positivity"
-  data$value = as.numeric(data$`Number of persons newly diagnosed with HIV`)
+  data$value = as.numeric(data$`Percent of persons newly diagnosed with HIV`)
   
   data <- data %>%
     select( year, location, value, outcome)
@@ -201,7 +201,7 @@ data.list.city.positivity.clean = lapply(city_tests, function(file){
   
   data$outcome = "hiv.test.positivity"
   
-  data$value = as.numeric(data$`Number of persons newly diagnosed with HIV`)
+  data$value = as.numeric(data$`Percent of persons newly diagnosed with HIV`)
   
   if(grepl("2018", filename)) {
     data$year = "2018"

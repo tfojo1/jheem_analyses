@@ -2,6 +2,8 @@
 library(jheem2)
 library(tidyverse)
 library(readxl)
+library(stringr)
+library(haven)
 
 ###Initialize data manager (surveillance manager) and establish ontology###
 
