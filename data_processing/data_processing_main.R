@@ -78,10 +78,19 @@ data.manager$register.outcome(
   'prep', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'prep',
-    axis.name = 'prep (n)',
+    display.name = 'PrEP',
+    axis.name = 'PrEP (n)',
     units = 'cases',
     description = "PrEP Use"))
+
+data.manager$register.outcome(
+  'prep.indications', 
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'PrEP Indications',
+    axis.name = 'PrEP Indications (n)',
+    units = 'cases',
+    description = "PrEP Indications"))
 
 data.manager$register.outcome(
   'aids.diagnosed.prevalence', #changed from aids.diagnosis to aids.diagnosed.prevalence
@@ -129,6 +138,15 @@ data.manager$register.outcome(
     description = "Heroin Use in the Past Year"))
 
 data.manager$register.outcome(
+  'cocaine', 
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Cocaine Use in the Past Year',
+    axis.name = 'Cocaine Use in the Past Year (n)',
+    units = 'cases',
+    description = "Cocaine Use in the Past Year"))
+
+data.manager$register.outcome(
   'hiv.tests',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
@@ -137,15 +155,14 @@ data.manager$register.outcome(
     units = 'cases',
     description = "HIV Tests"))
 
-#What should this outcome be called? Relates to the % pos
 data.manager$register.outcome(
-  'newly.diagnosed.positives', #can this hiv test positivty - put this in as a percentage not a count#
+  'hiv.test.positivity', #This was newly.diagnosed.positives, changing it to hiv.test.positivity put this in as a percentage not a count#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Newly Diagnosed Positives',
-    axis.name = 'Newly Diagnosed Positives (n)',
+    display.name = 'HIV Test Positivity',
+    axis.name = 'HIV Test Positivity (n)',
     units = 'cases',
-    description = "Newly Diagnosed Positives"))
+    description = "HIV Test Positivity"))
 
 data.manager$register.outcome(
   'linkage_3mo',
@@ -628,6 +645,142 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
   
 } )
 
+#############################################################################
+###NEW SECTION CLEAN PREP######
+###THIS IS THE PREP SECTION
+##########add into dat manager with prep and prep indications as outcomes##
+
+###########################################################################
+#---Clean prep---#
+
+data.list.clean.atlas.prep = lapply(data.list.atlas.prep, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$outcome = "prep"
+  
+  names(data)[names(data)=='Year'] = 'year'   
+  data$year = substring(data$year,1, 4)                                          
+  data$year = as.character(data$year)
+  
+  data$Cases[data$Cases %in% c("Data suppressed")] = NA    
+  data$Cases[data$Cases %in% c("Data not available")] = NA  
+  data$value = as.numeric(gsub(",", '', data$Cases))   
+  
+  
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
+    names(data)[names(data)=='Geography'] = 'state'
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
+  }
+  if(grepl("ehe", filename)) {
+    data$location = as.character(data$FIPS)
+  }
+  if(grepl("msa", filename)) {
+    data$msa_indicator= substring(data$FIPS, 6, 10)
+    
+    data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+    data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    
+    data$cbsa = substring(data$FIPS, 1, 5)
+    data$location = paste("C", data$cbsa, sep=".")
+  }
+  if(grepl("allcounty", filename)) {
+    data$location = as.character(data$FIPS)
+  }  
+  
+  if(grepl("age", filename)) {
+    data$age = age.mappings[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    names(data)[names(data)=='Race.Ethnicity'] = 'race'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("male", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("female", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("risk", filename)) {
+    data$risk = risk.mappings[data$Transmission.Category]
+  }
+  
+  list(filename, data) 
+  
+} )
+
+#---Clean prep INIDCATIONS---#
+
+data.list.clean.indications = lapply(data.list.atlas.prep, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$outcome = "prep.indications"
+  
+  names(data)[names(data)=='Year'] = 'year'   
+  data$year = substring(data$year,1, 4)                                          
+  data$year = as.character(data$year)
+  
+  data$Population[data$Population %in% c("Data suppressed")] = NA    
+  data$Population[data$Population %in% c("Data not available")] = NA  
+  data$value = as.numeric(gsub(",", '', data$Population))   
+  
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
+    names(data)[names(data)=='Geography'] = 'state'
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
+  }
+  if(grepl("ehe", filename)) {
+    data$location = as.character(data$FIPS)
+  }
+  if(grepl("msa", filename)) {
+    data$msa_indicator= substring(data$FIPS, 6, 10)
+    
+    data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+    data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    
+    data$cbsa = substring(data$FIPS, 1, 5)
+    data$location = paste("C", data$cbsa, sep=".")
+  }
+  if(grepl("allcounty", filename)) {
+    data$location = as.character(data$FIPS)
+  }  
+  
+  if(grepl("age", filename)) {
+    data$age = age.mappings[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    names(data)[names(data)=='Race.Ethnicity'] = 'race'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("male", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("female", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("risk", filename)) {
+    data$risk = risk.mappings[data$Transmission.Category]
+  }
+  
+  list(filename, data) 
+  
+} )
 
 
 #########################################
@@ -706,6 +859,33 @@ for (data in deaths_all) {
      details = 'CDC Reporting')
  }
  
+ ##Outcome=prep 
+ prep_atlas_all = lapply(data.list.clean.atlas.prep, `[[`, 2)  
+ 
+ for (data in prep_atlas_all) {
+   
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc',
+     dimension.values = list(),
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+     details = 'CDC Reporting')
+ }
+ 
+ ##Outcome=prep.INDICATIONS
+ indications_all = lapply(data.list.clean.indications, `[[`, 2)  
+ 
+ for (data in indications_all) {
+   
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc',
+     dimension.values = list(),
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+     details = 'CDC Reporting')
+ }
  
 ################################################################################
  ###Use various pull statements to check that data you put in is correct###
