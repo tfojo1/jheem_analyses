@@ -13,8 +13,8 @@ data.manager$register.outcome(
   'diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'New Diagnoses',
-    axis.name = 'New Diagnoses (n)',
+    display.name = 'new diagnoses',
+    axis.name = 'new diagnoses (n)',
     units = 'cases',
     description = "New HIV Cases Diagnosed in a Year"))
 
@@ -22,19 +22,19 @@ data.manager$register.outcome(
 'hiv.deaths',
 metadata = create.outcome.metadata(
   scale = 'non.negative.number',
-  display.name = 'HIV Deaths',
-  axis.name = 'HIV Deaths (n)',
+  display.name = 'HIV deaths',
+  axis.name = 'HIV deaths (n)',
   units = 'cases',
   description = "HIV Deaths"))
 
 data.manager$register.outcome(
-  'prevalence',
+  'diagnosed.prevalence', #Changing this from prevalence to diagnosed.prevalence bc CDC's prevalence only includes people who know their status#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Prevalence',
-    axis.name = 'Prevalence (n)',
+    display.name = 'diganosed prevalence',
+    axis.name = 'diganosed prevalence (n)',
     units = 'cases',
-    description = "HIV Prevalence"))
+    description = "Diagnosed HIV Prevalence"))
 
 data.manager$register.outcome(
   'linkage_1mo',
@@ -46,34 +46,34 @@ data.manager$register.outcome(
     description = "Linkage to HIV care within 1 Month"))
 
 data.manager$register.outcome(
-  'receipt',
+  'engagement', #changed from receipt to engagement
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Receipt',
-    axis.name = 'Receipt (n)',
+    display.name = 'engagement',
+    axis.name = 'engagement (n)',
     units = 'cases',
-    description = "Receipt of HIV medical care"))
+    description = "Engagement in  HIV medical care"))
 
 data.manager$register.outcome(
-  'suppressed',
+  'suppression', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Suppressed',
-    axis.name = 'Suppressed (n)',
+    display.name = 'suppression',
+    axis.name = 'suppression (n)',
     units = 'cases',
     description = "HIV Viral Suppression"))
 
 data.manager$register.outcome(
-  'knowledge',
+  'awareness', #changed from knowledge to awareness
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'knowledge',
-    axis.name = 'knowledge (n)',
+    display.name = 'awareness',
+    axis.name = 'awareness (n)',
     units = 'cases',
-    description = "Knowledge of Status"))
+    description = "Awareness of Status"))
 
 data.manager$register.outcome(
-  'prep',
+  'prep', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'prep',
@@ -82,20 +82,20 @@ data.manager$register.outcome(
     description = "PrEP Use"))
 
 data.manager$register.outcome(
-  'aids.prevalence',
+  'aids.diagnosed.prevalence', #changed from aids.diagnosis to aids.diagnosed.prevalence
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'AIDS Prevalence',
-    axis.name = 'AIDS Prevalence (n)',
+    display.name = 'AIDS diagnosed prevalence',
+    axis.name = 'AIDS diagnosed prevalence (n)',
     units = 'cases',
-    description = "AIDS Prevalence"))
+    description = "AIDS Diaagnosed Prevalence"))
 
 data.manager$register.outcome(
   'aids.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'AIDS Diagnoses',
-    axis.name = 'AIDS Diagnoses (n)',
+    display.name = 'AIDS diagnoses',
+    axis.name = 'AIDS diagnoses (n)',
     units = 'cases',
     description = "AIDS Diagnoses"))
 
@@ -112,13 +112,13 @@ data.manager$register.outcome(
   'ps.syphilis',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Primary and Secondary Syphilis',
-    axis.name = 'Primary and Secondary Syphilis (n)',
+    display.name = 'primary and secondary syphilis',
+    axis.name = 'primary and secondary syphilis (n)',
     units = 'cases',
     description = "Primary and Secondary Syphilis"))
 
 data.manager$register.outcome(
-  'heroin.use.past.year',
+  'heroin', #can change to heroin use but leave display name the same#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'Heroin Use in the Past Year',
@@ -137,7 +137,7 @@ data.manager$register.outcome(
 
 #What should this outcome be called? Relates to the % pos
 data.manager$register.outcome(
-  'newly.diagnosed.positives',
+  'newly.diagnosed.positives', #can this hiv test positivty - put this in as a percentage not a count#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'Newly Diagnosed Positives',
@@ -155,13 +155,13 @@ data.manager$register.outcome(
     description = "Linkage to HIV care within 3 Months"))
 
 data.manager$register.outcome(
-  'retained',
+  'retention', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'retained',
-    axis.name = 'retained',
+    display.name = 'retention',
+    axis.name = 'retention',
     units = 'cases',
-    description = "Retained in Care"))
+    description = "Retention in Care"))
 
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
@@ -251,6 +251,12 @@ source('data_processing/cdc_test_count_processing.R')
 ###Source LHD MSA data
 source('data_processing/lhd_msa_processing.R')
 
+###Source in STI data
+source('data_processing/sti_processing.R')
+
+###Source in NSDUH substance data
+source('data_processing/nsduh_processing.R')
+
 ###Source in CDC MSA PDF Reports data and cleaning
 ##Pending location package updates
 #source('data_processing/msa_reports_processing.R')
@@ -260,11 +266,11 @@ source('data_processing/lhd_msa_processing.R')
 
 outcome.mappings = c('HIV diagnoses'='diagnoses',
                      'HIV deaths' = 'hiv.deaths',
-                     'HIV prevalence' = 'prevalence',
+                     'HIV prevalence' = 'diagnosed.prevalence',
                      'Linkage to HIV care' = 'linkage_1mo',
-                     'Receipt of HIV medical care' = 'receipt',
-                     'HIV viral suppression' = 'suppressed',
-                     'Knowledge of Status' = 'knowledge')
+                     'Receipt of HIV medical care' = 'engagement',
+                     'HIV viral suppression' = 'suppression',
+                     'Knowledge of Status' = 'awareness')
 
 risk.mappings = c('Heterosexual contact' = 'heterosexual',
                   'Injection drug use' = 'idu',
