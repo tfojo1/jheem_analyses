@@ -50,7 +50,7 @@ data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
   
   data$estimate = if_else(data$estimate == "suppressed", NA, data$estimate)
   
-  data$outcome = "heroin.use.past.year"
+  data$outcome = "heroin"
   
   data <- data%>%
   mutate(state_name = str_extract(geography, paste(state.name, collapse = "|")))%>%
@@ -103,7 +103,7 @@ data.list.nsduh.state.clean = lapply(data.list.nsduh, function(file){
   
   data$estimate = if_else(data$estimate == "suppressed", NA, data$estimate)
   
-  data$outcome = "heroin.use.past.year"
+  data$outcome = "heroin"
   
   data <- data%>%
     mutate(state_name = str_extract(geography, paste(state.name, collapse = "|")))%>%
@@ -150,7 +150,7 @@ data.list.nsduh.national.clean = lapply(data.list.nsduh, function(file){
 
   data$estimate = if_else(data$estimate == "suppressed", NA, data$estimate)
   
-  data$outcome = "heroin.use.past.year"
+  data$outcome = "heroin"
 
   if(grepl("14.16", filename)) {
     data$year = "2014-2016"

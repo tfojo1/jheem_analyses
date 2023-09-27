@@ -82,7 +82,7 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
     data$year = "2021"
   }
 
-  data$outcome = "newly.diagnosed.positives"
+  data$outcome = "hiv.test.positivity"
   data$value = as.numeric(data$`Number of persons newly diagnosed with HIV`)
   
   data <- data %>%
@@ -199,7 +199,7 @@ data.list.city.positivity.clean = lapply(city_tests, function(file){
   
   data$location =locations::get.cbsa.for.msa.name(data$msa)
   
-  data$outcome = "newly.diagnosed.positives"
+  data$outcome = "hiv.test.positivity"
   
   data$value = as.numeric(data$`Number of persons newly diagnosed with HIV`)
   

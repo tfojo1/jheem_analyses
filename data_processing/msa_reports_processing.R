@@ -551,92 +551,92 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
      
  #Differentiate AIDs as outcome for files before 2007-2008 change
      if(grepl("1993 new 1992", filename)){
-      data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+      data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
       data <- data %>%
         select(-c(outcome))
       data$outcome= data$outcome_new
       
      }
      if(grepl("1994 new 1993", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("1995 new 1994", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("1996 new 1995", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("1997 new 1996", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("1998 new 1997", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("1999 new 1998", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("2000 new 1999", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("2001 new 2000", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("2002 new 2001", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("2003 new 2002", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("2004 new 2003", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("2005 new 2004", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("2006 new 2005", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
      }
      if(grepl("2007 new 2006", filename)){
-       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.prevalence", "aids.diagnoses")
+       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
