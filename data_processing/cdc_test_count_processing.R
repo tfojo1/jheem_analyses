@@ -14,7 +14,7 @@ data.list.tests <- lapply(test_files, function(x){
   list(filename=x, data=read_excel(x, skip=skip))
 })
 ################################################################################
-                    ###Clean HIV Test Data###
+                    ###Clean HIV Test Data- State###
 ################################################################################
 data.list.tests.clean = lapply(data.list.tests, function(file){
   
@@ -54,7 +54,7 @@ data.list.tests.clean = lapply(data.list.tests, function(file){
   list(filename, data) 
 })
 ################################################################################
-              ###Clean HIV Test Positivity Data###
+              ###Clean HIV Test Positivity Data-State###
 ################################################################################
 data.list.positives.clean = lapply(data.list.tests, function(file){
   
@@ -84,6 +84,7 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
 
   data$outcome = "hiv.test.positivity"
   data$value = as.numeric(data$`Percent of persons newly diagnosed with HIV`)
+  data$value = round(data$value, digits=2)
   
   data <- data %>%
     select( year, location, value, outcome)
@@ -202,6 +203,7 @@ data.list.city.positivity.clean = lapply(city_tests, function(file){
   data$outcome = "hiv.test.positivity"
   
   data$value = as.numeric(data$`Percent of persons newly diagnosed with HIV`)
+  data$value = round(data$value, digits=2)
   
   if(grepl("2018", filename)) {
     data$year = "2018"

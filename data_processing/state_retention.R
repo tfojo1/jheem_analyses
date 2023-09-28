@@ -1,88 +1,95 @@
+#library(readxl)
+
 ################################################################################
-###Read in Scraped PDF Tables###
-###State Retention Data
+        ###Read in Scraped PDF Tables###
+          ###State Retention Data
 ################################################################################ 
 
 DATA.DIR.RETENTION="../../data_raw/retention"
 
-retention_files <- Sys.glob(paste0(DATA.DIR.RETENTION, '/*.csv'))
+retention_files <- Sys.glob(paste0(DATA.DIR.RETENTION, '/*.xlsx'))
 
-#creating a list with sublists of filename, data#
-data.list.RETENTION <- lapply(retention_files, function(x){
-  skip=7
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+data.list.retention <- lapply(retention_files, function(x){
+  skip=1
+  list(filename=x, data=read_excel(x, sheet= 1, skip=skip))
 })
 
 ################################################################################
-###Clean State Retention Data
+                ###Clean State Retention Data###
+################################################################################
+data.list.retention.clean = lapply(data.list.retention, function(file){
+
+  data=file[["data"]]
+  filename = file[["filename"]]
+
+  data$outcome = "retention"
+  
+  data= subset(data, data$state != "Total")
+  
+  #Create Year#
+  if(grepl("2011", filename)) {
+    data$year = as.character("2011")
+    data= subset(data, data$state != "California") #Removing CA from the 2011 data bc it only represents LAC and SF
+  }
+  if(grepl("2012", filename)) {
+    data$year = as.character("2012")
+  }
+  if(grepl("2013", filename)) {
+    data$year = as.character("2013")
+  }
+  if(grepl("2014", filename)) {
+    data$year = as.character("2014")
+  }
+  if(grepl("2015", filename)) {
+    data$year = as.character("2015")
+  }
+  if(grepl("2016", filename)) {
+    data$year = as.character("2016")
+  }
+  if(grepl("2017", filename)) {
+    data$year = as.character("2017")
+  }
+  if(grepl("2018", filename)) {
+    data$year = as.character("2018")
+  }
+  if(grepl("2019", filename)) {
+    data$year = as.character("2019")
+  }
+  if(grepl("2020", filename)) {
+    data$year = as.character("2020")
+  }
+  if(grepl("2021", filename)) {
+    data$year = as.character("2021")
+  }
+  
+data$location = state.abb[match(data$state, state.name)]
+
+data$location = ifelse(data$state == "District of Columbia", "DC", data$location)
+  
+##Follow up with Todd about how to determine 'value' if it should be the test_2 count or the retention_calc##
+  #data$value = 
+  
+# data <- data %>%
+#   select(year, outcome, location, value)
+
+  data= as.data.frame(data)
+
+  list(filename, data)
+})
+
+################################################################################
+            ###Put Data into Data Manager###
 ################################################################################
 
-# data.list.sti.clean = lapply(data.list.sti, function(file){
-#   
-#   data=file[["data"]] 
-#   filename = file[["filename"]] 
-#   
-#   data$outcome = tolower(data$Indicator)
-#   data$year = substr(data$Year, 1, 4)
-#   data$Cases = (gsub(",", "", data$Cases))
-#   
-#   data$outcome = ifelse(data$outcome == "primary and secondary syphilis", "ps.syphilis", data$outcome)
-#   
-#   data <- data %>%
-#     mutate(value= ifelse(grepl("Data not available", Cases), NA,
-#                          ifelse(grepl("Data suppressed", Cases), NA, Cases)))
-#   data$value = as.numeric(data$value)
-#   
-#   if(grepl("state", filename)) {
-#     names(state.abb) <- state.name 
-#     data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography]) 
-#   }
-#   
-#   if(grepl("county", filename)) {
-#     data$location = data$FIPS
-#   }
-#   
-#   ###
-#   
-#   if(grepl("total", filename)) {
-#     data <- data %>%
-#       select(year, location, outcome, value)
-#   }
-#   if(grepl("sex", filename)) {
-#     data$sex = tolower(data$Sex)
-#     data <- data %>%
-#       select(year, location, outcome, sex, value)
-#   }
-#   if(grepl("race", filename)) {
-#     data$race = data$Race.Ethnicity
-#     data <- data %>%
-#       select(year, location, outcome, race, value)
-#   }
-#   if(grepl("age", filename)) {
-#     str1= "years"
-#     data$age = ifelse(data$Age.Group == "Unknown", "Unknown", paste(data$Age.Group, str1, sep= " "))
-#     data <- data %>%
-#       select(year, location, outcome, age, value)
-#   }
-#   
-#   data= as.data.frame(data)
-#   
-#   list(filename, data) 
-# })
+state_retention_data = lapply(data.list.retention.clean, `[[`, 2)
 
-################################################################################
-###Put Data into Data Manager###
-################################################################################
+for (data in state_retention_data) {
 
-# sti_data = lapply(data.list.sti.clean, `[[`, 2)
-# 
-# for (data in sti_data) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc sti',
-#     source = 'cdc',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC Reporting')
-# }
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/hiv/library/reports/hiv-surveillance.html',
+    details = 'Monitoring Selected National HIV Prevention and Care Objectives by Using HIV Surveillance Data')
+}
