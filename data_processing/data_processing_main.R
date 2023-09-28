@@ -276,6 +276,9 @@ source('data_processing/sti_processing.R')
 ###Source in NSDUH substance data
 source('data_processing/nsduh_processing.R')
 
+###Source in state retention data
+#source('data_processing/state_retention.R')
+
 ###Source in CDC MSA PDF Reports data and cleaning
 ##Pending location package updates
 #source('data_processing/msa_reports_processing.R')
@@ -646,10 +649,8 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
 } )
 
 #############################################################################
-###NEW SECTION CLEAN PREP######
-###THIS IS THE PREP SECTION
-##########add into dat manager with prep and prep indications as outcomes##
-
+###Adding in Section for Atlas Plus PrEP data- outcomes are PrEP and
+##PrEP indications
 ###########################################################################
 #---Clean prep---#
 
