@@ -912,27 +912,6 @@ for (data in deaths_all) {
    outcome='hiv.deaths',
    keep.dimensions = c('location', 'year')))
  
- z =(data.manager$pull(
-   outcome='prevalence',
-   keep.dimensions = c('location', 'year')))
-
- xx = (data.manager$pull(
-   outcome = 'linkage',
-   keep.dimensions = c('location', 'year')))
-
-yy = (data.manager$pull(
-   outcome = 'care',
-   keep.dimensions = c('location', 'year')))
-
-zz = (data.manager$pull(
-  outcome = 'suppression',
-  keep.dimensions = c('location', 'year')))
-
-zz = (data.manager$pull(
-  outcome = 'knowledge',
-  keep.dimensions = c('location', 'year')))
-
- 
  
 ################################################################################
 ###Save surveillance manager####
