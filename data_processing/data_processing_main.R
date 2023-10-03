@@ -174,13 +174,22 @@ data.manager$register.outcome(
     description = "Linkage to HIV care within 3 Months"))
 
 data.manager$register.outcome(
-  'retention', 
+  'retention',  #Defined as:Individuals with ≥2 tests (CD4 or VL) ≥3 months apart#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'retention',
     axis.name = 'retention',
     units = 'cases',
     description = "Retention in Care"))
+
+data.manager$register.outcome(
+  'retention.of.engaged', #Defined as >=2 tests (CD4 or VL) divided by >=1 test
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'retention of engaged',
+    axis.name = 'retention of engaged',
+    units = 'cases',
+    description = "Retention of Engaged in Care"))
 
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
@@ -781,7 +790,7 @@ data.list.clean.indications = lapply(data.list.atlas.prep, function(file){
   
   list(filename, data) 
   
-} )
+})
 
 
 #########################################
