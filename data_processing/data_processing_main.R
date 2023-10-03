@@ -9,7 +9,7 @@ library(haven)
 
 ###CDC Atlas Plus Data###
 
-data.manager = create.data.manager('test', description='a data manager to test with')
+data.manager = create.data.manager('surveillance', description='surveillance data manager')
 
 data.manager$register.outcome(
   'diagnoses',
@@ -24,8 +24,8 @@ data.manager$register.outcome(
 'hiv.deaths',
 metadata = create.outcome.metadata(
   scale = 'non.negative.number',
-  display.name = 'HIV deaths',
-  axis.name = 'HIV deaths (n)',
+  display.name = 'hiv deaths',
+  axis.name = 'hiv deaths (n)',
   units = 'cases',
   description = "HIV Deaths"))
 
@@ -78,8 +78,8 @@ data.manager$register.outcome(
   'prep', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'PrEP',
-    axis.name = 'PrEP (n)',
+    display.name = 'prep',
+    axis.name = 'prep (n)',
     units = 'cases',
     description = "PrEP Use"))
 
@@ -87,8 +87,8 @@ data.manager$register.outcome(
   'prep.indications', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'PrEP Indications',
-    axis.name = 'PrEP Indications (n)',
+    display.name = 'prep indications',
+    axis.name = 'prep indications (n)',
     units = 'cases',
     description = "PrEP Indications"))
 
@@ -96,17 +96,17 @@ data.manager$register.outcome(
   'aids.diagnosed.prevalence', #changed from aids.diagnosis to aids.diagnosed.prevalence
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'AIDS diagnosed prevalence',
-    axis.name = 'AIDS diagnosed prevalence (n)',
+    display.name = 'aids diagnosed prevalence',
+    axis.name = 'aids diagnosed prevalence (n)',
     units = 'cases',
-    description = "AIDS Diaagnosed Prevalence"))
+    description = "AIDS Diagnosed Prevalence"))
 
 data.manager$register.outcome(
   'aids.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'AIDS diagnoses',
-    axis.name = 'AIDS diagnoses (n)',
+    display.name = 'aids diagnoses',
+    axis.name = 'aids diagnoses (n)',
     units = 'cases',
     description = "AIDS Diagnoses"))
 
@@ -132,8 +132,8 @@ data.manager$register.outcome(
   'heroin', #can change to heroin use but leave display name the same#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Heroin Use in the Past Year',
-    axis.name = 'Heroin Use in the Past Year (n)',
+    display.name = 'heroin use in the past year',
+    axis.name = 'heroin use in the past year (n)',
     units = 'cases',
     description = "Heroin Use in the Past Year"))
 
@@ -141,8 +141,8 @@ data.manager$register.outcome(
   'cocaine', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Cocaine Use in the Past Year',
-    axis.name = 'Cocaine Use in the Past Year (n)',
+    display.name = 'cocaine use in the past year',
+    axis.name = 'cocaine use in the past year (n)',
     units = 'cases',
     description = "Cocaine Use in the Past Year"))
 
@@ -150,8 +150,8 @@ data.manager$register.outcome(
   'hiv.tests',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'HIV Tests',
-    axis.name = 'HIV Tests (n)',
+    display.name = 'hiv tests',
+    axis.name = 'hiv tests (n)',
     units = 'cases',
     description = "HIV Tests"))
 
@@ -159,8 +159,8 @@ data.manager$register.outcome(
   'hiv.test.positivity', #This was newly.diagnosed.positives, changing it to hiv.test.positivity put this in as a percentage not a count#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'HIV Test Positivity',
-    axis.name = 'HIV Test Positivity (n)',
+    display.name = 'hiv test positivity',
+    axis.name = 'hiv test positivity (n)',
     units = 'cases',
     description = "HIV Test Positivity"))
 
@@ -184,9 +184,9 @@ data.manager$register.outcome(
 
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
-data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='CDC')
+data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='cdc')
 
-data.manager$register.source('nsduh', full.name = "NSDUH", short.name='nsduh')
+data.manager$register.source('nsduh', full.name = "National Survey on Drug Use and Health", short.name='nsduh')
 
 data.manager$register.source('lhd', full.name = "Local Health Department", short.name='lhd')
 
@@ -787,7 +787,6 @@ data.list.clean.indications = lapply(data.list.atlas.prep, function(file){
 #########################################
 ##Put data into data manager###
 
-
 ##Outcome=diagnoses
 
 diagnoses_all = lapply(data.list.clean.diagnoses, `[[`, 2)  
@@ -800,7 +799,7 @@ for (data in diagnoses_all) {
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Reporting')
+    details = 'CDC Atlas Plus data')
 }
  
 ##Outcome=prevalence
@@ -814,7 +813,7 @@ for (data in prevalence_all) {
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Reporting')
+    details = 'CDC Atlas Plus data')
 }
 
 ##Outcome=deaths 
@@ -828,7 +827,7 @@ for (data in deaths_all) {
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Reporting')
+    details = 'CDC Atlas Plus data')
 }
 
  ##Outcome=SLE 
@@ -842,7 +841,7 @@ for (data in deaths_all) {
      source = 'cdc',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-     details = 'CDC Reporting')
+     details = 'CDC Atlas Plus data')
  }
  
 
@@ -857,7 +856,7 @@ for (data in deaths_all) {
      source = 'cdc',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-     details = 'CDC Reporting')
+     details = 'CDC Atlas Plus data')
  }
  
  ##Outcome=prep 
@@ -871,7 +870,7 @@ for (data in deaths_all) {
      source = 'cdc',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-     details = 'CDC Reporting')
+     details = 'CDC Atlas Plus data')
  }
  
  ##Outcome=prep.INDICATIONS
@@ -885,7 +884,7 @@ for (data in deaths_all) {
      source = 'cdc',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-     details = 'CDC Reporting')
+     details = 'CDC Atlas Plus data')
  }
  
 ################################################################################
