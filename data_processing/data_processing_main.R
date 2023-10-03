@@ -44,7 +44,7 @@ data.manager$register.outcome(
     scale = 'non.negative.number',
     display.name = 'linkage_1mo',
     axis.name = 'linkage_1mo (n)',
-    units = 'cases',
+    units = 'proportion',
     description = "Linkage to HIV care within 1 Month"))
 
 data.manager$register.outcome(
@@ -53,7 +53,7 @@ data.manager$register.outcome(
     scale = 'non.negative.number',
     display.name = 'engagement',
     axis.name = 'engagement (n)',
-    units = 'cases',
+    units = 'proportion',
     description = "Engagement in  HIV medical care"))
 
 data.manager$register.outcome(
@@ -62,7 +62,7 @@ data.manager$register.outcome(
     scale = 'non.negative.number',
     display.name = 'suppression',
     axis.name = 'suppression (n)',
-    units = 'cases',
+    units = 'proportion',
     description = "HIV Viral Suppression"))
 
 data.manager$register.outcome(
@@ -71,7 +71,7 @@ data.manager$register.outcome(
     scale = 'non.negative.number',
     display.name = 'awareness',
     axis.name = 'awareness (n)',
-    units = 'cases',
+    units = 'proportion',
     description = "Awareness of Status"))
 
 data.manager$register.outcome(
@@ -161,7 +161,7 @@ data.manager$register.outcome(
     scale = 'non.negative.number',
     display.name = 'hiv test positivity',
     axis.name = 'hiv test positivity (n)',
-    units = 'cases',
+    units = 'proportion',
     description = "HIV Test Positivity"))
 
 data.manager$register.outcome(
@@ -170,7 +170,7 @@ data.manager$register.outcome(
     scale = 'non.negative.number',
     display.name = 'linkage_3mo',
     axis.name = 'linkage_3mo (n)',
-    units = 'cases',
+    units = 'proportion',
     description = "Linkage to HIV care within 3 Months"))
 
 data.manager$register.outcome(
@@ -179,7 +179,7 @@ data.manager$register.outcome(
     scale = 'non.negative.number',
     display.name = 'retention',
     axis.name = 'retention',
-    units = 'cases',
+    units = 'proportion',
     description = "Retention in Care"))
 
 data.manager$register.outcome(
@@ -188,7 +188,7 @@ data.manager$register.outcome(
     scale = 'non.negative.number',
     display.name = 'retention of engaged',
     axis.name = 'retention of engaged',
-    units = 'cases',
+    units = 'proportion',
     description = "Retention of Engaged in Care"))
 
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
@@ -286,7 +286,7 @@ source('data_processing/sti_processing.R')
 source('data_processing/nsduh_processing.R')
 
 ###Source in state retention data
-#source('data_processing/state_retention.R')
+source('data_processing/state_retention.R')
 
 ###Source in CDC MSA PDF Reports data and cleaning
 ##Pending location package updates
@@ -538,9 +538,11 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   data$year = substring(data$year,1, 4)                                          
   data$year = as.character(data$year)
   
-  data$Cases[data$Cases %in% c("Data suppressed")] = NA    
-  data$Cases[data$Cases %in% c("Data not available")] = NA  
-  data$value = as.numeric(gsub(",", '', data$Cases))   
+  #Pulling from 'percent' variable
+  data$Percent[data$Percent %in% c("Data suppressed")] = NA    
+  data$Percent[data$Percent %in% c("Data not available")] = NA 
+  data$Percent = as.numeric(data$Percent)
+  data$value = (data$Percent/100) 
   
   if(grepl("state", filename)) {
     names(state.abb) <- state.name 
@@ -588,7 +590,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   
   list(filename, data) 
   
-} )
+})
 
 #---Clean Knowledge---#
 
@@ -604,10 +606,12 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
   data$year = substring(data$year,1, 4)                                          
   data$year = as.character(data$year)
   
-  data$Cases[data$Cases %in% c("Data suppressed")] = NA    
-  data$Cases[data$Cases %in% c("Data not available")] = NA  
-  data$value = as.numeric(gsub(",", '', data$Cases))   
-  
+  #Pulling from 'percent' variable
+  data$Percent[data$Percent %in% c("Data suppressed")] = NA    
+  data$Percent[data$Percent %in% c("Data not available")] = NA 
+  data$Percent = as.numeric(data$Percent)
+  data$value = (data$Percent/100)   
+
   
   if(grepl("state", filename)) {
     names(state.abb) <- state.name 
