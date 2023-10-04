@@ -129,6 +129,24 @@ data.manager$register.outcome(
     description = "Primary and Secondary Syphilis"))
 
 data.manager$register.outcome(
+  'early.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'early syphilis',
+    axis.name = 'early syphilis (n)',
+    units = 'cases',
+    description = "Early, non-primary, non-Secondary Syphilis"))
+
+data.manager$register.outcome(
+  'congenital.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'congenital syphilis',
+    axis.name = 'congenital syphilis (n)',
+    units = 'cases',
+    description = "Congenital Syphilis"))
+
+data.manager$register.outcome(
   'heroin', #can change to heroin use but leave display name the same#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
