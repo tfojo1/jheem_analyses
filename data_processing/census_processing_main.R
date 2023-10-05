@@ -2,6 +2,7 @@ library(jheem2)
 library(tidyverse)
 library(readr)
 library(readxl) 
+library(haven)
 
 ################################################################################
       ###Create a separate data manager for the census data###
@@ -94,8 +95,8 @@ data.list.county.pop <- lapply(census_county_files, function(x){
             ###Sourcing other files here###
 ################################################################################ 
 
-#This pulls population and demographics from 1970-1989#
-source('data_processing/census_1970_1989.R')
+#This pulls population from 1970-1999#
+source('data_processing/census_1970_1999.R')
 
 #This pulls single year age groups and demographic data from 2018-2020#
 source('data_processing/census_cdc_wonder.R')

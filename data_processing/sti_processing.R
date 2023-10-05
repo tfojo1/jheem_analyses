@@ -1,5 +1,5 @@
-library(jheem2)
-library(tidyverse)
+# library(jheem2)
+# library(tidyverse)
 
 ################################################################################
                 ###Read in STI Data from Atlas Plus###
@@ -18,59 +18,72 @@ data.list.sti <- lapply(sti_files, function(x){
 ################################################################################
                     ###Clean STI Data from Atlas Plus###
                        ###Syphilis and Gonorrhea###
+                ##Updating to add early and congenital syphilis##
+##commenting out the original code to see if I can make it more efficient##
 ################################################################################
 
+#MAPPINGS#
+outcome.mappings.sti = c('Primary and Secondary Syphilis'='ps.syphilis',
+                     'Early Non-Primary, Non-Secondary Syphilis' = 'early.syphilis',
+                     'Congenital Syphilis' = 'congenital.syphilis',
+                     'Gonorrhea' = 'gonorrhea')
+
+age.mappings.sti = c('0-14' = '0-14 years',
+                 '15-19' = '15-19 years',
+                 '20-24' = '20-24 years',
+                 '25-29' = '25-29 years',
+                 '30-34' = '30-34 years',
+                 '35-39' = '35-39 years',
+                 '40-44' = '40-44 years',
+                 '45-54' = '45-54 years',
+                 '55-64' = '55-64 years',
+                 '65+' = '65+ years',
+                 'Unknown' = 'unknown',
+                 '15-24'= '15-24 years',
+                 '25-34'= '25-34 years',
+                 '35-44'= '35-44 years')
+
+####
 data.list.sti.clean = lapply(data.list.sti, function(file){
-  
-  data=file[["data"]] 
-  filename = file[["filename"]] 
-  
-  data$outcome = tolower(data$Indicator)
+
+  data=file[["data"]]
+  filename = file[["filename"]]
+
   data$year = substr(data$Year, 1, 4)
   data$Cases = (gsub(",", "", data$Cases))
-  
-  data$outcome = ifelse(data$outcome == "primary and secondary syphilis", "ps.syphilis", data$outcome)
-  
+
+  data$outcome = outcome.mappings.sti [data$Indicator]
+
   data <- data %>%
   mutate(value= ifelse(grepl("Data not available", Cases), NA,
                       ifelse(grepl("Data suppressed", Cases), NA, Cases)))
   data$value = as.numeric(data$value)
-  
+
   if(grepl("state", filename)) {
-    names(state.abb) <- state.name 
-    data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography]) 
+    names(state.abb) <- state.name
+    data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography])
   }
-  
+
   if(grepl("county", filename)) {
     data$location = data$FIPS
   }
   
-  ###
+  ##Demographic conditionals##
   
-  if(grepl("total", filename)) {
-    data <- data %>%
-      select(year, location, outcome, value)
-  }
-  if(grepl("sex", filename)) {
-    data$sex = tolower(data$Sex)
-    data <- data %>%
-      select(year, location, outcome, sex, value)
+  if(grepl("age", filename)) {
+    data$age = age.mappings.sti[data$Age.Group]
   }
   if(grepl("race", filename)) {
-    data$race = data$Race.Ethnicity
-    data <- data %>%
-      select(year, location, outcome, race, value)
+    data$race= data$'Race.Ethnicity'
   }
-  if(grepl("age", filename)) {
-    str1= "years"
-    data$age = ifelse(data$Age.Group == "Unknown", "Unknown", paste(data$Age.Group, str1, sep= " "))
-    data <- data %>%
-      select(year, location, outcome, age, value)
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
   }
 
   data= as.data.frame(data)
-  
-  list(filename, data) 
+
+  list(filename, data)
 })
 
 ################################################################################
