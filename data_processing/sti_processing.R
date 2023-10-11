@@ -16,10 +16,23 @@ data.list.sti <- lapply(sti_files, function(x){
 })
 
 ################################################################################
+              ###Read in early syphilis data###
+################################################################################ 
+
+DATA.DIR.EARLY="../../data_raw/sti/early_syphilis"
+
+early_files <- Sys.glob(paste0(DATA.DIR.EARLY, '/*.csv'))
+
+#creating a list with sublists of filename, data#
+data.list.early <- lapply(early_files, function(x){
+  skip=7
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+})
+
+################################################################################
                     ###Clean STI Data from Atlas Plus###
                        ###Syphilis and Gonorrhea###
                 ##Updating to add early and congenital syphilis##
-##commenting out the original code to see if I can make it more efficient##
 ################################################################################
 
 #MAPPINGS#
@@ -87,8 +100,57 @@ data.list.sti.clean = lapply(data.list.sti, function(file){
 })
 
 ################################################################################
+               ###Clean Early Syphilis Data###
+################################################################################
+
+data.list.early.syphilis = lapply(data.list.early, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$year = substr(data$Year, 1, 4)
+  data$Cases = (gsub(",", "", data$Cases))
+  
+  data$outcome = outcome.mappings.sti [data$Indicator]
+  
+  data <- data %>%
+    mutate(value= ifelse(grepl("Data not available", Cases), NA,
+                         ifelse(grepl("Data suppressed", Cases), NA, Cases)))
+  data$value = as.numeric(data$value)
+  
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name
+    data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography])
+  }
+  
+  if(grepl("county", filename)) {
+    data$location = data$FIPS
+  }
+  
+  ##Demographic conditionals##
+  
+  if(grepl("age", filename)) {
+    data$age = age.mappings.sti[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    data$race= data$'Race.Ethnicity'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  
+  data= as.data.frame(data)
+  
+  list(filename, data)
+})
+
+################################################################################
                       ###Put Data into Data Manager###
 ################################################################################
+
+#Create 2 put statements one for the majority of the STI data and then one separate put
+#for the early.syphilis data bc the ontology is different bc of the slight change in age groups
 
 sti_data = lapply(data.list.sti.clean, `[[`, 2)
 
@@ -102,3 +164,16 @@ sti_data = lapply(data.list.sti.clean, `[[`, 2)
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Reporting')
  }
+
+early_syphilis_data = lapply(data.list.early.syphilis, `[[`, 2)
+
+for (data in early_syphilis_data) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc syphilis',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC Reporting')
+}

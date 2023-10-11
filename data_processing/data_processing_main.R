@@ -257,8 +257,19 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
-          '40-44 years', '45-54 years', '55-64 years', '65+ years', 'unknown', '15-24 years', '25-34 years', '35-44 years'), #adding extra age groups for early.syphilis#
+    age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years', 'unknown'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White', 'Unknown'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
+#Create a separate ontology for early syphilis
+data.manager$register.ontology(
+  'cdc syphilis',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('0-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years', 'unknown'), 
     race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White', 'Unknown'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
