@@ -1,4 +1,14 @@
 
+#-- Test Code --#
+if (1==2)
+{
+    source('applications/EHE/ehe_specification.R')
+    metadata = get.specification.metadata('ehe')
+    
+    get.prep.use.functional.form(specification.metadata = metadata)
+}
+
+#-- The Functions to Implement --#
 
 get.prep.use.functional.form <- function(specification.metadata)
 {
@@ -17,6 +27,9 @@ get.prep.use.functional.form <- function(specification.metadata)
     age.spans = age.info$upper - age.info$lower
   
     # Do the work
+    
+    intercept = 0 # for now
+    slope = 0 # for now
     
     # Make and return the functional form object
     create.logistic.linear.functional.form(
