@@ -2,6 +2,7 @@
 # The file to source to load all necessary packages, cached data, code
 
 library(locations)
+library(distributions)
 
 # Load the data - this will eventually be replaced with jheem2's native data manager
 if (!exists('ALL.DATA.MANAGERS'))
@@ -23,6 +24,16 @@ source('../jheem_analyses/data_managers/natality_manager.R')
 source('../jheem_analyses/data_managers/pairing_manager.R')
 
 # These are the real supporting files that will be in the final version
+
+# Input Managers
+source('../jheem_analyses/input_managers/covid_mobility_manager.R')
+
+# For the EHE version
 source('../jheem_analyses/applications/EHE/ehe_base_parameters.R')
 source('../jheem_analyses/applications/EHE/ehe_specification_helpers.R')
 
+# General
+source('../jheem_analyses/commoncode/target_populations.R')
+
+# Data Loads
+load('../jheem_analyses/cached/google_mobility_data.Rdata')
