@@ -68,7 +68,7 @@ data.list.census.sas.clean = lapply(census_sas_data_list, function(file){
    data$age = if_else(data$age == "0 years", "< 1 year", data$age)
    data$age = if_else(data$age == "1 years", "1 year", data$age)
    data$age = if_else(data$age == "85 years", "85+ years", data$age)
-   data$population_2010 = data$POP2010
+   data$population_2010 = data$POP2010_apr
    data$population_2011 = data$POP2011
    data$population_2012 = data$POP2012
    data$population_2013 = data$POP2013

@@ -257,8 +257,19 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
-          '40-44 years', '45-54 years', '55-64 years', '65+ years', 'unknown', '15-24 years', '25-34 years', '35-44 years'), #adding extra age groups for early.syphilis#
+    age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years', 'unknown'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White', 'Unknown'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
+#Create a separate ontology for early syphilis
+data.manager$register.ontology(
+  'cdc syphilis',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('0-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years', 'unknown'), 
     race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White', 'Unknown'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
@@ -475,6 +486,72 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
   list(filename, data) 
   
 } )
+
+##############################################################################
+##Adding a new section to deaths to differentiate issues in death reporting###
+##############################################################################
+#Certain locations have notes on reporting issues with under reported death values
+#Creating a separate list of these to create a separate put with specific details
+
+data.list.clean.deaths.notes = lapply(data.list.deaths, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$outcome = outcome.mappings[data$Indicator]
+  data = data[!is.na(data$outcome),]
+  
+  names(data)[names(data)=='Year'] = 'year'   
+  data$year = substring(data$year,1, 4)                                          
+  data$year = as.character(data$year)
+  
+  data$Cases[data$Cases %in% c("Data suppressed")] = NA    
+  data$Cases[data$Cases %in% c("Data not available")] = NA  
+  data$value = as.numeric(gsub(",", '', data$Cases))   
+  
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name 
+    
+    ##use this to select only states with missing reporting##
+    data <- data %>%
+      filter(str_detect(Geography, "[^[:alnum:] ]"))  
+    
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
+    names(data)[names(data)=='Geography'] = 'state'
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
+  }
+  
+  if(grepl("msa", filename)) {
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography)
+
+    data <- data %>%
+      filter(str_detect(Geography, "[^[:alnum:] ]"))  
+  }
+  
+  if(grepl("age", filename)) {
+    data$age = age.mappings[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    names(data)[names(data)=='Race.Ethnicity'] = 'race'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("male", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("female", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("risk", filename)) {
+    data$risk = risk.mappings[data$Transmission.Category]
+  }
+  list(filename, data)
+})
+
 
 #---Clean Prevalence---#
 
@@ -860,6 +937,21 @@ for (data in deaths_all) {
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
 }
+
+##Outcome=deaths; details= reporting issues
+deaths_notes = lapply(data.list.clean.deaths.notes, `[[`, 2)  
+
+for (data in deaths_notes) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc',
+    source = 'cdc',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'Jurisdiction with incomplete reporting of deaths for most recent year.')
+}
+
 
  ##Outcome=SLE 
  sle_all = lapply(data.list.clean.sle, `[[`, 2) 
