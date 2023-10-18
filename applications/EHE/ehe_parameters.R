@@ -311,3 +311,259 @@ EHE.PARAMETERS.PRIOR = join.distributions(
     age5.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
                                                           5)
 )
+
+BASE.PARAMETER.SAMPLING.BLOCKS = list(
+  peak.msm.transmission = 'msm.peak.trate.multiplier',
+  
+  black.msm.transmission = c(
+    'black.msm.trate.0',
+    'black.msm.trate.1',
+    'black.msm.trate.2'
+  ),
+  
+  hispanic.msm.transmission = c(
+    'hispanic.msm.trate.0',
+    'hispanic.msm.trate.1',
+    'hispanic.msm.trate.2'
+  ),
+  
+  other.msm.transmission = c(
+    'other.msm.trate.0',
+    'other.msm.trate.1',
+    'other.msm.trate.2',
+    'msm.fraction.trate.change.after.t2'
+  ),
+  
+  msm.aging = c(
+    'msm.age1.aging.base',
+    'msm.age2.aging.0',
+    'msm.age2.aging.1',
+    'msm.age3.aging.1'
+  ),
+  
+  sexual.mixing = c(
+    'black.black.sexual.oe',
+    'hispanic.hispanic.sexual.oe',
+    'other.other.sexual.oe'
+  ),
+  
+  msm.age1.susceptibility = c(
+    'age1.msm.susceptibility.rr.mult.1',
+    'age1.msm.susceptibility.rr.mult.2'
+  ),
+  
+  msm.age2.susceptibility = c(
+    'age2.msm.susceptibility.rr.mult.1',
+    'age2.msm.susceptibility.rr.mult.2'
+  ),
+  
+  old.msm.age.susceptibility = c(
+    'age4.msm.susceptibility.rr.mult.12',
+    'age5.msm.susceptibility.rr.mult.12'
+  ),
+  
+  sexual.pairing = c(
+    'oe.female.pairings.with.msm',
+    'fraction.heterosexual.male.pairings.with.male',
+    'oe.never.idu.pairings.with.idu'
+  ),
+  
+  proportion.msm.of.male = 'proportion.msm.of.male.mult',
+  
+  age.mixing = 'age.mixing.sd.mult',
+  
+  peak.heterosexual.transmission = 'heterosexual.peak.trate.multiplier',
+  
+  black.heterosexual.transmission = c(
+    'black.heterosexual.trate.0',
+    'black.heterosexual.trate.1',
+    'black.heterosexual.trate.2'
+  ),
+  
+  hispanic.heterosexual.transmission = c(
+    'hispanic.heterosexual.trate.0',
+    'hispanic.heterosexual.trate.1',
+    'hispanic.heterosexual.trate.2'
+  ),
+  
+  other.heterosexual.transmission = c(
+    'other.heterosexual.trate.0',
+    'other.heterosexual.trate.1',
+    'other.heterosexual.trate.2',
+    'heterosexual.fraction.trate.change.after.t2'
+  ),
+  
+  male.vs.female.heterosexual.rr = 'male.vs.female.heterosexual.rr',
+  
+  heterosexual.aging = c(
+    'heterosexual.age1.aging.base',
+    'heterosexual.age2.aging.0',
+    'heterosexual.age2.aging.1',
+    'heterosexual.age3.aging.1'
+  ),
+  
+  peak.idu.transmission = 'idu.peak.trate.multiplier',
+  
+  black.idu.transmission = c(
+    'black.idu.trate.0',
+    'black.idu.trate.1',
+    'black.idu.trate.2'
+  ),
+  
+  hispanic.idu.transmission = c(
+    'hispanic.idu.trate.0',
+    'hispanic.idu.trate.1',
+    'hispanic.idu.trate.2'
+  ),
+  
+  other.idu.transmission = c(
+    'other.idu.trate.0',
+    'other.idu.trate.1',
+    'other.idu.trate.2',
+    'idu.fraction.trate.change.after.t2'
+  ),
+  
+  female.vs.heterosexual.male.idu.susceptibility = 'female.vs.heterosexual.male.idu.susceptibility.rr',
+  
+  msm.idu.transmission = c(
+    'msm.vs.heterosexual.male.idu.susceptibility.rr.peak',
+    'msm.vs.heterosexual.male.idu.susceptibility.rr.0',
+    'msm.vs.heterosexual.male.idu.susceptibility.rr.1',
+    'msm.vs.heterosexual.male.idu.susceptibility.rr.2'
+  ),
+  
+  idu.aging = c(
+    'idu.age1.aging.base',
+    'idu.age2.aging.0',
+    'idu.age2.aging.1',
+    'idu.age3.aging.1'
+  ),
+  
+  young.age.susceptibility = c(
+    'age1.susceptibility.rr.mult',
+    'age2.susceptibility.rr.mult'
+  ),
+  
+  age4.susceptibility = 'age4.susceptibility.rr.mult',
+  
+  age5.susceptibility = 'age5.susceptibility.rr.mult',
+  
+  idu.transitions.0 = c(
+    'black.incident.idu.multiplier.0',
+    'hispanic.incident.idu.multiplier.0',
+    'other.incident.idu.multiplier.0',
+    'msm.incident.idu.multiplier.0'
+  ),
+  
+  idu.transitions.2 = c(
+    'black.incident.idu.multiplier.2',
+    'hispanic.incident.idu.multiplier.2',
+    'other.incident.idu.multiplier.2',
+    'msm.incident.idu.multiplier.2'
+  ),
+  
+  other.idu.transitions = c('idu.remission.multiplier',
+                            'idu.relapse.multiplier'),
+  
+  diagnosed.transmission = c('diagnosed.transmission.rr',
+                             'global.trate'),
+  
+  acute.transmissibility = c('acute.transmissibility.rr',
+                             'global.trate'),
+  
+  msm.heterosexual.testing = c(
+    'msm.proportion.tested.or',
+    'msm.proportion.tested.slope.or',
+    'heterosexual.proportion.tested.or',
+    'heterosexual.proportion.tested.slope.or'
+  ),
+  
+  idu.testing = c(
+    'idu.proportion.tested.or',
+    'idu.proportion.tested.slope.or'
+  ),
+  
+  msm.idu.testing = c(
+    'msm.idu.proportion.tested.or',
+    'msm.idu.proportion.tested.slope.or'
+  ),
+  
+  testing.by.race = c(
+    'black.proportion.tested.or',
+    'hispanic.proportion.tested.or'
+  ),
+  
+  young.age.testing = c('age1.proportion.tested.or',
+                        'age2.proportion.tested.or'),
+  
+  old.age.testing = c('age4.proportion.tested.or',
+                      'age5.proportion.tested.or'),
+  
+  testing.ramp.up = 'testing.ramp.up.vs.current.rr',
+  
+  msm.prep = c(
+    'msm.prep.intercept.or',
+    'msm.prep.slope.or',
+    'oral.prep.persistence'
+  ),
+  
+  non.msm.prep = c(
+    'non.msm.prep.intercept.or',
+    'idu.prep.slope.or',
+    'heterosexual.prep.slope.or'
+  ),
+  
+  prep.by.race = c('black.prep.or',
+                   'hispanic.prep.or',
+                   'prep.efficacy.z'),
+  
+  prep.by.age = c(
+    'age1.prep.or',
+    'age2.prep.or',
+    'age4.prep.or',
+    'age5.prep.or'
+  ),
+  
+  hiv.mortality = c('peak.hiv.mortality',
+                    'hiv.mortality.0',
+                    'hiv.mortality.2')
+)
+EHE.PARAMETER.SAMPLING.BLOCKS = 
+  c(BASE.PARAMETER.SAMPLING.BLOCKS,
+    list(
+      msm.suppression = c(
+        'msm.suppressed.or',
+        'msm.suppressed.slope.or',
+        'msm.idu.suppressed.or',
+        'msm.idu.suppressed.slope.or'
+      ),
+      
+      idu.heterosexual.suppression = c(
+        'idu.suppressed.or',
+        'idu.suppressed.slope.or',
+        'heterosexual.suppressed.or',
+        'heterosexual.suppressed.slope.or'
+      ),
+      
+      suppression.by.race = c(
+        'black.suppressed.or',
+        'black.suppressed.slope.or',
+        'hispanic.suppressed.or',
+        'hispanic.suppressed.slope.or'
+      ),
+      
+      young.suppression = c(
+        'age1.suppressed.or',
+        'age1.suppressed.slope.or',
+        'age2.suppressed.or',
+        'age2.suppressed.slope.or'
+      ),
+      
+      old.suppression = c(
+        'age4.suppressed.or',
+        'age4.suppressed.slope.or',
+        'age5.suppressed.or',
+        'age5.suppressed.slope.or'
+      )
+    ))
+    

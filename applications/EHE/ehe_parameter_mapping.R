@@ -3,79 +3,70 @@
 ##-- THE MAIN FUNCTIONS --##
 ##------------------------##
 
-EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
-                                   check.consistency = !jheem.engine$has.been.crunched())
+EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
+                                   track.used.parameters)
 {
-    specification.metadata = jheem.engine$specification.metadata
+    specification.metadata = model.settings$specification.metadata
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = character()
     
-    #-- Elements with Single Values --#
-    used.names = set.element.values.from.parameters(jheem.engine, 
-                                                    element.names = NULL,
-                                                    parameters = parameters,
-                                                    check.consistency = check.consistency)
-    if (check.consistency)
-        used.parameter.names = c(used.parameter.names, used.names)
-            
+          
     #-- Suppression --#
-    used.names = set.ehe.alphas.from.parameters(jheem.engine,
+    used.names = set.ehe.alphas.from.parameters(model.settings,
                                                 element.name = 'suppression.of.diagnosed',
                                                 parameters = parameters,
                                                 parameter.suffixes = c(intercept='.suppressed.or', slope='.suppressed.slope.or'),
                                                 idu.applies.to.in.remission = F,
-                                                check.consistency = check.consistency)
+                                                track.used.parameters = track.used.parameters)
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, used.names)
     
     
     #-- Testing --#
-    used.names = set.ehe.alphas.from.parameters(jheem.engine,
+    used.names = set.ehe.alphas.from.parameters(model.settings,
                                                 element.name = 'testing',
                                                 parameters = parameters,
                                                 parameter.suffixes = c(intercept='.proportion.tested.or', slope='.proportion.tested.slope.or'),
                                                 idu.applies.to.in.remission = F,
-                                                check.consistency = check.consistency)
+                                                track.used.parameters = track.used.parameters,
+                                                throw.error.if.no.parameters = F)
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, used.names)
     
     
     
-    jheem.engine$set.element.ramp.values(element.name = 'testing',
+    model.settings$set.element.ramp.values(element.name = 'testing',
                                          values = parameters['testing.ramp.up.vs.current.rr'] * c(TESTING.FIRST.YEAR.FRACTION.OF.RAMP,1),
-                                         indices = 2:3,
-                                         check.consistency = check.consistency)
+                                         indices = 2:3)
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, 'testing.ramp.up.vs.current.rr')
     
     #-- PrEP --#
     
     # parameters for PrEP x age and race - are used for both interecept and slope
-    used.names = set.element.functional.form.alphas.from.parameters(jheem.engine = jheem.engine,
+    used.names = set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
                                                                     element.name = 'oral.prep',
                                                                     alpha.name = 'intercept',
                                                                     parameters = parameters,
                                                                     parameter.name.prefix = '',
                                                                     parameter.name.suffix = '.prep.or',
                                                                     dimensions.with.values.referred.to.by.name = 'race',
-                                                                    dimensions.with.values.referred.to.by.index = 'age',
-                                                                    check.consistency = check.consistency)
+                                                                    dimensions.with.values.referred.to.by.index = 'age')
     
-    used.names = set.element.functional.form.alphas.from.parameters(jheem.engine = jheem.engine,
+    used.names = set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
                                                                     element.name = 'oral.prep',
                                                                     alpha.name = 'slope',
                                                                     parameters = parameters,
                                                                     parameter.name.prefix = '',
                                                                     parameter.name.suffix = '.prep.or',
                                                                     dimensions.with.values.referred.to.by.name = 'race',
-                                                                    dimensions.with.values.referred.to.by.index = 'age',
-                                                                    check.consistency = check.consistency)
+                                                                    dimensions.with.values.referred.to.by.index = 'age')
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, used.names)
     
     # parameters for PrEP x sex/risk
@@ -86,65 +77,57 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
     
     
     # Intercepts (only for msm vs non-msm)
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep',
                                                                 alpha.name = 'intercept',
                                                                 values = parameters['msm.prep.intercept.or'],
                                                                 applies.to.dimension.values = 'msm',
-                                                                dimensions = 'sex',
-                                                                check.consistency = check.consistency)
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep',
+                                                                dimensions = 'sex')
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep',
                                                                 alpha.name = 'intercept',
                                                                 values = parameters['non.msm.prep.intercept.or'],
                                                                 applies.to.dimension.values = c('heterosexual_male','female'),
-                                                                dimensions = 'sex',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'sex')
     
 
     # Slopes x3 - msm slope applies to all msm regardless of IDU status (a main effect)
     #             wherease heterosexual and idu slopes are an interaction between sex and risk
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep',
                                                                 alpha.name = 'slope',
                                                                 values = parameters['msm.prep.slope.or'],
                                                                 applies.to.dimension.values = 'msm',
-                                                                dimensions = 'sex',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'sex')
     
-    jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'oral.prep',
+    model.settings$set.element.functional.form.interaction.alphas(element.name = 'oral.prep',
                                                                 alpha.name = 'slope',
                                                                 value = parameters['idu.prep.slope.or'],
-                                                                applies.to.dimension.values=c(sex='heterosexual_male', sex='female', idu.states),
-                                                                check.consistency = check.consistency)
-    jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'oral.prep',
+                                                                applies.to.dimension.values=c(sex='heterosexual_male', sex='female', idu.states))
+    model.settings$set.element.functional.form.interaction.alphas(element.name = 'oral.prep',
                                                                 alpha.name = 'slope',
                                                                 value = parameters['heterosexual.prep.slope.or'],
-                                                                applies.to.dimension.values=c(sex='heterosexual_male', sex='female', non.idu.states),
-                                                                check.consistency = check.consistency)
+                                                                applies.to.dimension.values=c(sex='heterosexual_male', sex='female', non.idu.states))
     
     # PrEP Efficacy
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.msm.rr',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.msm.rr',
                                                                 alpha.name = 'value',
                                                                 values = exp(ORAL.PREP.MSM.RR.LOG.SD*parameters['prep.efficacy.z']),
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.heterosexual.rr',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.heterosexual.rr',
                                                                 alpha.name = 'value',
                                                                 values = exp(ORAL.PREP.HETEROSEXUAL.RR.LOG.SD*parameters['prep.efficacy.z']),
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.idu.rr',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.idu.rr',
                                                                 alpha.name = 'value',
                                                                 values = exp(ORAL.PREP.IDU.RR.LOG.SD*parameters['prep.efficacy.z']),
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, 
                                  'msm.prep.intercept.or',
                                  'non.msm.prep.intercept.or',
@@ -155,14 +138,13 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
     
     #-- Proportion MSM of Male --#
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'proportion.msm.of.male',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'proportion.msm.of.male',
                                                                 alpha.name = 'value',
                                                                 values = parameters['proportion.msm.of.male.mult'],
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, 
                                  'proportion.msm.of.male.mult')
     #-- Transmission Rates --#
@@ -170,152 +152,141 @@ EHE.APPLY.PARAMETERS.FN = function(jheem.engine, parameters,
     trate.times = 0:2
     
     # MSM
-    used.names = set.ehe.trate.alphas.from.parameters(jheem.engine,
+    used.names = set.ehe.trate.alphas.from.parameters(model.settings,
                                                       parameters = parameters,
                                                       category = 'msm',
                                                       age.multiplier.infix = 'msm.susceptibility.rr.mult',
                                                       times=trate.times,
                                                       do.ramp = T,
-                                                      check.consistency = check.consistency)
-    if (check.consistency)
+                                                      track.used.parameters = track.used.parameters)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, used.names)
     
     # Heterosexual
-    used.names = set.ehe.trate.alphas.from.parameters(jheem.engine,
+    used.names = set.ehe.trate.alphas.from.parameters(model.settings,
                                                       parameters = parameters,
                                                       category = 'heterosexual',
                                                       age.multiplier.infix = 'susceptibility.rr.mult',
                                                       times=trate.times,
                                                       do.ramp = T,
-                                                      check.consistency = check.consistency)
-    if (check.consistency)
+                                                      track.used.parameters = track.used.parameters)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, used.names)
     
     # IDU
-    used.names = set.ehe.trate.alphas.from.parameters(jheem.engine,
+    used.names = set.ehe.trate.alphas.from.parameters(model.settings,
                                                       parameters = parameters,
                                                       category = 'idu',
                                                       age.multiplier.infix = 'susceptibility.rr.mult',
                                                       times=trate.times,
                                                       do.ramp = F,
-                                                      check.consistency = check.consistency)
-    if (check.consistency)
+                                                      track.used.parameters = track.used.parameters)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, used.names)
     
     
     # Add in the IDU msm vs het male
     for (time in trate.times)
     {
-        jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
                                                                     alpha.name = paste0('rate', time),
                                                                     values = parameters[paste0('msm.vs.heterosexual.male.idu.susceptibility.rr.', time)],
                                                                     applies.to.dimension.values = 'msm',
-                                                                    dimensions = 'sex.to',
-                                                                    check.consistency = check.consistency)
+                                                                    dimensions = 'sex.to')
         
-        jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
                                                                     alpha.name = paste0('rate', time),
                                                                     values = parameters['female.vs.heterosexual.male.idu.susceptibility.rr'],
                                                                     applies.to.dimension.values = 'female',
-                                                                    dimensions = 'sex.to',
-                                                                    check.consistency = check.consistency)
+                                                                    dimensions = 'sex.to')
     }
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, 
                                  paste0('msm.vs.heterosexual.male.idu.susceptibility.rr.', trate.times),
                                  'female.vs.heterosexual.male.idu.susceptibility.rr')
     
     # Add in the IDU Peak
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
                                                                 alpha.name = 'peak.start',
                                                                 values = parameters['idu.peak.trate.multiplier'],
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
+                                                                dimensions = 'all')
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
                                                                 alpha.name = 'peak.end',
                                                                 values = parameters['idu.peak.trate.multiplier'],
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
                                                                 alpha.name = 'peak.start',
                                                                 values = parameters['msm.vs.heterosexual.male.idu.susceptibility.rr.peak'],
                                                                 applies.to.dimension.values = 'msm',
-                                                                dimensions = 'sex.to',
-                                                                check.consistency = check.consistency)
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
+                                                                dimensions = 'sex.to')
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
                                                                 alpha.name = 'peak.end',
                                                                 values = parameters['msm.vs.heterosexual.male.idu.susceptibility.rr.peak'],
                                                                 applies.to.dimension.values = 'msm',
-                                                                dimensions = 'sex.to',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'sex.to')
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, 'idu.peak.trate.multiplier', 'msm.vs.heterosexual.male.idu.susceptibility.rr.peak')
     
     
     #-- Aging --#
-    used.names = set.ehe.aging.from.parameters(jheem.engine,
+    used.names = set.ehe.aging.from.parameters(model.settings,
                                                parameters = parameters,
                                                times = c('.pre.spike', 0:3),
-                                               check.consistency = check.consistency)
-    if (check.consistency)
+                                               track.used.parameters = track.used.parameters)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, used.names)
     
     
     #-- IDU --#
-    used.names = set.ehe.idu.from.parameters(jheem.engine,
+    used.names = set.ehe.idu.from.parameters(model.settings,
                                              parameters = parameters,
-                                             check.consistency = check.consistency)
-    if (check.consistency)
+                                             track.used.parameters = track.used.parameters)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, used.names)
     
     
     #-- HIV Mortality --#
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
                                                                 alpha.name = 'rate0',
                                                                 values = parameters['hiv.mortality.0'],
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
                                                                 alpha.name = 'rate2',
                                                                 values = parameters['hiv.mortality.2'],
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    jheem.engine$set.element.ramp.values(element.name = 'unsuppressed.hiv.mortality.rate',
+    model.settings$set.element.ramp.values(element.name = 'unsuppressed.hiv.mortality.rate',
                                          values = c(parameters['hiv.mortality.0'], rep(parameters['peak.hiv.mortality'], 2)),
-                                         indices = c('pre.peak', 'peak.start', 'peak.end'),
-                                         check.consistency = check.consistency)
+                                         indices = c('pre.peak', 'peak.start', 'peak.end'))
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, 'hiv.mortality.0', 'hiv.mortality.2', 'peak.hiv.mortality')
     
     
     #-- Diagnosed Transmissibility --#
     
-    jheem.engine$set.element.value(element.name = 'diagnosed.needle.sharing.rr',
-                                   value = parameters['diagnosed.transmission.rr'],
-                                   check.consistency = check.consistency)
+    model.settings$set.element.value(element.name = 'diagnosed.needle.sharing.rr',
+                                   value = parameters['diagnosed.transmission.rr'])
     
-    jheem.engine$set.element.value(element.name = 'diagnosed.sexual.transmission.rr',
-                                   value = parameters['diagnosed.transmission.rr'],
-                                   check.consistency = check.consistency)
+    model.settings$set.element.value(element.name = 'diagnosed.sexual.transmission.rr',
+                                   value = parameters['diagnosed.transmission.rr'])
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, 'diagnosed.transmission.rr')
     
     
     
     #-- Return --#
-    if (check.consistency)
+    if (track.used.parameters)
         invisible(unique(used.parameter.names))
     else
         invisible(used.parameter.names)
@@ -334,9 +305,9 @@ ORAL.PREP.IDU.RR.LOG.SD = (log(EHE_BASE_PARAMETERS$ci.upper['prep.rr.idu']) - lo
 ##-- HELPER FUNCTIONS --##
 ##----------------------##
 
-# Returns the names of parameters used if check.consistency == T
+# Returns the names of parameters used if track.used.parameters == T
 # sex.risk.multiplier gets applied (multiplied in) BEFORE applying transformation
-set.ehe.alphas.from.parameters <- function(jheem.engine,
+set.ehe.alphas.from.parameters <- function(model.settings,
                                            element.name,
                                            parameters,
                                            parameter.suffixes,
@@ -346,10 +317,11 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
                                            sex.risk.multiplier=1,
                                            dimensions.with.values.referred.to.by.name = c('race'),
                                            dimensions.with.values.referred.to.by.index = c('age'),
-                                           check.consistency = !jheem.engine$has.been.crunched())
+                                           track.used.parameters,
+                                           throw.error.if.no.parameters = T)
 {
     #-- Check Arguments --#
-    if (check.consistency)
+    if (track.used.parameters)
     {
         if (length(sex.risk.multiplier)!=1 || is.na(sex.risk.multiplier))
             stop("sex.risk.multiplier must be a single value that is not NA")
@@ -357,7 +329,7 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
         # @need to do
     }
     
-    specification.metadata = jheem.engine$specification.metadata
+    specification.metadata = model.settings$specification.metadata
     
     #-- Invert Parameter values if requested --#
     if (transformation=='reciprocal')
@@ -385,7 +357,7 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
         parameter.suffix = parameter.suffixes[i]
         
         #-- Main Effects --#
-        used.names = set.element.functional.form.alphas.from.parameters(jheem.engine = jheem.engine,
+        used.names = set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
                                                                         element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         parameters = parameters,
@@ -393,10 +365,9 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
                                                                         parameter.name.suffix = parameter.suffix,
                                                                         dimensions.with.values.referred.to.by.name = dimensions.with.values.referred.to.by.name,
                                                                         dimensions.with.values.referred.to.by.index = dimensions.with.values.referred.to.by.index,
-                                                                        check.consistency = check.consistency,
-                                                                        throw.error.if.no.parameters = alpha.name != 'slope')
+                                                                        throw.error.if.no.parameters = throw.error.if.no.parameters)
         
-        if (check.consistency)
+        if (track.used.parameters)
             used.parameter.names = c(used.parameter.names, used.names)
         
         #-- Sex/Risk Interaction Effects --#
@@ -406,13 +377,12 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
         value = parameters[param.name]
         if (!is.na(value))
         {
-            jheem.engine$set.element.functional.form.interaction.alphas(element.name = element.name,
+            model.settings$set.element.functional.form.interaction.alphas(element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
-                                                                        applies.to.dimension.values = c(sex='msm', non.idu.states),
-                                                                        check.consistency = check.consistency)
+                                                                        applies.to.dimension.values = c(sex='msm', non.idu.states))
             
-            if (check.consistency)
+            if (track.used.parameters)
                 used.parameter.names = c(used.parameter.names, param.name)
         }
         
@@ -421,13 +391,12 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
         value = parameters[param.name]
         if (!is.na(value))
         {
-            jheem.engine$set.element.functional.form.interaction.alphas(element.name = element.name,
+            model.settings$set.element.functional.form.interaction.alphas(element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
-                                                                        applies.to.dimension.values = c(sex='heterosexual_male', sex='female', non.idu.states),
-                                                                        check.consistency = check.consistency)
+                                                                        applies.to.dimension.values = c(sex='heterosexual_male', sex='female', non.idu.states))
             
-            if (check.consistency)
+            if (track.used.parameters)
                 used.parameter.names = c(used.parameter.names, param.name)
         }
         
@@ -436,13 +405,12 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
         value = parameters[param.name]
         if (!is.na(value))
         {
-            jheem.engine$set.element.functional.form.interaction.alphas(element.name = element.name,
+            model.settings$set.element.functional.form.interaction.alphas(element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
-                                                                        applies.to.dimension.values = c(sex='heterosexual_male', sex='female', idu.states),
-                                                                        check.consistency = check.consistency)
+                                                                        applies.to.dimension.values = c(sex='heterosexual_male', sex='female', idu.states))
             
-            if (check.consistency)
+            if (track.used.parameters)
                 used.parameter.names = c(used.parameter.names, param.name)
         }
         
@@ -451,13 +419,12 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
         value = parameters[param.name]
         if (!is.na(value))
         {
-            jheem.engine$set.element.functional.form.interaction.alphas(element.name = element.name,
+            model.settings$set.element.functional.form.interaction.alphas(element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
-                                                                        applies.to.dimension.values = c(sex='msm', idu.states),
-                                                                        check.consistency = check.consistency)
+                                                                        applies.to.dimension.values = c(sex='msm', idu.states))
             
-            if (check.consistency)
+            if (track.used.parameters)
                 used.parameter.names = c(used.parameter.names, param.name)
         }
         
@@ -468,18 +435,18 @@ set.ehe.alphas.from.parameters <- function(jheem.engine,
 }
 
 
-set.ehe.trate.alphas.from.parameters <- function(jheem.engine,
+set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                  parameters,
                                                  category,
                                                  age.multiplier.infix,
                                                  times,
                                                  do.ramp,
-                                                 check.consistency)
+                                                 track.used.parameters)
 {
     elem.name = paste0(category, '.trates')
     used.parameter.names = character()
     
-    specification.metadata = jheem.engine$specification.metadata
+    specification.metadata = model.settings$specification.metadata
     for (time in times)
     {
         alpha.name = paste0('rate', time)
@@ -488,14 +455,13 @@ set.ehe.trate.alphas.from.parameters <- function(jheem.engine,
         for (race in specification.metadata$dim.names$race)
         {
             param.name = paste0(race, '.', category, '.trate.', time)
-            jheem.engine$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+            model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
                                                                         alpha.name = alpha.name,
                                                                         values = parameters[param.name],
                                                                         applies.to.dimension.values = race,
-                                                                        dimensions = 'race.to',
-                                                                        check.consistency = check.consistency)
+                                                                        dimensions = 'race.to')
             
-            if (check.consistency)
+            if (track.used.parameters)
                 used.parameter.names = c(used.parameter.names, param.name)
         }
         
@@ -524,15 +490,14 @@ set.ehe.trate.alphas.from.parameters <- function(jheem.engine,
             # Set if the parameter exists
             if (!is.na(param.value))
             {
-                jheem.engine$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
                                                                             alpha.name = alpha.name,
                                                                             values = param.value,
                                                                             applies.to.dimension.values = age.index,
-                                                                            dimensions = 'age.to',
-                                                                            check.consistency = check.consistency)
+                                                                            dimensions = 'age.to')
                 
                 
-                if (check.consistency)
+                if (track.used.parameters)
                     used.parameter.names = c(used.parameter.names, param.name)
             }
         }
@@ -542,25 +507,23 @@ set.ehe.trate.alphas.from.parameters <- function(jheem.engine,
     if (do.ramp)
     {
         param.name = paste0(category, ".peak.trate.multiplier")
-        jheem.engine$set.element.ramp.values(element.name = elem.name,
+        model.settings$set.element.ramp.values(element.name = elem.name,
                                              values = rep(parameters[param.name], 2),
-                                             indices = c('peak.start','peak.end'),
-                                             check.consistency = check.consistency)
+                                             indices = c('peak.start','peak.end'))
         
-        if (check.consistency)
+        if (track.used.parameters)
             used.parameter.names = c(used.parameter.names, param.name)
     }
     
     # After Modifier
     param.name = paste0(category, '.fraction.trate.change.after.t2')
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
                                                                 alpha.name = 'after.modifier',
                                                                 values = parameters[param.name],
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, param.name)
     
     
@@ -568,15 +531,15 @@ set.ehe.trate.alphas.from.parameters <- function(jheem.engine,
     used.parameter.names
 }
 
-set.ehe.aging.from.parameters <- function(jheem.engine,
+set.ehe.aging.from.parameters <- function(model.settings,
                                           parameters,
                                           times,
                                           idu.applies.to.in.remission = T,
-                                          check.consistency)
+                                          track.used.parameters)
 {
     #-- Some set-up --#
     used.parameter.names = character()
-    specification.metadata = jheem.engine$specification.metadata
+    specification.metadata = model.settings$specification.metadata
     
     if (idu.applies.to.in.remission)
         idu.states = specification.metadata$compartment.aliases$idu.states
@@ -591,27 +554,22 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
     for (time in times)
     {
         alpha.name = paste0('rate',time)
-        jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+        model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                     alpha.name = alpha.name,
                                                                     value = parameters['msm.age1.aging.base'],
-                                                                    applies.to.dimension.values=list(sex='msm', age=1, risk = non.idu.states),
-                                                           #         applies.to.dimension.values=list(sex='msm', age=1),
-                                                                    check.consistency = check.consistency)
+                                                                    applies.to.dimension.values=list(sex='msm', age=1, risk = non.idu.states))
         
-        jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+        model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                     alpha.name = alpha.name,
                                                                     value = parameters['heterosexual.age1.aging.base'],
-                                                                    applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=non.idu.states),
-                                                                    check.consistency = check.consistency)
+                                                                    applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=non.idu.states))
         
-        jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+        model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                     alpha.name = alpha.name,
                                                                     value = parameters['idu.age1.aging.base'],
-                                                                    applies.to.dimension.values=list(age=1, risk=idu.states),
-                                                               #     applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=idu.states),
-                                                                    check.consistency = check.consistency)
+                                                                    applies.to.dimension.values=list(age=1, risk=idu.states))
         
-        if (check.consistency)
+        if (track.used.parameters)
             used.parameter.names = c(used.parameter.names, 
                                      'msm.age1.aging.base',
                                      'heterosexual.age1.aging.base',
@@ -624,14 +582,12 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
             
             if (!is.na(param.value))
             {
-                jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+                model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
-                                                                            applies.to.dimension.values=list(sex='msm', age=age.index, risk=non.idu.states),
-                                                                    #        applies.to.dimension.values=list(sex='msm', age=age.index),
-                                                                            check.consistency = check.consistency)
+                                                                            applies.to.dimension.values=list(sex='msm', age=age.index, risk=non.idu.states))
                 
-                if (check.consistency)
+                if (track.used.parameters)
                     used.parameter.names = c(used.parameter.names, param.name)
             }
             
@@ -641,13 +597,12 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
             
             if (!is.na(param.value))
             {
-                jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+                model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
-                                                                            applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=age.index, risk=non.idu.states),
-                                                                            check.consistency = check.consistency)
+                                                                            applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=age.index, risk=non.idu.states))
                 
-                if (check.consistency)
+                if (track.used.parameters)
                     used.parameter.names = c(used.parameter.names, param.name)
             }
             
@@ -656,14 +611,12 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
             
             if (!is.na(param.value))
             {
-                jheem.engine$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+                model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
-                                                                            applies.to.dimension.values=list(age=age.index, risk=idu.states),
-                                                                       #     applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=age.index, risk=idu.states),
-                                                                            check.consistency = check.consistency)
+                                                                            applies.to.dimension.values=list(age=age.index, risk=idu.states))
                 
-                if (check.consistency)
+                if (track.used.parameters)
                     used.parameter.names = c(used.parameter.names, param.name)
             }
         }
@@ -674,13 +627,13 @@ set.ehe.aging.from.parameters <- function(jheem.engine,
     used.parameter.names
 }
 
-set.ehe.idu.from.parameters = function(jheem.engine,
+set.ehe.idu.from.parameters = function(model.settings,
                                        parameters,
                                        times = c(0,2),
-                                       check.consistency)
+                                       track.used.parameters)
 {
     used.parameter.names = character()
-    specification.metadata = jheem.engine$specification.metadata
+    specification.metadata = model.settings$specification.metadata
     
     for (time in times)
     {
@@ -688,45 +641,41 @@ set.ehe.idu.from.parameters = function(jheem.engine,
         for (race in specification.metadata$dim.names$race)
         {
             param.name = paste0(race, '.incident.idu.multiplier.', time)
-            jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
+            model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
                                                                         alpha.name = alpha.name,
                                                                         values = parameters[param.name],
                                                                         applies.to.dimension.values = race,
-                                                                        dimensions = 'race',
-                                                                        check.consistency = check.consistency)
+                                                                        dimensions = 'race')
             
-            if (check.consistency)
+            if (track.used.parameters)
                 used.parameter.names = c(used.parameter.names, param.name)
         }
         
         param.name = paste0('msm.incident.idu.multiplier.', time)
-        jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
                                                                     alpha.name = alpha.name,
                                                                     values = parameters[param.name],
                                                                     applies.to.dimension.values = 'msm',
-                                                                    dimensions = 'sex',
-                                                                    check.consistency = check.consistency)
+                                                                    dimensions = 'sex')
         
-        if (check.consistency)
+        if (track.used.parameters)
             used.parameter.names = c(used.parameter.names, param.name)
     }
     
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'idu.remission',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.remission',
                                                                 alpha.name = 'value',
                                                                 values = parameters['idu.remission.multiplier'],
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    jheem.engine$set.element.functional.form.main.effect.alphas(element.name = 'idu.relapse',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.relapse',
                                                                 alpha.name = 'value',
                                                                 values = parameters['idu.relapse.multiplier'],
                                                                 applies.to.dimension.values = 'all',
-                                                                dimensions = 'all',
-                                                                check.consistency = check.consistency)
+                                                                dimensions = 'all')
     
-    if (check.consistency)
+    if (track.used.parameters)
         used.parameter.names = c(used.parameter.names, 'idu.remission.multiplier', 'idu.relapse.multiplier')
     
     # Return

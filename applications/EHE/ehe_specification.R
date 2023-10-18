@@ -8,7 +8,6 @@ source('../jheem2/R/tests/source_jheem2_package.R')
     
 # Source supporting files
 source('../jheem_analyses/source_code.R')
-
  
 
 ##--------------------##
@@ -1167,7 +1166,8 @@ register.model.element.values(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.transmission.rates',
-                        value = 0)
+                        value = 0,
+                        scale = 'rate')
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.transmission.rates',
@@ -1384,6 +1384,121 @@ register.model.element(EHE.SPECIFICATION,
                        functional.form.to.time = TRATE.KNOT.TIMES[1]
 )
 
+
+##-----------------------------------##
+##-----------------------------------##
+##-- FOREGROUNDS for COVID EFFECTS --##
+##-----------------------------------##
+##-----------------------------------##
+
+N.COVID.MONTHS = 25
+N.COVID.MONTHS.UNTIL.TAPER = 13
+
+#-- Testing --#
+
+covid.testing.foreground = create.covid.foreground(
+    quantity.name = 'testing',
+    scale = 'rate',
+    n.covid.months = N.COVID.MONTHS,
+    n.months.until.taper = N.COVID.MONTHS.UNTIL.TAPER,
+    age.effect.magnitude.parameter.names = list(
+        'young.covid.testing.rr',
+        character(),
+        'old.covid.testing.rr'
+    ),
+    age.target.populations = list(
+        create.target.population(age=1:2, name='Young'),
+        create.target.population(age=3, name='Middle-aged'),
+        create.target.population(age=1:3, invert = T, name='Old')
+    ),
+    race.effect.magnitude.parameter.names = list(
+        black='black.covid.testing.rr',
+        hispanic='hispanic.covid.testing.rr',
+        other='other.covid.testing.rr'
+    ),
+    race.target.populations = list(
+        black = BLACK,
+        hispanic = HISPANIC,
+        other = NON.BLACK.NON.HISPANIC
+    ),
+    mobility.correlation.parameter.name = 'covid.mobility.correlation')
+  
+register.model.foreground(EHE.SPECIFICATION,
+                          foreground = covid.testing.foreground,
+                          name = 'covid.testing')
+
+register.default.parameter.values(EHE.SPECIFICATION,
+                                  c(black.covid.testing.rr = 1,
+                                    hispanic.covid.testing.rr = 1,
+                                    other.covid.testing.rr = 1,
+                                    young.covid.testing.rr = 1,
+                                    old.covid.testing.rr = 1,
+                                    covid.mobility.correlation = 1))
+
+#-- Sexual Transmission --#
+
+covid.sexual.transmission.foreground = create.covid.foreground(
+    quantity.name = 'sexual.transmission.rates',
+    scale = 'rate',
+    n.covid.months = N.COVID.MONTHS,
+    n.months.until.taper = N.COVID.MONTHS.UNTIL.TAPER,
+    age.effect.magnitude.parameter.names = list(
+        'young.covid.sexual.transmission.rr',
+        character(),
+        'old.covid.sexual.transmission.rr'
+    ),
+    age.target.populations = list(
+        create.target.population(age.to=1:2, name='Young'),
+        create.target.population(age.to=3, name='Middle-aged'),
+        create.target.population(age.to=1:3, invert = T, name='Old')
+    ),
+    race.effect.magnitude.parameter.names = list(
+        black='black.covid.sexual.transmission.rr',
+        hispanic='hispanic.covid.sexual.transmission.rr',
+        other='other.covid.sexual.transmission.rr'
+    ),
+    race.target.populations = list(
+        black = BLACK.TO,
+        hispanic = HISPANIC.TO,
+        other = NON.BLACK.NON.HISPANIC.TO
+    ),
+    mobility.correlation.parameter.name = 'covid.mobility.correlation')
+
+register.model.foreground(EHE.SPECIFICATION,
+                          foreground = covid.sexual.transmission.foreground,
+                          name = 'covid.sexual.transmission')
+
+register.default.parameter.values(EHE.SPECIFICATION,
+                                  c(black.covid.sexual.transmission.rr = 10,
+                                    hispanic.covid.sexual.transmission.rr = 1,
+                                    other.covid.sexual.transmission.rr = 1,
+                                    young.covid.sexual.transmission.rr = 5,
+                                    old.covid.sexual.transmission.rr = 3,
+                                    covid.mobility.correlation = 1))
+
+#-- IV Transmission --#
+
+covid.iv.transmission.foreground = create.model.foreground(
+    WHOLE.POPULATION,
+    create.covid.intervention.effect('idu.trates',
+                                     scale = 'rate',
+                                     n.covid.months = N.COVID.MONTHS,
+                                     n.months.until.taper = N.COVID.MONTHS.UNTIL.TAPER,
+                                     effect.magnitude.parameter.names = 'covid.iv.transmission.rr',
+                                     mobility.correlation.parameter.name = 'covid.mobility.correlation'
+                                     )
+)
+
+register.model.foreground(EHE.SPECIFICATION,
+                          foreground = covid.iv.transmission.foreground,
+                          name = 'covid.iv.transmission')
+
+register.default.parameter.values(EHE.SPECIFICATION,
+                                  c(covid.iv.transmission.rr = 1))
+#-- Suppression --#
+
+#-- PrEP --#
+
 ##--------------------------##
 ##--------------------------##
 ##-- SET TRACKED OUTCOMES --##
@@ -1402,7 +1517,7 @@ track.transition(EHE.SPECIFICATION,
                  from.compartments = 'undiagnosed.states',
                  to.compartments = 'first.diagnosed.states',
                  keep.dimensions = c('location','age','race','sex','risk'),
-                 corresponding.data.outcome = 'new')
+                 corresponding.data.outcome = 'diagnoses')
 
 track.dynamic.outcome(EHE.SPECIFICATION,
                       name = 'incidence',
@@ -1502,5 +1617,13 @@ track.integrated.outcome(EHE.SPECIFICATION,
 
 register.model.specification(EHE.SPECIFICATION)
 
+source('../jheem_analyses/applications/EHE/ehe_parameters_helpers.R')
+source('../jheem_analyses/applications/EHE/ehe_parameters.R')
+source('../jheem_analyses/applications/EHE/ehe_parameter_mapping.R')
 
+register.calibrated.parameters.for.version('ehe',
+                                           distribution = EHE.PARAMETERS.PRIOR,
+                                           apply.function = EHE.APPLY.PARAMETERS.FN,
+                                           sampling.blocks = EHE.PARAMETER.SAMPLING.BLOCKS,
+                                           join.with.previous.version = F)
 

@@ -4,6 +4,19 @@ if (1==2)
     test.n = c(2816,513,4951,56552,151476,89716,23030,6263)
     test.endpoints = c(0,13,15,25,35,45,55,65,100)
     
+    smoothed.endpoints = 0:100
+    smoothed.n = get.smoothed.age.bracket.counts(observed.n.per.bracket = test.n,
+                                                 observed.age.endpoints = test.endpoints,
+                                                 desired.age.endpoints = smoothed.endpoints)
+    
+    library(ggplot2)
+    
+    qplot(x=c((test.endpoints[-1] + test.endpoints[-length(test.endpoints)])/2,
+              (smoothed.endpoints[-1] + smoothed.endpoints[-length(smoothed.endpoints)])/2),
+          y=c(test.n/max(test.n), smoothed.n/max(smoothed.n)),
+          geom = 'line',
+          color = c(rep("observed", length(test.n)), rep("smoothed", length(smoothed.n))))
+    
     load('../jheem_analyses/cached/ALL.DATA.MANAGERS.Rdata')
     source('../jheem2/R/ONTOLOGY_ontology_mappings.R')
     source('../jheem_analyses/EHE/ehe_specification_helpers.R')
@@ -214,7 +227,7 @@ get.cumulative.age.smoother <- function(observed.n.per.bracket,
     if (!is.numeric(observed.age.endpoints))
         stop("'observed.age.endpoints' must be a NUMERIC vector")
     if (length(observed.age.endpoints) != (n.brackets+1))
-        stop("'observed.age.endpoints' must have length == length(n.per.bracket) + 1")
+        stop("'observed.age.endpoints' must have length == length(observed.n.per.bracket) + 1")
     if (any(is.na(observed.age.endpoints)))
         stop("'observed.age.endpoints' cannot contain NA values")
     if (any(observed.age.endpoints<0))
