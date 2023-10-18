@@ -41,29 +41,29 @@ data.manager$register.outcome(
 data.manager$register.outcome(
   'linkage_1mo',
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'linkage_1mo',
-    axis.name = 'linkage_1mo (n)',
-    units = 'proportion',
-    description = "Linkage to HIV care within 1 Month"))
+    scale = 'proportion',
+    display.name = 'Linkage (1 month)',
+    axis.name = 'Proportion Linked (1 month)',
+    units = '%',
+    description = "Linkage to HIV care within 1 Month"), denominator.outcome = 'diagnoses')
 
 data.manager$register.outcome(
   'engagement', #changed from receipt to engagement
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'engagement',
-    axis.name = 'engagement (n)',
-    units = 'proportion',
-    description = "Engagement in  HIV medical care"))
+    scale = 'proportion',
+    display.name = 'Engagement',
+    axis.name = 'Engagement',
+    units = '%',
+    description = "Engagement in  HIV medical care"), denominator.outcome = 'diagnosed.prevalence')
 
 data.manager$register.outcome(
   'suppression', 
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'suppression',
-    axis.name = 'suppression (n)',
-    units = 'proportion',
-    description = "HIV Viral Suppression"))
+    scale = 'proportion',
+    display.name = 'Suppression',
+    axis.name = 'Suppression',
+    units = '%',
+    description = "HIV Viral Suppression"), denominator.outcome = 'diagnosed.prevalence')
 
 data.manager$register.outcome(
   'awareness', #changed from knowledge to awareness
@@ -72,14 +72,14 @@ data.manager$register.outcome(
     display.name = 'awareness',
     axis.name = 'awareness (n)',
     units = 'proportion',
-    description = "Awareness of Status"))
+    description = "Awareness of Status")) #WHAT SHOULD THIS DENOMINATOR VALUE BE#
 
 data.manager$register.outcome(
   'prep', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'prep',
-    axis.name = 'prep (n)',
+    display.name = 'PrEP',
+    axis.name = 'PrEP',
     units = 'cases',
     description = "PrEP Use"))
 
@@ -87,8 +87,8 @@ data.manager$register.outcome(
   'prep.indications', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'prep indications',
-    axis.name = 'prep indications (n)',
+    display.name = 'PrEP Indications',
+    axis.name = 'PrEP Indications',
     units = 'cases',
     description = "PrEP Indications"))
 
@@ -96,8 +96,8 @@ data.manager$register.outcome(
   'aids.diagnosed.prevalence', #changed from aids.diagnosis to aids.diagnosed.prevalence
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'aids diagnosed prevalence',
-    axis.name = 'aids diagnosed prevalence (n)',
+    display.name = 'AIDS Diagnosed Prevalence',
+    axis.name = 'AIDS Diagnosed Prevalence',
     units = 'cases',
     description = "AIDS Diagnosed Prevalence"))
 
@@ -105,8 +105,8 @@ data.manager$register.outcome(
   'aids.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'aids diagnoses',
-    axis.name = 'aids diagnoses (n)',
+    display.name = 'AIDS Diagnoses',
+    axis.name = 'AIDS Diagnoses',
     units = 'cases',
     description = "AIDS Diagnoses"))
 
@@ -114,8 +114,8 @@ data.manager$register.outcome(
   'gonorrhea',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'gonorrhea',
-    axis.name = 'gonorrhea (n)',
+    display.name = 'Gonorrhea',
+    axis.name = 'Gonorrhea',
     units = 'cases',
     description = "Gonorrhea"))
 
@@ -123,8 +123,8 @@ data.manager$register.outcome(
   'ps.syphilis',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'primary and secondary syphilis',
-    axis.name = 'primary and secondary syphilis (n)',
+    display.name = 'Primary and Secondary Syphilis',
+    axis.name = 'Primary and Secondary Syphilis',
     units = 'cases',
     description = "Primary and Secondary Syphilis"))
 
@@ -132,8 +132,8 @@ data.manager$register.outcome(
   'early.syphilis',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'early syphilis',
-    axis.name = 'early syphilis (n)',
+    display.name = 'Early, non-primary, non-Secondary Syphilis',
+    axis.name = 'Early, non-primary, non-Secondary Syphilis',
     units = 'cases',
     description = "Early, non-primary, non-Secondary Syphilis"))
 
@@ -141,8 +141,8 @@ data.manager$register.outcome(
   'congenital.syphilis',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'congenital syphilis',
-    axis.name = 'congenital syphilis (n)',
+    display.name = 'Congenital Syphilis',
+    axis.name = 'Congenital Syphilis',
     units = 'cases',
     description = "Congenital Syphilis"))
 
@@ -176,38 +176,38 @@ data.manager$register.outcome(
 data.manager$register.outcome(
   'hiv.test.positivity', #This was newly.diagnosed.positives, changing it to hiv.test.positivity put this in as a percentage not a count#
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'hiv test positivity',
-    axis.name = 'hiv test positivity (n)',
-    units = 'proportion',
-    description = "HIV Test Positivity"))
+    scale = 'proportion',
+    display.name = 'HIV Test Positivity',
+    axis.name = 'HIV Test Positivity',
+    units = '%',
+    description = "HIV Test Positivity"), denominator.outcome = 'hiv.tests')
 
 data.manager$register.outcome(
   'linkage_3mo',
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'linkage_3mo',
-    axis.name = 'linkage_3mo (n)',
-    units = 'proportion',
-    description = "Linkage to HIV care within 3 Months"))
+    scale = 'proportion',
+    display.name = 'Linkage (3 months)',
+    axis.name = 'Proportion Linked (3 months)',
+    units = '%',
+    description = "Linkage to HIV care within 3 Months"), denominator.outcome = 'diagnoses')
 
 data.manager$register.outcome(
   'retention',  #Defined as:Individuals with ≥2 tests (CD4 or VL) ≥3 months apart#
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'retention',
     axis.name = 'retention',
-    units = 'proportion',
-    description = "Retention in Care"))
+    units = '%',
+    description = "Retention in Care"), denominator.outcome = 'diagnosed.prevalence')
 
 data.manager$register.outcome(
   'retention.of.engaged', #Defined as >=2 tests (CD4 or VL) divided by >=1 test
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'retention of engaged',
+    scale = 'proportion',
+    display.name = 'Retention of Engaged',
     axis.name = 'retention of engaged',
-    units = 'proportion',
-    description = "Retention of Engaged in Care"))
+    units = '%',
+    description = "Retention of Engaged in Care"), denominator.outcome = 'diagnosed.prevalence')
 
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
