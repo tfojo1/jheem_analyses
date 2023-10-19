@@ -65,14 +65,23 @@ data.manager$register.outcome(
     units = '%',
     description = "HIV Viral Suppression"), denominator.outcome = 'diagnosed.prevalence')
 
+data.manager$register.outcome(  #Adding this as a denominator value for awareness/knowledge of status- bc the cdc denominator is an estimated prevalence value of both known and unknown status#
+  'total.prevalence',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Total Prevalence',
+    axis.name = 'Total Prevalence',
+    units = 'cases',
+    description = "Estimated Prevalence of Known and Unknown Status"))
+
 data.manager$register.outcome(
   'awareness', #changed from knowledge to awareness
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'awareness',
-    axis.name = 'awareness (n)',
-    units = 'proportion',
-    description = "Awareness of Status")) #WHAT SHOULD THIS DENOMINATOR VALUE BE#
+    scale = 'proportion',
+    display.name = 'Awareness',
+    axis.name = 'Awareness',
+    units = '%',
+    description = "Awareness of Status"), denominator.outcome = 'total.prevalence') #creating outcome that is pop values for awarness#
 
 data.manager$register.outcome(
   'prep', 
@@ -756,6 +765,74 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
   
 } )
 
+#Create a new dataset to put in the 'population' column for the outcome=knowledge/awareness data
+#this is because this proportion has a denominator value which is an estimation of both dx and un-dx hiv cases and we don't have this anywhere else
+#Clean knowldge population
+data.list.clean.awareness.population = lapply(data.list.knowledge, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$outcome = "total.prevalence"
+  
+  names(data)[names(data)=='Year'] = 'year'   
+  data$year = substring(data$year,1, 4)                                          
+  data$year = as.character(data$year)
+  
+  #Pulling from 'population' variable
+  data$Population[data$Population %in% c("Data suppressed")] = NA    
+  data$Population[data$Population %in% c("Data not available")] = NA 
+  data$Population = as.numeric(gsub(",", '', data$Population))  
+  data$value = data$Population
+  
+  
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
+    names(data)[names(data)=='Geography'] = 'state'
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
+  }
+  if(grepl("ehe", filename)) {
+    data$location = as.character(data$FIPS)
+  }
+  if(grepl("msa", filename)) {
+    data$msa_indicator= substring(data$FIPS, 6, 10)
+    
+    data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+    data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    
+    data$cbsa = substring(data$FIPS, 1, 5)
+    data$location = paste("C", data$cbsa, sep=".")
+  }
+  if(grepl("allcounty", filename)) {
+    data$location = as.character(data$FIPS)
+  }  
+  
+  if(grepl("age", filename)) {
+    data$age = age.mappings[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    names(data)[names(data)=='Race.Ethnicity'] = 'race'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("male", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("female", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("risk", filename)) {
+    data$risk = risk.mappings[data$Transmission.Category]
+  }
+  
+  list(filename, data) 
+} )
+
 #############################################################################
   ###Adding in Section for Atlas Plus PrEP data- outcomes are PrEP and
   ##PrEP indications
@@ -982,6 +1059,20 @@ for (data in deaths_notes) {
      details = 'CDC Atlas Plus data')
  }
  
+ ##outcome= total.prevalence (for population for knowledge
+total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)  
+ 
+ for (data in total_prev_all) {
+   
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc',
+     dimension.values = list(),
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+     details = 'CDC Atlas Plus data')
+ }
+
  ##Outcome=prep 
  prep_atlas_all = lapply(data.list.clean.atlas.prep, `[[`, 2)  
  
