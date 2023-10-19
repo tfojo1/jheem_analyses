@@ -83,8 +83,10 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
   }
 
   data$outcome = "hiv.test.positivity"
-  data$value = as.numeric(data$`Percent of persons newly diagnosed with HIV`)
-  data$value = round(data$value, digits=2)
+  data$value = (data$`Number of persons newly diagnosed with HIV`)/(data$`Number of HIV tests conducted`)
+  data$value = round(data$value, digits=3)
+  
+  data$value_check = (as.numeric(data$`Percent of persons newly diagnosed with HIV`))/100
   
   data <- data %>%
     select( year, location, value, outcome)
@@ -201,9 +203,11 @@ data.list.city.positivity.clean = lapply(city_tests, function(file){
   data$location =locations::get.cbsa.for.msa.name(data$msa)
   
   data$outcome = "hiv.test.positivity"
+  data$outcome = "hiv.test.positivity"
+  data$value = (data$`Number of persons newly diagnosed with HIV`)/(data$`Number of HIV tests conducted`)
+  data$value = round(data$value, digits=3)
   
-  data$value = as.numeric(data$`Percent of persons newly diagnosed with HIV`)
-  data$value = round(data$value, digits=2)
+  data$value_check = (as.numeric(data$`Percent of persons newly diagnosed with HIV`))/100
   
   if(grepl("2018", filename)) {
     data$year = "2018"
