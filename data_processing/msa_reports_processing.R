@@ -67,6 +67,9 @@ risk.msa.mappings = c('1'= 'msm',
                       '3'= 'msm_idu',
                       '4'= 'heterosexual',
                       '5'= 'other')
+
+outcome.mappings.v2 = c('diagnoses'='diagnoses',
+                     'prevalence' = 'diagnosed.prevalence')
 ################################################################################
                             ###MSA DEATHS BY SEX### 
 ################################################################################
@@ -143,7 +146,7 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
 
   
   data <- data%>%
-    select(location, diagnoses_num, prevalence_num) %>%
+    #select(location, diagnoses_num, prevalence_num) %>%
     pivot_longer(cols=c(one_of('diagnoses_num', 'prevalence_num')),
                         names_to = "outcome",
                         values_to = "value")
@@ -176,6 +179,12 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   if(grepl("2017 new 2016", filename)){
     data$year = ifelse(data$outcome == "diagnoses", "2017", "2016")
   }
+  if(grepl("2018 new 2018", filename)){
+    data$year = ifelse(data$outcome == "diagnoses", "2018", "2018")
+  }
+  
+  data$outcome = outcome.mappings.v2[data$outcome]
+  
   data= as.data.frame(data)
   list(filename, data) 
   
@@ -243,6 +252,9 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   if(grepl("2018 new 2018", filename)){
     data$year = "2018"
   }
+  
+  data$outcome = outcome.mappings.v2[data$outcome]
+  
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -365,6 +377,7 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
                  values_to = "value")
   
   data$age = age.msa.mappings[data$age]
+  data$outcome = outcome.mappings.v2[data$outcome]
   
   data= as.data.frame(data)
   
@@ -642,6 +655,7 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
        data$outcome= data$outcome_new
      }   
      
+  data$outcome = outcome.mappings.v2[data$outcome]
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -764,6 +778,7 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
 
      
 data$race = race.msa.mappings[data$race]
+data$outcome = outcome.mappings.v2[data$outcome]
    
 data= as.data.frame(data)
 
@@ -894,6 +909,7 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
                  values_to = "value")
   
   data$risk= risk.msa.mappings[data$risk]
+  data$outcome = outcome.mappings.v2[data$outcome]
   
   data= as.data.frame(data)
   
@@ -1048,6 +1064,7 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
                  values_to = "value")
   
   data$risk= risk.msa.mappings[data$risk]
+  data$outcome = outcome.mappings.v2[data$outcome]
   
   data= as.data.frame(data)
   
