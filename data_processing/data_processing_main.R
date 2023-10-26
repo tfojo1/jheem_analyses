@@ -15,8 +15,8 @@ data.manager$register.outcome(
   'diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'new diagnoses',
-    axis.name = 'new diagnoses (n)',
+    display.name = 'New Diagnoses',
+    axis.name = 'New Diagnoses (n)',
     units = 'cases',
     description = "New HIV Cases Diagnosed in a Year"))
 
@@ -24,8 +24,8 @@ data.manager$register.outcome(
 'hiv.deaths',
 metadata = create.outcome.metadata(
   scale = 'non.negative.number',
-  display.name = 'hiv deaths',
-  axis.name = 'hiv deaths (n)',
+  display.name = 'HIV Deaths',
+  axis.name = 'HIV Deaths (n)',
   units = 'cases',
   description = "HIV Deaths"))
 
@@ -33,8 +33,8 @@ data.manager$register.outcome(
   'diagnosed.prevalence', #Changing this from prevalence to diagnosed.prevalence bc CDC's prevalence only includes people who know their status#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'diganosed prevalence',
-    axis.name = 'diganosed prevalence (n)',
+    display.name = 'Diganosed Prevalence',
+    axis.name = 'Diganosed Prevalence (n)',
     units = 'cases',
     description = "Diagnosed HIV Prevalence"))
 
@@ -51,8 +51,8 @@ data.manager$register.outcome(
   'engagement', #changed from receipt to engagement
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'Engagement',
-    axis.name = 'Engagement',
+    display.name = 'Engagement in Care',
+    axis.name = 'Proportion of Engaged in Care',
     units = '%',
     description = "Engagement in  HIV medical care"), denominator.outcome = 'diagnosed.prevalence')
 
@@ -60,37 +60,46 @@ data.manager$register.outcome(
   'suppression', 
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'Suppression',
-    axis.name = 'Suppression',
+    display.name = 'Viral Suppression',
+    axis.name = 'Proportion Virally Suppressed',
     units = '%',
     description = "HIV Viral Suppression"), denominator.outcome = 'diagnosed.prevalence')
+
+data.manager$register.outcome(  #Adding this as a denominator value for awareness/knowledge of status- bc the cdc denominator is an estimated prevalence value of both known and unknown status#
+  'total.prevalence',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Total Prevalence',
+    axis.name = 'Total Prevalence',
+    units = 'cases',
+    description = "Estimated Prevalence of Known and Unknown Status"))
 
 data.manager$register.outcome(
   'awareness', #changed from knowledge to awareness
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'awareness',
-    axis.name = 'awareness (n)',
-    units = 'proportion',
-    description = "Awareness of Status")) #WHAT SHOULD THIS DENOMINATOR VALUE BE#
+    scale = 'proportion',
+    display.name = 'Awareness of HIV Status',
+    axis.name = 'Proportion Aware of HIV Status',
+    units = '%',
+    description = "Awareness of HIV Status"), denominator.outcome = 'total.prevalence') #creating outcome that is pop values for awarness#
 
 data.manager$register.outcome(
   'prep', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'PrEP',
-    axis.name = 'PrEP',
+    display.name = 'Prescribed PrEP',
+    axis.name = 'Number Prescribed PrEP',
     units = 'cases',
-    description = "PrEP Use"))
+    description = "Number Prescribed PrEP"))
 
 data.manager$register.outcome(
   'prep.indications', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'PrEP Indications',
-    axis.name = 'PrEP Indications',
+    axis.name = 'Number with PrEP Indications',
     units = 'cases',
-    description = "PrEP Indications"))
+    description = "Estimated Number of Persons with PrEP Indications"))
 
 data.manager$register.outcome(
   'aids.diagnosed.prevalence', #changed from aids.diagnosis to aids.diagnosed.prevalence
@@ -150,8 +159,8 @@ data.manager$register.outcome(
   'heroin', #can change to heroin use but leave display name the same#
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'heroin use in the past year',
-    axis.name = 'heroin use in the past year (n)',
+    display.name = 'Heroin Use in the Past Year',
+    axis.name = 'Heroin Use in the Past Year (n)',
     units = 'cases',
     description = "Heroin Use in the Past Year"))
 
@@ -159,8 +168,8 @@ data.manager$register.outcome(
   'cocaine', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'cocaine use in the past year',
-    axis.name = 'cocaine use in the past year (n)',
+    display.name = 'Cocaine use in the Past Year',
+    axis.name = 'Cocaine use in the Past Year (n)',
     units = 'cases',
     description = "Cocaine Use in the Past Year"))
 
@@ -168,10 +177,10 @@ data.manager$register.outcome(
   'hiv.tests',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'hiv tests',
-    axis.name = 'hiv tests (n)',
+    display.name = 'HIV Tests',
+    axis.name = 'HIV Tests (n)',
     units = 'cases',
-    description = "HIV Tests"))
+    description = "Count of CDC Funded HIV Tests"))
 
 data.manager$register.outcome(
   'hiv.test.positivity', #This was newly.diagnosed.positives, changing it to hiv.test.positivity put this in as a percentage not a count#
@@ -195,8 +204,8 @@ data.manager$register.outcome(
   'retention',  #Defined as:Individuals with ≥2 tests (CD4 or VL) ≥3 months apart#
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'retention',
-    axis.name = 'retention',
+    display.name = 'Retention',
+    axis.name = 'Proportion Retained in Care',
     units = '%',
     description = "Retention in Care"), denominator.outcome = 'diagnosed.prevalence')
 
@@ -205,7 +214,7 @@ data.manager$register.outcome(
   metadata = create.outcome.metadata(
     scale = 'proportion',
     display.name = 'Retention of Engaged',
-    axis.name = 'retention of engaged',
+    axis.name = 'Retention of Engaged',
     units = '%',
     description = "Retention of Engaged in Care"), denominator.outcome = 'diagnosed.prevalence')
 
@@ -301,7 +310,7 @@ source('data_processing/fix_cdc_headers.R')
 
 ###Source in AIDS Vu data and cleaning
 source('data_processing/aids_vu_processing.R')
-
+ 
 ###Source CDC Test Count Data
 source('data_processing/cdc_test_count_processing.R')
 
@@ -756,6 +765,74 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
   
 } )
 
+#Create a new dataset to put in the 'population' column for the outcome=knowledge/awareness data
+#this is because this proportion has a denominator value which is an estimation of both dx and un-dx hiv cases and we don't have this anywhere else
+#Clean knowldge population
+data.list.clean.awareness.population = lapply(data.list.knowledge, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$outcome = "total.prevalence"
+  
+  names(data)[names(data)=='Year'] = 'year'   
+  data$year = substring(data$year,1, 4)                                          
+  data$year = as.character(data$year)
+  
+  #Pulling from 'population' variable
+  data$Population[data$Population %in% c("Data suppressed")] = NA    
+  data$Population[data$Population %in% c("Data not available")] = NA 
+  data$Population = as.numeric(gsub(",", '', data$Population))  
+  data$value = data$Population
+  
+  
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
+    names(data)[names(data)=='Geography'] = 'state'
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
+  }
+  if(grepl("ehe", filename)) {
+    data$location = as.character(data$FIPS)
+  }
+  if(grepl("msa", filename)) {
+    data$msa_indicator= substring(data$FIPS, 6, 10)
+    
+    data$msa_keep = ifelse(data$msa_indicator == "00000", "keep", "drop")
+    data = subset(data,data$msa_keep == "keep")   #Can make this shorter once you check over everything#
+    
+    data$cbsa = substring(data$FIPS, 1, 5)
+    data$location = paste("C", data$cbsa, sep=".")
+  }
+  if(grepl("allcounty", filename)) {
+    data$location = as.character(data$FIPS)
+  }  
+  
+  if(grepl("age", filename)) {
+    data$age = age.mappings[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    names(data)[names(data)=='Race.Ethnicity'] = 'race'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("male", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("female", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("risk", filename)) {
+    data$risk = risk.mappings[data$Transmission.Category]
+  }
+  
+  list(filename, data) 
+} )
+
 #############################################################################
   ###Adding in Section for Atlas Plus PrEP data- outcomes are PrEP and
   ##PrEP indications
@@ -982,6 +1059,20 @@ for (data in deaths_notes) {
      details = 'CDC Atlas Plus data')
  }
  
+ ##outcome= total.prevalence (for population for knowledge
+total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)  
+ 
+ for (data in total_prev_all) {
+   
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc',
+     dimension.values = list(),
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+     details = 'CDC Atlas Plus data')
+ }
+
  ##Outcome=prep 
  prep_atlas_all = lapply(data.list.clean.atlas.prep, `[[`, 2)  
  
