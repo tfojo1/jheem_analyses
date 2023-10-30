@@ -331,6 +331,10 @@ source('data_processing/state_retention.R')
 ##Pending location package updates
 #source('data_processing/msa_reports_processing.R')
 
+##Source in Code to use the county prevalence data from Atlas Plus in 2017
+## To sum counties to estimate MSA data
+# source('data_processing/msa_prevalence_totals_2017.R')
+
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
 
