@@ -4,6 +4,7 @@ library(tidyverse)
 library(readxl)
 library(stringr)
 library(haven)
+library(locations)
 
 ###Initialize data manager (surveillance manager) and establish ontology###
 
