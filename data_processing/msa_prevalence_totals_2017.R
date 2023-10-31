@@ -4,7 +4,7 @@
           ##Create data for which counties are in each MSA##
 ##Used this to determine which counties comprise each MSA#
 ################################################################################
-# msa_names = data.list.clean.prevalence[[36]] 
+# msa_names = data.list.clean.prevalence[[36]]
 # msa_names = msa_names[[2]]
 # 
 # msa_consolidated <- msa_names%>%
@@ -45,7 +45,7 @@ data.list.msa.estprev = lapply(data.list.clean.prevalence, function(file){
   
   data$msa_estimate = case_when(
     data$location == '39133' | data$location == "39153" ~ "C.10420",
-    data$location == '36001' | data$location == "36083"  | data$location == "36091" ~ "C.10580", 
+    data$location == '36001' | data$location == "36083"  | data$location == "36091"| data$location == "36093"| data$location == "36095" ~ "C.10580", 
     data$location == '35001'| data$location ==  '35043' |data$location == '35057'|data$location == '35061' ~"C.10740",
     data$location == '34041' | data$location =='42025'| data$location == '42077'| data$location == '42095' ~"C.10900",
     data$location =='13013'|data$location == '13015'|data$location ==  '13035'|data$location == '13045'|data$location == '13057'|data$location == '13063' |data$location =='13067'|data$location == '13077'|data$location == '13085'|data$location == '13089'|data$location == '13097'|data$location == '13113' |data$location =='13117'|data$location == '13121' |data$location =='13135'|data$location == '13143' |data$location =='13149' |data$location =='13151'|data$location == '13159'|data$location == '13171'|data$location == '13199'|data$location == '13211' |data$location =='13217'|data$location == '13223'| data$location == '13227' |data$location =='13231' | data$location =='13247'|data$location == '13255'|data$location == '13297'~"C.12060",
