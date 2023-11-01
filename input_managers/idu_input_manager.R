@@ -222,7 +222,7 @@ generate.multi.year.estimates.by.data.type = function(data.type,
   numerators.combined = Reduce("+",numerators)
   denominators.combined = Reduce("+",denominators)
 
-  rv = (numerators.combined/denominators.combined)*100000
+  rv = (numerators.combined/denominators.combined)
   
   rv
   
