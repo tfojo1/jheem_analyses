@@ -219,6 +219,24 @@ data.manager$register.outcome(
     units = '%',
     description = "Retention of Engaged in Care"), denominator.outcome = 'diagnosed.prevalence')
 
+data.manager$register.outcome(
+  'proportion.tested.n',           #Will have option in code to make this only people at risk or everyone#
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Denominator value for proportion tested in past year',
+    axis.name = 'Denominator value for proportion tested in past year',
+    units = '%',
+    description = "Denominator value for proportion tested in past year"))
+
+data.manager$register.outcome(
+  'proportion.tested', 
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Proportion Tested in Past Year',
+    axis.name = 'Proportion Tested in Past Year',
+    units = '%',
+    description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='cdc')
@@ -226,6 +244,8 @@ data.manager$register.source('cdc', full.name = "US Centers for Disease Control 
 data.manager$register.source('nsduh', full.name = "National Survey on Drug Use and Health", short.name='nsduh')
 
 data.manager$register.source('lhd', full.name = "Local Health Department", short.name='lhd')
+
+data.manager$register.source('brfss', full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 
 data.manager$register.ontology(
   'cdc',
@@ -304,6 +324,17 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual')
   ))
 
+data.manager$register.ontology(
+  'brfss',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
+    race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Multiracial', 'Hispanic', 'Unknown' ),
+    sex=c('male','female'),
+    risk=c('msm')
+  ))
+
 ################################################################################
 
 ###Source in File that reads .csvs and removes headers
@@ -334,6 +365,9 @@ source('data_processing/state_retention.R')
 ##Source in Code to use the county prevalence data from Atlas Plus in 2017
 ## To sum counties to estimate MSA data
 # source('data_processing/msa_prevalence_totals_2017.R')
+
+#Source BRFSS testing data
+#source('data_processing/brfss.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
