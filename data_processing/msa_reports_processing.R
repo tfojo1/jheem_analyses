@@ -2,7 +2,7 @@
 library(jheem2) #Remove this once you are sourcing the file#
 library(tidyverse)
 ################################################################################
-                ###Read in MSA Scraped PDF Files###
+                ###Read in MSA Scraped PDF Files### 
 ################################################################################
 DATA.DIR.MSA.TOTAL="../../data_raw/msa_surveillance_reports/total"
 DATA.DIR.MSA.DEATHS="../../data_raw/msa_surveillance_reports/deaths"
@@ -67,6 +67,9 @@ risk.msa.mappings = c('1'= 'msm',
                       '3'= 'msm_idu',
                       '4'= 'heterosexual',
                       '5'= 'other')
+
+outcome.mappings.v2 = c('diagnoses'='diagnoses',
+                     'prevalence' = 'diagnosed.prevalence')
 ################################################################################
                             ###MSA DEATHS BY SEX### 
 ################################################################################
@@ -77,8 +80,21 @@ data.list.msa_deaths.clean = lapply(data.list.msa_deaths, function(file){
   
 data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
 data= subset(data, data$division != "1")
-   
-data$location = as.character(locations::get.location.code(data$MSA,"CBSA"))
+
+##Manually Remove MSAs Todd decided to take out bc they are out of date##
+##The problem is these may have different symbols and things##
+data= subset(data, data$MSA != "Bergen-Passaic, NJ")
+data= subset(data, data$MSA != "Gary, IN")
+data= subset(data, data$MSA != "Middlesex-Somerset-Hunterdon, NJ")
+data= subset(data, data$MSA != "Middlesex, NJ")
+data= subset(data, data$MSA != "Monmouth-Ocean City, NJ")
+data= subset(data, data$MSA != "Monmouth-Ocean, NJ")
+data= subset(data, data$MSA != "Nassau-Suffolk, NY")
+data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
+data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
+data= subset(data, data$MSA != "West Palm Beach, FL")
+
+data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
 data$male = (gsub("[[:punct:]]", "", data$male_num))
 data$female = (gsub("[[:punct:]]", "", data$female_num))
@@ -133,7 +149,20 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
-  data$location = as.character(locations::get.location.code(data$MSA,"CBSA"))
+  ##Manually Remove MSAs Todd decided to take out bc they are out of date##
+  ##The problem is these may have different symbols and things##
+  data= subset(data, data$MSA != "Bergen-Passaic, NJ")
+  data= subset(data, data$MSA != "Gary, IN")
+  data= subset(data, data$MSA != "Middlesex-Somerset-Hunterdon, NJ")
+  data= subset(data, data$MSA != "Middlesex, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean City, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean, NJ")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NY")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
+  data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
+  data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
 
   data$diagnoses_num= str_replace_all(data$diagnoses_num, " ", "")  
   data$diagnoses_num= str_replace_all(data$diagnoses_num, ",", "")
@@ -143,7 +172,7 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
 
   
   data <- data%>%
-    select(location, diagnoses_num, prevalence_num) %>%
+    #select(location, diagnoses_num, prevalence_num) %>%
     pivot_longer(cols=c(one_of('diagnoses_num', 'prevalence_num')),
                         names_to = "outcome",
                         values_to = "value")
@@ -176,6 +205,12 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   if(grepl("2017 new 2016", filename)){
     data$year = ifelse(data$outcome == "diagnoses", "2017", "2016")
   }
+  if(grepl("2018 new 2018", filename)){
+    data$year = ifelse(data$outcome == "diagnoses", "2018", "2018")
+  }
+  
+  data$outcome = outcome.mappings.v2[data$outcome]
+  
   data= as.data.frame(data)
   list(filename, data) 
   
@@ -191,7 +226,20 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
-  data$location = as.character(locations::get.location.code(data$MSA,"CBSA"))
+  ##Manually Remove MSAs Todd decided to take out bc they are out of date##
+  ##The problem is these may have different symbols and things##
+  data= subset(data, data$MSA != "Bergen-Passaic, NJ")
+  data= subset(data, data$MSA != "Gary, IN")
+  data= subset(data, data$MSA != "Middlesex-Somerset-Hunterdon, NJ")
+  data= subset(data, data$MSA != "Middlesex, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean City, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean, NJ")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NY")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
+  data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
+  data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
   if(grepl("male", filename)){
     data$sex="male"
@@ -243,6 +291,9 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   if(grepl("2018 new 2018", filename)){
     data$year = "2018"
   }
+  
+  data$outcome = outcome.mappings.v2[data$outcome]
+  
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -258,7 +309,20 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
-  data$location = as.character(locations::get.location.code(data$MSA,"CBSA"))
+  ##Manually Remove MSAs Todd decided to take out bc they are out of date##
+  ##The problem is these may have different symbols and things##
+  data= subset(data, data$MSA != "Bergen-Passaic, NJ")
+  data= subset(data, data$MSA != "Gary, IN")
+  data= subset(data, data$MSA != "Middlesex-Somerset-Hunterdon, NJ")
+  data= subset(data, data$MSA != "Middlesex, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean City, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean, NJ")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NY")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
+  data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
+  data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
   #Create Year#
   if(grepl("2009", filename)) {
@@ -365,6 +429,7 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
                  values_to = "value")
   
   data$age = age.msa.mappings[data$age]
+  data$outcome = outcome.mappings.v2[data$outcome]
   
   data= as.data.frame(data)
   
@@ -394,7 +459,22 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   #data$location = as.character(locations::get.location.code(data$location_name,"CBSA"))
   
   #data$location= data$msa
-  data$location = "pending"
+  #data$location = "pending"
+  
+  ##Manually Remove MSAs Todd decided to take out bc they are out of date##
+  ##The problem is these may have different symbols and things##
+  data= subset(data, data$msa != "Bergen-Passaic, NJ")
+  data= subset(data, data$msa != "Gary, IN")
+  data= subset(data, data$msa != "Middlesex-Somerset-Hunterdon, NJ")
+  data= subset(data, data$msa != "Middlesex, NJ")
+  data= subset(data, data$msa != "Monmouth-Ocean City, NJ")
+  data= subset(data, data$msa != "Monmouth-Ocean, NJ")
+  data= subset(data, data$msa != "Nassau-Suffolk, NY")
+  data= subset(data, data$msa != "Nassau-Suffolk, NJ")
+  data= subset(data, data$msa != "West Palm Beach-Boca Raton, FL")
+  data= subset(data, data$msa != "West Palm Beach, FL")
+  
+  data$location = as.character(locations::get.cbsa.for.msa.name(data$msa))
   
   ##add year section##
   if(grepl("1993 new 1992", filename)){
@@ -642,6 +722,7 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
        data$outcome= data$outcome_new
      }   
      
+  data$outcome = outcome.mappings.v2[data$outcome]
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -658,7 +739,20 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
-  data$location = as.character(locations::get.location.code(data$MSA,"CBSA"))
+  ##Manually Remove MSAs Todd decided to take out bc they are out of date##
+  ##The problem is these may have different symbols and things##
+  data= subset(data, data$MSA != "Bergen-Passaic, NJ")
+  data= subset(data, data$MSA != "Gary, IN")
+  data= subset(data, data$MSA != "Middlesex-Somerset-Hunterdon, NJ")
+  data= subset(data, data$MSA != "Middlesex, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean City, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean, NJ")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NY")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
+  data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
+  data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
   #Create Year#
   if(grepl("2009", filename)) {
@@ -764,6 +858,7 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
 
      
 data$race = race.msa.mappings[data$race]
+data$outcome = outcome.mappings.v2[data$outcome]
    
 data= as.data.frame(data)
 
@@ -782,7 +877,20 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
-  data$location = as.character(locations::get.location.code(data$MSA,"CBSA"))
+  ##Manually Remove MSAs Todd decided to take out bc they are out of date##
+  ##The problem is these may have different symbols and things##
+  data= subset(data, data$MSA != "Bergen-Passaic, NJ")
+  data= subset(data, data$MSA != "Gary, IN")
+  data= subset(data, data$MSA != "Middlesex-Somerset-Hunterdon, NJ")
+  data= subset(data, data$MSA != "Middlesex, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean City, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean, NJ")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NY")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
+  data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
+  data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
   #Create Year#
   if(grepl("2009", filename)) {
@@ -894,6 +1002,7 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
                  values_to = "value")
   
   data$risk= risk.msa.mappings[data$risk]
+  data$outcome = outcome.mappings.v2[data$outcome]
   
   data= as.data.frame(data)
   
@@ -911,7 +1020,20 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   data$division= ifelse(grepl("Division", data$MSA), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
-  data$location = as.character(locations::get.location.code(data$MSA,"CBSA"))
+  ##Manually Remove MSAs Todd decided to take out bc they are out of date##
+  ##The problem is these may have different symbols and things##
+  data= subset(data, data$MSA != "Bergen-Passaic, NJ")
+  data= subset(data, data$MSA != "Gary, IN")
+  data= subset(data, data$MSA != "Middlesex-Somerset-Hunterdon, NJ")
+  data= subset(data, data$MSA != "Middlesex, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean City, NJ")
+  data= subset(data, data$MSA != "Monmouth-Ocean, NJ")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NY")
+  data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
+  data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
+  data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
   #Create Year#
   if(grepl("2009", filename)) {
@@ -1048,6 +1170,7 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
                  values_to = "value")
   
   data$risk= risk.msa.mappings[data$risk]
+  data$outcome = outcome.mappings.v2[data$outcome]
   
   data= as.data.frame(data)
   
