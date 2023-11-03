@@ -12,14 +12,6 @@ brfss_file_state_list <- lapply(brfss_file_state, function(x) {
   list(filename=x, data=read_xpt(x))
 })
 
-DATA.DIR.BRFSS.MSA="../../data_raw/brfss/brfss_msa"
-
-brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".XPT", full.names = "TRUE")
-
-brfss_file_msa_list <- lapply(brfss_file_msa, function(x) {
-  list(filename=x, data=read_xpt(x))
-})
-
 ################################################################################
 ###Create state mapping bc the function isnt working but maybe there's 
 #another way in the locations package that I don't know
