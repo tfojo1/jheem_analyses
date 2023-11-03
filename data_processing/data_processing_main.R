@@ -364,10 +364,12 @@ source('data_processing/state_retention.R')
 
 ##Source in Code to use the county prevalence data from Atlas Plus in 2017
 ## To sum counties to estimate MSA data
+##Andrew is writing a function to do this so use that once it's done and update this
 # source('data_processing/msa_prevalence_totals_2017.R')
 
 #Source BRFSS testing data
-#source('data_processing/brfss.R')
+#source('data_processing/brfss_state.R')
+#source('data_processing/brfss_msa.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###

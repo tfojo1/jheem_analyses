@@ -69,7 +69,9 @@ risk.msa.mappings = c('1'= 'msm',
                       '5'= 'other')
 
 outcome.mappings.v2 = c('diagnoses'='diagnoses',
-                     'prevalence' = 'diagnosed.prevalence')
+                     'prevalence' = 'diagnosed.prevalence',
+                     "aids.diagnosed.prevalence" = "aids.diagnosed.prevalence",
+                     "aids.diagnoses"= "aids.diagnoses")
 ################################################################################
                             ###MSA DEATHS BY SEX### 
 ################################################################################
@@ -93,6 +95,12 @@ data= subset(data, data$MSA != "Nassau-Suffolk, NY")
 data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
 data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
 data= subset(data, data$MSA != "West Palm Beach, FL")
+
+##Rename a few MSAs that are causing problems
+data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
+data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
+data$MSA = if_else(data$MSA =="Portland–Vancouver–Beaverton, OR–WA", "Portland-Vancouver, OR-WA", data$MSA)
+data$MSA = if_else(data$MSA == "Washington, DC–VA–MD–WV", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$MSA)
 
 data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
@@ -161,6 +169,12 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  ##Rename a few MSAs that are causing problems
+  data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
+  data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
+  data$MSA = if_else(data$MSA =="Portland–Vancouver–Beaverton, OR–WA", "Portland-Vancouver, OR-WA", data$MSA)
+  data$MSA = if_else(data$MSA == "Washington, DC–VA–MD–WV", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$MSA)
   
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
 
@@ -238,6 +252,12 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  ##Rename a few MSAs that are causing problems
+  data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
+  data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
+  data$MSA = if_else(data$MSA =="Portland–Vancouver–Beaverton, OR–WA", "Portland-Vancouver, OR-WA", data$MSA)
+  data$MSA = if_else(data$MSA == "Washington, DC–VA–MD–WV", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$MSA)
   
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
@@ -321,6 +341,12 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  ##Rename a few MSAs that are causing problems
+  data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
+  data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
+  data$MSA = if_else(data$MSA =="Portland–Vancouver–Beaverton, OR–WA", "Portland-Vancouver, OR-WA", data$MSA)
+  data$MSA = if_else(data$MSA == "Washington, DC–VA–MD–WV", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$MSA)
   
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
@@ -454,151 +480,164 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   data$division= ifelse(grepl("Division", data$msa), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
-  #Need to fix this location issue here#
-  #data$location_name = before.2009.msa.mapping[data$msa]
-  #data$location = as.character(locations::get.location.code(data$location_name,"CBSA"))
-  
-  #data$location= data$msa
-  #data$location = "pending"
-  
   ##Manually Remove MSAs Todd decided to take out bc they are out of date##
   ##The problem is these may have different symbols and things##
-  data= subset(data, data$msa != "Bergen-Passaic, NJ")
-  data= subset(data, data$msa != "Gary, IN")
-  data= subset(data, data$msa != "Middlesex-Somerset-Hunterdon, NJ")
-  data= subset(data, data$msa != "Middlesex, NJ")
-  data= subset(data, data$msa != "Monmouth-Ocean City, NJ")
-  data= subset(data, data$msa != "Monmouth-Ocean, NJ")
-  data= subset(data, data$msa != "Nassau-Suffolk, NY")
-  data= subset(data, data$msa != "Nassau-Suffolk, NJ")
-  data= subset(data, data$msa != "West Palm Beach-Boca Raton, FL")
-  data= subset(data, data$msa != "West Palm Beach, FL")
+  # data= subset(data, data$msa != "Middlesex-Somerset-Hunterdon, NJ")
+  # data= subset(data, data$msa != "Monmouth-Ocean City, NJ")
+  # data= subset(data, data$msa != "Nassau-Suffolk, NJ")
+  # data= subset(data, data$msa != "West Palm Beach-Boca Raton, FL")
+  # data= subset(data, data$msa != "West Palm Beach, FL")
   
+#############################################################################
+  
+  ####UPDATED 11-3 THESE ARE 2009 SPECIFIC LOCATIONS CAUSING PROBLEMS####
+  data= subset(data, data$msa != "Bergen-Passaic, N.J.") #fixed#
+  data= subset(data, data$msa != "Gary, Ind.") #fixed
+  data= subset(data, data$msa != "Middlesex, N.J.") #fixed
+  data= subset(data, data$msa != "Monmouth-Ocean, N.J.") #fixed
+  data= subset(data, data$msa != "Nassau-Suffolk, N.Y.")  #fixed
+  
+  data$msa = if_else(data$msa == "Charlotte, N.C.", "Charlotte-Concord,NC-SC", data$msa)
+  data$msa = if_else(data$msa == "Philadelphia, Pa.", "Philadelphia-Camden, PA-NJ-DE-MD", data$msa)
+  data$msa = if_else(data$msa =="Portland, Oreg", "Portland-Vancouver, OR-WA", data$msa)
+  data$msa = if_else(data$msa == "Washington, D.C.", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$msa)
+  
+  #I can't figure out if these are valid
+  data= subset(data, data$msa != "West Palm Beach, Fla.")  
+  data= subset(data, data$msa != "Wilmington, Del.")  
+  data= subset(data, data$msa != "Orange County, Calif.")
+  data= subset(data, data$msa != "Norfolk, Va.")
+
+ ##############################################################################
   data$location = as.character(locations::get.cbsa.for.msa.name(data$msa))
   
+  #Removing locations that do not work- they are just variations of those listed above#
+  data$check_loc = locations::is.location.valid(data$location)
+  data= subset(data, data$check_loc == "TRUE")
+
   ##add year section##
   if(grepl("1993 new 1992", filename)){
     data$diagnoses_1993 = data$new_no_1993
     data$prevalence_1992 = data$prev_total
-    
-    data$diagnoses_1993 = as.numeric(gsub(",",'', data$diagnoses_1993)) 
+
+    data$diagnoses_1993 = as.numeric(gsub(",",'', data$diagnoses_1993))
     data$prevalence_1992 = as.numeric(gsub(",",'', data$prevalence_1992))
     data$type = "aids"
   }
   if(grepl("1994 new 1993", filename)){
     data$diagnoses_1994 = data$new_no_1994
     data$prevalence_1993 = data$prev_total
-    
-    data$diagnoses_1994 = as.numeric(gsub(",",'', data$diagnoses_1994)) 
+
+    data$diagnoses_1994 = as.numeric(gsub(",",'', data$diagnoses_1994))
     data$prevalence_1993 = as.numeric(gsub(",",'', data$prevalence_1993))
     data$type = "aids"
   }
   if(grepl("1995 new 1994", filename)){
     data$diagnoses_1995 = data$new_no_1995
     data$prevalence_1994 = data$prev_total
-    
-    data$diagnoses_1995 = as.numeric(gsub(",",'', data$diagnoses_1995)) 
+
+    data$diagnoses_1995 = as.numeric(gsub(",",'', data$diagnoses_1995))
     data$prevalence_1994 = as.numeric(gsub(",",'', data$prevalence_1994))
     data$type = "aids"
   }
   if(grepl("1996 new 1995", filename)){
     data$diagnoses_1996 = data$new_no_1996
     data$prevalence_1995 = data$prev_total
-    
-    data$diagnoses_1996 = as.numeric(gsub(",",'', data$diagnoses_1996)) 
+
+    data$diagnoses_1996 = as.numeric(gsub(",",'', data$diagnoses_1996))
     data$prevalence_1995 = as.numeric(gsub(",",'', data$prevalence_1995))
     data$type = "aids"
   }
   if(grepl("1997 new 1996", filename)){
     data$diagnoses_1997 = data$new_no_1997
     data$prevalence_1996 = data$prev_total
-    
-    data$diagnoses_1997 = as.numeric(gsub(",",'', data$diagnoses_1997)) 
-    data$prevalence_1996 = as.numeric(gsub(",",'', data$prevalence_1996)) 
+
+    data$diagnoses_1997 = as.numeric(gsub(",",'', data$diagnoses_1997))
+    data$prevalence_1996 = as.numeric(gsub(",",'', data$prevalence_1996))
     data$type = "aids"
   }
   if(grepl("1998 new 1997", filename)){
     data$diagnoses_1998 = data$new_no_1998
     data$prevalence_1997 = data$prev_total
-    
-    data$diagnoses_1998 = as.numeric(gsub(",",'', data$diagnoses_1998)) 
-    data$prevalence_1997 = as.numeric(gsub(",",'', data$prevalence_1997)) 
+
+    data$diagnoses_1998 = as.numeric(gsub(",",'', data$diagnoses_1998))
+    data$prevalence_1997 = as.numeric(gsub(",",'', data$prevalence_1997))
     data$type = "aids"
   }
   if(grepl("1999 new 1998", filename)){
     data$diagnoses_1999 = data$new_no_1999
     data$prevalence_1998 = data$prev_total
-    
-    data$diagnoses_1999 = as.numeric(gsub(",",'', data$diagnoses_1999)) 
+
+    data$diagnoses_1999 = as.numeric(gsub(",",'', data$diagnoses_1999))
     data$prevalence_1998 = as.numeric(gsub(",",'', data$prevalence_1998))
     data$type = "aids"
   }
   if(grepl("2000 new 1999", filename)){
     data$diagnoses_2000 = data$new_no_2000
     data$prevalence_1999 = data$prev_total
-    
-    data$diagnoses_2000 = as.numeric(gsub(",",'', data$diagnoses_2000)) 
+
+    data$diagnoses_2000 = as.numeric(gsub(",",'', data$diagnoses_2000))
     data$prevalence_1999 = as.numeric(gsub(",",'', data$prevalence_1999))
     data$type = "aids"
   }
   if(grepl("2001 new 2000", filename)){
     data$diagnoses_2001 = data$new_no_2001
     data$prevalence_2000 = data$prev_total
-    
-    data$diagnoses_2001 = as.numeric(gsub(",",'', data$diagnoses_2001)) 
+
+    data$diagnoses_2001 = as.numeric(gsub(",",'', data$diagnoses_2001))
     data$prevalence_2000 = as.numeric(gsub(",",'', data$prevalence_2000))
     data$type = "aids"
   }
   if(grepl("2002 new 2001", filename)){
     data$diagnoses_2002 = data$new_no_2002
     data$prevalence_2001 = data$prev_total
-    
-    data$diagnoses_2002 = as.numeric(gsub(",",'', data$diagnoses_2002)) 
-    data$prevalence_2001 = as.numeric(gsub(",",'', data$prevalence_2001)) 
+
+    data$diagnoses_2002 = as.numeric(gsub(",",'', data$diagnoses_2002))
+    data$prevalence_2001 = as.numeric(gsub(",",'', data$prevalence_2001))
     data$type = "aids"
   }
   if(grepl("2003 new 2002", filename)){
     data$diagnoses_2003 = data$new_no_2003
     data$prevalence_2002 = data$prev_total
-    data$diagnoses_2003 = as.numeric(gsub(",",'', data$diagnoses_2003)) 
+    data$diagnoses_2003 = as.numeric(gsub(",",'', data$diagnoses_2003))
     data$prevalence_2002 = as.numeric(gsub(",",'', data$prevalence_2002))
     data$type = "aids"
   }
   if(grepl("2004 new 2003", filename)){
     data$diagnoses_2004 = data$new_no_2004
     data$prevalence_2003 = data$prev_total
-    
-    data$diagnoses_2004 = as.numeric(gsub(",",'', data$diagnoses_2004)) 
+
+    data$diagnoses_2004 = as.numeric(gsub(",",'', data$diagnoses_2004))
     data$prevalence_2003 = as.numeric(gsub(",",'', data$prevalence_2003))
     data$type = "aids"
   }
   if(grepl("2005 new 2004", filename)){
     data$diagnoses_2005 = data$new_no_2005
     data$prevalence_2004 = data$prev_total
-    data$diagnoses_2005 = as.numeric(gsub(",",'', data$diagnoses_2005)) 
+    data$diagnoses_2005 = as.numeric(gsub(",",'', data$diagnoses_2005))
     data$prevalence_2004 = as.numeric(gsub(",",'', data$prevalence_2004))
     data$type = "aids"
   }
   if(grepl("2006 new 2005", filename)){
     data$diagnoses_2006 = data$new_no_2006
     data$prevalence_2005 = data$prev_total
-    data$diagnoses_2006 = as.numeric(gsub(",",'', data$diagnoses_2006)) 
-    data$prevalence_2005 = as.numeric(gsub(",",'', data$prevalence_2005)) 
+    data$diagnoses_2006 = as.numeric(gsub(",",'', data$diagnoses_2006))
+    data$prevalence_2005 = as.numeric(gsub(",",'', data$prevalence_2005))
     data$type = "aids"
   }
   if(grepl("2007 new 2006", filename)){
     data$diagnoses_2007 = data$new_no_2007
     data$prevalence_2006 = data$prev_total
-    data$diagnoses_2007 = as.numeric(gsub(",",'', data$diagnoses_2007)) 
-    data$prevalence_2006 = as.numeric(gsub(",",'', data$prevalence_2006)) 
+    data$diagnoses_2007 = as.numeric(gsub(",",'', data$diagnoses_2007))
+    data$prevalence_2006 = as.numeric(gsub(",",'', data$prevalence_2006))
     data$type = "aids"
   }
-  
+
   if(grepl("2008 new 2007", filename)){
     data$diagnoses_2008 = data$new_num
     data$diagnoses_2008 = as.numeric(gsub(",","", data$diagnoses_2008))
     data$prevalence_2007 = data$prev_num
-    data$prevalence_2007 = gsub(",","", data$prevalence_2007) 
+    data$prevalence_2007 = gsub(",","", data$prevalence_2007)
     data$prevalence_2007 = gsub("[[:punct:]]", NA, data$prevalence_2007)
     data$prevalence_2007 = as.numeric(data$prevalence_2007)
     data$type = "hiv"
@@ -606,7 +645,7 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   if(grepl("2009 new 2008", filename)){
     data$diagnoses_2009 = data$new_num
     data$prevalence_2008 = data$prev_num
-    data$diagnoses_2009 = as.numeric(gsub(",",'', data$diagnoses_2009)) 
+    data$diagnoses_2009 = as.numeric(gsub(",",'', data$diagnoses_2009))
     data$prevalence_2008 = as.numeric(gsub(",",'', data$prevalence_2008))
     data$type = "hiv"
   }
@@ -628,14 +667,14 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
        names_sep = "_",
       values_to = "value")
 
-     
+
  #Differentiate AIDs as outcome for files before 2007-2008 change
      if(grepl("1993 new 1992", filename)){
       data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
       data <- data %>%
         select(-c(outcome))
       data$outcome= data$outcome_new
-      
+
      }
      if(grepl("1994 new 1993", filename)){
        data$outcome_new = ifelse(data$outcome == "prevalence", "aids.diagnosed.prevalence", "aids.diagnoses")
@@ -720,8 +759,8 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
        data <- data %>%
          select(-c(outcome))
        data$outcome= data$outcome_new
-     }   
-     
+     }
+
   data$outcome = outcome.mappings.v2[data$outcome]
   data= as.data.frame(data)
   
@@ -751,6 +790,12 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  ##Rename a few MSAs that are causing problems
+  data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
+  data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
+  data$MSA = if_else(data$MSA =="Portland–Vancouver–Beaverton, OR–WA", "Portland-Vancouver, OR-WA", data$MSA)
+  data$MSA = if_else(data$MSA == "Washington, DC–VA–MD–WV", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$MSA)
   
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
@@ -890,8 +935,15 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
   
-  data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
+  ##Rename a few MSAs that are causing problems
+  data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
+  data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
+  data$MSA = if_else(data$MSA =="Portland–Vancouver–Beaverton, OR–WA", "Portland-Vancouver, OR-WA", data$MSA)
+  data$MSA = if_else(data$MSA == "Washington, DC–VA–MD–WV", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$MSA)
   
+  data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
+
+
   #Create Year#
   if(grepl("2009", filename)) {
     data$year = as.character("2009")
@@ -923,8 +975,8 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   if(grepl("2018", filename)) {
     data$year = as.character("2018")
   }
-  
-  #Create Race# 
+
+  #Create Race#
   if(grepl("black", filename)){
     data$race="Black/African American"
   }
@@ -934,63 +986,63 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   if(grepl("hispanic", filename)){
     data$race="Hispanic/Latino"
   }
-  
+
   if(grepl("new", filename)){
-    
+
     data$diagnoses_1 = (gsub(",", "", data$diagnoses_1)) #replace comma with nothing
     data$diagnoses_1 = (gsub(" ", "", data$diagnoses_1)) #replace space with nothing
     data$diagnoses_1 = (gsub("[[:punct:]]", NA, data$diagnoses_1)) #if there's a dash replace with NA
     data$diagnoses_1 = as.numeric(data$diagnoses_1) #make it a number
-    
-    data$diagnoses_2 = (gsub(",", "", data$diagnoses_2)) 
-    data$diagnoses_2 = (gsub(" ", "", data$diagnoses_2)) 
-    data$diagnoses_2 = (gsub("[[:punct:]]", NA, data$diagnoses_2)) 
-    data$diagnoses_2 = as.numeric(data$diagnoses_2) 
-    
+
+    data$diagnoses_2 = (gsub(",", "", data$diagnoses_2))
+    data$diagnoses_2 = (gsub(" ", "", data$diagnoses_2))
+    data$diagnoses_2 = (gsub("[[:punct:]]", NA, data$diagnoses_2))
+    data$diagnoses_2 = as.numeric(data$diagnoses_2)
+
     data$diagnoses_3 = (gsub(",", "", data$diagnoses_3))
-    data$diagnoses_3 = (gsub(" ", "", data$diagnoses_3)) 
-    data$diagnoses_3 = (gsub("[[:punct:]]", NA, data$diagnoses_3)) 
-    data$diagnoses_3 = as.numeric(data$diagnoses_3) 
-    
-    data$diagnoses_4 = (gsub(",", "", data$diagnoses_4)) 
-    data$diagnoses_4 = (gsub(" ", "", data$diagnoses_4)) 
-    data$diagnoses_4 = (gsub("[[:punct:]]", NA, data$diagnoses_4)) 
-    data$diagnoses_4 = as.numeric(data$diagnoses_4) 
-    
-    data$diagnoses_5 = (gsub(",", "", data$diagnoses_5)) 
-    data$diagnoses_5 = (gsub(" ", "", data$diagnoses_5)) 
-    data$diagnoses_5 = (gsub("[[:punct:]]", NA, data$diagnoses_5)) 
-    data$diagnoses_5 = as.numeric(data$diagnoses_5) 
+    data$diagnoses_3 = (gsub(" ", "", data$diagnoses_3))
+    data$diagnoses_3 = (gsub("[[:punct:]]", NA, data$diagnoses_3))
+    data$diagnoses_3 = as.numeric(data$diagnoses_3)
+
+    data$diagnoses_4 = (gsub(",", "", data$diagnoses_4))
+    data$diagnoses_4 = (gsub(" ", "", data$diagnoses_4))
+    data$diagnoses_4 = (gsub("[[:punct:]]", NA, data$diagnoses_4))
+    data$diagnoses_4 = as.numeric(data$diagnoses_4)
+
+    data$diagnoses_5 = (gsub(",", "", data$diagnoses_5))
+    data$diagnoses_5 = (gsub(" ", "", data$diagnoses_5))
+    data$diagnoses_5 = (gsub("[[:punct:]]", NA, data$diagnoses_5))
+    data$diagnoses_5 = as.numeric(data$diagnoses_5)
   }
-  
+
   if(grepl("prevalence", filename)){
-    
+
     data$prevalence_1 = (gsub(",", "", data$prevalence_1)) #replace comma with nothing
     data$prevalence_1 = (gsub(" ", "", data$prevalence_1)) #replace space with nothing
     data$prevalence_1 = (gsub("[[:punct:]]", NA, data$prevalence_1)) #if there's a dash replace with NA
     data$prevalence_1 = as.numeric(data$prevalence_1) #make it a number
-    
-    data$prevalence_2 = (gsub(",", "", data$prevalence_2)) 
-    data$prevalence_2 = (gsub(" ", "", data$prevalence_2)) 
-    data$prevalence_2 = (gsub("[[:punct:]]", NA, data$prevalence_2)) 
-    data$prevalence_2 = as.numeric(data$prevalence_2) 
-    
-    data$prevalence_3 = (gsub(",", "", data$prevalence_3)) 
-    data$prevalence_3 = (gsub(" ", "", data$prevalence_3)) 
-    data$prevalence_3 = (gsub("[[:punct:]]", NA, data$prevalence_3)) 
-    data$prevalence_3 = as.numeric(data$prevalence_3) 
-    
-    data$prevalence_4 = (gsub(",", "", data$prevalence_4)) 
-    data$prevalence_4 = (gsub(" ", "", data$prevalence_4)) 
-    data$prevalence_4 = (gsub("[[:punct:]]", NA, data$prevalence_4)) 
-    data$prevalence_4 = as.numeric(data$prevalence_4) 
-    
-    data$prevalence_5 = (gsub(",", "", data$prevalence_5)) 
-    data$prevalence_5 = (gsub(" ", "", data$prevalence_5)) 
-    data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_5)) 
-    data$prevalence_5 = as.numeric(data$prevalence_5) 
+
+    data$prevalence_2 = (gsub(",", "", data$prevalence_2))
+    data$prevalence_2 = (gsub(" ", "", data$prevalence_2))
+    data$prevalence_2 = (gsub("[[:punct:]]", NA, data$prevalence_2))
+    data$prevalence_2 = as.numeric(data$prevalence_2)
+
+    data$prevalence_3 = (gsub(",", "", data$prevalence_3))
+    data$prevalence_3 = (gsub(" ", "", data$prevalence_3))
+    data$prevalence_3 = (gsub("[[:punct:]]", NA, data$prevalence_3))
+    data$prevalence_3 = as.numeric(data$prevalence_3)
+
+    data$prevalence_4 = (gsub(",", "", data$prevalence_4))
+    data$prevalence_4 = (gsub(" ", "", data$prevalence_4))
+    data$prevalence_4 = (gsub("[[:punct:]]", NA, data$prevalence_4))
+    data$prevalence_4 = as.numeric(data$prevalence_4)
+
+    data$prevalence_5 = (gsub(",", "", data$prevalence_5))
+    data$prevalence_5 = (gsub(" ", "", data$prevalence_5))
+    data$prevalence_5 = (gsub("[[:punct:]]", NA, data$prevalence_5))
+    data$prevalence_5 = as.numeric(data$prevalence_5)
   }
-  
+
   data <- data %>%
     select(year, location, race, one_of("diagnoses_1", "diagnoses_2", "diagnoses_3", "diagnoses_4", "diagnoses_5",
                                         "prevalence_1", "prevalence_2", "prevalence_3", "prevalence_4", "prevalence_5"))
@@ -1000,7 +1052,7 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
                  names_to = c("outcome", "risk"),
                  names_sep = "_",
                  values_to = "value")
-  
+
   data$risk= risk.msa.mappings[data$risk]
   data$outcome = outcome.mappings.v2[data$outcome]
   
@@ -1032,6 +1084,12 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  ##Rename a few MSAs that are causing problems
+  data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
+  data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
+  data$MSA = if_else(data$MSA =="Portland–Vancouver–Beaverton, OR–WA", "Portland-Vancouver, OR-WA", data$MSA)
+  data$MSA = if_else(data$MSA == "Washington, DC–VA–MD–WV", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$MSA)
   
   data$location = as.character(locations::get.cbsa.for.msa.name(data$MSA))
   
@@ -1272,7 +1330,7 @@ for (data in msa_race_risk) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc msa reports',
-    source = 'cdc msa report',
+    source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')
