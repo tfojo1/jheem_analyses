@@ -1,3 +1,83 @@
+#library(haven)
+
+################################################################################
+###Read in BRFSS .xpt files
+################################################################################
+
+DATA.DIR.BRFSS.STATE="../../data_raw/brfss/brfss_state"
+
+brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.names = "TRUE")
+
+brfss_file_state_list <- lapply(brfss_file_state, function(x) {
+  list(filename=x, data=read_xpt(x))
+})
+
+DATA.DIR.BRFSS.MSA="../../data_raw/brfss/brfss_msa"
+
+brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".XPT", full.names = "TRUE")
+
+brfss_file_msa_list <- lapply(brfss_file_msa, function(x) {
+  list(filename=x, data=read_xpt(x))
+})
+
+################################################################################
+###Create state mapping bc the function isnt working but maybe there's 
+#another way in the locations package that I don't know
+################################################################################
+state.to.fips.mappings = c('1' = 'AL',
+                           '2'='AK',
+                           '4'='AZ',
+                           '5'='AR',
+                           '6'='CA',
+                           '8'='CO',
+                           '9'='CT',
+                           '10'='DE',
+                           '11'='DC',
+                           '12'='FL',
+                           '13'='GA',
+                           '15'='HI',
+                           '16'='ID',
+                           '17'='IL',
+                           '18'='IN',
+                           '19'='IA',
+                           '20'='KA',
+                           '21'='KY',
+                           '22'='LA',
+                           '23'='ME',
+                           '24'='MD',
+                           '25'='MA',
+                           '26'='MI',
+                           '27'='MN',
+                           '28'='MS',
+                           '29'='MO',
+                           '30'='MT',
+                           '31'='NE',
+                           '32'='NV',
+                           '33'='NH',
+                           '34'='NJ',
+                           '35'='Nm',
+                           '36'='NY',
+                           '37'='NC',
+                           '38'='ND',
+                           '39'='OH',
+                           '40'='OK',
+                           '41'='OR',
+                           '42'='PA',
+                           '44'='RI',
+                           '45'='SC',
+                           '46'='SD',
+                           '47'='TN',
+                           '48'='TX',
+                           '49'='UT',
+                           '50'='VT',
+                           '51'='VA',
+                           '53'='WA',
+                           '54'='WV',
+                           '55'='WI',
+                           '56'='WY',
+                           '72'= 'PR')
+
+
 ################################################################################
 ##Creating clean template of BRFSS state data##
 ##Outcome = proportion.tested
@@ -17,61 +97,84 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$year = as.numeric("2013")
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
-    data$age = data$`_AGEG5YR`
+    data$age = data$`_AGEG5YR`  
+    data$risk = NA #No sexual orientation data for 2013#
   }
   if(grepl("2014", filename)) {
     data$year = as.numeric("2014")
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
+    data$test=data$SXORIENT
+    data <- data %>%
+      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
+                              SEX== "1" & SXORIENT == "3" ~ "msm",
+                               TRUE ~ NA ))
   }
   if(grepl("2015", filename)) {
     data$year = as.numeric("2015")
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
+    data <- data %>%
+      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
+                              SEX== "1" & SXORIENT == "3" ~ "msm",
+                              TRUE ~ NA ))
   }
   if(grepl("2016", filename)) {
     data$year = as.numeric("2016")
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
+    data <- data %>%
+      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
+                              SEX== "1" & SXORIENT == "3" ~ "msm",
+                              TRUE ~ NA ))
   }
   if(grepl("2017", filename)) {
     data$year = as.numeric("2017")
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
+    data <- data %>%
+      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
+                              SEX== "1" & SXORIENT == "3" ~ "msm",
+                              TRUE ~ NA ))
   }
   if(grepl("2018", filename)) {
     data$year = as.numeric("2018")
     data$sex = as.character(data$SEX1)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
+    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
   }
   if(grepl("2019", filename)) {
     data$year = as.numeric("2019")
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
+    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
   }
   if(grepl("2020", filename)) {
     data$year = as.numeric("2020")
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
+    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
   }
   if(grepl("2021", filename)) {
     data$year = as.numeric("2021")
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
+    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
   }
   if(grepl("2022", filename)) {
     data$year = as.numeric("2022")
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE1`
     data$age = data$`_AGEG5YR`
+    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
   }
   
   #Create location#
@@ -335,4 +438,5 @@ data.list.brfss.state.risk.n = lapply(data.list.brfss.state.risk, function(file)
 
 ################################################################################
 ##PUT INTO THE DATA MANAGER###
+#10 statements#
 ################################################################################
