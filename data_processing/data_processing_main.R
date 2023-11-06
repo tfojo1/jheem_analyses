@@ -359,8 +359,7 @@ source('data_processing/nsduh_processing.R')
 source('data_processing/state_retention.R')
 
 ###Source in CDC MSA PDF Reports data and cleaning
-##Pending location package updates
-#source('data_processing/msa_reports_processing.R')
+source('data_processing/msa_reports_processing.R')
 
 ##Source in Code to use the county prevalence data from Atlas Plus in 2017
 ## To sum counties to estimate MSA data

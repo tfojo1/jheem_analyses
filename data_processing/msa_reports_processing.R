@@ -465,12 +465,6 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
 ################################################################################
                         ###BEFORE 2009 FILES###
       ###Note: these files have AIDS and HIV data differentiated######
-
-###I dont know how to make these locations valid bc they are so inconsistent
-##Created a whole separate mapping file but it's not good for file 10
-
-
-##Fix this: sept 11 NAs introduced by coercion warning
 ################################################################################
 data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   
