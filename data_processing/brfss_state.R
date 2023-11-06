@@ -8,6 +8,11 @@ DATA.DIR.BRFSS.STATE="../../data_raw/brfss/brfss_state"
 
 brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.names = "TRUE")
 
+#\\\\\\To show only individuals at risk of HIV in the denominator///////#
+      #Un-comment line 14, comment out line 9
+      #Un-comment line 250-253
+#brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = "risk", full.names = "TRUE")
+
 brfss_file_state_list <- lapply(brfss_file_state, function(x) {
   list(filename=x, data=read_xpt(x))
 })
@@ -149,7 +154,8 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data <- data %>%
       mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
                               SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
+                              TRUE ~ NA )) %>%
+      mutate(at_risk = if_else(HIVRISK4 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
   }
   if(grepl("2017", filename)) {
     data$year = as.numeric("2017")
@@ -159,14 +165,17 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data <- data %>%
       mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
                               SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
+                              TRUE ~ NA )) %>%
+      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
   }
   if(grepl("2018", filename)) {
     data$year = as.numeric("2018")
     data$sex = as.character(data$SEX1)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
+    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
+    data <- data %>%
+    mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
   }
   if(grepl("2019", filename)) {
     data$year = as.numeric("2019")
@@ -174,6 +183,8 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
     data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
+    data <- data %>%
+      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
   }
   if(grepl("2020", filename)) {
     data$year = as.numeric("2020")
@@ -181,6 +192,8 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
     data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
+    data <- data %>%
+      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
   }
   if(grepl("2021", filename)) {
     data$year = as.numeric("2021")
@@ -194,7 +207,9 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE1`
     data$age = data$`_AGEG5YR`
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
+    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
+    data <- data %>%
+      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
   }
   
   #Create location#
@@ -229,6 +244,13 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   data$sex = brfss.sex.mappings[data$sex]
   data$age = brfss.age.mappings[data$age]
   data$race = brfss.race.mappings[data$race]
+  
+  #\\\\\\To show only individuals at risk of HIV in the denominator///////#
+        #Un-comment line 250-253
+  # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
+  # data <- data %>%
+  #    rename(any_of(brfss_risk_var))
+  # data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
   
   list(filename, data) 
 })
