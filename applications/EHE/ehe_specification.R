@@ -323,7 +323,6 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'suppression',
-               #         dimension.values = list(continuum='all'),
                         value = 0)
 
 register.model.quantity.subset(EHE.SPECIFICATION,
