@@ -34,6 +34,7 @@ source('../jheem_analyses/applications/EHE/ehe_specification_helpers.R')
 
 # General
 source('../jheem_analyses/commoncode/target_populations.R')
+source('../jheem_analyses/commoncode/age_mappings.R')
 
 # Data Loads
 load('../jheem_analyses/cached/google_mobility_data.Rdata')
