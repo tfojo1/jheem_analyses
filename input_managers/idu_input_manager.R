@@ -4,11 +4,11 @@
     #   denominator: total in age group (combined denominators over 3 years)
 # Remission/relapse from Shah et al: https://pubmed.ncbi.nlm.nih.gov/16364568/ 
 
-if (1==2)
-{
-    source('applications/EHE/ehe_specification.R')
-    specification.metadata = get.specification.metadata('ehe', 
-                                                        location = 'c.12580')
+if (1==2){
+  source('applications/EHE/ehe_specification.R')
+  source('commoncode/age_mappings.R')
+  specification.metadata = get.specification.metadata('ehe', 
+                                                      location = 'c.12580')
 }
 
 # initiation helper functions (combining numerators, denominators over 3 years and two data types (heroin and cocaine))
@@ -284,8 +284,7 @@ get.idu.remission.rates <- function(specification.metadata)
   names(remission.sex) = c("msm")
   
   age.info.remission = parse.age.strata.names(names(remission.age))
-  age.spans.remission = age.info.remission$upper - age.info.remission$lower
-
+  
   remission.age.mapped = map.age.values(values = overall.remission*remission.age,
                                         given.age.lowers = age.info.remission$lower,
                                         given.age.uppers = age.info.remission$upper, 
