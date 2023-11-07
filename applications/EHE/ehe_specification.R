@@ -323,6 +323,7 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'suppression',
+               #         dimension.values = list(continuum='all'),
                         value = 0)
 
 register.model.quantity.subset(EHE.SPECIFICATION,
@@ -1428,10 +1429,10 @@ register.model.foreground(EHE.SPECIFICATION,
                           name = 'covid.testing')
 
 register.default.parameter.values(EHE.SPECIFICATION,
-                                  c(black.covid.testing.rr = 1,
+                                  c(black.covid.testing.rr = 3,
                                     hispanic.covid.testing.rr = 1,
                                     other.covid.testing.rr = 1,
-                                    young.covid.testing.rr = 1,
+                                    young.covid.testing.rr = 10,
                                     old.covid.testing.rr = 1,
                                     covid.mobility.correlation = 1))
 
@@ -1531,27 +1532,36 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       keep.dimensions = c('location','age','race','sex','risk'))
 
 track.point.outcome(EHE.SPECIFICATION,
-                       'point.population',
-                       outcome.metadata = NULL,
-                       scale = 'non.negative.number',
-                       value = expression(uninfected+infected),
-                       keep.dimensions = c('location','age','race','sex','risk'),
-                       save = F)
+                    'point.population',
+                    outcome.metadata = NULL,
+                    scale = 'non.negative.number',
+                    value = expression(uninfected+infected),
+                    keep.dimensions = c('location','age','race','sex','risk'),
+                    save = F)
 
 track.point.outcome(EHE.SPECIFICATION,
-                       'testing',
-                       outcome.metadata = create.outcome.metadata(display.name = 'HIV Testing Rate',
-                                                                  description = "The average number of HIV tests per year",
-                                                                  scale = 'rate',
-                                                                  axis.name = 'Tests per Year',
-                                                                  units = 'tests/yr',
-                                                                  singular.unit = 'test/yr'),
-                       value = 'testing',
-                       denominator.outcome = 'point.population',
-                       keep.dimensions = c('location','age','race','sex','risk'))
+                    'testing',
+                    outcome.metadata = create.outcome.metadata(display.name = 'HIV Testing Rate',
+                                                               description = "The average number of HIV tests per year",
+                                                               scale = 'rate',
+                                                               axis.name = 'Tests per Year',
+                                                               units = 'tests/yr',
+                                                               singular.unit = 'test/yr'),
+                    value = 'testing',
+                    value.is.numerator = F,
+                    denominator.outcome = 'point.population',
+                    keep.dimensions = c('location','age','race','sex','risk'))
 
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'cumulative.uninfected',
+                         outcome.metadata = NULL,
+                         value.to.integrate = 'uninfected',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         scale = 'non.negative.number',
+                         save = F)
+
+track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'cumulative.infected',
                          outcome.metadata = NULL,
                          value.to.integrate = 'uninfected',
                          keep.dimensions = c('location','age','race','sex','risk'),
@@ -1568,6 +1578,22 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'point.population',
                          keep.dimensions = c('location','age','race','sex','risk'),
+                         save = T)
+
+track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'suppression',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Suppression',
+                                                                    description = "The Proportion of People with Diagnosed HIV who are Virally Suppressed",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion Suppressed',
+                                                                    units = '%'),
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         value.to.integrate = 'infected',
+                         value.is.numerator = T,
+                         multiply.by = 'suppression',
+                         denominator.outcome = 'cumulative.infected',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'suppression',
                          save = T)
 
 track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
