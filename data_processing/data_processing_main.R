@@ -369,6 +369,9 @@ source('data_processing/msa_reports_processing.R')
 #Source BRFSS testing data
 #source('data_processing/brfss_state.R')
 #source('data_processing/brfss_msa.R')
+#OR source the weighted BRFSS data
+#source('data_processing/brfss_state_weighted.R')
+#source('data_processing/brfss_msa_weighted.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###

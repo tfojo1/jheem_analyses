@@ -36,7 +36,7 @@ state.to.fips.mappings = c('1' = 'AL',
                            '17'='IL',
                            '18'='IN',
                            '19'='IA',
-                           '20'='KA',
+                           '20'='KS',
                            '21'='KY',
                            '22'='LA',
                            '23'='ME',
@@ -51,7 +51,7 @@ state.to.fips.mappings = c('1' = 'AL',
                            '32'='NV',
                            '33'='NH',
                            '34'='NJ',
-                           '35'='Nm',
+                           '35'='NM',
                            '36'='NY',
                            '37'='NC',
                            '38'='ND',
@@ -244,6 +244,11 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   data$age = brfss.age.mappings[data$age]
   data$race = brfss.race.mappings[data$race]
   
+  #Remove values that are NA
+  data= subset(data, !is.na(data$sex))
+  data= subset(data, !is.na(data$age))
+  data= subset(data, !is.na(data$race))
+  
   #\\\\\\To show only individuals at risk of HIV in the denominator///////#
         #Un-comment line 250-253
   # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
@@ -303,9 +308,10 @@ data.list.brfss.state.sex = lapply(data.list.brfss.state.clean, function(file){
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sex, proportion_tested, n)
+    select(outcome, year, location, value, sex, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -329,9 +335,10 @@ data.list.brfss.state.age = lapply(data.list.brfss.state.clean, function(file){
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, age, proportion_tested, n)
+    select(outcome, year, location, value, age, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -355,9 +362,10 @@ data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, race, proportion_tested, n)
+    select(outcome, year, location, value, race, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -381,9 +389,12 @@ data.list.brfss.state.risk = lapply(data.list.brfss.state.clean, function(file){
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
+  
+  data=subset(data, !is.na(data$risk)) #remove the risk is NA
   
   data <- data %>%
-    select(outcome, year, location, proportion_tested, risk, n)
+    select(outcome, year, location, value, proportion_tested, risk, n)
   data= as.data.frame(data)
   
   list(filename, data) 
