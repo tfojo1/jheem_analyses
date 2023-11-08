@@ -158,7 +158,7 @@ p.msm.age5 <- c(
   p.msm.2021$age5
 )
 
-years <- c(2017:2019,2021)
+years <- c(2017:2019,2021) - 2020
 p.max <- 0.6
 
 # race
@@ -266,7 +266,7 @@ p.idu.female <- c(
   p.idu.2017$female
 )
 
-years.idu <- c(2015,2017)
+years.idu <- c(2015,2017) - 2020
 
 fit.idu.black <- lm(logit(p.idu.black/p.max) ~ years.idu)
 fit.idu.hisp <- lm(logit(p.idu.hisp/p.max) ~ years.idu)
@@ -321,7 +321,7 @@ p.het.2019 <- data.frame(
 
 p.het.2019 <- (age_mutate(p.het.2019))/100
 
-years.het <- c(2016,2019)
+years.het <- c(2016,2019) - 2020
 
 p.het.black <- c(
   p.het.2016$black,
@@ -497,7 +497,7 @@ pi.msm.age5 <- c(
   pi.msm.2019$age5
 )
 
-years.pi <- 2017:2019
+years.pi <- c(2017:2019) - 2020
 pi.max <- 1
 
 fit.pi.msm.black <- lm(logit(pi.msm.black/pi.max) ~ years.pi)
