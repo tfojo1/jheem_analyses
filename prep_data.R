@@ -158,6 +158,53 @@ p.msm.age5 <- c(
   p.msm.2021$age5
 )
 
+<<<<<<< HEAD
+#### creating a combined model for msm -----
+p.msm.df <- data.frame(
+  year = c(2017:2019,2021),
+  black = p.msm.black,
+  hisp = p.msm.hisp,
+  nbnh = p.msm.nbnh,
+  age1 = p.msm.age1,
+  age2 = p.msm.age2,
+  age3 = p.msm.age3,
+  age4 = p.msm.age4,
+  age5 = p.msm.age5
+)
+
+library(tidyr)
+p.msm.df.long <- pivot_longer(p.msm.df, cols = c(black, hisp, nbnh, age1, age2, age3, age4, age5),
+                              names_to = "variable", values_to = "p")
+
+p.msm.df.long$raceid <- ifelse(grepl("black", p.msm.df.long$variable), 1,
+                               ifelse(grepl("hisp", p.msm.df.long$variable), 2, 
+                                      ifelse(grepl("nbnh", p.msm.df.long$variable), 3, 0)))
+p.msm.df.long$ageid <- ifelse(grepl("age1", p.msm.df.long$variable), 1,
+                              ifelse(grepl("age2", p.msm.df.long$variable), 2,
+                                     ifelse(grepl("age3", p.msm.df.long$variable), 3,
+                                            ifelse(grepl("age4", p.msm.df.long$variable), 4,
+                                                   ifelse(grepl("age5", p.msm.df.long$variable), 5, 0)))))
+anchor.year <- 2020
+p.msm.df.long$year <- p.msm.df.long$year - anchor.year
+
+fit.p.msm <- lm(logit(p.msm.df.long$p/p.max) ~ year + factor(raceid) + factor(ageid), 
+                data = p.msm.df.long)
+
+# years <- c(2017:2019,2021) - 2020
+# p.max <- 0.6
+# 
+# # race
+# fit.msm.black <- lm(logit(p.msm.black/p.max) ~ years)
+# fit.msm.hisp <- lm(logit(p.msm.hisp/p.max) ~ years)
+# fit.msm.nbnh <- lm(logit(p.msm.nbnh/p.max) ~ years)
+# 
+# #age 
+# fit.msm.age1 <- lm(logit(p.msm.age1/p.max) ~ years)
+# fit.msm.age2 <- lm(logit(p.msm.age2/p.max) ~ years)
+# fit.msm.age3 <- lm(logit(p.msm.age3/p.max) ~ years)
+# fit.msm.age4 <- lm(logit(p.msm.age4/p.max) ~ years)
+# fit.msm.age5 <- lm(logit(p.msm.age5/p.max) ~ years)
+=======
 years <- c(2017:2019,2021) - 2020
 p.max <- 0.6
 
@@ -172,6 +219,7 @@ fit.msm.age2 <- lm(logit(p.msm.age2/p.max) ~ years)
 fit.msm.age3 <- lm(logit(p.msm.age3/p.max) ~ years)
 fit.msm.age4 <- lm(logit(p.msm.age4/p.max) ~ years)
 fit.msm.age5 <- lm(logit(p.msm.age5/p.max) ~ years)
+>>>>>>> 79b01228d20a81348440aeaa4c9cfc8e0a271a7b
 
 ## PWID ------
 
@@ -266,6 +314,54 @@ p.idu.female <- c(
   p.idu.2017$female
 )
 
+<<<<<<< HEAD
+#### big model for IDU -----
+
+p.idu.df <- data.frame(
+  year = c(2015,2017),
+  p.idu.black,
+  p.idu.hisp,
+  p.idu.nbnh,
+  p.idu.age1,
+  p.idu.age2,
+  p.idu.age3,
+  p.idu.age4,
+  p.idu.age5,
+  p.idu.male,
+  p.idu.female
+)
+
+p.idu.df.long <- gather(p.idu.df, key = "group", value = "p", -year)
+p.idu.df.long$year <- p.idu.df.long$year - anchor.year
+
+p.idu.df.long$raceid <- ifelse(p.idu.df.long$group == "p.idu.black", "black", 
+                               ifelse(p.idu.df.long$group == "p.idu.hisp", "hisp", 
+                                      ifelse(p.idu.df.long$group == "p.idu.nbnh", "nbnh", 0)))
+p.idu.df.long$ageid <- ifelse(p.idu.df.long$group == "p.idu.age1", "age1", 
+                              ifelse(p.idu.df.long$group == "p.idu.age2", "age2", 
+                                     ifelse(p.idu.df.long$group == "p.idu.age3", "age3", 
+                                            ifelse(p.idu.df.long$group == "p.idu.age4", "age4", 
+                                                   ifelse(p.idu.df.long$group == "p.idu.age5", "age5", 0)))))
+p.idu.df.long$sexid <- ifelse(p.idu.df.long$group == "p.idu.male", "male",
+                              ifelse(p.idu.df.long$group == "p.idu.female", "female",0))
+
+fit.p.idu <- lm(logit(p) ~ year + raceid + ageid + sexid, data = p.idu.df.long)
+
+# years.idu <- c(2015,2017) - 2020
+# 
+# fit.idu.black <- lm(logit(p.idu.black/p.max) ~ years.idu)
+# fit.idu.hisp <- lm(logit(p.idu.hisp/p.max) ~ years.idu)
+# fit.idu.nbnh <- lm(logit(p.idu.nbnh/p.max) ~ years.idu)
+# 
+# fit.idu.age1 <- lm(logit(p.idu.age1/p.max) ~ years.idu)
+# fit.idu.age2 <- lm(logit(p.idu.age2/p.max) ~ years.idu)
+# fit.idu.age3 <- lm(logit(p.idu.age3/p.max) ~ years.idu)
+# fit.idu.age4 <- lm(logit(p.idu.age4/p.max) ~ years.idu)
+# fit.idu.age5 <- lm(logit(p.idu.age5/p.max) ~ years.idu)
+# 
+# fit.idu.hetmale <- lm(logit(p.idu.male/p.max) ~ years.idu)
+# fit.idu.female <- lm(logit(p.idu.female/p.max) ~ years.idu)
+=======
 years.idu <- c(2015,2017) - 2020
 
 fit.idu.black <- lm(logit(p.idu.black/p.max) ~ years.idu)
@@ -280,6 +376,7 @@ fit.idu.age5 <- lm(logit(p.idu.age5/p.max) ~ years.idu)
 
 fit.idu.hetmale <- lm(logit(p.idu.male/p.max) ~ years.idu)
 fit.idu.female <- lm(logit(p.idu.female/p.max) ~ years.idu)
+>>>>>>> 79b01228d20a81348440aeaa4c9cfc8e0a271a7b
 
 ## Heterosexual -----
 ### PrEP Use in 2016 ----
