@@ -1,7 +1,7 @@
 #library(haven)
 
 ################################################################################
-###Read in BRFSS .xpt files
+                  ###Read in BRFSS .xpt files###
 ################################################################################
 
 DATA.DIR.BRFSS.STATE="../../data_raw/brfss/brfss_state"
@@ -18,8 +18,7 @@ brfss_file_state_list <- lapply(brfss_file_state, function(x) {
 })
 
 ################################################################################
-###Create state mapping bc the function isnt working but maybe there's 
-#another way in the locations package that I don't know
+                        ###Create mappings###
 ################################################################################
 state.to.fips.mappings = c('1' = 'AL',
                            '2'='AK',
@@ -104,7 +103,7 @@ brfss.age.mappings= c('1'= '18-24 years',
                         '14'= 'Unknown')
 
 ################################################################################
-##Creating clean template of BRFSS state data##
+            ##Creating clean template of BRFSS state data##
 ##Outcome = proportion.tested
 ################################################################################
 data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
@@ -216,30 +215,30 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   data$location = state.to.fips.mappings[data$state_fips]
   
   #Create outcome#
-  data$outcome = "proportion.tested"  #will need to create a second outcome for denominator#
-  
-  data$HIVTSTD3 = if_else(data$HIVTSTD3== "777777", NA, data$HIVTSTD3) #Chaging invalid to NA#
-  data$HIVTSTD3 = if_else(data$HIVTSTD3== "999999", NA, data$HIVTSTD3) #Chaging invalid to NA#
-  
-  #data=subset(data, !is.na(data$HIVTSTD3)) #Need to remove NA values in order to create a sum of prob of tested#
+  data$outcome = "proportion.tested"  
+
+  #Removing missing values for HIVTSTD3  
+  data= subset(data, data$HIVTSTD3 != "777777")
+  data= subset(data, data$HIVTSTD3 != "999999")
   
   #Do calculation to determine if test was in fact in the past year:
   data$test_year = as.numeric(str_sub(data$HIVTSTD3, -4))
-  data$test_month = substring(data$HIVTSTD3, 1, nchar(data$HIVTSTD3)-4)
-  data$test_month = as.numeric(if_else(data$test_month == "77", NA, data$test_month))
+  data$test_month = as.numeric(substring(data$HIVTSTD3, 1, nchar(data$HIVTSTD3)-4))
   
   #Copying from Todd's code#
-  data$test_month = if_else((!is.na(data$test_month) & data$test_month==77), 6, data$test_month) #Ask Todd to clarify this piece?#
-  data$test_month = if_else(is.na(data$test_year), NA, data$test_month)
+  data$test_month = if_else((!is.na(data$test_month) & data$test_month==77), 6, data$test_month) #If month is missing but we have year- assuming june bc 50/50 prob#
+  data$test_month = if_else(is.na(data$test_year), NA, data$test_month) #If year is missing, then it's NA altogether
   
-  data$tested = as.numeric(!is.na(data$test_year) & data$test_year >= data$year)
+  data$tested = as.numeric(!is.na(data$test_year) & data$test_year >= data$year) #create probabilities of testing in past year
   mask = !is.na(data$test_year) & data$test_year==(data$year-1)
   data$tested[mask] = data$test_month[mask] / 12
   
-  #data$tested = as.numeric(!is.na(data$test_year) & data$test_year >= (data$year-1))
+  #Correct any dates that are years in the future
+  data$today = Sys.Date()
+  data$current_year = substr(data$today, 1, 4)
+  data$tested = if_else(data$test_year > data$current_year, NA, data$tested) #mark as NA for those with future test years
   
-  #Now calculate the proportion tested#
-  data=subset(data, !is.na(data$tested)) #Remove people who were not tested##
+  data=subset(data, !is.na(data$tested)) #Remove people who were not tested or had incorrect data##
   
   data$sex = brfss.sex.mappings[data$sex]
   data$age = brfss.age.mappings[data$age]
@@ -268,16 +267,16 @@ data.list.brfss.state.totals = lapply(data.list.brfss.state.clean, function(file
   
   data<- data %>%
     group_by(location) %>%
-    mutate(sum_tested = sum(tested)) %>%
+    mutate(sum_tested = sum(tested)) %>%  #add *_LLCPWT
     ungroup()%>%
-    mutate(proportion_tested = (sum_tested/n))
+    mutate(proportion_tested = (sum_tested/n)) #instead of n need variable that is the sum of weights-denoinator is sum of the weights
   
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
   
-  data <- data %>%
-    select(outcome, year, location, proportion_tested, n)
+   data <- data %>%
+     select(outcome, year, location, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
