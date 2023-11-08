@@ -10,7 +10,7 @@ brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".xpt", full.names = "
 
 #\\\\\\To show only individuals at risk of HIV in the denominator///////#
         #Un-comment line 14, comment out line 9
-        #Un-comment line 161-164
+        #Un-comment line 160-163
 #brfss_file_msa <- list.files(DATA.DIR.BRFSS.MSA, pattern = "risk", full.names = "TRUE")
 
 brfss_file_msa_list <- lapply(brfss_file_msa, function(x) {
@@ -61,7 +61,13 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   
   #Format MSA for data manager#
   data$location = paste("C", data$`_MMSA`, sep=".")
-  #locations::is.location.valid(check$location) #there's a couple of these that are not valid#
+ 
+  ##\\\\\\\\\\NEED TO FIX THIS BUT TEMPORARILY REMOVING INVALID LOCATIONS HERE /////////////########
+  data <- data %>%
+    mutate(location_check = locations::is.location.valid(location))%>%
+    filter(location_check == "TRUE")
+#############################################################################################
+  
   
   #Create year variable#
   if(grepl("2013", filename)) {
@@ -125,43 +131,47 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
     data$age = data$`_AGEG5YR`
   }
   
-  
   #Create outcome#
-  data$outcome = "proportion.tested"  #will need to create a second outcome for denominator#
+  data$outcome = "proportion.tested"  
   
-  data$HIVTSTD3 = if_else(data$HIVTSTD3== "777777", NA, data$HIVTSTD3) #Chaging invalid to NA#
-  data$HIVTSTD3 = if_else(data$HIVTSTD3== "999999", NA, data$HIVTSTD3) #Chaging invalid to NA#
-  
-  #data=subset(data, !is.na(data$HIVTSTD3)) #Need to remove NA values in order to create a sum of prob of tested#
+  #Removing missing values for HIVTSTD3  
+  data= subset(data, data$HIVTSTD3 != "777777")
+  data= subset(data, data$HIVTSTD3 != "999999")
   
   #Do calculation to determine if test was in fact in the past year:
   data$test_year = as.numeric(str_sub(data$HIVTSTD3, -4))
-  data$test_month = substring(data$HIVTSTD3, 1, nchar(data$HIVTSTD3)-4)
-  data$test_month = as.numeric(if_else(data$test_month == "77", NA, data$test_month))
+  data$test_month = as.numeric(substring(data$HIVTSTD3, 1, nchar(data$HIVTSTD3)-4))
   
   #Copying from Todd's code#
-  data$test_month = if_else((!is.na(data$test_month) & data$test_month==77), 6, data$test_month) #Ask Todd to clarify this piece?#
-  data$test_month = if_else(is.na(data$test_year), NA, data$test_month)
+  data$test_month = if_else((!is.na(data$test_month) & data$test_month==77), 6, data$test_month) #If month is missing but we have year- assuming june bc 50/50 prob#
+  data$test_month = if_else(is.na(data$test_year), NA, data$test_month) #If year is missing, then it's NA altogether
   
-  data$tested = as.numeric(!is.na(data$test_year) & data$test_year >= data$year)
+  data$tested = as.numeric(!is.na(data$test_year) & data$test_year >= data$year) #create probabilities of testing in past year
   mask = !is.na(data$test_year) & data$test_year==(data$year-1)
   data$tested[mask] = data$test_month[mask] / 12
   
-  #data$tested = as.numeric(!is.na(data$test_year) & data$test_year >= (data$year-1))
+  #Correct any dates that are years in the future
+  data$today = Sys.Date()
+  data$current_year = substr(data$today, 1, 4)
+  data$tested = if_else(data$test_year > data$current_year, NA, data$tested) #mark as NA for those with future test years
   
-  #Now calculate the proportion tested#
-  data=subset(data, !is.na(data$tested)) #Remove people who were not tested##
+  data=subset(data, !is.na(data$tested)) #Remove people who were not tested or had incorrect data##
   
   data$sex = brfss.sex.mappings[data$sex]
   data$age = brfss.age.mappings[data$age]
   data$race = brfss.race.mappings[data$race]
   
   #\\\\\\To show only individuals at risk of HIV in the denominator///////#
-  #Un-comment line 161-164
+  #Un-comment line 160-163
   # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
   #  data <- data %>%
   #     rename(any_of(brfss_risk_var))
   #  data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
+  
+  #Remove values that are NA
+  data= subset(data, !is.na(data$sex))
+  data= subset(data, !is.na(data$age))
+  data= subset(data, !is.na(data$race))
   
   list(filename, data) 
 })
@@ -186,9 +196,10 @@ data.list.brfss.msa.totals = lapply(data.list.brfss.msa.clean, function(file){
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, proportion_tested, n)
+    select(outcome, year, location, value, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -212,9 +223,10 @@ data.list.brfss.msa.sex = lapply(data.list.brfss.msa.clean, function(file){
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sex, proportion_tested, n)
+    select(outcome, year, location, sex, value, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -237,9 +249,10 @@ data.list.brfss.msa.age = lapply(data.list.brfss.msa.clean, function(file){
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, age, proportion_tested, n)
+    select(outcome, year, location, age, value, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -262,9 +275,10 @@ data.list.brfss.msa.race = lapply(data.list.brfss.msa.clean, function(file){
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, race, proportion_tested, n)
+    select(outcome, year, location, race, value, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -272,10 +286,9 @@ data.list.brfss.msa.race = lapply(data.list.brfss.msa.clean, function(file){
 
 ################################################################################
 ################################################################################
-################################################################################
 
 
-####2nd outcome###
+##Create outcome for the denominator value -> proportion.tested.n##
 
 
 ################################################################################
