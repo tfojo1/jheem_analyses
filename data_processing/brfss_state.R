@@ -10,7 +10,7 @@ brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.name
 
 #\\\\\\To show only individuals at risk of HIV in the denominator///////#
       #Un-comment line 14, comment out line 9
-      #Un-comment line 250-253
+      #Un-comment line 254-257
 #brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = "risk", full.names = "TRUE")
 
 brfss_file_state_list <- lapply(brfss_file_state, function(x) {
@@ -250,7 +250,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   data= subset(data, !is.na(data$race))
   
   #\\\\\\To show only individuals at risk of HIV in the denominator///////#
-        #Un-comment line 250-253
+        #Un-comment line 254-257
   # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
   # data <- data %>%
   #    rename(any_of(brfss_risk_var))
