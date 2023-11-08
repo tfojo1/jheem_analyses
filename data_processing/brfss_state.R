@@ -254,7 +254,8 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   list(filename, data) 
 })
 ################################################################################
-##Total-by state##
+                      ##Total-by state## 
+                          #UNWEIGHTED#
 ################################################################################
 data.list.brfss.state.totals = lapply(data.list.brfss.state.clean, function(file){
   
@@ -262,28 +263,30 @@ data.list.brfss.state.totals = lapply(data.list.brfss.state.clean, function(file
   filename = file[[1]] 
   
   #Create population variable-count of BRFSS responses by state#
-  countspop <- table(data$location)
-  data$n <-countspop[match(data$location, names(countspop))]
+   countspop <- table(data$location)
+   data$n <-countspop[match(data$location, names(countspop))]
   
   data<- data %>%
     group_by(location) %>%
-    mutate(sum_tested = sum(tested)) %>%  #add *_LLCPWT
+    mutate(sum_tested = sum(tested)) %>%  
     ungroup()%>%
-    mutate(proportion_tested = (sum_tested/n)) #instead of n need variable that is the sum of weights-denoinator is sum of the weights
+    mutate(proportion_tested = (sum_tested/n)) 
   
   data$proportion_tested = round(data$proportion_tested, digits=2)
   
   data$year = as.character(data$year)
+  data$value = data$proportion_tested
   
    data <- data %>%
-     select(outcome, year, location, proportion_tested, n)
+     select(outcome, year, location, value, proportion_tested, n)
   data= as.data.frame(data)
   
   list(filename, data) 
 })
 
 ################################################################################
-##Sex-by state##
+                            ##Sex-by state
+                            #UNWEIGHTED#
 ################################################################################
 data.list.brfss.state.sex = lapply(data.list.brfss.state.clean, function(file){
   
@@ -308,7 +311,8 @@ data.list.brfss.state.sex = lapply(data.list.brfss.state.clean, function(file){
   list(filename, data) 
 })
 ################################################################################
-##Age-by state##
+                        ##Age-by state#
+                          #UNWEIGHTED#
 ################################################################################
 data.list.brfss.state.age = lapply(data.list.brfss.state.clean, function(file){
   
@@ -333,7 +337,8 @@ data.list.brfss.state.age = lapply(data.list.brfss.state.clean, function(file){
   list(filename, data) 
 })
 ################################################################################
-##Race-by state##
+                          ##Race-by state#  
+                            #UNWEIGHTED#
 ################################################################################
 data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   
@@ -358,7 +363,8 @@ data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   list(filename, data) 
 })
 ################################################################################
-##Risk-by state-MSM Only##
+                    ##Risk-by state-MSM Only
+                          ##UNWEIGHTED#
 ################################################################################
 data.list.brfss.state.risk = lapply(data.list.brfss.state.clean, function(file){
   
@@ -384,10 +390,8 @@ data.list.brfss.state.risk = lapply(data.list.brfss.state.clean, function(file){
 })
 ################################################################################
 ################################################################################
-################################################################################
 
-
-####2nd outcome###
+    ##Create outcome for the denominator value -> proportion.tested.n##
 
 
 ################################################################################
@@ -420,13 +424,13 @@ data.list.brfss.state.sex.n = lapply(data.list.brfss.state.sex, function(file){
   data$value = data$n #replace the "population" calculated above as the outcome value
   
   data <- data %>%
-    select(outcome, year, location, value)
+    select(outcome, year, location, sex, value)
   
   data= as.data.frame(data)
   list(filename, data) 
 })
 ################################################################################
-##age
+##Age
 ##Outcome = proportion.tested.n
 ################################################################################
 data.list.brfss.state.age.n = lapply(data.list.brfss.state.age, function(file){
@@ -438,13 +442,13 @@ data.list.brfss.state.age.n = lapply(data.list.brfss.state.age, function(file){
   data$value = data$n #replace the "population" calculated above as the outcome value
   
   data <- data %>%
-    select(outcome, year, location, value)
+    select(outcome, year, location, age, value)
   
   data= as.data.frame(data)
   list(filename, data) 
 })
 ################################################################################
-##race
+#Race
 ##Outcome = proportion.tested.n
 ################################################################################
 data.list.brfss.state.race.n = lapply(data.list.brfss.state.race, function(file){
@@ -456,14 +460,13 @@ data.list.brfss.state.race.n = lapply(data.list.brfss.state.race, function(file)
   data$value = data$n #replace the "population" calculated above as the outcome value
   
   data <- data %>%
-    select(outcome, year, location, value)
+    select(outcome, year, location, race, value)
   
   data= as.data.frame(data)
   list(filename, data) 
 })
-
 ################################################################################
-##risk
+##Risk
 ##Outcome = proportion.tested.n
 ################################################################################
 data.list.brfss.state.risk.n = lapply(data.list.brfss.state.risk, function(file){
@@ -475,15 +478,16 @@ data.list.brfss.state.risk.n = lapply(data.list.brfss.state.risk, function(file)
   data$value = data$n #replace the "population" calculated above as the outcome value
   
   data <- data %>%
-    select(outcome, year, location, value)
+    select(outcome, year, location, risk, value)%>%
+    filter(risk == "msm")
   
   data= as.data.frame(data)
   list(filename, data) 
 })
-
 ################################################################################
-##PUT INTO THE DATA MANAGER###
-#10 statements#
+################################################################################
+                    ##PUT INTO THE DATA MANAGER###
+                          #10 statements#
 ################################################################################
 ##State-TOTAL-proportion.tested
 state.total.num = lapply(data.list.brfss.state.totals, `[[`, 2)  
