@@ -10,7 +10,7 @@ brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".xpt", full.names = "
 
 #\\\\\\To show only individuals at risk of HIV in the denominator///////#
         #Un-comment line 14, comment out line 9
-        #Un-comment line 160-163
+        #Un-comment line 171-174
 #brfss_file_msa <- list.files(DATA.DIR.BRFSS.MSA, pattern = "risk", full.names = "TRUE")
 
 brfss_file_msa_list <- lapply(brfss_file_msa, function(x) {
@@ -66,7 +66,7 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   data <- data %>%
     mutate(location_check = locations::is.location.valid(location))%>%
     filter(location_check == "TRUE")
-#############################################################################################
+
   
   
   #Create year variable#
@@ -161,17 +161,18 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   data$age = brfss.age.mappings[data$age]
   data$race = brfss.race.mappings[data$race]
   
-  #\\\\\\To show only individuals at risk of HIV in the denominator///////#
-  #Un-comment line 160-163
-  # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
-  #  data <- data %>%
-  #     rename(any_of(brfss_risk_var))
-  #  data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
-  
   #Remove values that are NA
   data= subset(data, !is.na(data$sex))
   data= subset(data, !is.na(data$age))
   data= subset(data, !is.na(data$race))
+  
+  #\\\\\\To show only individuals at risk of HIV in the denominator///////#
+  #Un-comment line 171-174
+  # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
+  #  data <- data %>%
+  #     rename(any_of(brfss_risk_var))
+  #  data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
+
   
   list(filename, data) 
 })
@@ -200,8 +201,8 @@ data.list.brfss.msa.totals = lapply(data.list.brfss.msa.clean, function(file){
   
   data <- data %>%
     select(outcome, year, location, value, proportion_tested, n)
-  data= as.data.frame(data)
   
+  data= as.data.frame(data)
   list(filename, data) 
 })
 
@@ -321,7 +322,7 @@ data.list.brfss.msa.sex.n = lapply(data.list.brfss.msa.sex, function(file){
   data$value = data$n #replace the "population" calculated above as the outcome value
   
   data <- data %>%
-    select(outcome, year, location, value)
+    select(outcome, year, location, sex, value)
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -339,7 +340,7 @@ data.list.brfss.msa.age.n = lapply(data.list.brfss.msa.age, function(file){
   data$value = data$n #replace the "population" calculated above as the outcome value
   
   data <- data %>%
-    select(outcome, year, location, value)
+    select(outcome, year, location, age, value)
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -357,7 +358,7 @@ data.list.brfss.msa.race.n = lapply(data.list.brfss.msa.race, function(file){
   data$value = data$n #replace the "population" calculated above as the outcome value
   
   data <- data %>%
-    select(outcome, year, location, value)
+    select(outcome, year, location, race, value)
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -365,7 +366,7 @@ data.list.brfss.msa.race.n = lapply(data.list.brfss.msa.race, function(file){
 
 ################################################################################
 ##PUT INTO THE DATA MANAGER###
-#10 msaments#
+#8 put statements#
 ################################################################################
 ##msa-TOTAL-proportion.tested
 msa.total.num = lapply(data.list.brfss.msa.totals, `[[`, 2)  
