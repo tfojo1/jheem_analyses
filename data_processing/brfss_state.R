@@ -391,12 +391,27 @@ data.list.brfss.state.risk = lapply(data.list.brfss.state.clean, function(file){
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  data=subset(data, !is.na(data$risk)) #remove the risk is NA
+  # data=subset(data, !is.na(data$risk)) #Remove risk = NA for other years with risk bc it is just MSM data
+  # data=subset(data, data$year != "2013") #Also remove year = 2013 bc there is not a risk var for 2013 data
   
   data <- data %>%
     select(outcome, year, location, value, proportion_tested, risk, n)
   data= as.data.frame(data)
   
+  list(filename, data) 
+})
+
+#Make a separate dataset for risk - this is what will get put into the manager#
+#Need to remove NAs for the put statement but need them in for the prportion calc below#
+data.list.brfss.state.risk.put = lapply(data.list.brfss.state.risk, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]]
+  
+  data <- data %>%
+   filter(risk == "msm")
+  
+  data= as.data.frame(data)
   list(filename, data) 
 })
 ################################################################################
@@ -489,7 +504,7 @@ data.list.brfss.state.risk.n = lapply(data.list.brfss.state.risk, function(file)
   data$value = data$n #replace the "population" calculated above as the outcome value
   
   data <- data %>%
-    select(outcome, year, location, risk, value)%>%
+    select(outcome, year, location, risk, value)%>% 
     filter(risk == "msm")
   
   data= as.data.frame(data)
@@ -554,7 +569,7 @@ for (data in state.race.num) {
     details = 'Behavioral Risk Factor Surveillance System')
 }
 ##State-RISK-proportion.tested
-state.risk.num = lapply(data.list.brfss.state.risk, `[[`, 2)  
+state.risk.num = lapply(data.list.brfss.state.risk.put, `[[`, 2)  
 
 for (data in state.risk.num) {
   
