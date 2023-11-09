@@ -38,8 +38,6 @@ if (1==2)
     df5 <- reshape2::melt(apply(y, c('year','age'), mean))
     ggplot(df5, aes(x=year, y=value, color=age)) + geom_line() + 
       ylim(min(df5$value),max(df5$value)) + theme_minimal()
-
-   
     
     df2 <- reshape2::melt(y)
     ggplot(df2, aes(x=year, y=value, color=sex)) + geom_line() + 
@@ -92,7 +90,7 @@ get.prep.use.functional.form <- function(specification.metadata)
     slope["45-54 years",,'msm',] <- slope["45-54 years",,'msm',] + coef(fit.p.msm)[9]
     slope["55+ years",,'msm',] <- slope["55+ years",,'msm',] + 0 #coef(fit.p.msm)[10]
     
-    # PWID - uses 2015 and 2017 data 
+    # PWID 
     
     int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit.p.idu)[1]
     
@@ -109,56 +107,33 @@ get.prep.use.functional.form <- function(specification.metadata)
     slope[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + 0 #coef(fit.p.idu)[12]
     slope[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit.p.idu)[11]
     
-    # Het - uses 2016 and 2019 data
+    # Het
+    
+    int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.p.het)[1]
+    int[,,"female",] <- int[,,"female",] + coef(fit.p.het)[1]
 
-    int[,'black','msm',] <- int[,'black','msm',] + coef(fit.msm.black)[1] # black log odds ratio
-    int[,'hispanic','msm',] <- int[,'hispanic','msm',] + coef(fit.msm.hisp)[1] # hispanic log odds ratio
-    int[,'other','msm',] <- int[,'other','msm',] + coef(fit.msm.nbnh)[1] # other log odds ratio (reference)
-    
-    int["13-24 years",,'msm',] <- int["13-24 years",,'msm',] + coef(fit.msm.age1)[1] # 13-24 log odds ratio
-    int["25-34 years",,'msm',] <- int["25-34 years",,'msm',] + coef(fit.msm.age2)[1] # 25-34 log odds ratio
-    int["35-44 years",,'msm',] <- int["35-44 years",,'msm',] + coef(fit.msm.age3)[1] # 35-44 log odds ratio (reference)
-    int["45-54 years",,'msm',] <- int["45-54 years",,'msm',] + coef(fit.msm.age4)[1] # 45-54 log odds ratio
-    int["55+ years",,'msm',] <- int["55+ years",,'msm',] + coef(fit.msm.age5)[1] # 55+ log odds ratio
-    
-    slope[,'black','msm',] <- slope[,'black','msm',] + coef(fit.msm.black)[2] 
-    slope[,'hispanic','msm',] <- slope[,'hispanic','msm',] + coef(fit.msm.hisp)[2]
-    slope[,'other','msm',] <- slope[,'other','msm',] + coef(fit.msm.nbnh)[2]
-    
-    slope["13-24 years",,'msm',] <- slope["13-24 years",,'msm',] + coef(fit.msm.age1)[2]
-    slope["25-34 years",,'msm',] <- slope["25-34 years",,'msm',] + coef(fit.msm.age2)[2]
-    slope["35-44 years",,'msm',] <- slope["35-44 years",,'msm',] + coef(fit.msm.age3)[2]
-    slope["45-54 years",,'msm',] <- slope["45-54 years",,'msm',] + coef(fit.msm.age4)[2]
-    slope["55+ years",,'msm',] <- slope["55+ years",,'msm',] + coef(fit.msm.age5)[2]
-    
-    
-    # int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.het.male)[1]
-    # int[,,"female",] <- int[,,"female",] + coef(fit.het.female)[1] 
-    # 
-    # slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit.het.male)[2]
-    # slope[,,"female",] <- slope[,,"female",] + coef(fit.het.female)[2]
-    # 
-    # slope[,"black","heterosexual_male",] <- slope[,"black","heterosexual_male",] + coef(fit.het.black)[2]
-    # slope[,"black","heterosexual_male",] <- slope[,"black","heterosexual_male",] + coef(fit.het.black)[2]
-    # slope[,"hispanic","heterosexual_male",] <- slope[,"hispanic","heterosexual_male",] + coef(fit.het.hisp)[2]
-    # slope[,"other","heterosexual_male",] <- slope[,"other","heterosexual_male",] + coef(fit.het.nbnh)[2]
-    # 
-    # slope[,"black","female",] <- slope[,"black","female",] + coef(fit.het.black)[2]
-    # slope[,"hispanic","female",] <- slope[,"hispanic","female",] + coef(fit.het.hisp)[2]
-    # slope[,"other","female",] <- slope[,"other","female",] + coef(fit.het.nbnh)[2]
-    # 
-    # slope["13-24 years",,"heterosexual_male",] <- slope["13-24 years",,"heterosexual_male",] + coef(fit.het.age1)[2]
-    # slope["25-34 years",,"heterosexual_male",] <- slope["25-34 years",,"heterosexual_male",] + coef(fit.het.age2)[2]
-    # slope["35-44 years",,"heterosexual_male",] <- slope["35-44 years",,"heterosexual_male",] + coef(fit.het.age3)[2]
-    # slope["45-54 years",,"heterosexual_male",] <- slope["45-54 years",,"heterosexual_male",] + coef(fit.het.age4)[2]
-    # slope["55+ years",,"heterosexual_male",] <- slope["55+ years",,"heterosexual_male",] + coef(fit.het.age5)[2]
-    # 
-    # slope["13-24 years",,"female",] <- slope["13-24 years",,"female",] + coef(fit.het.age1)[2]
-    # slope["25-34 years",,"female",] <- slope["25-34 years",,"female",] + coef(fit.het.age2)[2]
-    # slope["35-44 years",,"female",] <- slope["35-44 years",,"female",] + coef(fit.het.age3)[2]
-    # slope["45-54 years",,"female",] <- slope["45-54 years",,"female",] + coef(fit.het.age4)[2]
-    # slope["55+ years",,"female",] <- slope["55+ years",,"female",] + coef(fit.het.age5)[2]
-    # 
+    slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + 0 #coef(fit.p.het)[12]
+    slope[,,"female",] <- slope[,,"female",] + coef(fit.p.het)[11]
+
+    slope[,"black","heterosexual_male",] <- slope[,"black","heterosexual_male",] + coef(fit.p.het)[3]
+    slope[,"hispanic","heterosexual_male",] <- slope[,"hispanic","heterosexual_male",] + coef(fit.p.het)[4]
+    slope[,"other","heterosexual_male",] <- slope[,"other","heterosexual_male",] + coef(fit.p.het)[5]
+
+    slope[,"black","female",] <- slope[,"black","female",] + coef(fit.p.het)[3]
+    slope[,"hispanic","female",] <- slope[,"hispanic","female",] + coef(fit.p.het)[4]
+    slope[,"other","female",] <- slope[,"other","female",] + coef(fit.p.het)[5]
+
+    slope["13-24 years",,"heterosexual_male",] <- slope["13-24 years",,"heterosexual_male",] + coef(fit.p.het)[6]
+    slope["25-34 years",,"heterosexual_male",] <- slope["25-34 years",,"heterosexual_male",] + coef(fit.p.het)[7]
+    slope["35-44 years",,"heterosexual_male",] <- slope["35-44 years",,"heterosexual_male",] + coef(fit.p.het)[8]
+    slope["45-54 years",,"heterosexual_male",] <- slope["45-54 years",,"heterosexual_male",] + coef(fit.p.het)[9]
+    slope["55+ years",,"heterosexual_male",] <- slope["55+ years",,"heterosexual_male",] + coef(fit.p.het)[10]
+
+    slope["13-24 years",,"female",] <- slope["13-24 years",,"female",] + coef(fit.p.het)[6]
+    slope["25-34 years",,"female",] <- slope["25-34 years",,"female",] + coef(fit.p.het)[7]
+    slope["35-44 years",,"female",] <- slope["35-44 years",,"female",] + coef(fit.p.het)[8]
+    slope["45-54 years",,"female",] <- slope["45-54 years",,"female",] + coef(fit.p.het)[9]
+    slope["55+ years",,"female",] <- slope["55+ years",,"female",] + coef(fit.p.het)[10]
     
     # Make and return the functional form object
     create.logistic.linear.functional.form(
