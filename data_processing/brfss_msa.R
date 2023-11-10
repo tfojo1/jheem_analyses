@@ -10,7 +10,7 @@ brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".xpt", full.names = "
 
 #\\\\\\To show only individuals at risk of HIV in the denominator///////#
         #Un-comment line 14, comment out line 9
-        #Un-comment line 171-174
+        #Un-comment line 176-179
 #brfss_file_msa <- list.files(DATA.DIR.BRFSS.MSA, pattern = "risk", full.names = "TRUE")
 
 brfss_file_msa_list <- lapply(brfss_file_msa, function(x) {
@@ -166,8 +166,13 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   data= subset(data, !is.na(data$age))
   data= subset(data, !is.na(data$race))
   
+  #Remove unknown race and age
+  data= subset(data, data$age != 'Unknown')
+  data= subset(data, data$race != 'Unknown')
+  
+  
   #\\\\\\To show only individuals at risk of HIV in the denominator///////#
-  #Un-comment line 171-174
+  #Un-comment line 176-179
   # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
   #  data <- data %>%
   #     rename(any_of(brfss_risk_var))
