@@ -92,6 +92,12 @@ data.list.nsduh.region.clean = lapply(data.list.nsduh, function(file){
 
   data$location = locations::get.location.code(data$geography, "NSDUH")
   data$location = as.character(data$location)
+  
+  #####Removing Invalid MSAs (instructed by Todd 11/9########
+  data <- data %>%
+    mutate(location_check = locations::is.location.valid(location))%>%
+    filter(location_check == "TRUE")
+  
   data$value = as.numeric(data$estimate)
   data$age = data$age_group
   
