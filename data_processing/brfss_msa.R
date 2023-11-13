@@ -62,13 +62,11 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   #Format MSA for data manager#
   data$location = paste("C", data$`_MMSA`, sep=".")
  
-  ##\\\\\\\\\\NEED TO FIX THIS BUT TEMPORARILY REMOVING INVALID LOCATIONS HERE /////////////########
+  #####Removing Invalid MSAs (instructed by Todd 11/9########
   data <- data %>%
     mutate(location_check = locations::is.location.valid(location))%>%
     filter(location_check == "TRUE")
 
-  
-  
   #Create year variable#
   if(grepl("2013", filename)) {
     data$year = as.numeric("2013")
