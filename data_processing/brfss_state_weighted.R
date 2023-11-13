@@ -321,7 +321,7 @@ data.list.brfss.state.sex = lapply(data.list.brfss.state.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, value, sex, proportion_tested, n_weighted, `_LLCPWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -352,7 +352,7 @@ data.list.brfss.state.age = lapply(data.list.brfss.state.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, value, age, proportion_tested, n_weighted, `_LLCPWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, age, `_LLCPWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -383,7 +383,7 @@ data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, value, race, proportion_tested, n_weighted, `_LLCPWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, race, tested, `_LLCPWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -414,7 +414,7 @@ data.list.brfss.state.risk = lapply(data.list.brfss.state.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, value, risk, proportion_tested, n_weighted, `_LLCPWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, risk, `_LLCPWT`)
   data= as.data.frame(data)
   
   list(filename, data) 

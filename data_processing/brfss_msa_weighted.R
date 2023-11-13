@@ -206,7 +206,7 @@ data.list.brfss.msa.totals = lapply(data.list.brfss.msa.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, value, proportion_tested, n_weighted, `_MMSAWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, `_MMSAWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -239,7 +239,7 @@ data.list.brfss.msa.sex = lapply(data.list.brfss.msa.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, value, sex, proportion_tested, n_weighted, `_MMSAWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_MMSAWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -270,7 +270,7 @@ data.list.brfss.msa.age = lapply(data.list.brfss.msa.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, value, age, proportion_tested, n_weighted, `_MMSAWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, age, `_MMSAWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -301,7 +301,7 @@ data.list.brfss.msa.race = lapply(data.list.brfss.msa.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, value, race, proportion_tested, n_weighted, `_MMSAWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, race, `_MMSAWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
