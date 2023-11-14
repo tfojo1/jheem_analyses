@@ -288,8 +288,8 @@ data.list.brfss.state.totals = lapply(data.list.brfss.state.clean, function(file
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, `_LLCPWT`)
+  # data <- data %>%
+  #   select(outcome, year, location, sum_tested, n_weighted, value, `_LLCPWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
