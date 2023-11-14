@@ -3,7 +3,7 @@
                       ##Create Proportion of MSM##
               ##Note this dataset pulls from the BRFSS state code
                       ##This is a weighted measure
-
+                ##MSM Estimation using BRFSS Data by State
 ################################################################################
 data.list.brfss.state.msm = lapply(data.list.brfss.state.totals, function(file){
   
@@ -31,9 +31,9 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.totals, function(file){
 })
 
 ###############################################################################
-                ##Put MSM Proportion into data manager##
+                ##Put MSM Proportion into data manager- BRFSS##
 ###############################################################################
-######State-RISK-proportion.tested.n
+##BRFSS MSM State
 msm.state = lapply(data.list.brfss.state.msm, `[[`, 2)  
 
 for (data in msm.state) {
@@ -50,3 +50,35 @@ for (data in msm.state) {
 
 
 
+###############################################################################
+##Emory MSM Data by County for 2013#
+###############################################################################
+
+
+
+
+
+
+
+
+
+
+
+
+
+###############################################################################
+##Put MSM Proportion into data manager##
+###############################################################################
+# ###Emory MSM by County
+# msm.emory = lapply(data.list.brfss.state.msm, `[[`, 2)  
+# 
+# for (data in msm.emory) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'brfss',
+#     source = 'brfss',
+#     dimension.values = list(),
+#     url = 'https://www.cdc.gov/brfss/index.html',
+#     details = 'Behavioral Risk Factor Surveillance System')
+# }
