@@ -237,6 +237,15 @@ data.manager$register.outcome(
     units = '%',
     description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
 
+data.manager$register.outcome(
+  'proportion.msm', 
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Proportion of MSM',
+    axis.name = 'Proportion of MSM',
+    units = '%',
+    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population')
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='cdc')

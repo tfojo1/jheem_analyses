@@ -1,8 +1,8 @@
 
 ################################################################################
-##Create Proportion of MSM##
-##Note this dataset pulls from the BRFSS state code
-##This is a weighted measure
+                      ##Create Proportion of MSM##
+              ##Note this dataset pulls from the BRFSS state code
+                      ##This is a weighted measure
 
 ################################################################################
 data.list.brfss.state.msm = lapply(data.list.brfss.state.totals, function(file){
@@ -31,7 +31,7 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.totals, function(file){
 })
 
 ###############################################################################
-##Put MSM Proportion into data manager##
+                ##Put MSM Proportion into data manager##
 ###############################################################################
 ######State-RISK-proportion.tested.n
 msm.state = lapply(data.list.brfss.state.msm, `[[`, 2)  
