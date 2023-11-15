@@ -256,6 +256,8 @@ data.manager$register.source('lhd', full.name = "Local Health Department", short
 
 data.manager$register.source('brfss', full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 
+data.manager$register.source('emory', full.name = "Emory University", short.name='emory')
+
 data.manager$register.ontology(
   'cdc',
   ont = ontology(
@@ -342,6 +344,13 @@ data.manager$register.ontology(
     race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Multiracial', 'Hispanic'),
     sex=c('male','female'),
     risk=c('msm')
+  ))
+
+data.manager$register.ontology(
+  'emory',
+  ont = ontology(
+    year= NULL,
+    location= NULL
   ))
 
 ################################################################################
