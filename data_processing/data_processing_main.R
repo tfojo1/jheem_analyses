@@ -392,7 +392,7 @@ source('data_processing/msa_reports_processing.R')
 #source('data_processing/brfss_msa_weighted.R')
 
 #Source msm
-#source('data_processing/msm.R')
+source('data_processing/msm.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
