@@ -29,6 +29,7 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.totals, function(file){
   data= as.data.frame(data)
   list(filename, data) 
 })
+##NEED TO DO RACE AGE AND TOTAL##
 
 ###############################################################################
                 ##Put MSM Proportion into data manager- BRFSS##
