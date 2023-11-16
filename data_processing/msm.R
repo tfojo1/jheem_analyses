@@ -8,7 +8,8 @@
 #######
 ##Total
 #######
-data.list.brfss.state.msm = lapply(data.list.brfss.state.totals, function(file){
+#Pulling from the brffs.state.sex data list so that denominator for msm proportion is males only
+data.list.brfss.state.msm = lapply(data.list.brfss.state.sex, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -35,11 +36,49 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.totals, function(file){
   list(filename, data) 
 })
 
+################################################################################
+##Prior to calculating MSM proportion for race and age, need to create
+##Denominator values that are total males of each race and total males of each
+#age group so that MSM proportion can have male only denominator and be stratified by race/age appropriately
+################################################################################
+data.list.race.male.denom = lapply(data.list.brfss.state.sex, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data= subset(data, data$sex =="male")
+  
+  data<- data %>%
+    group_by(location, race) %>%
+    mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+    ungroup()
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+data.list.age.male.denom = lapply(data.list.brfss.state.sex, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data= subset(data, data$sex =="male")
+  
+  data<- data %>%
+    group_by(location, age) %>%
+    mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+    ungroup()
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+################################################################################
+################################################################################
 
 #######
 ##Race
 #######
-data.list.brfss.state.msm.race = lapply(data.list.brfss.state.race, function(file){
+
+data.list.brfss.state.msm.race = lapply(data.list.race.male.denom, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -65,10 +104,14 @@ data.list.brfss.state.msm.race = lapply(data.list.brfss.state.race, function(fil
   data= as.data.frame(data)
   list(filename, data) 
 })
+
 #######
 ##Age
 #######
-data.list.brfss.state.msm.age = lapply(data.list.brfss.state.age, function(file){
+
+##this needs to be just males of the age group##
+
+data.list.brfss.state.msm.age = lapply(data.list.age.male.denom, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
