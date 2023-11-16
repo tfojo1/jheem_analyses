@@ -388,8 +388,8 @@ source('data_processing/msa_reports_processing.R')
 #source('data_processing/brfss_state.R')
 #source('data_processing/brfss_msa.R')
 #OR source the weighted BRFSS data
-#source('data_processing/brfss_state_weighted.R')
-#source('data_processing/brfss_msa_weighted.R')
+source('data_processing/brfss_state_weighted.R')
+source('data_processing/brfss_msa_weighted.R')
 
 #Source msm
 source('data_processing/msm.R')
