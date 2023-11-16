@@ -130,7 +130,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data$test=data$SXORIENT
     data <- data %>%
       mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
                               SEX== "1" & SXORIENT == "3" ~ "msm",
@@ -288,8 +287,10 @@ data.list.brfss.state.totals = lapply(data.list.brfss.state.clean, function(file
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  # data <- data %>%
+   data <- data %>%
+  select(-risk) #have to remove risk in order to put into data manager#
   #   select(outcome, year, location, sum_tested, n_weighted, value, `_LLCPWT`)
+  
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -320,7 +321,8 @@ data.list.brfss.state.sex = lapply(data.list.brfss.state.clean, function(file){
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  # data <- data %>%
+  data <- data %>%
+    select(-risk) #have to remove risk in order to put into data manager#
   #   select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`)
   data= as.data.frame(data)
   
@@ -351,7 +353,8 @@ data.list.brfss.state.age = lapply(data.list.brfss.state.clean, function(file){
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  # data <- data %>%
+  data <- data %>%
+    select(-risk) #have to remove risk in order to put into data manager#
   #   select(outcome, year, location, sum_tested, n_weighted, value, age, `_LLCPWT`)
   data= as.data.frame(data)
   
@@ -382,7 +385,8 @@ data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  # data <- data %>%
+  data <- data %>%
+    select(-risk) #have to remove risk in order to put into data manager#
   #   select(outcome, year, location, sum_tested, n_weighted, value, race, tested, `_LLCPWT`)
   data= as.data.frame(data)
   
