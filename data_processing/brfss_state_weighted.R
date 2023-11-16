@@ -320,8 +320,8 @@ data.list.brfss.state.sex = lapply(data.list.brfss.state.clean, function(file){
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`)
+  # data <- data %>%
+  #   select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -351,8 +351,8 @@ data.list.brfss.state.age = lapply(data.list.brfss.state.clean, function(file){
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, age, `_LLCPWT`)
+  # data <- data %>%
+  #   select(outcome, year, location, sum_tested, n_weighted, value, age, `_LLCPWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -382,8 +382,8 @@ data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, race, tested, `_LLCPWT`)
+  # data <- data %>%
+  #   select(outcome, year, location, sum_tested, n_weighted, value, race, tested, `_LLCPWT`)
   data= as.data.frame(data)
   
   list(filename, data) 

@@ -256,6 +256,8 @@ data.manager$register.source('lhd', full.name = "Local Health Department", short
 
 data.manager$register.source('brfss', full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 
+data.manager$register.source('emory', full.name = "Emory University", short.name='emory')
+
 data.manager$register.ontology(
   'cdc',
   ont = ontology(
@@ -344,6 +346,13 @@ data.manager$register.ontology(
     risk=c('msm')
   ))
 
+data.manager$register.ontology(
+  'emory',
+  ont = ontology(
+    year= NULL,
+    location= NULL
+  ))
+
 ################################################################################
 
 ###Source in File that reads .csvs and removes headers
@@ -379,11 +388,11 @@ source('data_processing/msa_reports_processing.R')
 #source('data_processing/brfss_state.R')
 #source('data_processing/brfss_msa.R')
 #OR source the weighted BRFSS data
-#source('data_processing/brfss_state_weighted.R')
-#source('data_processing/brfss_msa_weighted.R')
+source('data_processing/brfss_state_weighted.R')
+source('data_processing/brfss_msa_weighted.R')
 
 #Source msm
-#source('data_processing/msm.R')
+source('data_processing/msm.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###

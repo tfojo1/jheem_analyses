@@ -178,14 +178,14 @@ library(tidyr)
 p.msm.df.long <- pivot_longer(p.msm.df, cols = c(black, hisp, nbnh, age1, age2, age3, age4, age5),
                               names_to = "variable", values_to = "p")
 
-p.msm.df.long$raceid <- ifelse(grepl("black", p.msm.df.long$variable), 1,
-                               ifelse(grepl("hisp", p.msm.df.long$variable), 2, 
-                                      ifelse(grepl("nbnh", p.msm.df.long$variable), 3, 0)))
-p.msm.df.long$ageid <- ifelse(grepl("age1", p.msm.df.long$variable), 1,
-                              ifelse(grepl("age2", p.msm.df.long$variable), 2,
-                                     ifelse(grepl("age3", p.msm.df.long$variable), 3,
-                                            ifelse(grepl("age4", p.msm.df.long$variable), 4,
-                                                   ifelse(grepl("age5", p.msm.df.long$variable), 5, 0)))))
+p.msm.df.long$raceid <- ifelse(grepl("black", p.msm.df.long$variable), "black",
+                               ifelse(grepl("hisp", p.msm.df.long$variable), "hispanic", 
+                                      ifelse(grepl("nbnh", p.msm.df.long$variable), "other", "ALL")))
+p.msm.df.long$ageid <- ifelse(grepl("age1", p.msm.df.long$variable), "age1",
+                              ifelse(grepl("age2", p.msm.df.long$variable), "age2",
+                                     ifelse(grepl("age3", p.msm.df.long$variable), "age3",
+                                            ifelse(grepl("age4", p.msm.df.long$variable), "age4",
+                                                   ifelse(grepl("age5", p.msm.df.long$variable), "age5", "ALL")))))
 anchor.year <- 2020
 p.msm.df.long$year <- p.msm.df.long$year - anchor.year
 
@@ -321,15 +321,15 @@ p.idu.df.long <- gather(p.idu.df, key = "group", value = "p", -year)
 p.idu.df.long$year <- p.idu.df.long$year - anchor.year
 
 p.idu.df.long$raceid <- ifelse(p.idu.df.long$group == "p.idu.black", "black", 
-                               ifelse(p.idu.df.long$group == "p.idu.hisp", "hisp", 
-                                      ifelse(p.idu.df.long$group == "p.idu.nbnh", "nbnh", 0)))
+                               ifelse(p.idu.df.long$group == "p.idu.hisp", "hispanic", 
+                                      ifelse(p.idu.df.long$group == "p.idu.nbnh", "other", "ALL")))
 p.idu.df.long$ageid <- ifelse(p.idu.df.long$group == "p.idu.age1", "age1", 
                               ifelse(p.idu.df.long$group == "p.idu.age2", "age2", 
                                      ifelse(p.idu.df.long$group == "p.idu.age3", "age3", 
                                             ifelse(p.idu.df.long$group == "p.idu.age4", "age4", 
-                                                   ifelse(p.idu.df.long$group == "p.idu.age5", "age5", 0)))))
+                                                   ifelse(p.idu.df.long$group == "p.idu.age5", "age5", "ALL")))))
 p.idu.df.long$sexid <- ifelse(p.idu.df.long$group == "p.idu.male", "male",
-                              ifelse(p.idu.df.long$group == "p.idu.female", "female",0))
+                              ifelse(p.idu.df.long$group == "p.idu.female", "female", "ALL"))
 
 fit.p.idu <- lm(logit(p) ~ year + raceid + ageid + sexid, data = p.idu.df.long)
 
@@ -455,20 +455,23 @@ p.het.df <- data.frame(
   p.het.female
 )
 
+#### het model -----
 p.het.df.long <- gather(p.het.df, key = "group", value = "p", -years.het)
+p.het.df.long$year <- p.het.df.long$years.het 
+p.het.df.long <- p.het.df.long[,-1]
 
 p.het.df.long$raceid <- ifelse(p.het.df.long$group == "p.het.black", "black", 
-                               ifelse(p.het.df.long$group == "p.het.hisp", "hisp", 
-                                      ifelse(p.het.df.long$group == "p.het.nbnh", "other", 0)))
+                               ifelse(p.het.df.long$group == "p.het.hisp", "hispanic", 
+                                      ifelse(p.het.df.long$group == "p.het.nbnh", "other", "ALL")))
 p.het.df.long$ageid <- ifelse(p.het.df.long$group == "p.het.age1", "age1", 
                               ifelse(p.het.df.long$group == "p.het.age2", "age2", 
                                      ifelse(p.het.df.long$group == "p.het.age3", "age3", 
                                             ifelse(p.het.df.long$group == "p.het.age4", "age4", 
-                                                   ifelse(p.het.df.long$group == "p.het.age5", "age5", 0)))))
+                                                   ifelse(p.het.df.long$group == "p.het.age5", "age5", "ALL")))))
 p.het.df.long$sexid <- ifelse(p.het.df.long$group == "p.het.female", "female",
-                              ifelse(p.het.df.long$group == "p.het.male", "male", 0))
+                              ifelse(p.het.df.long$group == "p.het.male", "male", "ALL"))
 
-fit.p.het <- lm(logit(p/p.max) ~ years.het + raceid + ageid + sexid, data = p.het.df.long) 
+fit.p.het <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid, data = p.het.df.long) 
 
 # fit.het.black <- lm(logit(p.het.black/p.max) ~ years.het)
 # fit.het.hisp <- lm(logit(p.het.hisp/p.max) ~ years.het)
@@ -482,6 +485,27 @@ fit.p.het <- lm(logit(p/p.max) ~ years.het + raceid + ageid + sexid, data = p.he
 # fit.het.age3 <- lm(logit(p.het.age3/p.max) ~ years.het)
 # fit.het.age4 <- lm(logit(p.het.age4/p.max) ~ years.het)
 # fit.het.age5 <- lm(logit(p.het.age5/p.max) ~ years.het)
+
+# One big model ------
+
+p.het.df.long <- p.het.df.long |> dplyr::select(-group) |> 
+  dplyr::mutate(risk = rep("het", length(p.het.df.long$ageid)))
+p.msm.df.long <- p.msm.df.long |> dplyr::select(-variable) |> 
+  dplyr::mutate(sexid = rep("msm", length(p.msm.df.long$ageid)), 
+                risk = rep("msm", length(p.msm.df.long$ageid)))
+p.idu.df.long <- p.idu.df.long |> dplyr::select(-group) |> 
+  dplyr::mutate(risk = rep("idu", length(p.idu.df.long$ageid)))
+
+big.df <- rbind(p.msm.df.long, p.idu.df.long, p.het.df.long)
+
+big.df$raceid <- relevel(factor(big.df$raceid), ref = "ALL")
+big.df$ageid <- relevel(factor(big.df$ageid), ref = "ALL")
+big.df$sexid <- relevel(factor(big.df$sexid), ref = "ALL")
+big.df$risk <- relevel(factor(big.df$risk), ref = "het")
+
+# fitting the big model
+fit.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid + risk, data = big.df)
+
 
 # PrEP Indications ------
 ## MSM ------
