@@ -53,7 +53,6 @@ data.list.brfss.state.msm.race = lapply(data.list.brfss.state.race, function(fil
     mutate(msm_total = sum(msm*`_LLCPWT`))%>% 
     ungroup()
 
-  #This is the problem section:
   data <- data %>%
     select(outcome, year, location, race, msm, msm_total, n_weighted)%>%
     filter(!is.na(msm_total))%>%
@@ -82,8 +81,7 @@ data.list.brfss.state.msm.age = lapply(data.list.brfss.state.age, function(file)
     group_by(location,msm,age) %>%
     mutate(msm_total = sum(msm*`_LLCPWT`))%>% 
     ungroup()
-  
-  #This is the problem section:
+
   data <- data %>%
     select(outcome, year, location, age, msm, msm_total, n_weighted)%>%
     filter(!is.na(msm_total))%>%
@@ -192,15 +190,12 @@ data.list.emory.msm.msa = lapply(data.list.emory.msm, function(file){
   data$value = as.numeric(data$MSM12MTH/data$ADULTMEN)
   data$value = round(data$value, digits=2)
   
-  #To create location- combine state and county FIPS
-  data$state_code= str_pad(data$STATEFP, width=2, side="left", pad="0")
-  data$county_code= str_pad(data$COUNTYFP, width=3, side="left", pad="0")
-  data$location = paste(data$state_code, data$county_code, sep="")
-  
-  data$location = sub("^", "C.", data$location)
-  data$location_check = locations::is.location.valid(data$location)
+  #To create location- for MSA use 'CBSACODE' and also 'METMICSA' ==1 for metropolitian statistical area
+    data = subset(data, data$METMICSA == "1") #Select msas only
+    data$location = sub("^", "C.", data$CBSACODE)
+    data$location_check = locations::is.location.valid(data$location)
   #Removing invalid MSA locations#
-  data=subset(data, !is.na(data$location))
+    data=subset(data, data$location_check == 'TRUE')
   
   data= as.data.frame(data)
   
