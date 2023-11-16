@@ -356,7 +356,7 @@ data.manager$register.ontology(
 ################################################################################
 ###Source locations of intersete to create MSA vector
 source('commoncode/locations_of_interest.R')
-##Source code for function from Andrew to sum counties populations from census to create MSA populations for suveillance manager
+##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
 source('data_processing/put_msa_population_data_script.R')
 ###############################################################################
 ###Source in File that reads .csvs and removes headers
