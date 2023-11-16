@@ -107,14 +107,14 @@ put.population.data = function(locations,
 
 practice.data.manager = create.data.manager('practice.data.manager', 'Data manager to test msa population putting')
 
-test = put.population.data(location = c('C.12580'), # MSAS.OF.INTEREST
+test = put.population.data(locations = c('C.12580'), # MSAS.OF.INTEREST
                            data.manager = practice.data.manager, # surveillance.manager
                            census.manager = census.manager)
 
 ##### -- TO USE -- #####
 # SEE DEFAULTS IN FUNCTION DEFINITION ABOVE.
 # 'fully.stratified.dimensions' SHOULD INCLUDE EVERY DIMENSION EXCEPT LOCATION
-# 'RACE' AND 'ETHNICITY' AND PUT AS A TWO-WAY STRATIFICATION SINCE WE WILL NEED
+# 'RACE' AND 'ETHNICITY' ARE PUT AS A TWO-WAY STRATIFICATION SINCE WE WILL NEED
 # THEM BOTH SIMULTANEOUSLY TO MAP TO OTHER ONTOLOGIES' 'RACE' DIMENSION
 # REACH OUT TO ANDREW WITH ANY QUESTIONS
 
