@@ -354,7 +354,11 @@ data.manager$register.ontology(
   ))
 
 ################################################################################
-
+###Source locations of intersete to create MSA vector
+source('commoncode/locations_of_interest.R')
+##Source code for function from Andrew to sum counties populations from census to create MSA populations for suveillance manager
+source('data_processing/put_msa_population_data_script.R')
+###############################################################################
 ###Source in File that reads .csvs and removes headers
 source('data_processing/fix_cdc_headers.R')
 
@@ -1179,10 +1183,19 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  
  
 ################################################################################
-###Save surveillance manager####
+###Rename surveillance manager####
   
  surveillance.manager= data.manager #Add this here so you don't have to change data.manager throughout entire code#
-  
+ 
+ ################################################################################
+ ##Put summation of census counties to create msa populations within the surveillance manager
+load("Q:/data_managers/census.manager.rdata")
+ put.population.data(locations = c(MSAS.OF.INTEREST), 
+                            data.manager = surveillance.manager, 
+                            census.manager = census.manager)
+ 
+ ################################################################################
+ ###Save surveillance manager####
   save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
 
 
