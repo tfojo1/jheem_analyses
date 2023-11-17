@@ -42,7 +42,7 @@ get.default.aging.rates <- function(location, specification.metadata,
 
 get.proportion.msm.of.male.by.race.functional.form <- function(location, specification.metadata)
 {
-    best.guess.proportions = get.best.guess.msm.proportions.by.race(get.sub.locations(location, 'county', limit.to.completely.enclosing = T),
+    best.guess.proportions = get.best.guess.msm.proportions.by.race(get.contained.locations(location, 'county'),
                                                                     census = ALL.DATA.MANAGERS$census.full,
                                                                     years = DEFAULT.POPULATION.YEARS,
                                                                     min.age = specification.metadata$age.lower.bounds[1])
@@ -98,7 +98,7 @@ get.best.guess.msm.proportions.by.race <- function(fips,
 
 get.model.fertility.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     
     # Get the population (to weight as we aggregate across races)
     county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
@@ -127,11 +127,11 @@ get.model.fertility.rates <- function(location, specification.metadata, populati
 
 get.non.idu.general.mortality.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     
     # Get the raw rates
     raw.mortality.rates = get.mortality.rates(ALL.DATA.MANAGERS$mortality, 
-                                              states=get.super.locations(location, 'state', limit.to.completely.enclosing = F), 
+                                              states=get.containing.locations(location, 'state'), 
                                               verbose=F)
     
     # Get the population (to weight as we aggregate across races)
@@ -142,7 +142,7 @@ get.non.idu.general.mortality.rates <- function(location, specification.metadata
     # Weight rates by population
     mortality.numerators = rowSums(sapply(counties, function(county){
         county.populations[county,,,] * 
-            raw.mortality.rates[get.super.locations(county, 'state', limit.to.completely.enclosing = T),,,]
+            raw.mortality.rates[get.containing.locations(county, 'state'),,,]
     }))
     mortality.rates.all.counties = mortality.numerators / population
     
@@ -164,7 +164,7 @@ get.base.initial.male.population <- function(location, specification.metadata, y
     if (length(specification.metadata$dim.names$location)>1)
         stop("We need to specify what to do with more than one location")
     
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     
     county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
                                          sexes = 'male', aggregate.sexes = T,
@@ -179,7 +179,7 @@ get.base.initial.female.population <- function(location, specification.metadata,
     if (length(specification.metadata$dim.names$location)>1)
         stop("We need to specify what to do with more than one location")
     
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     
     county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
                                          sexes = 'female', aggregate.sexes = T,
@@ -191,7 +191,7 @@ get.base.initial.female.population <- function(location, specification.metadata,
 
 get.location.ever.idu.prevalence <- function(location, specification.metadata)
 {
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     
     idu.ever.prevalence = get.idu.prevalence(ALL.DATA.MANAGERS$idu, 
                                              ALL.DATA.MANAGERS$census.full.msm, 
@@ -205,7 +205,7 @@ get.location.ever.idu.prevalence <- function(location, specification.metadata)
 
 get.location.active.idu.prevalence <- function(location, specification.metadata)
 {
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     
     idu.30d.prevalence = get.idu.prevalence(ALL.DATA.MANAGERS$idu, 
                                             ALL.DATA.MANAGERS$census.full.msm, 
@@ -303,7 +303,7 @@ get.aging.rate.mid.of.20 <- function(n.first.10, n.second.10)
 
 get.female.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     rv = get.census.data(ALL.DATA.MANAGERS$census.full, 
                          fips = counties,
                          years = population.years,
@@ -319,7 +319,7 @@ get.female.single.year.age.counts <- function(location, population.years=DEFAULT
 get.msm.single.year.age.counts <- function(location, specification.metadata,
                                            population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     rv = rowSums(get.best.guess.msm.proportions.by.race(fips=counties,
                                                         census = ALL.DATA.MANAGERS$census.full, 
                                                         years = population.years,
@@ -337,7 +337,7 @@ get.msm.single.year.age.counts <- function(location, specification.metadata,
 get.heterosexual.male.single.year.age.counts <- function(location, specification.metadata,
                                                          population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = get.sub.locations(location, 'county', limit.to.completely.enclosing = T)
+    counties = get.contained.locations(location, 'county')
     get.census.data(ALL.DATA.MANAGERS$census.full,
                     fips=counties,
                     years = population.years,

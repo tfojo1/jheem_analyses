@@ -60,8 +60,8 @@ EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
 ##----------------------##
 
 register.fixed.model.strata(EHE.SPECIFICATION,
-                            applies.after.time = 2007,
-                            applies.before.time = Inf,
+                            applies.after.time = -Inf,
+                            applies.before.time = 2007,
                             fix.strata = T,
                             dimensions.to.fix = c('location','age','race','sex'))
 
@@ -653,7 +653,8 @@ register.transmission(EHE.SPECIFICATION,
                       transmissibility.value = 'sexual.transmissibility',
                       new.infection.proportions.value = 'new.infection.proportions',
                       tag = 'sexual.transmission',
-                      all.new.infections.into.compartments = list(stage=1))
+                      all.new.infections.into.compartments = list(stage=1),
+                      new.infections.applies.to = list(continuum='undiagnosed.states'))
 
 register.transmission(EHE.SPECIFICATION,
                       contact.value = 'idu.contact',
@@ -663,7 +664,8 @@ register.transmission(EHE.SPECIFICATION,
                       tag = 'idu.transmission',
                       all.new.infections.into.compartments = list(stage=1),
                       from.applies.to = list(risk='active.idu.states'),
-                      to.applies.to = list(risk='active.idu.states'))
+                      to.applies.to = list(risk='active.idu.states'),
+                      new.infections.applies.to = list(continuum='undiagnosed.states'))
 
 
 ##--------------------##
@@ -1034,19 +1036,19 @@ register.model.element.values(EHE.SPECIFICATION,
                                                                                                              years = DEFAULT.POPULATION.YEARS,
                                                                                                              ages = (specification.metadata$age.endpoints[1]):min(specification.metadata$age.endpoints[length(specification.metadata$age.endpoints)],
                                                                                                                                                        ALL.DATA.MANAGERS$census.full$age.lowers[length(ALL.DATA.MANAGERS$census.full$age.lowers)]),
-                                                                                                             fips=get.sub.locations(location, 'county', limit.to.completely.enclosing = T)))/ length(DEFAULT.POPULATION.YEARS)},
+                                                                                                             fips=get.contained.locations(location, 'county')))/ length(DEFAULT.POPULATION.YEARS)},
                               hispanic.population.count = function(location, specification.metadata){sum(get.census.data(ALL.DATA.MANAGERS$census.full,
                                                                                                                 races = 'hispanic',
                                                                                                                 years=DEFAULT.POPULATION.YEARS,
                                                                                                                 ages = (specification.metadata$age.endpoints[1]):min(specification.metadata$age.endpoints[length(specification.metadata$age.endpoints)],
                                                                                                                                                                  ALL.DATA.MANAGERS$census.full$age.lowers[length(ALL.DATA.MANAGERS$census.full$age.lowers)]),
-                                                                                                                fips=get.sub.locations(location, 'county', limit.to.completely.enclosing = T)))/ length(DEFAULT.POPULATION.YEARS)},
+                                                                                                                fips=get.contained.locations(location, 'county')))/ length(DEFAULT.POPULATION.YEARS)},
                               other.population.count = function(location, specification.metadata){sum(get.census.data(ALL.DATA.MANAGERS$census.full,
                                                                                                              races = setdiff(ALL.DATA.MANAGERS$census.full$races, c('black','hispanic')),
                                                                                                              years=DEFAULT.POPULATION.YEARS,
                                                                                                              ages = (specification.metadata$age.endpoints[1]):min(specification.metadata$age.endpoints[length(specification.metadata$age.endpoints)],
                                                                                                                                                               ALL.DATA.MANAGERS$census.full$age.lowers[length(ALL.DATA.MANAGERS$census.full$age.lowers)]),
-                                                                                                             fips=get.sub.locations(location, 'county', limit.to.completely.enclosing = T)))/ length(DEFAULT.POPULATION.YEARS)}
+                                                                                                             fips=get.contained.locations(location, 'county')))/ length(DEFAULT.POPULATION.YEARS)}
 )
 
 register.model.element.values(EHE.SPECIFICATION,
@@ -1633,6 +1635,19 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          corresponding.data.outcome = 'diagnosed.prevalence',
                          keep.dimensions = c('location','age','race','sex','risk')
                          )
+
+track.dynamic.outcome(EHE.SPECIFICATION,
+                      name = 'test.dynamic.suppression',
+                      outcome.metadata = create.outcome.metadata(display.name = 'N Suppressed (Dynamically Tracked',
+                                                                 description = "The Proportion of People with Diagnosed HIV who are Virally Suppressed",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Number Suppressed',
+                                                                 units = 'individuals'),
+                      dynamic.quantity.name = 'population',
+                      multiply.by = 'suppression.of.diagnosed',
+                      groups = 'infected',
+                      keep.dimensions = c('location','age','race','sex','risk'),
+                      subset.dimension.values = list(continuum='diagnosed.states'))
 
 ##--------------------------------##
 ##--------------------------------##

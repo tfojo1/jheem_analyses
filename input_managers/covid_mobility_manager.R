@@ -110,7 +110,7 @@ get.covid.mobility.measure <- function(mobility.data,
     if (is.null(types))
         types = setdiff(dimnames(mobility.data)$type, 'parks')
   
-    counties = get.sub.locations(location, 'county', T)
+    counties = get.contained.locations(location, 'county')
     month.names = c(paste0('0', 1:9), as.character(10:12))
     times = unlist(sapply(from.year:to.year, function(year){
         

@@ -31,6 +31,7 @@ source('../jheem_analyses/input_managers/covid_mobility_manager.R')
 # For the EHE version
 source('../jheem_analyses/applications/EHE/ehe_base_parameters.R')
 source('../jheem_analyses/applications/EHE/ehe_specification_helpers.R')
+source('../jheem_analyses/applications/EHE/ehe_ontology_mappings.R')
 
 # General
 source('../jheem_analyses/commoncode/target_populations.R')
