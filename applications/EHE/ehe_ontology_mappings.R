@@ -1,0 +1,57 @@
+register.ontology.mapping('lump.other.risk.and.heterosexual',
+                          from.dimensions = 'risk',
+                          to.dimensions = 'risk',
+                          mappings = rbind(c('msm', 'msm'),
+                                           c('idu', 'idu'),
+                                           c('msm_idu', 'msm_idu'),
+                                           c('heterosexual', 'heterosexual'),
+                                           c('other', 'heterosexual'))
+)
+
+register.ontology.mapping('jheem.to.cdc.sex.risk',
+                          from.dimensions = c('sex', 'risk'),
+                          to.dimensions = c('sex', 'risk'),
+                          mappings = rbind(c('msm', 'never_IDU', 'male', 'msm'),
+                                           c('msm', 'active_IDU', 'male', 'msm_idu'),
+                                           c('msm', 'IDU_in_remission', 'male', 'msm_idu'),
+                                           c('heterosexual_male', 'never_IDU', 'male', 'heterosexual'),
+                                           c('heterosexual_male', 'active_IDU', 'male', 'idu'),
+                                           c('heterosexual_male', 'IDU_in_remission', 'male', 'idu'),
+                                           c('female', 'never_IDU', 'female', 'heterosexual'),
+                                           c('female', 'active_IDU', 'female', 'idu'),
+                                           c('female', 'IDU_in_remission', 'female', 'idu'))
+)
+
+register.ontology.mapping('cdc.to.jheem.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black/African American', 'black'),
+                                           c('Hispanic/Latino', 'hispanic'),
+                                           c('Multiracial', 'other'),
+                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
+                                           c('White', 'other'))
+)
+
+register.ontology.mapping('cdc.msa.reports.to.jheem.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black/African American', 'black'),
+                                           c('Hispanic/Latino', 'hispanic'),
+                                           c('White', 'other')))
+
+register.ontology.mapping('wonder.to.census.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
+                                           c('Asian or Pacific Islander', 'asian or pacific islander'),
+                                           c('Black or African American', 'black'),
+                                           c('White', 'white')))
+register.ontology.mapping('wonder.to.census.ethnicity',
+                          from.dimensions = 'ethnicity',
+                          to.dimensions = 'ethnicity',
+                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
+                                           c('Not Hispanic or Latino', 'not hispanic')))
