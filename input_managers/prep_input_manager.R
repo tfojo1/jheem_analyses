@@ -54,29 +54,32 @@ if (1==2)
     ggpubr::ggarrange(race.plot, sex.plot, risk.plot, age.plot,
                       ncol = 2, nrow = 2, labels = c("Race","Sex","Risk","Age"))
   
-    # msm.race <- reshape2::melt(apply(y[,,'msm',,], c('year','race'), mean))
-    # msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + geom_line(linewidth = 1) + 
-    #   ylim(min(msm.race$value),max(msm.race$value)) + 
-    #   scale_x_continuous(breaks = seq(2020, 2030, 1)) +
-    #   theme_minimal() 
-    # 
-    # msm.age <- reshape2::melt(apply(y[,,'msm',,], c('year','age'), mean))
-    # msm.age.plot <- ggplot(msm.age, aes(year, value, color = age)) + geom_line(linewidth = 1) + 
-    #   ylim(min(msm.age$value),max(msm.age$value)) + 
-    #   scale_x_continuous(breaks = seq(2020, 2030, 1)) +
-    #   theme_minimal() 
-    # 
-    # msm.sex <- reshape2::melt(apply(y[,,'msm',,], c('year'), mean))
-    # msm.sex$year <- rownames(msm.sex) 
-    # msm.sex.plot <- ggplot(msm.sex, aes(year, value, color = 'black')) + 
-    #   geom_line(group = 1, linewidth =1)  + 
-    #   ylim(min(msm.sex$value),max(msm.sex$value)) +
-    #   # scale_x_continuous(breaks = seq(2020, 2030, 1)) +
-    #   theme_minimal()
-    # msm.sex.plot
-    # 
-    # ggpubr::ggarrange(msm.race.plot, msm.age.plot, msm.sex.plot,
-    #                   ncol=3, nrow=1)
+    msm.race <- reshape2::melt(apply(y[,,'msm',,], c('year','race'), mean))
+    msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + geom_line(linewidth = 1) +
+      ylim(min(msm.race$value),max(msm.race$value)) +
+      scale_x_continuous(breaks = seq(2020, 2030, 1)) +
+      ylab("PrEP use") +
+      theme_minimal()
+
+    msm.age <- reshape2::melt(apply(y[,,'msm',,], c('year','age'), mean))
+    msm.age.plot <- ggplot(msm.age, aes(year, value, color = age)) + 
+      geom_line(linewidth = 1) +
+      ylim(min(msm.age$value),max(msm.age$value)) +
+      scale_x_continuous(breaks = seq(2020, 2030, 1)) +
+      ylab("PrEP use") +
+      theme_minimal()
+
+    msm.risk <- reshape2::melt(apply(y[,,'msm',,], c('year','risk'), mean))
+    msm.risk.plot <- ggplot(msm.risk, aes(year, value, color = risk)) +
+      geom_line(linewidth =1)  +
+      ylim(min(msm.risk$value),max(msm.risk$value)) +
+      scale_x_continuous(breaks = seq(2020, 2030, 1)) + 
+      ylab("PrEP use") +
+      theme_minimal()
+    # msm.risk.plot
+
+    ggpubr::ggarrange(msm.race.plot, msm.age.plot, msm.risk.plot,
+                      ncol=1, nrow=3, labels = c("MSM - Race", "MSM - Age", "MSM - Risk")) 
   
 }
 
