@@ -1,13 +1,13 @@
 
 ################################################################################
-##Create Proportion of MSM##
+                        ##Create Proportion of MSM##
 ##Note this code pulls from the BRFSS dataset created in the BRFSS weighted state code
 ##This is a weighted measure
 ##MSM Estimation using BRFSS Data by State
 ################################################################################
 #######
 ##Total
-#######
+#######       
 
 #Pulling from the brffs.state.sex data list so that denominator for msm proportion is males only
 data.list.brfss.state.msm = lapply(data.list.brfss.state.clean, function(file){
