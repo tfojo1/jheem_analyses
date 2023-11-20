@@ -246,6 +246,15 @@ data.manager$register.outcome(
     units = '%',
     description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population')
 
+data.manager$register.outcome(
+  'unweighted.denominator',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'unweighted.denominator',
+    axis.name = 'unweighted.denominator)',
+    units = 'cases',
+    description = "BRFSS Unweighted Denominator Value"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='cdc')
@@ -397,6 +406,9 @@ source('data_processing/brfss_msa_weighted.R')
 
 #Source msm
 source('data_processing/msm.R')
+
+#Source BRFSS Unweighted Denominator values
+source('data_processing/brfss_unweighted_denominators.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
