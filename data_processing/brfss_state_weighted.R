@@ -275,7 +275,7 @@ data.list.brfss.state.totals = lapply(data.list.brfss.state.clean, function(file
     group_by(location) %>%
     mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
     ungroup()
-
+  
   data<- data %>%
     group_by(location) %>%
     mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
@@ -288,8 +288,7 @@ data.list.brfss.state.totals = lapply(data.list.brfss.state.clean, function(file
   data$value = data$proportion_tested
   
    data <- data %>%
-  select(-risk) #have to remove risk in order to put into data manager#
-  #   select(outcome, year, location, sum_tested, n_weighted, value, `_LLCPWT`)
+  select(outcome, year, location, sum_tested, n_weighted, proportion_tested, value, `_LLCPWT`)
   
   data= as.data.frame(data)
   
@@ -321,9 +320,9 @@ data.list.brfss.state.sex = lapply(data.list.brfss.state.clean, function(file){
   data$year = as.character(data$year)
   data$value = data$proportion_tested
   
-  data <- data %>%
-    select(-risk) #have to remove risk in order to put into data manager#
-  #   select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`)
+   data <- data %>%
+    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`)
+  
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -354,8 +353,8 @@ data.list.brfss.state.age = lapply(data.list.brfss.state.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(-risk) #have to remove risk in order to put into data manager#
-  #   select(outcome, year, location, sum_tested, n_weighted, value, age, `_LLCPWT`)
+   select(outcome, year, location, sum_tested, n_weighted, value, age, `_LLCPWT`)
+  
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -386,8 +385,8 @@ data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(-risk) #have to remove risk in order to put into data manager#
-  #   select(outcome, year, location, sum_tested, n_weighted, value, race, tested, `_LLCPWT`)
+    select(outcome, year, location, sum_tested, n_weighted, value, race, tested, `_LLCPWT`)
+  
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -419,13 +418,14 @@ data.list.brfss.state.risk = lapply(data.list.brfss.state.clean, function(file){
   
   data <- data %>%
     select(outcome, year, location, sum_tested, n_weighted, value, risk, `_LLCPWT`)
+  
   data= as.data.frame(data)
   
   list(filename, data) 
 })
 
 #Make a separate dataset for risk - this is what will get put into the manager#
-#Need to remove NAs for the put statement but need them in for the prportion calc below#
+#Need to remove NAs for the put statement but need them in for the proportion calc below#
 data.list.brfss.state.risk.put = lapply(data.list.brfss.state.risk, function(file){
   
   data=file[[2]] 
