@@ -267,6 +267,22 @@ register.model.quantity(EHE.SPECIFICATION,
 
 ##-- Common to All PrEP / Combinations of PrEP modalities --##
 register.model.element(EHE.SPECIFICATION,
+                       name='prep.indication',
+                       scale='proportion',
+                       value=0.25) # FOR NOW, EVENTUALLY A FUNCTIONAL FORM (dependent on race/sex/risk)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'proportion.receiving.prep',
+                        scale = 'proportion',
+                        value = expression(
+                          prep.indication * 
+                            (oral.prep.coverage*(1-log(oral.prep.persistence)) + # oral.prep.uptake, in terms of coverage 
+                               lai.prep.coverage*(1-log(lai.prep.persistence))) # lai.prep.uptake, in terms of coverage 
+                          ))
+                            # oral.prep.uptake * (1 / (1-log(oral.prep.persistence)) ) = oral.prep.coverage 
+                            # oral.prep.uptake = oral.prep.coverage*(1-log(oral.prep.persistence))
+
+register.model.element(EHE.SPECIFICATION,
                        name = 'prep.screening.frequency',
                        scale = 'time',
                        value = 0.25) #3 months
@@ -1575,6 +1591,20 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex','risk'),
                          scale = 'non.negative.number',
                          save = F)
+
+track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'prep.uptake',
+                         outcome.metadata = create.outcome.metadata(display.name = 'PrEP Uptake',
+                                                                    description = "The Number of People who Received a PrEP Prescription in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Number with PrEP prescription',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'uninfected',
+                         multiply.by = 'proportion.receiving.prep', 
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'prep',
+                         save = T) 
 
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'population',
