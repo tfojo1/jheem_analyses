@@ -14,54 +14,6 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex, function(file){
   data=file[[2]] 
   filename = file[[1]] 
   
-  #Re-create risk variable so that you can use it to make msm var#
-  if(grepl("2013", filename)) {
-    data$risk = NA #No sexual orientation data for 2013#
-  }
-  if(grepl("2014", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2015", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2016", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2017", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA )) 
-  }
-  if(grepl("2018", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
-    
-  }
-  if(grepl("2019", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-    
-  }
-  if(grepl("2020", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-    
-  }
-  if(grepl("2021", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-  }
-  if(grepl("2022", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
-    
-  }
-  
   #Create MSM proportion
   data$outcome= "proportion.msm"
   data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
@@ -101,53 +53,6 @@ data.list.race.male.denom = lapply(data.list.brfss.state.sex, function(file){
     mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
     ungroup()
   
-  #Re-create risk variable so that you can use it to make msm var#
-  if(grepl("2013", filename)) {
-    data$risk = NA #No sexual orientation data for 2013#
-  }
-  if(grepl("2014", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2015", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2016", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2017", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA )) 
-  }
-  if(grepl("2018", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
-    
-  }
-  if(grepl("2019", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-    
-  }
-  if(grepl("2020", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-    
-  }
-  if(grepl("2021", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-  }
-  if(grepl("2022", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
-    
-  }
   data= as.data.frame(data)
   list(filename, data) 
 })
@@ -162,53 +67,6 @@ data.list.age.male.denom = lapply(data.list.brfss.state.sex, function(file){
     group_by(location, age) %>%
     mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
     ungroup()
-  #Re-create risk variable so that you can use it to make msm var#
-  if(grepl("2013", filename)) {
-    data$risk = NA #No sexual orientation data for 2013#
-  }
-  if(grepl("2014", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2015", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2016", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
-  }
-  if(grepl("2017", filename)) {
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA )) 
-  }
-  if(grepl("2018", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
-    
-  }
-  if(grepl("2019", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-    
-  }
-  if(grepl("2020", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-    
-  }
-  if(grepl("2021", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-  }
-  if(grepl("2022", filename)) {
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
-    
-  }
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -291,7 +149,7 @@ for (data in msm.state.total) {
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
-    dimension.values = list(),
+    dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
@@ -305,7 +163,7 @@ for (data in msm.state.race) {
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
-    dimension.values = list(),
+    dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
@@ -319,7 +177,7 @@ for (data in msm.state.age) {
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
-    dimension.values = list(),
+    dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
@@ -399,7 +257,7 @@ for (data in msm.emory.county) {
     data = data,
     ontology.name = 'emory',
     source = 'emory',
-    dimension.values = list(),
+    dimension.values = list(sex = "male"),
     url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
     details = 'Emory University MSM Research from American Community Survey')
 }
@@ -413,7 +271,7 @@ for (data in msm.emory.msa ) {
     data = data,
     ontology.name = 'emory',
     source = 'emory',
-    dimension.values = list(),
+    dimension.values = list(sex = "male"),
     url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
     details = 'Emory University MSM Research from American Community Survey')
 }
