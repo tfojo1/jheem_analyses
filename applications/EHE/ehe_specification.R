@@ -501,9 +501,8 @@ register.natality(specification = EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'fertility',
-                       get.value.function = get.model.fertility.rates,
+                       get.functional.form.function = get.model.fertility.rates.functional.form,
                        scale = 'rate')
-
 
 
 ##-----------------------##
@@ -596,7 +595,7 @@ register.mortality(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'non.idu.general.mortality',
-                       get.value.function = get.non.idu.general.mortality.rates,
+                       get.functional.form.function = get.non.idu.general.mortality.rates.functional.form,
                        scale = 'rate')
 
 register.model.element(EHE.SPECIFICATION,

@@ -96,6 +96,18 @@ get.best.guess.msm.proportions.by.race <- function(fips,
 ##-- Fertility --##
 ##---------------##
 
+# for this to be different, will also need to add alphas into ehe_parameters and map them in ehe_parameter_mapping
+get.model.fertility.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+  
+  rates = get.model.fertility.rates(location=location,
+                                    specification.metadata = specification.metadata) 
+  
+  create.static.functional.form(value = rates,
+                                link = "log",
+                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  
+}
+
 get.model.fertility.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
 {
     counties = get.contained.locations(location, 'county')
@@ -124,6 +136,17 @@ get.model.fertility.rates <- function(location, specification.metadata, populati
 ##---------------##
 ##-- MORTALITY --##
 ##---------------##
+
+get.non.idu.general.mortality.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+  
+  rates = get.non.idu.general.mortality.rates(location=location,
+                                              specification.metadata = specification.metadata) 
+  
+  create.static.functional.form(value = rates,
+                                link = "log",
+                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  
+}
 
 get.non.idu.general.mortality.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
 {
