@@ -105,63 +105,63 @@ p.msm.2021 <- p.msm.2021 / 100
 p.msm.black <- c(
   p.msm.2017$black,
   p.msm.2018$black,
-  p.msm.2019$black,
-  p.msm.2021$black
+  p.msm.2019$black
+  # p.msm.2021$black
 )
 
 p.msm.hisp <- c(
   p.msm.2017$hisp,
   p.msm.2018$hisp,
-  p.msm.2019$hisp,
-  p.msm.2021$hisp
+  p.msm.2019$hisp
+  # p.msm.2021$hisp
 )
 
 p.msm.nbnh <- c(
   p.msm.2017$nbnh,
   p.msm.2018$nbnh,
-  p.msm.2019$nbnh,
-  p.msm.2021$nbnh
+  p.msm.2019$nbnh
+  # p.msm.2021$nbnh
 )
 
 p.msm.age1 <- c(
   p.msm.2017$age1,
   p.msm.2018$age1,
-  p.msm.2019$age1,
-  p.msm.2021$age1
+  p.msm.2019$age1
+  # p.msm.2021$age1
 )
 
 p.msm.age2 <- c(
   p.msm.2017$age2,
   p.msm.2018$age2,
-  p.msm.2019$age2,
-  p.msm.2021$age2
+  p.msm.2019$age2
+  # p.msm.2021$age2
 )
 
 p.msm.age3 <- c(
   p.msm.2017$age3,
   p.msm.2018$age3,
-  p.msm.2019$age3,
-  p.msm.2021$age3
+  p.msm.2019$age3
+  # p.msm.2021$age3
 )
 
 p.msm.age4 <- c(
   p.msm.2017$age4,
   p.msm.2018$age4,
-  p.msm.2019$age4,
-  p.msm.2021$age4
+  p.msm.2019$age4
+  # p.msm.2021$age4
 )
 
 p.msm.age5 <- c(
   p.msm.2017$age5,
   p.msm.2018$age5,
-  p.msm.2019$age5,
-  p.msm.2021$age5
+  p.msm.2019$age5
+  # p.msm.2021$age5
 )
 
 
 #### creating a combined model for msm -----
 p.msm.df <- data.frame(
-  year = c(2017:2019,2021),
+  year = c(2017:2019),
   black = p.msm.black,
   hisp = p.msm.hisp,
   nbnh = p.msm.nbnh,
@@ -172,7 +172,9 @@ p.msm.df <- data.frame(
   age5 = p.msm.age5
 )
 
+# p.max and anchor year ----------
 p.max <- 0.6
+anchor.year <- 2017
 
 library(tidyr)
 p.msm.df.long <- pivot_longer(p.msm.df, cols = c(black, hisp, nbnh, age1, age2, age3, age4, age5),
@@ -186,7 +188,7 @@ p.msm.df.long$ageid <- ifelse(grepl("age1", p.msm.df.long$variable), "age1",
                                      ifelse(grepl("age3", p.msm.df.long$variable), "age3",
                                             ifelse(grepl("age4", p.msm.df.long$variable), "age4",
                                                    ifelse(grepl("age5", p.msm.df.long$variable), "age5", "ALL")))))
-anchor.year <- 2020
+
 p.msm.df.long$year <- p.msm.df.long$year - anchor.year
 
 fit.p.msm <- lm(logit(p.msm.df.long$p/p.max) ~ year + factor(raceid) + factor(ageid), 
@@ -630,3 +632,52 @@ fit.pi.msm.age2 <- lm(logit(pi.msm.age2/pi.max) ~ years.pi)
 fit.pi.msm.age3 <- lm(logit(pi.msm.age3/pi.max) ~ years.pi)
 fit.pi.msm.age4 <- lm(logit(pi.msm.age4/pi.max) ~ years.pi)
 fit.pi.msm.age5 <- lm(logit(pi.msm.age5/pi.max) ~ years.pi)
+
+## IDU ------
+
+# # https://journals.lww.com/stdjournal/FullText/2018/04000/An_Exploration_of_Factors_Impacting_Preexposure.1.aspx?casa_token=rVyxbUR_Wc8AAAAA:noQgD0j2phdyeYybIz-7kY3y5LngYlOnMBzNgVB53J8BmR74EJsyb6iiZdPte3KnzKYHkyZocw_vHyUPTktaR5tc&casa_token=PTZU195-rC4AAAAA:qxzCsh5TwpyByzcVN4Nix2L4X5pPIFCirYj6O_0Gf1Oga1mv4oOJAfGaBFGEIvdXotaDOf9sl86IUGx5gzJKJMAU 
+# pi.idu.2016 <- data.frame(
+#   total = 89.9,
+#   female = 95.4,
+#   male = 84.9
+# )
+# 
+# pi.idu.2016 <- pi.idu.2016 / 100
+# 
+# # https://www.thelancet.com/action/showPdf?pii=S2214-109X%2823%2900057-8
+# pi.idu.2017 <- 31.8 / 100 
+
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-18.pdf 
+p.idu.2015 <- data.frame(
+  total = 60.6,
+  male = 60.0,
+  female = 62.5,
+  age18.24 = 76.1,
+  age25.29 = 72.9,
+  age30.39 = 68.5,
+  age40.49 = 59.5,
+  age50ge = 49.4,
+  black = 50.6,
+  hisp = 61.1,
+  nbnh = 67.7
+)
+
+p.idu.2015 <- age_mutate(p.idu.2015)/100
+
+
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf 
+p.idu.2018 <- data.frame(
+  total = 59.8,
+  male = 58.5,
+  female = 62.6,
+  age18.24 = 72.0,
+  age25.29 = 70.5,
+  age30.39 = 67.2,
+  age40.49 = 59.6,
+  age50ge = 49.8,
+  black = 49.8,
+  hisp = 57.8,
+  nbnh = 67.4
+)
+
+p.idu.2018 <- age_mutate(p.idu.2018)/100
