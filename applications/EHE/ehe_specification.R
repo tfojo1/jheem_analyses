@@ -182,9 +182,9 @@ register.model.quantity(EHE.SPECIFICATION,
 
 ##-- Oral PrEP --##
 register.model.element(EHE.SPECIFICATION,
-                       name = 'oral.prep',
+                       name = 'oral.prep.uptake',
                        scale = 'proportion',
-                       get.functional.form.function = get.prep.model,
+                       get.functional.form.function = get.prep.model, # FOR NOW, replace with get.prep.uptake.model when available
                        functional.form.from.time = 2014,
                        prep.manager = ALL.DATA.MANAGERS$prep,
                        ramp.times = 2011,
@@ -233,9 +233,13 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'proportion',
                        value = EHE_BASE_PARAMETER_VALUES['prep.persistence'])
 
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'oral.prep.coverage',
+                        value = expression(oral.prep.uptake * (1 / (1-log(oral.prep.persistence)) )))
+
 ##-- LAI PrEP --##
 register.model.element(EHE.SPECIFICATION, 
-                       name = 'lai.prep',
+                       name = 'lai.prep.uptake',
                        scale = 'proportion',
                        value = 0)
 
@@ -257,6 +261,9 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'ratio',
                        value = 1)
 
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'lai.prep.coverage',
+                        value = expression(lai.prep.uptake * (1 / (1-log(lai.prep.persistence)) )))
 
 ##-- Common to All PrEP / Combinations of PrEP modalities --##
 register.model.element(EHE.SPECIFICATION,
@@ -266,18 +273,18 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'all.prep.coverage',
-                        value = expression(oral.prep + lai.prep),
+                        value = expression(oral.prep.coverage + lai.prep.coverage),
                         scale = 'proportion')
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'all.prep.risk',
-                        value = expression(oral.prep * oral.prep.rr + lai.prep * lai.prep.rr))
+                        value = expression(oral.prep.coverage * oral.prep.rr + lai.prep.coverage * lai.prep.rr))
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'all.prep.discontinuation',
-                        value = expression( (-log(1-oral.prep.persistence) * oral.prep +
-                                                 -log(1-lai.prep.persistence) * lai.prep) /
-                                                (oral.prep + lai.prep) ),
+                        value = expression( (-log(1-oral.prep.persistence) * oral.prep.coverage +
+                                                 -log(1-lai.prep.persistence) * lai.prep.coverage) /
+                                                (oral.prep.coverage + lai.prep.coverage) ),
                         na.replacement = 0)
 
 
