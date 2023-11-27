@@ -8,8 +8,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
 {
     specification.metadata = model.settings$specification.metadata
     
-    if (track.used.parameters)
-        used.parameter.names = character()
+    
+    used.parameter.names = character()
     
           
     #-- Suppression --#
@@ -289,7 +289,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
     if (track.used.parameters)
         invisible(unique(used.parameter.names))
     else
-        invisible(used.parameter.names)
+        invisible(character())
 }
 
 ##---------------##

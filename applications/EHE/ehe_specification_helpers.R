@@ -220,7 +220,7 @@ get.location.active.idu.prevalence <- function(location, specification.metadata)
 get.seed.rate.per.stratum <- function(location, specification.metadata, population.year=DEFAULT.POPULATION.YEARS)
 {
     # A hack for now to harmonize with old locations codes
-    location = gsub('^c\\.','',location)
+    location = gsub('^c\\.','',location,ignore.case = T)
         
     prevalence.sex.age = get.surveillance.data.rate(msa.surveillance,
                                                     location.codes=location,

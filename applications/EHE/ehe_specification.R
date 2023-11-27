@@ -1579,6 +1579,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'point.population',
                          keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'population',
                          save = T)
 
 track.integrated.outcome(EHE.SPECIFICATION,
