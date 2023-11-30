@@ -11,6 +11,26 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
     
     used.parameter.names = character()
     
+    #-- Birth rates --#
+    for(race in specification.metadata$dim.names$race){
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "fertility",
+                                                     alpha.name = 'intercept',
+                                                     values = parameters[paste0(race,'.birth.rate.multiplier')],
+                                                     applies.to.dimension.values=list(race=race))
+     
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "fertility",
+                                                     alpha.name = 'slope',
+                                                     values = parameters[paste0(race,'.birth.rate.slope.multiplier')],
+                                                     applies.to.dimension.values=list(race=race))
+      
+      used.parameter.names = c(used.parameter.names,
+                               c(paste0(race,'.birth.rate.multiplier'),
+                                 paste0(race,'.birth.rate.slope.multiplier')))
+       
+    }
+    
           
     #-- Suppression --#
     used.names = set.ehe.alphas.from.parameters(model.settings,

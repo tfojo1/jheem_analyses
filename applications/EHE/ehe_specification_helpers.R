@@ -102,9 +102,16 @@ get.model.fertility.rates.functional.form = function(location, specification.met
   rates = get.model.fertility.rates(location=location,
                                     specification.metadata = specification.metadata) 
   
-  create.static.functional.form(value = rates,
-                                link = "log",
-                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  # previous version was static - no slope 
+  # create.static.functional.form(value = rates,
+  #                               link = "log",
+  #                               value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  
+  
+  create.log.linear.functional.form(intercept = rates,
+                                    slope = 1, # log(1) = 0, so this means no slope on the non-transformed scale
+                                    parameters.are.on.log.scale = F,
+                                    anchor.year = 2010)
   
 }
 

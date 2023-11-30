@@ -10,6 +10,15 @@ TRATE.RR.0.PEAK.SPAN = 8#3
 BASE.PARAMETERS.PRIOR = join.distributions(
     global.trate = Loguniform.Distribution(0,Inf),
     
+    #-- Birth rates --#
+    black.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), # can be off by factor of 2
+    hispanic.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)),
+    other.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)),
+    
+    black.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)/5), # can be off by factor of 2, over 5 years
+    hispanic.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)/5),
+    other.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)/5),
+    
     #-- MSM Transmission --#
     black.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
                                                                     r1.log.sd=log(BASE.TRATE.CV),
@@ -313,6 +322,15 @@ EHE.PARAMETERS.PRIOR = join.distributions(
 )
 
 BASE.PARAMETER.SAMPLING.BLOCKS = list(
+  birth.rates = c(
+    'black.birth.rate.multiplier',
+    'hispanic.birth.rate.multiplier',
+    'other.birth.rate.multiplier',
+    'black.birth.rate.slope.multiplier',
+    'hispanic.birth.rate.slope.multiplier',
+    'other.birth.rate.slope.multiplier'
+  ),
+  
   peak.msm.transmission = 'msm.peak.trate.multiplier',
   
   black.msm.transmission = c(
