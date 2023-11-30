@@ -2,13 +2,14 @@ put.population.data = function(locations,
                                contained.geographic.type = 'county',
                                fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
                                put.stratifications = list('age', c('race', 'ethnicity'), 'sex'),
+                               adult.ages = census.adult.ages,
                                data.manager,
                                census.manager)
 {
-    
+    # browser()
     # register the source(s), ontologies, and/or outcome if necessary
-    if (!('population' %in% data.manager$outcomes))
-        data.manager$register.outcome(outcome = 'population',
+    if (!('adult.population' %in% data.manager$outcomes))
+        data.manager$register.outcome(outcome = 'adult.population',
                                       metadata = census.manager$outcome.info$population$metadata)
     for (source.name in names(census.manager$source.info))
         if (!(source.name %in% names(data.manager$source.info)))
@@ -31,42 +32,10 @@ put.population.data = function(locations,
             source.ontology.names = names(census.manager$data$population[[source.name]])
             
             for (ont.name in source.ontology.names) {
-                
-                ## -- TOTALS -- ##
-                census.data.totals = census.manager$pull(outcome = 'population',
-                                                         keep.dimensions = 'year',
-                                                         dimension.values = list(location = contained.locations),
-                                                         from.ontology.names = ont.name,
-                                                         sources = source.name,
-                                                         append.attributes = c('details', 'url'))
-                
-                if (!is.null(census.data.totals)) {
-                    dimnames.without.source = dimnames(census.data.totals)[names(dim(census.data.totals)) != 'source']
-                    dim(census.data.totals) = sapply(dimnames.without.source, length)
-                    dimnames(census.data.totals) = dimnames.without.source
-                    
-                    # Details and URL should be the same for all data, but check just in case they aren't
-                    details = attr(census.data.totals, 'details')[[1]]
-                    url = attr(census.data.totals, 'url')[[1]]
-                    
-                    if (any(sapply(attr(census.data.totals, 'details'), function(x) {!identical(x, details)})))
-                        stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'details'"))
-                    if (any(sapply(attr(census.data.totals, 'url'), function(x) {!identical(x, url)})))
-                        stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'url'"))
-                    
-                    data.manager$put(data = census.data.totals,
-                                     outcome = 'population',
-                                     source = source.name,
-                                     ontology.name = ont.name,
-                                     dimension.values = list(location=location),
-                                     url = url,
-                                     details = details)
-                }
-
-                ## -- STRATIFIED -- ##
+              
                 census.data.stratified = census.manager$pull(outcome = 'population',
                                                              keep.dimensions = fully.stratified.dimensions,
-                                                             dimension.values = list(location = contained.locations),
+                                                             dimension.values = list(location = contained.locations, age = adult.ages),
                                                              from.ontology.names = ont.name,
                                                              sources = source.name,
                                                              append.attributes = c('details', 'url'))
@@ -84,7 +53,22 @@ put.population.data = function(locations,
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'details'"))
                     if (any(sapply(attr(census.data.stratified, 'url'), function(x) {!identical(x, url)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'url'"))
+
+                    ## -- TOTALS -- ##
                     
+                    # Hand-aggregate the stratified data to total
+                    aggregated.totals.data = apply(census.data.stratified, 'year', sum)
+                    dimnames.because.r.apply.is.annoying = list(year=names(aggregated.totals.data))
+                    aggregated.totals.data = array(aggregated.totals.data, sapply(dimnames.because.r.apply.is.annoying, length), dimnames.because.r.apply.is.annoying)
+                    data.manager$put(data = aggregated.totals.data,
+                                     outcome = 'adult.population',
+                                     source = source.name,
+                                     ontology.name = ont.name,
+                                     dimension.values = list(location=location),
+                                     url = url,
+                                     details = details)
+                    
+                    ## -- STRATIFIED -- ##
                     for (stratification in put.stratifications) {
                         
                         # Hand-aggregate the stratified data to each stratification
@@ -92,7 +76,7 @@ put.population.data = function(locations,
                         aggregated.data = apply(census.data.stratified, margin.of.aggregation, sum)
                         
                         data.manager$put(data = aggregated.data,
-                                         outcome = 'population',
+                                         outcome = 'adult.population',
                                          source = source.name,
                                          ontology.name = ont.name,
                                          dimension.values = list(location=location),
@@ -105,12 +89,18 @@ put.population.data = function(locations,
     }
 }
 
-# practice.data.manager = create.data.manager('practice.data.manager', 'Data manager to test msa population putting')
-# 
-# test = put.population.data(locations = c('C.12580'), # MSAS.OF.INTEREST
-#                            data.manager = practice.data.manager, # surveillance.manager
-#                            census.manager = census.manager)
+# census.manager = load.data.manager('../jheem_analyses/cached/smaller.census.manager.rdata')
 
+practice.data.manager = create.data.manager('practice.data.manager', 'Data manager to test msa population putting')
+# 
+test = put.population.data(locations = c('C.12580'), # MSAS.OF.INTEREST
+                           data.manager = practice.data.manager, # surveillance.manager
+                           census.manager = census.manager)
+
+age.lower.limit = 13
+age.penultimate.upper = 84
+age.upper.limit.name = '85+'
+census.adult.ages = paste0(c(as.character(age.lower.limit:age.penultimate.upper), age.upper.limit.name), " years")
 
 ##### -- TO USE -- #####
 # SEE DEFAULTS IN FUNCTION DEFINITION ABOVE.
