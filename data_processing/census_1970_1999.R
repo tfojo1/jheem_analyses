@@ -63,7 +63,7 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
               .groups='drop')
   
   data$value= data$sum_population
-  data$outcome = "population"
+  data$outcome = "adult.population"
   
   if(grepl("1990", filename)) {
     data$year = "1990"
@@ -125,7 +125,7 @@ data.list.80.county.clean = lapply(county_80.89 , function(file){
      summarise(value = sum(total_population),
                .groups='drop')
   
-  data$outcome = "population"
+  data$outcome = "adult.population"
   data= as.data.frame(data)
   
   list(sheet, data)  
@@ -182,7 +182,7 @@ data <- data %>%
   summarise(value = sum(total_population),
             .groups='drop')
 
-data$outcome = "population"
+data$outcome = "adult.population"
 data= as.data.frame(data)
   
 list(filename, data)  

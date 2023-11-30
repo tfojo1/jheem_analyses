@@ -11,13 +11,13 @@ library(haven)
 census.manager = create.data.manager('census_manager', description='an additional data manager for census data')
 
 census.manager$register.outcome(
-  'population',
+  'adult.population',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Population',
-    axis.name = 'Population',
+    display.name = 'Adult Population',
+    axis.name = 'Adult Population',
     units = 'population',
-    description = "Population Estimate"))
+    description = "Adult Population Estimate, Ages 13 and over"))
 
 census.manager$register.outcome(
   'births',
@@ -239,6 +239,8 @@ data.list.county = lapply(data.list.county.pop, function(file){
                  values_to = "value")
   
   data$year = as.character(data$year) 
+  
+  data$outcome = if_else(data$outcome == "population", "adult.population", data$outcome) #adjusting for the change from population to adult.population
   
   data= as.data.frame(data)
   
