@@ -92,13 +92,13 @@ put.population.data = function(locations,
     }
 }
 
-# census.manager = load.data.manager('../jheem_analyses/cached/smaller.census.manager.rdata')
+census.manager = load.data.manager('../jheem_analyses/cached/smaller.census.manager.rdata')
 
-practice.data.manager = create.data.manager('practice.data.manager', 'Data manager to test msa population putting')
-# 
-test = put.population.data(locations = c('C.12580'), # MSAS.OF.INTEREST
-                           data.manager = practice.data.manager, # surveillance.manager
-                           census.manager = census.manager)
+# practice.data.manager = create.data.manager('practice.data.manager', 'Data manager to test msa population putting')
+# # 
+# test = put.population.data(locations = c('C.12580'), # MSAS.OF.INTEREST
+#                            data.manager = practice.data.manager, # surveillance.manager
+#                            census.manager = census.manager)
 
 
 
