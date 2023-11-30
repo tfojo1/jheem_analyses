@@ -66,3 +66,9 @@ register.ontology.mapping('census.to.jheem.race',
                                            c('american indian or alaska native', 'not hispanic', 'other'),
                                            c('asian or pacific islander', 'hispanic', 'hispanic'),
                                            c('asian or pacific islander', 'not hispanic', 'other')))
+register.ontology.mapping('jheem.to.cdc.sex',
+                          from.dimensions = 'sex',
+                          to.dimensions = 'sex',
+                          mappings = rbind(c('heterosexual_male', 'male'),
+                                           c('msm', 'male'),
+                                           c('female', 'female')))
