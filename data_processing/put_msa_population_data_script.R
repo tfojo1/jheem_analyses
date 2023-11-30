@@ -2,15 +2,13 @@ put.population.data = function(locations,
                                contained.geographic.type = 'county',
                                fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
                                put.stratifications = list('age', c('race', 'ethnicity'), 'sex'),
-                               adult.ages = census.adult.ages,
                                data.manager,
                                census.manager)
 {
     # browser()
     # register the source(s), ontologies, and/or outcome if necessary
     if (!('adult.population' %in% data.manager$outcomes))
-        data.manager$register.outcome(outcome = 'adult.population',
-                                      metadata = census.manager$outcome.info$population$metadata)
+      stop(paste0("Error: outcome 'adult.population' has not yet been registered"))
     for (source.name in names(census.manager$source.info))
         if (!(source.name %in% names(data.manager$source.info)))
             data.manager$register.source(source = census.manager$source.info[[source.name]]$source,
@@ -20,6 +18,11 @@ put.population.data = function(locations,
     for (ont.name in census.manager$ontology.names)
         if (!(ont.name %in% data.manager$ontology.names))
             data.manager$register.ontology(ont.name, census.manager$ontologies[[ont.name]])
+  
+  age.lower.limit = 13
+  age.penultimate.upper = 84
+  age.upper.limit.name = '85+'
+  census.adult.ages = paste0(c(as.character(age.lower.limit:age.penultimate.upper), age.upper.limit.name), " years")
     
     for (location in locations) {
         
@@ -97,10 +100,7 @@ test = put.population.data(locations = c('C.12580'), # MSAS.OF.INTEREST
                            data.manager = practice.data.manager, # surveillance.manager
                            census.manager = census.manager)
 
-age.lower.limit = 13
-age.penultimate.upper = 84
-age.upper.limit.name = '85+'
-census.adult.ages = paste0(c(as.character(age.lower.limit:age.penultimate.upper), age.upper.limit.name), " years")
+
 
 ##### -- TO USE -- #####
 # SEE DEFAULTS IN FUNCTION DEFINITION ABOVE.
