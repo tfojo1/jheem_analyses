@@ -502,6 +502,7 @@ register.natality(specification = EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'fertility',
                        get.functional.form.function = get.model.fertility.rates.functional.form,
+                       functional.form.from.time = 2007,
                        scale = 'rate')
 
 
