@@ -1201,7 +1201,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  
  ################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
-load("Q:/data_managers/census.manager.rdata")
+load.data.manager("Q:/data_managers/census.manager.rdata")  
  put.population.data(locations = c(MSAS.OF.INTEREST), 
                             data.manager = surveillance.manager, 
                             census.manager = census.manager)
