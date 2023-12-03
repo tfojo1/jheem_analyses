@@ -507,7 +507,7 @@ big.df$raceid <- relevel(factor(big.df$raceid), ref = "ALL")
 big.df$ageid <- relevel(factor(big.df$ageid), ref = "ALL")
 big.df$sexid <- relevel(factor(big.df$sexid), ref = "ALL")
 big.df$risk <- relevel(factor(big.df$risk), ref = "msm")
-
+big.df$sexrisk <- relevel(factor(big.df$sexrisk), ref="msm")
 
 # fitting the big model
 fit.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid + risk, data = big.df)
@@ -880,11 +880,11 @@ pi.msm.df.long$riskid <- rep("ALL", length(pi.msm.df.long$pi))
 
 pi.idu.df.long <- gather(pi.idu.df, key = "group", value = "pi", -years)
 pi.idu.df.long$riskid <- rep("idu", length(pi.idu.df.long$pi))
-pi.idu.df.long$sexid <- rep("ALL", length(pi.idu.df.long$pi))
+pi.idu.df.long$sexid <- rep("idu", length(pi.idu.df.long$pi))
 
 pi.het.df.long <- gather(pi.het.df, key = "group", value = "pi", -years)
 pi.het.df.long$riskid <- rep("het", length(pi.het.df.long$pi))
-pi.het.df.long$sexid <- rep("ALL", length(pi.het.df.long$pi))
+pi.het.df.long$sexid <- rep("het", length(pi.het.df.long$pi))
 
 pi.df.long <- rbind(pi.msm.df.long, pi.idu.df.long, pi.het.df.long)
 
@@ -896,9 +896,10 @@ pi.big.df <- pi.df.long |> dplyr::mutate(raceid = ifelse(group == "black", "blac
                                                           ifelse(group == "age3", "age3", 
                                                                  ifelse(group == "age4", "age4", 
                                                                         ifelse(group == "age5", "age5", "ALL"))))),
-                                          sexid = ifelse(group == "male", "male",
-                                                          ifelse(group == "female", "female",
-                                                          ifelse(sexid == "msm", "msm", "ALL")))) 
+                                          sexid = ifelse(sexid == "msm", "msm",
+                                                         ifelse(group == "male", "male",
+                                                                ifelse(group == "female", "female",
+                                                                       "ALL")))) 
 
 # pi.df.long$sexid <- rep("msm", nrow(pi.df.long))
 # # pi.df.long$riskid <- rep("msm", nrow(pi.df.long))
@@ -909,7 +910,7 @@ pi.big.df <- pi.df.long |> dplyr::mutate(raceid = ifelse(group == "black", "blac
 
 
 pi.big.df$sexrisk <- paste(pi.big.df$sexid, pi.big.df$risk, sep = "_")
-pi.big.df$sexrisk <- ifelse(pi.big.df$sexrisk == "msm_msm", "msm", big.df$sexrisk)
+pi.big.df$sexrisk <- ifelse(pi.big.df$sexrisk == "msm_ALL", "msm", pi.big.df$sexrisk)
 
 pi.big.df$raceid <- relevel(factor(pi.big.df$raceid), ref = "ALL")
 pi.big.df$ageid <- relevel(factor(pi.big.df$ageid), ref = "ALL")
