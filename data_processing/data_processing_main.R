@@ -405,7 +405,8 @@ source('data_processing/brfss_state_weighted.R')
 source('data_processing/brfss_msa_weighted.R')
 
 #Source msm
-source('data_processing/msm.R')
+#Commenting this out because need to fix the put statement#
+#source('data_processing/msm.R')
 
 #Source BRFSS Unweighted Denominator values
 source('data_processing/brfss_unweighted_denominators.R')
@@ -1201,7 +1202,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  
  ################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
-load("Q:/data_managers/census.manager.rdata")
+load.data.manager("Q:/data_managers/census.manager.rdata")  
  put.population.data(locations = c(MSAS.OF.INTEREST), 
                             data.manager = surveillance.manager, 
                             census.manager = census.manager)
