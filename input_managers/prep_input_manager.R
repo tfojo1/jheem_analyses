@@ -67,7 +67,13 @@ if (1==2)
       theme_minimal()
 
     msm.age <- reshape2::melt(apply(y[,,'msm',,], c('year','age'), mean))
-    df.pts <- subset(p.msm.df.long, ageid != "ALL") |> dplyr::mutate(year = year + 2017)
+    df.pts <- subset(p.msm.df.long, ageid != "ALL") |> dplyr::mutate(year = year + anchor.year)
+    
+    df.pts$ageid <- factor(df.pts$ageid, levels = c("age1", "age2", "age3", "age4", "age5"))
+    msm.age$age <- factor(msm.age$age, levels = c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55+ years"))
+    
+    levels(df.pts$ageid) <- levels(msm.age$age) 
+    
     msm.age.plot <- ggplot(msm.age, aes(year, value, color = age)) + 
       geom_line(linewidth = 1) +
       geom_point(aes(x=year, y = p, color=ageid), data = df.pts) +
@@ -77,8 +83,11 @@ if (1==2)
       theme_minimal()
 
     msm.risk <- reshape2::melt(apply(y[,,'msm',,], c('year','risk'), mean))
+    # df.pts <- p.idu.df.long |> dplyr::mutate(year = year + anchor.year)
+    # df.pts$risk[df.pts$risk=="idu"] <- "active_IDU"
     msm.risk.plot <- ggplot(msm.risk, aes(year, value, color = risk)) +
       geom_line(linewidth =1)  +
+      # geom_point(aes(x=year+2, y = p, color=risk), data=df.pts) +
       ylim(min(msm.risk$value),max(msm.risk$value)) +
       scale_x_continuous(breaks = seq(2017, 2030, 1)) + 
       ylab("PrEP use") +
@@ -94,7 +103,7 @@ if (1==2)
     df.pts <- subset(p.idu.df.long, raceid != "ALL") |> dplyr::mutate(year = year + 2017)
     idu.race.plot <- ggplot(idu.race, aes(year, value, color=race)) +
       geom_line(linewidth = 1) +
-      geom_point(aes(x=year, y = p, color=raceid), data = df.pts) +
+      geom_point(aes(x=year+2, y = p, color=raceid), data = df.pts) +
       ylim(min(idu.race$value),max(idu.race$value)) +
       scale_x_continuous(breaks = seq(2017, 2030, 1)) +
       ylab("PrEP use") +
@@ -104,7 +113,7 @@ if (1==2)
     df.pts <- subset(p.idu.df.long, ageid != "ALL") |> dplyr::mutate(year = year + 2017)
     idu.age.plot <- ggplot(idu.age, aes(year, value, color=age)) +
       geom_line(linewidth = 1) +
-      geom_point(aes(x = year, y = p, color=ageid), data = df.pts) +
+      geom_point(aes(x = year+2, y = p, color=ageid), data = df.pts) +
       ylim(min(idu.age$value),max(idu.age$value)) +
       scale_x_continuous(breaks = seq(2017, 2030, 1)) +
       ylab("PrEP use") +
@@ -114,7 +123,7 @@ if (1==2)
     df.pts <- subset(p.idu.df.long, sexid != "ALL") |> dplyr::mutate(year = year + 2017)
     idu.sex.plot <- ggplot(idu.sex, aes(year, value, color=sex)) +
       geom_line(linewidth = 1) +
-      geom_point(aes(x = year, y = p, color=sexid), data = df.pts) +
+      geom_point(aes(x = year+2, y = p, color=sexid), data = df.pts) +
       ylim(min(idu.sex$value),max(idu.sex$value)) +
       scale_x_continuous(breaks = seq(2017, 2030, 1)) +
       ylab("PrEP use") +

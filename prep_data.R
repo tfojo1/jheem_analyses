@@ -488,7 +488,7 @@ fit.p.het <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid, data = p.het.df.
 # fit.het.age4 <- lm(logit(p.het.age4/p.max) ~ years.het)
 # fit.het.age5 <- lm(logit(p.het.age5/p.max) ~ years.het)
 
-# One big model ------
+# One big model (PrEP Use) ------
 
 p.het.df.long <- p.het.df.long |> dplyr::select(-group) |> 
   dplyr::mutate(risk = rep("het", length(p.het.df.long$ageid)))
@@ -500,13 +500,21 @@ p.idu.df.long <- p.idu.df.long |> dplyr::select(-group) |>
 
 big.df <- rbind(p.msm.df.long, p.idu.df.long, p.het.df.long)
 
+big.df$sexrisk <- paste(big.df$sexid, big.df$risk, sep = "_")
+big.df$sexrisk <- ifelse(big.df$sexrisk == "msm_msm", "msm", big.df$sexrisk)
+
 big.df$raceid <- relevel(factor(big.df$raceid), ref = "ALL")
 big.df$ageid <- relevel(factor(big.df$ageid), ref = "ALL")
 big.df$sexid <- relevel(factor(big.df$sexid), ref = "ALL")
-big.df$risk <- relevel(factor(big.df$risk), ref = "het")
+big.df$risk <- relevel(factor(big.df$risk), ref = "msm")
+
+
 
 # fitting the big model
 fit.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid + risk, data = big.df)
+
+# fitting an alternative model
+fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexrisk, data = big.df)
 
 
 # PrEP Indications ------
@@ -620,7 +628,7 @@ pi.msm.age5 <- c(
   pi.msm.2019$age5
 )
 
-years.pi <- c(2017:2019) - 2020
+years.pi <- c(2017:2019) - anchor.year
 pi.max <- 1
 
 fit.pi.msm.black <- lm(logit(pi.msm.black/pi.max) ~ years.pi)
@@ -681,3 +689,135 @@ p.idu.2018 <- data.frame(
 )
 
 p.idu.2018 <- age_mutate(p.idu.2018)/100
+
+years.idu <- c(2015, 2018) - anchor.year
+
+pi.idu.black <- c(
+  p.idu.2015$black,
+  p.idu.2018$black
+)
+
+pi.idu.hisp <- c(
+  p.idu.2015$hisp,
+  p.idu.2018$hisp
+)
+
+pi.idu.nbnh <- c(
+  p.idu.2015$nbnh,
+  p.idu.2018$nbnh
+)
+
+pi.idu.age1 <- c(
+  p.idu.2015$age1,
+  p.idu.2018$age1
+)
+
+pi.idu.age2 <- c(
+  p.idu.2015$age2,
+  p.idu.2018$age2
+)
+
+pi.idu.age3 <- c(
+  p.idu.2015$age3,
+  p.idu.2018$age3
+)
+
+pi.idu.age4 <- c(
+  p.idu.2015$age4,
+  p.idu.2018$age4
+)
+
+pi.idu.age5 <- c(
+  p.idu.2015$age5,
+  p.idu.2018$age5
+)
+
+pi.idu.male <- c(
+  p.idu.2015$male,
+  p.idu.2018$male
+)
+
+pi.idu.female <- c(
+  p.idu.2015$female,
+  p.idu.2018$female
+)
+
+## Het -------
+
+# 2019 
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-26.pdf
+# criteria - condomless vaginal sex (among heterosexually active men + women)
+pi.het.2019 <- data.frame(
+  total = (3573 + 4693)/(4277 + 5305),
+  male = 83.5,
+  female = 88.5,
+  age18.24 = (683 + 923)/(806 + 1030),
+  age25.29 = (522 + 694)/(590 + 764),
+  age30.39 = (839 + 1152)/(969 + 1299),
+  age40.49 = (649 + 877)/(777 + 979),
+  age50ge = (809 + 950)/(1034 + 1111),
+  black = (2452 + 3021)/(2945 + 3432),
+  hisp = (726 + 1098)/(851 + 1227),
+  nbnh = (316 + 470)/(368 + 515)
+)
+
+pi.het.2019 <- age_mutate(pi.het.2019)/100
+
+## formatting data ------
+pi.msm.df <- data.frame(
+  years = years.pi,
+  black = pi.msm.black,
+  hisp = pi.msm.hisp,
+  nbnh = pi.msm.nbnh,
+  age1 = pi.msm.age1,
+  age2 = pi.msm.age2,
+  age3 = pi.msm.age3,
+  age4 = pi.msm.age4,
+  age5 = pi.msm.age5
+) 
+
+pi.idu.df <- data.frame(
+  years = years.idu,
+  black = pi.idu.black,
+  hisp = pi.idu.hisp,
+  nbnh = pi.idu.nbnh,
+  age1 = pi.idu.age1,
+  age2 = pi.idu.age2,
+  age3 = pi.idu.age3,
+  age4 = pi.idu.age4,
+  age5 = pi.idu.age5,
+  male = pi.idu.male,
+  female = pi.idu.female
+)
+
+pi.msm.df.long <- gather(pi.msm.df, key = "group", value = "pi", -years)
+pi.msm.df.long$sexid <- rep("msm", length(pi.msm.df.long$pi))
+pi.msm.df.long$riskid <- rep("ALL", length(pi.msm.df.long$pi))
+pi.idu.df.long <- gather(pi.idu.df, key = "group", value = "pi", -years)
+pi.idu.df.long$riskid <- rep("idu", length(pi.idu.df.long$pi))
+pi.idu.df.long$sexid <- rep("idu", length(pi.idu.df.long$pi))
+
+pi.df.long <- rbind(pi.msm.df.long, pi.idu.df.long)
+pi.big.df <- pi.df.long |> dplyr::mutate(raceid = ifelse(group == "black", "black", 
+                                                   ifelse(group == "hisp", "hisp", 
+                                                          ifelse(group == "nbnh", "nbnh", "ALL"))),
+                                          ageid = ifelse(group == "age1", "age1", 
+                                                   ifelse(group == "age2", "age2", 
+                                                          ifelse(group == "age3", "age3", 
+                                                                 ifelse(group == "age4", "age4", 
+                                                                        ifelse(group == "age5", "age5", "ALL"))))),
+                                          sexid = ifelse(group == "male", "male",
+                                                          ifelse(group == "female", "female",
+                                                          ifelse(sexid == "msm", "msm", "ALL")))) 
+# pi.df.long$sexid <- rep("msm", nrow(pi.df.long))
+# # pi.df.long$riskid <- rep("msm", nrow(pi.df.long))
+# pi.big.df <- pi.df.long |> dplyr::mutate(sexid = ifelse(group == "male", "male",
+#                                                          ifelse(group == "female", "female", "msm")))
+
+# big model PrEP indication ----------------------------------------------------
+pi.big.df$raceid <- relevel(factor(pi.big.df$raceid), ref = "ALL")
+pi.big.df$ageid <- relevel(factor(pi.big.df$ageid), ref = "ALL")
+pi.big.df$sexid <- relevel(factor(pi.big.df$sexid), ref = "ALL")
+pi.big.df$riskid <- relevel(factor(pi.big.df$riskid), ref = "ALL")
+
+fit.pi.df <- lm(logit(pi) ~ years + raceid + ageid + sexid + riskid, data = pi.big.df)
