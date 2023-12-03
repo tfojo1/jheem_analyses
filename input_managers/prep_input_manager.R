@@ -161,23 +161,27 @@ get.prep.use.functional.form <- function(specification.metadata)
   
     # Do the work
     
-    int[,,,] <- coef(fit.big.df)[1]
+    int[,,,] <- int[,,,] + coef(fit2.big.df)[1]
     
-    slope[,"black",,] <- slope[,"black",,] + coef(fit.big.df)[3]
-    slope[,"hispanic",,] <- slope[,"hispanic",,] + coef(fit.big.df)[4]
-    slope[,"other",,] <- slope[,"other",,] + coef(fit.big.df)[5]
+    int[,"black",,] <- int[,"black",,] + coef(fit2.big.df)[3]
+    int[,"hispanic",,] <- int[,"hispanic",,] + coef(fit2.big.df)[4]
+    int[,"other",,] <- int[,"other",,] + coef(fit2.big.df)[5]
     
-    slope["13-24 years",,,] <- slope["13-24 years",,,] + coef(fit.big.df)[6]
-    slope["25-34 years",,,] <- slope["25-34 years",,,] + coef(fit.big.df)[7]
-    slope["35-44 years",,,] <- slope["35-44 years",,,] + coef(fit.big.df)[8]
-    slope["45-54 years",,,] <- slope["45-54 years",,,] + coef(fit.big.df)[9]
-    slope["55+ years",,,] <- slope["55+ years",,,] + coef(fit.big.df)[10]
+    int["13-24 years",,,] <- int["13-24 years",,,] + coef(fit2.big.df)[6]
+    int["25-34 years",,,] <- int["25-34 years",,,] + coef(fit2.big.df)[7]
+    int["35-44 years",,,] <- int["35-44 years",,,] + coef(fit2.big.df)[8]
+    int["45-54 years",,,] <- int["45-54 years",,,] + coef(fit2.big.df)[9]
+    int["55+ years",,,] <- int["55+ years",,,] + coef(fit2.big.df)[10]
     
-    slope[,,"female",] <- slope[,,"female",] + coef(fit.big.df)[11]
-    slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit.big.df)[11] #coef(fit.big.df)[12]
-    slope[,,"msm",] <- slope[,,"msm",] + coef(fit.big.df)[13]
+    int[,,"female",] <- int[,,"female",] + coef(fit2.big.df)[12]
+    int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit2.big.df)[14] 
+    int[,,"msm",] <- int[,,"msm",] + coef(fit2.big.df)[16]
     
-    slope[,,,"active_IDU"] <- slope[,,,"active_IDU"] + coef(fit.big.df)[14]
+    int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit2.big.df)[11] 
+    int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit2.big.df)[13]
+    int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit2.big.df)[13]
+    
+    slope[,,,] <- coef(fit2.big.df)[2]
     
     # Make and return the functional form object
     create.logistic.linear.functional.form(
@@ -209,18 +213,38 @@ get.prep.indication.functional.form <- function(specification.metadata)
   age.info = parse.age.strata.names(dim.names$age)
   age.spans = age.info$upper - age.info$lower
   
-  # Intercepts and Slopes
-  int[,'black','msm',] <- int[,'black','msm',] + coef(fit.pi.msm.black)[1]
-  int[,'hispanic','msm',] <- int[,'hispanic','msm',] + coef(fit.pi.msm.hisp)[1]
-  int[,'other','msm',] <- int[,'other','msm',] + coef(fit.pi.msm.nbnh)[1]
+  # Intercepts and slopes
+  int[,,,] <- int[,,,] + coef(fit2.big.df)[1]
   
-  int["13-24 years",,'msm',] <- int["13-24 years",,'msm',] + coef(fit.pi.msm.age1)[1]
-  int["25-34 years",,'msm',] <- int["25-34 years",,'msm',] + coef(fit.pi.msm.age2)[1]
-  int["35-44 years",,'msm',] <- int["35-44 years",,'msm',] + coef(fit.pi.msm.age3)[1]
-  int["45-54 years",,'msm',] <- int["45-54 years",,'msm',] + coef(fit.pi.msm.age4)[1]
-  int["55+ years",,'msm',] <- int["55+ years",,'msm',] + coef(fit.pi.msm.age5)[1]
+  int[,"black",,] <- int[,"black",,] + coef(fit2.big.df)[3]
+  int[,"hispanic",,] <- int[,"hispanic",,] + coef(fit2.big.df)[4]
+  int[,"other",,] <- int[,"other",,] + coef(fit2.big.df)[5]
   
+  int["13-24 years",,,] <- int["13-24 years",,,] + coef(fit2.big.df)[6]
+  int["25-34 years",,,] <- int["25-34 years",,,] + coef(fit2.big.df)[7]
+  int["35-44 years",,,] <- int["35-44 years",,,] + coef(fit2.big.df)[8]
+  int["45-54 years",,,] <- int["45-54 years",,,] + coef(fit2.big.df)[9]
+  int["55+ years",,,] <- int["55+ years",,,] + coef(fit2.big.df)[10]
   
+  int[,,"female",] <- int[,,"female",] + coef(fit2.big.df)[12]
+  int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit2.big.df)[14] 
+  int[,,"msm",] <- int[,,"msm",] + coef(fit2.big.df)[16]
+  
+  int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit2.big.df)[11] 
+  int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit2.big.df)[13]
+  int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit2.big.df)[13]
+  
+  slope[,,,] <- coef(fit2.big.df)[2]
+  
+  # Make and return the functional form object
+  create.logistic.linear.functional.form(
+    intercept = int,
+    slope = slope,
+    anchor.year = anchor.year,
+    min = 0,
+    max = max.prep.indication, 
+    parameters.are.on.logit.scale = T
+  ) 
   
 }
 
