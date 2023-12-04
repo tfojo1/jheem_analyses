@@ -1,47 +1,48 @@
-#Pull birth and death data with demographics from CDC Wonder
-##THIS IS A PART OF THE CENSUS MANAGER
+#Pull birth and death data with demographics from CDC Wonder##
+##THIS IS A PART OF THE CENSUS MANAGER##
 
 # library(readr)
 # library(readxl)
 # library(tidyverse)
 ################################################################################
-                ###CDC Wonder Birth and Death data###
+                        ###BIRTH DATA###
 ################################################################################
-DATA.DIR.BIRTH.DEATH="../../data_raw/births_deaths"
+DATA.DIR.BIRTH="../../data_raw/births_deaths/births"
 
-birth_death_files <- list.files(DATA.DIR.BIRTH.DEATH, pattern = ".txt", full.names = "TRUE")
+birth_files <- list.files(DATA.DIR.BIRTH, pattern = ".txt", full.names = "TRUE")
 
-data.list.birth.death <- lapply(birth_death_files, function(x) {
-  list(filename=x, data=read_delim(x,  delim = "\t", escape_double = FALSE, 
-                                   col_types = cols(Notes = col_skip(), 
-                                                    `Yearly July 1st Estimates` = col_character(), 
-                                                    `Yearly July 1st Estimates Code` = col_character(), 
-                                                    Population = col_character()), trim_ws = TRUE))
+data.list.births <- lapply(birth_files, function(x) {
+  list(filename=x, data=read_delim(x, delim = "\t", escape_double = FALSE, 
+                                   col_types = cols(Notes = col_skip()), 
+                                   trim_ws = TRUE))
 })
-
 ################################################################################
-        ###Clean Birth and Death Data###
+                      ###CLEAN BIRTH DATA###
 ################################################################################
-data.list.births.clean = lapply(data.list.birth.death, function(file){
+data.list.births.clean = lapply(data.list.births, function(file){
   
-  data=file[["data"]] #apply the function to the data element#
-  filename = file[["filename"]] #apply the function to the filename element#
+  data=file[["data"]] 
+  filename = file[["filename"]]
   
-  data$year = as.character(data$`Yearly July 1st Estimates`)
-  data$location= as.character(data$`County Code`)
-  data$sex = ifelse(grepl("female", filename), "female", "male")
+  data$year = as.character(data$Year)
+  data$outcome= "births"
+  data$location= data$`County Code`
+  data$race = data$`Mother's Bridged Race`
+  data$ethnicity = data$`Mother's Hispanic Origin`
   
-  data$outcome= "population"
+  ##For right now I'm going to remove all the types of unk race/eth##
+  #data = subset(data, data$race != "Not Reported")
+  #data = subset(data, !is.na(data$race))
+  #data = subset(data, data$ethnicity != "Unknown or Not Stated")
+  #data = subset(data, !is.na(data$ethnicity))
   
-  data$value = ifelse(data$Population == "Missing", NA, data$Population) #Replacing 'missing' with NA
-  data$value = as.numeric(data$value)
+ ##For right now also going to remove births = suppressed or NA##
+  #data = subset(data, data$Births != "Suppressed")
+  #data = subset(data, !is.na(data$Births))
+  #data$value = as.numeric(data$Births)
   
-  data$race = data$Race
-  data$ethnicity= data$Ethnicity
-  data$age= data$Age
-  
-  data <- data %>%
-    select(outcome, year, location, age, race, ethnicity, sex, value)
+  # data <- data %>%
+  #   select(outcome, year, location, race, ethnicity, value)
   
   data = as.data.frame(data)
   list(filename, data)  
@@ -49,7 +50,7 @@ data.list.births.clean = lapply(data.list.birth.death, function(file){
 })
 
 ################################################################################
-            ###Put births and deaths into CENSUS MANAGER###
+                  ###Put BIRTHS into CENSUS MANAGER###
 ################################################################################
 county_single_year_age = lapply(data.list.cdc.wonder.clean, `[[`, 2)
 
@@ -63,3 +64,8 @@ for (data in county_single_year_age) {
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
+
+
+################################################################################
+###outcoe is Metro Deaths##
+################################################################################
