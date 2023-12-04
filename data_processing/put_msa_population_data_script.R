@@ -38,7 +38,7 @@ put.population.data = function(locations,
               
                 census.data.stratified = census.manager$pull(outcome = 'population',
                                                              keep.dimensions = fully.stratified.dimensions,
-                                                             dimension.values = list(location = contained.locations, age = adult.ages),
+                                                             dimension.values = list(location = contained.locations, age = census.adult.ages),
                                                              from.ontology.names = ont.name,
                                                              sources = source.name,
                                                              append.attributes = c('details', 'url'))
@@ -92,10 +92,10 @@ put.population.data = function(locations,
     }
 }
 
-census.manager = load.data.manager('../../cached/smaller.census.manager.rdata') 
+census.manager = load.data.manager('../../cached/smaller.census.manager.rdata')
 
 # practice.data.manager = create.data.manager('practice.data.manager', 'Data manager to test msa population putting')
-# # 
+# practice.data.manager$register.outcome('adult.population', metadata = create.outcome.metadata(scale = 'non.negative.number', display.name = 'Adult Population', axis.name = 'Adult Population (n)', units = 'persons', description = 'Population Ages 13+'))
 # test = put.population.data(locations = c('C.12580'), # MSAS.OF.INTEREST
 #                            data.manager = practice.data.manager, # surveillance.manager
 #                            census.manager = census.manager)
