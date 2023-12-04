@@ -1453,10 +1453,10 @@ register.model.foreground(EHE.SPECIFICATION,
                           name = 'covid.testing')
 
 register.default.parameter.values(EHE.SPECIFICATION,
-                                  c(black.covid.testing.rr = 3,
+                                  c(black.covid.testing.rr = 1,
                                     hispanic.covid.testing.rr = 1,
                                     other.covid.testing.rr = 1,
-                                    young.covid.testing.rr = 10,
+                                    young.covid.testing.rr = 1,
                                     old.covid.testing.rr = 1,
                                     covid.mobility.correlation = 1))
 
@@ -1494,11 +1494,11 @@ register.model.foreground(EHE.SPECIFICATION,
                           name = 'covid.sexual.transmission')
 
 register.default.parameter.values(EHE.SPECIFICATION,
-                                  c(black.covid.sexual.transmission.rr = 10,
+                                  c(black.covid.sexual.transmission.rr = 1,
                                     hispanic.covid.sexual.transmission.rr = 1,
                                     other.covid.sexual.transmission.rr = 1,
-                                    young.covid.sexual.transmission.rr = 5,
-                                    old.covid.sexual.transmission.rr = 3,
+                                    young.covid.sexual.transmission.rr = 1,
+                                    old.covid.sexual.transmission.rr = 1,
                                     covid.mobility.correlation = 1))
 
 #-- IV Transmission --#
@@ -1616,7 +1616,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'point.population',
                          keep.dimensions = c('location','age','race','sex','risk'),
-                         corresponding.data.outcome = 'population',
+                         corresponding.data.outcome = 'adult.population',
                          save = T)
 
 track.integrated.outcome(EHE.SPECIFICATION,
