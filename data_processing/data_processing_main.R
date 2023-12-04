@@ -12,6 +12,16 @@ library(locations)
 
 data.manager = create.data.manager('surveillance', description='surveillance data manager')
 
+#adding this but may need to remove
+data.manager$register.outcome(
+  'adult.population',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Adult Population',
+    axis.name = 'Adult Population',
+    units = 'population',
+    description = "Adult Population Estimate, Ages 13 and over"))
+
 data.manager$register.outcome(
   'diagnoses',
   metadata = create.outcome.metadata(
@@ -244,7 +254,7 @@ data.manager$register.outcome(
     display.name = 'Proportion of MSM',
     axis.name = 'Proportion of MSM',
     units = '%',
-    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population')
+    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'adult.population')
 
 data.manager$register.outcome(
   'unweighted.denominator',
@@ -1185,15 +1195,15 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
 ################################################################################
  ###Use various pull statements to check that data you put in is correct###
  
- x = (data.manager$pull(
-   outcome = 'diagnoses',
-   keep.dimensions = c('year', 'age'),
-   dimension.values = list(sex=c('male', 'female'))))
- 
- y =(data.manager$pull(
-   outcome='hiv.deaths',
-   keep.dimensions = c('location', 'year')))
- 
+ # x = (data.manager$pull(
+ #   outcome = 'diagnoses',
+ #   keep.dimensions = c('year', 'age'),
+ #   dimension.values = list(sex=c('male', 'female'))))
+ # 
+ # y =(data.manager$pull(
+ #   outcome='hiv.deaths',
+ #   keep.dimensions = c('location', 'year')))
+ # 
  
 ################################################################################
 ###Rename surveillance manager####
@@ -1202,7 +1212,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  
  ################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
-load.data.manager("Q:/data_managers/census.manager.rdata")  
+load.data.manager("../../cached/census.manager.rdata")  
  put.population.data(locations = c(MSAS.OF.INTEREST), 
                             data.manager = surveillance.manager, 
                             census.manager = census.manager)
