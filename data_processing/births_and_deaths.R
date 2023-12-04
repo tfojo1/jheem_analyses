@@ -97,7 +97,7 @@ data.list.deaths <- lapply(death_files, function(x) {
 
 data.list.deaths.clean = lapply(data.list.deaths, function(file){
   
-  data=file[["data"]] 
+  data=file[["data"]]  
   filename = file[["filename"]]
   
   names(state.abb) <- state.name
