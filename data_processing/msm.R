@@ -5,11 +5,41 @@
                       ##This is a weighted measure
                 ##MSM Estimation using BRFSS Data by State
 ################################################################################
+##Create a version of the brfss.state.sex data list to use below##
+data.list.brfss.state.sex.for.msm = lapply(data.list.brfss.state.clean, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data<- data %>%
+    group_by(location, sex) %>%
+    mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+    ungroup()
+  
+  data<- data %>%
+    group_by(location, sex) %>%
+    mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+    ungroup()%>%
+    mutate(proportion_tested = (sum_tested/n_weighted)) #denominators needs to be sum of weights by location by sex#
+  
+  data$proportion_tested = round(data$proportion_tested, digits=2)
+  
+  data$year = as.character(data$year)
+  data$value = data$proportion_tested
+  
+  data <- data %>%
+    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`, race, risk, age)
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) 
+})
+
 #######
 ##Total
 #######
 #Pulling from the brffs.state.sex data list so that denominator for msm proportion is males only
-data.list.brfss.state.msm = lapply(data.list.brfss.state.sex, function(file){
+data.list.brfss.state.msm = lapply(data.list.brfss.state.sex.for.msm, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -20,18 +50,18 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex, function(file){
   
   data<- data %>%
     group_by(location, msm) %>%
-    mutate(msm_total = sum(msm*`_LLCPWT`))%>%  
+    mutate(msm_total = sum(msm*`_LLCPWT`))%>%
     ungroup()
-  
+
   data <- data %>%
-    select(outcome, year, location, msm, msm_total, n_weighted)%>%
+    select(outcome, year, location, msm, msm_total, n_weighted)%>% #n_weighted here is the sum of the weights by sex#
     filter(!is.na(msm_total))%>%
     mutate(value = (msm_total/n_weighted))
-  
+
   data$value = round(data$value, digits=2)
-  
+
   data<- data[!duplicated(data), ]
-  
+
   data= as.data.frame(data)
   list(filename, data) 
 })
@@ -41,7 +71,7 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex, function(file){
 ##Denominator values that are total males of each race and total males of each
 #age group so that MSM proportion can have male only denominator and be stratified by race/age appropriately
 ################################################################################
-data.list.race.male.denom = lapply(data.list.brfss.state.sex, function(file){
+data.list.race.male.denom = lapply(data.list.brfss.state.sex.for.msm, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -56,7 +86,7 @@ data.list.race.male.denom = lapply(data.list.brfss.state.sex, function(file){
   data= as.data.frame(data)
   list(filename, data) 
 })
-data.list.age.male.denom = lapply(data.list.brfss.state.sex, function(file){
+data.list.age.male.denom = lapply(data.list.brfss.state.sex.for.msm, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 

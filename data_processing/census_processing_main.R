@@ -37,6 +37,15 @@ census.manager$register.outcome(
     units = 'deaths',
     description = "Deaths"))
 
+census.manager$register.outcome(
+  'metro.deaths',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Metro Deaths',
+    axis.name = 'Metro Deaths',
+    units = 'deaths',
+    description = "Metro Deaths"))
+
 census.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
 census.manager$register.source('cdc_wonder', full.name = "CDC Wonder", short.name='cdc_wonder')
@@ -104,6 +113,8 @@ source('data_processing/census_cdc_wonder.R')
 #This pulls single year age groups and demographic data from 2005-2017#
 source('data_processing/census_sas_files.R')
 
+#This pulls birth and death data from CDC Wonder#
+source('data_processing/births_and_deaths.R')
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
           ##County BIRTH AND DEATH ESTIMATES 2010-2022##
