@@ -125,7 +125,7 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   data$ethnicity = data$'Hispanic.Origin'
   data = subset(data, data$ethnicity != "Not Stated")
   data = subset(data, data$age != "Not Stated")
-  
+   
 
   
    data <- data %>%
