@@ -12,7 +12,6 @@ data.list.births <- lapply(birth_files, function(x) {
   list(filename=x, data=read.delim2(x))
   
 })
-
 ################################################################################
                       ###CLEAN BIRTH DATA###
 ################################################################################
@@ -40,7 +39,9 @@ data.list.births.clean = lapply(data.list.births, function(file){
   
   data$race = if_else(data$race == "Native Hawaiian or Other Pacific Islander" | data$race == "Asian", "Asian or Pacific Islander", data$race)
 
- ##For right now also going to remove births = suppressed or NA##
+##Removing births = suppressed or Missing County##
+##'Missing County' appears when county data is not available for a certain year. 
+#This occurs because the county did not meet minimum population standards and thus the data for the county was recoded to the "Unidentified Counties"
    data = subset(data, data$Births != "Suppressed") 
    data = subset(data, data$Births != "Missing County")
    data$value = as.numeric(data$Births)
@@ -126,8 +127,6 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   data = subset(data, data$ethnicity != "Not Stated")
   data = subset(data, data$age != "Not Stated")
    
-
-  
    data <- data %>%
      select(outcome, year, location, value, sex, age, race, ethnicity)
   
