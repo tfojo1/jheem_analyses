@@ -111,7 +111,7 @@ get.model.fertility.rates.functional.form = function(location, specification.met
   create.log.linear.functional.form(intercept = rates,
                                     slope = 1, # log(1) = 0, so this means no slope on the non-transformed scale
                                     parameters.are.on.log.scale = F,
-                                    anchor.year = 2010)
+                                    anchor.year = 2007)
   
 }
 
