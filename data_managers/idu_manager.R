@@ -60,7 +60,7 @@ KEEP.RACE.MAPPING = c(black='black', hispanic='hispanic',
 STANDARD.AGE.CUTOFFS = c(13,25,35,45,55,Inf)
 DEFAULT.YEAR = 2016
 
-get.incident.idu.model <- function(idu.manager,
+old.get.incident.idu.model <- function(idu.manager,
                                    census,
                                    location,
                                    specification.metadata,
@@ -92,7 +92,7 @@ get.incident.idu.model <- function(idu.manager,
     }
 }
 
-get.idu.remission.model <- function(idu.manager,
+old.get.idu.remission.model <- function(idu.manager,
                              census,
                              location,
                              specification.metadata,
@@ -124,7 +124,7 @@ get.idu.remission.model <- function(idu.manager,
     }
 }
 
-get.idu.relapse.model <- function(idu.manager,
+old.get.idu.relapse.model <- function(idu.manager,
                               census,
                               location,
                               specification.metadata,

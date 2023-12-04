@@ -11,11 +11,13 @@ if (1==2){
                                                       location = 'c.12580')
 }
 
+##-----------------------##
+##--  HELPER FUNCTIONS --##
+##-----------------------##
 # initiation helper functions (combining numerators, denominators over 3 years and two data types (heroin and cocaine))
 generate.iniation.numerators = function(data.type,
                                         year){
   
-  # file.dir = paste0("~/Dropbox/Documents_local/Hopkins/SOM_Job/jheem_non_code/IDU_data/initiation_data")
   file.dir = paste0("data_files/idu_initiation")
   
   if(data.type=="heroin"){
@@ -188,7 +190,6 @@ generate.iniation.numerators = function(data.type,
 
 generate.initiation.denominators = function(year){
   
-  # file.dir = paste0("~/Dropbox/Documents_local/Hopkins/SOM_Job/jheem_non_code/IDU_data/initiation_data")
   file.dir = paste0("data_files/idu_initiation")
   
   ages = c("12","21","22-23","24-25","26-29","30-34","35-49","50-64","65+","13","14","15","16","17","18","19","20")
@@ -241,31 +242,31 @@ generate.multi.year.estimates.total = function(years){
   
 }
 
-
-# Main functions for initiation, remission, relapse 
-# Return a 3-d array, with dimensions: 'age', 'race', 'sex'
+##-------------------##
+##--  RETURN RATES --##
+##-------------------##
 get.idu.incidence.rates <- function(specification.metadata)
 {
-    dim.names = specification.metadata$dim.names[c('age','race','sex')]
-
-    rates.2018.to.2020 = generate.multi.year.estimates.total(years = c("2018","2019","2020"))
-    
-    ## mapped estimates 
-    ages.sorted = sort(c("12","21","22-23","24-25","26-29","30-34","35-49",
-                         "50-64","65+","13","14","15","16","17","18","19","20"))
-    
-    age.info.initiation = parse.age.strata.names(ages.sorted)
-    
-    weighted.mapped = map.age.values(values = rates.2018.to.2020[,1],
-                                     given.age.lowers = age.info.initiation$lower,
-                                     given.age.uppers = age.info.initiation$upper, 
-                                     desired.ages = dim.names$age)
+  dim.names = specification.metadata$dim.names[c('age','race','sex')]
   
-    rv = array(rep(weighted.mapped,9), # this is going to fill in assuming that age is the first dimension 
-               dim=sapply(dim.names, length),
-               dimnames = dim.names)
-    
-    rv
+  rates.2018.to.2020 = generate.multi.year.estimates.total(years = c("2018","2019","2020"))
+  
+  ## mapped estimates 
+  ages.sorted = sort(c("12","21","22-23","24-25","26-29","30-34","35-49",
+                       "50-64","65+","13","14","15","16","17","18","19","20"))
+  
+  age.info.initiation = parse.age.strata.names(ages.sorted)
+  
+  weighted.mapped = map.age.values(values = rates.2018.to.2020[,1],
+                                   given.age.lowers = age.info.initiation$lower,
+                                   given.age.uppers = age.info.initiation$upper, 
+                                   desired.ages = dim.names$age)
+  
+  rv = array(rep(weighted.mapped,9), # this is going to fill in assuming that age is the first dimension 
+             dim=sapply(dim.names, length),
+             dimnames = dim.names)
+  
+  rv
 }
 
 get.idu.remission.rates <- function(specification.metadata)
@@ -321,4 +322,75 @@ get.idu.relapse.rates <- function(specification.metadata)
   rv[,,"female"] = rv[,,"female"]*relapse.sex
   
   rv 
+}
+
+##------------------------------##
+##--  RETURN FUNCTIONAL FORMS --##
+##------------------------------##
+get.incident.idu.model <- function(specification.metadata,
+                                   static,
+                                   knot.times=c(2000,2016))
+{
+  rates = get.idu.incidence.rates(specification.metadata = specification.metadata)
+  
+  if (static)
+    create.static.functional.form(value=rates, link='log')
+  else
+  {
+    knot.values = lapply(1:length(knot.times), function(i){rates})
+    names(knot.values) = names(knot.times) = paste0("time", (0:length(knot.values))[-length(knot.values)])
+    create.natural.spline.functional.form(knot.times = knot.times,
+                                          knot.values = knot.values,
+                                          before.time = min(knot.times)-10,
+                                          after.time = max(knot.times)+10,
+                                          link='log',
+                                          after.modifier = .025 / (1-.05-.025),
+                                          before.modifier = .05 / (1-.05-.025),
+                                          modifiers.apply.to.change = T)
+  }
+}
+
+get.idu.remission.model <- function(specification.metadata,
+                                    static,
+                                    knot.times=c(2000,2016))
+{
+  rates = get.idu.remission.rates(specification.metadata = specification.metadata)
+  
+  if (static)
+    create.static.functional.form(value=rates, link='log')
+  else    
+  {
+    knot.values = lapply(1:length(knot.times), function(i){rates})
+    names(knot.values) = names(knot.times) = paste0("time", (0:length(knot.values))[-length(knot.values)])
+    create.natural.spline.functional.form(knot.times = knot.times,
+                                          knot.values = knot.values,
+                                          before.time = min(knot.times)-10,
+                                          after.time = max(knot.times)+10,
+                                          link='log',
+                                          after.modifier = .025 / (1-.05-.025),
+                                          before.modifier = .05 / (1-.05-.025),
+                                          modifiers.apply.to.change = T)
+  }
+}
+
+get.idu.relapse.model <- function(specification.metadata,
+                                  static,
+                                  knot.times=c(2000,2016))
+{
+  rates = get.idu.relapse.rates(specification.metadata = specification.metadata)
+  if (static)
+    create.static.functional.form(value=rates, link='log')
+  else
+  {
+    knot.values = lapply(1:length(knot.times), function(i){rates})
+    names(knot.values) = names(knot.times) = paste0("time", (0:length(knot.values))[-length(knot.values)])
+    create.natural.spline.functional.form(knot.times = knot.times,
+                                          knot.values = knot.values,
+                                          before.time = min(knot.times)-10,
+                                          after.time = max(knot.times)+10,
+                                          link='log',
+                                          after.modifier = .025 / (1-.05-.025),
+                                          before.modifier = .05 / (1-.05-.025),
+                                          modifiers.apply.to.change = T)
+  }
 }

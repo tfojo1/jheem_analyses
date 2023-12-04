@@ -31,6 +31,7 @@ source('../jheem_analyses/data_managers/pairing_manager.R')
 
 # Input Managers
 source('../jheem_analyses/input_managers/covid_mobility_manager.R')
+source('../jheem_analyses/input_managers/idu_input_manager.R')
 
 # For the EHE version
 source('../jheem_analyses/applications/EHE/ehe_base_parameters.R')
