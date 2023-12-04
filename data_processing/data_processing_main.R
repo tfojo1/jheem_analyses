@@ -375,6 +375,7 @@ data.manager$register.ontology(
 ###Source locations of intersete to create MSA vector
 source('commoncode/locations_of_interest.R')
 ##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
+#This code also adjusts the population to be the 'adult.population' ages 13 and over
 source('data_processing/put_msa_population_data_script.R')
 ###############################################################################
 ###Source in File that reads .csvs and removes headers
@@ -1211,7 +1212,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  
  ################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
-load.data.manager("../../cached/census.manager.rdata")  
+load.data.manager("../../cached/smaller.census.manager.rdata")  
  put.population.data(locations = c(MSAS.OF.INTEREST), 
                             data.manager = surveillance.manager, 
                             census.manager = census.manager)
