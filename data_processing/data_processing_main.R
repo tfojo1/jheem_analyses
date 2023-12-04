@@ -12,7 +12,6 @@ library(locations)
 
 data.manager = create.data.manager('surveillance', description='surveillance data manager')
 
-#adding this but may need to remove
 data.manager$register.outcome(
   'adult.population',
   metadata = create.outcome.metadata(
