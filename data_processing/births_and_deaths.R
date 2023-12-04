@@ -101,7 +101,7 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   filename = file[["filename"]]
   
   names(state.abb) <- state.name
-  data$location = state.abb[data$State]
+  data$location =ifelse(data$State == "District of Columbia", "DC", state.abb[data$State]) 
   
   if(grepl("06.10", filename)) {
     data$year = "2006-2010"
@@ -124,11 +124,12 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   data$race = data$Race
   data$ethnicity = data$'Hispanic.Origin'
   data = subset(data, data$ethnicity != "Not Stated")
+  data = subset(data, data$age != "Not Stated")
   
 
   
-  # data <- data %>%
-  #   select(outcome, year, location, value, sex, age, race, ethnicity)
+   data <- data %>%
+     select(outcome, year, location, value, sex, age, race, ethnicity)
   
   data = as.data.frame(data)
   list(filename, data)  
