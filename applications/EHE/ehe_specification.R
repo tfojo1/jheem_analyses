@@ -618,7 +618,8 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'default.aging',
                        scale = 'rate',
-                       get.value.function = get.default.aging.rates)
+                       get.functional.form.function = get.empiric.aging.rates,
+                       functional.form.from.time = 2007)
 
 register.aging(EHE.SPECIFICATION,
                groups = 'uninfected',

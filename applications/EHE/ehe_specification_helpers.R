@@ -35,6 +35,72 @@ get.default.aging.rates <- function(location, specification.metadata,
     rv
 }
 
+get.empiric.aging.rates <- function(location, specification.metadata,
+                                    years=c(2007,2019),
+                                    active.idu.proportion.youngest.stratum.aging.up=0.25,
+                                    prior.idu.proportion.youngest.stratum.aging.up=0.25)
+{
+    counties = locations::get.contained.locations(location, 'county')
+    pop = CENSUS.MANAGER$pull(outcome='population',
+                              dimension.values = list(location = counties,
+                                                      year = as.character(years)),
+                              keep.dimensions = c('year','age','race','ethnicity','sex'))
+    
+    race.mapping = get.ontology.mapping(dimnames(pop)[c('race','ethnicity')],
+                                        specification.metadata$dim.names['race'])
+    
+    pop = apply(pop, c('year','age','race','ethnicity','sex'), sum, na.rm=T)
+    pop = race.mapping$apply(pop)
+    
+    
+    aging.rates = lapply(as.character(years), function(year){
+        raw.rates = sapply(1:(specification.metadata$n.ages-1), function(age.index){
+            
+            age.upper.bound = specification.metadata$age.upper.bounds[age.index] - 1
+            age.bracket.ages = specification.metadata$age.lower.bounds[age.index]:age.upper.bound
+          
+            pop[year, paste0(age.upper.bound, ' years'),,] /
+              colSums(pop[year, paste0(age.bracket.ages, ' years'),,], dims=1)
+        })
+        
+        dim.names = c(dimnames(pop)[c('race','sex')], list(age=specification.metadata$dim.names$age[-1]))
+        dim(raw.rates) = sapply(dim.names, length)
+        dimnames(raw.rates) = dim.names
+        
+        desired.dim.names = specification.metadata$dim.names[c('age','race','sex','risk')]
+        desired.dim.names$age = desired.dim.names$age[-length(desired.dim.names$age)]
+        
+        sex.mapping = c(msm='male', heterosexual_male='male', female='female')
+        rates.by.sex = sapply(desired.dim.names$sex, function(sex){
+          
+            sex.from = sex.mapping[sex]
+            if (is.na(sex.from))
+                stop("'get.empiric.aging.rates' in the ehe_specification_helpers is hard-coded for sex = [msm, heterosexual_male, female]. You will need to modify this function to accomodate additional sex categories")
+            
+            raw.rates[,sex.from,]
+        })
+        
+        dim.names = desired.dim.names[c('race','age','sex')]
+        dim(rates.by.sex) = sapply(dim.names, length)
+        dimnames(rates.by.sex) = dim.names
+        
+        rv = expand.array(rates.by.sex, target.dim.names = desired.dim.names)
+        
+        rv[1,,,specification.metadata$compartment.aliases$active.idu.states] = active.idu.proportion.youngest.stratum.aging.up
+        rv[1,,,specification.metadata$compartment.aliases$prior.idu.states] = prior.idu.proportion.youngest.stratum.aging.up
+        
+        rv
+    })
+    
+    names(aging.rates) = as.character(years)
+    names(years) = as.character(years)
+    
+    create.natural.spline.functional.form(knot.times = years,
+                                          knot.values = aging.rates,
+                                          link = 'log',
+                                          knots.are.on.transformed.scale = T)
+                                          
+}
 
 ##--------------------##
 ##-- Proportion MSM --##

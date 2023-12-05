@@ -4,9 +4,13 @@
 library(locations)
 library(distributions)
 
-# Load the data manager
+# Load the data managers
 if (is.null(get.default.data.manager()))
   SURVEILLANCE.MANAGER = load.data.manager('../jheem_analyses/cached/surveillance.manager.rdata', set.as.default = T)
+
+if (!exists('CENSUS.MANAGER'))
+  CENSUS.MANAGER = load.data.manager('../jheem_analyses/cached/smaller.census.manager.rdata', set.as.default = T)
+  
 
 # Load the data - this will eventually be replaced with jheem2's native data manager
 if (!exists('ALL.DATA.MANAGERS'))
