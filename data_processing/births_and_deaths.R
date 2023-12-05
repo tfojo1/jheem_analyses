@@ -31,12 +31,8 @@ data.list.births.clean = lapply(data.list.births, function(file){
   data$race = data$`Mother.s.Single.Race`
    }
 
-  ##For right now I'm going to remove all the types of unk race/eth##
-  data = subset(data, data$race != "Not Reported")
-  data = subset(data, data$race != "Not Available")
-  data = subset(data, data$race != "Unknown or Not Stated")
-  data = subset(data, data$ethnicity != "Unknown or Not Stated")
-  
+  #Combining racial groups from bridged and single
+  #Todd said for now to leave in Not reported, not available, and unknown and add to the ontology
   data$race = if_else(data$race == "Native Hawaiian or Other Pacific Islander" | data$race == "Asian", "Asian or Pacific Islander", data$race)
 
 ##Removing births = suppressed or Missing County##
@@ -70,7 +66,7 @@ for (data in births_race_eth ) {
   
   census.manager$put.long.form(
     data = data,
-    ontology.name = 'census.cdc.wonder',
+    ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/',
@@ -124,8 +120,9 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   data$sex = tolower(data$Gender)
   data$race = data$Race
   data$ethnicity = data$'Hispanic.Origin'
-  data = subset(data, data$ethnicity != "Not Stated")
-  data = subset(data, data$age != "Not Stated")
+  
+  # data = subset(data, data$ethnicity != "Not Stated")
+  # data = subset(data, data$age != "Not Stated")
    
    data <- data %>%
      select(outcome, year, location, value, sex, age, race, ethnicity)
@@ -144,7 +141,7 @@ for (data in deaths_race_eth ) {
   
   census.manager$put.long.form(
     data = data,
-    ontology.name = 'census.cdc.wonder.mortality',
+    ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/',
