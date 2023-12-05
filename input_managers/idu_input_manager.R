@@ -18,7 +18,7 @@ if (1==2){
 generate.iniation.numerators = function(data.type,
                                         year){
   
-  file.dir = paste0("data_files/idu_initiation")
+  file.dir = paste0("../jheem_analyses/data_files/idu_initiation")
   
   if(data.type=="heroin"){
     file = list.files(file.path(file.dir,year),"HER")
@@ -190,7 +190,7 @@ generate.iniation.numerators = function(data.type,
 
 generate.initiation.denominators = function(year){
   
-  file.dir = paste0("data_files/idu_initiation")
+  file.dir = paste0("../jheem_analyses/data_files/idu_initiation")
   
   ages = c("12","21","22-23","24-25","26-29","30-34","35-49","50-64","65+","13","14","15","16","17","18","19","20")
   
