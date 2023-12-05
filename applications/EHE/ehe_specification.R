@@ -429,25 +429,19 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'rate',
                        get.functional.form.function = get.incident.idu.model,
                        static=F,
-                       functional.form.from.time = 1990,
-                       idu.manager = ALL.DATA.MANAGERS$idu,
-                       census = ALL.DATA.MANAGERS$census.full.msm)
+                       functional.form.from.time = 1990)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.remission',
                        scale = 'rate',
                        get.functional.form.function = get.idu.remission.model,
-                       static=T,
-                       idu.manager = ALL.DATA.MANAGERS$idu,
-                       census = ALL.DATA.MANAGERS$census.full.msm)
+                       static=T)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.relapse',
                        scale = 'rate',
                        get.functional.form.function = get.idu.relapse.model,
-                       static=T,
-                       idu.manager = ALL.DATA.MANAGERS$idu,
-                       census = ALL.DATA.MANAGERS$census.full.msm)
+                       static=T)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'needle.exchange.remission.rate.ratio',
