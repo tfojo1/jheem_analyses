@@ -19,6 +19,21 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     hispanic.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)/5),
     other.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)/5),
     
+    #-- Non IDU general mortality rates --#
+    black.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    hispanic.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    other.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    
+    age1.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    age2.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    age3.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    age4.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    age5.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    
+    male.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    female.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    
+    
     #-- MSM Transmission --#
     black.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
                                                                     r1.log.sd=log(BASE.TRATE.CV),
@@ -329,6 +344,21 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'black.birth.rate.slope.multiplier',
     'hispanic.birth.rate.slope.multiplier',
     'other.birth.rate.slope.multiplier'
+  ),
+  
+  non.idu.general.mortality.rates = c(
+    'black.non.idu.general.mortality.rate.multiplier',
+    'hispanic.non.idu.general.mortality.rate.multiplier',
+    'other.non.idu.general.mortality.rate.multiplier',
+    
+    'age1.non.idu.general.mortality.rate.multiplier',
+    'age2.non.idu.general.mortality.rate.multiplier',
+    'age3.non.idu.general.mortality.rate.multiplier',
+    'age4.non.idu.general.mortality.rate.multiplier',
+    'age5.non.idu.general.mortality.rate.multiplier',
+    
+    'male.non.idu.general.mortality.rate.multiplier',
+    'female.non.idu.general.mortality.rate.multiplier'
   ),
   
   peak.msm.transmission = 'msm.peak.trate.multiplier',

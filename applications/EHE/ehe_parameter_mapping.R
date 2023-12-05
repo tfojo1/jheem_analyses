@@ -31,6 +31,55 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
        
     }
     
+    #-- Mortality rates --#
+    # Race
+    for(race in specification.metadata$dim.names$race){
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "non.idu.general.mortality",
+                                                     alpha.name = 'value',
+                                                     values = parameters[paste0(race,'.non.idu.general.mortality.rate.multiplier')],
+                                                     applies.to.dimension.values=list(race=race))
+
+      
+      used.parameter.names = c(used.parameter.names,
+                               c(paste0(race,'.non.idu.general.mortality.rate.multiplier')))
+      
+    }
+    
+    # Age
+    for(age in 1:length(specification.metadata$dim.names$age)){
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "non.idu.general.mortality",
+                                                     alpha.name = 'value',
+                                                     values = parameters[paste0('age',age,'.non.idu.general.mortality.rate.multiplier')],
+                                                     applies.to.dimension.values=list(age=age))
+      
+      
+      used.parameter.names = c(used.parameter.names,
+                               c(paste0('age',age,'.non.idu.general.mortality.rate.multiplier')))
+      
+    }
+    
+    # Sex
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "non.idu.general.mortality",
+                                                   alpha.name = 'value',
+                                                   values = parameters['male.non.idu.general.mortality.rate.multiplier'],
+                                                   applies.to.dimension.values=list(sex=c('heterosexual_male','msm')))
+    
+    
+    used.parameter.names = c(used.parameter.names,
+                             c(paste0('male.non.idu.general.mortality.rate.multiplier')))
+    
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "non.idu.general.mortality",
+                                                   alpha.name = 'value',
+                                                   values = parameters['female.non.idu.general.mortality.rate.multiplier'],
+                                                   applies.to.dimension.values=list(sex='female'))
+    
+    
+    used.parameter.names = c(used.parameter.names,
+                             c(paste0('female.non.idu.general.mortality.rate.multiplier')))
           
     #-- Suppression --#
     used.names = set.ehe.alphas.from.parameters(model.settings,
