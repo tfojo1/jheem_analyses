@@ -1,7 +1,7 @@
 put.population.data = function(locations,
                                contained.geographic.type = 'county',
                                fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
-                               put.stratifications = list('age', c('race', 'ethnicity'), 'sex'),
+                               put.stratifications = list('age', c('race', 'ethnicity'), 'sex', c('age', 'race', 'ethnicity'), c('age', 'sex'), c('race', 'ethnicity', 'sex')),
                                data.manager,
                                census.manager)
 {
