@@ -30,7 +30,7 @@ data.list.cdc.wonder.clean = lapply(data.list.cdc.wonder  , function(file){
   data$location= as.character(data$`County Code`)
   data$sex = ifelse(grepl("female", filename), "female", "male")
   
-  data$outcome= "adult.population"
+  data$outcome= "population"
 
   data$value = ifelse(data$Population == "Missing", NA, data$Population) #Replacing 'missing' with NA
   data$value = as.numeric(data$value)
@@ -41,8 +41,6 @@ data.list.cdc.wonder.clean = lapply(data.list.cdc.wonder  , function(file){
     
   data <- data %>%
     select(outcome, year, location, age, race, ethnicity, sex, value)
-  
-  data$outcome = if_else(data$outcome == "population", "adult.population", data$outcome) #adjusting for the change from population to adult.population
   
   data = as.data.frame(data)
   list(filename, data)  

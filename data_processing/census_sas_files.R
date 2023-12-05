@@ -88,9 +88,6 @@ data.list.census.sas.clean = lapply(census_sas_data_list, function(file){
                   names_to = c("outcome", "year"),
                   names_sep = "_",
                   values_to = "value")
-
-   data$outcome = if_else(data$outcome == "population", "adult.population", data$outcome) #adjusting for the change from population to adult.population
-   
    
  data = as.data.frame(data)
   list(filename, data)
