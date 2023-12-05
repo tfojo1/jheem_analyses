@@ -57,7 +57,7 @@ for (data in county_single_year_age) {
   
   census.manager$put.long.form(
     data = data,
-    ontology.name = 'census.cdc.wonder',
+    ontology.name = 'census.cdc.wonder.population',
     source = 'cdc_wonder',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/',

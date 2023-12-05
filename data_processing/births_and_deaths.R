@@ -138,16 +138,15 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
 ##Put DEATHS into CENSUS MANAGER
 ################################################################################
 
-deaths_race_eth = lapply(data.list.deaths.clean , `[[`, 2)
+deaths_race_eth = lapply(data.list.deaths.clean, `[[`, 2)
 
 for (data in deaths_race_eth ) {
   
   census.manager$put.long.form(
     data = data,
-    ontology.name = 'census.cdc.wonder',
+    ontology.name = 'census.cdc.wonder.mortality',
     source = 'cdc_wonder',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
-
