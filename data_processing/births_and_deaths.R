@@ -46,7 +46,7 @@ data.list.births.clean = lapply(data.list.births, function(file){
    data$location= str_pad(data$`County.Code`, width=5, side="left", pad="0")
    data$location = as.character(data$location)
    #Remove locations that are invalid
-   data$location_flag = is.location.valid(data$location)
+   data$location_flag = locations::is.location.valid(data$location)
    data = subset(data, data$location_flag != 'FALSE')
 
   data <- data %>%
