@@ -1,6 +1,10 @@
 # Takes the full census manager and subsets it to only include the "counties of
 # interest" as specified in jheem_analyses/commoncode/locations_of_interest.R
 
+library(locations)
+source('commoncode/locations_of_interest.R')
+COUNTIES.OF.INTEREST <- unlist(COUNTIES.OF.INTEREST)
+
 census.manager.filepath = "../../cached/census.manager.rdata"
 
 load(census.manager.filepath)

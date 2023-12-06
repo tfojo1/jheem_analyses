@@ -3,6 +3,7 @@ library(tidyverse)
 library(readr)
 library(readxl) 
 library(haven)
+library(locations)
 
 ################################################################################
       ###Create a separate data manager for the census data###
