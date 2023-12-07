@@ -98,7 +98,7 @@ get.empiric.aging.rates <- function(location, specification.metadata,
     create.natural.spline.functional.form(knot.times = years,
                                           knot.values = aging.rates,
                                           link = 'log',
-                                          knots.are.on.transformed.scale = T)
+                                          knots.are.on.transformed.scale = F)
                                           
 }
 
