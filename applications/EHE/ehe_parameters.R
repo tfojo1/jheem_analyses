@@ -149,6 +149,11 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #aging.0 rates from 2000 data in table 10 of
     # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-report-2002-vol-14.pdf
     
+    age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age4.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    
     msm.age1.aging.base = Lognormal.Distribution(log(12209/2/22537), 0.25*log(2)),
     msm.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
     msm.age2.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(49965,69515)), 0.5*log(2)),
@@ -380,6 +385,13 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'other.msm.trate.1',
     'other.msm.trate.2',
     'msm.fraction.trate.change.after.t2'
+  ),
+  
+  aging.multipliers = c(
+    'age1.aging.multiplier',
+    'age2.aging.multiplier',
+    'age3.aging.multiplier',
+    'age4.aging.multiplier'
   ),
   
   msm.aging = c(

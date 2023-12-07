@@ -303,6 +303,25 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
     
     
     #-- Aging --#
+    for(age in 1:(length(specification.metadata$dim.names$age)-1)){
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "default.aging",
+                                                     alpha.name = '2007',
+                                                     values = parameters[paste0('age',age,'.aging.multiplier')],
+                                                     applies.to.dimension.values=list(age=age))
+
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "default.aging",
+                                                     alpha.name = '2019',
+                                                     values = parameters[paste0('age',age,'.aging.multiplier')],
+                                                     applies.to.dimension.values=list(age=age))
+      
+      
+      used.parameter.names = c(used.parameter.names,
+                               c(paste0('age',age,'.aging.multiplier')))
+      
+    }
+    
     used.names = set.ehe.aging.from.parameters(model.settings,
                                                parameters = parameters,
                                                times = c('.pre.spike', 0:3),
