@@ -49,7 +49,8 @@ register.ontology.mapping('wonder.to.census.race',
                           mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
                                            c('Asian or Pacific Islander', 'asian or pacific islander'),
                                            c('Black or African American', 'black'),
-                                           c('White', 'white')))
+                                           c('White', 'white'),
+                                           c('More than one race', NA)))
 register.ontology.mapping('wonder.to.census.ethnicity',
                           from.dimensions = 'ethnicity',
                           to.dimensions = 'ethnicity',
