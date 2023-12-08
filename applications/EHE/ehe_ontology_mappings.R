@@ -42,8 +42,14 @@ register.ontology.mapping('cdc.msa.reports.to.jheem.race',
                                            c('Black/African American', 'black'),
                                            c('Hispanic/Latino', 'hispanic'),
                                            c('White', 'other')))
-
-register.ontology.mapping('wonder.to.census.race',
+register.ontology.mapping('wonder.to.census.race.1',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
+                                           c('Asian or Pacific Islander', 'asian or pacific islander'),
+                                           c('Black or African American', 'black'),
+                                           c('White', 'white')))
+register.ontology.mapping('wonder.to.census.race.2',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
                           mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
