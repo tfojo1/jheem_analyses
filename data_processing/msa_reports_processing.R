@@ -1239,7 +1239,7 @@ for (data in msa_deaths) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc msa reports',
+    ontology.name = 'cdc.msa.reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1253,7 +1253,7 @@ for (data in msa_total) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc msa reports',
+    ontology.name = 'cdc.msa.reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1267,7 +1267,7 @@ for (data in msa_sex) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc msa reports',
+    ontology.name = 'cdc.msa.reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1281,7 +1281,7 @@ for (data in msa_sex_age) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc msa reports',
+    ontology.name = 'cdc.msa.reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1295,7 +1295,7 @@ for (data in msa_2009) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc msa reports',
+    ontology.name = 'cdc.msa.reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1309,7 +1309,7 @@ for (data in msa_sex_race) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc msa reports',
+    ontology.name = 'cdc.msa.reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1323,7 +1323,7 @@ for (data in msa_race_risk) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc msa reports',
+    ontology.name = 'cdc.msa.reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1337,7 +1337,7 @@ for (data in msa_sex_risk) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc msa reports',
+    ontology.name = 'cdc.msa.reports',
     source = 'cdc',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',

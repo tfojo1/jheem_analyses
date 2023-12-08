@@ -299,7 +299,7 @@ data.manager$register.ontology(
   ))
 
 data.manager$register.ontology(
-  'cdc msa reports',
+  'cdc.msa.reports',
   ont = ontology(
     year= NULL,
     location= NULL,
@@ -312,7 +312,7 @@ data.manager$register.ontology(
 
 #This is for the Atlas Plus STI data, creating a separate ontology bc age groups are different#
 data.manager$register.ontology(
-  'cdc sti',
+  'cdc.sti',
   ont = ontology(
     year= NULL,
     location= NULL,
@@ -324,7 +324,7 @@ data.manager$register.ontology(
 
 #Create a separate ontology for early syphilis
 data.manager$register.ontology(
-  'cdc syphilis',
+  'cdc.syphilis',
   ont = ontology(
     year= NULL,
     location= NULL,
