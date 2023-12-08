@@ -18,7 +18,7 @@ put.population.data = function(locations,
     for (ont.name in census.manager$ontology.names)
         if (!(ont.name %in% data.manager$ontology.names))
             data.manager$register.ontology(ont.name, census.manager$ontologies[[ont.name]])
-  
+
   age.lower.limit = 13
   age.penultimate.upper = 84
   age.upper.limit.name = '85+'
@@ -52,9 +52,9 @@ put.population.data = function(locations,
                     details = attr(census.data.stratified, 'details')[[1]]
                     url = attr(census.data.stratified, 'url')[[1]]
                     
-                    if (any(sapply(attr(census.data.stratified, 'details'), function(x) {!identical(x, details)})))
+                    if (any(sapply(attr(census.data.stratified, 'details'), function(x) {!is.null(x) && !identical(x, details)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'details'"))
-                    if (any(sapply(attr(census.data.stratified, 'url'), function(x) {!identical(x, url)})))
+                    if (any(sapply(attr(census.data.stratified, 'url'), function(x) {!is.null(x) && !identical(x, url)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'url'"))
 
                     ## -- TOTALS -- ##
@@ -92,13 +92,13 @@ put.population.data = function(locations,
     }
 }
 
-census.manager = load.data.manager('../jheem_analyses/cached/smaller.census.manager.rdata')
+# census.manager = load.data.manager('../jheem_analyses/cached/smaller.census.manager.rdata')
 
 # practice.data.manager = create.data.manager('practice.data.manager', 'Data manager to test msa population putting')
 # practice.data.manager$register.outcome('adult.population', metadata = create.outcome.metadata(scale = 'non.negative.number', display.name = 'Adult Population', axis.name = 'Adult Population (n)', units = 'persons', description = 'Population Ages 13+'))
 # test = put.population.data(locations = c('C.12580'), # MSAS.OF.INTEREST
 #                            data.manager = practice.data.manager, # surveillance.manager
-#                            census.manager = census.manager)
+#                            census.manager = CENSUS.MANAGER)
 
 
 
