@@ -1,3 +1,5 @@
+source('../jheem2/R/tests/ENGINE_test.R')
+
 x = SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
                               keep.dimensions = c("year","age"),
                               dimension.values = list(location = "C.12580",
@@ -30,6 +32,9 @@ par.names = c("black.birth.rate.multiplier",
 par = params[par.names]
 
 counter = 0
+start.time = Sys.time()
+last.start.time = Sys.time()
+
 score.sim = function(sim){
   #print("scoring sim")
   sim.data = sim$get(outcomes = "population",keep.dimensions = c("year","age"),year=as.character(2007:2020))
@@ -42,12 +47,23 @@ score.sim = function(sim){
 
   counter <<- counter + 1
   
-  if((counter%%10)==0)
-    print(paste0("ran ",counter," simulations"))
-  
+  inc = 10
+  if((counter%%inc)==0)
+  {
+    end.time = Sys.time()
+    
+    total.time.per = (as.numeric(end.time)-as.numeric(start.time)) / counter
+    time.per.since.last = (as.numeric(end.time)-as.numeric(last.start.time)) / inc
+    
+    last.start.time <<- end.time
+    print(paste0("ran ",counter," simulations, at a run time of ",
+                 round(total.time.per, 1), " seconds (",
+                 round(time.per.since.last, 1), " seconds per sim over the last ", inc, " simulations)"))
+  }
   rv
    
 }
+end.time = Sys.time()
 
 run.and.score.sim = function(par) {
   
