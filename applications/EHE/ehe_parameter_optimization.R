@@ -1,17 +1,29 @@
 source('../jheem2/R/tests/ENGINE_test.R')
 
-x = SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+sim.metadata = get.simulation.metadata('ehe',location = 'C.12580')
+
+## AGE TARGET
+age.data = SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
                               keep.dimensions = c("year","age"),
                               dimension.values = list(location = "C.12580",
                                                       year = 2007:2020))
-
-x = apply(x,c("year","age"),sum,na.rm = T) # combine non-overlapping sources
-
-sim.metadata = get.simulation.metadata('ehe',location = 'C.12580')
-
-mapping = get.ontology.mapping(from.ontology = dimnames(x),
+age.data = apply(age.data,c("year","age"),sum,na.rm = T) # combine non-overlapping sources
+age.mapping = get.ontology.mapping(from.ontology = dimnames(age.data),
                                to.ontology = sim.metadata$outcome.ontologies$population[c('year','age')])
-target.data = mapping$apply(x)
+target.data.age = age.mapping$apply(age.data)
+
+## RACE TARGET
+race.data = SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+                                     keep.dimensions = c("year","race","ethnicity"),
+                                     dimension.values = list(location = "C.12580",
+                                                             year = 2007:2020))
+race.data = apply(race.data,c("year","race","ethnicity"),sum,na.rm = T) # combine non-overlapping sources
+race.mapping = get.ontology.mapping(from.ontology = dimnames(race.data),
+                                    to.ontology = sim.metadata$outcome.ontologies$population[c('year','race')])
+target.data.race = race.mapping$apply(race.data)
+
+
+
 
 params = suppressWarnings(get.medians(EHE.PARAMETERS.PRIOR))
 params['global.trate'] = 0.1
@@ -37,12 +49,13 @@ last.start.time = Sys.time()
 
 score.sim = function(sim){
   #print("scoring sim")
-  sim.data = sim$get(outcomes = "population",keep.dimensions = c("year","age"),year=as.character(2007:2020))
+  sim.data.age = sim$get(outcomes = "population",keep.dimensions = c("year","age"),year=as.character(2007:2020))
+  sim.data.race = sim$get(outcomes = "population",keep.dimensions = c("year","race"),year=as.character(2007:2020))
  
-  rv = sum((sim.data - target.data)^2)
+  rv = sum((sim.data.age - target.data.age)^2) + sum((sim.data.race - target.data.race)^2)
   
   if(rv>=.Machine$double.xmax | is.na(rv)){
-    rv = 367743139602 # this is the score of the original sim 
+    rv = .Machine$double.xmax 
   }
 
   counter <<- counter + 1
@@ -81,6 +94,8 @@ set.seed(2468)
 rv = optim(par = par, fn = run.and.score.sim, method = "L-BFGS-B",lower = 0,
            control = list(maxit = 6)
            )
+
+save(rv,file="applications/EHE/temp.Rdata")
 
 # params.2 = params
 # params.2[names(par)] = rv$par
