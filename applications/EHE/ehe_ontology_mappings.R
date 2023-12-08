@@ -56,7 +56,10 @@ register.ontology.mapping('wonder.to.census.race.2',
                                            c('Asian or Pacific Islander', 'asian or pacific islander'),
                                            c('Black or African American', 'black'),
                                            c('White', 'white'),
-                                           c('More than one race', NA)))
+                                           c('More than one race', NA),
+                                           c('Not Reported', NA),
+                                           c('Unknown or Not Stated', NA),
+                                            c('Not Available', NA)))
 register.ontology.mapping('wonder.to.census.ethnicity',
                           from.dimensions = 'ethnicity',
                           to.dimensions = 'ethnicity',
