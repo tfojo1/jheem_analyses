@@ -29,14 +29,14 @@ census.manager$register.outcome(
     units = 'births',
     description = "Births"))
 
-census.manager$register.outcome(
-  'deaths',
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'Deaths',
-    axis.name = 'Deaths',
-    units = 'deaths',
-    description = "Deaths"))
+# census.manager$register.outcome(
+#   'deaths',
+#   metadata = create.outcome.metadata(
+#     scale = 'non.negative.number',
+#     display.name = 'Deaths',
+#     axis.name = 'Deaths',
+#     units = 'deaths',
+#     description = "Deaths"))
 
 census.manager$register.outcome(
   'metro.deaths',
