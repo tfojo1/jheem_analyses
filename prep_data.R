@@ -508,12 +508,59 @@ big.df$ageid <- relevel(factor(big.df$ageid), ref = "ALL")
 big.df$sexid <- relevel(factor(big.df$sexid), ref = "ALL")
 big.df$risk <- relevel(factor(big.df$risk), ref = "msm")
 big.df$sexrisk <- relevel(factor(big.df$sexrisk), ref="msm")
+big.df$sexid[big.df$sexid=="msm"] <- "male"
 
 # fitting the big model
 fit.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid + risk, data = big.df)
 
-# fitting an alternative model
-fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexrisk, data = big.df)
+# fitting an alternative model - interacting sex with risk
+fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df)
+
+# fit3.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df[1:50,])
+
+big.df$female <- as.numeric(big.df$sexid=="female")
+
+# female model
+fit3.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + risk + female, data = big.df)
+
+# fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df[1:40,])
+
+big.df$nonmsm <- as.numeric(big.df$risk!="msm")
+big.df$idu <- as.numeric(big.df$risk=="idu")
+
+# nonmsm + female model
+fit4.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female, data = big.df)
+
+# interacting nonmsm with age
+fit5.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*ageid, 
+                  data = big.df) 
+
+# interacting nonmsm with year
+fit6.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*year,
+                  data = big.df)
+
+# interacting nonmsm with year and race
+fit7.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female +
+                    nonmsm*raceid + nonmsm*year,
+                  data = big.df)
+
+# interacting nonmsm with race, year, and age
+fit8.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*raceid +
+                    nonmsm*year + nonmsm*ageid,
+                  data = big.df)
+
+# making 2 separate big models -- nonmsm and msm -------
+
+msm.bigp.df <- subset(big.df, nonmsm == 0)
+nonmsm.big.df <- subset(big.df, nonmsm == 1)
+
+fit.p.msm <- lm(logit(p/p.max) ~ year + raceid + ageid,
+                data = msm.bigp.df)
+
+fit.p.nonmsm <- lm(logit(p/p.max) ~ year + raceid + ageid + female + idu,
+                   data = nonmsm.big.df)
+
+
 
 
 # PrEP Indications ------
@@ -876,7 +923,7 @@ pi.het.df <- data.frame(
 
 pi.msm.df.long <- gather(pi.msm.df, key = "group", value = "pi", -years)
 pi.msm.df.long$sexid <- rep("msm", length(pi.msm.df.long$pi))
-pi.msm.df.long$riskid <- rep("ALL", length(pi.msm.df.long$pi))
+pi.msm.df.long$riskid <- rep("msm", length(pi.msm.df.long$pi))
 
 pi.idu.df.long <- gather(pi.idu.df, key = "group", value = "pi", -years)
 pi.idu.df.long$riskid <- rep("idu", length(pi.idu.df.long$pi))
@@ -906,7 +953,7 @@ pi.big.df <- pi.df.long |> dplyr::mutate(raceid = ifelse(group == "black", "blac
 # pi.big.df <- pi.df.long |> dplyr::mutate(sexid = ifelse(group == "male", "male",
 #                                                          ifelse(group == "female", "female", "msm")))
 
-# big model PrEP indication ----------------------------------------------------
+## big model PrEP indication ----------------------------------------------------
 
 
 pi.big.df$sexrisk <- paste(pi.big.df$sexid, pi.big.df$risk, sep = "_")
@@ -917,4 +964,59 @@ pi.big.df$ageid <- relevel(factor(pi.big.df$ageid), ref = "ALL")
 pi.big.df$sexid <- relevel(factor(pi.big.df$sexid), ref = "ALL")
 pi.big.df$sexrisk <- relevel(factor(pi.big.df$sexrisk), ref = "msm")
 
+pi.big.df$sexid[pi.big.df$sexid=="msm"] <- "male"
+pi.big.df$female <- as.numeric(pi.big.df$sexid=="female")
+pi.big.df$male <- as.numeric(pi.big.df$sexid=="male")
+
+pi.big.df$nonmsm <- as.numeric(pi.big.df$riskid!="msm")
+pi.big.df$idu <- as.numeric(pi.big.df$riskid=="idu")
+
+msm.pi.df <- subset(pi.big.df, nonmsm==0)
+nonmsm.pi.df <- subset(pi.big.df, nonmsm==1)
+
 fit.pi.df <- lm(logit(pi) ~ years + raceid + ageid + sexrisk, data = pi.big.df)
+
+fit.pi.msm <- lm(logit(pi) ~ years + raceid + ageid, data = msm.pi.df)
+fit.pi.msm
+
+fit.pi.nonmsm <- lm(logit(pi) ~ years + raceid + ageid + male + idu, data = nonmsm.pi.df)
+fit.pi.nonmsm
+
+# PrEP persistence ------
+
+
+## PrEP Persistence
+
+#[2020 Persistence Data](https://www.tandfonline.com/doi/full/10.1080/09540121.2023.2217375) - MSM
+
+#[2015-17 Persistence Data](https://link.springer.com/article/10.1007/s10461-019-02654-x/tables/1)
+
+# MSM and transgender folks, 2017 - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6698689/ -- prevalence ratios
+
+# PrEP Persistence
+
+pp.2017 <- data.frame( 
+  total = 31.9,
+  age18.24 = 43.0,
+  age25.29 = 53,
+  age30.39 = 56.0,
+  age40.49 = 64.0,
+  age50ge = 65.0, # ages 50 or greater
+  male = 57,
+  female = 34
+)
+
+
+
+pp.msm.2020 <- data.frame(
+  total = 77.3,
+  age18.24 = 66.7,
+  age25.29 = 77.7,
+  age30.39 = 82.0,
+  age40.49 = 84.8,
+  age50ge = 84.8, # ages 50 or greater
+  black = 83.2,
+  hisp = 78.9,
+  nbnh = 76.0
+)
+

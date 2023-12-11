@@ -146,7 +146,7 @@ if (1==2)
                                                    "IDU - Sex", "IDU - Risk"))
     idu.plots
     
-  pdf("PrEP_Use_Plots.pdf", width = 18, height = 5)
+  pdf("PrEP_Use_Plots.pdf", width = 18, height = 10)
   combined.plot
   msm.plots
   idu.plots
@@ -270,27 +270,55 @@ get.prep.use.functional.form <- function(specification.metadata)
   
     # Do the work
     
-    int[,,,] <- int[,,,] + coef(fit2.big.df)[1]
+    int[,,"msm",] <- int[,,"msm",] + coef(fit.p.msm)["(Intercept)"]
+    int[,,"female",] <- int[,,"female",] + coef(fit.p.nonmsm)["(Intercept)"]
+    int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.p.nonmsm)["(Intercept)"]
     
-    int[,"black",,] <- int[,"black",,] + coef(fit2.big.df)[3]
-    int[,"hispanic",,] <- int[,"hispanic",,] + coef(fit2.big.df)[4]
-    int[,"other",,] <- int[,"other",,] + coef(fit2.big.df)[5]
+    int[,"black","msm",] <- int[,"black","msm",] + coef(fit.p.msm)["raceidblack"]
+    int[,"hispanic","msm",] <- int[,"hispanic","msm",] + coef(fit.p.msm)["raceidhispanic"]
+    int[,"other","msm",] <- int[,"other","msm",] + coef(fit.p.msm)["raceidother"]
     
-    int["13-24 years",,,] <- int["13-24 years",,,] + coef(fit2.big.df)[6]
-    int["25-34 years",,,] <- int["25-34 years",,,] + coef(fit2.big.df)[7]
-    int["35-44 years",,,] <- int["35-44 years",,,] + coef(fit2.big.df)[8]
-    int["45-54 years",,,] <- int["45-54 years",,,] + coef(fit2.big.df)[9]
-    int["55+ years",,,] <- int["55+ years",,,] + coef(fit2.big.df)[10]
+    int[,"black","heterosexual_male",] <- int[,"black","heterosexual_male",] + coef(fit.p.nonmsm)["raceidblack"]
+    int[,"hispanic","heterosexual_male",] <- int[,"hispanic","heterosexual_male",] + coef(fit.p.nonmsm)["raceidhispanic"]
+    int[,"other","heterosexual_male",] <- int[,"other","heterosexual_male",] + coef(fit.p.nonmsm)["raceidother"]
     
-    int[,,"female",] <- int[,,"female",] + coef(fit2.big.df)[11] + coef(fit2.big.df)[13]
-    int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit2.big.df)[11] + coef(fit2.big.df)[15] 
-    int[,,"msm",] <- int[,,"msm",] + 0 # msm is sexrisk REF
+    int[,"black","female",] <- int[,"black","female",] + coef(fit.p.nonmsm)["raceidblack"]
+    int[,"hispanic","female",] <- int[,"hispanic","female",] + coef(fit.p.nonmsm)["raceidhispanic"]
+    int[,"other","female",] <- int[,"other","female",] + coef(fit.p.nonmsm)["raceidother"]
     
-    int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit2.big.df)[12] 
-    int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit2.big.df)[14] 
-    int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + 0 #coef(fit2.big.df)[14] (NA)
+    int["13-24 years",,"msm",] <- int["13-24 years",,"msm",] + coef(fit.p.msm)["ageidage1"]
+    int["25-34 years",,"msm",] <- int["25-34 years",,"msm",] + coef(fit.p.msm)["ageidage2"]
+    int["35-44 years",,"msm",] <- int["35-44 years",,"msm",] + coef(fit.p.msm)["ageidage3"]
+    int["45-54 years",,"msm",] <- int["45-54 years",,"msm",] + coef(fit.p.msm)["ageidage4"]
+    int["55+ years",,"msm",] <- int["55+ years",,"msm",] + 0 #coef(fit.p.msm)["ageidage5"]
     
-    slope[,,,] <- coef(fit2.big.df)[2]
+    int["13-24 years",,"heterosexual_male",] <- int["13-24 years",,"heterosexual_male",] + coef(fit.p.nonmsm)["ageidage1"]
+    int["25-34 years",,"heterosexual_male",] <- int["25-34 years",,"heterosexual_male",] + coef(fit.p.nonmsm)["ageidage2"]
+    int["35-44 years",,"heterosexual_male",] <- int["35-44 years",,"heterosexual_male",] + coef(fit.p.nonmsm)["ageidage3"]
+    int["45-54 years",,"heterosexual_male",] <- int["45-54 years",,"heterosexual_male",] + coef(fit.p.nonmsm)["ageidage4"]
+    int["55+ years",,"heterosexual_male",] <- int["55+ years",,"heterosexual_male",] + coef(fit.p.nonmsm)["ageidage5"]
+    
+    int["13-24 years",,"female",] <- int["13-24 years",,"female",] + coef(fit.p.nonmsm)["ageidage1"]
+    int["25-34 years",,"female",] <- int["25-34 years",,"female",] + coef(fit.p.nonmsm)["ageidage2"]
+    int["35-44 years",,"female",] <- int["35-44 years",,"female",] + coef(fit.p.nonmsm)["ageidage3"]
+    int["45-54 years",,"female",] <- int["45-54 years",,"female",] + coef(fit.p.nonmsm)["ageidage4"]
+    int["55+ years",,"female",] <- int["55+ years",,"female",] + coef(fit.p.nonmsm)["ageidage5"]
+    
+    int[,,"female",] <- int[,,"female",] + coef(fit.p.nonmsm)["female"]
+    # int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit2.big.df)["nonmsm"]
+    # int[,,"msm",] <- int[,,"msm",] + 0 # msm is sexrisk REF
+    
+    int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit.p.nonmsm)["idu"]
+    # int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + 0
+    # int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] - 0 #coef(fit2.big.df)[14] (NA)
+    
+    slope[,,"msm",] <- slope[,,"msm",] + coef(fit.p.msm)["year"]
+    slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit.p.nonmsm)["year"]
+    slope[,,"female",] <- slope[,,"female",] + coef(fit.p.nonmsm)["year"]
+    
+    # slope[,,"female",] <- slope[,,"female",] + coef(fit2.big.df)["year:nonmsm"]
+    # slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit2.big.df)["year:nonmsm"]
+    
     
     # Make and return the functional form object
     create.logistic.linear.functional.form(
@@ -304,6 +332,7 @@ get.prep.use.functional.form <- function(specification.metadata)
 }
 
 get.prep.indication.functional.form <- function(specification.metadata){
+  
   # Some variables you will use
   anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
   max.prep.indication = 1 # modify as you see fit
@@ -322,28 +351,50 @@ get.prep.indication.functional.form <- function(specification.metadata){
   age.spans = age.info$upper - age.info$lower
   
   # Intercepts and slopes
-  int[,,,] <- int[,,,] + coef(fit.pi.df)[1]
+  int[,,"msm",] <- int[,,"msm",] + coef(fit.pi.msm)["(Intercept)"]
+  int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.pi.nonmsm)["(Intercept)"]
+  int[,,"female",] <- int[,,"female",] + coef(fit.pi.nonmsm)["(Intercept)"]
   
-  int[,"black",,] <- int[,"black",,] + coef(fit.pi.df)[3]
-  int[,"hispanic",,] <- int[,"hispanic",,] + coef(fit.pi.df)[4]
-  int[,"other",,] <- int[,"other",,] + coef(fit.pi.df)[5]
+  int[,"black","msm",] <- int[,"black","msm",] + coef(fit.pi.msm)["raceidblack"]
+  int[,"hispanic","msm",] <- int[,"hispanic","msm",] + coef(fit.pi.msm)["raceidhisp"]
+  int[,"other","msm",] <- int[,"other","msm",] + coef(fit.pi.msm)["raceidnbnh"]
   
-  int["13-24 years",,,] <- int["13-24 years",,,] + coef(fit.pi.df)[6]
-  int["25-34 years",,,] <- int["25-34 years",,,] + coef(fit.pi.df)[7]
-  int["35-44 years",,,] <- int["35-44 years",,,] + coef(fit.pi.df)[8]
-  int["45-54 years",,,] <- int["45-54 years",,,] + coef(fit.pi.df)[9]
-  int["55+ years",,,] <- int["55+ years",,,] + coef(fit.pi.df)[10]
+  int[,"black","heterosexual_male",] <- int[,"black","heterosexual_male",] + coef(fit.pi.nonmsm)["raceidblack"]
+  int[,"hispanic","heterosexual_male",] <- int[,"hispanic","heterosexual_male",] + coef(fit.pi.nonmsm)["raceidhisp"]
+  int[,"other","heterosexual_male",] <- int[,"other","heterosexual_male",] + coef(fit.pi.nonmsm)["raceidnbnh"]
   
-  int[,,"female",] <- int[,,"female",] + coef(fit.pi.df)[11] + coef(fit.pi.df)[13]
-  int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.pi.df)[11] + coef(fit.pi.df)[15] 
-  int[,,"msm",] <- int[,,"msm",] + 0 # MSM is sexrisk REF
+  int[,"black","female",] <- int[,"black","female",] + coef(fit.pi.nonmsm)["raceidblack"]
+  int[,"hispanic","female",] <- int[,"hispanic","female",] + coef(fit.pi.nonmsm)["raceidhisp"]
+  int[,"other","female",] <- int[,"other","female",] + coef(fit.pi.nonmsm)["raceidnbnh"]
   
-  int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit.pi.df)[12] 
-  int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit.pi.df)[14]
-  int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit.pi.df)[14]
+  int["13-24 years",,"msm",] <- int["13-24 years",,"msm",] + coef(fit.pi.msm)["ageidage1"]
+  int["25-34 years",,"msm",] <- int["25-34 years",,"msm",] + coef(fit.pi.msm)["ageidage2"]
+  int["35-44 years",,"msm",] <- int["35-44 years",,"msm",] + coef(fit.pi.msm)["ageidage3"]
+  int["45-54 years",,"msm",] <- int["45-54 years",,"msm",] + coef(fit.pi.msm)["ageidage4"]
+  int["55+ years",,"msm",] <- int["55+ years",,"msm",] + 0 #coef(fit.p.msm)["ageidage5"]
   
-  slope[,,,] <- coef(fit.pi.df)[2]
+  int["13-24 years",,"heterosexual_male",] <- int["13-24 years",,"heterosexual_male",] + coef(fit.pi.nonmsm)["ageidage1"]
+  int["25-34 years",,"heterosexual_male",] <- int["25-34 years",,"heterosexual_male",] + coef(fit.pi.nonmsm)["ageidage2"]
+  int["35-44 years",,"heterosexual_male",] <- int["35-44 years",,"heterosexual_male",] + coef(fit.pi.nonmsm)["ageidage3"]
+  int["45-54 years",,"heterosexual_male",] <- int["45-54 years",,"heterosexual_male",] + coef(fit.pi.nonmsm)["ageidage4"]
+  int["55+ years",,"heterosexual_male",] <- int["55+ years",,"heterosexual_male",] + coef(fit.pi.nonmsm)["ageidage5"]
   
+  int["13-24 years",,"female",] <- int["13-24 years",,"female",] + coef(fit.pi.nonmsm)["ageidage1"]
+  int["25-34 years",,"female",] <- int["25-34 years",,"female",] + coef(fit.pi.nonmsm)["ageidage2"]
+  int["35-44 years",,"female",] <- int["35-44 years",,"female",] + coef(fit.pi.nonmsm)["ageidage3"]
+  int["45-54 years",,"female",] <- int["45-54 years",,"female",] + coef(fit.pi.nonmsm)["ageidage4"]
+  int["55+ years",,"female",] <- int["55+ years",,"female",] + coef(fit.pi.nonmsm)["ageidage5"]
+  
+  int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.pi.nonmsm)["male"]
+  int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit.pi.nonmsm)["idu"] 
+  
+  # int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit.pi.df)[14]
+  # int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit.pi.df)[14]
+  
+  slope[,,"msm",] <- slope[,,"msm",] + coef(fit.pi.msm)["years"]
+  slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit.pi.nonmsm)["years"]
+  slope[,,"female",] <- slope[,,"female",] + coef(fit.pi.nonmsm)["years"]
+
   # Make and return the functional form object
   create.logistic.linear.functional.form(
     intercept = int,
