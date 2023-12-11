@@ -1,6 +1,8 @@
 source('../jheem2/R/tests/ENGINE_test.R')
+source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 
 sim.metadata = get.simulation.metadata('ehe',location = 'C.12580')
+pop.lik.test = population.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 
 ## AGE TARGET
 age.data = SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
@@ -52,9 +54,13 @@ score.sim = function(sim){
   sim.data.age = sim$get(outcomes = "population",keep.dimensions = c("year","age"),year=as.character(2007:2020))
   sim.data.race = sim$get(outcomes = "population",keep.dimensions = c("year","race"),year=as.character(2007:2020))
  
-  rv = sum((sim.data.age - target.data.age)^2) + sum((sim.data.race - target.data.race)^2)
+  # sum of squared errors version 
+  # rv = sum((sim.data.age - target.data.age)^2) + sum((sim.data.race - target.data.race)^2)
   
-  if(rv>=.Machine$double.xmax | is.na(rv)){
+  # version using actual likelihood 
+  rv = -pop.lik.test$compute(sim,check.consistency=F)
+  
+  if(rv>=.Machine$double.xmax | is.na(rv) | is.nan(rv)){
     rv = .Machine$double.xmax 
   }
 
@@ -73,6 +79,10 @@ score.sim = function(sim){
                  round(total.time.per, 1), " seconds (",
                  round(time.per.since.last, 1), " seconds per sim over the last ", inc, " simulations)"))
   }
+  
+  if(counter==1540)
+    browser()
+  
   rv
    
 }
@@ -83,19 +93,20 @@ run.and.score.sim = function(par) {
   params = suppressWarnings(get.medians(EHE.PARAMETERS.PRIOR))
   params['global.trate'] = 0.1
   params[names(par)] = par
-  
+  if(counter>1540)
+    save(params,file="cached/temp.test.Rdata")
   sim = engine$run(parameters = params)
   
   score.sim(sim)
   
 }
 
-set.seed(2468)
+set.seed(1234)
 rv = optim(par = par, fn = run.and.score.sim, method = "L-BFGS-B",lower = 0,
-           control = list(maxit = 6)
+           control = list(maxit = 10)
            )
 
-save(rv,file="applications/EHE/temp.Rdata")
+# save(rv,file="applications/EHE/temp.Rdata")
 
 # params.2 = params
 # params.2[names(par)] = rv$par
