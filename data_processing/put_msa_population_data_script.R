@@ -52,9 +52,9 @@ put.population.data = function(locations,
                     details = attr(census.data.stratified, 'details')[[1]]
                     url = attr(census.data.stratified, 'url')[[1]]
                     
-                    if (any(sapply(attr(census.data.stratified, 'details'), function(x) {!identical(x, details)})))
+                    if (any(sapply(attr(census.data.stratified, 'details'), function(x) {!identical(x, details) && !is.null(x)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'details'"))
-                    if (any(sapply(attr(census.data.stratified, 'url'), function(x) {!identical(x, url)})))
+                    if (any(sapply(attr(census.data.stratified, 'url'), function(x) {!identical(x, url) && !is.null(x)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'url'"))
 
                     ## -- TOTALS -- ##
