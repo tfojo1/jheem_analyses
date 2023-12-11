@@ -58,5 +58,6 @@ get.location.mortality.rates <- function(location,
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two
     target.dim.names = specification.metadata$dim.names[c('age','race','sex')]
-    map.value.ontology
+    map.value.ontology(deaths, target.dim.names=target.dim.names) / 
+      map.value.ontology(population, target.dim.names=target.dim.names)
 }
