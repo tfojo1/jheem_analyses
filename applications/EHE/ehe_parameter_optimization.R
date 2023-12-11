@@ -54,6 +54,9 @@ score.sim = function(sim){
   sim.data.age = sim$get(outcomes = "population",keep.dimensions = c("year","age"),year=as.character(2007:2020))
   sim.data.race = sim$get(outcomes = "population",keep.dimensions = c("year","race"),year=as.character(2007:2020))
  
+  if (any(is.na(sim.data.age)))
+    browser()
+  
   # sum of squared errors version 
   # rv = sum((sim.data.age - target.data.age)^2) + sum((sim.data.race - target.data.race)^2)
   
@@ -80,8 +83,6 @@ score.sim = function(sim){
                  round(time.per.since.last, 1), " seconds per sim over the last ", inc, " simulations)"))
   }
   
-  if(counter==1540)
-    browser()
   
   rv
    
@@ -92,9 +93,9 @@ run.and.score.sim = function(par) {
   
   params = suppressWarnings(get.medians(EHE.PARAMETERS.PRIOR))
   params['global.trate'] = 0.1
-  params[names(par)] = par
-  if(counter>1540)
-    save(params,file="cached/temp.test.Rdata")
+  params[names(par)] = exp(par)
+#  if(counter>1300)
+#    save(params,file="cached/temp.test.Rdata")
   sim = engine$run(parameters = params)
   
   score.sim(sim)
@@ -102,9 +103,14 @@ run.and.score.sim = function(par) {
 }
 
 set.seed(1234)
-rv = optim(par = par, fn = run.and.score.sim, method = "L-BFGS-B",lower = 0,
-           control = list(maxit = 10)
-           )
+#rv = optim(par = par, fn = run.and.score.sim, method = "L-BFGS-B",lower = 0,
+#           control = list(maxit = 10)
+#           )
+
+rv = optim(par = log(par), fn = run.and.score.sim,
+           control = list(maxit = 10000)
+)
+           
 
 # save(rv,file="applications/EHE/temp.Rdata")
 
