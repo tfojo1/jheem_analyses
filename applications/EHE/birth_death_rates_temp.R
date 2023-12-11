@@ -49,8 +49,14 @@ get.location.mortality.rates <- function(location,
                                          years = 2007:2017,
                                          census.manager = CENSUS.MANAGER)
 {
-    # Pull the deaths
-    # Pull the population
+    # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
+    deaths
   
-    # Map to the age, race, and sex 
+    # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
+    population
+  
+    # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
+    # then divide the two
+    target.dim.names = specification.metadata$dim.names[c('age','race','sex')]
+    map.value.ontology
 }
