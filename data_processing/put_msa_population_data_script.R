@@ -60,7 +60,7 @@ put.population.data = function(locations,
                     ## -- TOTALS -- ##
                     
                     # Hand-aggregate the stratified data to total
-                    aggregated.totals.data = apply(census.data.stratified, 'year', sum)
+                    aggregated.totals.data = apply(census.data.stratified, 'year', sum, na.rm=T)
                     dimnames.because.r.apply.is.annoying = list(year=names(aggregated.totals.data))
                     aggregated.totals.data = array(aggregated.totals.data, sapply(dimnames.because.r.apply.is.annoying, length), dimnames.because.r.apply.is.annoying)
                     data.manager$put(data = aggregated.totals.data,
@@ -76,7 +76,7 @@ put.population.data = function(locations,
                         
                         # Hand-aggregate the stratified data to each stratification
                         margin.of.aggregation = c('year', stratification)
-                        aggregated.data = apply(census.data.stratified, margin.of.aggregation, sum)
+                        aggregated.data = apply(census.data.stratified, margin.of.aggregation, sum, na.rm=T)
                         
                         data.manager$put(data = aggregated.data,
                                          outcome = 'adult.population',
