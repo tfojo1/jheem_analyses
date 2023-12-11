@@ -299,6 +299,6 @@ for (data in county_pop) {
                   ###Save Census Manager###
 ################################################################################ 
 
-save(census.manager, file="../../cached/census.manager.rdata")
+save(census.manager, file="/cached/census.manager.rdata")
 
 

@@ -1219,6 +1219,6 @@ load.data.manager("../../cached/smaller.census.manager.rdata")
  
  ################################################################################
  ###Save surveillance manager####
-  save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
+  save(surveillance.manager, file="/cached/surveillance.manager.rdata")
 
 
