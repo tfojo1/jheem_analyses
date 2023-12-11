@@ -987,13 +987,24 @@ fit.pi.nonmsm
 
 ## PrEP Persistence
 
-#[2020 Persistence Data](https://www.tandfonline.com/doi/full/10.1080/09540121.2023.2217375) - MSM
-
-#[2015-17 Persistence Data](https://link.springer.com/article/10.1007/s10461-019-02654-x/tables/1)
 
 # MSM and transgender folks, 2017 - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6698689/ -- prevalence ratios
 
-# PrEP Persistence
+# 2013-2019 clinical data - https://www.liebertpub.com/doi/full/10.1089/apc.2021.0074?casa_token=7Pq9qYIOoeAAAAAA%3ALvWdcft-Qq0LT0wkma1KMR7grGwGODoOjebSB_OqFPIRO98OPk1_RaGyaoac1O-RjfffcOovwbqu
+
+pp.2019 <- data.frame(
+  total = 274/(274+380),
+  white = 187/(187+233),
+  black = 20/(20+39),
+  other = 59/(59+102),
+  hisp = 46/(46+74),
+  male = 268/(268+360),
+  female = 6/(6+20)
+)
+
+pp.2019
+
+#[2015-17 Persistence Data](https://link.springer.com/article/10.1007/s10461-019-02654-x/tables/1)
 
 pp.2017 <- data.frame( 
   total = 31.9,
@@ -1006,8 +1017,9 @@ pp.2017 <- data.frame(
   female = 34
 )
 
+pp.2017 <- pp.2017/100
 
-
+#[2020 Persistence Data](https://www.tandfonline.com/doi/full/10.1080/09540121.2023.2217375) - MSM
 pp.msm.2020 <- data.frame(
   total = 77.3,
   age18.24 = 66.7,
