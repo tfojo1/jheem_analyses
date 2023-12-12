@@ -310,7 +310,7 @@ register.model.quantity(EHE.SPECIFICATION,
 
 TESTING.FIRST.YEAR.FRACTION.OF.RAMP = 0.5^(1993-1982)
 register.model.element(EHE.SPECIFICATION,
-                       name = 'testing',
+                       name = 'testing', # testing.no.covid
                        scale = 'rate',
                        
                        get.functional.form.function = get.testing.model,
@@ -322,6 +322,13 @@ register.model.element(EHE.SPECIFICATION,
                        ramp.times = c(1981,1982,1993),
                        ramp.values = c(0,0.5*TESTING.FIRST.YEAR.FRACTION.OF.RAMP,0.5),
                        ramp.interpolate.links = c('identity','log','identity'))
+
+# register.model.quantity(EHE.SPECIFICATION,
+#                         name = 'testing',
+#                         scale = 'rate',
+#                         value = expression(testing.no.covid*
+#                                              (1-max.covid.effect.testing.reduction*covid.mobility.change*testing.mobility.correlation)))
+# testing.no.covid is time-varying, max.covid.effect.testing.reduction is (1- relative risk) (static), covid.mobility.change, testing.mobility.correlation
 
 
 ##---------------------##
