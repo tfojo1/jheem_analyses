@@ -42,8 +42,6 @@ simplot(sim, sim2, "new")
 
 params.2 = params
 
-# Will try out an optimization with just birth and death rates to see if we can get the population reasonably well
-
 params.2['other.birth.rate.multiplier'] = 2
 params.2['black.birth.rate.multiplier'] = 2
 params.2['hispanic.birth.rate.multiplier'] = 2
@@ -67,13 +65,66 @@ simplot(sim, sim2, "population",facet.by = "age",dimension.values = list(year = 
 simplot(sim, sim2, "population",facet.by = "race",dimension.values = list(year = as.character(2000:2020)))
 
 
-pop.lik.test = population.likelihood.instructions$instantiate.likelihood('ehe',
-                                                                         location = 'C.12580')
+## TESTING OUT AFTER OPTIM OUTPUT
+# sim.optim = sim
+# params.optim = sim.optim$parameters[names(params)]
+
+simplot(sim.optim, "population",facet.by = "age",dimension.values = list(year = as.character(2000:2020)))
+
+# manually tweaking after optim 
+params.manual = param.optim
+params.manual["black.birth.rate.multiplier"] = 2.3 # 1.868623
+params.manual["age1.non.idu.general.mortality.rate.multiplier"] = 5 # 0.22525397
+sim.manual = engine$run(parameters = params.manual)
+save(sim.manual, params.manual,file="prelim_results/ehe_manual_pop_result.Rdata")
+
+# Plotting optim vs manual 
+simplot(sim.optim, sim.manual,"population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, sim.manual,"population",facet.by = "age",split.by = "sex",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, sim.manual,"population",facet.by = "race",split.by = "sex",dimension.values = list(year = as.character(2000:2020)))
+
+simplot(sim.optim, sim.manual,"population",facet.by = "age",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, sim.manual, "population",facet.by = "race",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, sim.manual, "population",facet.by = "sex",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, sim.manual,"population",dimension.values = list(year = as.character(2000:2020)))
+
+# Creating likelihoods
+pop.lik.test.total = population.total.likelihood.instructions$instantiate.likelihood('ehe',
+                                                                                     location = 'C.12580')
+
+pop.lik.test.one.way = population.one.way.likelihood.instructions$instantiate.likelihood('ehe',
+                                                                                     location = 'C.12580')
+
+
+# ANDREW RUN THIS
+pop.lik.test.two.way = population.two.way.likelihood.instructions$instantiate.likelihood('ehe',
+                                                                                         location = 'C.12580')
+pop.lik.test.two.way$compute(sim.manual,check.consistency=F,debug = T)
 
 
 
+# Comparing manual vs optim likelihood
+exp(pop.lik.test$compute(sim.manual,check.consistency=F) - pop.lik.test$compute(sim.optim,check.consistency=F)) 
+exp(pop.lik.test.two.way$compute(sim.manual,check.consistency=F) - pop.lik.test.two.way$compute(sim.optim,check.consistency=F)) 
 
+# Comparing manual vs optim prior
+exp(calculate.density(EHE.PARAMETERS.PRIOR, x = sim.manual$parameters, log = T) - 
+      calculate.density(EHE.PARAMETERS.PRIOR, x = sim.optim$parameters, log = T))
 
+# Comparing manual vs optim parameters
+cbind(sim.manual$parameters[names(optim.result$par)],sim.optim$parameters[names(optim.result$par)])
+
+# original sim 
+params0 = suppressWarnings(get.medians(EHE.PARAMETERS.PRIOR))
+params0['global.trate'] = 0.1
+sim0 = engine$run(parameters = params0)
+
+exp(pop.lik.test$compute(sim.optim,check.consistency=F) - pop.lik.test$compute(sim0,check.consistency=F))
+simplot(sim.optim, sim0,"population",facet.by = "age",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, sim0,"population",facet.by = "race",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, sim0,"population",facet.by = "sex",dimension.values = list(year = as.character(2000:2020)))
+
+# next step - 2-way plots
 
 
 
