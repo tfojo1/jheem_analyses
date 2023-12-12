@@ -33,6 +33,9 @@ params['global.trate'] = 0.1
 par.names = c("black.birth.rate.multiplier",
               "hispanic.birth.rate.multiplier",
               "other.birth.rate.multiplier",
+              "black.birth.rate.slope.multiplier",
+              "hispanic.birth.rate.slope.multiplier",
+              "other.birth.rate.slope.multiplier",
               "age1.non.idu.general.mortality.rate.multiplier",
               "age2.non.idu.general.mortality.rate.multiplier",
               "age3.non.idu.general.mortality.rate.multiplier",
@@ -61,7 +64,10 @@ score.sim = function(sim){
   # rv = sum((sim.data.age - target.data.age)^2) + sum((sim.data.race - target.data.race)^2)
   
   # version using actual likelihood 
-  rv = -pop.lik.test$compute(sim,check.consistency=F)
+  log.likelihood = pop.lik.test$compute(sim,check.consistency=F)
+  log.prior = calculate.density(EHE.PARAMETERS.PRIOR, x = sim$parameters, log = T)
+  
+  rv = -(log.likelihood+log.prior)
   
   if(rv>=.Machine$double.xmax | is.na(rv) | is.nan(rv)){
     rv = .Machine$double.xmax 
@@ -110,7 +116,10 @@ set.seed(1234)
 rv = optim(par = log(par), fn = run.and.score.sim,
            control = list(maxit = 10000)
 )
-           
+ 
+params.optim = params
+params.optim[names(rv$par)] = exp(rv$par)
+sim.optim = engine$run(parameters = params.optim)
 
 # save(rv,file="applications/EHE/temp.Rdata")
 
