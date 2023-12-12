@@ -48,9 +48,6 @@ par.names = c("black.birth.rate.multiplier",
 
 par = params[par.names]
 
-counter = 0
-start.time = Sys.time()
-last.start.time = Sys.time()
 
 score.sim = function(sim){
   #print("scoring sim")
@@ -93,7 +90,6 @@ score.sim = function(sim){
   rv
    
 }
-end.time = Sys.time()
 
 run.and.score.sim = function(par) {
   
@@ -113,15 +109,23 @@ set.seed(1234)
 #           control = list(maxit = 10)
 #           )
 
+counter = 0
+start.time = Sys.time()
+last.start.time = Sys.time()
 optim.result = optim(par = log(par), fn = run.and.score.sim,
            control = list(maxit = 10000)
 )
+end.time = Sys.time()
  
+time.per.sim = (as.numeric(end.time) - as.numeric(start.time)) / counter
+
+print(paste0("DONE! Took ", round(time.per.sim, 1), " seconds per sim for each of ", format(counter, big.mark = ','), " simulations"))
+
 params.optim = params
 params.optim[names(optim.result$par)] = exp(optim.result$par)
 sim.optim = engine$run(parameters = params.optim)
 
-save(sim.optim, param.optim, optim.result, file="prelim_results/ehe_optim_pop_result.Rdata")
+save(sim.optim, param.optim, optim.result, start.time, end.time, counter, time.per.sim, file="prelim_results/ehe_optim_pop_result.Rdata")
 
 # params.2 = params
 # params.2[names(par)] = rv$par
