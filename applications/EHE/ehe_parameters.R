@@ -11,27 +11,27 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     global.trate = Loguniform.Distribution(0,Inf),
     
     #-- Birth rates --#
-    black.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), # can be off by factor of 2
-    hispanic.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)),
-    other.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)),
+    black.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), # can be off by factor of 4
+    hispanic.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
+    other.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
     
-    black.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)/5), # can be off by factor of 2, over 5 years
-    hispanic.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)/5),
-    other.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)/5),
+    black.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)/5), # can be off by factor of 4, over 5 years
+    hispanic.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)/5),
+    other.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)/5),
     
     #-- Non IDU general mortality rates --#
-    black.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    hispanic.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    other.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    black.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+    hispanic.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+    other.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
     
-    age1.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    age2.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    age3.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    age4.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    age5.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    age1.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+    age2.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+    age3.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+    age4.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+    age5.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
     
-    male.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    female.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    male.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+    female.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
     
     
     #-- MSM Transmission --#
@@ -149,10 +149,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #aging.0 rates from 2000 data in table 10 of
     # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-report-2002-vol-14.pdf
     
-    age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    age4.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
+    age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
+    age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
+    age4.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
     
     msm.age1.aging.base = Lognormal.Distribution(log(12209/2/22537), 0.25*log(2)),
     msm.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
