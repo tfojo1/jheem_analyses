@@ -2,7 +2,7 @@ source('../jheem2/R/tests/ENGINE_test.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 
 sim.metadata = get.simulation.metadata('ehe',location = 'C.12580')
-pop.lik.test = population.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+pop.lik.test = population.two.way.likelihood.instructions$instantiate.likelihood('ehe','C.12580') # USING TWO-WAY LIKELIHOOD
 
 ## AGE TARGET
 age.data = SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
