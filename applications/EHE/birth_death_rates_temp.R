@@ -48,12 +48,14 @@ get.location.mortality.rates <- function(location,
                                          specification.metadata,
                                          years = 2007:2017,
                                          census.manager = CENSUS.MANAGER)
+
 {
+  states = locations::get.containing.locations(location, "state")
     # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
-    deaths
+    mortality.rate = census.manager$pull(outcome = 'deaths', location = states, year= years, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
   
     # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
-    population
+    population = census.manager$pull(outcome = 'population', location =  )
   
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two

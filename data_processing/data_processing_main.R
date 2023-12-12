@@ -1212,13 +1212,13 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  
  ################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
-load.data.manager("../../cached/smaller.census.manager.rdata")  
+load.data.manager("cached/smaller.census.manager.rdata")  
  put.population.data(locations = c(MSAS.OF.INTEREST), 
                             data.manager = surveillance.manager, 
                             census.manager = census.manager)
  
  ################################################################################
  ###Save surveillance manager####
-  save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
+  save(surveillance.manager, file="cached/surveillance.manager.rdata")
 
 

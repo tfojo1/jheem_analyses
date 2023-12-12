@@ -29,14 +29,14 @@ census.manager$register.outcome(
     units = 'births',
     description = "Births"))
 
-census.manager$register.outcome(
-  'deaths',
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'Deaths',
-    axis.name = 'Deaths',
-    units = 'deaths',
-    description = "Deaths"))
+# census.manager$register.outcome(
+#   'deaths',
+#   metadata = create.outcome.metadata(
+#     scale = 'non.negative.number',
+#     display.name = 'Deaths',
+#     axis.name = 'Deaths',
+#     units = 'deaths',
+#     description = "Deaths"))
 
 census.manager$register.outcome(
   'metro.deaths',
@@ -138,7 +138,6 @@ source('data_processing/census_sas_files.R')
 source('data_processing/births_and_deaths.R')
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
-          ##County BIRTH AND DEATH ESTIMATES 2010-2022##
 ################################################################################
 
 data.list.county = lapply(data.list.county.pop, function(file){
@@ -189,70 +188,16 @@ data.list.county = lapply(data.list.county.pop, function(file){
   data$"population_2020" = data$POPESTIMATE2020
   data$"population_2021" = data$POPESTIMATE2021
   data$"population_2022" = data$POPESTIMATE2022
+
   
-  data$"births_2000" = data$BIRTHS2000
-  data$"births_2001" = data$BIRTHS2001 
-  data$"births_2002" = data$BIRTHS2002 
-  data$"births_2003" = data$BIRTHS2003
-  data$"births_2004" = data$BIRTHS2004
-  data$"births_2005" = data$BIRTHS2005
-  data$"births_2006" = data$BIRTHS2006
-  data$"births_2007" = data$BIRTHS2007
-  data$"births_2008" = data$BIRTHS2008
-  data$"births_2009" = data$BIRTHS2009
-  data$"births_2010" = data$BIRTHS2010
-  data$"births_2010" = data$BIRTHS2010
-  data$"births_2011" = data$BIRTHS2011
-  data$"births_2012" = data$BIRTHS2012
-  data$"births_2013" = data$BIRTHS2013
-  data$"births_2014" = data$BIRTHS2014
-  data$"births_2015" = data$BIRTHS2015
-  data$"births_2016" = data$BIRTHS2016
-  data$"births_2017" = data$BIRTHS2017
-  data$"births_2018" = data$BIRTHS2018
-  data$"births_2019" = data$BIRTHS2019
-  data$"births_2020" = data$BIRTHS2020
-  data$"births_2021" = data$BIRTHS2021
-  data$"births_2022" = data$BIRTHS2022
-  
-  data$"deaths_2000" = data$DEATHS2000
-  data$"deaths_2001" = data$DEATHS2001 
-  data$"deaths_2002" = data$DEATHS2002 
-  data$"deaths_2003" = data$DEATHS2003
-  data$"deaths_2004" = data$DEATHS2004
-  data$"deaths_2005" = data$DEATHS2005
-  data$"deaths_2006" = data$DEATHS2006
-  data$"deaths_2007" = data$DEATHS2007
-  data$"deaths_2008" = data$DEATHS2008
-  data$"deaths_2009" = data$DEATHS2009
-  data$"deaths_2010" = data$DEATHS2010
-  data$"deaths_2010" = data$DEATHS2010
-  data$"deaths_2011" = data$DEATHS2011
-  data$"deaths_2012" = data$DEATHS2012
-  data$"deaths_2013" = data$DEATHS2013
-  data$"deaths_2014" = data$DEATHS2014
-  data$"deaths_2015" = data$DEATHS2015
-  data$"deaths_2016" = data$DEATHS2016
-  data$"deaths_2017" = data$DEATHS2017
-  data$"deaths_2018" = data$DEATHS2018
-  data$"deaths_2019" = data$DEATHS2019
-  data$"deaths_2020" = data$DEATHS2020
-  data$"deaths_2021" = data$DEATHS2021
-  data$"deaths_2022" = data$DEATHS2022
-  
-  
+
   ##this will give warning that it doesn't see these vars across all dfs##
   
   data<- data %>%
     select(location,(one_of("population_2000", "population_2001", "population_2002", "population_2003", "population_2004", "population_2005", "population_2006",
                             "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", "population_2012", "population_2013", 
                             "population_2014", "population_2015", "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", 
-                            "population_2021", "population_2022", "births_2000", "births_2001", "births_2002", "births_2003", "births_2004", "births_2005", "births_2006", 
-                            "births_2007", "births_2008", "births_2009", "births_2010", "births_2011", "births_2012", "births_2013", "births_2014", "births_2015", 
-                            "births_2016", "births_2017", "births_2018", "births_2019", "births_2020", "births_2021", "births_2022", "deaths_2000", "deaths_2001",
-                            "deaths_2002", "deaths_2003", "deaths_2004", "deaths_2005", "deaths_2006", "deaths_2007", "deaths_2008", "deaths_2009", "deaths_2010", 
-                            "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                            "deaths_2020", "deaths_2021", "deaths_2022")))
+                            "population_2021", "population_2022")))
   
   
   
@@ -260,12 +205,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
     pivot_longer(cols=c(one_of("population_2000", "population_2001", "population_2002", "population_2003", "population_2004", "population_2005", "population_2006",
                                "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", "population_2012", "population_2013", 
                                "population_2014", "population_2015", "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", 
-                               "population_2021", "population_2022", "births_2000", "births_2001", "births_2002", "births_2003", "births_2004", "births_2005", "births_2006", 
-                               "births_2007", "births_2008", "births_2009", "births_2010", "births_2011", "births_2012", "births_2013", "births_2014", "births_2015", 
-                               "births_2016", "births_2017", "births_2018", "births_2019", "births_2020", "births_2021", "births_2022", "deaths_2000", "deaths_2001",
-                               "deaths_2002", "deaths_2003", "deaths_2004", "deaths_2005", "deaths_2006", "deaths_2007", "deaths_2008", "deaths_2009", "deaths_2010", 
-                               "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                               "deaths_2020", "deaths_2021", "deaths_2022")),
+                               "population_2021", "population_2022")),
                  names_to = c("outcome", "year"),
                  names_sep = "_",
                  values_to = "value")
@@ -299,6 +239,6 @@ for (data in county_pop) {
                   ###Save Census Manager###
 ################################################################################ 
 
-save(census.manager, file="../../cached/census.manager.rdata")
+save(census.manager, file="cached/census.manager.rdata")
 
 
