@@ -113,15 +113,15 @@ set.seed(1234)
 #           control = list(maxit = 10)
 #           )
 
-rv = optim(par = log(par), fn = run.and.score.sim,
+optim.result = optim(par = log(par), fn = run.and.score.sim,
            control = list(maxit = 10000)
 )
  
 params.optim = params
-params.optim[names(rv$par)] = exp(rv$par)
+params.optim[names(optim.result$par)] = exp(optim.result$par)
 sim.optim = engine$run(parameters = params.optim)
 
-# save(rv,file="applications/EHE/temp.Rdata")
+save(sim.optim, param.optim, optim.result, file="prelim_results/ehe_optim_pop_result.Rdata")
 
 # params.2 = params
 # params.2[names(par)] = rv$par
