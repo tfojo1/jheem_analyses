@@ -87,7 +87,7 @@ census.manager$register.ontology(
     ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino'), 
     sex=c('male','female')
   ))
-
+ 
 #Need to change this ontology because i'm changing the age groups for deaths.  I think births will need somethnig else but wonder is down so idk#
 # census.manager$register.ontology(
 #   'census.cdc.wonder.births.deaths',

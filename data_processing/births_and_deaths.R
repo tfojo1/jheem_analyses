@@ -222,7 +222,7 @@ data.list.deaths.rate = lapply(data.list.deaths, function(file){
     data <- data %>%
       select(outcome, year, location, value, sex, age, race, ethnicity)
   }
-  if(grepl("HISP", filename)) {
+  if(grepl("HISP", filename)) { 
     data <- data %>%
       select(outcome, year, location, value, sex, age, ethnicity)
   }
