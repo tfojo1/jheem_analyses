@@ -100,32 +100,132 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   names(state.abb) <- state.name
   data$location =ifelse(data$State == "District of Columbia", "DC", state.abb[data$State]) 
   
-  if(grepl("06.10", filename)) {
-    data$year = "2006-2010"
+  if(grepl("01.10", filename)) {
+    data$year = "2001-2010"
   }
-  if(grepl("11.15", filename)) {
-    data$year = "2011-2015"
+  if(grepl("11.20", filename)) {
+    data$year = "2011-2020"
   }
-  if(grepl("16.20", filename)) {
-    data$year = "2016-2020"
-  }
-  
+
   data$outcome= "metro.deaths"
   
   #Remove suppressed death values
   data = subset(data, data$Deaths != "Suppressed")
   data$value = as.numeric(data$'Deaths')
   
-  data$age = data$"Single.Year.Ages"
+  data$age = data$"Ten.Year.Age.Groups"
   data$sex = tolower(data$Gender)
-  data$race = data$Race
   data$ethnicity = data$'Hispanic.Origin'
   
-  # data = subset(data, data$ethnicity != "Not Stated")
-  # data = subset(data, data$age != "Not Stated")
-   
-   data <- data %>%
-     select(outcome, year, location, value, sex, age, race, ethnicity)
+   data = subset(data, data$ethnicity != "Not Stated")
+   data = subset(data, data$age != "Not Stated")
+  
+  if(grepl("nh", filename)) {
+    data$race = data$Race
+    data <- data %>%
+      select(outcome, year, location, value, sex, age, race, ethnicity)
+  }
+  if(grepl("HISP", filename)) {
+    data <- data %>%
+      select(outcome, year, location, value, sex, age, ethnicity)
+  }
+  
+  data = as.data.frame(data)
+  list(filename, data)  
+  
+})
+################################################################################
+#Note outcome = metro.deaths.denominator
+################################################################################
+
+data.list.deaths.denom = lapply(data.list.deaths, function(file){
+  
+  data=file[["data"]]  
+  filename = file[["filename"]]
+  
+  names(state.abb) <- state.name
+  data$location =ifelse(data$State == "District of Columbia", "DC", state.abb[data$State]) 
+  
+  if(grepl("01.10", filename)) {
+    data$year = "2001-2010"
+  }
+  if(grepl("11.20", filename)) {
+    data$year = "2011-2020"
+  }
+  
+  data$outcome= "metro.deaths.denominator"
+  
+  #Remove suppressed  values
+   data = subset(data, data$Population != "Not Applicable")
+  data = subset(data, data$Population != "Suppressed")
+   data$value = as.numeric(data$'Population')
+  
+  data$age = data$"Ten.Year.Age.Groups"
+  data$sex = tolower(data$Gender)
+  data$ethnicity = data$'Hispanic.Origin'
+  
+   data = subset(data, data$ethnicity != "Not Stated")
+   data = subset(data, data$age != "Not Stated")
+
+   if(grepl("nh", filename)) {
+     data$race = data$Race
+     data <- data %>%
+       select(outcome, year, location, value, sex, age, race, ethnicity)
+   }
+   if(grepl("HISP", filename)) {
+     data <- data %>%
+       select(outcome, year, location, value, sex, age, ethnicity)
+   }
+  
+  data = as.data.frame(data)
+  list(filename, data)  
+  
+})
+
+################################################################################
+#Note outcome = metro.death.rate
+################################################################################
+
+data.list.deaths.rate = lapply(data.list.deaths, function(file){
+  
+  data=file[["data"]]  
+  filename = file[["filename"]]
+  
+  names(state.abb) <- state.name
+  data$location =ifelse(data$State == "District of Columbia", "DC", state.abb[data$State]) 
+  
+  if(grepl("01.10", filename)) {
+    data$year = "2001-2010"
+  }
+  if(grepl("11.20", filename)) {
+    data$year = "2011-2020"
+  }
+  
+  data$outcome= "metro.death.rate"
+  
+  #Remove suppressed death values
+  data = subset(data, data$`Crude.Rate` != "Not Applicable")
+  data = subset(data, data$`Crude.Rate` != "Suppressed")
+  data = subset(data, data$`Crude.Rate` != "Unreliable")
+  data$value = as.numeric(data$'Crude.Rate')
+  data$value = (data$value / 100000)
+  
+  data$age = data$"Ten.Year.Age.Groups"
+  data$sex = tolower(data$Gender)
+  data$ethnicity = data$'Hispanic.Origin'
+  
+  data = subset(data, data$ethnicity != "Not Stated")
+  data = subset(data, data$age != "Not Stated")
+
+  if(grepl("nh", filename)) {
+    data$race = data$Race
+    data <- data %>%
+      select(outcome, year, location, value, sex, age, race, ethnicity)
+  }
+  if(grepl("HISP", filename)) {
+    data <- data %>%
+      select(outcome, year, location, value, sex, age, ethnicity)
+  }
   
   data = as.data.frame(data)
   list(filename, data)  
@@ -138,6 +238,32 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
 deaths_race_eth = lapply(data.list.deaths.clean, `[[`, 2)
 
 for (data in deaths_race_eth ) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census.cdc.wonder.births.deaths',
+    source = 'cdc_wonder',
+    dimension.values = list(),
+    url = 'https://wonder.cdc.gov/',
+    details = 'CDC Wonder')
+}
+
+deaths_denom = lapply(data.list.deaths.denom, `[[`, 2)
+
+for (data in deaths_denom ) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census.cdc.wonder.births.deaths',
+    source = 'cdc_wonder',
+    dimension.values = list(),
+    url = 'https://wonder.cdc.gov/',
+    details = 'CDC Wonder')
+}
+
+death_rate = lapply(data.list.deaths.rate, `[[`, 2)
+
+for (data in death_rate ) {
   
   census.manager$put.long.form(
     data = data,
