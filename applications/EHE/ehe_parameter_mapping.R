@@ -3,13 +3,9 @@
 ##-- THE MAIN FUNCTIONS --##
 ##------------------------##
 
-EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
-                                   track.used.parameters)
+EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
 {
     specification.metadata = model.settings$specification.metadata
-    
-    
-    used.parameter.names = character()
     
     #-- Birth rates --#
     for(race in specification.metadata$dim.names$race){
@@ -24,11 +20,6 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                      alpha.name = 'slope',
                                                      values = parameters[paste0(race,'.birth.rate.slope.multiplier')],
                                                      applies.to.dimension.values=list(race=race))
-      
-      used.parameter.names = c(used.parameter.names,
-                               c(paste0(race,'.birth.rate.multiplier'),
-                                 paste0(race,'.birth.rate.slope.multiplier')))
-       
     }
     
     #-- Mortality rates --#
@@ -39,11 +30,6 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                      alpha.name = 'value',
                                                      values = parameters[paste0(race,'.non.idu.general.mortality.rate.multiplier')],
                                                      applies.to.dimension.values=list(race=race))
-
-      
-      used.parameter.names = c(used.parameter.names,
-                               c(paste0(race,'.non.idu.general.mortality.rate.multiplier')))
-      
     }
     
     # Age
@@ -53,11 +39,6 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                      alpha.name = 'value',
                                                      values = parameters[paste0('age',age,'.non.idu.general.mortality.rate.multiplier')],
                                                      applies.to.dimension.values=list(age=age))
-      
-      
-      used.parameter.names = c(used.parameter.names,
-                               c(paste0('age',age,'.non.idu.general.mortality.rate.multiplier')))
-      
     }
     
     # Sex
@@ -67,76 +48,53 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                    values = parameters['male.non.idu.general.mortality.rate.multiplier'],
                                                    applies.to.dimension.values=list(sex=c('heterosexual_male','msm')))
     
-    
-    used.parameter.names = c(used.parameter.names,
-                             c(paste0('male.non.idu.general.mortality.rate.multiplier')))
-    
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "non.idu.general.mortality",
                                                    alpha.name = 'value',
                                                    values = parameters['female.non.idu.general.mortality.rate.multiplier'],
                                                    applies.to.dimension.values=list(sex='female'))
     
-    
-    used.parameter.names = c(used.parameter.names,
-                             c(paste0('female.non.idu.general.mortality.rate.multiplier')))
           
     #-- Suppression --#
-    used.names = set.ehe.alphas.from.parameters(model.settings,
-                                                element.name = 'suppression.of.diagnosed',
-                                                parameters = parameters,
-                                                parameter.suffixes = c(intercept='.suppressed.or', slope='.suppressed.slope.or'),
-                                                idu.applies.to.in.remission = F,
-                                                track.used.parameters = track.used.parameters)
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, used.names)
-    
+    set.ehe.alphas.from.parameters(model.settings,
+                                   element.name = 'suppression.of.diagnosed',
+                                   parameters = parameters,
+                                   parameter.suffixes = c(intercept='.suppressed.or', slope='.suppressed.slope.or'),
+                                   idu.applies.to.in.remission = F)
     
     #-- Testing --#
-    used.names = set.ehe.alphas.from.parameters(model.settings,
-                                                element.name = 'testing',
-                                                parameters = parameters,
-                                                parameter.suffixes = c(intercept='.proportion.tested.or', slope='.proportion.tested.slope.or'),
-                                                idu.applies.to.in.remission = F,
-                                                track.used.parameters = track.used.parameters,
-                                                throw.error.if.no.parameters = F)
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, used.names)
-    
-    
-    
+    set.ehe.alphas.from.parameters(model.settings,
+                                   element.name = 'testing',
+                                   parameters = parameters,
+                                   parameter.suffixes = c(intercept='.proportion.tested.or', slope='.proportion.tested.slope.or'),
+                                   idu.applies.to.in.remission = F,
+                                   throw.error.if.no.parameters = F)
+
     model.settings$set.element.ramp.values(element.name = 'testing',
                                          values = parameters['testing.ramp.up.vs.current.rr'] * c(TESTING.FIRST.YEAR.FRACTION.OF.RAMP,1),
                                          indices = 2:3)
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, 'testing.ramp.up.vs.current.rr')
-    
+
     #-- PrEP --#
     
     # parameters for PrEP x age and race - are used for both interecept and slope
-    used.names = set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
-                                                                    element.name = 'oral.prep.uptake',
-                                                                    alpha.name = 'intercept',
-                                                                    parameters = parameters,
-                                                                    parameter.name.prefix = '',
-                                                                    parameter.name.suffix = '.prep.or',
-                                                                    dimensions.with.values.referred.to.by.name = 'race',
-                                                                    dimensions.with.values.referred.to.by.index = 'age')
+    set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
+                                                       element.name = 'oral.prep.uptake',
+                                                       alpha.name = 'intercept',
+                                                       parameters = parameters,
+                                                       parameter.name.prefix = '',
+                                                       parameter.name.suffix = '.prep.or',
+                                                       dimensions.with.values.referred.to.by.name = 'race',
+                                                       dimensions.with.values.referred.to.by.index = 'age')
     
-    used.names = set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
-                                                                    element.name = 'oral.prep.uptake',
-                                                                    alpha.name = 'slope',
-                                                                    parameters = parameters,
-                                                                    parameter.name.prefix = '',
-                                                                    parameter.name.suffix = '.prep.or',
-                                                                    dimensions.with.values.referred.to.by.name = 'race',
-                                                                    dimensions.with.values.referred.to.by.index = 'age')
+    set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
+                                                       element.name = 'oral.prep.uptake',
+                                                       alpha.name = 'slope',
+                                                       parameters = parameters,
+                                                       parameter.name.prefix = '',
+                                                       parameter.name.suffix = '.prep.or',
+                                                       dimensions.with.values.referred.to.by.name = 'race',
+                                                       dimensions.with.values.referred.to.by.index = 'age')
     
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, used.names)
     
     # parameters for PrEP x sex/risk
     idu.states = specification.metadata$compartment.aliases$active.idu.states
@@ -194,17 +152,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                                 values = exp(ORAL.PREP.IDU.RR.LOG.SD*parameters['prep.efficacy.z']),
                                                                 applies.to.dimension.values = 'all',
                                                                 dimensions = 'all')
-    
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, 
-                                 'msm.prep.intercept.or',
-                                 'non.msm.prep.intercept.or',
-                                 'msm.prep.slope.or',
-                                 'idu.prep.slope.or',
-                                 'heterosexual.prep.slope.or',
-                                 'prep.efficacy.z')
-    
+
+
     #-- Proportion MSM of Male --#
     
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'proportion.msm.of.male',
@@ -212,47 +161,35 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                                 values = parameters['proportion.msm.of.male.mult'],
                                                                 applies.to.dimension.values = 'all',
                                                                 dimensions = 'all')
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, 
-                                 'proportion.msm.of.male.mult')
+
     #-- Transmission Rates --#
     
     trate.times = 0:2
     
     # MSM
-    used.names = set.ehe.trate.alphas.from.parameters(model.settings,
-                                                      parameters = parameters,
-                                                      category = 'msm',
-                                                      age.multiplier.infix = 'msm.susceptibility.rr.mult',
-                                                      times=trate.times,
-                                                      do.ramp = T,
-                                                      track.used.parameters = track.used.parameters)
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, used.names)
-    
+    set.ehe.trate.alphas.from.parameters(model.settings,
+                                         parameters = parameters,
+                                         category = 'msm',
+                                         age.multiplier.infix = 'msm.susceptibility.rr.mult',
+                                         times=trate.times,
+                                         do.ramp = T)
+
     # Heterosexual
-    used.names = set.ehe.trate.alphas.from.parameters(model.settings,
-                                                      parameters = parameters,
-                                                      category = 'heterosexual',
-                                                      age.multiplier.infix = 'susceptibility.rr.mult',
-                                                      times=trate.times,
-                                                      do.ramp = T,
-                                                      track.used.parameters = track.used.parameters)
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, used.names)
-    
+    set.ehe.trate.alphas.from.parameters(model.settings,
+                                         parameters = parameters,
+                                         category = 'heterosexual',
+                                         age.multiplier.infix = 'susceptibility.rr.mult',
+                                         times=trate.times,
+                                         do.ramp = T)
+
     # IDU
-    used.names = set.ehe.trate.alphas.from.parameters(model.settings,
-                                                      parameters = parameters,
-                                                      category = 'idu',
-                                                      age.multiplier.infix = 'susceptibility.rr.mult',
-                                                      times=trate.times,
-                                                      do.ramp = F,
-                                                      track.used.parameters = track.used.parameters)
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, used.names)
-    
+    set.ehe.trate.alphas.from.parameters(model.settings,
+                                         parameters = parameters,
+                                         category = 'idu',
+                                         age.multiplier.infix = 'susceptibility.rr.mult',
+                                         times=trate.times,
+                                         do.ramp = F)
+
     
     # Add in the IDU msm vs het male
     for (time in trate.times)
@@ -269,11 +206,6 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                                     applies.to.dimension.values = 'female',
                                                                     dimensions = 'sex.to')
     }
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, 
-                                 paste0('msm.vs.heterosexual.male.idu.susceptibility.rr.', trate.times),
-                                 'female.vs.heterosexual.male.idu.susceptibility.rr')
     
     # Add in the IDU Peak
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'extra.idu.peak.multiplier',
@@ -298,9 +230,6 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                                 applies.to.dimension.values = 'msm',
                                                                 dimensions = 'sex.to')
     
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, 'idu.peak.trate.multiplier', 'msm.vs.heterosexual.male.idu.susceptibility.rr.peak')
-    
     
     #-- Aging --#
     for(age in 1:(length(specification.metadata$dim.names$age)-1)){
@@ -315,29 +244,17 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
                                                      alpha.name = '2019',
                                                      values = parameters[paste0('age',age,'.aging.multiplier')],
                                                      applies.to.dimension.values=list(age=age))
-      
-      
-      used.parameter.names = c(used.parameter.names,
-                               c(paste0('age',age,'.aging.multiplier')))
-      
     }
     
-    used.names = set.ehe.aging.from.parameters(model.settings,
-                                               parameters = parameters,
-                                               times = c('.pre.spike', 0:3),
-                                               track.used.parameters = track.used.parameters)
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, used.names)
-    
+    set.ehe.aging.from.parameters(model.settings,
+                                  parameters = parameters,
+                                  times = c('.pre.spike', 0:3))
     
     #-- IDU --#
-    used.names = set.ehe.idu.from.parameters(model.settings,
-                                             parameters = parameters,
-                                             track.used.parameters = track.used.parameters)
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, used.names)
+    set.ehe.idu.from.parameters(model.settings,
+                                parameters = parameters)
     
-    
+
     #-- HIV Mortality --#
     
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
@@ -355,11 +272,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
     model.settings$set.element.ramp.values(element.name = 'unsuppressed.hiv.mortality.rate',
                                          values = c(parameters['hiv.mortality.0'], rep(parameters['peak.hiv.mortality'], 2)),
                                          indices = c('pre.peak', 'peak.start', 'peak.end'))
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, 'hiv.mortality.0', 'hiv.mortality.2', 'peak.hiv.mortality')
-    
-    
+
+        
     #-- Diagnosed Transmissibility --#
     
     model.settings$set.element.value(element.name = 'diagnosed.needle.sharing.rr',
@@ -368,16 +282,6 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters,
     model.settings$set.element.value(element.name = 'diagnosed.sexual.transmission.rr',
                                    value = parameters['diagnosed.transmission.rr'])
     
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, 'diagnosed.transmission.rr')
-    
-    
-    
-    #-- Return --#
-    if (track.used.parameters)
-        invisible(unique(used.parameter.names))
-    else
-        invisible(character())
 }
 
 ##---------------##
@@ -393,7 +297,6 @@ ORAL.PREP.IDU.RR.LOG.SD = (log(EHE_BASE_PARAMETERS$ci.upper['prep.rr.idu']) - lo
 ##-- HELPER FUNCTIONS --##
 ##----------------------##
 
-# Returns the names of parameters used if track.used.parameters == T
 # sex.risk.multiplier gets applied (multiplied in) BEFORE applying transformation
 set.ehe.alphas.from.parameters <- function(model.settings,
                                            element.name,
@@ -405,17 +308,9 @@ set.ehe.alphas.from.parameters <- function(model.settings,
                                            sex.risk.multiplier=1,
                                            dimensions.with.values.referred.to.by.name = c('race'),
                                            dimensions.with.values.referred.to.by.index = c('age'),
-                                           track.used.parameters,
                                            throw.error.if.no.parameters = T)
 {
     #-- Check Arguments --#
-    if (track.used.parameters)
-    {
-        if (length(sex.risk.multiplier)!=1 || is.na(sex.risk.multiplier))
-            stop("sex.risk.multiplier must be a single value that is not NA")
-        
-        # @need to do
-    }
     
     specification.metadata = model.settings$specification.metadata
     
@@ -438,25 +333,22 @@ set.ehe.alphas.from.parameters <- function(model.settings,
     names(non.idu.states) = rep('risk', length(non.idu.states))
     
     #-- Iterate through each alpha name --#
-    used.parameter.names = character()
     for (i in 1:length(alpha.names))
     {
         alpha.name = alpha.names[i]
         parameter.suffix = parameter.suffixes[i]
         
         #-- Main Effects --#
-        used.names = set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
-                                                                        element.name = element.name,
-                                                                        alpha.name = alpha.name,
-                                                                        parameters = parameters,
-                                                                        parameter.name.prefix = '',
-                                                                        parameter.name.suffix = parameter.suffix,
-                                                                        dimensions.with.values.referred.to.by.name = dimensions.with.values.referred.to.by.name,
-                                                                        dimensions.with.values.referred.to.by.index = dimensions.with.values.referred.to.by.index,
-                                                                        throw.error.if.no.parameters = throw.error.if.no.parameters)
+        set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
+                                                           element.name = element.name,
+                                                           alpha.name = alpha.name,
+                                                           parameters = parameters,
+                                                           parameter.name.prefix = '',
+                                                           parameter.name.suffix = parameter.suffix,
+                                                           dimensions.with.values.referred.to.by.name = dimensions.with.values.referred.to.by.name,
+                                                           dimensions.with.values.referred.to.by.index = dimensions.with.values.referred.to.by.index,
+                                                           throw.error.if.no.parameters = throw.error.if.no.parameters)
         
-        if (track.used.parameters)
-            used.parameter.names = c(used.parameter.names, used.names)
         
         #-- Sex/Risk Interaction Effects --#
         
@@ -469,9 +361,6 @@ set.ehe.alphas.from.parameters <- function(model.settings,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
                                                                         applies.to.dimension.values = c(sex='msm', non.idu.states))
-            
-            if (track.used.parameters)
-                used.parameter.names = c(used.parameter.names, param.name)
         }
         
         # Heterosexual
@@ -483,9 +372,6 @@ set.ehe.alphas.from.parameters <- function(model.settings,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
                                                                         applies.to.dimension.values = c(sex='heterosexual_male', sex='female', non.idu.states))
-            
-            if (track.used.parameters)
-                used.parameter.names = c(used.parameter.names, param.name)
         }
         
         # IDU
@@ -497,9 +383,6 @@ set.ehe.alphas.from.parameters <- function(model.settings,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
                                                                         applies.to.dimension.values = c(sex='heterosexual_male', sex='female', idu.states))
-            
-            if (track.used.parameters)
-                used.parameter.names = c(used.parameter.names, param.name)
         }
         
         # MSM-IDU
@@ -511,15 +394,9 @@ set.ehe.alphas.from.parameters <- function(model.settings,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
                                                                         applies.to.dimension.values = c(sex='msm', idu.states))
-            
-            if (track.used.parameters)
-                used.parameter.names = c(used.parameter.names, param.name)
         }
         
     }
-    
-    # Return
-    used.parameter.names
 }
 
 
@@ -528,11 +405,9 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                  category,
                                                  age.multiplier.infix,
                                                  times,
-                                                 do.ramp,
-                                                 track.used.parameters)
+                                                 do.ramp)
 {
     elem.name = paste0(category, '.trates')
-    used.parameter.names = character()
     
     specification.metadata = model.settings$specification.metadata
     for (time in times)
@@ -548,9 +423,6 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                                         values = parameters[param.name],
                                                                         applies.to.dimension.values = race,
                                                                         dimensions = 'race.to')
-            
-            if (track.used.parameters)
-                used.parameter.names = c(used.parameter.names, param.name)
         }
         
         
@@ -583,10 +455,6 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                                             values = param.value,
                                                                             applies.to.dimension.values = age.index,
                                                                             dimensions = 'age.to')
-                
-                
-                if (track.used.parameters)
-                    used.parameter.names = c(used.parameter.names, param.name)
             }
         }
     }
@@ -598,9 +466,6 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
         model.settings$set.element.ramp.values(element.name = elem.name,
                                              values = rep(parameters[param.name], 2),
                                              indices = c('peak.start','peak.end'))
-        
-        if (track.used.parameters)
-            used.parameter.names = c(used.parameter.names, param.name)
     }
     
     # After Modifier
@@ -610,23 +475,14 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                                 values = parameters[param.name],
                                                                 applies.to.dimension.values = 'all',
                                                                 dimensions = 'all')
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, param.name)
-    
-    
-    # Return
-    used.parameter.names
 }
 
 set.ehe.aging.from.parameters <- function(model.settings,
                                           parameters,
                                           times,
-                                          idu.applies.to.in.remission = T,
-                                          track.used.parameters)
+                                          idu.applies.to.in.remission = T)
 {
     #-- Some set-up --#
-    used.parameter.names = character()
     specification.metadata = model.settings$specification.metadata
     
     if (idu.applies.to.in.remission)
@@ -656,12 +512,7 @@ set.ehe.aging.from.parameters <- function(model.settings,
                                                                     alpha.name = alpha.name,
                                                                     value = parameters['idu.age1.aging.base'],
                                                                     applies.to.dimension.values=list(age=1, risk=idu.states))
-        
-        if (track.used.parameters)
-            used.parameter.names = c(used.parameter.names, 
-                                     'msm.age1.aging.base',
-                                     'heterosexual.age1.aging.base',
-                                     'idu.age1.aging.base')
+
         
         for (age.index in 2:specification.metadata$n.ages)
         {
@@ -674,9 +525,6 @@ set.ehe.aging.from.parameters <- function(model.settings,
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
                                                                             applies.to.dimension.values=list(sex='msm', age=age.index, risk=non.idu.states))
-                
-                if (track.used.parameters)
-                    used.parameter.names = c(used.parameter.names, param.name)
             }
             
             
@@ -689,9 +537,6 @@ set.ehe.aging.from.parameters <- function(model.settings,
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
                                                                             applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=age.index, risk=non.idu.states))
-                
-                if (track.used.parameters)
-                    used.parameter.names = c(used.parameter.names, param.name)
             }
             
             param.name = paste0('idu.age',age.index,'.aging.',time)
@@ -703,24 +548,15 @@ set.ehe.aging.from.parameters <- function(model.settings,
                                                                             alpha.name = alpha.name,
                                                                             value = param.value,
                                                                             applies.to.dimension.values=list(age=age.index, risk=idu.states))
-                
-                if (track.used.parameters)
-                    used.parameter.names = c(used.parameter.names, param.name)
             }
         }
     }
-    
-    
-    # Return
-    used.parameter.names
 }
 
 set.ehe.idu.from.parameters = function(model.settings,
                                        parameters,
-                                       times = c(0,2),
-                                       track.used.parameters)
+                                       times = c(0,2))
 {
-    used.parameter.names = character()
     specification.metadata = model.settings$specification.metadata
     
     for (time in times)
@@ -734,9 +570,6 @@ set.ehe.idu.from.parameters = function(model.settings,
                                                                         values = parameters[param.name],
                                                                         applies.to.dimension.values = race,
                                                                         dimensions = 'race')
-            
-            if (track.used.parameters)
-                used.parameter.names = c(used.parameter.names, param.name)
         }
         
         param.name = paste0('msm.incident.idu.multiplier.', time)
@@ -745,9 +578,6 @@ set.ehe.idu.from.parameters = function(model.settings,
                                                                     values = parameters[param.name],
                                                                     applies.to.dimension.values = 'msm',
                                                                     dimensions = 'sex')
-        
-        if (track.used.parameters)
-            used.parameter.names = c(used.parameter.names, param.name)
     }
     
     
@@ -762,11 +592,4 @@ set.ehe.idu.from.parameters = function(model.settings,
                                                                 values = parameters['idu.relapse.multiplier'],
                                                                 applies.to.dimension.values = 'all',
                                                                 dimensions = 'all')
-    
-    if (track.used.parameters)
-        used.parameter.names = c(used.parameter.names, 'idu.remission.multiplier', 'idu.relapse.multiplier')
-    
-    # Return
-    used.parameter.names
-    
 }
