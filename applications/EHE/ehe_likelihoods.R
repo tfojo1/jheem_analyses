@@ -26,7 +26,7 @@ population.two.way.likelihood.instructions = create.basic.likelihood.instruction
                                                                           # downweight because large population size; 
                                                                           # can get more specific with create.likelihood.weights 
                                                                           #(e.g., different weight for age X)
-                                                                          weights = list(1/64),
+                                                                          weights = 1/32, ### UPDATED 12/13
                                                                           
                                                                           # if there are more datapoints for certain years, this will normalize
                                                                           # e.g., if there are a few years with only the totals 
