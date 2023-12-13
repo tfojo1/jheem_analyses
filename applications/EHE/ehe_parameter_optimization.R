@@ -49,22 +49,22 @@ par.names = c("black.birth.rate.multiplier",
 par = params[par.names]
 
 
-score.sim = function(sim){
-  #print("scoring sim")
+score.sim = function(sim,
+                     include.prior = T){
+  
   sim.data.age = sim$get(outcomes = "population",keep.dimensions = c("year","age"),year=as.character(2007:2020))
   sim.data.race = sim$get(outcomes = "population",keep.dimensions = c("year","race"),year=as.character(2007:2020))
  
   if (any(is.na(sim.data.age)))
     browser()
   
-  # sum of squared errors version 
-  # rv = sum((sim.data.age - target.data.age)^2) + sum((sim.data.race - target.data.race)^2)
-  
-  # version using actual likelihood 
   log.likelihood = pop.lik.test$compute(sim,check.consistency=F)
-  log.prior = calculate.density(EHE.PARAMETERS.PRIOR, x = sim$parameters, log = T)
   
-  rv = -(log.likelihood+log.prior)
+  if(include.prior){
+    log.prior = calculate.density(EHE.PARAMETERS.PRIOR, x = sim$parameters, log = T)
+    rv = -(log.likelihood+log.prior)
+  } else
+    rv = -(log.likelihood)
   
   if(rv>=.Machine$double.xmax | is.na(rv) | is.nan(rv)){
     rv = .Machine$double.xmax 
@@ -91,28 +91,27 @@ score.sim = function(sim){
    
 }
 
-run.and.score.sim = function(par) {
+run.and.score.sim = function(par,
+                             include.prior = T) {
   
   params = suppressWarnings(get.medians(EHE.PARAMETERS.PRIOR))
   params['global.trate'] = 0.1
   params[names(par)] = exp(par)
-#  if(counter>1300)
-#    save(params,file="cached/temp.test.Rdata")
+
   sim = engine$run(parameters = params)
   
-  score.sim(sim)
+  score.sim(sim, include.prior = include.prior)
   
 }
 
 set.seed(1234)
-#rv = optim(par = par, fn = run.and.score.sim, method = "L-BFGS-B",lower = 0,
-#           control = list(maxit = 10)
-#           )
+
 
 counter = 0
 start.time = Sys.time()
 last.start.time = Sys.time()
-optim.result = optim(par = log(par), fn = run.and.score.sim,
+optim.result = optim(par = log(par), fn = run.and.score.sim, include.prior = F,
+                     method = "SANN",
            control = list(maxit = 10000)
 )
 end.time = Sys.time()
@@ -125,7 +124,8 @@ params.optim = params
 params.optim[names(optim.result$par)] = exp(optim.result$par)
 sim.optim = engine$run(parameters = params.optim)
 
-save(sim.optim, param.optim, optim.result, start.time, end.time, counter, time.per.sim, file="prelim_results/ehe_optim_pop_result.Rdata")
+save(sim.optim, params.optim, optim.result, start.time, end.time, counter, time.per.sim, 
+     file=paste0("prelim_results/ehe_optim_pop_result_",Sys.Date(),".Rdata"))
 
 # params.2 = params
 # params.2[names(par)] = rv$par
