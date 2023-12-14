@@ -19,7 +19,6 @@ get.location.birth.rates <- function(location,
   
     # Pull the births into an array
     # I imagine this should be indexed [year, county, race, ethnicity] - not necessarily in that order
-  
     births
   
     # Pull population into an array
@@ -27,19 +26,9 @@ get.location.birth.rates <- function(location,
     population
     
     # Map the ontologies
-    birth.ontology.mapping = get.ontology.mapping(from.ontology = dimnames(births)[c('year','race','ethnicity')])
-    if (is.null(birth.ontology.mapping))
-        stop("We could not find a mapping to take the races in births in the census/Wonder and map them to the races for the '", specification.metadata$version, "' specification")
-    
-    population.ontology.mapping = get.ontology.mapping(from.ontology = dimnames(population)[c('year','race','ethnicity')])
-    if (is.null(birth.ontology.mapping))
-      stop("We could not find a mapping to take the races in population in the census/Wonder and map them to the races for the '", specification.metadata$version, "' specification")
-    
-    births = birth.ontology.mapping$apply(births)
-    population = population.ontology.mapping$apply(population)
-    
-    # Sum up over counties/years and divide births by pop
-    apply(births, 'race', sum) / apply(population, 'race', sum)
+    target.dim.names = specification.metadata$dim.names[c('race')]
+    map.value.ontology(births, target.dim.names=target.dim.names) / 
+      map.value.ontology(population, target.dim.names=target.dim.names)
 }
 
 # Should return an array with dimensions 'age', 'race', 'sex'
