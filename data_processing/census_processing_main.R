@@ -56,15 +56,6 @@ census.manager$register.outcome(
     units = 'deaths',
     description = "Metro Deaths Denominator"))
     
-    census.manager$register.outcome(
-      'metro.death.rate',
-      metadata = create.outcome.metadata(
-        scale = 'proportion',
-        display.name = 'Metro Death Rate per 100,000',
-        axis.name = 'Metro Death Rate per 100,000',
-        units = '%',
-        description = "Metro Death Rate per 100,000"), denominator.outcome = 'metro.deaths.denominator')
-    
 census.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
 census.manager$register.source('cdc_wonder', full.name = "CDC Wonder", short.name='cdc_wonder')

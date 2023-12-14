@@ -183,55 +183,6 @@ data.list.deaths.denom = lapply(data.list.deaths, function(file){
 })
 
 ################################################################################
-#Note outcome = metro.death.rate
-################################################################################
-
-data.list.deaths.rate = lapply(data.list.deaths, function(file){
-  
-  data=file[["data"]]  
-  filename = file[["filename"]]
-  
-  names(state.abb) <- state.name
-  data$location =ifelse(data$State == "District of Columbia", "DC", state.abb[data$State]) 
-  
-  if(grepl("01.10", filename)) {
-    data$year = "2001-2010"
-  }
-  if(grepl("11.20", filename)) {
-    data$year = "2011-2020"
-  }
-  
-  data$outcome= "metro.death.rate"
-  
-  #Remove suppressed death values
-  data = subset(data, data$`Crude.Rate` != "Not Applicable")
-  data = subset(data, data$`Crude.Rate` != "Suppressed")
-  data = subset(data, data$`Crude.Rate` != "Unreliable")
-  data$value = as.numeric(data$'Crude.Rate')
-  data$value = (data$value / 100000)
-  
-  data$age = data$"Ten.Year.Age.Groups"
-  data$sex = tolower(data$Gender)
-  data$ethnicity = data$'Hispanic.Origin'
-  
-  data = subset(data, data$ethnicity != "Not Stated")
-  data = subset(data, data$age != "Not Stated")
-
-  if(grepl("nh", filename)) {
-    data$race = data$Race
-    data <- data %>%
-      select(outcome, year, location, value, sex, age, race, ethnicity)
-  }
-  if(grepl("HISP", filename)) { 
-    data <- data %>%
-      select(outcome, year, location, value, sex, age, ethnicity)
-  }
-  
-  data = as.data.frame(data)
-  list(filename, data)  
-  
-})
-################################################################################
 ##Put DEATHS into CENSUS MANAGER
 ################################################################################
 
@@ -251,19 +202,6 @@ for (data in deaths_race_eth ) {
 deaths_denom = lapply(data.list.deaths.denom, `[[`, 2)
 
 for (data in deaths_denom ) {
-  
-  census.manager$put.long.form(
-    data = data,
-    ontology.name = 'census.cdc.wonder.births.deaths',
-    source = 'cdc_wonder',
-    dimension.values = list(),
-    url = 'https://wonder.cdc.gov/',
-    details = 'CDC Wonder')
-}
-
-death_rate = lapply(data.list.deaths.rate, `[[`, 2)
-
-for (data in death_rate ) {
   
   census.manager$put.long.form(
     data = data,
