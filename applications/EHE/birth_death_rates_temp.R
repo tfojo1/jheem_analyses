@@ -52,7 +52,7 @@ get.location.mortality.rates <- function(location,
 {
   states = locations::get.containing.locations(location, "state")
     # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
-    mortality.rate = census.manager$pull(outcome = 'deaths', location = states, year= years, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
+    deaths = census.manager$pull(outcome = 'deaths', location = states, year= years, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
   
     # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
     population = census.manager$pull(outcome = 'population', location =  )
