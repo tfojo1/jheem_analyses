@@ -264,6 +264,24 @@ data.manager$register.outcome(
     units = 'cases',
     description = "BRFSS Unweighted Denominator Value"))
 
+data.manager$register.outcome(
+  'immigration',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Immigration',
+    axis.name = 'Immigration',
+    units = 'population',
+    description = "Metro Immigration"))
+
+data.manager$register.outcome(
+  'emigration',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Emigration',
+    axis.name = 'Emigration',
+    units = 'population',
+    description = "Metro Emigration"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='cdc')
@@ -275,6 +293,8 @@ data.manager$register.source('lhd', full.name = "Local Health Department", short
 data.manager$register.source('brfss', full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 
 data.manager$register.source('emory', full.name = "Emory University", short.name='emory')
+
+data.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
 data.manager$register.ontology(
   'cdc',
@@ -369,6 +389,14 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL
+  ))
+
+data.manager$register.ontology(
+  'census',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    sex=c('male','female')
   ))
 
 ################################################################################
