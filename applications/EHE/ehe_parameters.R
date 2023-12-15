@@ -342,30 +342,63 @@ EHE.PARAMETERS.PRIOR = join.distributions(
 )
 
 BASE.PARAMETER.SAMPLING.BLOCKS = list(
-  birth.rates = c(
+  
+  black.population.rates = c(
     'black.birth.rate.multiplier',
-    'hispanic.birth.rate.multiplier',
-    'other.birth.rate.multiplier',
     'black.birth.rate.slope.multiplier',
-    'hispanic.birth.rate.slope.multiplier',
-    'other.birth.rate.slope.multiplier'
+    'black.non.idu.general.mortality.rate.multiplier'
   ),
   
-  non.idu.general.mortality.rates = c(
-    'black.non.idu.general.mortality.rate.multiplier',
-    'hispanic.non.idu.general.mortality.rate.multiplier',
-    'other.non.idu.general.mortality.rate.multiplier',
-    
+  hispanic.population.rates = c(
+    'hispanic.birth.rate.multiplier',
+    'hispanic.birth.rate.slope.multiplier',
+    'hispanic.non.idu.general.mortality.rate.multiplier'
+  ),
+  
+  other.population.rates = c(
+    'other.birth.rate.multiplier',
+    'other.birth.rate.slope.multiplier',
+    'other.non.idu.general.mortality.rate.multiplier'
+  ),
+  
+  age1.population.rates = c(
     'age1.non.idu.general.mortality.rate.multiplier',
+    'age1.aging.multiplier'
+    # eventually include migration here as well
+  ),
+  
+  age2.population.rates = c(
     'age2.non.idu.general.mortality.rate.multiplier',
+    'age1.aging.multiplier',
+    'age2.aging.multiplier'
+    # eventually include migration here as well
+  ),
+  
+  age3.population.rates = c(
     'age3.non.idu.general.mortality.rate.multiplier',
+    'age2.aging.multiplier',
+    'age3.aging.multiplier'
+    # eventually include migration here as well
+  ),
+  
+  age4.population.rates = c(
     'age4.non.idu.general.mortality.rate.multiplier',
+    'age3.aging.multiplier',
+    'age4.aging.multiplier'
+    # eventually include migration here as well
+  ),
+  
+  age5.population.rates = c(
     'age5.non.idu.general.mortality.rate.multiplier',
-    
+    'age4.aging.multiplier'
+    # eventually include migration here as well
+  ),
+  
+  sex.non.idu.general.mortality.rates = c(
     'male.non.idu.general.mortality.rate.multiplier',
     'female.non.idu.general.mortality.rate.multiplier'
   ),
-  
+
   peak.msm.transmission = 'msm.peak.trate.multiplier',
   
   black.msm.transmission = c(
@@ -387,12 +420,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'msm.fraction.trate.change.after.t2'
   ),
   
-  aging.multipliers = c(
-    'age1.aging.multiplier',
-    'age2.aging.multiplier',
-    'age3.aging.multiplier',
-    'age4.aging.multiplier'
-  ),
+
   
   msm.aging = c(
     'msm.age1.aging.base',
