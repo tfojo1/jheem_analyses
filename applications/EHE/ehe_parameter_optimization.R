@@ -111,7 +111,7 @@ counter = 0
 start.time = Sys.time()
 last.start.time = Sys.time()
 optim.result = optim(par = log(par), fn = run.and.score.sim, include.prior = F,
-                     method = "SANN",
+                     method = "BFGS",
            control = list(maxit = 10000)
 )
 end.time = Sys.time()
