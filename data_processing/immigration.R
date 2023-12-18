@@ -38,6 +38,8 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data<- data[!duplicated(data), ]
     }
   
+  ##Need to clarify this variable: `Movers in Metro-to-Metro Flow Estimate`
+  
   #Location conditional formatting
   if(grepl("emigration", filename)) {
     data$location = data$`Residence 1 Year Ago Metro Code1`
@@ -45,13 +47,16 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data$outcome = "emigration"
     
       data <-data %>%
-        mutate(value = (`Movers to Different Metropolitan Statistical Area3 Estimate` + `Movers to Elsewhere in the U.S. or Puerto Rico Estimate` + `Movers in Metro-to-Metro Flow Estimate`))%>%
+        mutate(value = (`Movers to Different Metropolitan Statistical Area3 Estimate` + `Movers to Elsewhere in the U.S. or Puerto Rico Estimate` ))%>%
         select(outcome, year, location, sex, value)
+      
+      data<- data[!duplicated(data), ]
   }
   
   #remove invalid locations?
-  #data$location_test = locations::get.location.code(data$location, "CBSA")
-  #data = subset(data, data$location_test != "FALSE")
+  data$location_test = locations::get.location.code(data$location, "CBSA")
+  data = subset(data, data$location_test != "FALSE")
+  data = subset(data, !is.na(data$location_test))
   
   data= as.data.frame(data)
   
@@ -63,9 +68,9 @@ data.list.move.clean = lapply(data.list.move, function(file){
 #put
 ################################################################################
 
-immigration_data = lapply(ddata.list.immigration.clean , `[[`, 2)  
+movement_data = lapply(data.list.move.clean, `[[`, 2)  
 
-for (data in immigration_data) {
+for (data in movement_data) {
   
   data.manager$put.long.form(
     data = data,
