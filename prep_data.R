@@ -158,6 +158,12 @@ p.msm.age5 <- c(
   # p.msm.2021$age5
 )
 
+p.msm.total <- c(
+  p.msm.2017$total,
+  p.msm.2018$total,
+  p.msm.2019$total
+)
+
 
 #### creating a combined model for msm -----
 p.msm.df <- data.frame(
@@ -169,7 +175,8 @@ p.msm.df <- data.frame(
   age2 = p.msm.age2,
   age3 = p.msm.age3,
   age4 = p.msm.age4,
-  age5 = p.msm.age5
+  age5 = p.msm.age5,
+  total = p.msm.total
 )
 
 # p.max and anchor year ----------
@@ -177,7 +184,7 @@ p.max <- 0.6
 anchor.year <- 2017
 
 library(tidyr)
-p.msm.df.long <- pivot_longer(p.msm.df, cols = c(black, hisp, nbnh, age1, age2, age3, age4, age5),
+p.msm.df.long <- pivot_longer(p.msm.df, cols = c(black, hisp, nbnh, age1, age2, age3, age4, age5, total),
                               names_to = "variable", values_to = "p")
 
 p.msm.df.long$raceid <- ifelse(grepl("black", p.msm.df.long$variable), "black",
@@ -498,7 +505,7 @@ p.msm.df.long <- p.msm.df.long |> dplyr::select(-variable) |>
 p.idu.df.long <- p.idu.df.long |> dplyr::select(-group) |> 
   dplyr::mutate(risk = rep("idu", length(p.idu.df.long$ageid)))
 
-big.df <- rbind(p.msm.df.long, p.idu.df.long, p.het.df.long)
+big.df <- rbind(p.idu.df.long, p.het.df.long)
 
 big.df$sexrisk <- paste(big.df$sexid, big.df$risk, sep = "_")
 big.df$sexrisk <- ifelse(big.df$sexrisk == "msm_msm", "msm", big.df$sexrisk)
@@ -510,57 +517,73 @@ big.df$risk <- relevel(factor(big.df$risk), ref = "msm")
 big.df$sexrisk <- relevel(factor(big.df$sexrisk), ref="msm")
 big.df$sexid[big.df$sexid=="msm"] <- "male"
 
-# fitting the big model
-fit.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid + risk, data = big.df)
-
-# fitting an alternative model - interacting sex with risk
-fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df)
-
-# fit3.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df[1:50,])
-
 big.df$female <- as.numeric(big.df$sexid=="female")
-
-# female model
-fit3.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + risk + female, data = big.df)
-
-# fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df[1:40,])
 
 big.df$nonmsm <- as.numeric(big.df$risk!="msm")
 big.df$idu <- as.numeric(big.df$risk=="idu")
 
-# nonmsm + female model
-fit4.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female, data = big.df)
+# fitting the big model
+# fit.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid + risk, data = big.df)
 
-# interacting nonmsm with age
-fit5.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*ageid, 
-                  data = big.df) 
+# # fitting an alternative model - interacting sex with risk
+# fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df)
 
-# interacting nonmsm with year
-fit6.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*year,
-                  data = big.df)
+# fit3.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df[1:50,])
 
-# interacting nonmsm with year and race
-fit7.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female +
-                    nonmsm*raceid + nonmsm*year,
-                  data = big.df)
 
-# interacting nonmsm with race, year, and age
-fit8.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*raceid +
-                    nonmsm*year + nonmsm*ageid,
-                  data = big.df)
+
+# female model
+# fit3.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + risk + female, data = big.df)
+
+# fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df[1:40,])
+
+# 
+# # nonmsm + female model
+# fit4.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female, data = big.df)
+# 
+# # interacting nonmsm with age
+# fit5.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*ageid, 
+#                   data = big.df) 
+# 
+# # interacting nonmsm with year
+# fit6.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*year,
+#                   data = big.df)
+# 
+# # interacting nonmsm with year and race
+# fit7.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female +
+#                     nonmsm*raceid + nonmsm*year,
+#                   data = big.df)
+# 
+# # interacting nonmsm with race, year, and age
+# fit8.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*raceid +
+#                     nonmsm*year + nonmsm*ageid,
+#                   data = big.df)
 
 # making 2 separate big models -- nonmsm and msm -------
 
-msm.bigp.df <- subset(big.df, nonmsm == 0)
+msm.bigp.df <- p.msm.df.long
+msm.bigp.df$ageid <- relevel(factor(msm.bigp.df$ageid), ref = "ALL")
+msm.bigp.df$raceid <- relevel(factor(msm.bigp.df$raceid), ref="ALL")
 nonmsm.big.df <- subset(big.df, nonmsm == 1)
 
-fit.p.msm <- lm(logit(p/p.max) ~ year + raceid + ageid,
-                data = msm.bigp.df)
+# fit.p.msm <- lm(logit(p/p.max) ~ year + raceid + ageid,
+#                 data = msm.bigp.df)
 
-fit.p.nonmsm <- lm(logit(p/p.max) ~ year + raceid + ageid + female + idu,
+
+fit.p.msm <- lm((p/p.max) ~ year + raceid + ageid,
+                data = msm.bigp.df)
+fit.p.msm
+
+fit.p.nonmsm <- lm((p/p.max) ~ year + raceid + ageid + female + idu,
                    data = nonmsm.big.df)
 
 
+# 
+# create.logistic.tail.functional.form(
+#   # everything else the same
+#   
+#   logistic.after.frac.of.span = 0.5,
+#   )
 
 
 # PrEP Indications ------
@@ -672,6 +695,12 @@ pi.msm.age5 <- c(
   pi.msm.2017$age5,
   pi.msm.2018$age5,
   pi.msm.2019$age5
+)
+
+pi.msm.total <- c(
+  pi.msm.2017$total,
+  pi.msm.2018$total,
+  pi.msm.2019$total
 )
 
 years.pi <- c(2017:2019) - anchor.year
@@ -890,7 +919,8 @@ pi.msm.df <- data.frame(
   age2 = pi.msm.age2,
   age3 = pi.msm.age3,
   age4 = pi.msm.age4,
-  age5 = pi.msm.age5
+  age5 = pi.msm.age5,
+  total = pi.msm.total
 ) 
 
 pi.idu.df <- data.frame(
@@ -956,13 +986,13 @@ pi.big.df <- pi.df.long |> dplyr::mutate(raceid = ifelse(group == "black", "blac
 ## big model PrEP indication ----------------------------------------------------
 
 
-pi.big.df$sexrisk <- paste(pi.big.df$sexid, pi.big.df$risk, sep = "_")
-pi.big.df$sexrisk <- ifelse(pi.big.df$sexrisk == "msm_ALL", "msm", pi.big.df$sexrisk)
+# pi.big.df$sexrisk <- paste(pi.big.df$sexid, pi.big.df$risk, sep = "_")
+# pi.big.df$sexrisk <- ifelse(pi.big.df$sexrisk == "msm_ALL", "msm", pi.big.df$sexrisk)
 
 pi.big.df$raceid <- relevel(factor(pi.big.df$raceid), ref = "ALL")
 pi.big.df$ageid <- relevel(factor(pi.big.df$ageid), ref = "ALL")
 pi.big.df$sexid <- relevel(factor(pi.big.df$sexid), ref = "ALL")
-pi.big.df$sexrisk <- relevel(factor(pi.big.df$sexrisk), ref = "msm")
+# pi.big.df$sexrisk <- relevel(factor(pi.big.df$sexrisk), ref = "msm")
 
 pi.big.df$sexid[pi.big.df$sexid=="msm"] <- "male"
 pi.big.df$female <- as.numeric(pi.big.df$sexid=="female")
