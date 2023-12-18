@@ -25,20 +25,30 @@ data.list.immigration.clean = lapply(data.list.immigration, function(file){
   
   data$year = "2011-2015"
   data$sex = if_else(data$`Sex Code2` == "01", "male", "female")
-  data$location = paste("C", data$`_MMSA`, sep=".")
-  
-  #remove invalid locations?
-  data$location_test = locations::get.location.code(data$location)
-  data = subset(data, data$location_test != "FALSE")
   
   if(grepl("immigration", filename)) {
    data$location = data$`Current Residence Metro Code1`
-  }
+   data$location = paste("C", data$location, sep=".")
+   
+    data <-data %>%
+      mutate(value = (`Movers from Different Metropolitan Statistical Area3 Estimate` + `Movers from Elsewhere in the U.S. or Puerto Rico Estimate` + `Movers from Abroad4 Estimate`))
+    
+    data<- data[!duplicated(data), ]
+    }
   
   #Location conditional formatting
   if(grepl("emigration", filename)) {
     data$location = data$`Residence 1 Year Ago Metro Code1`
+    data$location = paste("C", data$location, sep=".")
+    
+      data <-data %>%
+        mutate(value = (`Movers to Different Metropolitan Statistical Area3 Estimate` + `Movers to Elsewhere in the U.S. or Puerto Rico Estimate` + `Movers in Metro-to-Metro Flow Estimate`))
   }
+  
+
+  #remove invalid locations?
+  #data$location_test = locations::get.location.code(data$location, "CBSA")
+  #data = subset(data, data$location_test != "FALSE")
   
   data= as.data.frame(data)
   
