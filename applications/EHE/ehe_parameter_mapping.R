@@ -53,8 +53,47 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                    alpha.name = 'value',
                                                    values = parameters['female.non.idu.general.mortality.rate.multiplier'],
                                                    applies.to.dimension.values=list(sex='female'))
+    if(1==2){
+      #-- Immigration rates --#
+      # Race
+      for(race in specification.metadata$dim.names$race){
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "immigration",
+                                                       alpha.name = 'value',
+                                                       values = parameters[paste0(race,'.immigration.rate.multiplier')],
+                                                       applies.to.dimension.values=list(race=race))
+      }
+      
+      # Age
+      for(age in 1:length(specification.metadata$dim.names$age)){
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "immigration",
+                                                       alpha.name = 'value',
+                                                       values = parameters[paste0('age',age,'.immigration.rate.multiplier')],
+                                                       applies.to.dimension.values=list(age=age))
+      }
+      
+      #-- Emigration rates --#
+      # Race
+      for(race in specification.metadata$dim.names$race){
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "emigration",
+                                                       alpha.name = 'value',
+                                                       values = parameters[paste0(race,'.emigration.rate.multiplier')],
+                                                       applies.to.dimension.values=list(race=race))
+      }
+      
+      # Age
+      for(age in 1:length(specification.metadata$dim.names$age)){
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "emigration",
+                                                       alpha.name = 'value',
+                                                       values = parameters[paste0('age',age,'.emigration.rate.multiplier')],
+                                                       applies.to.dimension.values=list(age=age))
+      }
+    }
     
-          
+
     #-- Suppression --#
     set.ehe.alphas.from.parameters(model.settings,
                                    element.name = 'suppression.of.diagnosed',

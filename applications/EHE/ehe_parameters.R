@@ -33,6 +33,29 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     male.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
     female.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
     
+    #-- Immigration/emigration rates --#
+ #   if(1==2){
+      # black.immigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # hispanic.immigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # other.immigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # 
+      # age1.immigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # age2.immigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # age3.immigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # age4.immigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # age5.immigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # 
+      # black.emigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # hispanic.emigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # other.emigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # 
+      # age1.emigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # age2.emigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # age3.emigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # age4.emigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
+      # age5.emigration.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),       
+ #   }
+
     
     #-- MSM Transmission --#
     black.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
@@ -342,56 +365,67 @@ EHE.PARAMETERS.PRIOR = join.distributions(
 )
 
 BASE.PARAMETER.SAMPLING.BLOCKS = list(
-  
+
   black.population.rates = c(
     'black.birth.rate.multiplier',
     'black.birth.rate.slope.multiplier',
     'black.non.idu.general.mortality.rate.multiplier'
+    # 'black.immigration.rate.multiplier',
+    # 'black.emigration.rate.multiplier'
   ),
   
   hispanic.population.rates = c(
     'hispanic.birth.rate.multiplier',
     'hispanic.birth.rate.slope.multiplier',
     'hispanic.non.idu.general.mortality.rate.multiplier'
+    # 'hispanic.immigration.rate.multiplier',
+    # 'hispanic.emigration.rate.multiplier'
   ),
   
   other.population.rates = c(
     'other.birth.rate.multiplier',
     'other.birth.rate.slope.multiplier',
     'other.non.idu.general.mortality.rate.multiplier'
+    # 'other.immigration.rate.multiplier',
+    # 'other.emigration.rate.multiplier'
   ),
   
   age1.population.rates = c(
     'age1.non.idu.general.mortality.rate.multiplier',
     'age1.aging.multiplier'
-    # eventually include migration here as well
+    # 'age1.immigration.rate.multiplier',
+    # 'age1.emigration.rate.multiplier'
   ),
   
   age2.population.rates = c(
     'age2.non.idu.general.mortality.rate.multiplier',
     'age1.aging.multiplier',
     'age2.aging.multiplier'
-    # eventually include migration here as well
+    # 'age2.immigration.rate.multiplier',
+    # 'age2.emigration.rate.multiplier'
   ),
   
   age3.population.rates = c(
     'age3.non.idu.general.mortality.rate.multiplier',
     'age2.aging.multiplier',
     'age3.aging.multiplier'
-    # eventually include migration here as well
+    # 'age3.immigration.rate.multiplier',
+    # 'age3.emigration.rate.multiplier'
   ),
   
   age4.population.rates = c(
     'age4.non.idu.general.mortality.rate.multiplier',
     'age3.aging.multiplier',
     'age4.aging.multiplier'
-    # eventually include migration here as well
+    # 'age4.immigration.rate.multiplier',
+    # 'age4.emigration.rate.multiplier'
   ),
   
   age5.population.rates = c(
     'age5.non.idu.general.mortality.rate.multiplier',
     'age4.aging.multiplier'
-    # eventually include migration here as well
+    # 'age5.immigration.rate.multiplier',
+    # 'age5.emigration.rate.multiplier'
   ),
   
   sex.non.idu.general.mortality.rates = c(

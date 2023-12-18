@@ -251,6 +251,58 @@ get.non.idu.general.mortality.rates <- function(location, specification.metadata
     stratify.males.by.orientation(mortality.rates, msm.multiplier = 1, heterosexual.multiplier = 1) #this function is in the JHEEM package
 }
 
+##---------------##
+##-- Migration --##
+##---------------##
+
+
+get.immigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+  
+  rates = get.immigration.rates(location=location,
+                                specification.metadata = specification.metadata) 
+  
+  create.static.functional.form(value = rates,
+                                link = "log",
+                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  
+}
+
+get.immigration.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+  
+  # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
+  if(1==2){
+    immigration.rates = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
+                                                  location = location,
+                                                  year = "2011-2015") / 5 # because it's 5-year aggregate data     
+  }
+
+  1
+}
+
+get.emigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+  
+  rates = get.emigration.rates(location=location,
+                               specification.metadata = specification.metadata) 
+  
+  create.static.functional.form(value = rates,
+                                link = "log",
+                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  
+}
+
+get.emigration.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+  
+  # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
+  if(1==2){
+    emigration.rates = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
+                                                 location = location,
+                                                 year = "2011-2015") / 5 # because it's 5-year aggregate data 
+  }
+
+  1
+}  
+
+
 ##------------------------##
 ##-- Initial Population --##
 ##------------------------##

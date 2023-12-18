@@ -663,6 +663,56 @@ register.model.element(EHE.SPECIFICATION,
                        scale='rate')
 
 
+##----------------------------##
+##----------------------------##
+##--        MIGRATION       --##
+##----------------------------##
+##----------------------------##
+
+##-----------------##
+##-- Immigration --##
+##-----------------##
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'immigration',
+                       get.functional.form.function = get.immigration.rates.functional.form,
+                       scale = 'rate')
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'null.proportions',
+                        value = 1)
+
+register.natality(specification = EHE.SPECIFICATION,
+                  parent.groups = 'uninfected',
+                  child.groups = 'uninfected',
+                  fertility.rate.value = 'immigration',
+                  birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
+                  parent.child.concordant.dimensions = c('age','race','sex','risk'),
+                  all.births.into.compartments = list(),
+                  tag = "immigration")
+
+register.natality(specification = EHE.SPECIFICATION,
+                  parent.groups = 'infected',
+                  child.groups = 'infected',
+                  fertility.rate.value = 'immigration',
+                  birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
+                  parent.child.concordant.dimensions = c('age','race','sex','risk','continuum','stage'),
+                  all.births.into.compartments = list(),
+                  tag = "immigration")
+
+##----------------##
+##-- Emigration --##
+##----------------##
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'emigration',
+                       get.functional.form.function = get.emigration.rates.functional.form,
+                       scale = 'rate')
+
+register.mortality(EHE.SPECIFICATION,
+                   mortality.rate.value = "emigration",
+                   groups = c("uninfected","infected"), 
+                   tag = "emigration")
 
 
 
@@ -1660,7 +1710,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       dynamic.quantity.name = 'mortality',
                       corresponding.data.outcome = 'hiv.mortality',
                       groups = 'infected',
-                      tags = NULL,
+                      exclude.tags = "emigration",
                       keep.dimensions = c('location','sex'))
 
 track.integrated.outcome(EHE.SPECIFICATION,
@@ -1688,6 +1738,35 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       groups = 'infected',
                       keep.dimensions = c('location','age','race','sex','risk'),
                       subset.dimension.values = list(continuum='diagnosed.states'))
+
+
+track.dynamic.outcome(EHE.SPECIFICATION,
+                      name = 'immigration',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
+                                                                 description = "Number of People Immigrating into MSA in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Number Immigrating',
+                                                                 units = 'individuals'),
+                      dynamic.quantity.name = 'births',
+                      corresponding.data.outcome = 'immigration',
+                      include.tags = "immigration",
+                      keep.dimensions = c('location','age','race','sex'))
+
+track.dynamic.outcome(EHE.SPECIFICATION,
+                      name = 'emigration',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
+                                                                 description = "Number of People Emigrating from MSA in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Number Emigrating',
+                                                                 units = 'individuals'),
+                      dynamic.quantity.name = 'mortality',
+                      corresponding.data.outcome = 'emigration',
+                      include.tags = "emigration",
+                      keep.dimensions = c('location','age','race','sex'))
+
+
+
+
 
 ##--------------------------------##
 ##--------------------------------##
