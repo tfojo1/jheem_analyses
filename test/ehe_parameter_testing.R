@@ -69,14 +69,23 @@ simplot(sim, sim2, "population",facet.by = "race",dimension.values = list(year =
 # sim.optim = sim
 # params.optim = sim.optim$parameters[names(params)]
 
-simplot(sim.optim, "population",facet.by = "age",dimension.values = list(year = as.character(2000:2020)))
+sim.optim.new = sim.optim
 
-# manually tweaking after optim 
-params.manual = param.optim
-params.manual["black.birth.rate.multiplier"] = 2.3 # 1.868623
-params.manual["age1.non.idu.general.mortality.rate.multiplier"] = 5 # 0.22525397
-sim.manual = engine$run(parameters = params.manual)
-save(sim.manual, params.manual,file="prelim_results/ehe_manual_pop_result.Rdata")
+simplot(sim.optim, "population",facet.by = "age",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, "population",facet.by = "race",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, "population",facet.by = "sex",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, "population",dimension.values = list(year = as.character(2000:2020)))
+
+simplot(sim.optim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, "population",facet.by = "age",split.by = "sex",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim.optim, "population",facet.by = "race",split.by = "sex",dimension.values = list(year = as.character(2000:2020)))
+
+# manually tweaking after previous optim 
+# params.manual = param.optim
+# params.manual["black.birth.rate.multiplier"] = 2.3 # 1.868623
+# params.manual["age1.non.idu.general.mortality.rate.multiplier"] = 5 # 0.22525397
+# sim.manual = engine$run(parameters = params.manual)
+# save(sim.manual, params.manual,file="prelim_results/ehe_manual_pop_result.Rdata")
 
 # Plotting optim vs manual 
 simplot(sim.optim, sim.manual,"population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
@@ -104,7 +113,7 @@ pop.lik.test.two.way$compute(sim.manual,check.consistency=F,debug = T)
 
 
 # Comparing manual vs optim likelihood
-exp(pop.lik.test$compute(sim.manual,check.consistency=F) - pop.lik.test$compute(sim.optim,check.consistency=F)) 
+exp(pop.lik.test.one.way$compute(sim.manual,check.consistency=F) - pop.lik.test.one.way$compute(sim.optim,check.consistency=F)) 
 exp(pop.lik.test.two.way$compute(sim.manual,check.consistency=F) - pop.lik.test.two.way$compute(sim.optim,check.consistency=F)) 
 
 # Comparing manual vs optim prior
