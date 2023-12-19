@@ -29,7 +29,7 @@ age.mappings.immigration = c('01' = '1-4 years',
                              '14' = '70-74 years',
                              '15' = '75+ years')
 
-race.mappings.immigration = c('02' = 'black')
+race.mappings.immigration = c('02' = 'Black')
 
 ethnicity.mappings.immigration = c( '01' = 'White, Non-Hispanic',
                                     '03' = 'Hispanic or Latino')
@@ -59,6 +59,7 @@ data.list.move.clean = lapply(data.list.move, function(file){
      select(outcome, year, location, value)
     
     data<- data[!duplicated(data), ]
+
     }
 
   if(grepl("emigration_total", filename)) {
@@ -110,6 +111,10 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data$location = paste("C", data$location, sep=".")
     data$outcome = "immigration"
     
+    data$`Movers from Different Metropolitan Statistical Area3 Estimate` = if_else (is.na(data$`Movers from Different Metropolitan Statistical Area3 Estimate`), 0, data$`Movers from Different Metropolitan Statistical Area3 Estimate`)
+    data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate` = if_else (is.na(data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate`), 0, data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate`)
+    data$`Movers from Abroad4 Estimate` = if_else (is.na(data$`Movers from Abroad4 Estimate`), 0, data$`Movers from Abroad4 Estimate`)
+    
     data$age = age.mappings.immigration[data$`Age Group Code`]
     
     data <-data %>%
@@ -123,6 +128,9 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data$location = data$`Residence 1 Year Ago Metro Code1`
     data$location = paste("C", data$location, sep=".")
     data$outcome = "emigration"
+    
+    data$`Movers to Different Metropolitan Statistical Area3 Estimate` = if_else (is.na(data$`Movers to Different Metropolitan Statistical Area3 Estimate`), 0, data$`Movers to Different Metropolitan Statistical Area3 Estimate`)
+    data$`Movers to Elsewhere in the U.S. or Puerto Rico Estimate` = if_else (is.na(data$`Movers to Elsewhere in the U.S. or Puerto Rico Estimate`), 0, data$`Movers to Elsewhere in the U.S. or Puerto Rico Estimate`)
     
     data$age = age.mappings.immigration[data$`Age Group Code`]
     
@@ -139,6 +147,10 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data$location = paste("C", data$location, sep=".")
     data$outcome = "immigration"
     
+    data$`Movers from Different Metropolitan Statistical Area3 Estimate` = if_else (is.na(data$`Movers from Different Metropolitan Statistical Area3 Estimate`), 0, data$`Movers from Different Metropolitan Statistical Area3 Estimate`)
+    data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate` = if_else (is.na(data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate`), 0, data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate`)
+    data$`Movers from Abroad4 Estimate` = if_else (is.na(data$`Movers from Abroad4 Estimate`), 0, data$`Movers from Abroad4 Estimate`)
+    
     data=subset(data, data$`Race Code`=="02")
     data$race = race.mappings.immigration[data$`Race Code`]
     
@@ -153,6 +165,9 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data$location = data$`Residence 1 Year Ago Metro Code1`
     data$location = paste("C", data$location, sep=".")
     data$outcome = "emigration"
+    
+    data$`Movers to Different Metropolitan Statistical Area3 Estimate` = if_else (is.na(data$`Movers to Different Metropolitan Statistical Area3 Estimate`), 0, data$`Movers to Different Metropolitan Statistical Area3 Estimate`)
+    data$`Movers to Elsewhere in the U.S. or Puerto Rico Estimate` = if_else (is.na(data$`Movers to Elsewhere in the U.S. or Puerto Rico Estimate`), 0, data$`Movers to Elsewhere in the U.S. or Puerto Rico Estimate`)
     
     data=subset(data, data$`Race Code`=="02")
     data$race = race.mappings.immigration[data$`Race Code`]
@@ -170,8 +185,12 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data$location = paste("C", data$location, sep=".")
     data$outcome = "immigration"
     
+    data$`Movers from Different Metropolitan Statistical Area3 Estimate` = if_else (is.na(data$`Movers from Different Metropolitan Statistical Area3 Estimate`), 0, data$`Movers from Different Metropolitan Statistical Area3 Estimate`)
+    data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate` = if_else (is.na(data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate`), 0, data$`Movers from Elsewhere in the U.S. or Puerto Rico Estimate`)
+    data$`Movers from Abroad4 Estimate` = if_else (is.na(data$`Movers from Abroad4 Estimate`), 0, data$`Movers from Abroad4 Estimate`)
+    
     data=subset(data, data$`Hispanic Origin Code`!="02")
-    data$race = race.mappings.immigration[data$`Hispanic Origin Code`]
+    data$race = ethnicity.mappings.immigration[data$`Hispanic Origin Code`]
     
     data <-data %>%
       mutate(value = (`Movers from Different Metropolitan Statistical Area3 Estimate` + `Movers from Elsewhere in the U.S. or Puerto Rico Estimate` + `Movers from Abroad4 Estimate`))%>%
@@ -195,8 +214,7 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data<- data[!duplicated(data), ]
   }
   
-  
-  ##################################################
+
   #remove invalid locations?
   data$location_test = locations::get.location.code(data$location, "CBSA")
   data = subset(data, data$location_test != "FALSE")
