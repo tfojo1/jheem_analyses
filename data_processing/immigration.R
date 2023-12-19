@@ -14,6 +14,7 @@ data.list.move <- lapply(movement_files, function(x){
 
 ################################################################################
 #Clean
+#BY SEX
 #outcome=immigration
 #outcome=emigration
 ################################################################################
@@ -24,12 +25,42 @@ data.list.move.clean = lapply(data.list.move, function(file){
   filename = file[["filename"]]
   
   data$year = "2011-2015"
-  data$sex = if_else(data$`Sex Code2` == "01", "male", "female")
   
-  if(grepl("immigration", filename)) {
+##TOTAL##
+    if(grepl("immigration_total", filename)) {
    data$location = data$`Current Residence Metro Code1`
    data$location = paste("C", data$location, sep=".")
    data$outcome = "immigration"
+   
+     data <-data %>%
+     mutate(value = (`Movers from Different Metropolitan Statistical Area3 Estimate` + `Movers from Elsewhere in the U.S. or Puerto Rico Estimate` + `Movers from Abroad4 Estimate`))%>%
+     select(outcome, year, location, value)
+    
+    data<- data[!duplicated(data), ]
+    }
+  
+  
+  #Location conditional formatting
+  if(grepl("emigration_total", filename)) {
+    data$location = data$`Residence 1 Year Ago Metro Code1`
+    data$location = paste("C", data$location, sep=".")
+    data$outcome = "emigration"
+    
+      data <-data %>%
+        mutate(value = (`Movers to Different Metropolitan Statistical Area3 Estimate` + `Movers to Elsewhere in the U.S. or Puerto Rico Estimate` ))%>%
+        select(outcome, year, location, value)
+      
+      data<- data[!duplicated(data), ]
+  }
+
+  
+###BY SEX##
+  if(grepl("immigration_sex", filename)) {
+   data$location = data$`Current Residence Metro Code1`
+   data$location = paste("C", data$location, sep=".")
+   data$outcome = "immigration"
+   
+   data$sex = if_else(data$`Sex Code2` == "01", "male", "female")
    
      data <-data %>%
      mutate(value = (`Movers from Different Metropolitan Statistical Area3 Estimate` + `Movers from Elsewhere in the U.S. or Puerto Rico Estimate` + `Movers from Abroad4 Estimate`))%>%
@@ -38,13 +69,17 @@ data.list.move.clean = lapply(data.list.move, function(file){
     data<- data[!duplicated(data), ]
     }
   
-  ##Need to clarify this variable: `Movers in Metro-to-Metro Flow Estimate`
+##BY AGE##
+  
+##BY RACE##
   
   #Location conditional formatting
-  if(grepl("emigration", filename)) {
+  if(grepl("emigration_sex", filename)) {
     data$location = data$`Residence 1 Year Ago Metro Code1`
     data$location = paste("C", data$location, sep=".")
     data$outcome = "emigration"
+    
+    data$sex = if_else(data$`Sex Code2` == "01", "male", "female")
     
       data <-data %>%
         mutate(value = (`Movers to Different Metropolitan Statistical Area3 Estimate` + `Movers to Elsewhere in the U.S. or Puerto Rico Estimate` ))%>%
@@ -53,6 +88,8 @@ data.list.move.clean = lapply(data.list.move, function(file){
       data<- data[!duplicated(data), ]
   }
   
+  
+  ##################################################
   #remove invalid locations?
   data$location_test = locations::get.location.code(data$location, "CBSA")
   data = subset(data, data$location_test != "FALSE")
