@@ -392,10 +392,13 @@ data.manager$register.ontology(
   ))
 
 data.manager$register.ontology(
-  'census',
+  'census.immigration',
   ont = ontology(
     year= NULL,
     location= NULL,
+    age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
+            "65-69 years", "70-74 years", "75 years+"),
+    race=c("white", "hispanic", "black", "other"),
     sex=c('male','female')
   ))
 
@@ -450,7 +453,7 @@ source('data_processing/brfss_msa_weighted.R')
 source('data_processing/brfss_unweighted_denominators.R')
 
 #Source immigration data
-source('data_processing_immigration.R')
+source('data_processing/immigration.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###

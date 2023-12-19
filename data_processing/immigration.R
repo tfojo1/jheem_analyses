@@ -111,7 +111,7 @@ for (data in movement_data) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'census',
+    ontology.name = 'census.immigration',
     source = 'census',
     dimension.values = list(),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
