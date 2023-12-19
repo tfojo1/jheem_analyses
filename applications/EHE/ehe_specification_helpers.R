@@ -270,13 +270,18 @@ get.immigration.rates.functional.form <- function(location, specification.metada
 get.immigration.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
   
   # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
-  if(1==2){
-    immigration.rates = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
-                                                  location = location,
-                                                  year = "2011-2015") / 5 # because it's 5-year aggregate data     
-  }
 
-  1
+  immigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
+                                                location = location,
+                                                year = "2011-2015") / 5 # because it's 5-year aggregate data     
+
+  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+                                           location = location,
+                                           year = as.character(c(2011:2015)))) 
+
+  immigration.rates = immigration.numbers/population
+  
+  c(immigration.rates)
 }
 
 get.emigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
@@ -293,13 +298,18 @@ get.emigration.rates.functional.form <- function(location, specification.metadat
 get.emigration.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
   
   # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
-  if(1==2){
-    emigration.rates = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
+  emigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
                                                  location = location,
                                                  year = "2011-2015") / 5 # because it's 5-year aggregate data 
-  }
-
-  1
+    
+    population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+                                                location = location,
+                                                year = as.character(c(2011:2015)))) 
+    
+    emigration.rates = emigration.numbers/population
+    
+    c(emigration.rates)
+    
 }  
 
 

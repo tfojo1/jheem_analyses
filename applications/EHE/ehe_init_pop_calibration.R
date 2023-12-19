@@ -7,9 +7,6 @@ N.ITER = 2500
 par.names = c("black.birth.rate.multiplier",
               "hispanic.birth.rate.multiplier",
               "other.birth.rate.multiplier",
-              "black.birth.rate.slope.multiplier",
-              "hispanic.birth.rate.slope.multiplier",
-              "other.birth.rate.slope.multiplier",
               "age1.non.idu.general.mortality.rate.multiplier",
               "age2.non.idu.general.mortality.rate.multiplier",
               "age3.non.idu.general.mortality.rate.multiplier",
@@ -18,7 +15,24 @@ par.names = c("black.birth.rate.multiplier",
               "age1.aging.multiplier",
               "age2.aging.multiplier",
               "age3.aging.multiplier",
-              "age4.aging.multiplier")
+              "age4.aging.multiplier",
+              "black.immigration.rate.multiplier",
+              "hispanic.immigration.rate.multiplier",
+              "other.immigration.rate.multiplier",
+              "age1.immigration.rate.multiplier",
+              "age2.immigration.rate.multiplier",
+              "age3.immigration.rate.multiplier",
+              "age4.immigration.rate.multiplier",
+              "age5.immigration.rate.multiplier",
+              "black.emigration.rate.multiplier",
+              "hispanic.emigration.rate.multiplier",
+              "other.emigration.rate.multiplier",
+              "age1.emigration.rate.multiplier",
+              "age2.emigration.rate.multiplier",
+              "age3.emigration.rate.multiplier",
+              "age4.emigration.rate.multiplier",
+              "age5.emigration.rate.multiplier"
+              )
 
 clear.calibration.cache(version='ehe',
                         location='C.12580',
@@ -46,6 +60,7 @@ set.up.calibration(version='ehe',
 
 set.seed(12345)
 start.time = Sys.time()
+print(paste0("STARTING MCMC RUN AT ",Sys.time()))
 mcmc = run.calibration(version = 'ehe',
                 location = "C.12580",
                 calibration.code = CALIBRATION.CODE,
@@ -69,5 +84,7 @@ print(paste0("DONE RUNNING MCMC: Took ",
 #                                      chains = 1)
 
 sim = mcmc@simulations[[length(mcmc@simulations)]]
+
+# save(sim,file=paste0("prelim_results/init.pop.sim_",Sys.Date(),".Rdata"))
 
 simplot(sim, 'population')
