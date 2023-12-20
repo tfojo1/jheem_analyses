@@ -1,4 +1,6 @@
 
+load.data.manager("cached/census.manager.rdata") 
+
 
 # TEST CODE
 if (1==2)
@@ -19,11 +21,11 @@ get.location.birth.rates <- function(location,
   
     # Pull the births into an array
     # I imagine this should be indexed [year, county, race, ethnicity] - not necessarily in that order
-    births
+    births=census.manager$pull(outcome = 'births', location = counties, year= years, keep.dimensions = c('race', 'ethnicity', 'location'))
   
     # Pull population into an array
     # I imagine this should be indexed [year, county, race, ethnicity] - not necessarily in that order
-    population
+    population=census.manager$pull(outcome = 'population', location = counties, year= years, keep.dimensions = c('race', 'ethnicity', 'location'))
     
     # Map the ontologies
     target.dim.names = specification.metadata$dim.names[c('race')]
@@ -41,10 +43,10 @@ get.location.mortality.rates <- function(location,
 {
   states = locations::get.containing.locations(location, "state")
     # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
-    deaths = census.manager$pull(outcome = 'deaths', location = states, year= years, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
+    deaths = census.manager$pull(outcome = 'metro.deaths', location = states, year= years, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
   
     # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
-    population = census.manager$pull(outcome = 'population', location =  )
+    population = census.manager$pull(outcome = 'population', location = states, year= years, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
   
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two
