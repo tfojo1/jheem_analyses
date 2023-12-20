@@ -217,6 +217,9 @@ data.list.move.clean = lapply(data.list.move, function(file){
   data = subset(data, data$location_test != "FALSE")
   data = subset(data, !is.na(data$location_test))
   
+  #Removing any negative values- this was relevant for PR msas only#
+  data = subset(data, data$value >0)
+  
   data= as.data.frame(data)
   
   list(filename, data)
