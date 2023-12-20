@@ -59,7 +59,6 @@ data.list.move.clean = lapply(data.list.move, function(file){
      select(outcome, year, location, value)
     
     data<- data[!duplicated(data), ]
-
     }
 
   if(grepl("emigration_total", filename)) {
@@ -103,7 +102,6 @@ data.list.move.clean = lapply(data.list.move, function(file){
       
       data<- data[!duplicated(data), ]
   }
-  
   
   ##BY AGE##
   if(grepl("immigration_age", filename)) {
@@ -213,7 +211,6 @@ data.list.move.clean = lapply(data.list.move, function(file){
     
     data<- data[!duplicated(data), ]
   }
-  
 
   #remove invalid locations?
   data$location_test = locations::get.location.code(data$location, "CBSA")
@@ -242,3 +239,107 @@ for (data in movement_data) {
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
     details = 'Census Metro Area to Metro Area Migration Flows')
 }
+
+
+###############################################################################
+##Need to figure out how to redo this section to make it more efficient and reliable
+#Calculate the 'other' race category
+###############################################################################
+##IMMIGRATION##
+immigration_total = data.list.move.clean [[10]]
+immigration_total = immigration_total [[2]]
+
+immigration_total <- immigration_total %>%
+  rename(total = value)%>%
+  select(-location_test)
+
+imm_black = data.list.move.clean [[8]]
+imm_black = imm_black [[2]]
+
+imm_black <- imm_black%>%
+  rename(black = race)%>%
+  rename(black.value = value)%>%
+  select(-location_test)
+
+imm_hisp = data.list.move.clean [[7]]
+imm_hisp = imm_hisp [[2]]
+
+imm_hisp <- imm_hisp %>%
+  filter(race == 'Hispanic or Latino')%>%
+  rename(hispanic = race)%>%
+  rename(hispanic.value = value)%>%
+  select(-location_test)
+
+imm_combo <- merge(imm_hisp, imm_black, by="location")
+imm_combo <- merge(imm_combo, immigration_total, by="location")
+
+imm_combo <- imm_combo %>%
+  select(location, outcome, year, total, hispanic.value, black.value)%>%
+  mutate(black.hisp = (black.value + hispanic.value))%>%
+  mutate(other.race = (total - black.hisp))
+
+##EMIGRATION
+
+emigration_total = data.list.move.clean [[5]]
+emigration_total = emigration_total [[2]]
+
+emigration_total <- emigration_total %>%
+  rename(total = value)%>%
+  select(-location_test)
+
+em_black = data.list.move.clean [[3]]
+em_black = em_black [[2]]
+
+em_black <- em_black%>%
+  rename(black = race)%>%
+  rename(black.value = value)%>%
+  select(-location_test)
+
+em_hisp = data.list.move.clean [[2]]
+em_hisp = em_hisp [[2]]
+
+em_hisp <- em_hisp %>%
+  filter(race == 'Hispanic or Latino')%>%
+  rename(hispanic = race)%>%
+  rename(hispanic.value = value)%>%
+  select(-location_test)
+
+em_combo <- merge(em_hisp, em_black, by="location")
+em_combo <- merge(em_combo, emigration_total, by="location")
+
+em_combo <- em_combo %>%
+  select(location, outcome, year, total, hispanic.value, black.value)%>%
+  mutate(black.hisp = (black.value + hispanic.value))%>%
+  mutate(other.race = (total - black.hisp))
+
+######
+#Reformat for put
+
+imm_combo <- imm_combo %>%
+  rename(value = other.race)%>%
+  select(location, outcome, year, value)%>%
+  mutate(race = "Other")%>%
+  filter(value > 0)
+
+em_combo <- em_combo %>%
+  rename(value = other.race)%>%
+  select(location, outcome, year, value)%>%
+  mutate(race = "Other")%>%
+  filter(value > 0)
+
+other_race <- list(imm_combo, em_combo)
+
+
+##Put other race file#
+
+for (data in other_race) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'census.immigration',
+    source = 'census',
+    dimension.values = list(),
+    url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
+    details = 'Census Metro Area to Metro Area Migration Flows')
+}
+
