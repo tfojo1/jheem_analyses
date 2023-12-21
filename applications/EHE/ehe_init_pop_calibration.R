@@ -13,7 +13,9 @@ par.names = c("black.birth.rate.multiplier",
               "age4.non.idu.general.mortality.rate.multiplier",
               "age5.non.idu.general.mortality.rate.multiplier",
               "age1.aging.multiplier",
-              "age2.aging.multiplier",
+              "age2.black.aging.multiplier",
+              "age2.hispanic.aging.multiplier",
+              "age2.other.aging.multiplier",
               "age3.aging.multiplier",
               "age4.aging.multiplier",
               "black.immigration.rate.multiplier",
@@ -85,6 +87,8 @@ print(paste0("DONE RUNNING MCMC: Took ",
 
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
-# save(sim,file=paste0("prelim_results/init.pop.sim_",Sys.Date(),".Rdata"))
+save(sim,file=paste0("prelim_results/init.pop.sim_",Sys.Date(),".Rdata"))
 
 simplot(sim, 'population')
+simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
+sim$parameters[[1]][par.names]
