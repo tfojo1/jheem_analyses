@@ -173,7 +173,11 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-report-2002-vol-14.pdf
     
     age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
-    age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
+    
+    age2.black.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
+    age2.hispanic.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
+    age2.other.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
+    
     age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
     age4.aging.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
     
@@ -400,14 +404,18 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   age2.population.rates = c(
     'age2.non.idu.general.mortality.rate.multiplier',
     'age1.aging.multiplier',
-    'age2.aging.multiplier',
+    'age2.black.aging.multiplier',
+    'age2.hispanic.aging.multiplier',
+    'age2.other.aging.multiplier',
     'age2.immigration.rate.multiplier',
     'age2.emigration.rate.multiplier'
   ),
   
   age3.population.rates = c(
     'age3.non.idu.general.mortality.rate.multiplier',
-    'age2.aging.multiplier',
+    'age2.black.aging.multiplier',
+    'age2.hispanic.aging.multiplier',
+    'age2.other.aging.multiplier',
     'age3.aging.multiplier',
     'age3.immigration.rate.multiplier',
     'age3.emigration.rate.multiplier'

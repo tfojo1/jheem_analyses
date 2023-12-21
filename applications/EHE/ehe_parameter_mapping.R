@@ -270,17 +270,38 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     #-- Aging --#
     for(age in 1:(length(specification.metadata$dim.names$age)-1)){
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "default.aging",
-                                                     alpha.name = '2007',
-                                                     values = parameters[paste0('age',age,'.aging.multiplier')],
-                                                     applies.to.dimension.values=list(age=age))
+      
+      if(age==2){ # race-specific multipliers for age 2 aging
+        for(race in specification.metadata$dim.names$race){
+          set.element.functional.form.main.effect.alphas(model.settings,
+                                                         element.name = "default.aging",
+                                                         alpha.name = '2007',
+                                                         values = parameters[paste0('age',age,'.',race,'.aging.multiplier')],
+                                                         applies.to.dimension.values=list(age=age,
+                                                                                          race=race))
+          
+          set.element.functional.form.main.effect.alphas(model.settings,
+                                                         element.name = "default.aging",
+                                                         alpha.name = '2019',
+                                                         values = parameters[paste0('age',age,'.',race,'.aging.multiplier')],
+                                                         applies.to.dimension.values=list(age=age,
+                                                                                          race=race))
+          
+        }
+      } else {
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "default.aging",
+                                                       alpha.name = '2007',
+                                                       values = parameters[paste0('age',age,'.aging.multiplier')],
+                                                       applies.to.dimension.values=list(age=age))
+        
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "default.aging",
+                                                       alpha.name = '2019',
+                                                       values = parameters[paste0('age',age,'.aging.multiplier')],
+                                                       applies.to.dimension.values=list(age=age))        
+      }
 
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "default.aging",
-                                                     alpha.name = '2019',
-                                                     values = parameters[paste0('age',age,'.aging.multiplier')],
-                                                     applies.to.dimension.values=list(age=age))
     }
     
     set.ehe.aging.from.parameters(model.settings,
