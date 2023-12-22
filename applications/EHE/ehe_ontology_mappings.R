@@ -72,7 +72,9 @@ register.ontology.mapping('wonder.to.census.ethnicity',
                           from.dimensions = 'ethnicity',
                           to.dimensions = 'ethnicity',
                           mappings = rbind(c('Hispanic or Latino', 'hispanic'),
-                                           c('Not Hispanic or Latino', 'not hispanic')))
+                                           c('Not Hispanic or Latino', 'not hispanic'),
+                                           c('Unknown or Not Stated', NA),
+                                           c('Not Stated', NA)))
 register.ontology.mapping('census.to.jheem.race',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
