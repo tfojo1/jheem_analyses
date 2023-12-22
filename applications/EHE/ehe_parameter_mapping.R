@@ -271,7 +271,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     #-- Aging --#
     for(age in 1:(length(specification.metadata$dim.names$age)-1)){
       
-      if(age==2){ # race-specific multipliers for age 2 aging
+      if(age==1){ # race-specific multipliers for age 2 aging
         for(race in specification.metadata$dim.names$race){
           set.element.functional.form.main.effect.alphas(model.settings,
                                                          element.name = "default.aging",
