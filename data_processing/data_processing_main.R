@@ -282,6 +282,24 @@ data.manager$register.outcome(
     units = 'population',
     description = "Metro Emigration"))
 
+data.manager$register.outcome(
+  'adult.immigration',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Adult Immigration',
+    axis.name = 'Adult Immigration',
+    units = 'population',
+    description = "Metro Immigration Ages 13+"))
+
+data.manager$register.outcome(
+  'adult.emigration',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Emigration',
+    axis.name = 'Emigration',
+    units = 'population',
+    description = "Metro Emigration Ages 13+"))
+
 data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
 
 data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='cdc')

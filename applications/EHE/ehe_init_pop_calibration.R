@@ -42,7 +42,7 @@ clear.calibration.cache(version='ehe',
                         root.dir = '../test_runs')
 
 register.calibration.info(CALIBRATION.CODE,
-                          likelihood.instructions = heavy.weight.population.two.way.likelihood.instructions,
+                          likelihood.instructions = population.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           start.year = 1970,
                           end.year = 2030, 
