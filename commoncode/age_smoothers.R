@@ -325,7 +325,7 @@ parse.desired.ages <- function(desired.ages,
             stop("If 'desired.ages' is a numeric vector of endpoints, it must be a strictly ascending vector")
       
         rv = list(lowers = desired.ages[-length(desired.ages)],
-                  uppers = desired.ages[-length(desired.ages)])
+                  uppers = desired.ages[-1])
     }
     else
         stop("'desired.ages' must be either a CHARACTER vector of ages names or a NUMERIC vector of age endpoints")
