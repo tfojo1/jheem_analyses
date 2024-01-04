@@ -247,7 +247,13 @@ for (data in movement_data) {
 ###############################################################################
 ##Need to figure out how to redo this section to make it more efficient and reliable
 #Calculate the 'other' race category
+#Pulling the individual variables from the other dfs to make one df
 ###############################################################################
+#Pulled from cdc wonder
+#Proportion of Black who are Hispanic: 14,568,073 / 218,869,956 = 0.067
+#Proportion of Hispanic who are Black:  14,568,073 / 269,697,533 = 0.054
+###############################################################################
+
 ##IMMIGRATION##
 immigration_total = data.list.move.clean [[10]]
 immigration_total = immigration_total [[2]]
@@ -271,15 +277,26 @@ imm_hisp <- imm_hisp %>%
   filter(race == 'Hispanic or Latino')%>%
   rename(hispanic = race)%>%
   rename(hispanic.value = value)%>%
-  select(-location_test)
+  select(-location_test, -year, -outcome)
 
-imm_combo <- merge(imm_hisp, imm_black, by="location")
-imm_combo <- merge(imm_combo, immigration_total, by="location")
+#adding white back in
+imm_white= data.list.move.clean [[7]]
+imm_white = imm_white [[2]]
+
+imm_white <- imm_white %>%
+  filter(race == 'White, Non-Hispanic')%>%
+  rename(white = race)%>%
+  rename(white.value = value)%>%
+  select(-location_test, -year, -outcome)
+
+imm_combo_1 <- merge(imm_hisp, imm_black, by="location")
+imm_combo_2 <- merge(imm_combo_1, imm_white, by="location")
+imm_combo <- merge(imm_combo_2, immigration_total, by="location")
 
 imm_combo <- imm_combo %>%
-  select(location, outcome, year, total, hispanic.value, black.value)%>%
-  mutate(black.hisp = (black.value + hispanic.value))%>%
-  mutate(other.race = (total - black.hisp))
+  select(location, total, hispanic.value, black.value, white.value)%>% #add outcome and year back
+  mutate(black.nh = black.value-(sqrt(0.067*0.054*hispanic.value*black.value)))%>% #should I be multiply by black or subtracting?
+  mutate(other.race = (total - (hispanic.value + black.nh + white.value)))
 
 ##EMIGRATION
 
@@ -311,9 +328,9 @@ em_combo <- merge(em_hisp, em_black, by="location")
 em_combo <- merge(em_combo, emigration_total, by="location")
 
 em_combo <- em_combo %>%
-  select(location, outcome, year, total, hispanic.value, black.value)%>%
-  mutate(black.hisp = (black.value + hispanic.value))%>%
-  mutate(other.race = (total - black.hisp))
+  select(location, total, outcome, year, hispanic.value, black.value)%>% #add outcome and year back
+  mutate(black.nh = black.value-(sqrt(0.067*0.054*hispanic.value*black.value)))%>% 
+  mutate(other_race = total - (hispanic.value + black.nh))    #I didn't put white here but I did above
 
 ######
 #Reformat for put
