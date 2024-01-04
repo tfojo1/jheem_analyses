@@ -1,6 +1,7 @@
 ##This is the function that Todd wrote; More code included to run the functions that his function references
 ##This is from the HELPERS_age_year_helpers.R file (this is in JHEEM2 dev branch I think)
 
+source('data_processing/HELPERS_age_year_helpers_COPY.R')
 ################################################################################
 #'@title Re-distribute counts according to one set of age brackets into a different set of age brackets
 #'
@@ -139,8 +140,11 @@ restratify.age.counts <- function(counts,
 }
 ################################################################################
 ##The immigration/emigration data has a 5-17 age bracket- need to split this out
-##And then need to create adult.immigration outcome to just show 13+
+##And then need to create adult.immigration/emigration outcome to just show 13+
 ################################################################################
+
+#EMIGRATION
+
 #Create vector of what you want the ages to be; Todd's function needs this
 #Specify anything in his function that does not have a default; it needs an array and returns an array
 
@@ -173,17 +177,29 @@ agearray<- array(data = age.df$value,
 restratify.age.array <- restratify.age.counts(agearray, desired.age.brackets= desired.ages, smooth.infinite.age.to =100)
 
 ##Now use to calculate the proportion of immigration that is only 13+ (adults)
-total.array = apply(restratify.age.array, MARGIN = c("year", "location"), sum )
+total.array = apply(restratify.age.array, MARGIN = c("year", "location"), sum)
 total.array #Denominator for proportion
 
-adult.array = restratify.age.array[,,2:14]
+adult.array = restratify.age.array[ , , 2:15]
 adult.array.new = apply(adult.array, MARGIN = c("location"), sum) #numerator for proportion
 
 proportion.adult.array = (adult.array.new/total.array)
 proportion.adult.array
 
 ##NEED TO CLEAN UP THIS PART##
-##Create arrays for sex/race/eth (do age groups later)
+
+##Apply adult proportion to other datasets
+adult.prop.df = as.data.frame.table(proportion.adult.array)
+
+#Total
+total.adults = as.data.frame.table(restratify.age.array)
+total.adults.df <-total.adults%>%
+  mutate(outcome = 'adult.emigration')%>%
+  mutate(value = round(Freq))%>%
+  filter(age != "1-12 years")%>%
+  select(-Freq)
+  
+#Sex
 sex.df = data.list.move.clean[[4]]
 sex.df=sex.df[[2]]
 sex.adult.prop = left_join(sex.df, adult.prop.df, by="location")
@@ -192,8 +208,10 @@ sex.adult.prop <- sex.adult.prop %>%
   mutate(value_new = round(value * Freq))%>%
   select(outcome, year.x, location, sex, value_new)%>%
   rename(value = value_new)%>%
-  rename(year = year.x)
+  rename(year = year.x)%>%
+  mutate(outcome = 'adult.immigration')
 
+#Race
 race.df = data.list.move.clean[[3]]
 race.df=race.df[[2]]
 race.adult.prop = left_join(race.df, adult.prop.df, by="location")
@@ -202,8 +220,10 @@ race.adult.prop <- race.adult.prop %>%
   mutate(value_new = round(value * Freq))%>%
   select(outcome, year.x, location, race, value_new)%>%
   rename(value = value_new)%>%
-  rename(year = year.x)
+  rename(year = year.x)%>%
+  mutate(outcome = 'adult.immigration')
 
+#Ethnicity (race)
 eth.df = data.list.move.clean[[2]]
 eth.df=eth.df[[2]]
 eth.adult.prop = left_join(eth.df, adult.prop.df, by="location")
@@ -212,16 +232,28 @@ eth.adult.prop <- eth.adult.prop %>%
   mutate(value_new = round(value * Freq))%>%
   select(outcome, year.x, location, race, value_new)%>%
   rename(value = value_new)%>%
-  rename(year = year.x)
+  rename(year = year.x)%>%
+  mutate(outcome = 'adult.immigration')
 
 adult.prop.df <- adult.prop.df %>%
-  mutate(outcome = "emigration") %>%
+  mutate(outcome = "adult.emigration") %>%
   rename(value = Freq)
 
+#Age
+new.age.df = as.data.frame.table(restratify.age.array)
+new.age.prop = left_join(new.age.df, adult.prop.df, by = "location")
+
+new.age.prop.1 <- new.age.prop %>%
+  select(-year.y)%>%
+  mutate(value = round(Freq*value))%>%
+  filter(age != "1-12 years")%>%
+  mutate(outcome = "adult.emigration")%>%
+  select(-Freq)
+
 adult.immigration.list = list(
-     "df.total" = adult.prop.df,
+     "df.total" = total.adults.df, 
+    "df.age" = new.age.prop.1,
     "df.eth" = eth.adult.prop, 
     "df.race" = race.adult.prop, 
     "df.sex" = sex.adult.prop)
 
-##NEED TO REMOVE THE DICHOTOMOUS AGE GROUPS BUT STILL BE ABLE TO EASILY SUM ADULTS SO YOU CAN PUT THE AGE GROUP DF

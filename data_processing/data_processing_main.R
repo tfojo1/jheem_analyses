@@ -472,6 +472,7 @@ source('data_processing/brfss_unweighted_denominators.R')
 
 #Source immigration data
 source('data_processing/immigration.R')
+source('data_processing/immigration_age_calulations.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
