@@ -224,3 +224,4 @@ adult.immigration.list = list(
     "df.race" = race.adult.prop, 
     "df.sex" = sex.adult.prop)
 
+##NEED TO REMOVE THE DICHOTOMOUS AGE GROUPS BUT STILL BE ABLE TO EASILY SUM ADULTS SO YOU CAN PUT THE AGE GROUP DF
