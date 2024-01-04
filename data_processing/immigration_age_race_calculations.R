@@ -144,7 +144,8 @@ restratify.age.counts <- function(counts,
 #Create vector of what you want the ages to be; Todd's function needs this
 #Specify anything in his function that does not have a default; it needs an array and returns an array
 
-desired.ages <- c("1-12 years", "13+ years")
+desired.ages <- c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
+                  "65-69 years", "70-74 years", "75+ years")
 
 #Pull the data frame you made and turn it into an array
                                           ##USE NAMES TO IMPROVE THIS SECTION##
@@ -175,12 +176,11 @@ restratify.age.array <- restratify.age.counts(agearray, desired.age.brackets= de
 total.array = apply(restratify.age.array, MARGIN = c("year", "location"), sum )
 total.array #Denominator for proportion
 
-adult.array = restratify.age.array[,,"13+ years"]
-adult.array #numerator for proportion
+adult.array = restratify.age.array[,,2:14]
+adult.array.new = apply(adult.array, MARGIN = c("location"), sum) #numerator for proportion
 
-proportion.adult.array = (adult.array/total.array)
+proportion.adult.array = (adult.array.new/total.array)
 proportion.adult.array
-
 
 ##NEED TO CLEAN UP THIS PART##
 ##Create arrays for sex/race/eth (do age groups later)
