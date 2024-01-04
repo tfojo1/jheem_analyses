@@ -268,7 +268,7 @@ imm_black = imm_black [[2]]
 imm_black <- imm_black%>%
   rename(black = race)%>%
   rename(black.value = value)%>%
-  select(-location_test)
+  select(-location_test, -year, -outcome)
 
 imm_hisp = data.list.move.clean [[7]]
 imm_hisp = imm_hisp [[2]]
@@ -279,24 +279,13 @@ imm_hisp <- imm_hisp %>%
   rename(hispanic.value = value)%>%
   select(-location_test, -year, -outcome)
 
-#adding white back in
-imm_white= data.list.move.clean [[7]]
-imm_white = imm_white [[2]]
-
-imm_white <- imm_white %>%
-  filter(race == 'White, Non-Hispanic')%>%
-  rename(white = race)%>%
-  rename(white.value = value)%>%
-  select(-location_test, -year, -outcome)
-
 imm_combo_1 <- merge(imm_hisp, imm_black, by="location")
-imm_combo_2 <- merge(imm_combo_1, imm_white, by="location")
-imm_combo <- merge(imm_combo_2, immigration_total, by="location")
+imm_combo <- merge(imm_combo_1, immigration_total, by="location")
 
 imm_combo <- imm_combo %>%
-  select(location, total, hispanic.value, black.value, white.value)%>% #add outcome and year back
+  select(location, total, outcome, year, hispanic.value, black.value)%>% 
   mutate(black.nh = black.value-(sqrt(0.067*0.054*hispanic.value*black.value)))%>% #should I be multiply by black or subtracting?
-  mutate(other.race = (total - (hispanic.value + black.nh + white.value)))
+  mutate(other.race = (total - (hispanic.value + black.nh)))
 
 ##EMIGRATION
 
@@ -330,7 +319,7 @@ em_combo <- merge(em_combo, emigration_total, by="location")
 em_combo <- em_combo %>%
   select(location, total, outcome, year, hispanic.value, black.value)%>% #add outcome and year back
   mutate(black.nh = black.value-(sqrt(0.067*0.054*hispanic.value*black.value)))%>% 
-  mutate(other_race = total - (hispanic.value + black.nh))    #I didn't put white here but I did above
+  mutate(other.race = total - (hispanic.value + black.nh))    #I didn't put white here but I did above
 
 ######
 #Reformat for put

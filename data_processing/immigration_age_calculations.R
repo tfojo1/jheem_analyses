@@ -263,12 +263,25 @@ new.age.prop.1 <- new.age.prop %>%
   mutate(location = as.character(location))%>%
   mutate(age = as.character(age))
 
+##Add in 'other' race
+other.emigration = other_race[[2]]
+other.emigration.adults = left_join(other.emigration, adult.prop.df, by = "location")
+
+other.emigration.adults <- other.emigration.adults %>%
+  rename(outcome = outcome.y)%>%
+  mutate(value = round(value.x *value.y))%>%
+  mutate(location = as.character(location))%>%
+  mutate(year = as.character(year.y))%>%
+  select(-outcome.x, -year.x, -year.y, -value.x, -value.y)
+
+
 adult.emigration.list = list(
      "df.total" = total.adults.df, 
     "df.age" = new.age.prop.1,
     "df.eth" = eth.adult.prop, 
     "df.race" = race.adult.prop, 
-    "df.sex" = sex.adult.prop)
+    "df.sex" = sex.adult.prop,
+    "df.other.em"= other.emigration.adults)
 
 ###############################################################################
                       #Immigration
@@ -379,12 +392,24 @@ new.age.prop.1.imm <- new.age.prop.imm %>%
   mutate(location = as.character(location))%>%
   mutate(age = as.character(age))
 
+##Add in 'other' race
+other.immigration = other_race[[1]]
+other.immigration.adults = left_join(other.immigration, adult.prop.df.imm, by = "location")
+
+other.immigration.adults <- other.immigration.adults %>%
+  rename(outcome = outcome.y)%>%
+  mutate(value = round(value.x *value.y))%>%
+  mutate(location = as.character(location))%>%
+  mutate(year = as.character(year.y))%>%
+  select(-outcome.x, -year.x, -year.y, -value.x, -value.y)
+
 adult.immigration.list = list(
   "df.total.imm" = total.adults.df.imm, 
   "df.age.imm" = new.age.prop.1.imm,
   "df.eth.imm" = eth.adult.prop.imm, 
   "df.race.imm" = race.adult.prop.imm, 
-  "df.sex.imm" = sex.adult.prop.imm)
+  "df.sex.imm" = sex.adult.prop.imm,
+  "df.other.race.imm"= other.immigration.adults)
 
 ###############################################################################
 #Put adult.immigration/emigration into manager
