@@ -254,6 +254,9 @@ for (data in movement_data) {
 #Proportion of Hispanic who are Black:  14,568,073 / 269,697,533 = 0.054
 ###############################################################################
 
+prop.black.hisp <- 0.067
+prop.hisp.black <-0.054
+
 ##IMMIGRATION##
 immigration_total = data.list.move.clean [[10]]
 immigration_total = immigration_total [[2]]
@@ -284,7 +287,7 @@ imm_combo <- merge(imm_combo_1, immigration_total, by="location")
 
 imm_combo <- imm_combo %>%
   select(location, total, outcome, year, hispanic.value, black.value)%>% 
-  mutate(black.nh = black.value-(sqrt(0.067*0.054*hispanic.value*black.value)))%>% #should I be multiply by black or subtracting?
+  mutate(black.nh = black.value-(sqrt(prop.black.hisp*prop.hisp.black*hispanic.value*black.value)))%>% 
   mutate(other.race = (total - (hispanic.value + black.nh)))
 
 ##EMIGRATION
@@ -318,7 +321,7 @@ em_combo <- merge(em_combo, emigration_total, by="location")
 
 em_combo <- em_combo %>%
   select(location, total, outcome, year, hispanic.value, black.value)%>% #add outcome and year back
-  mutate(black.nh = black.value-(sqrt(0.067*0.054*hispanic.value*black.value)))%>% 
+  mutate(black.nh = black.value-(sqrt(prop.black.hisp*prop.hisp.black*hispanic.value*black.value)))%>% 
   mutate(other.race = total - (hispanic.value + black.nh))    #I didn't put white here but I did above
 
 ######
