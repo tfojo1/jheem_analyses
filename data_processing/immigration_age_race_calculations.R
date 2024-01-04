@@ -172,7 +172,6 @@ agearray<- array(data = age.df$value,
 restratify.age.array <- restratify.age.counts(agearray, desired.age.brackets= desired.ages, smooth.infinite.age.to =100)
 
 ##Now use to calculate the proportion of immigration that is only 13+ (adults)
-
 total.array = apply(restratify.age.array, MARGIN = c("year", "location"), sum )
 total.array #Denominator for proportion
 
@@ -182,27 +181,46 @@ adult.array #numerator for proportion
 proportion.adult.array = (adult.array/total.array)
 proportion.adult.array
 
+
+##NEED TO CLEAN UP THIS PART##
 ##Create arrays for sex/race/eth (do age groups later)
 sex.df = data.list.move.clean[[4]]
 sex.df=sex.df[[2]]
+sex.adult.prop = left_join(sex.df, adult.prop.df, by="location")
 
-sex.array.dimnames <- list(year = unique(sex.df$year), location = unique(sex.df$location), sex = unique(sex.df$sex))
+sex.adult.prop <- sex.adult.prop %>%
+  mutate(value_new = round(value * Freq))%>%
+  select(outcome, year.x, location, sex, value_new)%>%
+  rename(value = value_new)%>%
+  rename(year = year.x)
 
-sex.array<- array(data = sex.df$value, 
-                 dim= sapply(sex.array.dimnames, length),
-                 dimnames= sex.array.dimnames)
+race.df = data.list.move.clean[[3]]
+race.df=race.df[[2]]
+race.adult.prop = left_join(race.df, adult.prop.df, by="location")
 
-test.array = (c(proportion.adult.array)*sex.array)
+race.adult.prop <- race.adult.prop %>%
+  mutate(value_new = round(value * Freq))%>%
+  select(outcome, year.x, location, race, value_new)%>%
+  rename(value = value_new)%>%
+  rename(year = year.x)
 
-#testing to see if it worked#
-baltimore.test = proportion.adult.array[,"C.10180"]
-baltimore.test
-balitmore.sex = sex.array[,"C.10180",]
-baltimore.test = test.array[,"C.10180",]
+eth.df = data.list.move.clean[[2]]
+eth.df=eth.df[[2]]
+eth.adult.prop = left_join(eth.df, adult.prop.df, by="location")
 
-#can i ust make the arrya back into a df?
-adult.prop.df = as.data.frame.table(proportion.adult.array)
+eth.adult.prop <- eth.adult.prop %>%
+  mutate(value_new = round(value * Freq))%>%
+  select(outcome, year.x, location, race, value_new)%>%
+  rename(value = value_new)%>%
+  rename(year = year.x)
 
-sex.df = data.list.move.clean[[9]]
-sex.df=sex.df[[2]]
-test = merge()
+adult.prop.df <- adult.prop.df %>%
+  mutate(outcome = "emigration") %>%
+  rename(value = Freq)
+
+adult.immigration.list = list(
+     "df.total" = adult.prop.df,
+    "df.eth" = eth.adult.prop, 
+    "df.race" = race.adult.prop, 
+    "df.sex" = sex.adult.prop)
+
