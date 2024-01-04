@@ -1,8 +1,21 @@
+print("SOURCING CODE")
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
+source('../jheem_analyses/commoncode/locations_of_interest.R')
 
+print("SETTING UP MCMC")
 CALIBRATION.CODE = 'init.pop.ehe.heavy'
 N.ITER = 2500
+LOCATION = ATLANTA.MSA 
+# have done: 
+      # Baltimore, Houston (C.26420), Miami (C.33100), Atlanta (C.12060), 
+      # Detroit (C.19820), Seattle (C.42660), Jacksonville (C.27260)
+      # Orlando (C.36740), Vegas (C.29820)
+# SF, LA, Riverside, Memphis had a bug with 'proportion.msm.of.male' being NA or empty 
+# NY, Chicago, Boston, Philly, DC, Charlotte had a bug with 'non.idu.general.mortality' subscript out of bounds
+# NOLA had a bug with mobility data[] subscript out of bounds 
+
+# 1/4 - trying atlanta with new aging method
 
 par.names = c("black.birth.rate.multiplier",
               "hispanic.birth.rate.multiplier",
@@ -12,12 +25,13 @@ par.names = c("black.birth.rate.multiplier",
               "age3.non.idu.general.mortality.rate.multiplier",
               "age4.non.idu.general.mortality.rate.multiplier",
               "age5.non.idu.general.mortality.rate.multiplier",
-              "age1.black.aging.multiplier",
-              "age1.hispanic.aging.multiplier",
-              "age1.other.aging.multiplier",
+              "age1.aging.multiplier",
               "age2.aging.multiplier",
               "age3.aging.multiplier",
               "age4.aging.multiplier",
+              "black.aging.multiplier",
+              "hispanic.aging.multiplier",
+              "other.aging.multiplier",
               "black.immigration.rate.multiplier",
               "hispanic.immigration.rate.multiplier",
               "other.immigration.rate.multiplier",
@@ -37,7 +51,7 @@ par.names = c("black.birth.rate.multiplier",
               )
 
 clear.calibration.cache(version='ehe',
-                        location='C.12580',
+                        location=LOCATION,
                         calibration.code = CALIBRATION.CODE,
                         root.dir = '../test_runs')
 
@@ -55,7 +69,7 @@ register.calibration.info(CALIBRATION.CODE,
                           )
 
 set.up.calibration(version='ehe',
-                   location='C.12580',
+                   location=LOCATION,
                    calibration.code = CALIBRATION.CODE,
                    root.dir = '../test_runs',
                    cache.frequency = 250)
@@ -64,7 +78,7 @@ set.seed(12345)
 start.time = Sys.time()
 print(paste0("STARTING MCMC RUN AT ",Sys.time()))
 mcmc = run.calibration(version = 'ehe',
-                location = "C.12580",
+                location = LOCATION,
                 calibration.code = CALIBRATION.CODE,
                 root.dir = '../test_runs',
                 chains = 1,
@@ -80,14 +94,14 @@ print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
 
 #mcmc = assemble.mcmc.from.calibration(version = 'ehe',
-#                                      location = "C.12580",
+#                                      location = LOCATION,
 #                                      calibration.code = CALIBRATION.CODE,
 #                                      root.dir = '../test_runs',
 #                                      chains = 1)
 
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
-save(sim,file=paste0("prelim_results/init.pop.sim_",Sys.Date(),".Rdata"))
+save(sim,file=paste0("prelim_results/init.pop.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
 
 simplot(sim, 'population')
 simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))

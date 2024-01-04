@@ -269,39 +269,30 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     
     #-- Aging --#
+    spline.times = c(2010,2020,2030,2040)
+    
     for(age in 1:(length(specification.metadata$dim.names$age)-1)){
       
-      if(age==1){ # race-specific multipliers for age 2 aging
-        for(race in specification.metadata$dim.names$race){
-          set.element.functional.form.main.effect.alphas(model.settings,
-                                                         element.name = "default.aging",
-                                                         alpha.name = '2007',
-                                                         values = parameters[paste0('age',age,'.',race,'.aging.multiplier')],
-                                                         applies.to.dimension.values=list(age=age,
-                                                                                          race=race))
-          
-          set.element.functional.form.main.effect.alphas(model.settings,
-                                                         element.name = "default.aging",
-                                                         alpha.name = '2019',
-                                                         values = parameters[paste0('age',age,'.',race,'.aging.multiplier')],
-                                                         applies.to.dimension.values=list(age=age,
-                                                                                          race=race))
-          
-        }
-      } else {
-        set.element.functional.form.main.effect.alphas(model.settings,
-                                                       element.name = "default.aging",
-                                                       alpha.name = '2007',
-                                                       values = parameters[paste0('age',age,'.aging.multiplier')],
-                                                       applies.to.dimension.values=list(age=age))
+      for(race in specification.metadata$dim.names$race){
         
-        set.element.functional.form.main.effect.alphas(model.settings,
-                                                       element.name = "default.aging",
-                                                       alpha.name = '2019',
-                                                       values = parameters[paste0('age',age,'.aging.multiplier')],
-                                                       applies.to.dimension.values=list(age=age))        
+        for(spline.i in 1:length(spline.times)){
+          aging.multiplier = parameters[paste0('age',age,'.aging.multiplier')]
+              
+          if(age==spline.i)
+            aging.multiplier = aging.multiplier*parameters[paste0(race,'.aging.multiplier')]
+          if(age==(spline.i-1))
+            aging.multiplier = aging.multiplier/parameters[paste0(race,'.aging.multiplier')]
+          
+          set.element.functional.form.main.effect.alphas(model.settings,
+                                                         element.name = "default.aging",
+                                                         alpha.name = as.character(spline.times[spline.i]),
+                                                         values = aging.multiplier,
+                                                         applies.to.dimension.values=list(age=age,
+                                                                                          race=race))
+        }
+        
       }
-
+      
     }
     
     set.ehe.aging.from.parameters(model.settings,

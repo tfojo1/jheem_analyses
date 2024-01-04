@@ -36,14 +36,19 @@ get.default.aging.rates <- function(location, specification.metadata,
 }
 
 get.empiric.aging.rates <- function(location, specification.metadata,
-                                    years=c(2007,2019),
+                                    years=c(2010,2020,2030,2040),
                                     active.idu.proportion.youngest.stratum.aging.up=0.25,
                                     prior.idu.proportion.youngest.stratum.aging.up=0.25)
 {
     counties = locations::get.contained.locations(location, 'county')
+    
+    max.year = CENSUS.MANAGER$get.year.bounds.for.outcome('population')$latest.year
+    
+    years.to.pull = union(years[years<max.year],max.year)
+    
     pop = CENSUS.MANAGER$pull(outcome='population',
                               dimension.values = list(location = counties,
-                                                      year = as.character(years)),
+                                                      year = as.character(years.to.pull)),
                               keep.dimensions = c('year','age','race','ethnicity','sex'))
     
     race.mapping = get.ontology.mapping(dimnames(pop)[c('race','ethnicity')],
@@ -52,8 +57,9 @@ get.empiric.aging.rates <- function(location, specification.metadata,
     pop = apply(pop, c('year','age','race','ethnicity','sex'), sum, na.rm=T)
     pop = race.mapping$apply(pop)
     
-    
-    aging.rates = lapply(as.character(years), function(year){
+    aging.rates = lapply(years, function(year){
+      year = as.character(min(year,max.year))
+      
         raw.rates = sapply(1:(specification.metadata$n.ages-1), function(age.index){
             
             age.upper.bound = specification.metadata$age.upper.bounds[age.index] - 1
