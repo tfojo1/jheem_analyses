@@ -61,6 +61,9 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex.for.msm, function(f
   data$value = round(data$value, digits=2)
 
   data<- data[!duplicated(data), ]
+  
+  #Need to add sex column in for put statment dimensions
+  data$sex = "male"
 
   data= as.data.frame(data)
   list(filename, data) 
@@ -130,6 +133,9 @@ data.list.brfss.state.msm.race = lapply(data.list.race.male.denom, function(file
   data$value = round(data$value, digits=2)
   
    data<- data[!duplicated(data), ]
+   
+   #Need to add sex column in for put statment dimensions
+   data$sex = "male"
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -163,6 +169,9 @@ data.list.brfss.state.msm.age = lapply(data.list.age.male.denom, function(file){
   data$value = round(data$value, digits=2)
   
   data<- data[!duplicated(data), ]
+  
+  #Need to add sex column in for put statment dimensions
+  data$sex = "male"
   
   data= as.data.frame(data)
   list(filename, data) 
@@ -245,6 +254,9 @@ data.list.emory.msm.county = lapply(data.list.emory.msm, function(file){
   data$county_code= str_pad(data$COUNTYFP, width=3, side="left", pad="0")
   data$location = paste(data$state_code, data$county_code, sep="")
 
+  #Need to add sex column in for put statment dimensions
+  data$sex = "male"
+  
   data= as.data.frame(data)
   
   list(filename, data)
@@ -269,6 +281,9 @@ data.list.emory.msm.msa = lapply(data.list.emory.msm, function(file){
     data$location_check = locations::is.location.valid(data$location)
   #Removing invalid MSA locations#
     data=subset(data, data$location_check == 'TRUE')
+    
+    #Need to add sex column in for put statment dimensions
+    data$sex = "male"
   
   data= as.data.frame(data)
   
