@@ -32,7 +32,7 @@ put.population.data = function(locations,
         
         for (source.name in names(census.manager$source.info))
         {
-            source.ontology.names = names(census.manager$data$population[[source.name]])
+            source.ontology.names = names(census.manager$data$population[['estimate']][[source.name]])
             
             for (ont.name in source.ontology.names) {
               
