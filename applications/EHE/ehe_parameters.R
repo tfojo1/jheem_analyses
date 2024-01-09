@@ -14,11 +14,7 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     black.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), # can be off by factor of 4
     hispanic.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
     other.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    
-    black.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)/5), # can be off by factor of 4, over 5 years
-    hispanic.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)/5),
-    other.birth.rate.slope.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)/5),
-    
+
     #-- Non IDU general mortality rates --#
     black.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
     hispanic.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), 
@@ -172,14 +168,17 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #aging.0 rates from 2000 data in table 10 of
     # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-report-2002-vol-14.pdf
     
-    age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    black.age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    hispanic.age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    other.age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    
     age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     age4.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     
-    black.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    hispanic.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    other.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    black.domino.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    hispanic.domino.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    other.domino.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
 
     msm.age1.aging.base = Lognormal.Distribution(log(12209/2/22537), 0.25*log(2)),
     msm.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
@@ -370,43 +369,51 @@ EHE.PARAMETERS.PRIOR = join.distributions(
 
 BASE.PARAMETER.SAMPLING.BLOCKS = list(
 
-  black.population.rates = c(
+  
+  black.age1.population.rates = c(
     'black.birth.rate.multiplier',
-    'black.birth.rate.slope.multiplier',
+    'black.age1.aging.multiplier',
+    'black.domino.aging.multiplier'
+  ),
+  
+  black.population.rates = c(
     'black.non.idu.general.mortality.rate.multiplier',
-    'black.aging.multiplier',
     'black.immigration.rate.multiplier',
     'black.emigration.rate.multiplier'
   ),
   
-  hispanic.population.rates = c(
+  hispanic.age1.population.rates = c(
     'hispanic.birth.rate.multiplier',
-    'hispanic.birth.rate.slope.multiplier',
+    'hispanic.age1.aging.multiplier',
+    'hispanic.domino.aging.multiplier'
+  ),
+  
+  hispanic.population.rates = c(
     'hispanic.non.idu.general.mortality.rate.multiplier',
-    'hispanic.aging.multiplier',
     'hispanic.immigration.rate.multiplier',
     'hispanic.emigration.rate.multiplier'
   ),
   
-  other.population.rates = c(
+  other.age1.population.rates = c(
     'other.birth.rate.multiplier',
-    'other.birth.rate.slope.multiplier',
+    'other.age1.aging.multiplier',
+    'other.domino.aging.multiplier'
+  ),
+  
+  other.population.rates = c(
     'other.non.idu.general.mortality.rate.multiplier',
-    'other.aging.multiplier',
     'other.immigration.rate.multiplier',
     'other.emigration.rate.multiplier'
   ),
   
   age1.population.rates = c(
     'age1.non.idu.general.mortality.rate.multiplier',
-    'age1.aging.multiplier',
     'age1.immigration.rate.multiplier',
     'age1.emigration.rate.multiplier'
   ),
   
   age2.population.rates = c(
     'age2.non.idu.general.mortality.rate.multiplier',
-    'age1.aging.multiplier',
     'age2.aging.multiplier',
     'age2.immigration.rate.multiplier',
     'age2.emigration.rate.multiplier'

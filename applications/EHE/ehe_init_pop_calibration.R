@@ -5,7 +5,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 print("SETTING UP MCMC")
 CALIBRATION.CODE = 'init.pop.ehe.heavy'
-N.ITER = 2500
+N.ITER = 5000
 LOCATION = ATLANTA.MSA 
 # have done: 
       # Baltimore, Houston (C.26420), Miami (C.33100), Atlanta (C.12060), 
@@ -25,13 +25,15 @@ par.names = c("black.birth.rate.multiplier",
               "age3.non.idu.general.mortality.rate.multiplier",
               "age4.non.idu.general.mortality.rate.multiplier",
               "age5.non.idu.general.mortality.rate.multiplier",
-              "age1.aging.multiplier",
+              "black.age1.aging.multiplier",
+              "hispanic.age1.aging.multiplier",
+              "other.age1.aging.multiplier",
               "age2.aging.multiplier",
               "age3.aging.multiplier",
               "age4.aging.multiplier",
-              "black.aging.multiplier",
-              "hispanic.aging.multiplier",
-              "other.aging.multiplier",
+              "black.domino.aging.multiplier",
+              "hispanic.domino.aging.multiplier",
+              "other.domino.aging.multiplier",
               "black.immigration.rate.multiplier",
               "hispanic.immigration.rate.multiplier",
               "other.immigration.rate.multiplier",

@@ -11,14 +11,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     for(race in specification.metadata$dim.names$race){
       set.element.functional.form.main.effect.alphas(model.settings,
                                                      element.name = "fertility",
-                                                     alpha.name = 'intercept',
+                                                     alpha.name = 'value',
                                                      values = parameters[paste0(race,'.birth.rate.multiplier')],
-                                                     applies.to.dimension.values=list(race=race))
-     
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "fertility",
-                                                     alpha.name = 'slope',
-                                                     values = parameters[paste0(race,'.birth.rate.slope.multiplier')],
                                                      applies.to.dimension.values=list(race=race))
     }
     
@@ -270,29 +264,36 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     #-- Aging --#
     spline.times = c(2010,2020,2030,2040)
+    age.indices = 1:(length(specification.metadata$dim.names$age)-1)
     
-    for(age in 1:(length(specification.metadata$dim.names$age)-1)){
+    age.race.interaction.ages = 1
+    non.interacted.ages = setdiff(age.indices, age.race.interaction.ages)
+    
+    for(spline.i in 1:length(spline.times)){
       
-      for(race in specification.metadata$dim.names$race){
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = "default.aging",
+                                                                      alpha.name = as.character(spline.times[spline.i]),
+                                                                      value = parameters[paste0('age',non.interacted.ages,'.aging.multiplier')],
+                                                                      applies.to.dimension.values = non.interacted.ages,
+                                                                      dimensions = 'age')
         
-        for(spline.i in 1:length(spline.times)){
-          aging.multiplier = parameters[paste0('age',age,'.aging.multiplier')]
+        for (race in specification.metadata$dim.names$race)
+        {
+            for (age in age.race.interaction.ages)
+            {
+                aging.multiplier = parameters[paste0(race, '.age', age, '.aging.multiplier')]
               
-          if(age==spline.i)
-            aging.multiplier = aging.multiplier*parameters[paste0(race,'.aging.multiplier')]
-          if(age==(spline.i-1))
-            aging.multiplier = aging.multiplier/parameters[paste0(race,'.aging.multiplier')]
-          
-          set.element.functional.form.main.effect.alphas(model.settings,
-                                                         element.name = "default.aging",
-                                                         alpha.name = as.character(spline.times[spline.i]),
-                                                         values = aging.multiplier,
-                                                         applies.to.dimension.values=list(age=age,
-                                                                                          race=race))
+                if (spline.i == age)
+                    aging.multiplier = aging.multiplier * parameters[paste0(race,'.domino.aging.multiplier')]
+                
+                set.element.functional.form.interaction.alphas(model.settings,
+                                                               element.name = "default.aging",
+                                                               alpha.name = as.character(spline.times[spline.i]),
+                                                               value = aging.multiplier,
+                                                               applies.to.dimension.values=list(age=age,
+                                                                                                race=race))
+            }
         }
-        
-      }
-      
     }
     
     set.ehe.aging.from.parameters(model.settings,
