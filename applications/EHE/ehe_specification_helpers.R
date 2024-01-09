@@ -42,14 +42,18 @@ get.empiric.aging.rates <- function(location, specification.metadata,
 {
     counties = locations::get.contained.locations(location, 'county')
     
-    max.year = CENSUS.MANAGER$get.year.bounds.for.outcome('population')$latest.year
-    
-    years.to.pull = union(years[years<max.year],max.year)
+    years.to.pull = min(years):max(years)
     
     pop = CENSUS.MANAGER$pull(outcome='population',
                               dimension.values = list(location = counties,
                                                       year = as.character(years.to.pull)),
                               keep.dimensions = c('year','age','race','ethnicity','sex'))
+    
+    if (is.null(pop))
+        stop("There was no population data at all for location ", location, " between ", min(years), " and ", max(years))
+    
+    max.year = max(as.numeric(dimnames(pop)$year))
+    min.year = min(as.numeric(dimnames(pop)$year))
     
     race.mapping = get.ontology.mapping(dimnames(pop)[c('race','ethnicity')],
                                         specification.metadata$dim.names['race'])
@@ -58,7 +62,7 @@ get.empiric.aging.rates <- function(location, specification.metadata,
     pop = race.mapping$apply(pop)
     
     aging.rates = lapply(years, function(year){
-      year = as.character(min(year,max.year))
+      year = as.character(min(max(year,min.year),max.year))
       
         raw.rates = sapply(1:(specification.metadata$n.ages-1), function(age.index){
             
