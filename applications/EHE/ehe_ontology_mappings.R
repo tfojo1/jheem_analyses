@@ -110,3 +110,10 @@ register.ontology.mapping('jheem.to.cdc.sex',
                           mappings = rbind(c('heterosexual_male', 'male'),
                                            c('msm', 'male'),
                                            c('female', 'female')))
+register.ontology.mapping('census.immigration.to.jheem.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
+                                           c('White, Non-Hispanic', 'white'),
+                                           c('Black', 'black'),
+                                           c('Other', 'other'))) # needed?

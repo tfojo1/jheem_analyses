@@ -566,16 +566,22 @@ msm.bigp.df$ageid <- relevel(factor(msm.bigp.df$ageid), ref = "ALL")
 msm.bigp.df$raceid <- relevel(factor(msm.bigp.df$raceid), ref="ALL")
 nonmsm.big.df <- subset(big.df, nonmsm == 1)
 
+idu.big.df <- subset(big.df, risk == "idu")
+het.big.df <- subset(big.df, risk == "het")
+
 # fit.p.msm <- lm(logit(p/p.max) ~ year + raceid + ageid,
 #                 data = msm.bigp.df)
 
 
-fit.p.msm <- lm((p/p.max) ~ year + raceid + ageid,
+fit.p.msm <- lm((p) ~ year + raceid + ageid,
                 data = msm.bigp.df)
 fit.p.msm
 
-fit.p.nonmsm <- lm((p/p.max) ~ year + raceid + ageid + female + idu,
+fit.p.nonmsm <- lm((p) ~ year + raceid + ageid + female + idu,
                    data = nonmsm.big.df)
+
+fit.p.idu <- lm(p ~ year + raceid + ageid + female, data = idu.big.df)
+fit.p.het <- lm(p ~ year + raceid + ageid + female, data = het.big.df)
 
 
 # 
