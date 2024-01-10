@@ -9,7 +9,7 @@ movement_files <- Sys.glob(paste0(DATA.DIR.MOVEMENT, '/*.xlsx'))
 
 data.list.move <- lapply(movement_files, function(x){
   skip=1
-  list(filename=x, data=read_excel(x, sheet= 1, skip=skip))
+  list(filename=basename(x), data=read_excel(x, sheet= 1, skip=skip))
 })
 
 ################################################################################
@@ -42,6 +42,7 @@ ethnicity.mappings.immigration = c( '01' = 'White, Non-Hispanic',
 ################################################################################
 
 data.list.move.clean = lapply(data.list.move, function(file){
+  
   
   data=file[["data"]]
   filename = file[["filename"]]
