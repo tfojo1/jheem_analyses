@@ -3,7 +3,7 @@
 # SURVEILLANCE.MANAGER$outcomes
 # SURVEILLANCE.MANAGER$get.ontologies.for.outcome("diagnoses")
 
-immigration.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "immigration", # fix this 
+immigration.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", # fix this 
                                                                           outcome.for.sim = "immigration",
                                                                           dimensions = c("race"), # eventually will include age
                                                                           levels.of.stratification = c(0,1),
@@ -16,7 +16,7 @@ immigration.likelihood.instructions = create.basic.likelihood.instructions(outco
 )
 
 
-# imm.lik = immigration.likelihood.instructions$instantiate.likelihood(version = 'ehe', location = 'C.12580')
+imm.lik = immigration.likelihood.instructions$instantiate.likelihood(version = 'ehe', location = 'C.12580')
 
 # this gives instructions; major function is instantiate.likelihood
 # population.likelihood.instructions$instantiate.likelihood()
