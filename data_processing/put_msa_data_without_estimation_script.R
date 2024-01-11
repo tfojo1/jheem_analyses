@@ -1,5 +1,5 @@
-put.msa.data.strict = function(census.outcome.name,
-                               put.outcome.name,
+put.msa.data.strict = function(census.outcome.name = 'population',
+                               put.outcome.name = 'adult.population',
                                locations,
                                contained.geographic.type = 'county',
                                fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
