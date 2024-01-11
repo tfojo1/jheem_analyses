@@ -22,6 +22,15 @@ data.manager$register.outcome(
     description = "Adult Population Estimate, Ages 13 and over"))
 
 data.manager$register.outcome(
+  'adult.deaths',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Adult Deaths',
+    axis.name = 'Adult Deaths',
+    units = 'population',
+    description = "Adult Deaths, Ages 13 and over"))
+
+data.manager$register.outcome(
   'diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
@@ -437,7 +446,7 @@ data.manager$register.ontology(
 source('commoncode/locations_of_interest.R')
 ##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
 #This code also adjusts the population to be the 'adult.population' ages 13 and over
-source('data_processing/put_msa_population_data_script.R')
+source('data_processing/put_msa_data_without_estimation_script.R')
 ###############################################################################
 ###Source in File that reads .csvs and removes headers
 source('data_processing/fix_cdc_headers.R')
@@ -1276,10 +1285,26 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  
  ################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
-smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata")  
- put.population.data(locations = MSAS.OF.INTEREST, 
+smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata")
+ 
+ #this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
+ #this function currently defaults to population, when using it for mortality you need to define mortality as the outome#
+ #adult.population
+ put.msa.data.strict(locations = MSAS.OF.INTEREST, 
                             data.manager = surveillance.manager, 
-                            census.manager = smaller.census.manager)
+                            census.manager = smaller.census.manager) 
+
+ 
+#adult.mortality
+ #Need to make sure this line works
+ put.msa.data.strict(census.outcome.name = 'deaths',
+                     put.outcome.name = 'adult.population',
+                    locations = MSAS.OF.INTEREST, 
+                     fully.stratified.dimensions = 'year',
+                     put.stratifications = list(),                
+                     data.manager = surveillance.manager, 
+                     census.manager = smaller.census.manager)
+
  
  ################################################################################
  ###Save surveillance manager####
