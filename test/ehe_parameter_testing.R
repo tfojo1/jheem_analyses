@@ -141,7 +141,7 @@ simplot(sim.optim, sim0,"population",facet.by = "sex",dimension.values = list(ye
 # x = get.model.fertility.rates.functional.form("C.12580",specification.metadata = get.specification.metadata('ehe','C.12580'))
 # y = get.empiric.aging.rates("C.12580",specification.metadata = get.specification.metadata('ehe','C.12580'))
 # z = get.non.idu.general.mortality.rates.functional.form("C.12580",specification.metadata = get.specification.metadata('ehe','C.12580'))
-
+# x$betas
 
 
 
