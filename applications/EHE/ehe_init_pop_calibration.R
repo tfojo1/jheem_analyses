@@ -4,8 +4,8 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 print("SETTING UP MCMC")
-CALIBRATION.CODE = 'init.pop.ehe.heavy'
-N.ITER = 5000
+CALIBRATION.CODE = 'init.pop.ehe'
+N.ITER = 10000
 LOCATION = ATLANTA.MSA 
 # have done: 
       # Baltimore, Houston (C.26420), Miami (C.33100), Atlanta (C.12060), 

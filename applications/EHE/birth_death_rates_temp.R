@@ -1,12 +1,13 @@
 
-load.data.manager("cached/census.manager.rdata") 
+#load.data.manager("cached/census.manager.rdata") 
 
 # TEST CODE
 if (1==2)
 {
     source('applications/EHE/ehe_specification.R')
     specification.metadata = get.specification.metadata('ehe', location = "C.12580")
-    get.location.birth.rates(location= "C.12580", specification.metadata = specification.metadata)
+    x = get.location.birth.rates(location = "C.12580", specification.metadata = specification.metadata)
+    y = get.location.mortality.rates(location = "C.12580", specification.metadata = specification.metadata)
 }
 
 # THE ACTUAL FUNCTIONS TO IMPLEMENT
@@ -38,22 +39,29 @@ get.location.birth.rates <- function(location,
 #  with mortality rate for each stratum
 get.location.mortality.rates <- function(location,
                                          specification.metadata,
-                                         years = 2007:2017,
+                                         year.ranges = c('2006-2010','2011-2015'),
                                          census.manager = CENSUS.MANAGER)
 
 {
   states = locations::get.containing.locations(location, "state")
     # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
-    deaths = census.manager$pull(outcome = 'metro.deaths', location = states, year= years, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
+    deaths = census.manager$pull(outcome = 'metro.deaths', location = states, year= year.ranges, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
   
+    if (is.null(deaths))
+      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
+    
     # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
-    population = census.manager$pull(outcome = 'metro.deaths.denominator', location = states, year= years, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
-  
+    population = census.manager$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
+    
+    if (is.null(population))
+      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
+    
     #You have this denominator it should align wit the mtro deaths
     
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two
     target.dim.names = specification.metadata$dim.names[c('age','race','sex')]
+    browser()
     map.value.ontology(deaths, target.dim.names=target.dim.names) / 
       map.value.ontology(population, target.dim.names=target.dim.names)
 }
