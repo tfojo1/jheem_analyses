@@ -105,6 +105,10 @@ sim = mcmc@simulations[[length(mcmc@simulations)]]
 
 save(sim,file=paste0("prelim_results/init.pop.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
 
-simplot(sim, 'population')
-simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
-sim$parameters[[1]][par.names]
+# simplot(sim, 'population')
+# simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
+# sim$parameters[[1]][par.names]
+# 
+# jpeg(file=paste0("prelim_results/age.race_",sim$location,".jpeg"), width = 2500,height = 1500,res=300)
+# simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
+# dev.off()

@@ -16,7 +16,7 @@ immigration.likelihood.instructions = create.basic.likelihood.instructions(outco
 )
 
 
-imm.lik = immigration.likelihood.instructions$instantiate.likelihood(version = 'ehe', location = 'C.12580')
+# imm.lik = immigration.likelihood.instructions$instantiate.likelihood(version = 'ehe', location = 'C.12580')
 
 # this gives instructions; major function is instantiate.likelihood
 # population.likelihood.instructions$instantiate.likelihood()
