@@ -1,9 +1,5 @@
 
 #-- For now - source code and load data --#
-
-# This 'source' call is equivalent to loading the jheem2 package
-source('../jheem2/R/tests/source_jheem2_package.R')
-
     
     
 # Source supporting files
