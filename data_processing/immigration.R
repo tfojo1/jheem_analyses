@@ -9,7 +9,7 @@ movement_files <- Sys.glob(paste0(DATA.DIR.MOVEMENT, '/*.xlsx'))
 
 data.list.move <- lapply(movement_files, function(x){
   skip=1
-  list(filename=basename(x), data=read_excel(x, sheet= 1, skip=skip))
+  list(filename=file_path_sans_ext(basename(x), compression=FALSE), data=read_excel(x, sheet= 1, skip=skip))
 })
 
 ################################################################################
@@ -222,6 +222,9 @@ data.list.move.clean = lapply(data.list.move, function(file){
   data = subset(data, data$value >0)
   
   data= as.data.frame(data)
+  
+  data <- data %>%
+    select(-location_test)
   
   list(filename, data)
   
