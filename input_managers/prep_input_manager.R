@@ -227,7 +227,7 @@ get.prep.indication.functional.form <- function(specification.metadata){
   age.spans = age.info$upper - age.info$lower
   
   # Intercepts and slopes
-  int[,,"msm",] <- int[,,"msm",] + coef(fit.pi.msm)["(Intercept)"]
+  int[,,"msm","never_IDU"] <- int[,,"msm",] + coef(fit.pi.msm)["(Intercept)"]
   int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.pi.nonmsm)["(Intercept)"]
   int[,,"female",] <- int[,,"female",] + coef(fit.pi.nonmsm)["(Intercept)"]
   
@@ -287,7 +287,7 @@ get.prep.persistence.functional.form <- function(specification.metadata)
 {
   # Some variables you will use
   anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
-  max.prep.coverage = 0.6 # modify as you see fit
+  max.prep.persistence = 0.8 # modify as you see fit
   
   # Set up our intercept/slope arrays
   # We are going to define these on the LOGIT scale
@@ -301,4 +301,30 @@ get.prep.persistence.functional.form <- function(specification.metadata)
   # The code for how you can parse the age strata we need
   age.info = parse.age.strata.names(dim.names$age)
   age.spans = age.info$upper - age.info$lower
+  
+  
+  # Intercepts and slopes
+  
+  int[,"black",,] <- int[,"black",,] + coef(fit.pp)["raceidblack"]
+  int[,"hispanic",,] <- int[,"hispanic",,] + coef(fit.pp)["raceidhisp"]
+  int[,"other",,] <- int[,"other",,] + coef(fit.pp)["raceidnbnh"]
+  
+  int["13-24 years",,,] <- int["13-24 years",,,] + coef(fit.pp)["ageidage1"]
+  int["25-34 years",,,] <- int["25-34 years",,,] + coef(fit.pp)["ageidage2"]
+  int["35-44 years",,,] <- int["35-44 years",,,] + coef(fit.pp)["ageidage3"]
+  int["45-54 years",,,] <- int["45-54 years",,,] + coef(fit.pp)["ageidage4"]
+  int["55+ years",,,] <- int["55+ years",,,] + coef(fit.pp)["ageidage5"]
+  
+  slope[,,,] <- slope[,,,] + coef(fit.pp)["years"]
+  
+  # Make and return the functional form object
+  create.logistic.linear.functional.form(
+    intercept = int,
+    slope = slope,
+    anchor.year = anchor.year,
+    min = 0,
+    max = max.prep.persistence, 
+    parameters.are.on.logit.scale = T
+  ) 
+  
 }
