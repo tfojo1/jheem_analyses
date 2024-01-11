@@ -2,3 +2,12 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Project-specific
+cached
+prelim_results
+
+
+# OS-specific
+.DS_Store
+applications/.DS_Store
