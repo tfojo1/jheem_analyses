@@ -1,14 +1,19 @@
-put.population.data = function(locations,
+put.msa.data.strict = function(census.outcome.name,
+                               put.outcome.name,
+                               locations,
                                contained.geographic.type = 'county',
                                fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
                                put.stratifications = list('age', c('race', 'ethnicity'), 'sex', c('age', 'race', 'ethnicity'), c('age', 'sex'), c('race', 'ethnicity', 'sex')),
+                               age.lower.limit = 13,
+                               age.penultimate.upper = 84,
+                               age.upper.limit.name = '85+',
                                data.manager,
                                census.manager)
 {
     # browser()
     # register the source(s), ontologies, and/or outcome if necessary
-    if (!('adult.population' %in% data.manager$outcomes))
-      stop(paste0("Error: outcome 'adult.population' has not yet been registered"))
+    if (!(put.outcome.name %in% data.manager$outcomes))
+      stop(paste0("Error: outcome '", put.outcome.name, "' has not yet been registered"))
     for (source.name in names(census.manager$source.info))
         if (!(source.name %in% names(data.manager$source.info)))
             data.manager$register.source(source = census.manager$source.info[[source.name]]$source,
@@ -19,24 +24,21 @@ put.population.data = function(locations,
         if (!(ont.name %in% data.manager$ontology.names))
             data.manager$register.ontology(ont.name, census.manager$ontologies[[ont.name]])
   
-  age.lower.limit = 13
-  age.penultimate.upper = 84
-  age.upper.limit.name = '85+'
   census.adult.ages = paste0(c(as.character(age.lower.limit:age.penultimate.upper), age.upper.limit.name), " years")
     
     for (location in locations) {
 
-        error.prefix = paste0("Error putting population data for '", location, "':")
+        error.prefix = paste0("Error putting '", put.outcome.name, "' data for '", location, "':")
         
         contained.locations = locations::get.contained.locations(location, sub.type = contained.geographic.type)
         
         for (source.name in names(census.manager$source.info))
         {
-            source.ontology.names = names(census.manager$data$population[['estimate']][[source.name]])
+            source.ontology.names = names(census.manager$data[[census.outcome.name]][['estimate']][[source.name]])
             
             for (ont.name in source.ontology.names) {
 
-                census.data.stratified = census.manager$pull(outcome = 'population',
+                census.data.stratified = census.manager$pull(outcome = census.outcome.name,
                                                              keep.dimensions = fully.stratified.dimensions,
                                                              dimension.values = list(location = contained.locations, age = census.adult.ages),
                                                              from.ontology.names = ont.name,
@@ -65,7 +67,7 @@ put.population.data = function(locations,
                     dimnames.because.r.apply.is.annoying = list(year=names(aggregated.totals.data))
                     aggregated.totals.data = array(aggregated.totals.data, sapply(dimnames.because.r.apply.is.annoying, length), dimnames.because.r.apply.is.annoying)
                     data.manager$put(data = aggregated.totals.data,
-                                     outcome = 'adult.population',
+                                     outcome = put.outcome.name,
                                      source = source.name,
                                      ontology.name = ont.name,
                                      dimension.values = list(location=location),
@@ -80,7 +82,7 @@ put.population.data = function(locations,
                         aggregated.data = apply(census.data.stratified, margin.of.aggregation, sum, na.rm=T)
                         
                         data.manager$put(data = aggregated.data,
-                                         outcome = 'adult.population',
+                                         outcome = put.outcome.name,
                                          source = source.name,
                                          ontology.name = ont.name,
                                          dimension.values = list(location=location),
@@ -93,7 +95,7 @@ put.population.data = function(locations,
     }
 }
 
-# census.manager = load.data.manager('cached/smaller.census.manager.rdata')
+# census.manager = load.data.manager('../jheem_analyses/cached/smaller.census.manager.rdata')
 
 # practice.data.manager = create.data.manager('practice.data.manager', 'Data manager to test msa population putting')
 # practice.data.manager$register.outcome('adult.population', metadata = create.outcome.metadata(scale = 'non.negative.number', display.name = 'Adult Population', axis.name = 'Adult Population (n)', units = 'persons', description = 'Population Ages 13+'))
