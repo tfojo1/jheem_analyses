@@ -319,12 +319,26 @@ register.model.element(EHE.SPECIFICATION,
                        ramp.values = c(0,0.5*TESTING.FIRST.YEAR.FRACTION.OF.RAMP,0.5),
                        ramp.interpolate.links = c('identity','log','identity'))
 
-# register.model.quantity(EHE.SPECIFICATION,
-#                         name = 'testing',
-#                         scale = 'rate',
-#                         value = expression(testing.no.covid*
-#                                              (1-max.covid.effect.testing.reduction*covid.mobility.change*testing.mobility.correlation)))
-# testing.no.covid is time-varying, max.covid.effect.testing.reduction is (1- relative risk) (static), covid.mobility.change, testing.mobility.correlation
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.testing.reduction',
+                       scale = 'ratio',
+                       get.functional.form.function = get.covid.max.testing.effect)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'testing.with.covid',
+                        scale = 'rate',
+                        value = expression(
+                          testing *  # eventually change to testing.no.covid
+                            (1-(1-max.covid.effect.testing.reduction) * covid.on * 
+                               (1-testing.mobility.correlation+(testing.mobility.correlation*covid.mobility.change)))))
+
+# original version: 
+# ((( 1 - (1-max.covid.effect.testing.reduction) *covid.mobility.change) * testing.mobility.correlation) + 
+# ((1 - testing.mobility.correlation)*max.covid.effect.testing.reduction))
+
+# testing.no.covid is time-varying, max.covid.effect.testing.reduction is (1- relative risk) (static)
+# if testing mobility correlation is 0, always the max reduction; if testing mobility correlation is 1, moves the same as mobility
+# if covid.on = 0 , go back to testing.no.covid 
 
 
 ##---------------------##
@@ -1464,110 +1478,42 @@ register.model.element(EHE.SPECIFICATION,
 ##-----------------------------------##
 ##-----------------------------------##
 
-N.COVID.MONTHS = 25
-N.COVID.MONTHS.UNTIL.TAPER = 13
+N.COVID.MONTHS = 24
+N.COVID.MONTHS.FULL.EFFECT = 12
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'covid.on',
+                       scale = 'proportion',
+                       functional.form = create.linear.spline.functional.form(
+                         knot.times = c(pre = (2020 + (2.5/12)), # March 15, 2020
+                                        start = (2020 + (3/12)), # March 30, 2020
+                                        end = (2020 + (3/12) + N.COVID.MONTHS.FULL.EFFECT/12), # starts tapering 
+                                        post = (2020 + (3/12) + N.COVID.MONTHS/12) # back to normal 
+                         ),
+                         knot.values = list(pre = 0,
+                                            start = 1,
+                                            end = 1,
+                                            post = 0)
+                       ),
+                       functional.form.from.time = 2020)
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'covid.mobility.change',
+                       scale = 'proportion',
+                       get.functional.form.function = get.covid.mobility.for.location,
+                       functional.form.from.time = 2020)
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'testing.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
 
 #-- Testing --#
 
-covid.testing.foreground = create.covid.foreground(
-    quantity.name = 'testing',
-    scale = 'rate',
-    n.covid.months = N.COVID.MONTHS,
-    n.months.until.taper = N.COVID.MONTHS.UNTIL.TAPER,
-    age.effect.magnitude.parameter.names = list(
-        'young.covid.testing.rr',
-        character(),
-        'old.covid.testing.rr'
-    ),
-    age.target.populations = list(
-        create.target.population(age=1:2, name='Young'),
-        create.target.population(age=3, name='Middle-aged'),
-        create.target.population(age=1:3, invert = T, name='Old')
-    ),
-    race.effect.magnitude.parameter.names = list(
-        black='black.covid.testing.rr',
-        hispanic='hispanic.covid.testing.rr',
-        other='other.covid.testing.rr'
-    ),
-    race.target.populations = list(
-        black = BLACK,
-        hispanic = HISPANIC,
-        other = NON.BLACK.NON.HISPANIC
-    ),
-    mobility.correlation.parameter.name = 'covid.mobility.correlation')
-  
-register.model.foreground(EHE.SPECIFICATION,
-                          foreground = covid.testing.foreground,
-                          name = 'covid.testing')
-
-register.default.parameter.values(EHE.SPECIFICATION,
-                                  c(black.covid.testing.rr = 1,
-                                    hispanic.covid.testing.rr = 1,
-                                    other.covid.testing.rr = 1,
-                                    young.covid.testing.rr = 1,
-                                    old.covid.testing.rr = 1,
-                                    covid.mobility.correlation = 1))
-
 #-- Sexual Transmission --#
-
-covid.sexual.transmission.foreground = create.covid.foreground(
-    quantity.name = 'sexual.transmission.rates',
-    scale = 'rate',
-    n.covid.months = N.COVID.MONTHS,
-    n.months.until.taper = N.COVID.MONTHS.UNTIL.TAPER,
-    age.effect.magnitude.parameter.names = list(
-        'young.covid.sexual.transmission.rr',
-        character(),
-        'old.covid.sexual.transmission.rr'
-    ),
-    age.target.populations = list(
-        create.target.population(age.to=1:2, name='Young'),
-        create.target.population(age.to=3, name='Middle-aged'),
-        create.target.population(age.to=1:3, invert = T, name='Old')
-    ),
-    race.effect.magnitude.parameter.names = list(
-        black='black.covid.sexual.transmission.rr',
-        hispanic='hispanic.covid.sexual.transmission.rr',
-        other='other.covid.sexual.transmission.rr'
-    ),
-    race.target.populations = list(
-        black = BLACK.TO,
-        hispanic = HISPANIC.TO,
-        other = NON.BLACK.NON.HISPANIC.TO
-    ),
-    mobility.correlation.parameter.name = 'covid.mobility.correlation')
-
-register.model.foreground(EHE.SPECIFICATION,
-                          foreground = covid.sexual.transmission.foreground,
-                          name = 'covid.sexual.transmission')
-
-register.default.parameter.values(EHE.SPECIFICATION,
-                                  c(black.covid.sexual.transmission.rr = 1,
-                                    hispanic.covid.sexual.transmission.rr = 1,
-                                    other.covid.sexual.transmission.rr = 1,
-                                    young.covid.sexual.transmission.rr = 1,
-                                    old.covid.sexual.transmission.rr = 1,
-                                    covid.mobility.correlation = 1))
 
 #-- IV Transmission --#
 
-covid.iv.transmission.foreground = create.model.foreground(
-    WHOLE.POPULATION,
-    create.covid.intervention.effect('idu.trates',
-                                     scale = 'rate',
-                                     n.covid.months = N.COVID.MONTHS,
-                                     n.months.until.taper = N.COVID.MONTHS.UNTIL.TAPER,
-                                     effect.magnitude.parameter.names = 'covid.iv.transmission.rr',
-                                     mobility.correlation.parameter.name = 'covid.mobility.correlation'
-                                     )
-)
-
-register.model.foreground(EHE.SPECIFICATION,
-                          foreground = covid.iv.transmission.foreground,
-                          name = 'covid.iv.transmission')
-
-register.default.parameter.values(EHE.SPECIFICATION,
-                                  c(covid.iv.transmission.rr = 1))
 #-- Suppression --#
 
 #-- PrEP --#
