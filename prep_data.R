@@ -1058,7 +1058,7 @@ pp.2017
 # https://academic.oup.com/ofid/article/6/4/ofz101/5365426
 # sample size - 364
 
-pp.2016 <- data.frame(
+pp.2012 <- data.frame(
   total = 38.0,
   age18.24 = 30,
   age25.29 = 35,
@@ -1073,8 +1073,8 @@ pp.2016 <- data.frame(
   idu = 33
 )
 
-pp.2016 <- pp.2016/100
-pp.2016
+pp.2012 <- pp.2012/100
+pp.2012
 
 # 2011-2014 Persistence Data; Fenway Health Cohort - Boston; 24 months total follow-up
 # https://onlinelibrary.wiley.com/doi/epdf/10.1002/jia2.25250
@@ -1096,17 +1096,17 @@ pp.2014 <- data.frame(
 
 pp.2014
 
-pp.total <- c(pp.2014$total, pp.2016$total)
-pp.age1 <- c(pp.2014$age18.24, pp.2016$age18.24)
-pp.age2 <- c(pp.2014$age25.29, pp.2016$age25.29)
-pp.age3 <- c(pp.2014$age30.39, pp.2016$age30.39)
-pp.age4 <- c(pp.2014$age40.49, pp.2016$age40.49)
-pp.age5 <- c(pp.2014$age50ge, pp.2016$age50ge)
-pp.black <- c(pp.2014$black, pp.2016$black)
-pp.hisp <- c(pp.2014$hispanic, pp.2016$hispanic)
-pp.nbnh <- c(pp.2014$nbnh, pp.2016$nbnh)
+pp.total <- c(pp.2014$total, pp.2012$total)
+pp.age1 <- c(pp.2014$age18.24, pp.2012$age18.24)
+pp.age2 <- c(pp.2014$age25.29, pp.2012$age25.29)
+pp.age3 <- c(pp.2014$age30.39, pp.2012$age30.39)
+pp.age4 <- c(pp.2014$age40.49, pp.2012$age40.49)
+pp.age5 <- c(pp.2014$age50ge, pp.2012$age50ge)
+pp.black <- c(pp.2014$black, pp.2012$black)
+pp.hisp <- c(pp.2014$hispanic, pp.2012$hispanic)
+pp.nbnh <- c(pp.2014$nbnh, pp.2012$nbnh)
 
-years.pp <- c(2014,2016)-anchor.year
+years.pp <- c(2014, 2012)-anchor.year
 
 pp.df <- data.frame(
   years = years.pp,

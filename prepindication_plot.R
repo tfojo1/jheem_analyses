@@ -87,8 +87,6 @@ msm.plots.pi <- ggpubr::ggarrange(msm.race.plot, msm.age.plot, msm.risk.plot,
                                   ncol=1, nrow=3, labels = c("MSM - Race", "MSM - Age", "MSM - Risk")) 
 msm.plots.pi
 
-
-
 pdf("PrEP_Indication_Plots.pdf", width = 18, height = 10)
 combined.plot.pi
 msm.plots.pi
