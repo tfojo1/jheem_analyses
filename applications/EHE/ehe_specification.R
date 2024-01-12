@@ -1744,7 +1744,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                                                                  axis.name = 'Number Immigrating',
                                                                  units = 'individuals'),
                       dynamic.quantity.name = 'births',
-                      corresponding.data.outcome = 'immigration',
+                      corresponding.data.outcome = 'adult.immigration',
                       include.tags = "immigration",
                       keep.dimensions = c('location','age','race','sex'))
 
@@ -1756,7 +1756,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                                                                  axis.name = 'Number Emigrating',
                                                                  units = 'individuals'),
                       dynamic.quantity.name = 'mortality',
-                      corresponding.data.outcome = 'emigration',
+                      corresponding.data.outcome = 'adult.emigration',
                       include.tags = "emigration",
                       keep.dimensions = c('location','age','race','sex'))
 
