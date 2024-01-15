@@ -97,24 +97,25 @@ get.prep.use.functional.form <- function(specification.metadata)
     #     parameters.are.on.logit.scale = T
     # )
 
-    # create.logistic.tail.functional.form(
-    #   # everything else the same
+    create.logistic.tail.functional.form(
+      # everything else the same
+      intercept = pmax(int,0),
+      slope = slope,
+      anchor.year = anchor.year,
+      min = 0,
+      max = max.prep.coverage,
+      # parameters.are.on.logit.scale = T,
+      logistic.after.frac.of.span = 0.8,
+      parameters.are.on.transformed.scale = F
+    )
+
+    # create.linear.functional.form(
     #   intercept = int,
     #   slope = slope,
     #   anchor.year = anchor.year,
     #   min = 0,
-    #   max = max.prep.coverage, 
-    #   # parameters.are.on.logit.scale = T,
-    #   logistic.after.frac.of.span = 0.8
+    #   max = max.prep.coverage
     # )
-
-    create.linear.functional.form(
-      intercept = int,
-      slope = slope,
-      anchor.year = anchor.year,
-      min = 0,
-      max = max.prep.coverage
-    )
 }
 
 get.prep.indication.functional.form <- function(specification.metadata){
@@ -137,7 +138,7 @@ get.prep.indication.functional.form <- function(specification.metadata){
   age.spans = age.info$upper - age.info$lower
   
   # Intercepts and slopes
-  int[,,"msm","never_IDU"] <- int[,,"msm",] + coef(fit.pi.msm)["(Intercept)"]
+  int[,,"msm",] <- int[,,"msm",] + coef(fit.pi.msm)["(Intercept)"]
   int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.pi.nonmsm)["(Intercept)"]
   int[,,"female",] <- int[,,"female",] + coef(fit.pi.nonmsm)["(Intercept)"]
   
