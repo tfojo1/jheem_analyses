@@ -7,15 +7,9 @@ print("SETTING UP MCMC")
 CALIBRATION.CODE = 'init.pop.ehe'
 N.ITER = 10000
 LOCATION = ATLANTA.MSA 
-# have done: 
-      # Baltimore, Houston (C.26420), Miami (C.33100), Atlanta (C.12060), 
-      # Detroit (C.19820), Seattle (C.42660), Jacksonville (C.27260)
-      # Orlando (C.36740), Vegas (C.29820)
 # SF, LA, Riverside, Memphis had a bug with 'proportion.msm.of.male' being NA or empty 
 # NY, Chicago, Boston, Philly, DC, Charlotte had a bug with 'non.idu.general.mortality' subscript out of bounds
 # NOLA had a bug with mobility data[] subscript out of bounds 
-
-# 1/4 - trying atlanta with new aging method
 
 par.names = c("black.birth.rate.multiplier",
               "hispanic.birth.rate.multiplier",
@@ -104,28 +98,3 @@ print(paste0("DONE RUNNING MCMC: Took ",
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
 save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-
-engine = create.jheem.engine('ehe', 'C.12060', start.year=1970, end.year=2025, max.run.time.seconds = 10)
-sim.pop.only = engine$run(parameters = sim.pop.only$parameters[,1])
-sim.migration = engine$run(parameters = sim.migration$parameters[,1])
-
-simplot(sim.pop.only, sim.migration, "population",
-        facet.by = "age", split.by = "race",
-        dimension.values = list(year = as.character(2000:2020)))
-
-simplot(sim.pop.only, sim.migration, "immigration",
-        split.by = "race",
-        dimension.values = list(year = as.character(2000:2020)))
-
-simplot(sim.pop.only, sim.migration, "emigration",
-        split.by = "race",
-        dimension.values = list(year = as.character(2000:2020)))
-
-cbind(par.pop.only,par.migration)
-# simplot(sim, 'population')
-# simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
-# sim$parameters[[1]][par.names]
-# 
-jpeg(file=paste0("prelim_results/age.race_",sim$location,".jpeg"), width = 2500,height = 1500,res=300)
-simplot(sim.migration, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
-dev.off()
