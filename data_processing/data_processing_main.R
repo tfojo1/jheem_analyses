@@ -5,6 +5,7 @@ library(readxl)
 library(stringr)
 library(haven)
 library(locations)
+library(tools)
 
 ###Initialize data manager (surveillance manager) and establish ontology###
 
@@ -1298,13 +1299,17 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
 #adult.mortality
  #Need to make sure this line works
  put.msa.data.strict(census.outcome.name = 'deaths',
-                     put.outcome.name = 'adult.population',
-                    locations = MSAS.OF.INTEREST, 
+                     put.outcome.name = 'adult.deaths',
+                     locations = MSAS.OF.INTEREST, 
+                     contained.geographic.type = 'county',
                      fully.stratified.dimensions = 'year',
-                     put.stratifications = list(),                
+                     put.stratifications = list(),   
+                     age.lower.limit = 13,
+                     age.penultimate.upper = 84,
+                     age.upper.limit.name = '85+',
                      data.manager = surveillance.manager, 
                      census.manager = smaller.census.manager)
-
+ 
  
  ################################################################################
  ###Save surveillance manager####

@@ -266,8 +266,7 @@ immigration_total = data.list.move.clean [[10]]
 immigration_total = immigration_total [[2]]
 
 immigration_total <- immigration_total %>%
-  rename(total = value)%>%
-  select(-location_test)
+  rename(total = value)
 
 imm_black = data.list.move.clean [[8]]
 imm_black = imm_black [[2]]
@@ -275,7 +274,7 @@ imm_black = imm_black [[2]]
 imm_black <- imm_black%>%
   rename(black = race)%>%
   rename(black.value = value)%>%
-  select(-location_test, -year, -outcome)
+  select(-year, -outcome)
 
 imm_hisp = data.list.move.clean [[7]]
 imm_hisp = imm_hisp [[2]]
@@ -284,7 +283,7 @@ imm_hisp <- imm_hisp %>%
   filter(race == 'Hispanic or Latino')%>%
   rename(hispanic = race)%>%
   rename(hispanic.value = value)%>%
-  select(-location_test, -year, -outcome)
+  select(-year, -outcome)
 
 imm_combo_1 <- merge(imm_hisp, imm_black, by="location")
 imm_combo <- merge(imm_combo_1, immigration_total, by="location")
@@ -300,16 +299,14 @@ emigration_total = data.list.move.clean [[5]]
 emigration_total = emigration_total [[2]]
 
 emigration_total <- emigration_total %>%
-  rename(total = value)%>%
-  select(-location_test)
+  rename(total = value)
 
 em_black = data.list.move.clean [[3]]
 em_black = em_black [[2]]
 
 em_black <- em_black%>%
   rename(black = race)%>%
-  rename(black.value = value)%>%
-  select(-location_test)
+  rename(black.value = value)
 
 em_hisp = data.list.move.clean [[2]]
 em_hisp = em_hisp [[2]]
@@ -317,8 +314,7 @@ em_hisp = em_hisp [[2]]
 em_hisp <- em_hisp %>%
   filter(race == 'Hispanic or Latino')%>%
   rename(hispanic = race)%>%
-  rename(hispanic.value = value)%>%
-  select(-location_test)
+  rename(hispanic.value = value)
 
 em_combo <- merge(em_hisp, em_black, by="location")
 em_combo <- merge(em_combo, emigration_total, by="location")
