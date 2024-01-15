@@ -737,21 +737,22 @@ fit.pi.msm.age5 <- lm(logit(pi.msm.age5/pi.max) ~ years.pi)
 # pi.idu.2017 <- 31.8 / 100 
 
 # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-18.pdf 
+
 p.idu.2015 <- data.frame(
   total = 60.6,
   male = 60.0,
   female = 62.5,
-  age18.24 = 76.1,
-  age25.29 = 72.9,
-  age30.39 = 68.5,
-  age40.49 = 59.5,
-  age50ge = 49.4,
+  age1 = 76.1,
+  age2 = 72.9,
+  age3 = 68.5,
+  age4 = 59.5,
+  age5 = 49.4,
   black = 50.6,
   hisp = 61.1,
   nbnh = 67.7
 )
-
-p.idu.2015 <- age_mutate(p.idu.2015)/100
+  
+p.idu.2015 <- p.idu.2015/100
 
 
 # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf 
@@ -759,17 +760,17 @@ p.idu.2018 <- data.frame(
   total = 59.8,
   male = 58.5,
   female = 62.6,
-  age18.24 = 72.0,
-  age25.29 = 70.5,
-  age30.39 = 67.2,
-  age40.49 = 59.6,
-  age50ge = 49.8,
+  age1 = 72.0,
+  age2 = 70.5,
+  age3 = 67.2,
+  age4 = 59.6,
+  age5 = 49.8,
   black = 49.8,
   hisp = 57.8,
   nbnh = 67.4
 )
 
-p.idu.2018 <- age_mutate(p.idu.2018)/100
+p.idu.2018 <- p.idu.2018/100
 
 years.idu <- c(2015, 2018) - anchor.year
 
@@ -1010,7 +1011,7 @@ pi.big.df$idu <- as.numeric(pi.big.df$riskid=="idu")
 msm.pi.df <- subset(pi.big.df, nonmsm==0)
 nonmsm.pi.df <- subset(pi.big.df, nonmsm==1)
 
-fit.pi.df <- lm(logit(pi) ~ years + raceid + ageid + sexrisk, data = pi.big.df)
+# fit.pi.df <- lm(logit(pi) ~ years + raceid + ageid + sexrisk, data = pi.big.df)
 
 fit.pi.msm <- lm(logit(pi) ~ years + raceid + ageid, data = msm.pi.df)
 fit.pi.msm
@@ -1054,6 +1055,7 @@ pp.2017 <- data.frame(
 pp.2017 <- pp.2017/100
 pp.2017
 
+# ------- i only used data below to fit the model 
 # [2012-2017 Persistence Data]; SF; 12 months of observation
 # https://academic.oup.com/ofid/article/6/4/ofz101/5365426
 # sample size - 364
