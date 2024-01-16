@@ -1314,5 +1314,10 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
  ################################################################################
  ###Save surveillance manager####
   save(surveillance.manager, file="cached/surveillance.manager.rdata")
+ 
+#Also save to Q drive
+ save(surveillance.manager, file="Q:/data_managers/surveillance.manager.rdata")
+ 
+
 
 

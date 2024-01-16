@@ -13,6 +13,9 @@ smaller.census.manager = census.manager$subset.data(dimension.values = list(loca
 
 save(census.manager, file="cached/smaller.census.manager.rdata")
 
+#Also save to Q drive
+save(smaller.census.manager, file="Q:/data_managers/smaller.census.manager.rdata")
+
 # NOTES: Get the COUNTIES.OF.INTEREST from jheem_analyses/commoncode/lcations.of.interest.R
 # Change these filepaths based on what the current working directory is.
 # Also, find a better name for the new census manager if desired
