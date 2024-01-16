@@ -151,10 +151,12 @@ restratify.age.counts <- function(counts,
 desired.ages <- c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                   "65-69 years", "70-74 years", "75+ years")
 
-#Pull the data frame you made and turn it into an array
-                                          ##USE NAMES TO IMPROVE THIS SECTION##
-age.df = data.list.move.clean[[1]]
-age.df=age.df[[2]]
+#Create data frame for age (then turn df into an array):
+movement.file.names = file_path_sans_ext(basename(movement_files), compression = FALSE)
+names(data.list.move.clean) = movement.file.names
+
+age.df <- data.list.move.clean[grep("emigration_age", names(data.list.move.clean))] 
+age.df <- as.data.frame(age.df$msa_immigration_age_11.15) 
 
 age.df <- age.df%>%
   mutate(age = factor(age.df$age, levels =c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
@@ -287,8 +289,9 @@ adult.emigration.list = list(
                       #Immigration
 ###############################################################################
 
-age.df.imm = data.list.move.clean[[6]]
-age.df.imm=age.df.imm[[2]]
+age.df.imm <- data.list.move.clean[grep("immigration_age", names(data.list.move.clean))] 
+age.df.imm <- as.data.frame(age.df.imm$msa_immigration_age_11.15) 
+##
 
 age.df.imm <- age.df.imm%>%
   mutate(age = factor(age.df.imm$age, levels =c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
