@@ -324,6 +324,9 @@ data.manager$register.source('emory', full.name = "Emory University", short.name
 
 data.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
+#Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source(source = 'cdc.aggregated.county', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
+
 data.manager$register.ontology(
   'cdc',
   ont = ontology(
@@ -448,6 +451,8 @@ source('commoncode/locations_of_interest.R')
 ##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
 #This code also adjusts the population to be the 'adult.population' ages 13 and over
 source('data_processing/put_msa_data_without_estimation_script.R')
+#source code to sum diagnosed prevalence and new diagnoses for counties to make up MSAs
+source('data_processing/put_msa_data_as_new_source_script.R')
 ###############################################################################
 ###Source in File that reads .csvs and removes headers
 source('data_processing/fix_cdc_headers.R')
@@ -1296,8 +1301,8 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
                             census.manager = smaller.census.manager) 
 
  
-#adult.mortality
- #Need to make sure this line works
+#Use function to put adult.mortality based on deaths from Census Manager
+#This isn't putting the data correctly#
  put.msa.data.strict(census.outcome.name = 'deaths',
                      put.outcome.name = 'adult.deaths',
                      locations = MSAS.OF.INTEREST, 
@@ -1310,6 +1315,17 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
                      data.manager = surveillance.manager, 
                      census.manager = smaller.census.manager)
  
+ #Use function to sum county data into MSA values for diagnosed.prevalence and new diagnoses
+
+ put.msa.data.as.new.source = function(outcome = 'diagnosed.prevalence',
+           from.source.name = 'cdc',
+           to.source.name = 'cdc.aggregated.county',
+           to.locations =  location,  #What should go here? is this pulling from the location i have in the data#
+           geographic.type.from = 'COUNTY',
+           geographic.type.to = 'CBSA',
+           details.for.new.data = 'estimated from county data',
+           data.manager = SURVEILLANCE.MANAGER)
+
  
  ################################################################################
  ###Save surveillance manager####
