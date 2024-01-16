@@ -1,6 +1,4 @@
-
-#load.data.manager("cached/census.manager.rdata") 
-
+ 
 # TEST CODE
 if (1==2)
 {
@@ -56,12 +54,11 @@ get.location.mortality.rates <- function(location,
     if (is.null(population))
       stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
     
-    #You have this denominator it should align wit the mtro deaths
+    #You have this denominator it should align wit the metro deaths
     
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two
     target.dim.names = specification.metadata$dim.names[c('age','race','sex')]
-    browser()
     map.value.ontology(deaths, target.dim.names=target.dim.names) / 
       map.value.ontology(population, target.dim.names=target.dim.names)
 }
