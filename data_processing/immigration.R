@@ -345,6 +345,11 @@ em_combo <- em_combo %>%
 
 other_race <- list(imm_combo, em_combo)
 
+#Assign file names for other race to be used in immigration_age_calc code
+other.race.file.names = c("other.race.immigration", "other.race.emigration")
+names(other_race) = other.race.file.names
+
+
 
 ##Put other race file#
 
