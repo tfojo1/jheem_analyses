@@ -249,7 +249,6 @@ for (data in movement_data) {
 
 
 ###############################################################################
-##Need to figure out how to redo this section to make it more efficient and reliable
 #Calculate the 'other' race category
 #Pulling the individual variables from the other dfs to make one df
 ###############################################################################
@@ -261,7 +260,7 @@ for (data in movement_data) {
 prop.black.hisp <- 0.067
 prop.hisp.black <-0.054
 
-#SET UP FILES
+#SET UP FILES, assign file names
 movement.file.names = file_path_sans_ext(basename(movement_files), compression = FALSE)
 names(data.list.move.clean) = movement.file.names
 
