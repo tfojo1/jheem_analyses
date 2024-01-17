@@ -411,8 +411,7 @@ data.manager$register.ontology(
     location= NULL,
     age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
     race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Multiracial', 'Hispanic'),
-    sex=c('male','female'),
-    risk=c('msm')
+    sex=c('male','female') #removing risk from the ontology bc there is no value for risk other than 'msm'
   ))
 
 data.manager$register.ontology(
@@ -420,7 +419,7 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    sex=c('male')
+    sex=c('male', 'female') #needs to have male and female here to represent all possible outcomes
   ))
 
 data.manager$register.ontology(
@@ -1302,25 +1301,24 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
 
  
 #Use function to put adult.mortality based on deaths from Census Manager
-#This isn't putting the data correctly#
- put.msa.data.strict(census.outcome.name = 'deaths',
-                     put.outcome.name = 'adult.deaths',
-                     locations = MSAS.OF.INTEREST, 
-                     contained.geographic.type = 'county',
-                     fully.stratified.dimensions = 'year',
-                     put.stratifications = list(),   
-                     age.lower.limit = 13,
-                     age.penultimate.upper = 84,
-                     age.upper.limit.name = '85+',
-                     data.manager = surveillance.manager, 
-                     census.manager = smaller.census.manager)
+#Commenting out this until we have sorted out the calculation of adult.deaths 1-17-24
+ # put.msa.data.strict(census.outcome.name = 'deaths',
+ #                     put.outcome.name = 'adult.deaths',
+ #                     locations = MSAS.OF.INTEREST, 
+ #                     contained.geographic.type = 'county',
+ #                     fully.stratified.dimensions = 'year',
+ #                     put.stratifications = list(),   
+ #                     age.lower.limit = 13,
+ #                     age.penultimate.upper = 84,
+ #                     age.upper.limit.name = '85+',
+ #                     data.manager = surveillance.manager, 
+ #                     census.manager = smaller.census.manager)
  
  #Use function to sum county data into MSA values for diagnosed.prevalence and new diagnoses
-
  put.msa.data.as.new.source = function(outcome = 'diagnosed.prevalence',
            from.source.name = 'cdc',
            to.source.name = 'cdc.aggregated.county',
-           to.locations =  location,  #What should go here? is this pulling from the location i have in the data#
+           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
            geographic.type.from = 'COUNTY',
            geographic.type.to = 'CBSA',
            details.for.new.data = 'estimated from county data',
