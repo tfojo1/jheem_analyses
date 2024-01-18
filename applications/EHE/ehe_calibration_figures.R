@@ -41,8 +41,8 @@ for(i in 1:length(locations.run)){
 #         dimension.values = list(year = as.character(2000:2020)))
 # cbind(par.pop.only,par.migration)
 # simplot(sim, 'population')
-# simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
-# sim$parameters[[1]][par.names]
+simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
+sim$parameters[par.names,]
 # 
 
 
