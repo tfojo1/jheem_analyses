@@ -15,6 +15,17 @@ immigration.likelihood.instructions = create.basic.likelihood.instructions(outco
                                                                           equalize.weight.by.year = T 
 )
 
+emigration.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", # fix this 
+                                                                           outcome.for.sim = "emigration",
+                                                                           dimensions = c("race"), # eventually will include age
+                                                                           levels.of.stratification = c(0,1),
+                                                                           from.year = 2011, # may break
+                                                                           
+                                                                           observation.correlation.form = 'compound.symmetry', 
+                                                                           measurement.error.coefficient.of.variance = 0.05, # look up how far off migration data may be
+                                                                           weights = 1,
+                                                                           equalize.weight.by.year = T 
+)
 
 # imm.lik = immigration.likelihood.instructions$instantiate.likelihood(version = 'ehe', location = 'C.12580')
 
@@ -48,6 +59,10 @@ population.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                                   equalize.weight.by.year = T 
 )
 
+joint.pop.migration.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
+                                                                           immigration.likelihood.instructions,
+                                                                           emigration.likelihood.instructions
+                                                                           )
 
 if(1==2){
   new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",

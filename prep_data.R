@@ -737,21 +737,22 @@ fit.pi.msm.age5 <- lm(logit(pi.msm.age5/pi.max) ~ years.pi)
 # pi.idu.2017 <- 31.8 / 100 
 
 # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-18.pdf 
+
 p.idu.2015 <- data.frame(
   total = 60.6,
   male = 60.0,
   female = 62.5,
-  age18.24 = 76.1,
-  age25.29 = 72.9,
-  age30.39 = 68.5,
-  age40.49 = 59.5,
-  age50ge = 49.4,
+  age1 = 76.1,
+  age2 = 72.9,
+  age3 = 68.5,
+  age4 = 59.5,
+  age5 = 49.4,
   black = 50.6,
   hisp = 61.1,
   nbnh = 67.7
 )
-
-p.idu.2015 <- age_mutate(p.idu.2015)/100
+  
+p.idu.2015 <- p.idu.2015/100
 
 
 # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf 
@@ -759,17 +760,17 @@ p.idu.2018 <- data.frame(
   total = 59.8,
   male = 58.5,
   female = 62.6,
-  age18.24 = 72.0,
-  age25.29 = 70.5,
-  age30.39 = 67.2,
-  age40.49 = 59.6,
-  age50ge = 49.8,
+  age1 = 72.0,
+  age2 = 70.5,
+  age3 = 67.2,
+  age4 = 59.6,
+  age5 = 49.8,
   black = 49.8,
   hisp = 57.8,
   nbnh = 67.4
 )
 
-p.idu.2018 <- age_mutate(p.idu.2018)/100
+p.idu.2018 <- p.idu.2018/100
 
 years.idu <- c(2015, 2018) - anchor.year
 
@@ -1010,7 +1011,7 @@ pi.big.df$idu <- as.numeric(pi.big.df$riskid=="idu")
 msm.pi.df <- subset(pi.big.df, nonmsm==0)
 nonmsm.pi.df <- subset(pi.big.df, nonmsm==1)
 
-fit.pi.df <- lm(logit(pi) ~ years + raceid + ageid + sexrisk, data = pi.big.df)
+# fit.pi.df <- lm(logit(pi) ~ years + raceid + ageid + sexrisk, data = pi.big.df)
 
 fit.pi.msm <- lm(logit(pi) ~ years + raceid + ageid, data = msm.pi.df)
 fit.pi.msm
@@ -1054,11 +1055,12 @@ pp.2017 <- data.frame(
 pp.2017 <- pp.2017/100
 pp.2017
 
+# ------- i only used data below to fit the model 
 # [2012-2017 Persistence Data]; SF; 12 months of observation
 # https://academic.oup.com/ofid/article/6/4/ofz101/5365426
 # sample size - 364
 
-pp.2016 <- data.frame(
+pp.2012 <- data.frame(
   total = 38.0,
   age18.24 = 30,
   age25.29 = 35,
@@ -1073,8 +1075,8 @@ pp.2016 <- data.frame(
   idu = 33
 )
 
-pp.2016 <- pp.2016/100
-pp.2016
+pp.2012 <- pp.2012/100
+pp.2012
 
 # 2011-2014 Persistence Data; Fenway Health Cohort - Boston; 24 months total follow-up
 # https://onlinelibrary.wiley.com/doi/epdf/10.1002/jia2.25250
@@ -1096,17 +1098,17 @@ pp.2014 <- data.frame(
 
 pp.2014
 
-pp.total <- c(pp.2014$total, pp.2016$total)
-pp.age1 <- c(pp.2014$age18.24, pp.2016$age18.24)
-pp.age2 <- c(pp.2014$age25.29, pp.2016$age25.29)
-pp.age3 <- c(pp.2014$age30.39, pp.2016$age30.39)
-pp.age4 <- c(pp.2014$age40.49, pp.2016$age40.49)
-pp.age5 <- c(pp.2014$age50ge, pp.2016$age50ge)
-pp.black <- c(pp.2014$black, pp.2016$black)
-pp.hisp <- c(pp.2014$hispanic, pp.2016$hispanic)
-pp.nbnh <- c(pp.2014$nbnh, pp.2016$nbnh)
+pp.total <- c(pp.2014$total, pp.2012$total)
+pp.age1 <- c(pp.2014$age18.24, pp.2012$age18.24)
+pp.age2 <- c(pp.2014$age25.29, pp.2012$age25.29)
+pp.age3 <- c(pp.2014$age30.39, pp.2012$age30.39)
+pp.age4 <- c(pp.2014$age40.49, pp.2012$age40.49)
+pp.age5 <- c(pp.2014$age50ge, pp.2012$age50ge)
+pp.black <- c(pp.2014$black, pp.2012$black)
+pp.hisp <- c(pp.2014$hispanic, pp.2012$hispanic)
+pp.nbnh <- c(pp.2014$nbnh, pp.2012$nbnh)
 
-years.pp <- c(2014,2016)-anchor.year
+years.pp <- c(2014, 2012)-anchor.year
 
 pp.df <- data.frame(
   years = years.pp,

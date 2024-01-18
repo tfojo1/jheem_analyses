@@ -322,6 +322,30 @@ get.emigration.rates <- function(location, specification.metadata, population.ye
     
 }  
 
+##--------------------##
+##-- COVID MOBILITY --##
+##--------------------##
+
+get.covid.mobility.for.location = function(location){
+  
+  covid.mobility = get.covid.mobility.measure(COVID.MOBILITY.DATA,
+                                              location = location,
+                                              n.covid.months = N.COVID.MONTHS,
+                                              census.manager = CENSUS.MANAGER)
+  
+  covid.times = 2020 + (1.5 + 1:length(covid.mobility))/12
+  names(covid.times) = names(covid.mobility)
+  
+  create.linear.spline.functional.form(knot.times = covid.times,
+                                       knot.values = as.list(covid.mobility))
+}
+
+get.covid.max.testing.effect = function(specification.metadata){
+  
+  create.static.functional.form(value = get.q2.full.stratified.covid.reduction.in.testing(specification.metadata),
+                                link = 'log',
+                                value.is.on.transformed.scale = F)
+}
 
 ##------------------------##
 ##-- Initial Population --##

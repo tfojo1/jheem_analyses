@@ -151,8 +151,7 @@ restratify.age.counts <- function(counts,
 desired.ages <- c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                   "65-69 years", "70-74 years", "75+ years")
 
-#Pull the data frame you made and turn it into an array
-                                          ##USE NAMES TO IMPROVE THIS SECTION##
+#Create data frame for age (then turn df into an array):
 age.df = data.list.move.clean[[1]]
 age.df=age.df[[2]]
 
@@ -288,7 +287,8 @@ adult.emigration.list = list(
 ###############################################################################
 
 age.df.imm = data.list.move.clean[[6]]
-age.df.imm=age.df.imm[[2]]
+age.df.imm=age.df.imm[[2]] 
+##
 
 age.df.imm <- age.df.imm%>%
   mutate(age = factor(age.df.imm$age, levels =c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",

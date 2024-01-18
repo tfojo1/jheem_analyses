@@ -5,6 +5,7 @@ library(readxl)
 library(stringr)
 library(haven)
 library(locations)
+library(tools)
 
 ###Initialize data manager (surveillance manager) and establish ontology###
 
@@ -323,6 +324,9 @@ data.manager$register.source('emory', full.name = "Emory University", short.name
 
 data.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
+#Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source(source = 'cdc.aggregated.county', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
+
 data.manager$register.ontology(
   'cdc',
   ont = ontology(
@@ -407,8 +411,7 @@ data.manager$register.ontology(
     location= NULL,
     age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
     race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Multiracial', 'Hispanic'),
-    sex=c('male','female'),
-    risk=c('msm')
+    sex=c('male','female') #removing risk from the ontology bc there is no value for risk other than 'msm'
   ))
 
 data.manager$register.ontology(
@@ -416,7 +419,7 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    sex=c('male')
+    sex=c('male', 'female') #needs to have male and female here to represent all possible outcomes
   ))
 
 data.manager$register.ontology(
@@ -447,6 +450,8 @@ source('commoncode/locations_of_interest.R')
 ##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
 #This code also adjusts the population to be the 'adult.population' ages 13 and over
 source('data_processing/put_msa_data_without_estimation_script.R')
+#source code to sum diagnosed prevalence and new diagnoses for counties to make up MSAs
+source('data_processing/put_msa_data_as_new_source_script.R')
 ###############################################################################
 ###Source in File that reads .csvs and removes headers
 source('data_processing/fix_cdc_headers.R')
@@ -1295,19 +1300,38 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
                             census.manager = smaller.census.manager) 
 
  
-#adult.mortality
- #Need to make sure this line works
- put.msa.data.strict(census.outcome.name = 'deaths',
-                     put.outcome.name = 'adult.population',
-                    locations = MSAS.OF.INTEREST, 
-                     fully.stratified.dimensions = 'year',
-                     put.stratifications = list(),                
-                     data.manager = surveillance.manager, 
-                     census.manager = smaller.census.manager)
+#Use function to put adult.mortality based on deaths from Census Manager
+#Commenting out this until we have sorted out the calculation of adult.deaths 1-17-24
+ # put.msa.data.strict(census.outcome.name = 'deaths',
+ #                     put.outcome.name = 'adult.deaths',
+ #                     locations = MSAS.OF.INTEREST, 
+ #                     contained.geographic.type = 'county',
+ #                     fully.stratified.dimensions = 'year',
+ #                     put.stratifications = list(),   
+ #                     age.lower.limit = 13,
+ #                     age.penultimate.upper = 84,
+ #                     age.upper.limit.name = '85+',
+ #                     data.manager = surveillance.manager, 
+ #                     census.manager = smaller.census.manager)
+ 
+ #Use function to sum county data into MSA values for diagnosed.prevalence and new diagnoses
+ put.msa.data.as.new.source = function(outcome = 'diagnosed.prevalence',
+           from.source.name = 'cdc',
+           to.source.name = 'cdc.aggregated.county',
+           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+           geographic.type.from = 'COUNTY',
+           geographic.type.to = 'CBSA',
+           details.for.new.data = 'estimated from county data',
+           data.manager = SURVEILLANCE.MANAGER)
 
  
  ################################################################################
  ###Save surveillance manager####
   save(surveillance.manager, file="cached/surveillance.manager.rdata")
+ 
+#Also save to Q drive
+ save(surveillance.manager, file="Q:/data_managers/surveillance.manager.rdata")
+ 
+
 
 

@@ -1,7 +1,15 @@
 
 # prep use plots -----
-ff <-  get.prep.use.functional.form(specification.metadata = metadata)
+ff.linear <-  get.prep.use.functional.form(specification.metadata = metadata)
+ff.logistict <-  get.prep.use.functional.form(specification.metadata = metadata)
+
+ff.linear$betas$intercept
+
 x <- ff$project(2017:2030, alphas = NULL, dim.names = ff$minimum.dim.names)
+
+saveRDS(ff.logistict, file = "ff.logistict.rds")
+
+x <- ff.logistict$project(2017:2030, alphas = NULL, dim.names = ff.logistict$minimum.dim.names)
 
 # length(x)
 # x[[1]]
@@ -59,7 +67,7 @@ msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + geom_line(li
   ylab("PrEP use") +
   theme_minimal()
 
-msm.age <- reshape2::melt(apply(y[,,'msm',,], c('year','age'), mean))
+msm.age <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','age'), mean))
 df.pts <- subset(p.msm.df.long, ageid != "ALL") |> dplyr::mutate(year = year + anchor.year)
 
 df.pts$ageid <- factor(df.pts$ageid, levels = c("age1", "age2", "age3", "age4", "age5"))
@@ -75,7 +83,7 @@ msm.age.plot <- ggplot(msm.age, aes(year, value, color = age)) +
   ylab("PrEP use") +
   theme_minimal()
 
-msm.risk <- reshape2::melt(apply(y[,,'msm',,], c('year','risk'), mean))
+msm.risk <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','risk'), mean))
 # df.pts <- p.idu.df.long |> dplyr::mutate(year = year + anchor.year)
 # df.pts$risk[df.pts$risk=="idu"] <- "active_IDU"
 msm.risk.plot <- ggplot(msm.risk, aes(year, value, color = risk)) +
@@ -128,20 +136,9 @@ idu.sex.plot <- ggplot(idu.sex, aes(year, value, color=sex)) +
   ylab("PrEP use") +
   theme_minimal()  
 
-idu.risk <- reshape2::melt(apply(y, c('year','risk'), mean))
-df.pts <- subset(p.idu.df.long, risk == "idu") |> dplyr::mutate(year = year + anchor.year)
-df.pts$risk <- rep("active_IDU", length(df.pts$p))
-idu.risk.plot <- ggplot(idu.risk, aes(year, value, color=risk)) +
-  geom_line(linewidth = 1) +
-  geom_point(aes(x = year+2, y = p, color=risk), data = df.pts) +
-  ylim(0,max(idu.risk$value)) +
-  scale_x_continuous(breaks = seq(2017, 2030, 1)) +
-  ylab("PrEP use") +
-  theme_minimal()  
-
-idu.plots <- ggpubr::ggarrange(idu.race.plot, idu.age.plot, idu.sex.plot, idu.risk.plot,
-                               nrow = 2, ncol=2, labels = c("IDU - Race", "IDU - Age", 
-                                                            "IDU - Sex", "IDU - Risk"))
+idu.plots <- ggpubr::ggarrange(idu.race.plot, idu.age.plot, idu.sex.plot,
+                               nrow = 3, ncol=1, labels = c("IDU - Race", "IDU - Age", 
+                                                            "IDU - Sex"))
 idu.plots
 
 het.race <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),"never_IDU",], c('year', 'race'), mean))

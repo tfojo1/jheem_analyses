@@ -83,6 +83,7 @@ get.covid.reduction.in.testing = function(specification.metadata){
 
 }
 
+# pass a functional form with just this value - don't need to make an array here; functional form will do it 
 get.covid.reduction.in.sexual.transmission = function(specification.metadata){
   dim.names = specification.metadata$dim.names[c('age','race','sex','risk')]
   
@@ -160,11 +161,23 @@ get.age.covid.reduction = function(specification.metadata){
   age.to.all.ages.reduction.mapped
 }
 
+get.q2.full.stratified.covid.reduction.in.testing = function(specification.metadata){
+  
+  testing.no.age = get.covid.reduction.in.testing(specification.metadata = specification.metadata)
+  
+  testing.age.only = get.age.covid.reduction(specification.metadata = specification.metadata)
+  
+  rv = testing.no.age*testing.age.only
+  
+  rv = rv*get.q2.covid.reduction()
+  
+  rv
+}
 
 
 
-
-
+# max.covid.effect.testing.reduction = get.q2.full.stratified.covid.reduction.in.testing(
+#   specification.metadata = specification.metadata)
 
 
 

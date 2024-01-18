@@ -289,4 +289,5 @@ for (data in county_pop) {
 
 save(census.manager, file="cached/census.manager.rdata")
 
-
+#Also save to Q drive
+save(census.manager, file="Q:/data_managers/census.manager.rdata")

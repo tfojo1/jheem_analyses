@@ -1,4 +1,4 @@
-library(readxl)
+#library(readxl)
 ################################################################################
 ##read in immigration/emigration##
 ################################################################################
@@ -249,7 +249,6 @@ for (data in movement_data) {
 
 
 ###############################################################################
-##Need to figure out how to redo this section to make it more efficient and reliable
 #Calculate the 'other' race category
 #Pulling the individual variables from the other dfs to make one df
 ###############################################################################
@@ -261,30 +260,34 @@ for (data in movement_data) {
 prop.black.hisp <- 0.067
 prop.hisp.black <-0.054
 
+#SET UP FILES, assign file names
+movement.file.names = file_path_sans_ext(basename(movement_files), compression = FALSE)
+names(data.list.move.clean) = movement.file.names
+
 ##IMMIGRATION##
-immigration_total = data.list.move.clean [[10]]
-immigration_total = immigration_total [[2]]
+immigration_total <- data.list.move.clean[grep("immigration_total", names(data.list.move.clean))] 
+immigration_total <- as.data.frame(immigration_total$msa_immigration_total_11.15)
 
 immigration_total <- immigration_total %>%
-  rename(total = value)%>%
-  select(-location_test)
+  rename(total = value)
 
-imm_black = data.list.move.clean [[8]]
-imm_black = imm_black [[2]]
+imm_black <- data.list.move.clean[grep("immigration_race", names(data.list.move.clean))] 
+imm_black <- as.data.frame(imm_black$msa_immigration_race_11.15) 
+
 
 imm_black <- imm_black%>%
   rename(black = race)%>%
   rename(black.value = value)%>%
-  select(-location_test, -year, -outcome)
+  select(-year, -outcome)
 
-imm_hisp = data.list.move.clean [[7]]
-imm_hisp = imm_hisp [[2]]
+imm_hisp <- data.list.move.clean[grep("immigration_eth", names(data.list.move.clean))] 
+imm_hisp <- as.data.frame(imm_hisp$msa_immigration_eth_11.15) 
 
 imm_hisp <- imm_hisp %>%
   filter(race == 'Hispanic or Latino')%>%
   rename(hispanic = race)%>%
   rename(hispanic.value = value)%>%
-  select(-location_test, -year, -outcome)
+  select(-year, -outcome)
 
 imm_combo_1 <- merge(imm_hisp, imm_black, by="location")
 imm_combo <- merge(imm_combo_1, immigration_total, by="location")
@@ -296,29 +299,26 @@ imm_combo <- imm_combo %>%
 
 ##EMIGRATION
 
-emigration_total = data.list.move.clean [[5]]
-emigration_total = emigration_total [[2]]
+emigration_total <- data.list.move.clean[grep("emigration_total", names(data.list.move.clean))] 
+emigration_total <- as.data.frame(emigration_total$msa_emigration_total_11.15)
 
 emigration_total <- emigration_total %>%
-  rename(total = value)%>%
-  select(-location_test)
+  rename(total = value)
 
-em_black = data.list.move.clean [[3]]
-em_black = em_black [[2]]
+em_black <- data.list.move.clean[grep("emigration_race", names(data.list.move.clean))] 
+em_black <- as.data.frame(em_black$msa_emigration_race_11.15) 
 
 em_black <- em_black%>%
   rename(black = race)%>%
-  rename(black.value = value)%>%
-  select(-location_test)
+  rename(black.value = value)
 
-em_hisp = data.list.move.clean [[2]]
-em_hisp = em_hisp [[2]]
+em_hisp <- data.list.move.clean[grep("emigration_eth", names(data.list.move.clean))] 
+em_hisp <- as.data.frame(em_hisp$msa_emigration_eth_11.15) 
 
 em_hisp <- em_hisp %>%
   filter(race == 'Hispanic or Latino')%>%
   rename(hispanic = race)%>%
-  rename(hispanic.value = value)%>%
-  select(-location_test)
+  rename(hispanic.value = value)
 
 em_combo <- merge(em_hisp, em_black, by="location")
 em_combo <- merge(em_combo, emigration_total, by="location")
