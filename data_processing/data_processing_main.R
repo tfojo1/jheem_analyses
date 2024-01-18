@@ -411,7 +411,8 @@ data.manager$register.ontology(
     location= NULL,
     age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
     race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Multiracial', 'Hispanic'),
-    sex=c('male','female') #removing risk from the ontology bc there is no value for risk other than 'msm'
+    sex=c('male','female'),
+    risk=c('msm', 'not_msm')
   ))
 
 data.manager$register.ontology(
