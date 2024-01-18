@@ -144,6 +144,7 @@ get.best.guess.msm.proportions.by.race <- function(fips,
                                                    keep.ages = F)
 {
     #    props = read.msm.proportions()[as.character(fips)]
+    fips = as.character(as.numeric(fips))
     props = ALL.DATA.MANAGERS$msm.proportions[as.character(fips)]
     males = get.census.data(census, years=years, fips=fips,
                             sexes = 'male',
@@ -152,7 +153,7 @@ get.best.guess.msm.proportions.by.race <- function(fips,
                             aggregate.years = T,
                             aggregate.races = F,
                             aggregate.sexes = T)
-    
+
     to.dim.names = dimnames(males)
     to.dim.names$race = names(msm.proportions.by.race)
     males = CENSUS.BHO.RACE.MAPPING$apply(males, to.dim.names = to.dim.names)
@@ -236,7 +237,7 @@ get.non.idu.general.mortality.rates <- function(location, specification.metadata
     
     # Get the raw rates
     raw.mortality.rates = get.mortality.rates(ALL.DATA.MANAGERS$mortality, 
-                                              states=get.containing.locations(location, 'state'), 
+                                              states=get.overlapping.locations(location, 'state'), 
                                               verbose=F)
     
     # Get the population (to weight as we aggregate across races)
