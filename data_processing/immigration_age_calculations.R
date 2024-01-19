@@ -143,57 +143,74 @@ restratify.age.counts <- function(counts,
 ##And then need to create adult.immigration/emigration outcome to just show 13+
 ################################################################################
 
-#EMIGRATION
-
-#Create vector of what you want the ages to be; Todd's function needs this
-#Specify anything in his function that does not have a default; it needs an array and returns an array
-
+#CREATE VECTOR OF WHAT YOU WANT AGES TO BE
 desired.ages <- c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                   "65-69 years", "70-74 years", "75+ years")
 
-#Create data frame for age (then turn df into an array):
-age.df = data.list.move.clean[[1]]
-age.df=age.df[[2]]
+#AGE RE-CALCULATION: EMIGRATION
+age.em.df <- data.list.move.clean[grep("emigration_age", names(data.list.move.clean))] 
+age.em.df <- as.data.frame(age.em.df$msa_emigration_age_11.15) 
 
-age.df <- age.df%>%
-  mutate(age = factor(age.df$age, levels =c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
-                            "65-69 years", "70-74 years", "75+ years")))
-
-#Must make sure the structure matches the array- need to sort in this order for it to be correct
-age.df <- age.df %>% 
+age.em.df <- age.em.df%>%
+  mutate(age = factor(age.em.df$age, levels =c("1-4 years", 
+                                               "5-17 years", "18-19 years", "20-24 years", "25-29 years",
+                                               "30-34 years", "35-39 years", "40-44 years", "45-49 years", 
+                                               "50-54 years", "55-59 years", "60-64 years","65-69 years", 
+                                               "70-74 years", "75+ years")))%>% 
   select(year, location, age, value)%>% 
   arrange(age,location, year)
 
-#Now make df into an array; but first set dimnames. Dim is the number of categories there are
-#You can use 'length' to determine the number easily
-agearray.dimnames <- list(year = unique(age.df$year), location = unique(age.df$location), age = unique(age.df$age))
+agearray.dimnames.em <- list(year = unique(age.em.df$year), location = unique(age.em.df$location), age = unique(age.em.df$age))
+agearray.emm<- array(data = age.em.df$value, 
+                     dim= sapply(agearray.dimnames.em, length),
+                     dimnames= agearray.dimnames.em)
 
-agearray<- array(data = age.df$value, 
-                 dim= sapply(agearray.dimnames, length),
-                 dimnames= agearray.dimnames)
+#APPLY RESTRATIFY AGE FUNCTION: EMIGRATION
+restratify.age.array.em <- restratify.age.counts(agearray.emm, desired.age.brackets= desired.ages, smooth.infinite.age.to =100)
 
-##RIGHT NOW IN ORDER TO RUN THIS YOU HAVE TO SOURCE 'HELPERS_age_year_helpers.R" that Andrew emailed 1.3
-restratify.age.array <- restratify.age.counts(agearray, desired.age.brackets= desired.ages, smooth.infinite.age.to =100)
+#AGE Re-CALCULATION: IMMIGRATION
+age.df.imm <- data.list.move.clean[grep("immigration_age", names(data.list.move.clean))] 
+age.df.imm <- as.data.frame(age.df.imm$msa_immigration_age_11.15) 
+age.df.imm <- age.df.imm%>%
+  mutate(age = factor(age.df.imm$age, levels =c("1-4 years", 
+                                                "5-17 years", "18-19 years", "20-24 years", "25-29 years", 
+                                                "30-34 years", "35-39 years", "40-44 years", "45-49 years", 
+                                                "50-54 years", "55-59 years", "60-64 years","65-69 years", 
+                                                "70-74 years", "75+ years")))%>% 
+  select(year, location, age, value)%>% 
+  arrange(age,location, year)
 
-##Now use to calculate the proportion of immigration that is only 13+ (adults)
-total.array = apply(restratify.age.array, MARGIN = c("year", "location"), sum)
-total.array #Denominator for proportion
+agearray.dimnames.imm <- list(year = unique(age.df.imm$year), location = unique(age.df.imm$location), age = unique(age.df.imm$age))
+agearray.imm<- array(data = age.df.imm$value, 
+                     dim= sapply(agearray.dimnames.imm, length),
+                     dimnames= agearray.dimnames.imm)
 
-adult.array = restratify.age.array[ , , 2:15]
-adult.array.new = apply(adult.array, MARGIN = c("location"), sum) #numerator for proportion
+#APPLY RESTRATIFY AGE FUNCTION: IMMIGRATION
+restratify.age.array.imm <- restratify.age.counts(agearray.imm, desired.age.brackets= desired.ages, smooth.infinite.age.to =100)
 
-proportion.adult.array = (adult.array.new/total.array)
-proportion.adult.array
+#PROPORTION ARRAY: EMIGRATION
+total.array.em = apply(restratify.age.array.em, MARGIN = c("year", "location"), sum)
+total.array.em #Denominator for proportion
 
-################################################################################
-##Need to clean up this section
+adult.array.em = restratify.age.array.em[ , , 2:15]
+adult.array.new.em = apply(adult.array.em, MARGIN = c("location"), sum) #Numerator for proportion- only people ages 13+
 
-##Apply adult proportion to other datasets
-adult.prop.df = as.data.frame.table(proportion.adult.array)
+proportion.adult.array.em = (adult.array.new.em/total.array.em) #Proportion array
+adult.prop.df.em = as.data.frame.table(proportion.adult.array.em)
 
-#Total
-total.adults = as.data.frame.table(restratify.age.array)
-total.adults.df <-total.adults%>%
+#PROPORTION ARRAY: IMMIGRATION
+total.array.imm = apply(restratify.age.array.imm, MARGIN = c("year", "location"), sum)
+total.array.imm #Denominator for proportion
+
+adult.array.imm = restratify.age.array.imm[ , , 2:15]
+adult.array.new.imm = apply(adult.array.imm, MARGIN = c("location"), sum) #Numerator for proportion
+
+proportion.adult.array.imm = (adult.array.new.imm/total.array.imm) #Proportion array
+adult.prop.df.imm = as.data.frame.table(proportion.adult.array.imm)
+
+#TOTAL: EMIGRATION
+total.adults.em = as.data.frame.table(restratify.age.array.em)
+total.adults.df.em <-total.adults.em %>%
   mutate(outcome = 'adult.emigration')%>%
   mutate(age.group.sum = as.numeric(round(Freq)))%>%
   filter(age != "1-12 years")%>%
@@ -201,127 +218,12 @@ total.adults.df <-total.adults%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   group_by(location)%>%
-  mutate(value = sum(age.group.sum))
+  mutate(value = sum(age.group.sum))%>%
+  select(-age.group.sum)
 
-total.adults.df  = as.data.frame(total.adults.df)
-  
-#Sex
-sex.df = data.list.move.clean[[4]]
-sex.df=sex.df[[2]]
-sex.adult.prop = left_join(sex.df, adult.prop.df, by="location")
+total.adults.df.em  = as.data.frame(total.adults.df.em)
 
-sex.adult.prop <- sex.adult.prop %>%
-  mutate(value_new = round(value * Freq))%>%
-  select(outcome, year.x, location, sex, value_new)%>%
-  mutate(value = as.numeric(value_new))%>%
-  mutate(year = as.character(year.x))%>%
-  mutate(outcome = 'adult.immigration')%>%
-mutate(location = as.character(location))
-
-#Race
-race.df = data.list.move.clean[[3]]
-race.df=race.df[[2]]
-race.adult.prop = left_join(race.df, adult.prop.df, by="location")
-
-race.adult.prop <- race.adult.prop %>%
-  mutate(value_new = round(value * Freq))%>%
-  select(outcome, year.x, location, race, value_new)%>%
-  rename(value = value_new)%>%
-  mutate(year = as.character(year.x))%>%
-  mutate(outcome = 'adult.immigration')%>%
-  mutate(location = as.character(location))
-
-#Ethnicity (race)
-eth.df = data.list.move.clean[[2]]
-eth.df=eth.df[[2]]
-eth.adult.prop = left_join(eth.df, adult.prop.df, by="location")
-
-eth.adult.prop <- eth.adult.prop %>%
-  mutate(value_new = round(value * Freq))%>%
-  select(outcome, year.x, location, race, value_new)%>%
-  rename(value = value_new)%>%
-  mutate(year = as.character(year.x))%>%
-  mutate(outcome = 'adult.immigration')%>%
-  mutate(location = as.character(location))
-
-adult.prop.df <- adult.prop.df %>%
-  mutate(outcome = "adult.emigration") %>%
-  rename(value = Freq)
-
-#Age
-new.age.df = as.data.frame.table(restratify.age.array)
-new.age.prop = left_join(new.age.df, adult.prop.df, by = "location")
-
-new.age.prop.1 <- new.age.prop %>%
-  select(-year.y)%>%
-  mutate(value = round(Freq*value))%>%
-  filter(age != "1-12 years")%>%
-  mutate(outcome = "adult.emigration")%>%
-  select(-Freq)%>%
-  mutate(year = as.character(year.x))%>%
-  mutate(location = as.character(location))%>%
-  mutate(age = as.character(age))
-
-##Add in 'other' race
-other.emigration = other_race[[2]]
-other.emigration.adults = left_join(other.emigration, adult.prop.df, by = "location")
-
-other.emigration.adults <- other.emigration.adults %>%
-  rename(outcome = outcome.y)%>%
-  mutate(value = round(value.x *value.y))%>%
-  mutate(location = as.character(location))%>%
-  mutate(year = as.character(year.y))%>%
-  select(-outcome.x, -year.x, -year.y, -value.x, -value.y)
-
-
-adult.emigration.list = list(
-     "df.total" = total.adults.df, 
-    "df.age" = new.age.prop.1,
-    "df.eth" = eth.adult.prop, 
-    "df.race" = race.adult.prop, 
-    "df.sex" = sex.adult.prop,
-    "df.other.em"= other.emigration.adults)
-
-###############################################################################
-                      #Immigration
-###############################################################################
-
-age.df.imm = data.list.move.clean[[6]]
-age.df.imm=age.df.imm[[2]] 
-##
-
-age.df.imm <- age.df.imm%>%
-  mutate(age = factor(age.df.imm$age, levels =c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
-                                          "65-69 years", "70-74 years", "75+ years")))
-age.df.imm <- age.df.imm %>% 
-  select(year, location, age, value)%>% 
-  arrange(age,location, year)
-
-agearray.dimnames.imm <- list(year = unique(age.df.imm$year), location = unique(age.df.imm$location), age = unique(age.df.imm$age))
-
-agearray.imm<- array(data = age.df.imm$value, 
-                 dim= sapply(agearray.dimnames.imm, length),
-                 dimnames= agearray.dimnames.imm)
-
-##RIGHT NOW IN ORDER TO RUN THIS YOU HAVE TO SOURCE 'HELPERS_age_year_helpers.R" that Andrew emailed 1.3
-restratify.age.array.imm <- restratify.age.counts(agearray.imm, desired.age.brackets= desired.ages, smooth.infinite.age.to =100)
-
-##Now use to calculate the proportion of immigration that is only 13+ (adults)
-total.array.imm = apply(restratify.age.array.imm, MARGIN = c("year", "location"), sum)
-#Denominator for proportion
-
-adult.array.imm = restratify.age.array.imm[ , , 2:15]
-adult.array.new.imm = apply(adult.array.imm, MARGIN = c("location"), sum) #numerator for proportion
-
-proportion.adult.array.imm = (adult.array.new.imm/total.array.imm)
-
-################################################################################
-##Need to clean up this section
-
-##Apply adult proportion to other datasets
-adult.prop.df.imm = as.data.frame.table(proportion.adult.array.imm)
-
-#Total
+#TOTAL: IMMIGRATION (+Proportion array)
 total.adults.imm = as.data.frame.table(restratify.age.array.imm)
 total.adults.df.imm <-total.adults.imm%>%
   mutate(outcome = 'adult.immigration')%>%
@@ -331,28 +233,53 @@ total.adults.df.imm <-total.adults.imm%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   group_by(location)%>%
-  mutate(value = sum(age.group.sum))
+  mutate(value = sum(age.group.sum))%>%
+  select(-age.group.sum)
 
 total.adults.df.imm  = as.data.frame(total.adults.df.imm)
 
-#Sex
-sex.df.imm = data.list.move.clean[[9]]
-sex.df.imm=sex.df.imm[[2]]
-sex.adult.prop.imm = left_join(sex.df.imm, adult.prop.df.imm, by="location")
+#SEX: EMIGRATION
+sex.df.em <- data.list.move.clean[grep("emigration_sex", names(data.list.move.clean))] 
+sex.df.em <- as.data.frame(sex.df.em$msa_emigration_sex_11.15) 
+sex.adult.prop.em = left_join(sex.df.em, adult.prop.df.em, by="location")
+sex.adult.prop.em <- sex.adult.prop.em %>%
+  mutate(value_new = round(value * Freq))%>%
+  select(outcome, year.x, location, sex, value_new)%>%
+  mutate(value = as.numeric(value_new))%>%
+  mutate(year = as.character(year.x))%>%
+  mutate(outcome = 'adult.emigration')%>%
+  mutate(location = as.character(location))%>%
+  select(-value_new, -year.x)
 
+#SEX: IMMIGRATION
+sex.df.imm <- data.list.move.clean[grep("immigration_sex", names(data.list.move.clean))] 
+sex.df.imm <- as.data.frame(sex.df.imm$msa_immigration_sex_11.15) 
+sex.adult.prop.imm = left_join(sex.df.imm, adult.prop.df.imm, by="location")
 sex.adult.prop.imm <- sex.adult.prop.imm %>%
   mutate(value_new = round(value * Freq))%>%
   select(outcome, year.x, location, sex, value_new)%>%
   mutate(value = as.numeric(value_new))%>%
   mutate(year = as.character(year.x))%>%
   mutate(outcome = 'adult.immigration')%>%
+  mutate(location = as.character(location))%>%
+  select(-value_new, -year.x)
+
+#RACE: EMIGRATION
+race.df.em <- data.list.move.clean[grep("emigration_race", names(data.list.move.clean))] 
+race.df.em <- as.data.frame(race.df.em$msa_emigration_race_11.15) 
+race.adult.prop.em = left_join(race.df.em, adult.prop.df.em, by="location")
+race.adult.prop.em <- race.adult.prop.em %>%
+  mutate(value_new = round(value * Freq))%>%
+  select(outcome, year.x, location, race, value_new)%>%
+  rename(value = value_new)%>%
+  mutate(year = as.character(year.x))%>%
+  mutate(outcome = 'adult.emigration')%>%
   mutate(location = as.character(location))
 
-#Race
-race.df.imm = data.list.move.clean[[8]]
-race.df.imm=race.df.imm[[2]]
+#RACE: IMMIGRATION
+race.df.imm <- data.list.move.clean[grep("immigration_race", names(data.list.move.clean))] 
+race.df.imm <- as.data.frame(race.df.imm$msa_immigration_race_11.15) 
 race.adult.prop.imm = left_join(race.df.imm, adult.prop.df.imm, by="location")
-
 race.adult.prop.imm <- race.adult.prop.imm %>%
   mutate(value_new = round(value * Freq))%>%
   select(outcome, year.x, location, race, value_new)%>%
@@ -361,60 +288,99 @@ race.adult.prop.imm <- race.adult.prop.imm %>%
   mutate(outcome = 'adult.immigration')%>%
   mutate(location = as.character(location))
 
-#Ethnicity (race)
-eth.df.imm = data.list.move.clean[[7]]
-eth.df.imm=eth.df.imm[[2]]
+#ETHNICITY: IMMIGRATION
+eth.df.imm <- data.list.move.clean[grep("immigration_eth", names(data.list.move.clean))] 
+eth.df.imm <- as.data.frame(eth.df.imm$msa_immigration_eth_11.15) 
 eth.adult.prop.imm = left_join(eth.df.imm, adult.prop.df.imm, by="location")
 
 eth.adult.prop.imm <- eth.adult.prop.imm %>%
-  mutate(value_new = round(value * Freq))%>%
-  select(outcome, year.x, location, race, value_new)%>%
-  rename(value = value_new)%>%
+  mutate(value = round(Freq*value))%>%
   mutate(year = as.character(year.x))%>%
   mutate(outcome = 'adult.immigration')%>%
-  mutate(location = as.character(location))
+  mutate(location = as.character(location))%>%
+  select (-year.x, -year.y, -Freq, -X.msa_immigration_eth_11.15.)
 
-adult.prop.df.imm <- adult.prop.df.imm %>%
-  mutate(outcome = "adult.immigration") %>%
-  rename(value = Freq)
 
-#Age
-new.age.df.imm = as.data.frame.table(restratify.age.array.imm)
-new.age.prop.imm = left_join(new.age.df.imm, adult.prop.df.imm, by = "location")
+#ETHNICITY: EMIGRATION
+eth.df.em <- data.list.move.clean[grep("emigration_eth", names(data.list.move.clean))] 
+eth.df.em <- as.data.frame(eth.df.em$msa_emigration_eth_11.15) 
+eth.adult.prop.em = left_join(eth.df.em, adult.prop.df.em, by="location")
 
-new.age.prop.1.imm <- new.age.prop.imm %>%
-  select(-year.y)%>%
+eth.adult.prop.em <- eth.adult.prop.em %>%
   mutate(value = round(Freq*value))%>%
+  mutate(year = as.character(year.x))%>%
+  mutate(outcome = 'adult.emigration')%>%
+  mutate(location = as.character(location))%>%
+  select(-year.x, -year.y, -Freq, -X.msa_emigration_eth_11.15.)
+
+
+#AGE: IMMIGRATION
+new.age.df.imm = as.data.frame.table(restratify.age.array.imm)
+
+new.age.prop.1.imm <- new.age.df.imm  %>%
   filter(age != "1-12 years")%>%
   mutate(outcome = "adult.immigration")%>%
-  select(-Freq)%>%
-  mutate(year = as.character(year.x))%>%
+  mutate(value = round(Freq))%>%
+  mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
-  mutate(age = as.character(age))
+  mutate(age = as.character(age))%>%
+  select(-Freq)
 
-##Add in 'other' race
-other.immigration = other_race[[1]]
+#AGE: EMIGRATION
+new.age.df.em = as.data.frame.table(restratify.age.array.em)
+
+new.age.prop.1.em <- new.age.df.em %>%
+  filter(age != "1-12 years")%>%
+  mutate(outcome = "adult.emigration")%>%
+  mutate(value = round(Freq))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(age = as.character(age))%>%
+  select(-Freq)
+
+#OTHER RACE: EMIGRATION (Note this pulls dataset from immigration code)
+other.emigration <- other_race[grep("emigration", names(other_race))] 
+other.emigration <- as.data.frame(other.emigration$other.race.emigration)
+other.emigration.adults = left_join(other.emigration, adult.prop.df.em, by = "location")
+
+other.emigration.adults <- other.emigration.adults %>%
+  mutate(outcome = "adult.emigration")%>%
+  mutate(value = round(value*Freq))%>% #this is what i keep changing
+  mutate(location = as.character(location))%>%
+  mutate(year = as.character(year.y))%>%
+  select (-year.x, -year.y, -Freq)
+
+#OTHER RACE: IMMIGRATION (Note this pulls dataset from immigration code)
+other.immigration <- other_race[grep("immigration", names(other_race))] 
+other.immigration <- as.data.frame(other.immigration$other.race.immigration)
 other.immigration.adults = left_join(other.immigration, adult.prop.df.imm, by = "location")
 
 other.immigration.adults <- other.immigration.adults %>%
-  rename(outcome = outcome.y)%>%
-  mutate(value = round(value.x *value.y))%>%
+  mutate(outcome = "adult.immigration")%>%
+  mutate(value = round(value*Freq))%>%
   mutate(location = as.character(location))%>%
   mutate(year = as.character(year.y))%>%
-  select(-outcome.x, -year.x, -year.y, -value.x, -value.y)
+  select (-year.x, -year.y, -Freq)
 
-adult.immigration.list = list(
+#CREATE LISTS FOR IMMIGRATION/EMIGRATION TO PUT INTO MANAGER
+adult.imm.em.list = list(
   "df.total.imm" = total.adults.df.imm, 
   "df.age.imm" = new.age.prop.1.imm,
   "df.eth.imm" = eth.adult.prop.imm, 
   "df.race.imm" = race.adult.prop.imm, 
   "df.sex.imm" = sex.adult.prop.imm,
-  "df.other.race.imm"= other.immigration.adults)
+  "df.other.race.imm"= other.immigration.adults,
+  
+  "df.total.em" = total.adults.df.em, 
+  "df.age.em" = new.age.prop.1.em,
+  "df.eth.em" = eth.adult.prop.em, 
+  "df.race.em" = race.adult.prop.em, 
+  "df.sex.em" = sex.adult.prop.em ,
+  "df.other.em"= other.emigration.adults)
 
-###############################################################################
-#Put adult.immigration/emigration into manager
-###############################################################################
-for (data in adult.emigration.list) {
+
+#PUT INTO DATA MANAGER
+for (data in adult.imm.em.list) {
   
   data.manager$put.long.form(
     data = data,
@@ -424,16 +390,3 @@ for (data in adult.emigration.list) {
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
     details = 'Census Metro Area to Metro Area Migration Flows')
 }
-
-for (data in adult.immigration.list) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'census.immigration.adults',
-    source = 'census',
-    dimension.values = list(),
-    url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
-    details = 'Census Metro Area to Metro Area Migration Flows')
-}
-
-###############################################################################
