@@ -51,7 +51,7 @@ population.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                           # downweight because large population size; 
                                                                           # can get more specific with create.likelihood.weights 
                                                                           #(e.g., different weight for age X)
-                                                                          weights = 1/8, ### UPDATED 1/18 for Miami issue 
+                                                                          weights = 1, 
                                                                           
                                                                           # if there are more datapoints for certain years, this will normalize
                                                                           # e.g., if there are a few years with only the totals 
