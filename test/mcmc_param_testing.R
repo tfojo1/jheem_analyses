@@ -190,3 +190,15 @@ cov.mat = matrix(sigma, nrow=length(private$i.obs.vector), ncol=length(private$i
 round(cov2cor(cov.mat[mask,mask]),3)
 # range(lik.summary$`sqrt(diag(sigma))`[!mask])
 
+
+# How to use weights in likelihood
+pop.lik.instr.black = create.basic.likelihood.instructions(outcome.for.data = "adult.population",
+                                                           outcome.for.sim = "population",
+                                                           dimensions = c("race"),
+                                                           levels.of.stratification = c(1),
+                                                           from.year = as.integer(2007),
+                                                           observation.correlation.form = 'compound.symmetry',
+                                                           measurement.error.coefficient.of.variance = 0.03,
+                                                           weights = list(create.likelihood.weights(dimension.values = list(race=c("other","hispanic")),
+                                                                                                    total.weight = .000000000001)),
+                                                           equalize.weight.by.year = T)
