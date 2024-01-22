@@ -271,9 +271,14 @@ get.immigration.rates.functional.form <- function(location, specification.metada
   rates = get.immigration.rates(location=location,
                                 specification.metadata = specification.metadata) 
   
-  create.static.functional.form(value = rates,
-                                link = "log",
-                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  create.natural.spline.functional.form(knot.times = c(time.1 = 2010,time.2 = 2020),
+                                        knot.values = list(time.1 = rates, time.2 = rates),
+                                        link = "log",
+                                        knots.are.on.transformed.scale = F)
+  
+  # create.static.functional.form(value = rates,
+  #                               link = "log",
+  #                               value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
   
 }
 
@@ -299,9 +304,14 @@ get.emigration.rates.functional.form <- function(location, specification.metadat
   rates = get.emigration.rates(location=location,
                                specification.metadata = specification.metadata) 
   
-  create.static.functional.form(value = rates,
-                                link = "log",
-                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  create.natural.spline.functional.form(knot.times = c(time.1 = 2010,time.2 = 2020),
+                                        knot.values = list(time.1 = rates, time.2 = rates),
+                                        link = "log",
+                                        knots.are.on.transformed.scale = F)
+  
+  # create.static.functional.form(value = rates,
+  #                               link = "log",
+  #                               value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
   
 }
 

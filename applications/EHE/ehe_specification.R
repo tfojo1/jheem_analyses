@@ -686,6 +686,7 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'immigration',
                        get.functional.form.function = get.immigration.rates.functional.form,
+                       functional.form.from.time = 2007,
                        scale = 'rate')
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -717,6 +718,7 @@ register.natality(specification = EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'emigration',
                        get.functional.form.function = get.emigration.rates.functional.form,
+                       functional.form.from.time = 2007,
                        scale = 'rate')
 
 register.mortality(EHE.SPECIFICATION,

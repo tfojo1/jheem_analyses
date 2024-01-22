@@ -48,42 +48,55 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                    values = parameters['female.non.idu.general.mortality.rate.multiplier'],
                                                    applies.to.dimension.values=list(sex='female'))
     
-    #-- Immigration rates --#
-    # Race
-    for(race in specification.metadata$dim.names$race){
+    #-- Migration rates --#
+    migration.times = c("time.1","time.2")
+    races = specification.metadata$dim.names$race
+    ages = specification.metadata$dim.names$age
+    
+    for(time in migration.times){
+      # Immigration
+      # Total 
       set.element.functional.form.main.effect.alphas(model.settings,
                                                      element.name = "immigration",
-                                                     alpha.name = 'value',
-                                                     values = parameters[paste0(race,'.immigration.rate.multiplier')],
-                                                     applies.to.dimension.values=list(race=race))
-    }
-    
-    # Age
-    for(age in 1:length(specification.metadata$dim.names$age)){
+                                                     alpha.name = time,
+                                                     values = parameters[paste0('immigration.multiplier.',time)],
+                                                     dimensions = "all") 
+      # Race
       set.element.functional.form.main.effect.alphas(model.settings,
                                                      element.name = "immigration",
-                                                     alpha.name = 'value',
-                                                     values = parameters[paste0('age',age,'.immigration.rate.multiplier')],
-                                                     applies.to.dimension.values=list(age=age))
-    }
-    
-    #-- Emigration rates --#
-    # Race
-    for(race in specification.metadata$dim.names$race){
+                                                     alpha.name = time,
+                                                     values = parameters[paste0(races,'.migration.multiplier.',time)],
+                                                     dimensions = "race",
+                                                     applies.to.dimension.values=races)  
+      # Age
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "immigration",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0("age",(1:length(ages)),'.migration.multiplier.',time)],
+                                                     dimensions = "age",
+                                                     applies.to.dimension.values=ages) 
+      # Emigration
+      # Total 
       set.element.functional.form.main.effect.alphas(model.settings,
                                                      element.name = "emigration",
-                                                     alpha.name = 'value',
-                                                     values = parameters[paste0(race,'.emigration.rate.multiplier')],
-                                                     applies.to.dimension.values=list(race=race))
-    }
-    
-    # Age
-    for(age in 1:length(specification.metadata$dim.names$age)){
+                                                     alpha.name = time,
+                                                     values = parameters[paste0('emigration.multiplier.',time)],
+                                                     dimensions = "all") 
+      # Race
       set.element.functional.form.main.effect.alphas(model.settings,
                                                      element.name = "emigration",
-                                                     alpha.name = 'value',
-                                                     values = parameters[paste0('age',age,'.emigration.rate.multiplier')],
-                                                     applies.to.dimension.values=list(age=age))
+                                                     alpha.name = time,
+                                                     values = 1/parameters[paste0(races,'.migration.multiplier.',time)],
+                                                     dimensions = "race",
+                                                     applies.to.dimension.values=races)  
+      # Age
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "emigration",
+                                                     alpha.name = time,
+                                                     values = 1/parameters[paste0("age",(1:length(ages)),'.migration.multiplier.',time)],
+                                                     dimensions = "age",
+                                                     applies.to.dimension.values=ages) 
+      
     }
 
     #-- Suppression --#
