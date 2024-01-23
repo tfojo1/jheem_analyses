@@ -22,7 +22,9 @@ par.names = c("black.birth.rate.multiplier",
               "black.age1.aging.multiplier",
               "hispanic.age1.aging.multiplier",
               "other.age1.aging.multiplier",
-              "age2.aging.multiplier",
+              "black.age2.aging.multiplier",
+              "hispanic.age2.aging.multiplier",
+              "other.age2.aging.multiplier",
               "age3.aging.multiplier",
               "age4.aging.multiplier",
               "black.domino.aging.multiplier",
@@ -65,6 +67,7 @@ register.calibration.info(CALIBRATION.CODE,
                           thin = 50, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
+                          max.run.time.seconds = 10,
                           description = "A quick run to get population parameters in the general vicinity"
                           )
 
