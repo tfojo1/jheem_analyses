@@ -417,7 +417,7 @@ data.manager$register.ontology(
 data.manager$register.ontology(
   'census.immigration',
   ont = ontology(
-    year= NULL,
+    year= c("2006-2010", "2011-2015", "2016-2020"),
     location= NULL,
     age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
             "65-69 years", "70-74 years", "75+ years"),
@@ -428,7 +428,7 @@ data.manager$register.ontology(
 data.manager$register.ontology(
   'census.immigration.adults',
   ont = ontology(
-    year= NULL,
+    year= c("2006-2010", "2011-2015", "2016-2020"),
     location= NULL,
     age = c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
             "65-69 years", "70-74 years", "75+ years"),
@@ -437,7 +437,7 @@ data.manager$register.ontology(
   ))
 
 ################################################################################
-###Source locations of intersete to create MSA vector
+###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')
 ##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
 #This code also adjusts the population to be the 'adult.population' ages 13 and over
