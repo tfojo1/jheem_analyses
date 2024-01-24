@@ -175,8 +175,14 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     hispanic.age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     other.age1.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     
-    age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    black.age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    hispanic.age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    other.age2.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+  
+    black.age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    hispanic.age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    other.age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    
     age4.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     
     black.domino.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
@@ -384,7 +390,12 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   black.age1.population.rates = c(
     'black.birth.rate.multiplier',
-    'black.age1.aging.multiplier',
+    'black.age1.aging.multiplier'
+  ),
+  
+  black.age2.population.rates = c(
+    'black.age2.aging.multiplier',
+    'black.age3.aging.multiplier',
     'black.domino.aging.multiplier'
   ),
   
@@ -396,7 +407,12 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   hispanic.age1.population.rates = c(
     'hispanic.birth.rate.multiplier',
-    'hispanic.age1.aging.multiplier',
+    'hispanic.age1.aging.multiplier'
+  ),
+  
+  hispanic.age2.population.rates = c(
+    'hispanic.age2.aging.multiplier',
+    'hispanic.age3.aging.multiplier',
     'hispanic.domino.aging.multiplier'
   ),
   
@@ -408,7 +424,12 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   other.age1.population.rates = c(
     'other.birth.rate.multiplier',
-    'other.age1.aging.multiplier',
+    'other.age1.aging.multiplier'
+  ),
+  
+  other.age2.population.rates = c(
+    'other.age2.aging.multiplier',
+    'other.age3.aging.multiplier',
     'other.domino.aging.multiplier'
   ),
   
@@ -426,22 +447,18 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   age2.population.rates = c(
     'age2.non.idu.general.mortality.rate.multiplier',
-    'age2.aging.multiplier',
     'age2.migration.multiplier.time.1',
     'age2.migration.multiplier.time.2'
   ),
   
   age3.population.rates = c(
     'age3.non.idu.general.mortality.rate.multiplier',
-    'age2.aging.multiplier',
-    'age3.aging.multiplier',
     'age3.migration.multiplier.time.1',
     'age3.migration.multiplier.time.2'
   ),
   
   age4.population.rates = c(
     'age4.non.idu.general.mortality.rate.multiplier',
-    'age3.aging.multiplier',
     'age4.aging.multiplier',
     'age4.migration.multiplier.time.1',
     'age4.migration.multiplier.time.2'

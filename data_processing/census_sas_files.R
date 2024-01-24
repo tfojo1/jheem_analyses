@@ -106,7 +106,7 @@ for (data in census_sas_pops) {
   census.manager$put.long.form(
     data = data,
     ontology.name = 'census',
-    source = 'census',
+    source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting')

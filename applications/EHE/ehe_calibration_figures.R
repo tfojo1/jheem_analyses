@@ -13,8 +13,10 @@ files.old.3 = files[grepl("init.pop.migration.sim_2024-01-14",files)]
 files.old.4 = files[grepl("init.pop.migration.sim_2024-01-15",files)]
 files.old = c(files.old.1,files.old.2,files.old.3,files.old.4)
 
-files.1 = files[grepl("init.pop.migration.sim_2024-01-19",files)]
-files.2 = files[grepl("init.pop.migration.sim_2024-01-20",files)]
+files.1 = files[grepl("init.pop.migration.sim_2024-01-22",files)]
+files.2 = files[grepl("init.pop.migration.sim_2024-01-23",files)]
+# files.1 = files[grepl("init.pop.migration.sim_2024-01-19",files)]
+# files.2 = files[grepl("init.pop.migration.sim_2024-01-20",files)]
 files = c(files.1,files.2)
 locations.run = str_sub(files,-13,-7)
 names(locations.run) = names(LOCATIONS.OF.INTEREST[match(locations.run,unname(LOCATIONS.OF.INTEREST))])
@@ -44,7 +46,7 @@ for(i in 1:length(locations.run)){
     theme(plot.title = element_text(hjust = 0.5,size = 25),plot.subtitle = element_text(hjust = 0.5))
   
   ggsave(filename = 
-           paste0("prelim_results/2024_01_22_figs/",names(location),".jpeg"),
+           paste0("prelim_results/2024_01_23_figs/",names(location),".jpeg"),
          plot,width = 10,height = 7,dpi = 350)
   
 }
@@ -88,6 +90,7 @@ if(1==2){
 # simplot(sim, 'population')
 simplot(sim, "population",facet.by = "age",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
 simplot(sim, "population",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
+simplot(sim, "immigration",split.by = "race",dimension.values = list(year = as.character(2000:2020)))
 sim$parameters[par.names,]
 # # 
 # 

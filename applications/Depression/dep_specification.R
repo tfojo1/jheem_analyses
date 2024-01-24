@@ -43,7 +43,9 @@ register.model.quantity.subset(DEP.SPECIFICATION,
 register.model.quantity(DEP.SPECIFICATION, name="suppression.of.diagnosed.depressed",
                         value=expression(suppression.of.diagnosed*(depression.proportion.tx*rr.suppression.dep.tx+(1-depression.proportion.tx)*rr.suppression.dep.notx)))
 
-#register.model.element(DEP.SPECIFICATION, )
+#register.model.element(DEP.SPECIFICATION, name="suppression.of.diagnosed", ...)
+#register.model.element(DEP.SPECIFICATION, name="rr.suppression.dep.tx", ...)
+#register.model.element(DEP.SPECIFICATION, name="rr.suppression.dep.notx", ...)
 
 #register.model.specification(DEP.SPECIFICATION)
 

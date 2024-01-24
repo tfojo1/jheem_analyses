@@ -279,7 +279,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     spline.times = c(2010,2020,2030,2040)
     age.indices = 1:(length(specification.metadata$dim.names$age)-1)
     
-    age.race.interaction.ages = 1
+    age.race.interaction.ages = c(1,2,3)
     non.interacted.ages = setdiff(age.indices, age.race.interaction.ages)
     
     for(spline.i in 1:length(spline.times)){

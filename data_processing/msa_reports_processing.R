@@ -1,6 +1,6 @@
 ###You'll need to add this as a source file into the main census processing code###
-library(jheem2) #Remove this once you are sourcing the file#
-library(tidyverse)
+#library(jheem2) #Remove this once you are sourcing the file#
+#library(tidyverse)
 ################################################################################
                 ###Read in MSA Scraped PDF Files### 
 ################################################################################
@@ -1240,7 +1240,7 @@ for (data in msa_deaths) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.msa.reports',
-    source = 'cdc',
+    source = 'cdc.surveillance.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Reporting')
@@ -1254,7 +1254,7 @@ for (data in msa_total) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.msa.reports',
-    source = 'cdc',
+    source = 'cdc.surveillance.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Reporting')
@@ -1268,7 +1268,7 @@ for (data in msa_sex) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.msa.reports',
-    source = 'cdc',
+    source = 'cdc.surveillance.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')
@@ -1282,7 +1282,7 @@ for (data in msa_sex_age) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.msa.reports',
-    source = 'cdc',
+    source = 'cdc.surveillance.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')
@@ -1296,7 +1296,7 @@ for (data in msa_2009) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.msa.reports',
-    source = 'cdc',
+    source = 'cdc.surveillance.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')
@@ -1310,7 +1310,7 @@ for (data in msa_sex_race) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.msa.reports',
-    source = 'cdc',
+    source = 'cdc.surveillance.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')
@@ -1324,7 +1324,7 @@ for (data in msa_race_risk) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.msa.reports',
-    source = 'cdc',
+    source = 'cdc.surveillance.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')
@@ -1338,7 +1338,7 @@ for (data in msa_sex_risk) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.msa.reports',
-    source = 'cdc',
+    source = 'cdc.surveillance.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')

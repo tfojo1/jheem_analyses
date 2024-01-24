@@ -64,10 +64,15 @@ census.manager$register.outcome(
     axis.name = 'Metro Deaths Denominator',
     units = 'deaths',
     description = "Metro Deaths Denominator"))
-    
-census.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
-census.manager$register.source('cdc_wonder', full.name = "CDC Wonder", short.name='cdc_wonder')
+#Register "Parent" Sources
+census.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
+census.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
+
+#Register Data Sources ('children')
+census.manager$register.source('census.population', parent.source= "census", full.name = "Census Population Data", short.name='census.population')
+census.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
+census.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
 
 census.manager$register.ontology(
   'census.cdc.wonder.population',
@@ -265,19 +270,63 @@ data.list.county = lapply(data.list.county.pop, function(file){
   list(filename, data) #what to return# 
 })
 
+
+###############################################################################
+##Separate into lists for population and deaths now that parent source is different
+###############################################################################
+data.list.county.pop.00.22 = lapply(data.list.county, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+
+  data= subset(data, data$outcome == "population")
+
+data= as.data.frame(data)
+
+list(filename, data) #what to return# 
+})
+
+data.list.county.deaths.00.22 = lapply(data.list.county, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  data= subset(data, data$outcome == "deaths")
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) #what to return# 
+})
+
+
 ################################################################################
                 ###Put data into Census Manager###
 ################################################################################  
 
 #County POPULATION Values
-county_pop = lapply(data.list.county, `[[`, 2)
+county_pop = lapply(data.list.county.pop.00.22, `[[`, 2)
 
 for (data in county_pop) {
   
   census.manager$put.long.form(
     data = data,
     ontology.name = 'census',
-    source = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+
+#County DEATH Values
+county_deaths = lapply(data.list.county.deaths.00.22, `[[`, 2)
+
+for (data in county_pop) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.deaths',
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting')

@@ -199,7 +199,7 @@ for (data in county_90_pop) {
   census.manager$put.long.form(
     data = data,
     ontology.name = 'census',
-    source = 'census',
+    source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting')
@@ -213,7 +213,7 @@ for (data in county_80_pop) {
   census.manager$put.long.form(
     data = data,
     ontology.name = 'census',
-    source = 'census',
+    source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting')
@@ -227,7 +227,7 @@ for (data in county_70_pop) {
   census.manager$put.long.form(
     data = data,
     ontology.name = 'census',
-    source = 'census',
+    source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting')
