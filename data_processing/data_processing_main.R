@@ -1311,17 +1311,17 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
 #Use function to put adult.mortality based on deaths from Census Manager
 #Commenting out this until we have sorted out the calculation of adult.deaths 1-17-24
  #1-19-24 Need to ask Andrew if this is okay now that we decided not to use adult.deaths
- put.msa.data.strict(census.outcome.name = 'deaths',
-                     put.outcome.name = 'deaths',
-                     locations = MSAS.OF.INTEREST,
-                     contained.geographic.type = 'county',
-                     fully.stratified.dimensions = 'year',
-                     put.stratifications = list(),
-                     age.lower.limit = 13,
-                     age.penultimate.upper = 84,
-                     age.upper.limit.name = '85+',
-                     data.manager = surveillance.manager,
-                     census.manager = smaller.census.manager)
+ # put.msa.data.strict(census.outcome.name = 'deaths',
+ #                     put.outcome.name = 'deaths',
+ #                     locations = MSAS.OF.INTEREST,
+ #                     contained.geographic.type = 'county',
+ #                     fully.stratified.dimensions = 'year',
+ #                     put.stratifications = list(),
+ #                     age.lower.limit = 13,
+ #                     age.penultimate.upper = 84,
+ #                     age.upper.limit.name = '85+',
+ #                     data.manager = surveillance.manager,
+ #                     census.manager = smaller.census.manager)
  
  #Use function to sum county data into MSA values for diagnosed.prevalence and new diagnoses
  put.msa.data.as.new.source = function(outcome = 'diagnosed.prevalence',
