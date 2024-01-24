@@ -301,22 +301,36 @@ data.manager$register.outcome(
     units = 'population',
     description = "Metro Emigration Ages 13+"))
 
-data.manager$register.source('aidsvu', full.name = "AIDS Vu", short.name='aidsvu')
+#Register "Parent" Sources
+data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
+data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
+data.manager$register.parent.source('LHD', full.name = 'Local Health Department', short.name= "LHD")
+data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS")
+data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS")
+data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
+data.manager$register.parent.source('NNHSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNHSS")
+data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS")
+data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
+data.manager$register.parent.source('cdc.aggregated', full.name = 'CDC Data Aggregated from County to MSA', short.name= "cdc.aggregated")
+data.manager$register.parent.source('cdc.retention.report.pdf', full.name = 'CDC HIV Surveillance PDF Reports', short.name= "cdc.retention.report.pdf") #These are really similar
+data.manager$register.parent.source('NHM&E', full.name = 'National HIV Prevention Program Monitoring and Evaluation', short.name= "NHM&E")
 
-data.manager$register.source('cdc', full.name = "US Centers for Disease Control and Prevention", short.name='cdc')
-
-data.manager$register.source('nsduh', full.name = "National Survey on Drug Use and Health", short.name='nsduh')
-
-data.manager$register.source('lhd', full.name = "Local Health Department", short.name='lhd')
-
-data.manager$register.source('brfss', full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
-
-data.manager$register.source('emory', full.name = "Emory University", short.name='emory')
-
-data.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
-
-#Note this is for the aggregated county data being used to represent MSAs
-data.manager$register.source(source = 'cdc.aggregated.county', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
+#Register Data Sources ('children')
+data.manager$register.source('aidsvu', parent.source= "IQVIA", full.name = "AIDS Vu", short.name='aidsvu')
+data.manager$register.source('nsduh', parent.source= "NSDUH", full.name = "National Survey on Drug Use and Health", short.name='nsduh')
+data.manager$register.source('lhd', parent.source= "LHD", full.name = "Local Health Department", short.name='lhd')
+data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
+data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory')
+data.manager$register.source('cdc.aggregated.county', parent.source= "cdc.aggregated", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
+data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "US Census Bureau Death Data", short.name='census.deaths')
+data.manager$register.source('cdc.sti', parent.source= "NNHSS", full.name = "CDC STI Data", short.name='cdc.sti')
+data.manager$register.source('cdc.prep', parent.source= "IQVIA", full.name = "CDC PrEP Data", short.name='cdc.prep')
+data.manager$register.source('cdc.prep.indications', parent.source= "NHANES", full.name = "CDC PrEP Indications Data", short.name='cdc.prep.indications')
+data.manager$register.source('cdc.hiv', parent.source= "NHSS", full.name = "CDC HIV Outcomes Data", short.name='cdc.hiv')
+data.manager$register.source('cdc.retention.reports', parent.source= "cdc.retention.report.pdf", full.name = "CDC HIV Surveillance Reports", short.name='cdc.retention.reports') #These are really similar
+data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = "CDC Annual HIV Testing Report", short.name='cdc.testing')
+data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports')
 
 data.manager$register.ontology(
   'cdc',
@@ -1144,7 +1158,7 @@ for (data in diagnoses_all) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.hiv',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
@@ -1158,7 +1172,7 @@ for (data in prevalence_all) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.hiv',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
@@ -1172,7 +1186,7 @@ for (data in deaths_all) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.hiv',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
@@ -1186,7 +1200,7 @@ for (data in deaths_notes) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.hiv',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'Jurisdiction with incomplete reporting of deaths for most recent year.')
@@ -1201,7 +1215,7 @@ for (data in deaths_notes) {
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc',
-     source = 'cdc',
+     source = 'cdc.hiv',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Atlas Plus data')
@@ -1216,7 +1230,7 @@ for (data in deaths_notes) {
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc',
-     source = 'cdc',
+     source = 'cdc.hiv',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Atlas Plus data')
@@ -1230,7 +1244,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc',
-     source = 'cdc',
+     source = 'cdc.hiv',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Atlas Plus data')
@@ -1244,7 +1258,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc',
-     source = 'cdc',
+     source = 'cdc.prep',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Atlas Plus data')
@@ -1258,7 +1272,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc',
-     source = 'cdc',
+     source = 'cdc.prep.indications',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Atlas Plus data')

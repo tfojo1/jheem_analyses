@@ -241,7 +241,7 @@ for (data in movement_data) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'census.immigration',
-    source = 'census',
+    source = 'census.population',
     dimension.values = list(),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
     details = 'Census Metro Area to Metro Area Migration Flows')
@@ -358,7 +358,7 @@ for (data in other_race) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'census.immigration',
-    source = 'census',
+    source = 'census.population',
     dimension.values = list(),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
     details = 'Census Metro Area to Metro Area Migration Flows')

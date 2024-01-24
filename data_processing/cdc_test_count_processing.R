@@ -105,7 +105,7 @@ for (data in test_data) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.testing',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/testing/2021/index.html#:~:text=Among%20the%201%2C736%2C850%20CDC%2Dfunded,demographic%20characteristics%20and%20population%20groups.',
     details = 'CDC Annual HIV Testing Report')
@@ -118,7 +118,7 @@ for (data in positives_data) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.testing',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/testing/2021/index.html#:~:text=Among%20the%201%2C736%2C850%20CDC%2Dfunded,demographic%20characteristics%20and%20population%20groups.',
     details = 'CDC Annual HIV Testing Report')
@@ -239,7 +239,7 @@ for (data in city_test_data) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.testing',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/testing/2021/index.html#:~:text=Among%20the%201%2C736%2C850%20CDC%2Dfunded,demographic%20characteristics%20and%20population%20groups.',
     details = 'CDC Annual HIV Testing Report')
@@ -252,7 +252,7 @@ for (data in city_pos_data) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.testing',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/testing/2021/index.html#:~:text=Among%20the%201%2C736%2C850%20CDC%2Dfunded,demographic%20characteristics%20and%20population%20groups.',
     details = 'CDC Annual HIV Testing Report')

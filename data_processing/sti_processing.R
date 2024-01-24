@@ -159,7 +159,7 @@ sti_data = lapply(data.list.sti.clean, `[[`, 2)
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc.sti',
-     source = 'cdc',
+     source = 'cdc.sti',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Reporting')
@@ -172,7 +172,7 @@ for (data in early_syphilis_data) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.syphilis',
-    source = 'cdc',
+    source = 'cdc.sti',
     dimension.values = list(),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Reporting')

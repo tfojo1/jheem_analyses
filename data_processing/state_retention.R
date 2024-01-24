@@ -446,7 +446,7 @@ for (data in state_retention_data) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.retention.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/hiv-surveillance.html',
     details = 'Monitoring Selected National HIV Prevention and Care Objectives by Using HIV Surveillance Data')
@@ -460,7 +460,7 @@ for (data in state_retention_engaged_data) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.retention.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/hiv-surveillance.html',
     details = 'Monitoring Selected National HIV Prevention and Care Objectives by Using HIV Surveillance Data')
@@ -478,7 +478,7 @@ for (data in state_retention_footnotes) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.retention.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/hiv-surveillance.html',
     details = 'Monitoring Selected National HIV Prevention and Care Objectives by Using HIV Surveillance Data; Data should be interpreted with caution due to incomplete ascertainment of deaths that occurred during the year')
@@ -492,7 +492,7 @@ for (data in state_retention_engaged_footnotes) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.retention.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/hiv-surveillance.html',
     details = 'Monitoring Selected National HIV Prevention and Care Objectives by Using HIV Surveillance Data; Data should be interpreted with caution due to incomplete ascertainment of deaths that occurred during the year')
@@ -511,7 +511,7 @@ for (data in state_retention_MD) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.retention.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/hiv-surveillance.html',
     details = 'Monitoring Selected National HIV Prevention and Care Objectives by Using HIV Surveillance Data;Data should be interpreted with caution due to incomplete reporting of case information to CDC during December 2021.')
@@ -525,7 +525,7 @@ for (data in state_retention_engaged_MD) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc',
+    source = 'cdc.retention.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/library/reports/hiv-surveillance.html',
     details = 'Monitoring Selected National HIV Prevention and Care Objectives by Using HIV Surveillance Data; Data should be interpreted with caution due to incomplete reporting of case information to CDC during December 2021.')
