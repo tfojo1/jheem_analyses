@@ -64,10 +64,15 @@ census.manager$register.outcome(
     axis.name = 'Metro Deaths Denominator',
     units = 'deaths',
     description = "Metro Deaths Denominator"))
-    
-census.manager$register.source('census', full.name = "US Census Bureau", short.name='census')
 
-census.manager$register.source('cdc_wonder', full.name = "CDC Wonder", short.name='cdc_wonder')
+#Register "Parent" Sources
+census.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
+census.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
+
+#Register Data Sources ('children')
+census.manager$register.source('census.population', parent.source= "census", full.name = "Census Population Data", short.name='census.population')
+census.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
+census.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
 
 census.manager$register.ontology(
   'census.cdc.wonder.population',
