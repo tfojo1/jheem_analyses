@@ -270,19 +270,63 @@ data.list.county = lapply(data.list.county.pop, function(file){
   list(filename, data) #what to return# 
 })
 
+
+###############################################################################
+##Separate into lists for population and deaths now that parent source is different
+###############################################################################
+data.list.county.pop.00.22 = lapply(data.list.county, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+
+  data= subset(data, data$outcome == "population")
+
+data= as.data.frame(data)
+
+list(filename, data) #what to return# 
+})
+
+data.list.county.deaths.00.22 = lapply(data.list.county, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  data= subset(data, data$outcome == "deaths")
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) #what to return# 
+})
+
+
 ################################################################################
                 ###Put data into Census Manager###
 ################################################################################  
 
 #County POPULATION Values
-county_pop = lapply(data.list.county, `[[`, 2)
+county_pop = lapply(data.list.county.pop.00.22, `[[`, 2)
 
 for (data in county_pop) {
   
   census.manager$put.long.form(
     data = data,
     ontology.name = 'census',
-    source = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+
+#County DEATH Values
+county_deaths = lapply(data.list.county.deaths.00.22, `[[`, 2)
+
+for (data in county_pop) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.deaths',
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting')
