@@ -9,44 +9,147 @@ DEP.SPECIFICATION <- create.jheem.specification(version="dep",
                                                 iteration = 1, 
                                                 compartments.for.infected.and.uninfected = list("depression"=c("not_depressed", "depressed")))
 
+##--------------------------------##
+##--------------------------------##
+##--   Depression Transitions   --##
+##--------------------------------##
+##--------------------------------##
 
-#depression transitions
-# 1. add compartments
-# 2. add movement between
-# 3. add effect of depression on HIV transitions
+register.transition(DEP.SPECIFICATION, dimension="dep", from.compartments="depressed", to.compartments="not_depressed", 
+                    value=expression(1/depression.length))
 
-# effect on testing
-# effect on susceptibility
-# effect on transmissibility
+register.transition(DEP.SPECIFICATION, dimension="dep", from.compartments="not_depressed", to.compartments="depressed", 
+                    value=expression(depression.prevalence)) 
 
-register.transition(DEP.SPECIFICATION, dimension="dep", from.compartments="depressed", to.compartments="not_depressed", value=expression(1/depression.length))
-register.model.element(DEP.SPECIFICATION, name="depression.length", functional.form = create.static.functional.form(value=6/12, link = "log"), scale="time") # average length of dep epi
-# add other model transitions
 
-register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx", functional.form = create.static.functional.form(value=.23, link = "logit", value.is.on.transformed.scale = F), scale = "proportion")
+##--------------------------------------##
+##--------------------------------------##
+##--        GENERAL QUANTITIES        --##
+##--------------------------------------##
+##--------------------------------------##
 
+register.model.element(DEP.SPECIFICATION, name="depression.length", 
+                       functional.form = create.static.functional.form(value=6/12, link = "log"), 
+                       scale="time") # average length of depressive episode
+
+register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx", 
+                       functional.form = create.static.functional.form(value=0.18, link = "logit", 
+                                                                       value.is.on.transformed.scale = F), 
+                       scale = "proportion")
+
+register.model.element(DEP.SPECIFICATION, name="depression.prevalence", 
+                       functional.form = create.static.functional.form(value = 0.091, link = "logit",
+                                                                       value.is.on.transformed.scale = F), 
+                       scale = "proportion") # prevalence of depression in the general population ## can be stratified by age and race ## CHANGE THIS TO INC RATE ##
+
+
+##--------------------------------------##
+##--------------------------------------##
+##---  Effects of depression on HIV  ---##
+##--------------------------------------##
+##--------------------------------------##
+
+##--------------------##
+##--  Suppression   --##
+##--------------------##
 
 register.model.quantity(DEP.SPECIFICATION,
                         name = 'suppression',
                         value = 0)
 
-register.model.quantity.subset(DEP.SPECIFICATION,
-                               name = 'suppression',
-                               value = 'suppression.of.diagnosed',
-                               applies.to = list(continuum='diagnosed', depression="not_depressed"))
+register.model.quantity(DEP.SPECIFICATION, name = "suppression.of.diagnosed", 
+                        value = expression(super.suppression.of.diagnosed* depression.effect.on.suppression))
 
-register.model.quantity.subset(DEP.SPECIFICATION,
-                               name = 'suppression',
-                               value = 'suppression.of.diagnosed.depressed',
-                               applies.to = list(continuum='diagnosed', depression="depressed"))
+register.model.quantity(DEP.SPECIFICATION, name = "depression.effect.on.suppression", 
+                        value = 1)
 
-register.model.quantity(DEP.SPECIFICATION, name="suppression.of.diagnosed.depressed",
-                        value=expression(suppression.of.diagnosed*(depression.proportion.tx*rr.suppression.dep.tx+(1-depression.proportion.tx)*rr.suppression.dep.notx)))
+register.model.quantity.subset(DEP.SPECIFICATION, name = "depression.effect.on.suppression", 
+                               applies.to = list(depression="depressed"), 
+                               value = expression(rr.suppression.dep.tx* depression.proportion.tx + rr.suppression.dep.notx* (1-depression.proportion.tx)))
 
-#register.model.element(DEP.SPECIFICATION, name="suppression.of.diagnosed", ...)
-#register.model.element(DEP.SPECIFICATION, name="rr.suppression.dep.tx", ...)
-#register.model.element(DEP.SPECIFICATION, name="rr.suppression.dep.notx", ...)
+register.model.element(DEP.SPECIFICATION, name="rr.suppression.dep.tx",
+                       value = 1, scale = "ratio") # rate ratio
+
+register.model.element(DEP.SPECIFICATION, name="rr.suppression.dep.notx",
+                       value = 1, scale = "ratio") # rate ratio
+
+
+##--------------------##
+##-- Susceptibility --##
+##--------------------##
+
+## Sexual behaviour ##
+
+register.model.quantity(DEP.SPECIFICATION, name = "sexual.susceptibility", 
+                        value = expression(super.sexual.susceptibility* depression.effect.on.sexual.susceptibility))
+
+register.model.quantity(DEP.SPECIFICATION, name = "depression.effect.on.sexual.susceptibility", 
+                       value = 1)
+
+register.model.quantity.subset(DEP.SPECIFICATION, name = "depression.effect.on.sexual.susceptibility", 
+                               applies.to = list(depression="depressed"), 
+                               value = "rr.sex.sus.dep")
+
+register.model.element(DEP.SPECIFICATION, name = "rr.sex.sus.dep.hetmale", 
+                       value = .88) 
+register.model.element(DEP.SPECIFICATION, name = "rr.sex.sus.dep.msm", 
+                       value = .88) 
+register.model.element(DEP.SPECIFICATION, name = "rr.sex.sus.dep.female", 
+                       value = .72) 
+
+register.model.quantity(DEP.SPECIFICATION, name = "rr.sex.sus.dep", 
+                        value = "rr.sex.sus.dep.tx.female")
+
+register.model.quantity.subset(DEP.SPECIFICATION, name = "rr.sex.sus.dep", 
+                               applies.to = list(sex="msm"), 
+                               value = "rr.sex.sus.dep.tx.msm")
+
+register.model.quantity.subset(DEP.SPECIFICATION, name = "rr.sex.sus.dep.tx", 
+                               applies.to = list(sex="heterosexual_male"), 
+                               value = "rr.sex.sus.dep.tx.hetmale")
+
+## IDU ##
+
+register.model.quantity(DEP.SPECIFICATION, name = "idu.susceptibility", 
+                        value = expression(super.idu.susceptibility * depression.effect.on.idu.susceptibility))
+
+register.model.quantity(DEP.SPECIFICATION, name = "depression.effect.on.idu.susceptibility", 
+                        value = 1)
+
+register.model.quantity.subset(DEP.SPECIFICATION, name = "depression.effect.on.idu.susceptibility", 
+                               applies.to = list(depression="depressed"), 
+                               value = expression(rr.idu.dep.tx * depression.proportion.tx + rr.idu.dep.notx * (1-depression.proportion.tx)))
+
+register.model.element(DEP.SPECIFICATION, name="rr.idu.dep.tx",
+                       value = 0.71, scale = "ratio") # rate ratio
+
+register.model.element(DEP.SPECIFICATION, name="rr.idu.dep.notx",
+                       value = 1.67, scale = "ratio") # rate ratio
+
+
+##--------------------##
+##-- Transmission   --##
+##--------------------##
+
+
+
+
+##--------------------##
+##--    Testing     --##
+##--------------------##
+
+register.model.quantity(DEP.SPECIFICATION, name = "testing", 
+                        value = expression(super.testin*depression.effect.on.testing))
+
+register.model.quantity(DEP.SPECIFICATION, name = "depression.effect.on.testing", 
+                        value = 1)
+
+register.model.quantity.subset(DEP.SPECIFICATION, name = "depression.effect.on.testing", 
+                               applies.to = list(depression="depressed"), 
+                               value = "rr.testing.depressed")
+
+register.model.element(DEP.SPECIFICATION, name="rr.testing.depressed",
+                       value = 1.4, scale = "ratio") # rate ratio
+
 
 #register.model.specification(DEP.SPECIFICATION)
-
-

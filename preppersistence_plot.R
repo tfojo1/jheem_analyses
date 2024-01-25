@@ -19,19 +19,19 @@ race.plot <- ggplot(df, aes(x=year, y=value, color=race)) + geom_line(linewidth 
   # geom_point(aes(x=year, y = p, color=raceid), data = df.pts)
   scale_x_continuous(breaks = seq(2017, 2030, 1)) +
   theme_minimal() 
-# 
-# df3 <- reshape2::melt(apply(y, c('year','sex'), mean))
-# sex.plot <- ggplot(df3, aes(x=year, y=value, color=sex)) + geom_line(linewidth = 1) + 
-#   ylim(min(df3$value),max(df3$value)) + 
-#   scale_x_continuous(breaks = seq(2017, 2030, 1)) +
-#   theme_minimal()
-# 
-# 
-# df4 <- reshape2::melt(apply(y, c('year','risk'), mean))
-# risk.plot <- ggplot(df4, aes(x=year, y=value, color=risk)) + geom_line(linewidth = 1) + 
-#   ylim(min(df4$value),max(df4$value)) + 
-#   scale_x_continuous(breaks = seq(2017, 2030, 1)) +
-#   theme_minimal()
+
+df3 <- reshape2::melt(apply(y, c('year','sex'), mean))
+sex.plot <- ggplot(df3, aes(x=year, y=value, color=sex)) + geom_line(linewidth = 1) +
+  ylim(min(df3$value),max(df3$value)) +
+  scale_x_continuous(breaks = seq(2017, 2030, 1)) +
+  theme_minimal()
+
+
+df4 <- reshape2::melt(apply(y, c('year','risk'), mean))
+risk.plot <- ggplot(df4, aes(x=year, y=value, color=risk)) + geom_line(linewidth = 1) +
+  ylim(min(df4$value),max(df4$value)) +
+  scale_x_continuous(breaks = seq(2017, 2030, 1)) +
+  theme_minimal()
 
 df5 <- reshape2::melt(apply(y, c('year','age'), mean))
 age.plot <- ggplot(df5, aes(x=year, y=value, color=age)) + geom_line(linewidth = 1) + 
@@ -41,9 +41,9 @@ age.plot <- ggplot(df5, aes(x=year, y=value, color=age)) + geom_line(linewidth =
 
 # arrange all 4 plots
 combined.plot.pp <- ggpubr::ggarrange(race.plot, 
-                                      #sex.plot, risk.plot, 
+                                      sex.plot, risk.plot,
                                       age.plot,
-                                      ncol = 1, nrow = 2, labels = c("Race","Age"))
+                                      ncol = 2, nrow = 2, labels = c("Race","Age"))
 combined.plot.pp
 
 

@@ -11,12 +11,21 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                census.manager)
 {
     # browser()
-    # register the source(s), ontologies, and/or outcome if necessary
+    
+    # register the parent source(s), source(s), ontologies, and/or outcome if necessary
     if (!(put.outcome.name %in% data.manager$outcomes))
       stop(paste0("Error: outcome '", put.outcome.name, "' has not yet been registered"))
+    
+    for (parent.source.name in names(census.manager$parent.source.info))
+        if (!(parent.source.name %in% names(data.manager$parent.source.info)))
+            data.manager$register.parent.source(parent.source = census.manager$parent.source.info[[parent.source.name]]$parent.source,
+                                                full.name = census.manager$parent.source.info[[parent.source.name]]$full.name,
+                                                short.name = census.manager$parent.source.info[[parent.source.name]]$short.name)
+    
     for (source.name in names(census.manager$source.info))
         if (!(source.name %in% names(data.manager$source.info)))
             data.manager$register.source(source = census.manager$source.info[[source.name]]$source,
+                                         parent.source = census.manager$source.info[[source.name]]$parent.source,
                                          full.name = census.manager$source.info[[source.name]]$full.name,
                                          short.name = census.manager$source.info[[source.name]]$short.name)
 
