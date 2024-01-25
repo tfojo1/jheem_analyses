@@ -4,6 +4,7 @@ x <- ff2$project(2017:2030, alphas = NULL, dim.names = ff2$minimum.dim.names)
 
 saveRDS(ff2, "ff.indication.rds")
 
+ff <- ff2
 y <- sapply(x, function(z) {return(z)})
 dim.names <- c(ff$minimum.dim.names, list('year'=2017:2030))
 dim(y) <- sapply(dim.names, length)
@@ -90,10 +91,9 @@ msm.plots.pi <- ggpubr::ggarrange(msm.race.plot, msm.age.plot,
                                   ncol=1, nrow=2, labels = c("MSM - Race", "MSM - Age", "MSM - Risk")) 
 msm.plots.pi
 
-
 # idu plots
 idu.race <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),'active_IDU',], c('year', 'race'), mean))
-df.pts <- nonmsm.pi.df |> filter(raceid!="ALL" & idu==1) |> 
+df.pts <- subset(nonmsm.pi.df, raceid!="ALL") %>% subset(.,idu==1) %>%
   dplyr::mutate(years = years + anchor.year + 2) 
 
 df.pts$raceid <- factor(df.pts$raceid, levels = c("black", "hisp", "nbnh"))

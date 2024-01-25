@@ -195,7 +195,7 @@ p.msm.df.long$ageid <- ifelse(grepl("age1", p.msm.df.long$variable), "age1",
                                      ifelse(grepl("age3", p.msm.df.long$variable), "age3",
                                             ifelse(grepl("age4", p.msm.df.long$variable), "age4",
                                                    ifelse(grepl("age5", p.msm.df.long$variable), "age5", "ALL")))))
-
+p.msm.df.long$risk <- rep("msm", length(p.msm.df.long$raceid))
 p.msm.df.long$year <- p.msm.df.long$year - anchor.year
 
 fit.p.msm <- lm(logit(p.msm.df.long$p/p.max) ~ year + factor(raceid) + factor(ageid), 
@@ -221,43 +221,46 @@ fit.p.msm <- lm(logit(p.msm.df.long$p/p.max) ~ year + factor(raceid) + factor(ag
 ### PrEP Use in 2015 among PWID (NHBS) ----
 ## https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-18.pdf
 
+# numerator: # took PrEP
+# denominator: # any receptive sharing
+
 p.idu.2015 <- data.frame(
-  total = 0.3,
-  male = 0.3,
-  female = 0.3,
-  age18.24 = 0.5,
-  age25.29 = 0.5,
-  age30.39 = 0.6,
-  age40.49 = 0.3,
-  age50ge = 0.1, 
-  black = 0.2,
-  hisp = 0.4,
-  nbnh = 0.2
+  total = 33/5867,
+  male = 24/4169,
+  female = 8/1677,
+  age18.24 = 3/440,
+  age25.29 = 6/837,
+  age30.39 = 13/1588,
+  age40.49 = 6/1285,
+  age50ge = 5/1717, 
+  black = 7/1586,
+  hisp = 9/1320,
+  nbnh = 17/(64+19+10+2620+240)
 )
 
-p.idu.2015 <- (age_mutate(p.idu.2015))/100
+p.idu.2015 <- (age_mutate(p.idu.2015))
 
 ### PrEP Use in 2017 among PWID (NHBS) -------
 ## https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf
 
+# numerator: # took PrEP
+# denominator: # any receptive sharing
+
 p.idu.2017 <- data.frame(
-  total = 1.1,
-  male = 0.9,
-  female = 1.5,
-  age18.24 = 1.7,
-  age25.29 = 1.1,
-  age30.39 = 1.3,
-  age40.49 = 1.4,
-  age50ge = 0.8, # ages 50 or greater
-  black = 0.7,
-  hisp = 1.4,
-  nbnh = 0.6,
-  white = 1.2
+  total = 120/6350,
+  male = 65/4287,
+  female = 49/2015,
+  age18.24 = 7/290,
+  age25.29 = 13/812,
+  age30.39 = 37/1922,
+  age40.49 = 33/1448,
+  age50ge = 30/1878, 
+  black = 25/1698,
+  hisp = 30/1255,
+  nbnh = (3+1+53+8)/(77+20+5+2927+364)
 )
 
 p.idu.2017 <- age_mutate(p.idu.2017)
-
-p.idu.2017 <- p.idu.2017 / 100
 
 p.idu.black <- c(
   p.idu.2015$black,
@@ -362,41 +365,45 @@ fit.p.idu <- lm(logit(p) ~ year + raceid + ageid + sexid, data = p.idu.df.long)
 ### PrEP Use in 2016 ----
 ## https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-19.pdf
 
+# denominator: any STI
+
 p.het.2016 <- data.frame(
-  total = 0.2,
-  male = 0.1,
-  female = 0.2,
-  age18.24 = 0.1,
-  age25.29 = 0.2,
-  age30.39 = 0.1,
-  age40.49 = 0.1,
-  age50ge = 0.2, 
-  black = 0.2,
-  hisp = 0.2, # this is assumed to be the same rate as black for now
-  nbnh = 0.3
+  total = 11/507,
+  male = 2/176,
+  female = 9/331,
+  age18.24 = 2/173,
+  age25.29 = 2/114,
+  age30.39 = 2/86,
+  age40.49 = 2/68,
+  age50ge = 3/66, 
+  black = 9/415,
+  hisp = 1/55,  # there were 0 people who took PrEP this year among the hispanic ethnicity category. This threw an Inf error in the fit and so I've changed it to 1 for now.
+  nbnh = 2/(4+3+1+8+20)
 )
 
-p.het.2016 <- (age_mutate(p.het.2016))/100
+p.het.2016 <- (age_mutate(p.het.2016))
 
 
 ### PrEP Use in 2019 ----
 ## https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-26.pdf
 
+# denominator: any STI
+
 p.het.2019 <- data.frame(
-  total = 0.4,
-  male = 0.4,
-  female = 0.5,
-  age18.24 = 0.3,
-  age25.29 = 0.4,
-  age30.39 = 0.6,
-  age40.49 = 0.7,
-  age50ge = 0.2, 
-  black = 0.5,
-  hisp = 0.2,
-  nbnh = 0.7
+  total = 42/658,
+  male = 18/218,
+  female = 24/440,
+  age18.24 = 5/216,
+  age25.29 = 6/120,
+  age30.39 = 14/143,
+  age40.49 = 12/86,
+  age50ge = 5/93, 
+  black = 32/499,
+  hisp = 4/102,
+  nbnh = (1+2+3)/(6+2+1+14+34)
 )
 
-p.het.2019 <- (age_mutate(p.het.2019))/100
+p.het.2019 <- (age_mutate(p.het.2019))
 
 years.het <- c(2016,2019) - anchor.year
 
@@ -505,16 +512,12 @@ p.msm.df.long <- p.msm.df.long |> dplyr::select(-variable) |>
 p.idu.df.long <- p.idu.df.long |> dplyr::select(-group) |> 
   dplyr::mutate(risk = rep("idu", length(p.idu.df.long$ageid)))
 
-big.df <- rbind(p.idu.df.long, p.het.df.long)
-
-big.df$sexrisk <- paste(big.df$sexid, big.df$risk, sep = "_")
-big.df$sexrisk <- ifelse(big.df$sexrisk == "msm_msm", "msm", big.df$sexrisk)
+big.df <- rbind(p.idu.df.long, p.het.df.long, p.msm.df.long)
 
 big.df$raceid <- relevel(factor(big.df$raceid), ref = "ALL")
 big.df$ageid <- relevel(factor(big.df$ageid), ref = "ALL")
 big.df$sexid <- relevel(factor(big.df$sexid), ref = "ALL")
 big.df$risk <- relevel(factor(big.df$risk), ref = "msm")
-big.df$sexrisk <- relevel(factor(big.df$sexrisk), ref="msm")
 big.df$sexid[big.df$sexid=="msm"] <- "male"
 
 big.df$female <- as.numeric(big.df$sexid=="female")
@@ -522,42 +525,6 @@ big.df$female <- as.numeric(big.df$sexid=="female")
 big.df$nonmsm <- as.numeric(big.df$risk!="msm")
 big.df$idu <- as.numeric(big.df$risk=="idu")
 
-# fitting the big model
-# fit.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid + risk, data = big.df)
-
-# # fitting an alternative model - interacting sex with risk
-# fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df)
-
-# fit3.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df[1:50,])
-
-
-
-# female model
-# fit3.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + risk + female, data = big.df)
-
-# fit2.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid*risk, data = big.df[1:40,])
-
-# 
-# # nonmsm + female model
-# fit4.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female, data = big.df)
-# 
-# # interacting nonmsm with age
-# fit5.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*ageid, 
-#                   data = big.df) 
-# 
-# # interacting nonmsm with year
-# fit6.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*year,
-#                   data = big.df)
-# 
-# # interacting nonmsm with year and race
-# fit7.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female +
-#                     nonmsm*raceid + nonmsm*year,
-#                   data = big.df)
-# 
-# # interacting nonmsm with race, year, and age
-# fit8.big.df <- lm(logit(p/p.max) ~ year + raceid + ageid + nonmsm + idu + female + nonmsm*raceid +
-#                     nonmsm*year + nonmsm*ageid,
-#                   data = big.df)
 
 # making 2 separate big models -- nonmsm and msm -------
 
@@ -1022,51 +989,17 @@ fit.pi.nonmsm
 # PrEP persistence ------
 
 
-## PrEP Persistence
-
-
-# 2013-2019 clinical data - https://www.liebertpub.com/doi/full/10.1089/apc.2021.0074?casa_token=7Pq9qYIOoeAAAAAA%3ALvWdcft-Qq0LT0wkma1KMR7grGwGODoOjebSB_OqFPIRO98OPk1_RaGyaoac1O-RjfffcOovwbqu
-
-pp.2019 <- data.frame(
-  total = 274/(274+380),
-  white = 187/(187+233),
-  black = 20/(20+39),
-  other = 59/(59+102),
-  hisp = 46/(46+74),
-  male = 268/(268+360),
-  female = 6/(6+20)
-)
-
-pp.2019
-
-#[2015-17 Persistence Data](https://link.springer.com/article/10.1007/s10461-019-02654-x/tables/1)
-
-pp.2017 <- data.frame( 
-  total = 31.9,
-  age18.24 = 43.0,
-  age25.29 = 53,
-  age30.39 = 56.0,
-  age40.49 = 64.0,
-  age50ge = 65.0, # ages 50 or greater
-  male = 57,
-  female = 34
-)
-
-pp.2017 <- pp.2017/100
-pp.2017
-
-# ------- i only used data below to fit the model 
 # [2012-2017 Persistence Data]; SF; 12 months of observation
 # https://academic.oup.com/ofid/article/6/4/ofz101/5365426
 # sample size - 364
 
-pp.2012 <- data.frame(
+pp.2012 <- c(
   total = 38.0,
-  age18.24 = 30,
-  age25.29 = 35,
-  age30.39 = 35,
-  age40.49 = 44,
-  age50ge = 60/134*100,
+  age1 = 30,
+  age2 = 35,
+  age3 = 35,
+  age4 = 44,
+  age5 = 60/134*100,
   black = 33,
   hispanic = 41,
   nbnh = (12+56+16)/(29+136+59)*100,
@@ -1078,89 +1011,144 @@ pp.2012 <- data.frame(
 pp.2012 <- pp.2012/100
 pp.2012
 
+pp.df <- data.frame(pp = pp.2012)
+pp.df$group <- rownames(pp.df)
+
+pp.df$raceid <- ifelse(pp.df$group == "black", "black",
+                       ifelse(pp.df$group == "hispanic", "hispanic",
+                              ifelse(pp.df$group == "nbnh", "other", "ALL")))
+pp.df$riskid <- ifelse(pp.df$group == "msm", "msm", 
+                       ifelse(pp.df$group == "idu", "idu",
+                              ifelse(pp.df$group == "het", "het", "ALL")))
+pp.df$ageid <- ifelse(pp.df$group == "age1", "age1",
+                      ifelse(pp.df$group == "age2", "age2",
+                             ifelse(pp.df$group == "age3", "age3",
+                                    ifelse(pp.df$group == "age4", "age4",
+                                           ifelse(pp.df$group == "age5", "age5",
+                                                  "ALL")))))
+
+pp.df$ageid <- relevel(factor(pp.df$ageid), ref = "ALL")
+pp.df$raceid <- relevel(factor(pp.df$raceid), ref = "ALL")
+pp.df$riskid <- relevel(factor(pp.df$riskid), ref = "ALL")
+
+fit.pp <- lm(pp ~ 1 + raceid + riskid + ageid, data = pp.df)
+fit.pp
+
+
+
+# 2013-2019 clinical data - https://www.liebertpub.com/doi/full/10.1089/apc.2021.0074?casa_token=7Pq9qYIOoeAAAAAA%3ALvWdcft-Qq0LT0wkma1KMR7grGwGODoOjebSB_OqFPIRO98OPk1_RaGyaoac1O-RjfffcOovwbqu
+# 
+# pp.2019 <- data.frame(
+#   total = 274/(274+380),
+#   white = 187/(187+233),
+#   black = 20/(20+39),
+#   other = 59/(59+102),
+#   hisp = 46/(46+74),
+#   male = 268/(268+360),
+#   female = 6/(6+20)
+# )
+# 
+# pp.2019
+# 
+# #[2015-17 Persistence Data](https://link.springer.com/article/10.1007/s10461-019-02654-x/tables/1)
+# 
+# pp.2017 <- data.frame( 
+#   total = 31.9,
+#   age18.24 = 43.0,
+#   age25.29 = 53,
+#   age30.39 = 56.0,
+#   age40.49 = 64.0,
+#   age50ge = 65.0, # ages 50 or greater
+#   male = 57,
+#   female = 34
+# )
+# 
+# pp.2017 <- pp.2017/100
+# pp.2017
+
 # 2011-2014 Persistence Data; Fenway Health Cohort - Boston; 24 months total follow-up
 # https://onlinelibrary.wiley.com/doi/epdf/10.1002/jia2.25250
 # sample size - 663
-
-pp.2014 <- data.frame(
-  total = 376/663,
-  age18.24 = 37/88,
-  age25.29 = 69/168,
-  age30.39 = 130/208,
-  age40.49 = 140/199,
-  age50ge = 140/199,
-  male = (367+5)/(636+2),
-  female = (2+2)/(3+4),
-  black = 20/43,
-  hispanic = 22/44,
-  nbnh = (289+10+35)/(481+24+61)
-)
-
-pp.2014
-
-pp.total <- c(pp.2014$total, pp.2012$total)
-pp.age1 <- c(pp.2014$age18.24, pp.2012$age18.24)
-pp.age2 <- c(pp.2014$age25.29, pp.2012$age25.29)
-pp.age3 <- c(pp.2014$age30.39, pp.2012$age30.39)
-pp.age4 <- c(pp.2014$age40.49, pp.2012$age40.49)
-pp.age5 <- c(pp.2014$age50ge, pp.2012$age50ge)
-pp.black <- c(pp.2014$black, pp.2012$black)
-pp.hisp <- c(pp.2014$hispanic, pp.2012$hispanic)
-pp.nbnh <- c(pp.2014$nbnh, pp.2012$nbnh)
-
-years.pp <- c(2014, 2012)-anchor.year
-
-pp.df <- data.frame(
-  years = years.pp,
-  total = pp.total,
-  black = pp.black,
-  hisp = pp.hisp,
-  nbnh = pp.nbnh,
-  age1 = pp.age1,
-  age2 = pp.age2,
-  age3 = pp.age3,
-  age4= pp.age4,
-  age5 = pp.age5
-)
-### prep persistence model ------
-pp.df.long <- gather(pp.df, key = "group", value = "pp", -years)
-pp.df.long <- pp.df.long |> dplyr::mutate(raceid = ifelse(group == "black", "black", 
-                                                          ifelse(group == "hisp", "hisp", 
-                                                                 ifelse(group == "nbnh", "nbnh", "ALL"))),
-                                          ageid = ifelse(group == "age1", "age1", 
-                                                         ifelse(group == "age2", "age2", 
-                                                                ifelse(group == "age3", "age3", 
-                                                                       ifelse(group == "age4", "age4", 
-                                                                              ifelse(group == "age5", "age5", "ALL"))))))
-pp.df.long$raceid <- relevel(factor(pp.df.long$raceid), ref = "ALL")
-pp.df.long$ageid <- relevel(factor(pp.df.long$ageid), ref = "ALL")
-
-fit.pp <- lm(logit(pp) ~ years + raceid + ageid, data = pp.df.long)
-
-# 2014-2017 persistence; cohort study; 24 month assessments
-# https://link.springer.com/article/10.1007/s10461-018-2045-1/tables/1
-
-pp.msm.2016 <- data.frame(
-  total = ((55-12)+(117-19))/(55+117+12+19),
-  white = (117-19)/117,
-  nonwhite = (55-12)/55
-)
-
 # 
-#[2020 Persistence Data](https://www.tandfonline.com/doi/full/10.1080/09540121.2023.2217375) - MSM
-pp.msm.2020 <- data.frame(
-  total = 77.3,
-  age18.24 = 66.7,
-  age25.29 = 77.7,
-  age30.39 = 82.0,
-  age40.49 = 84.8,
-  age50ge = 84.8, # ages 50 or greater
-  black = 83.2,
-  hisp = 78.9,
-  nbnh = 76.0
-)
-
-
+# pp.2014 <- data.frame(
+#   total = 376/663,
+#   age18.24 = 37/88,
+#   age25.29 = 69/168,
+#   age30.39 = 130/208,
+#   age40.49 = 140/199,
+#   age50ge = 140/199,
+#   male = (367+5)/(636+2),
+#   female = (2+2)/(3+4),
+#   black = 20/43,
+#   hispanic = 22/44,
+#   nbnh = (289+10+35)/(481+24+61)
+# )
+# 
+# pp.2014
+# 
+# pp.total <- c(pp.2014$total, pp.2012$total)
+# pp.age1 <- c(pp.2014$age18.24, pp.2012$age18.24)
+# pp.age2 <- c(pp.2014$age25.29, pp.2012$age25.29)
+# pp.age3 <- c(pp.2014$age30.39, pp.2012$age30.39)
+# pp.age4 <- c(pp.2014$age40.49, pp.2012$age40.49)
+# pp.age5 <- c(pp.2014$age50ge, pp.2012$age50ge)
+# pp.black <- c(pp.2014$black, pp.2012$black)
+# pp.hisp <- c(pp.2014$hispanic, pp.2012$hispanic)
+# pp.nbnh <- c(pp.2014$nbnh, pp.2012$nbnh)
+# 
+# years.pp <- c(2014, 2012)-anchor.year
+# 
+# pp.df <- data.frame(
+#   years = years.pp,
+#   total = pp.total,
+#   black = pp.black,
+#   hisp = pp.hisp,
+#   nbnh = pp.nbnh,
+#   age1 = pp.age1,
+#   age2 = pp.age2,
+#   age3 = pp.age3,
+#   age4= pp.age4,
+#   age5 = pp.age5
+# )
+# ### prep persistence model ------
+# pp.df.long <- gather(pp.df, key = "group", value = "pp", -years)
+# pp.df.long <- pp.df.long |> dplyr::mutate(raceid = ifelse(group == "black", "black", 
+#                                                           ifelse(group == "hisp", "hisp", 
+#                                                                  ifelse(group == "nbnh", "nbnh", "ALL"))),
+#                                           ageid = ifelse(group == "age1", "age1", 
+#                                                          ifelse(group == "age2", "age2", 
+#                                                                 ifelse(group == "age3", "age3", 
+#                                                                        ifelse(group == "age4", "age4", 
+#                                                                               ifelse(group == "age5", "age5", "ALL"))))))
+# pp.df.long$raceid <- relevel(factor(pp.df.long$raceid), ref = "ALL")
+# pp.df.long$ageid <- relevel(factor(pp.df.long$ageid), ref = "ALL")
+# 
+# fit.pp <- lm(logit(pp) ~ years + raceid + ageid, data = pp.df.long)
+# 
+# # 2014-2017 persistence; cohort study; 24 month assessments
+# # https://link.springer.com/article/10.1007/s10461-018-2045-1/tables/1
+# 
+# pp.msm.2016 <- data.frame(
+#   total = ((55-12)+(117-19))/(55+117+12+19),
+#   white = (117-19)/117,
+#   nonwhite = (55-12)/55
+# )
+# 
+# # 
+# #[2020 Persistence Data](https://www.tandfonline.com/doi/full/10.1080/09540121.2023.2217375) - MSM
+# pp.msm.2020 <- data.frame(
+#   total = 77.3,
+#   age18.24 = 66.7,
+#   age25.29 = 77.7,
+#   age30.39 = 82.0,
+#   age40.49 = 84.8,
+#   age50ge = 84.8, # ages 50 or greater
+#   black = 83.2,
+#   hisp = 78.9,
+#   nbnh = 76.0
+# )
+# 
+# 
 
 
 # MSM and transgender folks, 2017 - https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6698689/ -- prevalence ratios
