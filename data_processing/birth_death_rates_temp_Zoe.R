@@ -1,6 +1,6 @@
-#load.data.manager(name="smaller.census.manager", file="cached/smaller.census.manager.rdata")
-#library(jheem2)
-#library(locations)
+# load.data.manager(name="smaller.census.manager", file="cached/smaller.census.manager.rdata")
+# library(jheem2)
+# library(locations)
 
 # TEST CODE
 if (1==2)
@@ -73,6 +73,14 @@ get.location.mortality.rates <- function(location,
 #Also adjusting for mortality = 0
 ###############################################################################
 
+test <- function(msa.name,
+                 year.ranges = c('2006-2010','2011-2015'),
+                                 census.manager = CENSUS.MANAGER){
+  states = locations::get.containing.locations(msa.name, "state")
+  counties = locations::get.contained.locations(msa.name, 'county')
+  state.metro.deaths = census.manager$pull(outcome = 'metro.deaths', dimension.values = list(location = states, year= year.ranges), keep.dimensions = c('location', 'age', 'race', 'ethnicity', 'sex'))
+ #Keep copying lines from old function to new function to sort out where the issue is 
+}
 #Working with one MSA at a time
 
 get.location.mortality.rates.new <- function(msa.name,
@@ -81,12 +89,12 @@ get.location.mortality.rates.new <- function(msa.name,
                                              census.manager = smaller.census.manager)
   
 {
-  browser()
+
   states = locations::get.containing.locations(msa.name, "state")
   counties = locations::get.contained.locations(msa.name, 'county')
   
   #Pull state metro deaths (numerator)
-  state.metro.deaths = census.manager$pull(outcome = 'metro.deaths', dimension.values = list(location = states, year= year.ranges), keep.dimensions = c('location', 'age', 'race', 'ethnicity', 'sex'))
+  state.metro.deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', dimension.values = list(location = states, year= year.ranges), keep.dimensions = c('location', 'age', 'race', 'ethnicity', 'sex'))
   
   #Set up for if deaths = 0, need to set to the minimum value calculated in other stratum
   
