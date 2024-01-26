@@ -64,48 +64,53 @@ joint.pop.migration.likelihood.instructions = join.likelihood.instructions(popul
                                                                            emigration.likelihood.instructions
                                                                            )
 
-if(1==2){
-  new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                                                               outcome.for.sim = "new",
-                                                                               dimensions = c("age","sex","race","risk"),
-                                                                               levels.of.stratification = c(0,1), # how do I get this? 
-                                                                               from.year = as.integer(1992), # got from ontologies?
-                                                                               
-                                                                               observation.correlation.form = 'compound.symmetry', 
-                                                                               measurement.error.coefficient.of.variance = 0.03,
-                                                                               
-                                                                               weights = list(1), # upweight?
-                                                                               equalize.weight.by.year = T 
-  )
-  
-  prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                                                            outcome.for.sim = "diagnosed.prevalence",
-                                                                            dimensions = c("age","sex","race","risk"),
-                                                                            levels.of.stratification = c(0,1), # how do I get this? 
-                                                                            from.year = as.integer(1992), # got from ontologies?
-                                                                            
-                                                                            observation.correlation.form = 'compound.symmetry', 
-                                                                            measurement.error.coefficient.of.variance = 0.03,
-                                                                            
-                                                                            weights = list(1), # upweight?
-                                                                            equalize.weight.by.year = T 
-  )
-  
-  mortality.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
-                                                                           outcome.for.sim = "hiv.mortality",
-                                                                           dimensions = c("age","sex","race","risk"),
-                                                                           levels.of.stratification = c(0,1), # how do I get this? 
-                                                                           from.year = as.integer(1992), # got from ontologies?
-                                                                           
-                                                                           observation.correlation.form = 'compound.symmetry', 
-                                                                           measurement.error.coefficient.of.variance = 0.03,
-                                                                           
-                                                                           weights = list(1), 
-                                                                           equalize.weight.by.year = T 
-  )
-}
+new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                                                             outcome.for.sim = "new",
+                                                                             dimensions = c("age","sex","race","risk"),
+                                                                             levels.of.stratification = c(0,1,2), 
+                                                                             from.year = as.integer(2008), 
+                                                                             
+                                                                             observation.correlation.form = 'compound.symmetry', 
+                                                                             measurement.error.coefficient.of.variance = 0.03,
+                                                                             
+                                                                             weights = list(1), # upweight?
+                                                                             equalize.weight.by.year = T 
+)
+
+prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                                                          outcome.for.sim = "diagnosed.prevalence",
+                                                                          dimensions = c("age","sex","race","risk"),
+                                                                          levels.of.stratification = c(0,1,2), 
+                                                                          from.year = as.integer(2008), 
+                                                                          
+                                                                          observation.correlation.form = 'compound.symmetry', 
+                                                                          measurement.error.coefficient.of.variance = 0.03,
+                                                                          
+                                                                          weights = list(1), # upweight?
+                                                                          equalize.weight.by.year = T 
+)
+
+mortality.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
+                                                                         outcome.for.sim = "hiv.mortality",
+                                                                         dimensions = c("age","sex","race","risk"),
+                                                                         levels.of.stratification = c(0,1,2), 
+                                                                         from.year = as.integer(2008), 
+                                                                         
+                                                                         observation.correlation.form = 'compound.symmetry', 
+                                                                         measurement.error.coefficient.of.variance = 0.03,
+                                                                         
+                                                                         weights = list(1), 
+                                                                         equalize.weight.by.year = T 
+)
 
 
+full.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
+                                                            immigration.likelihood.instructions,
+                                                            emigration.likelihood.instructions,
+                                                            new.diagnoses.likelihood.instructions,
+                                                            prevalence.likelihood.instructions,
+                                                            mortality.likelihood.instructions
+)
 
 
 
