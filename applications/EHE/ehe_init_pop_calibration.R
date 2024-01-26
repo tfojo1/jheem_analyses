@@ -8,7 +8,6 @@ CALIBRATION.CODE = 'init.pop.ehe'
 N.ITER = 10000
 LOCATION = MIAMI.MSA 
 # SF, LA, Riverside, Memphis had a bug with 'proportion.msm.of.male' being NA or empty 
-# NY, Chicago, Boston, Philly, DC, Charlotte had a bug with 'non.idu.general.mortality' subscript out of bounds
 # NOLA had a bug with mobility data[] subscript out of bounds 
 
 par.names = c("black.birth.rate.multiplier",

@@ -9,22 +9,19 @@ load("../jheem_analyses/prelim_results/init.pop.migration.sim_2024-01-13_C.33100
 LOCATION = sim$location
 
 sim.mcmc = sim 
-# params.mcmc = sim.mcmc$parameters
-params.new = sim.new$parameters
+params.mcmc = sim.mcmc$parameters
 
-# params.manual = c(params.mcmc)
-params.manual = c(params.new)
-# names(params.manual) = dimnames(params.mcmc)[[1]]
-names(params.manual) = dimnames(params.new)[[1]]
+params.manual = c(params.mcmc)
+names(params.manual) = dimnames(params.mcmc)[[1]]
 
 engine = create.jheem.engine('ehe', LOCATION, start.year=1970, end.year=2025, max.run.time.seconds = 10)
-sim.manual = engine$run(parameters = params.manual) # only works if you comment out lines 1512-1516 of JHEEM_engine
+sim.manual = engine$run(parameters = params.manual) 
 
-simplot(sim.new, sim.manual, "population",
+simplot(sim.mcmc, sim.manual, "population",
         facet.by = "age",split.by = "race",
         dimension.values = list(year = as.character(2000:2020)))
 
-cbind(sim.new$parameters[par.names,],
+cbind(sim.mcmc$parameters[par.names,],
       sim.manual$parameters[par.names,])
 
 # HOUSTON PARAMETERS
@@ -48,7 +45,7 @@ params.manual["age2.migration.multiplier.time.1"] = 1 # 0.18348045
 params.manual["hispanic.migration.multiplier.time.2"] = 1 # 0.27902878
 
 sim.manual = engine$run(parameters = params.manual)
-simplot(sim.new, sim.manual, "population",
+simplot(sim.mcmc, sim.manual, "population",
         facet.by = "age",split.by = "race",
         dimension.values = list(year = as.character(2000:2020)))
 
@@ -57,23 +54,10 @@ simplot(sim.new, sim.manual, "population",
 lik = joint.pop.migration.likelihood.instructions$instantiate.likelihood('ehe', location = LOCATION,
                                                                          data.manager = SURVEILLANCE.MANAGER)
 
-# exp(lik$compute(sim.manual,check.consistency=F) - lik$compute(sim.mcmc,check.consistency=F)) 
-exp(lik$compute(sim.manual,check.consistency=F) - lik$compute(sim.new,check.consistency=F)) 
+exp(lik$compute(sim.manual,check.consistency=F) - lik$compute(sim.mcmc,check.consistency=F)) 
 
 # Individual likelihood components
-pop.lik = population.likelihood.instructions$instantiate.likelihood('ehe', location = LOCATION)
-imm.lik = immigration.likelihood.instructions$instantiate.likelihood('ehe', location = LOCATION)
-em.lik = emigration.likelihood.instructions$instantiate.likelihood('ehe', location = LOCATION)
-
-# exp(pop.lik$compute(sim.manual,check.consistency=F) - pop.lik$compute(sim.mcmc,check.consistency=F)) 
-# exp(imm.lik$compute(sim.manual,check.consistency=F) - imm.lik$compute(sim.mcmc,check.consistency=F)) 
-# exp(em.lik$compute(sim.manual,check.consistency=F) - em.lik$compute(sim.mcmc,check.consistency=F)) 
-
-exp(pop.lik$compute(sim.manual,check.consistency=F) - pop.lik$compute(sim.new,check.consistency=F)) 
-exp(imm.lik$compute(sim.manual,check.consistency=F) - imm.lik$compute(sim.new,check.consistency=F)) 
-exp(em.lik$compute(sim.manual,check.consistency=F) - em.lik$compute(sim.new,check.consistency=F)) 
-
-
+exp(lik$compute.piecewise(sim.manual,check.consistency=F) - lik$compute.piecewise(sim.mcmc,check.consistency=F)) 
 
 
 ## EXTRA DEBUGGING - MIAMI 
