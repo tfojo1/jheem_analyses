@@ -122,6 +122,10 @@ get.covid.mobility.measure <- function(mobility.data,
             paste0(year, "-", month.names)
     }))
     
+    counties = intersect(counties, dimnames(mobility.data)$location)
+    if (length(counties)==0)
+        stop(paste0("Cannot get COVID mobility data for '", location, "' - no data are available for any contained counties"))
+    
     sub.data = mobility.data[times, types, counties, drop=F]
     proportions.data = apply(sub.data, 2:3, function(x){
         norm.to = x[2]
