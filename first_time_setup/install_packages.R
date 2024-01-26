@@ -3,7 +3,8 @@
 library(devtools)
 
 # Packages requires for our custom packages
-install.packages('ggmap')
+if (nchar(system.file(package='ggmap'))==0)
+  install.packages('ggmap')
 
 # Our Custom Packages
 install_github('tfojo1/distributions')
@@ -14,4 +15,5 @@ install_github('tfojo1/locations')
 
 # Archival packages - I hope to eventually remove these
 install_github('tfojo1/jheem')
-install.packages('sas7bdat')
+if (nchar(system.file(package='sas7bdat'))==0)
+  install.packages('sas7bdat')
