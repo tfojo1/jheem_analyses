@@ -452,6 +452,17 @@ data.manager$register.ontology(
     incomplete.dimensions = c("year", "location")
   ))
 
+data.manager$register.ontology(
+  'cdc.national',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-19 years', '20-24 years', '25-34 years', '35-44 years', '45-54 years','55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80-84 years','85+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
 ################################################################################
 ###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')
@@ -506,6 +517,9 @@ source('data_processing/brfss_unweighted_denominators.R')
 #Source immigration data
 source('data_processing/immigration.R')
 source('data_processing/immigration_age_calculations.R')
+
+#National Atlas Plus data on diagnosis and prevalence
+source('data_processing/national_data.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
