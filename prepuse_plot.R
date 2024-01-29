@@ -128,7 +128,7 @@ idu.age.plot <- ggplot(idu.age, aes(year, value, color=age)) +
 
 idu.sex <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),'active_IDU',], c('year', 'sex'), mean))
 df.pts <- subset(p.idu.df.long, sexid != "ALL") |> dplyr::mutate(year = year + anchor.year)
-
+I 
 
 df.pts$sexid <- factor(df.pts$sexid, levels = c("male", "female"))
 idu.sex$sex <- factor(idu.sex$sex, levels = c("heterosexual_male", "female"))
