@@ -122,7 +122,7 @@ get.prep.indication.functional.form <- function(specification.metadata){
   
   # Some variables you will use
   anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
-  max.prep.indication = 1 # modify as you see fit
+  max.prep.indication = 0.85 # modify as you see fit
   
   # Set up our intercept/slope arrays
   # We are going to define these on the LOGIT scale
@@ -158,9 +158,13 @@ get.prep.indication.functional.form <- function(specification.metadata){
   int[,"hispanic","female","never_IDU"] <- int[,"hispanic","female","never_IDU"] + coef(fit.pi.het)["raceidhisp"]
   int[,"other","female","never_IDU"] <- int[,"other","female","never_IDU"] + coef(fit.pi.het)["raceidnbnh"]
   
-  int[,"black",,"active_IDU"] <- int[,"black",,"active_IDU"] + coef(fit.pi.idu)["raceidblack"]
-  int[,"hispanic",,"active_IDU"] <- int[,"hispanic",,"active_IDU"] + coef(fit.pi.idu)["raceidhisp"]
-  int[,"other",,"active_IDU"] <- int[,"other",,"active_IDU"] + coef(fit.pi.idu)["raceidnbnh"]
+  int[,"black","heterosexual_male","active_IDU"] <- int[,"black","heterosexual_male","active_IDU"] + coef(fit.pi.idu)["raceidblack"]
+  int[,"hispanic","heterosexual_male","active_IDU"] <- int[,"hispanic","heterosexual_male","active_IDU"] + coef(fit.pi.idu)["raceidhisp"]
+  int[,"other","heterosexual_male","active_IDU"] <- int[,"other","heterosexual_male","active_IDU"] + coef(fit.pi.idu)["raceidnbnh"]
+  
+  int[,"black","female","active_IDU"] <- int[,"black","female","active_IDU"] + coef(fit.pi.idu)["raceidblack"]
+  int[,"hispanic","female","active_IDU"] <- int[,"hispanic","female","active_IDU"] + coef(fit.pi.idu)["raceidhisp"]
+  int[,"other","female","active_IDU"] <- int[,"other","female","active_IDU"] + coef(fit.pi.idu)["raceidnbnh"]
   
   int["13-24 years",,"msm",] <- int["13-24 years",,"msm",] + coef(fit.pi.msm)["ageidage1"]
   int["25-34 years",,"msm",] <- int["25-34 years",,"msm",] + coef(fit.pi.msm)["ageidage2"]
@@ -180,11 +184,17 @@ get.prep.indication.functional.form <- function(specification.metadata){
   int["45-54 years",,"female","never_IDU"] <- int["45-54 years",,"female","never_IDU"] + coef(fit.pi.het)["ageidage4"]
   int["55+ years",,"female","never_IDU"] <- int["55+ years",,"female","never_IDU"] + coef(fit.pi.nonmsm)["ageidage5"]
   
-  int["13-24 years",,,"active_IDU"] <- int["13-24 years",,,"active_IDU"] + coef(fit.pi.idu)["ageidage1"]
-  int["25-34 years",,,"active_IDU"] <- int["25-34 years",,,"active_IDU"] + coef(fit.pi.idu)["ageidage2"]
-  int["35-44 years",,,"active_IDU"] <- int["35-44 years",,,"active_IDU"] + coef(fit.pi.idu)["ageidage3"]
-  int["45-54 years",,,"active_IDU"] <- int["45-54 years",,,"active_IDU"] + coef(fit.pi.idu)["ageidage4"]
-  int["55+ years",,,"active_IDU"] <- int["55+ years",,,"active_IDU"] + coef(fit.pi.idu)["ageidage5"]
+  int["13-24 years",,"heterosexual_male","active_IDU"] <- int["13-24 years",,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["ageidage1"]
+  int["25-34 years",,"heterosexual_male","active_IDU"] <- int["25-34 years",,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["ageidage2"]
+  int["35-44 years",,"heterosexual_male","active_IDU"] <- int["35-44 years",,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["ageidage3"]
+  int["45-54 years",,"heterosexual_male","active_IDU"] <- int["45-54 years",,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["ageidage4"]
+  int["55+ years",,"heterosexual_male","active_IDU"] <- int["55+ years",,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["ageidage5"]
+  
+  int["13-24 years",,"female","active_IDU"] <- int["13-24 years",,"female","active_IDU"] + coef(fit.pi.idu)["ageidage1"]
+  int["25-34 years",,"female","active_IDU"] <- int["25-34 years",,"female","active_IDU"] + coef(fit.pi.idu)["ageidage2"]
+  int["35-44 years",,"female","active_IDU"] <- int["35-44 years",,"female","active_IDU"] + coef(fit.pi.idu)["ageidage3"]
+  int["45-54 years",,"female","active_IDU"] <- int["45-54 years",,"female","active_IDU"] + coef(fit.pi.idu)["ageidage4"]
+  int["55+ years",,"female","active_IDU"] <- int["55+ years",,"female","active_IDU"] + coef(fit.pi.idu)["ageidage5"]
   
   int[,,"female","never_IDU"] <- int[,,"female","never_IDU"] + coef(fit.pi.het)["female"]
   int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit.pi.idu)["female"]
@@ -199,7 +209,6 @@ get.prep.indication.functional.form <- function(specification.metadata){
   slope[,,"heterosexual_male","active_IDU"] <- slope[,,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["years"]
   slope[,,"female","active_IDU"] <- slope[,,"female","active_IDU"] + coef(fit.pi.idu)["years"]
   
-
   # Make and return the functional form object
   create.logistic.linear.functional.form(
     intercept = int,
