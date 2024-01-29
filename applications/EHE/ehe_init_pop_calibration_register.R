@@ -4,9 +4,8 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 print("SETTING UP MCMC")
-CALIBRATION.CODE = 'init.pop.ehe'
+CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 N.ITER = 10000
-LOCATION = MIAMI.MSA 
 # SF, LA, Riverside, Memphis had a bug with 'proportion.msm.of.male' being NA or empty 
 # NOLA had a bug with mobility data[] subscript out of bounds 
 
@@ -51,14 +50,9 @@ par.names = c("black.birth.rate.multiplier",
               "age4.migration.multiplier.time.2",
               "age5.migration.multiplier.time.1",
               "age5.migration.multiplier.time.2"
-              )
+)
 
-clear.calibration.cache(version='ehe',
-                        location=LOCATION,
-                        calibration.code = CALIBRATION.CODE,
-                        root.dir = '../test_runs')
-
-register.calibration.info(CALIBRATION.CODE,
+register.calibration.info(CALIBRATION.CODE.POPULATION,
                           likelihood.instructions = joint.pop.migration.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           start.year = 1970,
@@ -70,39 +64,5 @@ register.calibration.info(CALIBRATION.CODE,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get population parameters in the general vicinity"
-                          )
+)
 
-set.up.calibration(version='ehe',
-                   location=LOCATION,
-                   calibration.code = CALIBRATION.CODE,
-                   root.dir = '../test_runs',
-                   cache.frequency = 250)
-
-set.seed(12345)
-start.time = Sys.time()
-print(paste0("STARTING MCMC RUN AT ",Sys.time()))
-mcmc = run.calibration(version = 'ehe',
-                location = LOCATION,
-                calibration.code = CALIBRATION.CODE,
-                root.dir = '../test_runs',
-                chains = 1,
-                update.frequency = 100,
-                update.detail = 'med')
-end.time = Sys.time()
-run.time = as.numeric(end.time) - as.numeric(start.time)
-
-print(paste0("DONE RUNNING MCMC: Took ",
-             round(run.time/60, 0), " minutes to run ",
-             format(N.ITER, big.mark = ","),
-             " simulations (",
-             round(run.time / N.ITER, 1), " seconds per simulation on average)"))
-
-#mcmc = assemble.mcmc.from.calibration(version = 'ehe',
-#                                      location = LOCATION,
-#                                      calibration.code = CALIBRATION.CODE,
-#                                      root.dir = '../test_runs',
-#                                      chains = 1)
-
-sim = mcmc@simulations[[length(mcmc@simulations)]]
-
-save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
