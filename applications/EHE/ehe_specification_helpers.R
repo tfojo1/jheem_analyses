@@ -186,7 +186,7 @@ get.empiric.hiv.aging.rates <- function(location,
     }
     
     create.natural.spline.functional.form(knot.times = years,
-                                          knot.values = interpolated.aging.rates.by.year,
+                                          knot.values = merged.aging.rates.by.year,
                                           link = 'log',
                                           knots.are.on.transformed.scale = F)
   
