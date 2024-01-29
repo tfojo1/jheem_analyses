@@ -36,9 +36,27 @@ get.default.aging.rates <- function(location, specification.metadata,
 }
 
 get.empiric.aging.rates <- function(location, specification.metadata,
-                                    years=c(2010,2020,2030,2040),
+                                    years=c('2010'=2010,'2020'=2020,'2030'=2030,'2040'=2040),
                                     active.idu.proportion.youngest.stratum.aging.up=0.25,
                                     prior.idu.proportion.youngest.stratum.aging.up=0.25)
+{
+    aging.rates = do.get.empiric.aging.rates(location = location,
+                                             specification.metadata = specification.metadata,
+                                             years = years,
+                                             active.idu.proportion.youngest.stratum.aging.up = active.idu.proportion.youngest.stratum.aging.up,
+                                             prior.idu.proportion.youngest.stratum.aging.up = active.idu.proportion.youngest.stratum.aging.up)
+    
+    create.natural.spline.functional.form(knot.times = years,
+                                          knot.values = aging.rates,
+                                          link = 'log',
+                                          knots.are.on.transformed.scale = F)
+}
+
+do.get.empiric.aging.rates <- function(location, specification.metadata,
+                                       years=c('2010'=2010,'2020'=2020,'2030'=2030,'2040'=2040),
+                                       active.idu.proportion.youngest.stratum.aging.up=0.25,
+                                       prior.idu.proportion.youngest.stratum.aging.up=0.25,
+                                       force.match.age.brackets.to.before.smoothing = NULL)
 {
     counties = locations::get.contained.locations(location, 'county')
     
@@ -60,6 +78,21 @@ get.empiric.aging.rates <- function(location, specification.metadata,
     
     pop = apply(pop, c('year','age','race','ethnicity','sex'), sum, na.rm=T)
     pop = race.mapping$apply(pop)
+    
+    if (!is.null(force.match.age.brackets.to.before.smoothing))
+    {
+        age.mapping = get.ontology.mapping(from.ontology = dimnames(pop)['age'],
+                                           to.ontology = list(age=force.match.age.brackets.to.before.smoothing))
+        
+        if (is.null(age.mapping))
+            stop("Cannot infer empiric aging rates: don't know how to map age to the brackets given in 'force.match.age.brackets.to.before.smoothing'")
+        
+        pop2 = age.mapping$apply(pop)
+        pop = restratify.age.counts(pop2,
+                                    desired.age.brackets = dimnames(pop)$age,
+                                    smooth.infinite.age.to = 101,
+                                    allow.extrapolation = T)
+    }
     
     aging.rates = lapply(years, function(year){
       year = as.character(min(max(year,min.year),max.year))
@@ -102,14 +135,191 @@ get.empiric.aging.rates <- function(location, specification.metadata,
         rv
     })
     
-    names(aging.rates) = as.character(years)
-    names(years) = as.character(years)
+    names(aging.rates) = names(years)
+    aging.rates
+}
+
+get.empiric.hiv.aging.rates <- function(location, 
+                                        specification.metadata,
+                                        years=c(time0=1990, time1=2000, time2=2010, time3=2020),
+                                        year.range.span = 5,
+                                        min.years.per.range = 3,
+                                        weight.to.national=1)
+{
+    states = get.overlapping.locations(location, 'state')
+    
+    if (length(states)>1)
+    {
+        counties.in.states = get.contained.locations(states, 'county')
+        counties.in.location = get.contained.locations(location, 'county')
+        
+        state.weights = matrix(1/length(states), nrow=length(years), ncol=length(states))
+    }
+    else
+        state.weights = matrix(1, nrow=length(years), ncol=1)
+    
+    weights = cbind(weight.to.national, (1-weight.to.national)*state.weights)
+    data.locations = c("US", states)
+    
+    data.locations = data.locations[colSums(weights)>0]
+    weights = weights[colSums(weights)>0]
+    
+    aging.rates.by.location = lapply(data.locations, 
+                                     do.get.empiric.hiv.aging.rates,
+                                     specification.metadata = specification.metadata,
+                                     years = years,
+                                     year.range.span = year.range.span,
+                                     min.years.per.range = min.years.per.range)
+    
+    if (length(data.locations)==1)
+        merged.aging.rates.by.year = aging.rates.by.location[[1]]
+    else
+    {
+        merged.aging.rates.by.year = lapply(1:length(aging.rates.by.location[[1]], function(y){
+            rv = 0
+            for (loc in 2:length(data.lotcations))
+                rv = aging.rates.by.location[[loc]][[y]] * weights[y,loc] + rv
+            rv
+        }))
+        
+        names(merged.aging.rates.by.year) = names(aging.rates.by.location[[1]])
+    }
     
     create.natural.spline.functional.form(knot.times = years,
-                                          knot.values = aging.rates,
+                                          knot.values = interpolated.aging.rates.by.year,
                                           link = 'log',
                                           knots.are.on.transformed.scale = F)
-                                          
+  
+}
+
+do.get.empiric.hiv.aging.rates <- function(location, 
+                                           specification.metadata,
+                                           years=c(time0=1990, time1=2000, time2=2010, time3=2020),
+                                           year.range.span = 5,
+                                           min.years.per.range = 3,
+                                           force.match.age.brackets.before.smoothing = F)
+{
+    print("For now, we are directly extracting from the data manager. Need to get the ontology-specific pull working")
+    if (location=='US')
+        pop = SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.hiv$cdc.national$year__location__age__race__sex__risk[,1,,,,]
+    else
+        pop = SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk[,location,,,,]
+    
+    # pop = SURVEILLANCE.MANAGER$pull(outcome='diagnosed.prevalence',
+    #                                 dimension.values = list(location = 'US'),
+    #                                 keep.dimensions = c('year','age','race','sex','risk'))
+    # 
+    # pop = rowMeans(pop, dims=length(dim(pop))-1)
+    
+    
+    if (is.null(pop))
+      stop("Cannot infer empiric HIV aging rates: there was no fully stratified, HIV prevalence data at all for '", location, "'")
+    
+
+    pop.years = as.numeric(dimnames(pop)$year)
+    parsed.ages = parse.age.strata.names(dimnames(pop)$age)
+    min.age = min(parsed.ages$lower)
+    max.age = min(101, max(parsed.ages$upper))
+    
+    map.to.jheem.sex.risk = create.ontology.mapping(
+      from.dimensions = c('risk','sex'),
+      mappings = rbind(
+        c('msm', 'male', 'never_IDU', 'msm'),
+        c('msm', 'female', NA, NA),
+        
+        c('msm_idu', 'male', 'active_IDU', 'msm'),
+        c('msm_idu', 'male', 'IDU_in_remission', 'msm'),
+        c('msm_idu', 'female', NA, NA),
+        
+        c('idu', 'male', 'active_IDU', 'heterosexual_male'),
+        c('idu', 'male', 'IDU_in_remission', 'heterosexual_male'),
+        c('idu', 'female', 'active_IDU', 'female'),
+        c('idu', 'female', 'IDU_in_remission', 'female'),
+        
+        c('heterosexual', 'male', 'never_IDU','heterosexual_male'),
+        c('heterosexual', 'female', 'never_IDU','female'),
+        c('other', 'male', 'never_IDU','heterosexual_male'),
+        c('other', 'female', 'never_IDU','female')
+      )
+      
+    )
+    
+    pop2 = map.to.jheem.sex.risk$apply(pop)
+    
+    race.mapping = get.ontology.mapping(from.ontology = dimnames(pop)['race'],
+                                        to.ontology = specification.metadata$dim.names['race'])
+    if (is.null(race.mapping))
+        stop("Cannot infer empiric HIV aging rates: don't know how to map race to the desired ontology for the specification")
+    
+    pop2 = race.mapping$apply(pop2)
+    
+    if (force.match.age.brackets.before.smoothing)
+    {
+        age.mapping = get.ontology.mapping(from.ontology = dimnames(pop)['age'],
+                                           to.ontology = specification.metadata$dim.names['age'])
+        
+        if (is.null(age.mapping))
+          stop("Cannot infer empiric HIV aging rates: don't know how to map age to the desired ontology for the specification (and we have set force.match.age.brackets.before.smoothing==T)")
+        
+        pop2 = age.mapping$apply(pop2)
+    }
+    
+    aging.rates.by.year = lapply(years, function(year){
+      
+      delta = ceiling((year.range.span-1)/2)
+      desired.years.to.pull = (year-delta):(year+delta)
+      years.to.pull = intersect(desired.years.to.pull, pop.years)  
+      
+      if (length(years.to.pull)==0)
+        return(NULL)
+      
+      if (length(years.to.pull) < min.years.per.range)
+        stop(paste0("Cannot infer empiric HIV aging rates: there ",
+                    ifelse(length(years.to.pull)==0, "are no years",
+                           ifelse(length(years.to.pull)==1, "is only one year",
+                                  paste0("are only ", length(years.to.pull), " years"))),
+                    " with fully stratified, HIV prevalence data for '", location, "' between ",
+                    min(desired.years.to.pull), " and ", max(desired.years.to.pull),
+                    ". We require a minimum of ", min.years.per.range, " years with data"))
+      
+      pop.for.year = colSums(pop2[as.character(years.to.pull),,,,,drop=F])
+      single.year.ages.pop = restratify.age.counts(pop.for.year,
+                                                   desired.age.brackets = min.age:max.age,
+                                                   smooth.infinite.age.to = max.age)
+      
+      aging.rates = t(sapply(1:(specification.metadata$n.ages-1), function(age.index){
+        ages = specification.metadata$age.lower.bounds[age.index]:(specification.metadata$age.upper.bounds[age.index]-1)
+        
+        last.in.bracket = single.year.ages.pop[ages[length(ages)]-min.age+1,,,]
+        all.in.bracket = colSums(single.year.ages.pop[ages-min.age+1,,,,drop=F])
+        rates = last.in.bracket / all.in.bracket
+        
+        rates[is.na(rates)] = mean(rates, na.rm=T)
+        
+        rates
+      }))
+      
+      dim.names = c(list(age=specification.metadata$dim.names$age[-specification.metadata$n.ages]),
+                    dimnames(single.year.ages.pop)[-1])
+      dim(aging.rates) = sapply(dim.names, length)
+      dimnames(aging.rates) = dim.names
+      
+      
+      aging.rates
+    })
+    
+    null.data.for.year.mask = sapply(aging.rates.by.year, is.null)
+    if (all(null.data.for.year.mask))
+      stop(paste0("Cannot infer empiric HIV aging rates: none of the requested years (",
+                  collapse.with.and(years), 
+                  ") had fully stratified, HIV prevalence data for '", location, "'"))
+    
+    interpolated.aging.rates.by.year = interpolate(values = aging.rates.by.year[!null.data.for.year.mask],
+                                                   value.times = years[!null.data.for.year.mask],
+                                                   desired.times = years)
+    names(interpolated.aging.rates.by.year) = names(years)
+    
+    interpolated.aging.rates.by.year
 }
 
 ##--------------------##

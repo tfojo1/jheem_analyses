@@ -41,7 +41,7 @@ get.location.mortality.rates <- function(location,
                                          census.manager = CENSUS.MANAGER)
 
 {
-  states = locations::get.containing.locations(location, "state")
+  states = locations::get.overlapping.locations(location, "state")
     # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
     deaths = census.manager$pull(outcome = 'metro.deaths', location = states, year= year.ranges, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
   

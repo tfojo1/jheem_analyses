@@ -1343,3 +1343,70 @@ for (data in msa_sex_risk) {
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC MSA Reports')
 }
+
+
+###############################################################################
+#Addition for 1-26-24
+#Sum sex_age, sex_race, and sex_risk to get totals for Age, Race, Risk
+###############################################################################
+#AGE TOTAL
+sex.age.df = lapply(data.list.msa_sex_age.clean, function(file){
+  data=file[[2]] 
+  filename = file[[1]] 
+  data= as.data.frame(data)
+})
+age.total <- bind_rows(sex.age.df)
+age.total <- age.total %>%
+  group_by(outcome, year, location, age)%>%
+  mutate(total = sum(value))%>%
+  select(-sex, -value)%>%
+  rename(value = total)
+age.total<- age.total[!duplicated(age.total), ]
+
+#RACE TOTAL
+sex.race.df = lapply(data.list.msa_sex_race.clean, function(file){
+  data=file[[2]] 
+  filename = file[[1]] 
+  data= as.data.frame(data)
+})
+race.total <- bind_rows(sex.race.df)
+race.total <- race.total %>%
+  group_by(outcome, year, location, race)%>%
+  mutate(total = sum(value))%>%
+  select(-sex, -value)%>%
+  rename(value = total)
+race.total<- race.total[!duplicated(race.total), ]
+
+#RISK TOTAL
+sex.risk.df = lapply(data.list.msa_sex_risk.clean, function(file){
+  data=file[[2]] 
+  filename = file[[1]] 
+  data= as.data.frame(data)
+})
+risk.total <- bind_rows(sex.risk.df)
+risk.total <- risk.total %>%
+  group_by(outcome, year, location, risk)%>%
+  mutate(total = sum(value))%>%
+  select(-sex, -value)%>%
+  rename(value = total)
+risk.total<- risk.total[!duplicated(risk.total), ]
+
+###############################################################################
+#Put Age, Race, Risk totals into data manager
+###############################################################################
+
+totals = list(
+  "age.total" = as.data.frame(age.total), 
+  "race.total"= as.data.frame(race.total), 
+  "risk.total"=as.data.frame(risk.total))
+
+for (data in totals) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.msa.reports',
+    source = 'cdc.surveillance.reports',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC MSA Reports')
+}
