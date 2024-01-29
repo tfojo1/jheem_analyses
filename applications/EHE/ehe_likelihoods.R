@@ -64,6 +64,32 @@ joint.pop.migration.likelihood.instructions = join.likelihood.instructions(popul
                                                                            emigration.likelihood.instructions
                                                                            )
 
+race.risk.new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                                                             outcome.for.sim = "new",
+                                                                             dimensions = c("race","risk"),
+                                                                             levels.of.stratification = c(0,1,2), 
+                                                                             from.year = as.integer(2008), 
+                                                                             
+                                                                             observation.correlation.form = 'compound.symmetry', 
+                                                                             measurement.error.coefficient.of.variance = 0.03,
+                                                                             
+                                                                             weights = list(1), # upweight?
+                                                                             equalize.weight.by.year = T 
+)
+
+race.risk.prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                                                          outcome.for.sim = "diagnosed.prevalence",
+                                                                          dimensions = c("race","risk"),
+                                                                          levels.of.stratification = c(0,1,2), 
+                                                                          from.year = as.integer(2008), 
+                                                                          
+                                                                          observation.correlation.form = 'compound.symmetry', 
+                                                                          measurement.error.coefficient.of.variance = 0.03,
+                                                                          
+                                                                          weights = list(1), # upweight?
+                                                                          equalize.weight.by.year = T 
+)
+
 new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                                                              outcome.for.sim = "new",
                                                                              dimensions = c("age","sex","race","risk"),
@@ -92,8 +118,8 @@ prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcom
 
 mortality.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
                                                                          outcome.for.sim = "hiv.mortality",
-                                                                         dimensions = c("age","sex","race","risk"),
-                                                                         levels.of.stratification = c(0,1,2), 
+                                                                         dimensions = c("sex"),
+                                                                         levels.of.stratification = c(0,1), 
                                                                          from.year = as.integer(2008), 
                                                                          
                                                                          observation.correlation.form = 'compound.symmetry', 
@@ -104,12 +130,11 @@ mortality.likelihood.instructions = create.basic.likelihood.instructions(outcome
 )
 
 
-full.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
+transmission.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
                                                             immigration.likelihood.instructions,
                                                             emigration.likelihood.instructions,
-                                                            new.diagnoses.likelihood.instructions,
-                                                            prevalence.likelihood.instructions,
-                                                            mortality.likelihood.instructions
+                                                            race.risk.new.diagnoses.likelihood.instructions,
+                                                            race.risk.prevalence.likelihood.instructions
 )
 
 
