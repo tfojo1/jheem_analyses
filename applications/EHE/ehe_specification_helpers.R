@@ -141,7 +141,7 @@ do.get.empiric.aging.rates <- function(location, specification.metadata,
 
 get.empiric.hiv.aging.rates <- function(location, 
                                         specification.metadata,
-                                        years=c(time0=1990, time1=2000, time2=2010, time3=2020),
+                                        years=c(pre.spike = 1980, time0=2000, time1=2010, time2=2020),
                                         year.range.span = 5,
                                         min.years.per.range = 3,
                                         weight.to.national=1)
@@ -194,7 +194,7 @@ get.empiric.hiv.aging.rates <- function(location,
 
 do.get.empiric.hiv.aging.rates <- function(location, 
                                            specification.metadata,
-                                           years=c(time0=1990, time1=2000, time2=2010, time3=2020),
+                                           years,
                                            year.range.span = 5,
                                            min.years.per.range = 3,
                                            force.match.age.brackets.before.smoothing = F)

@@ -652,23 +652,7 @@ register.aging(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'hiv.positive.aging.rates',
-                       get.functional.form.function = function(location, specification.metadata){
-                           rates = get.default.aging.rates(location, specification.metadata)
-                           create.natural.spline.functional.form(knot.times=c(rate.pre.spike=1980, 
-                                                                              rate0=2000, 
-                                                                              rate1=2010, 
-                                                                              rate2=2020, 
-                                                                              rate3=2030),
-                                                                 knot.values=list(rate.pre.spike=rates,
-                                                                                  rate0=rates,
-                                                                                  rate1=rates,
-                                                                                  rate2=rates,
-                                                                                  rate3=rates),
-                                                                 knot.link = 'identity',
-                                                                 min = 0,
-                                                                 overwrite.knot.values.with.alphas = T
-                           )
-                       },
+                       get.functional.form.function = get.empiric.hiv.aging.rates,
                        functional.form.from.time = 1980,
                        scale='rate')
 

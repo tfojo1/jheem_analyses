@@ -189,32 +189,20 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     hispanic.domino.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     other.domino.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
 
-    msm.age1.aging.base = Lognormal.Distribution(log(12209/2/22537), 0.25*log(2)),
-    msm.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
-    msm.age2.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(49965,69515)), 0.5*log(2)),
-    #msm.age2.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(11562,16831), 0.5*log(2)),
-    msm.age3.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(91431,140082)), 0.5*log(2)),
-    #msm.age3.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(23488,28704)), 0.5*log(2)),
-    #msm.age4.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(173559,139643)), 0.5*log(2)),
-    #msm.age4.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(34401,38437)), 0.5*log(2)),
-    
-    heterosexual.age1.aging.base = Lognormal.Distribution(log((427+1861)/2/(814+3752)), 0.25*log(2)),
-    heterosexual.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
-    heterosexual.age2.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(49965,69515)), 0.5*log(2)),
-    #heterosexual.age2.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(11562,16831), 0.5*log(2)),
-    heterosexual.age3.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(91431,140082)), 0.5*log(2)),
-    #heterosexual.age3.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(23488,28704)), 0.5*log(2)),
-    #heterosexual.age4.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(173559,139643)), 0.5*log(2)),
-    #heterosexual.age4.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(34401,38437)), 0.5*log(2)),
-    
-    idu.age1.aging.base = Lognormal.Distribution(log((180+221)/2/(218+411)), 0.25*log(2)),
-    idu.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
-    idu.age2.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(49965,69515)), 0.5*log(2)),
-    #idu.age2.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(11562,16831), 0.5*log(2)),
-    idu.age3.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(91431,140082)), 0.5*log(2)),
-    #idu.age3.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(23488,28704)), 0.5*log(2)),
-    #idu.age4.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(173559,139643)), 0.5*log(2)),
-    #idu.age4.aging.2 = Lognormal.Distribution(log(get.aging.rate.last.of.10(34401,38437)), 0.5*log(2)),
+    # msm.age1.aging.base = Lognormal.Distribution(log(12209/2/22537), 0.25*log(2)),
+    # msm.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
+    # msm.age2.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(49965,69515)), 0.5*log(2)),
+    # msm.age3.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(91431,140082)), 0.5*log(2)),
+    # 
+    # heterosexual.age1.aging.base = Lognormal.Distribution(log((427+1861)/2/(814+3752)), 0.25*log(2)),
+    # heterosexual.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
+    # heterosexual.age2.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(49965,69515)), 0.5*log(2)),
+    # heterosexual.age3.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(91431,140082)), 0.5*log(2)),
+    # 
+    # idu.age1.aging.base = Lognormal.Distribution(log((180+221)/2/(218+411)), 0.25*log(2)),
+    # idu.age2.aging.0 = Lognormal.Distribution(log(get.aging.rate.mid.of.20(56552,151476)), 0.5*log(2)),
+    # idu.age2.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(49965,69515)), 0.5*log(2)),
+    # idu.age3.aging.1 = Lognormal.Distribution(log(get.aging.rate.last.of.10(91431,140082)), 0.5*log(2)),
     
     
     
@@ -499,12 +487,6 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
 
   
-  msm.aging = c(
-    'msm.age1.aging.base',
-    'msm.age2.aging.0',
-    'msm.age2.aging.1',
-    'msm.age3.aging.1'
-  ),
   
   sexual.mixing = c(
     'black.black.sexual.oe',
@@ -559,13 +541,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   ),
   
   male.vs.female.heterosexual.rr = 'male.vs.female.heterosexual.rr',
-  
-  heterosexual.aging = c(
-    'heterosexual.age1.aging.base',
-    'heterosexual.age2.aging.0',
-    'heterosexual.age2.aging.1',
-    'heterosexual.age3.aging.1'
-  ),
+
   
   peak.idu.transmission = 'idu.peak.trate.multiplier',
   
@@ -597,13 +573,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'msm.vs.heterosexual.male.idu.susceptibility.rr.2'
   ),
   
-  idu.aging = c(
-    'idu.age1.aging.base',
-    'idu.age2.aging.0',
-    'idu.age2.aging.1',
-    'idu.age3.aging.1'
-  ),
-  
+
   young.age.susceptibility = c(
     'age1.susceptibility.rr.mult',
     'age2.susceptibility.rr.mult'
