@@ -539,7 +539,6 @@ het.big.df <- subset(big.df, risk == "het")
 # fit.p.msm <- lm(logit(p/p.max) ~ year + raceid + ageid,
 #                 data = msm.bigp.df)
 
-
 fit.p.msm <- lm((p) ~ year + raceid + ageid,
                 data = msm.bigp.df)
 fit.p.msm
@@ -573,6 +572,115 @@ pi.age.mutate <- function(df){
       age5 = age40ge
     ))
 }
+
+### CDC surveillance special report data ----
+# indicator: condomless anal sex with casual male partner
+
+#https://www.cdc.gov/hiv/library/reports/hiv-surveillance-special-reports/no-31/index.html
+
+pi.msm.cdc.2021 <- data.frame(
+  total = 53.4,
+  age18.24 = 40.1,
+  age25.29 = 50.9,
+  age30.39 = 56.2,
+  age40.49 = 58.1,
+  age50ge = 52.0,
+  black = 40.4,
+  hisp = 59.4,
+  nbnh = (3+66+7+390+57)/(4+110+15+597+111)*100
+)
+
+pi.msm.cdc.2021 <- age_mutate(pi.msm.cdc.2021)/100
+
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-22.pdf 
+
+pi.msm.cdc.2017 <- data.frame(
+  total = 46.7,
+  age18.24 = 43.6,
+  age25.29 = 51.5,
+  age30.39 = 50.1,
+  age40.49 = 44.4,
+  age50ge = 36.7,
+  black = 39.5,
+  hisp = 45.3,
+  nbnh = (14+90+18+1437+177)/(49+192+32+2774+365)*100
+)
+
+pi.msm.cdc.2017 <- age_mutate(pi.msm.cdc.2017)/100
+
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-15.pdf
+
+pi.msm.cdc.2014 <- data.frame(
+  total = 36.8,
+  age18.24 = 33.5,
+  age25.29 = 40.2,
+  age30.39 = 38.9,
+  age40.49 = 38.3,
+  age50ge = 30.7,
+  black = 33.1,
+  hisp = 37.1,
+  nbnh = (13+54+15+1076+121)/(43+144+37+2796+319)*100
+)
+
+pi.msm.cdc.2014 <- age_mutate(pi.msm.cdc.2014)/100
+
+pi.msm.cdc.black <- c(
+  pi.msm.cdc.2014$black,
+  pi.msm.cdc.2017$black,
+  pi.msm.cdc.2021$black
+)
+
+pi.msm.cdc.hisp <- c(
+  pi.msm.cdc.2014$hisp,
+  pi.msm.cdc.2017$hisp,
+  pi.msm.cdc.2021$hisp
+)
+
+pi.msm.cdc.nbnh <- c(
+  pi.msm.cdc.2014$nbnh,
+  pi.msm.cdc.2017$nbnh,
+  pi.msm.cdc.2021$nbnh
+)
+
+pi.msm.cdc.age1 <- c(
+  pi.msm.cdc.2014$age1,
+  pi.msm.cdc.2017$age1,
+  pi.msm.cdc.2021$age1
+)
+
+pi.msm.cdc.age2 <- c(
+  pi.msm.cdc.2014$age2,
+  pi.msm.cdc.2017$age2,
+  pi.msm.cdc.2021$age2
+)
+
+pi.msm.cdc.age3 <- c(
+  pi.msm.cdc.2014$age3,
+  pi.msm.cdc.2017$age3,
+  pi.msm.cdc.2021$age3
+)
+
+pi.msm.cdc.age4 <- c(
+  pi.msm.cdc.2014$age4,
+  pi.msm.cdc.2017$age4,
+  pi.msm.cdc.2021$age4
+)
+
+pi.msm.cdc.age5 <- c(
+  pi.msm.cdc.2014$age5,
+  pi.msm.cdc.2017$age5,
+  pi.msm.cdc.2021$age5
+)
+
+pi.msm.cdc.total <- c(
+  pi.msm.cdc.2014$total,
+  pi.msm.cdc.2017$total,
+  pi.msm.cdc.2021$total
+)
+
+years.pi.cdc <- c(2014, 2017, 2021) - anchor.year
+
+### AMIS -----
 
 # 2017
 ## <!-- https://emoryamis.org/wp-content/uploads/2021/12/AMIS-2017-United-States-tables-REV_20171204.pdf -->
@@ -677,33 +785,23 @@ pi.msm.total <- c(
 )
 
 years.pi <- c(2017:2019) - anchor.year
-pi.max <- 1
+# pi.max <- 1
 
-fit.pi.msm.black <- lm(logit(pi.msm.black/pi.max) ~ years.pi)
-fit.pi.msm.hisp <- lm(logit(pi.msm.hisp/pi.max) ~ years.pi)
-fit.pi.msm.nbnh <- lm(logit(pi.msm.nbnh/pi.max) ~ years.pi)
-
-fit.pi.msm.age1 <- lm(logit(pi.msm.age1/pi.max) ~ years.pi)
-fit.pi.msm.age2 <- lm(logit(pi.msm.age2/pi.max) ~ years.pi)
-fit.pi.msm.age3 <- lm(logit(pi.msm.age3/pi.max) ~ years.pi)
-fit.pi.msm.age4 <- lm(logit(pi.msm.age4/pi.max) ~ years.pi)
-fit.pi.msm.age5 <- lm(logit(pi.msm.age5/pi.max) ~ years.pi)
+# fit.pi.msm.black <- lm(logit(pi.msm.black/pi.max) ~ years.pi)
+# fit.pi.msm.hisp <- lm(logit(pi.msm.hisp/pi.max) ~ years.pi)
+# fit.pi.msm.nbnh <- lm(logit(pi.msm.nbnh/pi.max) ~ years.pi)
+# 
+# fit.pi.msm.age1 <- lm(logit(pi.msm.age1/pi.max) ~ years.pi)
+# fit.pi.msm.age2 <- lm(logit(pi.msm.age2/pi.max) ~ years.pi)
+# fit.pi.msm.age3 <- lm(logit(pi.msm.age3/pi.max) ~ years.pi)
+# fit.pi.msm.age4 <- lm(logit(pi.msm.age4/pi.max) ~ years.pi)
+# fit.pi.msm.age5 <- lm(logit(pi.msm.age5/pi.max) ~ years.pi)
 
 ## IDU ------
 
-# # https://journals.lww.com/stdjournal/FullText/2018/04000/An_Exploration_of_Factors_Impacting_Preexposure.1.aspx?casa_token=rVyxbUR_Wc8AAAAA:noQgD0j2phdyeYybIz-7kY3y5LngYlOnMBzNgVB53J8BmR74EJsyb6iiZdPte3KnzKYHkyZocw_vHyUPTktaR5tc&casa_token=PTZU195-rC4AAAAA:qxzCsh5TwpyByzcVN4Nix2L4X5pPIFCirYj6O_0Gf1Oga1mv4oOJAfGaBFGEIvdXotaDOf9sl86IUGx5gzJKJMAU 
-# pi.idu.2016 <- data.frame(
-#   total = 89.9,
-#   female = 95.4,
-#   male = 84.9
-# )
-# 
-# pi.idu.2016 <- pi.idu.2016 / 100
-# 
-# # https://www.thelancet.com/action/showPdf?pii=S2214-109X%2823%2900057-8
-# pi.idu.2017 <- 31.8 / 100 
-
 # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-18.pdf 
+
+# criteria - any receptive sharing of injection equipment
 
 pi.idu.2015 <- data.frame(
   total = 60.6,
@@ -998,6 +1096,20 @@ pi.years.het <- c(2016, 2016, 2019, 2019) - anchor.year
 # 
 
 ## formatting data ------
+
+pi.msm.cdc.df <- data.frame(
+  years = years.pi.cdc,
+  black = pi.msm.cdc.black,
+  hisp = pi.msm.cdc.hisp,
+  nbnh = pi.msm.cdc.nbnh,
+  age1 = pi.msm.cdc.age1,
+  age2 = pi.msm.cdc.age2,
+  age3 = pi.msm.cdc.age3,
+  age4 = pi.msm.cdc.age4,
+  age5 = pi.msm.cdc.age5,
+  total = pi.msm.cdc.total
+) 
+
 pi.msm.df <- data.frame(
   years = years.pi,
   black = pi.msm.black,
@@ -1041,7 +1153,7 @@ pi.het.df <- data.frame(
   # female = pi.het.female
 )
 
-pi.msm.df.long <- gather(pi.msm.df, key = "group", value = "pi", -years)
+pi.msm.df.long <- gather(pi.msm.cdc.df, key = "group", value = "pi", -years)
 pi.msm.df.long$sexid <- rep("msm", length(pi.msm.df.long$pi))
 pi.msm.df.long$riskid <- rep("msm", length(pi.msm.df.long$pi))
 
@@ -1107,7 +1219,9 @@ het.pi.df <- subset(pi.big.df, riskid=="het")
 
 # fit.pi.df <- lm(logit(pi) ~ years + raceid + ageid + sexrisk, data = pi.big.df)
 
-fit.pi.msm <- lm(logit(pi) ~ years + raceid + ageid, data = msm.pi.df)
+pi.max <- 0.85
+
+fit.pi.msm <- lm(logit(pi/pi.max) ~ years + raceid + ageid, data = msm.pi.df)
 fit.pi.msm
 
 fit.pi.idu <- lm(logit(pi) ~ years + raceid + ageid + female, data = idu.pi.df)

@@ -47,10 +47,11 @@ combined.plot.pi <- ggpubr::ggarrange(race.plot, sex.plot, risk.plot, age.plot,
 combined.plot.pi
 
 msm.race <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','race'), mean))
-df.pts <- subset(msm.pi.df, raceid != "ALL") |> dplyr::mutate(years = years + anchor.year)
+df.pts <- subset(msm.pi.df, raceid != "ALL") %>%
+  dplyr::mutate(years = years + anchor.year + 3)
 df.pts$raceid <- factor(df.pts$raceid, levels = c("black","hisp","nbnh"))
 msm.race$race <- factor(msm.race$race, levels = c("black","hispanic","other"))
-# levels(df.pts$raceid) <- levels(msm.race$race)
+levels(df.pts$raceid) <- levels(msm.race$race)
 msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + geom_line(linewidth = 1) +
   geom_point(aes(x=years, y = pi, color=raceid), data = df.pts) +
   ylim(0,max(msm.race$value)) +
@@ -59,7 +60,8 @@ msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + geom_line(li
   theme_minimal()
 
 msm.age <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','age'), mean))
-df.pts <- subset(msm.pi.df, ageid != "ALL") |> dplyr::mutate(years = years + anchor.year)
+df.pts <- subset(msm.pi.df, ageid != "ALL") %>%
+  dplyr::mutate(years = years + anchor.year + 3)
 df.pts$ageid <- factor(df.pts$ageid, levels = c("age1", "age2", "age3", "age4", "age5"))
 msm.age$age <- factor(msm.age$age, levels = c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55+ years"))
 
@@ -127,7 +129,7 @@ idu.age.plot <- ggplot(idu.age, aes(year, value, color=age)) +
 
 idu.sex <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),'active_IDU',], c('year', 'sex'), mean))
 df.pts <- subset(nonmsm.pi.df, sexid!="ALL") %>% subset(.,idu==1) %>%
-  dplyr::mutate(years = years + anchor.year + 2) 
+  dplyr::mutate(years = years + anchor.year + 2)
 
 df.pts$sexid <- factor(df.pts$sexid, levels = c("male", "female"))
 idu.sex$sex <- factor(idu.sex$sex, levels = c("heterosexual_male", "female"))
@@ -150,7 +152,7 @@ idu.plots.pi
 
 het.race <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),"never_IDU",], c('year', 'race'), mean))
 df.pts <- subset(nonmsm.pi.df, raceid!="ALL") %>% subset(.,idu==0) %>%
-  dplyr::mutate(years = years + anchor.year + 2) 
+  dplyr::mutate(years = years + anchor.year + 1) 
 
 df.pts$raceid <- factor(df.pts$raceid, levels = c("black", "hisp", "nbnh"))
 het.race$race <- factor(het.race$race, levels = c("black","hispanic","other"))
@@ -167,7 +169,7 @@ het.race.plot <- ggplot(het.race, aes(year, value, color=race)) +
 
 het.age <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),'never_IDU',], c('year', 'age'), mean))
 df.pts <- subset(nonmsm.pi.df, ageid!="ALL") %>% subset(.,idu==0) %>%
-  dplyr::mutate(years = years + anchor.year + 2)
+  dplyr::mutate(years = years + anchor.year + 1)
 
 df.pts$ageid <- factor(df.pts$ageid, levels = c("age1", "age2", "age3", "age4", "age5"))
 het.age$age <- factor(het.age$age, levels = c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55+ years"))
@@ -184,7 +186,7 @@ het.age.plot <- ggplot(het.age, aes(year, value, color=age)) +
 
 het.sex <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),'never_IDU',], c('year', 'sex'), mean))
 df.pts <- subset(nonmsm.pi.df, sexid!="ALL") %>% subset(.,idu==0) %>%
-  dplyr::mutate(years = years + anchor.year + 2)
+  dplyr::mutate(years = years + anchor.year + 1)
 
 df.pts$sexid <- factor(df.pts$sexid, levels = c("male", "female"))
 het.sex$sex <- factor(het.sex$sex, levels = c("heterosexual_male", "female"))
