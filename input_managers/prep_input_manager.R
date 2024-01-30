@@ -140,11 +140,11 @@ get.prep.indication.functional.form <- function(specification.metadata){
   # Intercepts and slopes
   int[,,"msm",] <- int[,,"msm",] + coef(fit.pi.msm)["(Intercept)"]
   
-  int[,,"heterosexual_male","never_IDU"] <- int[,,"heterosexual_male","never_IDU"] + coef(fit.pi.idu)["(Intercept)"]
-  int[,,"female","never_IDU"] <- int[,,"female","never_IDU"] + coef(fit.pi.idu)["(Intercept)"]
+  int[,,"heterosexual_male","never_IDU"] <- int[,,"heterosexual_male","never_IDU"] + coef(fit.pi.het)["(Intercept)"]
+  int[,,"female","never_IDU"] <- int[,,"female","never_IDU"] + coef(fit.pi.het)["(Intercept)"]
   
-  int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit.pi.het)["(Intercept)"]
-  int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit.pi.het)["(Intercept)"]
+  int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["(Intercept)"]
+  int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit.pi.idu)["(Intercept)"]
   
   int[,"black","msm",] <- int[,"black","msm",] + coef(fit.pi.msm)["raceidblack"]
   int[,"hispanic","msm",] <- int[,"hispanic","msm",] + coef(fit.pi.msm)["raceidhisp"]
@@ -182,7 +182,7 @@ get.prep.indication.functional.form <- function(specification.metadata){
   int["25-34 years",,"female","never_IDU"] <- int["25-34 years",,"female","never_IDU"] + coef(fit.pi.het)["ageidage2"]
   int["35-44 years",,"female","never_IDU"] <- int["35-44 years",,"female","never_IDU"] + coef(fit.pi.het)["ageidage3"]
   int["45-54 years",,"female","never_IDU"] <- int["45-54 years",,"female","never_IDU"] + coef(fit.pi.het)["ageidage4"]
-  int["55+ years",,"female","never_IDU"] <- int["55+ years",,"female","never_IDU"] + coef(fit.pi.nonmsm)["ageidage5"]
+  int["55+ years",,"female","never_IDU"] <- int["55+ years",,"female","never_IDU"] + coef(fit.pi.het)["ageidage5"]
   
   int["13-24 years",,"heterosexual_male","active_IDU"] <- int["13-24 years",,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["ageidage1"]
   int["25-34 years",,"heterosexual_male","active_IDU"] <- int["25-34 years",,"heterosexual_male","active_IDU"] + coef(fit.pi.idu)["ageidage2"]

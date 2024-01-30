@@ -979,21 +979,21 @@ pi.het.m.2019 <- data.frame(
 pi.het.m.2019 <- age_mutate(pi.het.m.2019)/100
 
 # criteria - condomless sex with casual partner
-pi.het.2019 <- data.frame(
-  total = 7.0,
-  male = 5.2,
-  female = 8.5,
-  age18.24 = 11.8,
-  age25.29 = 8.9,
-  age30.39 = 6.3,
-  age40.49 = 4.9,
-  age50ge = 4.3,
-  black = 7.8,
-  hisp = 4.9,
-  nbnh = (6+2+1+14+34)/(58+17+33+413+362)*100
-)
-
-pi.het.2019 <- age_mutate(pi.het.2019)/100
+# pi.het.2019 <- data.frame(
+#   total = 7.0,
+#   male = 5.2,
+#   female = 8.5,
+#   age18.24 = 11.8,
+#   age25.29 = 8.9,
+#   age30.39 = 6.3,
+#   age40.49 = 4.9,
+#   age50ge = 4.3,
+#   black = 7.8,
+#   hisp = 4.9,
+#   nbnh = (6+2+1+14+34)/(58+17+33+413+362)*100
+# )
+# 
+# pi.het.2019 <- age_mutate(pi.het.2019)/100
 
 # criteria - any STI
 # pi.het.2019 <- data.frame(

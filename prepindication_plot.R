@@ -122,7 +122,7 @@ levels(df.pts$ageid) <- levels(idu.age$age)
 idu.age.plot <- ggplot(idu.age, aes(year, value, color=age)) +
   geom_line(linewidth = 1) +
   geom_point(aes(x = years, y = pi, color=ageid), data = df.pts) +
-  ylim(0,max(idu.age$value)) +
+  ylim(0,1) +
   scale_x_continuous(breaks = seq(2017, 2030, 1)) +
   ylab("PrEP use") +
   theme_minimal()
@@ -140,7 +140,7 @@ levels(df.pts$sexid) <- levels(idu.sex$sex)
 idu.sex.plot <- ggplot(idu.sex, aes(year, value, color=sex)) +
   geom_line(linewidth = 1) +
   geom_point(aes(x = years, y = pi, color=sexid), data = df.pts) +
-  ylim(0,max(idu.sex$value)) +
+  ylim(0,1) +
   scale_x_continuous(breaks = seq(2017, 2030, 1)) +
   ylab("PrEP use") +
   theme_minimal()  
@@ -151,7 +151,7 @@ idu.plots.pi <- ggpubr::ggarrange(idu.race.plot, idu.age.plot, idu.sex.plot,
 idu.plots.pi
 
 het.race <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),"never_IDU",], c('year', 'race'), mean))
-df.pts <- subset(nonmsm.pi.df, raceid!="ALL") %>% subset(.,idu==0) %>%
+df.pts <- subset(het.pi.df, raceid!="ALL") %>% subset(.,idu==0) %>%
   dplyr::mutate(years = years + anchor.year + 1) 
 
 df.pts$raceid <- factor(df.pts$raceid, levels = c("black", "hisp", "nbnh"))
@@ -168,7 +168,7 @@ het.race.plot <- ggplot(het.race, aes(year, value, color=race)) +
   theme_minimal()
 
 het.age <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),'never_IDU',], c('year', 'age'), mean))
-df.pts <- subset(nonmsm.pi.df, ageid!="ALL") %>% subset(.,idu==0) %>%
+df.pts <- subset(het.pi.df, ageid!="ALL") %>% subset(.,idu==0) %>%
   dplyr::mutate(years = years + anchor.year + 1)
 
 df.pts$ageid <- factor(df.pts$ageid, levels = c("age1", "age2", "age3", "age4", "age5"))
@@ -179,13 +179,13 @@ levels(df.pts$ageid) <- levels(het.age$age)
 het.age.plot <- ggplot(het.age, aes(year, value, color=age)) +
   geom_line(linewidth = 1) +
   geom_point(aes(x = years, y = pi, color=ageid), data = df.pts) +
-  ylim(0,max(het.age$value)) +
+  ylim(0,1) +
   scale_x_continuous(breaks = seq(2017, 2030, 1)) +
   ylab("PrEP use") +
   theme_minimal()
 
 het.sex <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),'never_IDU',], c('year', 'sex'), mean))
-df.pts <- subset(nonmsm.pi.df, sexid!="ALL") %>% subset(.,idu==0) %>%
+df.pts <- subset(het.pi.df, sexid!="ALL") %>% subset(.,idu==0) %>%
   dplyr::mutate(years = years + anchor.year + 1)
 
 df.pts$sexid <- factor(df.pts$sexid, levels = c("male", "female"))
