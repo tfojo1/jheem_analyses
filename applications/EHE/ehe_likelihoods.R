@@ -64,10 +64,10 @@ joint.pop.migration.likelihood.instructions = join.likelihood.instructions(popul
                                                                            emigration.likelihood.instructions
                                                                            )
 
-race.risk.new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+risk.new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                                                              outcome.for.sim = "new",
-                                                                             dimensions = c("race","risk"),
-                                                                             levels.of.stratification = c(0,1,2), 
+                                                                             dimensions = c("risk"),
+                                                                             levels.of.stratification = c(0,1), 
                                                                              from.year = as.integer(2008), 
                                                                              
                                                                              observation.correlation.form = 'compound.symmetry', 
@@ -77,10 +77,10 @@ race.risk.new.diagnoses.likelihood.instructions = create.basic.likelihood.instru
                                                                              equalize.weight.by.year = T 
 )
 
-race.risk.prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+risk.prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                                                           outcome.for.sim = "diagnosed.prevalence",
-                                                                          dimensions = c("race","risk"),
-                                                                          levels.of.stratification = c(0,1,2), 
+                                                                          dimensions = c("risk"),
+                                                                          levels.of.stratification = c(0,1), 
                                                                           from.year = as.integer(2008), 
                                                                           
                                                                           observation.correlation.form = 'compound.symmetry', 
@@ -130,11 +130,11 @@ mortality.likelihood.instructions = create.basic.likelihood.instructions(outcome
 )
 
 
-transmission.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
+one.way.transmission.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
                                                             immigration.likelihood.instructions,
                                                             emigration.likelihood.instructions,
-                                                            race.risk.new.diagnoses.likelihood.instructions,
-                                                            race.risk.prevalence.likelihood.instructions
+                                                            risk.new.diagnoses.likelihood.instructions,
+                                                            risk.prevalence.likelihood.instructions
 )
 
 
