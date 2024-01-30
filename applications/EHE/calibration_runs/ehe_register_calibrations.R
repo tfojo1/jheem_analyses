@@ -7,6 +7,7 @@ CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 N.ITER = 10000
 
+print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
 par.names.pop = c("black.birth.rate.multiplier",
                   "hispanic.birth.rate.multiplier",
