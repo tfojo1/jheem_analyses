@@ -309,9 +309,9 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
         }
     }
     
-    set.ehe.aging.from.parameters(model.settings,
-                                  parameters = parameters,
-                                  times = c('.pre.spike', 0:3))
+    # set.ehe.aging.from.parameters(model.settings,
+    #                               parameters = parameters,
+    #                               times = c('.pre.spike', 0:3))
     
     #-- IDU --#
     set.ehe.idu.from.parameters(model.settings,
@@ -540,81 +540,81 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                                 dimensions = 'all')
 }
 
-set.ehe.aging.from.parameters <- function(model.settings,
-                                          parameters,
-                                          times,
-                                          idu.applies.to.in.remission = T)
-{
-    #-- Some set-up --#
-    specification.metadata = model.settings$specification.metadata
-    
-    if (idu.applies.to.in.remission)
-        idu.states = specification.metadata$compartment.aliases$idu.states
-    else
-        idu.states = specification.metadata$compartment.aliases$active.idu.states
-    
-    non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
-    
-    names(idu.states) = rep('risk', length(idu.states))
-    names(non.idu.states) = rep('risk', length(non.idu.states))
-       
-    for (time in times)
-    {
-        alpha.name = paste0('rate',time)
-        model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
-                                                                    alpha.name = alpha.name,
-                                                                    value = parameters['msm.age1.aging.base'],
-                                                                    applies.to.dimension.values=list(sex='msm', age=1, risk = non.idu.states))
-        
-        model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
-                                                                    alpha.name = alpha.name,
-                                                                    value = parameters['heterosexual.age1.aging.base'],
-                                                                    applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=non.idu.states))
-        
-        model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
-                                                                    alpha.name = alpha.name,
-                                                                    value = parameters['idu.age1.aging.base'],
-                                                                    applies.to.dimension.values=list(age=1, risk=idu.states))
-
-        
-        for (age.index in 2:specification.metadata$n.ages)
-        {
-            param.name = paste0('msm.age',age.index,'.aging.',time)
-            param.value = parameters[param.name]
-            
-            if (!is.na(param.value))
-            {
-                model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
-                                                                            alpha.name = alpha.name,
-                                                                            value = param.value,
-                                                                            applies.to.dimension.values=list(sex='msm', age=age.index, risk=non.idu.states))
-            }
-            
-            
-            param.name = paste0('heterosexual.age',age.index,'.aging.',time)
-            param.value = parameters[param.name]
-            
-            if (!is.na(param.value))
-            {
-                model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
-                                                                            alpha.name = alpha.name,
-                                                                            value = param.value,
-                                                                            applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=age.index, risk=non.idu.states))
-            }
-            
-            param.name = paste0('idu.age',age.index,'.aging.',time)
-            param.value = parameters[param.name]
-            
-            if (!is.na(param.value))
-            {
-                model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
-                                                                            alpha.name = alpha.name,
-                                                                            value = param.value,
-                                                                            applies.to.dimension.values=list(age=age.index, risk=idu.states))
-            }
-        }
-    }
-}
+# set.ehe.aging.from.parameters <- function(model.settings,
+#                                           parameters,
+#                                           times,
+#                                           idu.applies.to.in.remission = T)
+# {
+#     #-- Some set-up --#
+#     specification.metadata = model.settings$specification.metadata
+#     
+#     if (idu.applies.to.in.remission)
+#         idu.states = specification.metadata$compartment.aliases$idu.states
+#     else
+#         idu.states = specification.metadata$compartment.aliases$active.idu.states
+#     
+#     non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
+#     
+#     names(idu.states) = rep('risk', length(idu.states))
+#     names(non.idu.states) = rep('risk', length(non.idu.states))
+#        
+#     for (time in times)
+#     {
+#         alpha.name = paste0('rate',time)
+#         model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+#                                                                     alpha.name = alpha.name,
+#                                                                     value = parameters['msm.age1.aging.base'],
+#                                                                     applies.to.dimension.values=list(sex='msm', age=1, risk = non.idu.states))
+#         
+#         model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+#                                                                     alpha.name = alpha.name,
+#                                                                     value = parameters['heterosexual.age1.aging.base'],
+#                                                                     applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=1, risk=non.idu.states))
+#         
+#         model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+#                                                                     alpha.name = alpha.name,
+#                                                                     value = parameters['idu.age1.aging.base'],
+#                                                                     applies.to.dimension.values=list(age=1, risk=idu.states))
+# 
+#         
+#         for (age.index in 2:specification.metadata$n.ages)
+#         {
+#             param.name = paste0('msm.age',age.index,'.aging.',time)
+#             param.value = parameters[param.name]
+#             
+#             if (!is.na(param.value))
+#             {
+#                 model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+#                                                                             alpha.name = alpha.name,
+#                                                                             value = param.value,
+#                                                                             applies.to.dimension.values=list(sex='msm', age=age.index, risk=non.idu.states))
+#             }
+#             
+#             
+#             param.name = paste0('heterosexual.age',age.index,'.aging.',time)
+#             param.value = parameters[param.name]
+#             
+#             if (!is.na(param.value))
+#             {
+#                 model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+#                                                                             alpha.name = alpha.name,
+#                                                                             value = param.value,
+#                                                                             applies.to.dimension.values=list(sex=c('heterosexual_male', 'female'), age=age.index, risk=non.idu.states))
+#             }
+#             
+#             param.name = paste0('idu.age',age.index,'.aging.',time)
+#             param.value = parameters[param.name]
+#             
+#             if (!is.na(param.value))
+#             {
+#                 model.settings$set.element.functional.form.interaction.alphas(element.name = 'hiv.positive.aging.rates',
+#                                                                             alpha.name = alpha.name,
+#                                                                             value = param.value,
+#                                                                             applies.to.dimension.values=list(age=age.index, risk=idu.states))
+#             }
+#         }
+#     }
+# }
 
 set.ehe.idu.from.parameters = function(model.settings,
                                        parameters,

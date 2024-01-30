@@ -321,7 +321,7 @@ for (data in county_pop) {
 #County DEATH Values
 county_deaths = lapply(data.list.county.deaths.00.22, `[[`, 2)
 
-for (data in county_pop) {
+for (data in county_deaths) {
   
   census.manager$put.long.form(
     data = data,
