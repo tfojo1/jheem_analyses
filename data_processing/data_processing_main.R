@@ -521,6 +521,9 @@ source('data_processing/immigration_age_calculations.R')
 #National Atlas Plus data on diagnosis and prevalence
 source('data_processing/national_data.R')
 
+#CDC Wonder AIDS data from 1981-2001
+source('data_processing/aids_data_1981_2001.R')
+
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
 
