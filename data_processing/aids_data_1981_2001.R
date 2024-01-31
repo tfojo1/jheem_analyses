@@ -108,6 +108,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
   
   #Change this once we decide what to do with locations
   data = subset(data, !is.na(data$location))
+  data$location = as.character(data$location)
   
   list(filename, data) 
 })
@@ -119,7 +120,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
  aids.data.clean.put = lapply(aids.data.clean, `[[`, 2)  
  
  for (data in aids.data.clean.put) {
-   
+
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc.aids', 

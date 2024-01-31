@@ -301,6 +301,24 @@ data.manager$register.outcome(
     units = 'population',
     description = "Metro Emigration Ages 13+"))
 
+data.manager$register.outcome(
+  'aids.diagnoses.alive.by.2001',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'AIDS Diagnoses Alive by 2001',
+    axis.name = 'AIDS Diagnoses Alive by 2001',
+    units = 'population',
+    description = "AIDS Diagnoses Alive by 2001"))
+
+data.manager$register.outcome(
+  'aids.diagnoses.deceased.by.2001',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'AIDS Diagnoses Deceased by 2001',
+    axis.name = 'AIDS Diagnoses Deceased by 2001',
+    units = 'population',
+    description = "AIDS Diagnoses Deceased by 2001"))
+
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
