@@ -9,15 +9,13 @@ data.list.aids <- lapply(aids.files, function(x) {
   list(filename=x, data=read.delim2(x))
   
 })
-
 ################################################################################
 #Set up mappings
 ################################################################################
 aids.sex.mappings = c('Female (any)' = 'female',
                       'Male (bisexual)' = 'male',
                       'Male (heterosexual or pediatric)' = 'male',
-                      'Male (homosexual) or Unknown Classification' = 'male')
-
+                      'Male (homosexual)  or Unknown Classification' = 'male')
 
 aids.risk.mappings = c('Heterosexual contact with HIV' = 'heterosexual',
                        'IV drug use (female and hetero male)' = 'idu',
@@ -39,19 +37,19 @@ aids.race.mappings = c('American Indian /Alaskan Native' = 'American Indian/Alas
                       'White (and also not Hispanic)' = 'White',
                       'Unknown'= 'Unknown')
 
-aids.age.mappings = c('Less than 1 year old' = '< 1 year',
-                      '1 to 12 years old' = '1-12 years',
-                      '13 to 19 years old' = '13-19 years',
-                      '20 to 24 years old' = '20-24 years',
-                      '25 to 29 years old' = '25-29 years',
-                      '30 to 34 years old' = '30-34 years',
-                      '35 to 39 years old or age is missing' = '35-39 years',
-                      '40 to 44 years old' = '40-44 years',
-                      '45 to 49 years old' = '45-49 years',
-                      '50 to 54 years old' = '50-54 years',
-                      '55 to 59 years old' = '55-59 years',
-                      '60 to 64 years old' = '60-64 years',
-                      '65 years old or older' = '65+ years')
+aids.age.mappings = c('Less than 1 Year' = '< 1 year',
+                      '1 - 12 Years' = '1-12 years',
+                      '13 - 19 Years' = '13-19 years',
+                      '20 - 24 Years' = '20-24 years',
+                      '25 - 29 Years' = '25-29 years',
+                      '30 - 34 Years' = '30-34 years',
+                      '35 - 39 Years or age is missing' = '35-39 years',
+                      '40 - 44 Years' = '40-44 years',
+                      '45 - 49 Years' = '45-49 years',
+                      '50 - 54 Years' = '50-54 years',
+                      '55 - 59 Years' = '55-59 years',
+                      '60 - 64 Years' = '60-64 years',
+                      '65+ Years' = '65+ years')
 
 ################################################################################
 #PROCESSING
@@ -68,17 +66,18 @@ aids.data.clean = lapply(data.list.aids, function(file){
   data$Cases[data$Cases %in% c("Data suppressed")] = NA    
   data$Cases[data$Cases %in% c("Data not available")] = NA  
   data$value = as.numeric(gsub(",", '', data$Cases))   
-
   
   if(grepl("alive", filename)) {
     data$location = "US"
   }
-  if(grepl("deceased", filename)) {
-    data$location = locations::get.cbsa.for.msa.name(data$Location)
-  }
-  if(grepl("all", filename)) {
-    data$location = locations::get.cbsa.for.msa.name(data$Location)
-  }
+  # if(grepl("deceased", filename)) {
+  #   #data$location = locations::get.cbsa.for.msa.name(data$Location)
+  #   data$location = locations::get.location.code(data$Location, "CBSA")
+  # }
+  # if(grepl("all", filename)) {
+  #   #data$location = locations::get.cbsa.for.msa.name(data$Location)
+  #   data$location = locations::get.location.code(data$Location, "CBSA")
+  # }
 
   ##Demographic conditionals##
 
@@ -103,7 +102,8 @@ aids.data.clean = lapply(data.list.aids, function(file){
     data$risk = aids.risk.mappings[data$HIV.Exposure.Category]
   }
 
-  
+  data <- data %>%
+    select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code )
   list(filename, data) 
 })
 
