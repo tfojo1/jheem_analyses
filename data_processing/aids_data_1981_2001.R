@@ -70,14 +70,14 @@ aids.data.clean = lapply(data.list.aids, function(file){
   if(grepl("alive", filename)) {
     data$location = "US"
   }
-  # if(grepl("deceased", filename)) {
-  #   #data$location = locations::get.cbsa.for.msa.name(data$Location)
-  #   data$location = locations::get.location.code(data$Location, "CBSA")
-  # }
-  # if(grepl("all", filename)) {
-  #   #data$location = locations::get.cbsa.for.msa.name(data$Location)
-  #   data$location = locations::get.location.code(data$Location, "CBSA")
-  # }
+  if(grepl("deceased", filename)) {
+    #data$location = locations::get.cbsa.for.msa.name(data$Location)
+    data$location = locations::get.location.code(data$Location, "CBSA")
+  }
+  if(grepl("all", filename)) {
+    #data$location = locations::get.cbsa.for.msa.name(data$Location)
+    data$location = locations::get.location.code(data$Location, "CBSA")
+  }
 
   ##Demographic conditionals##
 
