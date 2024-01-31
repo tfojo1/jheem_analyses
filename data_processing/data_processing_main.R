@@ -169,20 +169,20 @@ data.manager$register.outcome(
 data.manager$register.outcome(
   'heroin', #can change to heroin use but leave display name the same#
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Heroin Use in the Past Year',
     axis.name = 'Heroin Use in the Past Year (n)',
-    units = 'cases',
-    description = "Heroin Use in the Past Year"))
+    units = '%',
+    description = "Heroin Use in the Past Year", denominator.outcome = 'adult.population'))
 
 data.manager$register.outcome(
   'cocaine', 
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Cocaine use in the Past Year',
     axis.name = 'Cocaine use in the Past Year (n)',
-    units = 'cases',
-    description = "Cocaine Use in the Past Year"))
+    units = '%',
+    description = "Cocaine Use in the Past Year", denominator.outcome = 'adult.population'))
 
 data.manager$register.outcome(
   'hiv.tests',
