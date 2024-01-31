@@ -7,6 +7,7 @@ CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 N.ITER = 10000
 
+print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
 par.names.pop = c("black.birth.rate.multiplier",
                   "hispanic.birth.rate.multiplier",
@@ -66,19 +67,21 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
 )
 
 #-- REGISTER TRANSMISSION CALIBRATION  --#
-par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAMETERS.PRIOR@var.names)]
+par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('msm.vs.heterosexual.male.idu.susceptibility', 
+                                                                EHE.PARAMETERS.PRIOR@var.names)]
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
-                          likelihood.instructions = transmission.likelihood.instructions,
+                          likelihood.instructions = one.way.transmission.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           start.year = 1970,
                           end.year = 2030, 
                           parameter.names = c(par.names.pop, par.names.transmission),
                           n.iter = N.ITER,
-                          thin = 10, 
+                          thin = 50, 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
-                          description = "A test run",
+                          description = "A quick run to get transmission parameters in the general vicinity",
                           preceding.calibration.codes = CALIBRATION.CODE.POPULATION
 )
 
