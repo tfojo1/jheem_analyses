@@ -107,8 +107,11 @@ aids.data.clean = lapply(data.list.aids, function(file){
     select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
   
   #Change this once we decide what to do with locations
-  data = subset(data, !is.na(data$location))
   data$location = as.character(data$location)
+  
+  data <- data %>%
+    mutate(location_check = locations::is.location.valid(location))%>%
+    filter(location_check == "TRUE")
   
   list(filename, data) 
 })
