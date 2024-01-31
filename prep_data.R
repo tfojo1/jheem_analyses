@@ -345,21 +345,6 @@ p.idu.df.long$sexid <- ifelse(p.idu.df.long$group == "p.idu.male", "male",
 
 fit.p.idu <- lm(logit(p) ~ year + raceid + ageid + sexid, data = p.idu.df.long)
 
-# years.idu <- c(2015,2017) - 2020
-# 
-# fit.idu.black <- lm(logit(p.idu.black/p.max) ~ years.idu)
-# fit.idu.hisp <- lm(logit(p.idu.hisp/p.max) ~ years.idu)
-# fit.idu.nbnh <- lm(logit(p.idu.nbnh/p.max) ~ years.idu)
-# 
-# fit.idu.age1 <- lm(logit(p.idu.age1/p.max) ~ years.idu)
-# fit.idu.age2 <- lm(logit(p.idu.age2/p.max) ~ years.idu)
-# fit.idu.age3 <- lm(logit(p.idu.age3/p.max) ~ years.idu)
-# fit.idu.age4 <- lm(logit(p.idu.age4/p.max) ~ years.idu)
-# fit.idu.age5 <- lm(logit(p.idu.age5/p.max) ~ years.idu)
-# 
-# fit.idu.hetmale <- lm(logit(p.idu.male/p.max) ~ years.idu)
-# fit.idu.female <- lm(logit(p.idu.female/p.max) ~ years.idu)
-
 
 ## Heterosexual -----
 ### PrEP Use in 2016 ----
@@ -803,6 +788,41 @@ years.pi <- c(2017:2019) - anchor.year
 
 # criteria - any receptive sharing of injection equipment
 
+# https://www.cdc.gov/mmwr/preview/mmwrhtml/ss6306a1.htm 
+pi.idu.2009 <- data.frame(
+  total = (4249+1696)/(6992+2660),
+  male = 4249/6992,
+  female = 1696/2660,
+  age1 = 745/995,
+  age2 = 0.5*((1174/1760)+(1802/2961)),
+  age3 = 0.5*((1802/2961)+(1916/3303)),
+  age4 = 0.5*((1916/3303)+(308/633)),
+  age5 = 308/633,
+  black = 2544/4436,
+  hisp = 1312/2095,
+  nbnh = (56+25+1816+182)/(88+39+2673+306)
+)
+
+# pi.idu.2012 <- pi.idu.2012/100
+
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-11.pdf 
+pi.idu.2012 <- data.frame(
+  total = 60.6,
+  male = 60.0,
+  female = 62.3,
+  age1 = 74.2,
+  age2 = (0.5*475 + 0.5*1194)/(0.5*639+0.5*1759)*100,
+  age3 = (1194+1438)/(1759+2431)*100,
+  age4 = (1438+2143)/(2431+3910)*100,
+  age5 = 54.8,
+  black = 54.7,
+  hisp = 61.6,
+  nbnh = (54+14+10+1753+199)/(84+27+15+2550+323)*100
+)
+
+pi.idu.2012 <- pi.idu.2012/100
+
+
 pi.idu.2015 <- data.frame(
   total = 60.6,
   male = 60.0,
@@ -840,59 +860,83 @@ pi.idu.2018 <- pi.idu.2018/100
 years.idu <- c(2015, 2018) - anchor.year
 
 pi.idu.total <- c(
+  pi.idu.2009$total,
+  pi.idu.2012$total,
   pi.idu.2015$total,
   pi.idu.2018$total
 )
 
 pi.idu.black <- c(
+  pi.idu.2009$black,
+  pi.idu.2012$black,
   pi.idu.2015$black,
   pi.idu.2018$black
 )
 
 pi.idu.hisp <- c(
+  pi.idu.2009$hisp,
+  pi.idu.2012$hisp,
   pi.idu.2015$hisp,
   pi.idu.2018$hisp
 )
 
 pi.idu.nbnh <- c(
+  pi.idu.2009$nbnh,
+  pi.idu.2012$nbnh,
   pi.idu.2015$nbnh,
   pi.idu.2018$nbnh
 )
 
 pi.idu.age1 <- c(
+  pi.idu.2009$age1,
+  pi.idu.2012$age1,
   pi.idu.2015$age1,
   pi.idu.2018$age1
 )
 
 pi.idu.age2 <- c(
+  pi.idu.2009$age2,
+  pi.idu.2012$age2,
   pi.idu.2015$age2,
   pi.idu.2018$age2
 )
 
 pi.idu.age3 <- c(
+  pi.idu.2009$age3,
+  pi.idu.2012$age3,
   pi.idu.2015$age3,
   pi.idu.2018$age3
 )
 
 pi.idu.age4 <- c(
+  pi.idu.2009$age4,
+  pi.idu.2012$age4,
   pi.idu.2015$age4,
   pi.idu.2018$age4
 )
 
 pi.idu.age5 <- c(
+  pi.idu.2009$age5,
+  pi.idu.2012$age5,
   pi.idu.2015$age5,
   pi.idu.2018$age5
 )
 
 pi.idu.male <- c(
+  pi.idu.2009$male,
+  pi.idu.2012$male,
   pi.idu.2015$male,
   pi.idu.2018$male
 )
 
 pi.idu.female <- c(
+  pi.idu.2009$female,
+  pi.idu.2012$female,
   pi.idu.2015$female,
   pi.idu.2018$female
 )
+
+years.pi.idu <- c(2009, 2012, 2015, 2018) - anchor.year 
 
 ## Het -------
 
@@ -1124,7 +1168,7 @@ pi.msm.df <- data.frame(
 ) 
 
 pi.idu.df <- data.frame(
-  years = years.idu,
+  years = years.pi.idu,
   black = pi.idu.black,
   hisp = pi.idu.hisp,
   nbnh = pi.idu.nbnh,
