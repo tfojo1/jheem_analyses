@@ -331,6 +331,7 @@ data.manager$register.source('cdc.hiv', parent.source= "NHSS", full.name = "CDC 
 data.manager$register.source('cdc.retention.reports', parent.source= "cdc.retention.report.pdf", full.name = "CDC HIV Surveillance Reports", short.name='cdc.retention.reports') #These are really similar
 data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = "CDC Annual HIV Testing Report", short.name='cdc.testing')
 data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports')
+data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids')
 
 data.manager$register.ontology(
   'cdc',
@@ -463,6 +464,16 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
 
+data.manager$register.ontology(
+  'cdc.aids',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White', 'Unknown'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
 ################################################################################
 ###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')
