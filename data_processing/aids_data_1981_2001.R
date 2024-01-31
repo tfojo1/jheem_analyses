@@ -72,13 +72,11 @@ aids.data.clean = lapply(data.list.aids, function(file){
     data$outcome= "aids.diagnoses.alive.by.2001"
   }
   if(grepl("deceased", filename)) {
-    #data$location = locations::get.cbsa.for.msa.name(data$Location)
-    data$location = locations::get.location.code(data$Location, "CBSA")
+    data$location = locations::get.cbsa.for.msa.name(data$Location)
     data$outcome= "aids.diagnoses.deceased.by.2001"
   }
   if(grepl("all", filename)) {
-    #data$location = locations::get.cbsa.for.msa.name(data$Location)
-    data$location = locations::get.location.code(data$Location, "CBSA")
+    data$location = locations::get.cbsa.for.msa.name(data$Location)
     data$outcome= "aids.diagnoses"
   }
 
@@ -106,7 +104,11 @@ aids.data.clean = lapply(data.list.aids, function(file){
   }
 
   data <- data %>%
-    select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code )
+    select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
+  
+  #Change this once we decide what to do with locations
+  data = subset(data, !is.na(data$location))
+  
   list(filename, data) 
 })
 
