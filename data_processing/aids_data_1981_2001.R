@@ -108,7 +108,6 @@ aids.data.clean = lapply(data.list.aids, function(file){
   
   #Change this once we decide what to do with locations
   data$location = as.character(data$location)
-  
   data <- data %>%
     mutate(location_check = locations::is.location.valid(location))%>%
     filter(location_check == "TRUE")%>%
