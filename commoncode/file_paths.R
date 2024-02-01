@@ -1,0 +1,10 @@
+
+
+BIG.DESKTOP.ROOT.DIR = 'Q:'
+LAPTOP.ROOT.DIR = '../test_runs'
+
+RUNNING.ON.DESKTOP = file.exists(file.path(BIG.DESKTOP.ROOT.DIR, "mcmc_runs"))
+
+ROOT.DIR = LAPTOP.ROOT.DIR
+if (RUNNING.ON.DESKTOP)
+    ROOT.DIR = BIG.DESKTOP.ROOT.DIR

@@ -1,18 +1,7 @@
-source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
+source('../jheem_analyses/applications/EHE/calibration_runs/ehe_setup_init_calibration.R')
 
 LOCATION = MIAMI.MSA 
 CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION # or CALIBRATION.CODE.POPULATION
-
-clear.calibration.cache(version='ehe',
-                        location=LOCATION,
-                        calibration.code = CALIBRATION.CODE.TO.RUN,
-                        root.dir = '../test_runs')
-
-set.up.calibration(version='ehe',
-                   location=LOCATION,
-                   calibration.code = CALIBRATION.CODE.TO.RUN,
-                   root.dir = '../test_runs',
-                   cache.frequency = 250)
 
 set.seed(12345)
 start.time = Sys.time()
@@ -20,7 +9,7 @@ print(paste0("STARTING MCMC RUN AT ",Sys.time()))
 mcmc = run.calibration(version = 'ehe',
                 location = LOCATION,
                 calibration.code = CALIBRATION.CODE.TO.RUN,
-                root.dir = '../test_runs',
+                root.dir = ROOT.DIR,
                 chains = 1,
                 update.frequency = 100,
                 update.detail = 'med')
