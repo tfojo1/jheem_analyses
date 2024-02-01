@@ -1714,5 +1714,6 @@ register.calibrated.parameters.for.version('ehe',
                                            distribution = EHE.PARAMETERS.PRIOR,
                                            apply.function = EHE.APPLY.PARAMETERS.FN,
                                            sampling.blocks = EHE.PARAMETER.SAMPLING.BLOCKS,
+                                           calibrate.to.year = 2025,
                                            join.with.previous.version = F)
 
