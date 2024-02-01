@@ -91,22 +91,25 @@ register.model.quantity.subset(DEP.SPECIFICATION, name = "depression.effect.on.s
                                value = "rr.sex.sus.dep")
 
 register.model.element(DEP.SPECIFICATION, name = "rr.sex.sus.dep.hetmale", 
-                       value = .88) 
+                       value = .88,
+                       scale = 'ratio') 
 register.model.element(DEP.SPECIFICATION, name = "rr.sex.sus.dep.msm", 
-                       value = .88) 
+                       value = .88,
+                       scale = 'ratio') 
 register.model.element(DEP.SPECIFICATION, name = "rr.sex.sus.dep.female", 
-                       value = .72) 
+                       value = .72,
+                       scale = 'ratio') 
 
 register.model.quantity(DEP.SPECIFICATION, name = "rr.sex.sus.dep", 
-                        value = "rr.sex.sus.dep.tx.female")
+                        value = "rr.sex.sus.dep.female")
 
 register.model.quantity.subset(DEP.SPECIFICATION, name = "rr.sex.sus.dep", 
                                applies.to = list(sex="msm"), 
-                               value = "rr.sex.sus.dep.tx.msm")
+                               value = "rr.sex.sus.dep.msm")
 
-register.model.quantity.subset(DEP.SPECIFICATION, name = "rr.sex.sus.dep.tx", 
+register.model.quantity.subset(DEP.SPECIFICATION, name = "rr.sex.sus.dep", 
                                applies.to = list(sex="heterosexual_male"), 
-                               value = "rr.sex.sus.dep.tx.hetmale")
+                               value = "rr.sex.sus.dep.hetmale")
 
 ## IDU ##
 
@@ -139,7 +142,7 @@ register.model.element(DEP.SPECIFICATION, name="rr.idu.dep.notx",
 ##--------------------##
 
 register.model.quantity(DEP.SPECIFICATION, name = "testing", 
-                        value = expression(super.testin*depression.effect.on.testing))
+                        value = expression(super.testing*depression.effect.on.testing))
 
 register.model.quantity(DEP.SPECIFICATION, name = "depression.effect.on.testing", 
                         value = 1)
@@ -152,4 +155,4 @@ register.model.element(DEP.SPECIFICATION, name="rr.testing.depressed",
                        value = 1.4, scale = "ratio") # rate ratio
 
 
-#register.model.specification(DEP.SPECIFICATION)
+register.model.specification(DEP.SPECIFICATION)
