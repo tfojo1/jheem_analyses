@@ -940,11 +940,71 @@ years.pi.idu <- c(2009, 2012, 2015, 2018) - anchor.year
 
 ## Het -------
 
+# criteria - condomless sex with casual partners
+
+# https://www.cdc.gov/mmwr/preview/mmwrhtml/ss6314a1.htm
+
+pi.het.f.2010 <- data.frame(
+  total = (167+366+288+428+563+349)/(452+916+699+943+1197+748),
+  age18.24 = (167+366)/(452+916),
+  age25.29 = 288/699,
+  age30.39 = 428/943,
+  age40.49 = 563/1197,
+  age50ge  = 349/748,
+  black = 1561/3530,
+  hisp = 449/1034,
+  nbnh = (10+21+54+64)/(32+64+132+157)
+)
+
+pi.het.f.2010 <- age_mutate(pi.het.f.2010)
+
+pi.het.m.2010 <- data.frame(
+  total = (190+356+259+397+600+477)/(377+732+484+757+1128+845),
+  age18.24 = (190+356)/(377+732),
+  age25.29 = 259/484,
+  age30.39 = 397/757,
+  age40.49 = 600/1128,
+  age50ge  = 477/845,
+  black = 1616/3105,
+  hisp = 479/887,
+  nbnh = (11+17+86+67)/(24+44+134+125)
+)
+
+pi.het.m.2010 <- age_mutate(pi.het.m.2010)
+
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-13.pdf
+
+pi.het.f.2013 <- data.frame(
+  total = 41.9,
+  age18.24 = 37.4,
+  age25.29 = 39.0,
+  age30.39 = 42.9,
+  age40.49 = 47.1,
+  age50ge = 42.5,
+  black = 43.0,
+  hisp = 34.9,
+  nbnh = (15+5+3+53+61)/(33+6+8+113+140)*100
+)
+
+pi.het.f.2013 <- age_mutate(pi.het.f.2013)/100
+
+pi.het.m.2013 <- data.frame(
+  total = 49.9,
+  age18.24 = 47.5,
+  age25.29 = 50.6,
+  age30.39 = 50.4,
+  age40.49 = 52.7,
+  age50ge = 49.1,
+  black = 50.8,
+  hisp = 45.7,
+  nbnh = (15+6+6+59+46)/(26+10+14+104+105)*100
+)
+
+pi.het.m.2013 <- age_mutate(pi.het.m.2013)/100
+
 # 2016 
 # https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-19.pdf
 
-
-# criteria - condomless sex with casual partners
 pi.het.f.2016 <- data.frame(
   total = 40.1,
   age18.24 = 35.2,
@@ -1057,6 +1117,10 @@ pi.het.m.2019 <- age_mutate(pi.het.m.2019)/100
 # pi.het.2019 <- age_mutate(pi.het.2019)/100
 
 pi.het.total <- c(
+  pi.het.m.2010$total,
+  pi.het.f.2010$total,
+  pi.het.m.2013$total,
+  pi.het.f.2013$total,
   pi.het.m.2016$total,
   pi.het.f.2016$total,
   pi.het.m.2019$total,
@@ -1064,6 +1128,10 @@ pi.het.total <- c(
 )
 
 pi.het.black <- c(
+  pi.het.m.2010$black,
+  pi.het.f.2010$black,
+  pi.het.m.2013$black,
+  pi.het.f.2013$black,
   pi.het.m.2016$black,
   pi.het.f.2016$black,
   pi.het.m.2019$black,
@@ -1071,6 +1139,10 @@ pi.het.black <- c(
 )
 
 pi.het.hisp <- c(
+  pi.het.m.2010$hisp,
+  pi.het.f.2010$hisp,
+  pi.het.m.2013$hisp,
+  pi.het.f.2013$hisp,
   pi.het.m.2016$hisp,
   pi.het.f.2016$hisp,
   pi.het.m.2019$hisp,
@@ -1078,6 +1150,10 @@ pi.het.hisp <- c(
 )
 
 pi.het.nbnh <- c(
+  pi.het.m.2010$nbnh,
+  pi.het.f.2010$nbnh,
+  pi.het.m.2013$nbnh,
+  pi.het.f.2013$nbnh,
   pi.het.m.2016$nbnh,
   pi.het.f.2016$nbnh,
   pi.het.m.2019$nbnh,
@@ -1085,6 +1161,10 @@ pi.het.nbnh <- c(
 )
 
 pi.het.age1 <- c(
+  pi.het.m.2010$age1,
+  pi.het.f.2010$age1,
+  pi.het.m.2013$age1,
+  pi.het.f.2013$age1,
   pi.het.m.2016$age1,
   pi.het.f.2016$age1,
   pi.het.m.2019$age1,
@@ -1092,6 +1172,10 @@ pi.het.age1 <- c(
 )
 
 pi.het.age2 <- c(
+  pi.het.m.2010$age2,
+  pi.het.f.2010$age2,
+  pi.het.m.2013$age2,
+  pi.het.f.2013$age2,
   pi.het.m.2016$age2,
   pi.het.f.2016$age2,
   pi.het.m.2019$age2,
@@ -1099,6 +1183,10 @@ pi.het.age2 <- c(
 )
 
 pi.het.age3 <- c(
+  pi.het.m.2010$age3,
+  pi.het.f.2010$age3,
+  pi.het.m.2013$age3,
+  pi.het.f.2013$age3,
   pi.het.m.2016$age3,
   pi.het.f.2016$age3,
   pi.het.m.2019$age3,
@@ -1106,6 +1194,10 @@ pi.het.age3 <- c(
 )
 
 pi.het.age4 <- c(
+  pi.het.m.2010$age4,
+  pi.het.f.2010$age4,
+  pi.het.m.2013$age4,
+  pi.het.f.2013$age4,
   pi.het.m.2016$age4,
   pi.het.f.2016$age4,
   pi.het.m.2019$age4,
@@ -1113,6 +1205,10 @@ pi.het.age4 <- c(
 )
 
 pi.het.age5 <- c(
+  pi.het.m.2010$age5,
+  pi.het.f.2010$age5,
+  pi.het.m.2013$age5,
+  pi.het.f.2013$age5,
   pi.het.m.2016$age5,
   pi.het.f.2016$age5,
   pi.het.m.2019$age5,
@@ -1126,7 +1222,7 @@ pi.het.sex <- c(
   "female"
 )
 
-pi.years.het <- c(2016, 2016, 2019, 2019) - anchor.year
+pi.years.het <- c(2010, 2010, 2013, 2013, 2016, 2016, 2019, 2019) - anchor.year
 
 # pi.het.male <- c(
 #   pi.het.2016$male,
@@ -1154,7 +1250,7 @@ pi.msm.cdc.df <- data.frame(
   total = pi.msm.cdc.total
 ) 
 
-pi.msm.df <- data.frame(
+pi.msm.amis.df <- data.frame(
   years = years.pi,
   black = pi.msm.black,
   hisp = pi.msm.hisp,
@@ -1196,22 +1292,37 @@ pi.het.df <- data.frame(
   # male = pi.het.male,
   # female = pi.het.female
 )
+# 
+# pi.msm.df.long <- gather(pi.msm.cdc.df, key = "group", value = "pi", -years)
+# pi.msm.df.long$sexid <- rep("msm", length(pi.msm.df.long$pi))
+# pi.msm.df.long$riskid <- rep("msm", length(pi.msm.df.long$pi))
 
-pi.msm.df.long <- gather(pi.msm.cdc.df, key = "group", value = "pi", -years)
-pi.msm.df.long$sexid <- rep("msm", length(pi.msm.df.long$pi))
-pi.msm.df.long$riskid <- rep("msm", length(pi.msm.df.long$pi))
+pi.msm.cdc.long <- gather(pi.msm.cdc.df, key = "group", value = "pi", -years)
+pi.msm.cdc.long$sexid <- rep("msm", length(pi.msm.cdc.long$pi))
+pi.msm.cdc.long$riskid <- rep("msm", length(pi.msm.cdc.long$pi))
+pi.msm.cdc.long$dataid <- rep("cdc", length(pi.msm.cdc.long$pi))
+
+pi.msm.amis.long <- gather(pi.msm.amis.df, key = "group", value = "pi", -years)
+pi.msm.amis.long$sexid <- rep("msm", length(pi.msm.amis.long$pi))
+pi.msm.amis.long$riskid <- rep("msm", length(pi.msm.amis.long$pi))
+pi.msm.amis.long$dataid <- rep("amis", length(pi.msm.amis.long$pi))
+
+pi.msm.combined <- rbind(pi.msm.cdc.long, pi.msm.amis.long)
 
 pi.idu.df.long <- gather(pi.idu.df, key = "group", value = "pi", -years)
 pi.idu.df.long$riskid <- rep("idu", length(pi.idu.df.long$pi))
 pi.idu.df.long$sexid <- rep("idu", length(pi.idu.df.long$pi))
+pi.idu.df.long$dataid <- rep("cdc", length(pi.idu.df.long$pi))
 
 pi.het.df.long <- gather(pi.het.df, key = "group", value = "pi", -years)
 pi.het.df.long$riskid <- rep("het", length(pi.het.df.long$pi))
 pi.het.df.long$sexid <- rep(c("het-male","het-female"), 
                             length(pi.het.df.long$pi)/2)
+pi.het.df.long$dataid <- rep("cdc", length(pi.het.df.long$pi))
 # pi.het.df.long$sexid <- rep("het", length(pi.het.df.long$pi))
 
-pi.df.long <- rbind(pi.msm.df.long, pi.idu.df.long, pi.het.df.long)
+# pi.df.long <- rbind(pi.msm.df.long, pi.idu.df.long, pi.het.df.long)
+pi.df.long <- rbind(pi.msm.combined, pi.idu.df.long, pi.het.df.long)
 
 pi.big.df <- pi.df.long |> dplyr::mutate(raceid = ifelse(group == "black", "black", 
                                                    ifelse(group == "hisp", "hisp", 

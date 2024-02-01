@@ -17,6 +17,8 @@ EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
                                                iteration = 1,
                                                description = "The initial JHEEM version, set up to address achieving EHE goals",
                                                
+                                               start.year = 1970,
+                                               
                                                age.endpoints=c(13,25,35,45,55,Inf),
                                                compartments.for.infected.only = list(
                                                    continuum = c('undiagnosed', 'undiagnosed_from_prep', 'diagnosed'),
@@ -1729,5 +1731,6 @@ register.calibrated.parameters.for.version('ehe',
                                            distribution = EHE.PARAMETERS.PRIOR,
                                            apply.function = EHE.APPLY.PARAMETERS.FN,
                                            sampling.blocks = EHE.PARAMETER.SAMPLING.BLOCKS,
+                                           calibrate.to.year = 2025,
                                            join.with.previous.version = F)
 

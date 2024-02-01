@@ -169,20 +169,20 @@ data.manager$register.outcome(
 data.manager$register.outcome(
   'heroin', #can change to heroin use but leave display name the same#
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Heroin Use in the Past Year',
-    axis.name = 'Heroin Use in the Past Year (n)',
-    units = 'cases',
-    description = "Heroin Use in the Past Year"))
+    axis.name = 'Heroin Use in the Past Year',
+    units = '%',
+    description = "Heroin Use in the Past Year"), denominator.outcome = 'adult.population')
 
 data.manager$register.outcome(
   'cocaine', 
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Cocaine use in the Past Year',
-    axis.name = 'Cocaine use in the Past Year (n)',
-    units = 'cases',
-    description = "Cocaine Use in the Past Year"))
+    axis.name = 'Cocaine use in the Past Year',
+    units = '%',
+    description = "Cocaine Use in the Past Year"), denominator.outcome = 'adult.population')
 
 data.manager$register.outcome(
   'hiv.tests',
@@ -301,6 +301,24 @@ data.manager$register.outcome(
     units = 'population',
     description = "Metro Emigration Ages 13+"))
 
+data.manager$register.outcome(
+  'aids.diagnoses.alive.by.2001',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'AIDS Diagnoses Alive by 2001',
+    axis.name = 'AIDS Diagnoses Alive by 2001',
+    units = 'population',
+    description = "AIDS Diagnoses Alive by 2001"))
+
+data.manager$register.outcome(
+  'aids.diagnoses.deceased.by.2001',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'AIDS Diagnoses Deceased by 2001',
+    axis.name = 'AIDS Diagnoses Deceased by 2001',
+    units = 'population',
+    description = "AIDS Diagnoses Deceased by 2001"))
+
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
@@ -331,6 +349,7 @@ data.manager$register.source('cdc.hiv', parent.source= "NHSS", full.name = "CDC 
 data.manager$register.source('cdc.retention.reports', parent.source= "cdc.retention.report.pdf", full.name = "CDC HIV Surveillance Reports", short.name='cdc.retention.reports') #These are really similar
 data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = "CDC Annual HIV Testing Report", short.name='cdc.testing')
 data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports')
+data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids')
 
 data.manager$register.ontology(
   'cdc',
@@ -463,6 +482,16 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
 
+data.manager$register.ontology(
+  'cdc.aids',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White', 'Unknown'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
 ################################################################################
 ###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')

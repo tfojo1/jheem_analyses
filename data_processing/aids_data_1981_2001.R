@@ -21,7 +21,6 @@ aids.risk.mappings = c('Heterosexual contact with HIV' = 'heterosexual',
                        'IV drug use (female and hetero male)' = 'idu',
                        'Male homo/bisexual and IV drug use' = 'msm_idu',
                        'Male homosexual/bisexual contact' = 'msm',
-                       
                        'Mother with HIV, or HIV risk' = "other",
                        'Pediatric hemophilia' = "other",
                        'Pediatric receipt of blood' = "other",
@@ -43,7 +42,7 @@ aids.age.mappings = c('Less than 1 Year' = '< 1 year',
                       '20 - 24 Years' = '20-24 years',
                       '25 - 29 Years' = '25-29 years',
                       '30 - 34 Years' = '30-34 years',
-                      '35 - 39 Years or age is missing' = '35-39 years',
+                      '35 - 39 Years or age is missing' = '35-39 years', #decided to group missing with 35-39
                       '40 - 44 Years' = '40-44 years',
                       '45 - 49 Years' = '45-49 years',
                       '50 - 54 Years' = '50-54 years',
@@ -62,6 +61,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
   filename = file[["filename"]]
   
   data$year = data$Year.Diagnosed
+  data$year = ifelse(data$year == "Before 1982", "1981", data$year)
   
   data$Cases[data$Cases %in% c("Data suppressed")] = NA    
   data$Cases[data$Cases %in% c("Data not available")] = NA  
@@ -69,14 +69,15 @@ aids.data.clean = lapply(data.list.aids, function(file){
   
   if(grepl("alive", filename)) {
     data$location = "US"
+    data$outcome= "aids.diagnoses.alive.by.2001"
   }
   if(grepl("deceased", filename)) {
-    #data$location = locations::get.cbsa.for.msa.name(data$Location)
-    data$location = locations::get.location.code(data$Location, "CBSA")
+    data$location = locations::get.cbsa.for.msa.name(data$Location)
+    data$outcome= "aids.diagnoses.deceased.by.2001"
   }
   if(grepl("all", filename)) {
-    #data$location = locations::get.cbsa.for.msa.name(data$Location)
-    data$location = locations::get.location.code(data$Location, "CBSA")
+    data$location = locations::get.cbsa.for.msa.name(data$Location)
+    data$outcome= "aids.diagnoses"
   }
 
   ##Demographic conditionals##
@@ -103,7 +104,15 @@ aids.data.clean = lapply(data.list.aids, function(file){
   }
 
   data <- data %>%
-    select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code )
+    select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
+  
+  #Change this once we decide what to do with locations
+  data$location = as.character(data$location)
+  data <- data %>%
+    mutate(location_check = locations::is.location.valid(location))%>%
+    filter(location_check == "TRUE")%>%
+    filter(!is.na(location))
+  
   list(filename, data) 
 })
 
@@ -111,16 +120,15 @@ aids.data.clean = lapply(data.list.aids, function(file){
 ##Put into surveillance manager
 ################################################################################
 
-
  aids.data.clean.put = lapply(aids.data.clean, `[[`, 2)  
  
  for (data in aids.data.clean.put) {
-   
+
    data.manager$put.long.form(
      data = data,
-     ontology.name = 'cdc.national', #UPDATE
-     source = 'cdc.hiv', #UPDATE
+     ontology.name = 'cdc.aids', 
+     source = 'cdc.aids',
      dimension.values = list(),
      url = 'https://wonder.cdc.gov/AIDSPublic.html',
-     details = 'CDC Atlas Plus data')  #UPDATE
+     details = 'CDC Wonder AIDS Public Information Data')  
  }
