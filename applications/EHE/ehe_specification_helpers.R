@@ -216,6 +216,31 @@ do.get.empiric.hiv.aging.rates <- function(location,
     
     pop = rowMeans(pop, dims=length(dim(pop))-1, na.rm=T) # sum out source
     
+    
+    
+    map.to.jheem.sex.risk = create.ontology.mapping(
+      from.dimensions = c('risk','sex'),
+      mappings = rbind(
+        c('msm', 'male', 'never_IDU', 'msm'),
+        c('msm', 'female', NA, NA),
+        
+        c('msm_idu', 'male', 'active_IDU', 'msm'),
+        c('msm_idu', 'male', 'IDU_in_remission', 'msm'),
+        c('msm_idu', 'female', NA, NA),
+        
+        c('idu', 'male', 'active_IDU', 'heterosexual_male'),
+        c('idu', 'male', 'IDU_in_remission', 'heterosexual_male'),
+        c('idu', 'female', 'active_IDU', 'female'),
+        c('idu', 'female', 'IDU_in_remission', 'female'),
+        
+        c('heterosexual', 'male', 'never_IDU','heterosexual_male'),
+        c('heterosexual', 'female', 'never_IDU','female'),
+        c('other', 'male', 'never_IDU','heterosexual_male'),
+        c('other', 'female', 'never_IDU','female')
+      )
+      
+    )
+    
     aging.rates.2001 = NULL
     if (any(years<=2001))
     {
@@ -233,15 +258,15 @@ do.get.empiric.hiv.aging.rates <- function(location,
         {
             pop.alive.2001 = rowMeans(pop.alive.2001, dims=length(dim(pop.alive.2001))-1, na.rm=T) # sum out source
           
-            race.sex.risk.mappings = get.mappings.to.align.ontologies(ontology.1 = dimnames(pop.alive.2001)[c('race','sex','risk')],
-                                                                      ontology.2 = specification.metadata$dim.names[c('race','sex','risk')])
+            race.mapping = get.ontology.mapping(from.ontology = dimnames(pop.alive.2001)['race'],
+                                                to.ontology = specification.metadata$dim.names['race'])
             
             if (is.null(race.sex.risk.mappings))
               stop(paste0("Cannot infer empiric HIV aging rates: cannot find ontology mappings to align pre-2001 HIV data with the '",
-                          specification.metadata$version, "' version's sex/race/risk ontologies"))
+                          specification.metadata$version, "' version's race"))
             
-            pop.alive.2001 = race.sex.risk.mappings$mapping.from.1$apply(pop.alive.2001, na.rm=T)
-            pop.alive.2001 = race.sex.risk.mappings$mapping.from.2$reverse.apply(pop.alive.2001, na.rm=T)
+            pop.alive.2001 = race.mapping$apply(pop.alive.2001, na.rm=T)
+            pop.alive.2001 = map.to.jheem.sex.risk$apply(pop.alive.2001, na.rm=T)
             
             pop.alive.2001[is.na(pop.alive.2001)] = 0
             
@@ -281,29 +306,7 @@ do.get.empiric.hiv.aging.rates <- function(location,
     parsed.ages = parse.age.strata.names(dimnames(pop)$age)
     min.age = min(parsed.ages$lower)
     max.age = min(101, max(parsed.ages$upper))
-    
-    map.to.jheem.sex.risk = create.ontology.mapping(
-      from.dimensions = c('risk','sex'),
-      mappings = rbind(
-        c('msm', 'male', 'never_IDU', 'msm'),
-        c('msm', 'female', NA, NA),
-        
-        c('msm_idu', 'male', 'active_IDU', 'msm'),
-        c('msm_idu', 'male', 'IDU_in_remission', 'msm'),
-        c('msm_idu', 'female', NA, NA),
-        
-        c('idu', 'male', 'active_IDU', 'heterosexual_male'),
-        c('idu', 'male', 'IDU_in_remission', 'heterosexual_male'),
-        c('idu', 'female', 'active_IDU', 'female'),
-        c('idu', 'female', 'IDU_in_remission', 'female'),
-        
-        c('heterosexual', 'male', 'never_IDU','heterosexual_male'),
-        c('heterosexual', 'female', 'never_IDU','female'),
-        c('other', 'male', 'never_IDU','heterosexual_male'),
-        c('other', 'female', 'never_IDU','female')
-      )
-      
-    )
+
     
     pop2 = map.to.jheem.sex.risk$apply(pop)
     
