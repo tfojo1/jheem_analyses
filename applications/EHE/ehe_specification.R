@@ -1692,7 +1692,24 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       include.tags = "emigration",
                       keep.dimensions = c('location','age','race','sex'))
 
+register.model.element(EHE.SPECIFICATION,
+                       name = 'aids.to.new.diagnosis.ratio',
+                       value = 1.4,
+                       scale = 'ratio')
 
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'aids.diagnoses',
+                         outcome.metadata = create.outcome.metadata(display.name = 'AIDS Diagnoses',
+                                                                    description = "Number of Individuals with an AIDS Diagnosis in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         value = expression(new*aids.to.new.diagnosis.ratio),
+                         corresponding.data.outcome = "aids.diagnoses",
+                         keep.dimensions = c("location","age","race","sex"),
+                         to.year = 2001)
 
 
 
