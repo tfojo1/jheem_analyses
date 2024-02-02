@@ -261,7 +261,7 @@ do.get.empiric.hiv.aging.rates <- function(location,
             race.mapping = get.ontology.mapping(from.ontology = dimnames(pop.alive.2001)['race'],
                                                 to.ontology = specification.metadata$dim.names['race'])
             
-            if (is.null(race.sex.risk.mappings))
+            if (is.null(race.mapping))
               stop(paste0("Cannot infer empiric HIV aging rates: cannot find ontology mappings to align pre-2001 HIV data with the '",
                           specification.metadata$version, "' version's race"))
             
