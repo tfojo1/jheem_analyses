@@ -84,12 +84,14 @@ test <- function(msa.name,
   states = locations::get.overlapping.locations(msa.name, "state") 
   counties = locations::get.contained.locations(msa.name, 'county')
   
+  browser()
   state.metro.deaths = census.manager$pull(outcome = 'metro.deaths', dimension.values = list(location = states, year= year.ranges), keep.dimensions = c('location', 'year', 'age', 'race', 'ethnicity', 'sex'))
   state.metro.pop = census.manager$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('location','year', 'age', 'race', 'ethnicity', 'sex'))
   state.metro.death.rate = (state.metro.deaths/state.metro.pop) 
 
   #Need to fix 'year' here
-  msa.population = census.manager$pull(outcome = 'population', location = counties, year = "2011", keep.dimensions = c('age', 'race', 'ethnicity', 'sex')) #this would add up all populations from counties; ideally want this to aggregate across year ranges even though data isnt in year ranges#
+  #QUESTION: Is all I need to do here now update to year ranges and it'll aggregate over the years?  (same for line 110?)
+  msa.population = census.manager$pull(outcome = 'population', location = counties, year = year.ranges, keep.dimensions = c('age', 'race', 'ethnicity', 'sex')) #this would add up all populations from counties; ideally want this to aggregate across year ranges even though data isnt in year ranges#
   
   #Return what counties are in the MSA
   counties.in.this.msa = locations::get.contained.locations(msa.name, "county")
@@ -104,16 +106,20 @@ test <- function(msa.name,
     intersect(counties.in.this.msa, counties.in.this.state)
   })
   
-  state.1.msa.pop = census.manager$pull(outcome='population', location=counties.in.states.and.msa, year = "2011", keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
-  state.1.proportion = (state.1.msa.pop/msa.population) 
+  #2-1-24 this is where I'm starting off
+  states.population.in.msa = lapply(counties.in.states.and.msa, function(states.population){
+    states.population = census.manager$pull(outcome='population', location=counties.in.states.and.msa, year = year.ranges, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
+    states.proportion = states.population/msa.population
+  })
   
-  state.2.msa.pop = census.manager$pull(outcome='population', location=counties.in.state.2.and.msa, year = "2011", keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
-  #state.2.proportion = (state.2.msa.pop/msa.population)  #This the proportion value the state contributes to the MSA
+  # state.2.msa.pop = census.manager$pull(outcome='population', location=counties.in.state.2.and.msa, year = "2011", keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
+  # states.population = census.manager$pull(outcome='population', location=counties.in.states.and.msa, year = year.ranges, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
+  
+    #state.1.proportion = (state.1.msa.pop/msa.population) 
   
   #Apply weights to create a final scaled mortality rate
   #final.msa.death.rate = (proportion.state.1 * state.metro.death.rate.1) + (proportion.state.2 * state.metro.death.rate.2) 
   
- #Keep copying lines from old function to new function to sort out where the issue is 
 }
 
 
