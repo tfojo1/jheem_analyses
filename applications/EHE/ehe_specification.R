@@ -17,6 +17,8 @@ EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
                                                iteration = 1,
                                                description = "The initial JHEEM version, set up to address achieving EHE goals",
                                                
+                                               start.year = 1970,
+                                               
                                                age.endpoints=c(13,25,35,45,55,Inf),
                                                compartments.for.infected.only = list(
                                                    continuum = c('undiagnosed', 'undiagnosed_from_prep', 'diagnosed'),
@@ -1692,7 +1694,24 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       include.tags = "emigration",
                       keep.dimensions = c('location','age','race','sex'))
 
+register.model.element(EHE.SPECIFICATION,
+                       name = 'aids.to.new.diagnosis.ratio',
+                       value = 1.4,
+                       scale = 'ratio')
 
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'aids.diagnoses',
+                         outcome.metadata = create.outcome.metadata(display.name = 'AIDS Diagnoses',
+                                                                    description = "Number of Individuals with an AIDS Diagnosis in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         value = expression(new*aids.to.new.diagnosis.ratio),
+                         corresponding.data.outcome = "aids.diagnoses",
+                         keep.dimensions = c("location","age","race","sex"),
+                         to.year = 2001)
 
 
 
@@ -1712,5 +1731,6 @@ register.calibrated.parameters.for.version('ehe',
                                            distribution = EHE.PARAMETERS.PRIOR,
                                            apply.function = EHE.APPLY.PARAMETERS.FN,
                                            sampling.blocks = EHE.PARAMETER.SAMPLING.BLOCKS,
+                                           calibrate.to.year = 2025,
                                            join.with.previous.version = F)
 

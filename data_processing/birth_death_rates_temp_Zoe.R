@@ -72,15 +72,54 @@ get.location.mortality.rates <- function(location,
 #Adjusting to account for MSAs that span multiple states
 #Also adjusting for mortality = 0
 ###############################################################################
+###############################################################################
+#THIS IS WHERE I'M WORKING 2-1-24
+###############################################################################
+###############################################################################
 
 test <- function(msa.name,
                  year.ranges = c('2006-2010','2011-2015'),
                                  census.manager = CENSUS.MANAGER){
-  states = locations::get.containing.locations(msa.name, "state")
+  
+  states = locations::get.overlapping.locations(msa.name, "state") 
   counties = locations::get.contained.locations(msa.name, 'county')
-  state.metro.deaths = census.manager$pull(outcome = 'metro.deaths', dimension.values = list(location = states, year= year.ranges), keep.dimensions = c('location', 'age', 'race', 'ethnicity', 'sex'))
+  
+  state.metro.deaths = census.manager$pull(outcome = 'metro.deaths', dimension.values = list(location = states, year= year.ranges), keep.dimensions = c('location', 'year', 'age', 'race', 'ethnicity', 'sex'))
+  state.metro.pop = census.manager$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('location','year', 'age', 'race', 'ethnicity', 'sex'))
+  state.metro.death.rate = (state.metro.deaths/state.metro.pop) 
+
+  #Need to fix 'year' here
+  msa.population = census.manager$pull(outcome = 'population', location = counties, year = "2011", keep.dimensions = c('age', 'race', 'ethnicity', 'sex')) #this would add up all populations from counties; ideally want this to aggregate across year ranges even though data isnt in year ranges#
+  
+  #Return what counties are in the MSA
+  counties.in.this.msa = locations::get.contained.locations(msa.name, "county")
+  
+  #Returns the counties in each state
+  counties.in.states = lapply(states, function(state){
+    counties.in.this.state = locations::get.contained.locations(state, "county")
+  })
+  
+  #Returns the overlap of what counties are in the MSA and in each state
+  counties.in.states.and.msa = lapply(counties.in.states, function(counties.in.this.state){
+    intersect(counties.in.this.msa, counties.in.this.state)
+  })
+  
+  state.1.msa.pop = census.manager$pull(outcome='population', location=counties.in.states.and.msa, year = "2011", keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
+  state.1.proportion = (state.1.msa.pop/msa.population) 
+  
+  state.2.msa.pop = census.manager$pull(outcome='population', location=counties.in.state.2.and.msa, year = "2011", keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
+  #state.2.proportion = (state.2.msa.pop/msa.population)  #This the proportion value the state contributes to the MSA
+  
+  #Apply weights to create a final scaled mortality rate
+  #final.msa.death.rate = (proportion.state.1 * state.metro.death.rate.1) + (proportion.state.2 * state.metro.death.rate.2) 
+  
  #Keep copying lines from old function to new function to sort out where the issue is 
 }
+
+
+##############################################################################
+#NOTE FROM 2-1-24 THIS IS OUT OF DATE##
+
 #Working with one MSA at a time
 
 get.location.mortality.rates.new <- function(msa.name,
@@ -136,7 +175,7 @@ get.location.mortality.rates.new <- function(msa.name,
   state.2.proportion = (state.2.msa.pop/msa.population)  #This the proportion value the state contributes to the MSA
   
   #Apply weights to create a final scaled mortality rate
-  final.msa.death.rate = (proportion.state.1 * state.metro.death.rate.1) + (proportion.state.2 * state.metro.death.rate.2) + (proportion.state.3 * state.metro.death.rate.3) #use apply here; create vector of proportion for example
+  final.msa.death.rate = (proportion.state.1 * state.metro.death.rate) + (proportion.state.2 * state.metro.death.rate) + (proportion.state.3 * state.metro.death.rate) #use apply here; create vector of proportion for example
   
   
   #Question: How to have the function return an array of values?
