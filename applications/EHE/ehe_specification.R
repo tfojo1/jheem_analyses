@@ -1632,7 +1632,7 @@ track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
 track.dynamic.outcome(EHE.SPECIFICATION,
                       name = 'hiv.mortality',
                       outcome.metadata = create.outcome.metadata(display.name = 'Mortality in PWH',
-                                                                 description = "Number of People with HIV who Died of Any Cause in the Past Year",
+                                                                 description = "Number of People with Diagnosed HIV who Died of Any Cause in the Past Year",
                                                                  scale = 'non.negative.number',
                                                                  axis.name = 'Deaths',
                                                                  units = 'deaths',
@@ -1640,6 +1640,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       dynamic.quantity.name = 'mortality',
                       corresponding.data.outcome = 'hiv.mortality',
                       groups = 'infected',
+                      subset.dimension.values = list(continuum = "diagnosed.states"), # only those who were diagnosed, diff from aids deaths
                       exclude.tags = "emigration",
                       keep.dimensions = c('location','sex'))
 
@@ -1710,9 +1711,24 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          value = expression(new*aids.to.new.diagnosis.ratio),
                          corresponding.data.outcome = "aids.diagnoses",
-                         keep.dimensions = c("location","age","race","sex"),
+                         keep.dimensions = c("location","age","race","sex","risk"),
                          to.year = 2001)
 
+track.dynamic.outcome(EHE.SPECIFICATION,
+                      name = 'aids.deaths',
+                      outcome.metadata = create.outcome.metadata(display.name = 'AIDS Deaths',
+                                                                 description = "Number of People with HIV who Died of AIDS in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Deaths',
+                                                                 units = 'deaths',
+                                                                 singular.unit = 'death'),
+                      dynamic.quantity.name = 'mortality',
+                      corresponding.data.outcome = 'aids.deaths',
+                      groups = 'infected',
+                      exclude.tags = "emigration",
+                      keep.dimensions = c("location","race","sex","risk"),
+                      from.year = 1980, 
+                      to.year = 2001)
 
 
 ##--------------------------------##

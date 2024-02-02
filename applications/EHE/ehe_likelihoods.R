@@ -145,15 +145,26 @@ general.mortality.likelihood.instructions = create.basic.likelihood.instructions
 )
 
 #-- SUPPRESSION  --#
-# Right now there's a data manager error that messes this up 
+# Right now there's a data manager error that messes this up - check applied_test file for how to pick source 
+# this is going to be too slow - have a separate file that runs and saves all the p.bias.estimates 
+# and then load those when I actually do the likelihoods
 # suppression.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
 #                                                  dimensions = c("age","race","sex","risk"),
-#                                                  levels.of.stratification = c(0,1,2),
+#                                                  levels.of.stratification = c(0,1),
 #                                                  outcome.for.p = "suppression",
 #                                                  outcome.for.n = "diagnosed.prevalence",
 #                                                  sub.location.type = "COUNTY",
 #                                                  super.location.type = "STATE",
 #                                                  main.location.type = "CBSA")
+# proportion.tested.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+#                                                         dimensions = c("age","race","sex","risk"),
+#                                                         levels.of.stratification = c(0,1),
+#                                                         outcome.for.p = "proportion.tested",
+#                                                         outcome.for.n = "adult.population",
+#                                                         sub.location.type = "COUNTY",
+#                                                         super.location.type = "STATE",
+#                                                         main.location.type = "CBSA") 
+
 p.bias.inside = 0
 p.bias.outside = 0
 p.bias.sd.inside = 0.03
@@ -212,6 +223,81 @@ suppression.likelihood.instructions =
                                                    
                                                    weights = list(1), 
                                                    equalize.weight.by.year = T 
+  )
+
+# TO DO: 
+# proportion tested, awareness, IDU (heroin/cocaine ratios)
+
+#-- AIDS DIAGNOSES  --#
+aids.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
+                                                                              outcome.for.sim = "aids.diagnoses", 
+                                                                              dimensions = c("age","sex","race","risk"),
+                                                                              levels.of.stratification = c(0,1), 
+                                                                              from.year = as.integer(1980),
+                                                                              to.year = as.integer(2001),
+                                                                              observation.correlation.form = 'compound.symmetry', 
+                                                                              measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up
+                                                                              weights = list(1), 
+                                                                              equalize.weight.by.year = T 
+)
+
+#-- AIDS DEATHS  --#
+# in the data, this is the cumulative estimate of aids.diagnoses.deceased.by.2001 from 1980-2001 
+# e.g., 1995 aids.diagnoses.deceased.by.2001 gives everyone diagnosed in 1995 who is deceased by 2001 (NOT that they died in 1995)
+# so cumulative total will be helpful to get totals by sex/race/risk
+aids.deaths.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "aids.deaths", 
+                                                                           outcome.for.sim = "aids.deaths", 
+                                                                           dimensions = c("sex","race","risk"),
+                                                                           levels.of.stratification = c(0,1), 
+                                                                           from.year = as.integer(1980), 
+                                                                           to.year = as.integer(2001),
+                                                                           observation.correlation.form = 'compound.symmetry', 
+                                                                           measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up 
+                                                                           weights = list(1), 
+                                                                           equalize.weight.by.year = T 
+)
+
+#-- PREP UPTAKE  --#
+prep.uptake.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "prep",
+                                                                              outcome.for.sim = "prep.uptake", 
+                                                                              dimensions = c("age","sex","race"),
+                                                                              levels.of.stratification = c(0,1,2), 
+                                                                              from.year = as.integer(2007),
+                                                                              observation.correlation.form = 'compound.symmetry', 
+                                                                              measurement.error.coefficient.of.variance = 0.03, 
+                                                                              weights = list(1), 
+                                                                              equalize.weight.by.year = T 
+)
+
+#-- PROPORTION TESTED --#
+proportion.tested.likelihood.instructions =
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
+                                                   outcome.for.sim = "proportion.tested",
+                                                   denominator.outcome.for.data = "adult.population",
+                                                   denominator.outcome.for.sim = "population",
+
+                                                   location.types = c('STATE','CBSA'),
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+
+                                                   dimensions = c("age","sex","race","risk"),
+                                                   levels.of.stratification = c(0,1),
+                                                   from.year = as.integer(2008),
+
+                                                   p.bias.inside.location = p.bias.inside, # proportion.tested.bias.estimates$...
+                                                   p.bias.outside.location = p.bias.outside,
+                                                   p.bias.sd.inside.location = p.bias.sd.inside,
+                                                   p.bias.sd.outside.location = p.bias.sd.outside,
+
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+
+                                                   observation.correlation.form = 'compound.symmetry',
+                                                   measurement.error.sd = 0.03,
+
+                                                   partitioning.function = test.partitioning.function, # there will be a default.partitioning.function
+
+                                                   weights = list(1),
+                                                   equalize.weight.by.year = T
   )
 
 
