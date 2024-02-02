@@ -144,8 +144,9 @@ idu.sex.plot <- ggplot(idu.sex, aes(year, value, color=sex)) +
   theme_minimal()  
 
 idu.plots <- ggpubr::ggarrange(idu.race.plot, idu.age.plot, idu.sex.plot,
-                               nrow = 3, ncol=1, labels = c("IDU - Race", "IDU - Age", 
-                                                            "IDU - Sex"))
+                               nrow = 3, ncol=1, 
+                               labels = c("PWID - Race", "PWID - Age", 
+                                                            "PWID - Sex"))
 idu.plots
 
 het.race <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),"never_IDU",], c('year', 'race'), mean))
@@ -192,6 +193,10 @@ het.sex.plot <- ggplot(het.sex, aes(year, value, color=sex)) +
 
 het.plots <- ggpubr::ggarrange(het.race.plot, het.age.plot, het.sex.plot, nrow = 3, ncol = 1, 
                                labels=c("Het - Race", "Het - Age", "Het - Sex"))
+
+pdf("prep_msm.pdf", width = 20, height = 15)
+msm.plots
+dev.off()
 
 pdf("PrEP_Use_Plots.pdf", width = 15, height = 15)
 combined.plot
