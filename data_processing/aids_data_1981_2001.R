@@ -67,28 +67,40 @@ aids.data.clean = lapply(data.list.aids, function(file){
   data$Cases[data$Cases %in% c("Data not available")] = NA  
   data$value = as.numeric(gsub(",", '', data$Cases))   
   
-  #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
-  data$location = ifelse(data$Location == "Greenvile, SC", "Greenville, SC", data$Location) #fixing typo for Greenville, SC
-  
-  data$location = ifelse(data$Location == "Bergen-Passaic, NJ", "New York, NY", data$Location) 
-  data$location = ifelse(data$Location == "Middlesex, NJ", "New York, NY", data$Location) 
-  data$location = ifelse(data$Location == "Monmouth-Ocean City, NJ", "New York, NY", data$Location) 
-  data$location = ifelse(data$Location == "Nassau-Suffolk, NY", "New York, NY", data$Location) 
-  data$location = ifelse(data$Location == "Gary, IN", "Chicago, IL", data$Location) 
-  data$location = ifelse(data$Location == "Orange County, CA", "Los Angeles, CA", data$Location) 
-  data$location = ifelse(data$Location == "West Palm Beach, FL", "Miami, FL", data$Location) 
-  
   if(grepl("alive", filename)) {
     data$location = "US"
     data$outcome= "aids.diagnoses.alive.by.2001"
   }
+  
   if(grepl("deceased", filename)) {
-    data$location = locations::get.cbsa.for.msa.name(data$Location)
     data$outcome= "aids.diagnoses.deceased.by.2001"
+    
+    #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
+    data$location.fixed = ifelse(data$Location == "Greenvile, SC", "Greenville, SC", data$Location) #fixing typo for Greenville, SC
+    data$location.fixed = ifelse(data$Location == "Bergen-Passaic, NJ", "New York, NY", data$Location)
+    data$location.fixed = ifelse(data$Location == "Middlesex, NJ", "New York, NY", data$Location)
+    data$location.fixed = ifelse(data$Location == "Monmouth-Ocean City, NJ", "New York, NY", data$Location)
+    data$location.fixed = ifelse(data$Location == "Nassau-Suffolk, NY", "New York, NY", data$Location)
+    data$location.fixed = ifelse(data$Location == "Gary, IN", "Chicago, IL", data$Location)
+    data$location.fixed = ifelse(data$Location == "Orange County, CA", "Los Angeles, CA", data$Location)
+    data$location.fixed = ifelse(data$Location == "West Palm Beach, FL", "Miami, FL", data$Location)
+    
+    data$location = locations::get.cbsa.for.msa.name(data$location.fixed)
   }
   if(grepl("all", filename)) {
-    data$location = locations::get.cbsa.for.msa.name(data$Location)
     data$outcome= "aids.diagnoses"
+    
+    #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
+    data$location.fixed = ifelse(data$Location == "Greenvile, SC", "Greenville, SC", data$Location) #fixing typo for Greenville, SC
+    data$location.fixed = ifelse(data$Location == "Bergen-Passaic, NJ", "New York, NY", data$Location)
+    data$location.fixed = ifelse(data$Location == "Middlesex, NJ", "New York, NY", data$Location)
+    data$location.fixed = ifelse(data$Location == "Monmouth-Ocean City, NJ", "New York, NY", data$Location)
+    data$location.fixed = ifelse(data$Location == "Nassau-Suffolk, NY", "New York, NY", data$Location)
+    data$location.fixed = ifelse(data$Location == "Gary, IN", "Chicago, IL", data$Location)
+    data$location.fixed = ifelse(data$Location == "Orange County, CA", "Los Angeles, CA", data$Location)
+    data$location.fixed = ifelse(data$Location == "West Palm Beach, FL", "Miami, FL", data$Location)
+    
+    data$location = locations::get.cbsa.for.msa.name(data$location.fixed)
   }
 
   ##Demographic conditionals##
@@ -105,7 +117,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
   if(grepl("risk", filename)) {
     data$risk = aids.risk.mappings[data$HIV.Exposure.Category]
   }
-  
+
   ##
   if(grepl("national", filename)) {
     data$sex = aids.sex.mappings[data$Sex.and.Sexual.Orientation]
@@ -116,9 +128,9 @@ aids.data.clean = lapply(data.list.aids, function(file){
 
   data <- data %>%
     select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
-  
+
   data$location = as.character(data$location)
-  
+
   # data <- data %>%
   #   mutate(location_check = locations::is.location.valid(location))%>%
   #   filter(location_check == "TRUE")%>%
