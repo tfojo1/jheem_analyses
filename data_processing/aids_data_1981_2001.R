@@ -67,6 +67,17 @@ aids.data.clean = lapply(data.list.aids, function(file){
   data$Cases[data$Cases %in% c("Data not available")] = NA  
   data$value = as.numeric(gsub(",", '', data$Cases))   
   
+  #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
+  data$location = ifelse(data$Location == "Greenvile, SC", "Greenville, SC", data$Location) #fixing typo for Greenville, SC
+  
+  data$location = ifelse(data$Location == "Bergen-Passaic, NJ", "New York, NY", data$Location) 
+  data$location = ifelse(data$Location == "Middlesex, NJ", "New York, NY", data$Location) 
+  data$location = ifelse(data$Location == "Monmouth-Ocean City, NJ", "New York, NY", data$Location) 
+  data$location = ifelse(data$Location == "Nassau-Suffolk, NY", "New York, NY", data$Location) 
+  data$location = ifelse(data$Location == "Gary, IN", "Chicago, IL", data$Location) 
+  data$location = ifelse(data$Location == "Orange County, CA", "Los Angeles, CA", data$Location) 
+  data$location = ifelse(data$Location == "West Palm Beach, FL", "Miami, FL", data$Location) 
+  
   if(grepl("alive", filename)) {
     data$location = "US"
     data$outcome= "aids.diagnoses.alive.by.2001"
@@ -106,12 +117,12 @@ aids.data.clean = lapply(data.list.aids, function(file){
   data <- data %>%
     select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
   
-  #Change this once we decide what to do with locations
   data$location = as.character(data$location)
-  data <- data %>%
-    mutate(location_check = locations::is.location.valid(location))%>%
-    filter(location_check == "TRUE")%>%
-    filter(!is.na(location))
+  
+  # data <- data %>%
+  #   mutate(location_check = locations::is.location.valid(location))%>%
+  #   filter(location_check == "TRUE")%>%
+  #   filter(!is.na(location))
   
   list(filename, data) 
 })
