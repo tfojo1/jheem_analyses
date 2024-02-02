@@ -822,6 +822,7 @@ pi.idu.2012 <- data.frame(
 
 pi.idu.2012 <- pi.idu.2012/100
 
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-18.pdf
 
 pi.idu.2015 <- data.frame(
   total = 60.6,
