@@ -329,7 +329,6 @@ data.manager$register.parent.source('NCHS', full.name = 'National Center for Hea
 data.manager$register.parent.source('NNHSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNHSS")
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS")
 data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
-data.manager$register.parent.source('cdc.aggregated', full.name = 'CDC Data Aggregated from County to MSA', short.name= "cdc.aggregated")
 data.manager$register.parent.source('cdc.retention.report.pdf', full.name = 'CDC HIV Surveillance PDF Reports', short.name= "cdc.retention.report.pdf") #These are really similar
 data.manager$register.parent.source('NHM&E', full.name = 'National HIV Prevention Program Monitoring and Evaluation', short.name= "NHM&E")
 
@@ -339,7 +338,7 @@ data.manager$register.source('nsduh', parent.source= "NSDUH", full.name = "Natio
 data.manager$register.source('lhd', parent.source= "LHD", full.name = "Local Health Department", short.name='lhd')
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory')
-data.manager$register.source('cdc.aggregated.county', parent.source= "cdc.aggregated", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('cdc.aggregated.county', parent.source= "cdc.hiv", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "US Census Bureau Death Data", short.name='census.deaths')
 data.manager$register.source('cdc.sti', parent.source= "NNHSS", full.name = "CDC STI Data", short.name='cdc.sti')
