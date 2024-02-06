@@ -10,8 +10,6 @@ if (1==2)
 
 # Reading in PrEP data
 
-
-
 #-- The Functions to Implement --#
 
 
@@ -231,18 +229,6 @@ get.prep.persistence.functional.form <- function(specification.metadata){
   int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.pp)["riskidhet"]
   int[,,"female",] <- int[,,"female",] + coef(fit.pp)["riskidhet"]
   int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit.pp)["riskididu"]
-  
-  # slope[,,,] <- slope[,,,] + coef(fit.pp)["years"]
-  
-  # Make and return the functional form object
-  # create.logistic.linear.functional.form(
-  #   intercept = int,
-  #   slope = slope,
-  #   anchor.year = anchor.year,
-  #   min = 0,
-  #   max = max.prep.persistence, 
-  #   parameters.are.on.logit.scale = T
-  # ) 
   
   create.linear.functional.form(
     intercept = int,
