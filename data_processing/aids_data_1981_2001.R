@@ -75,7 +75,6 @@ aids.data.clean = lapply(data.list.aids, function(file){
   if(grepl("deceased", filename)) {
     data$outcome= "aids.diagnoses.deceased.by.2001"
     
-    data$og.location = data$Location
     
     #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
     data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
@@ -89,7 +88,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
                               gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
   
 
-    #data$location = locations::get.cbsa.for.msa.name(data$location.fixed)
+    data$location = locations::get.cbsa.for.msa.name(data$Location)
     
   }
   if(grepl("all", filename)) {
@@ -106,7 +105,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
                           gsub("Monmouth-Ocean City, NJ", "New York, NY",
                          gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
     
-    #data$location = locations::get.cbsa.for.msa.name(data$location.fixed)
+    data$location = locations::get.cbsa.for.msa.name(data$Location)
   }
 
   ##Demographic conditionals##
@@ -135,7 +134,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
   data <- data %>%
     select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
 
-  #data$location = as.character(data$location)
+  data$location = as.character(data$location)
 
   # data <- data %>%
   #   mutate(location_check = locations::is.location.valid(location))%>%
