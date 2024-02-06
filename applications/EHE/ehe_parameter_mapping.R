@@ -108,13 +108,13 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     #-- Testing --#
     set.ehe.alphas.from.parameters(model.settings,
-                                   element.name = 'testing',
+                                   element.name = 'general.population.testing.without.covid',
                                    parameters = parameters,
                                    parameter.suffixes = c(intercept='.proportion.tested.or', slope='.proportion.tested.slope.or'),
                                    idu.applies.to.in.remission = F,
                                    throw.error.if.no.parameters = F)
 
-    model.settings$set.element.ramp.values(element.name = 'testing',
+    model.settings$set.element.ramp.values(element.name = 'general.population.testing.without.covid',
                                          values = parameters['testing.ramp.up.vs.current.rr'] * c(TESTING.FIRST.YEAR.FRACTION.OF.RAMP,1),
                                          indices = 2:3)
 
