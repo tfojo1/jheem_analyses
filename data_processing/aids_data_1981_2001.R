@@ -141,6 +141,9 @@ aids.data.clean = lapply(data.list.aids, function(file){
   #   filter(location_check == "TRUE")%>%
   #   filter(!is.na(location))
   
+  #Removing PR bc invalid location
+  data= subset(data, data$Location != "San Juan, PR")
+  
   list(filename, data) 
 })
 
