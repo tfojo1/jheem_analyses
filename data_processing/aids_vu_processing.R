@@ -127,14 +127,14 @@ data.list.prep.age = lapply(data.list.prep, function(file){
     data$location= str_pad(data$FIPS, width=5, side="left", pad="0")
   }
   
-  data$`under 25 years`= data$`Age LE 24 PrEP Users`
+  data$`13-24 years`= data$`Age LE 24 PrEP Users` #Updating for 2/5/24: decided to change this to 13-24 to align with Atlas bc there are few under 13 using prep
   data$`25-34 years`= data$`Age 25-34 PrEP Users`
   data$`35-44 years` = data$`Age 35-44 PrEP Users`
   data$`45-54 years`= data$`Age 45-54 PrEP Users`
   data$`55+ years` = data$`Age 55+ PrEP Users`
 
   data <- data %>%
-   pivot_longer(cols=c("under 25 years", "25-34 years", "35-44 years", "45-54 years", "55+ years"),
+   pivot_longer(cols=c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55+ years"),
                   names_to = "age",
                   values_to = "value")
   
