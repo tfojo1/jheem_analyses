@@ -1154,23 +1154,29 @@ get.undiagnosed.testing.rr <- function(location, specification.metadata, populat
   full.array = array(multiplier[1],
                      dim = sapply(dim.names, length),
                      dimnames = dim.names)
+
+  full.array = sapply(dim.names$risk, function(risk){
+    sapply(dim.names$race, function(race){
+      sapply(dim.names$age, function(age){
+        full.array[age,race,risk]*multiplier[age]*multiplier[race]*multiplier[risk]
+      })
+    })
+  })
   
-  for(age in dim.names$age){
-    for(race in dim.names$race){
-      for(risk in dim.names$risk){
-        full.array[age,race,risk] = full.array[age,race,risk]*multiplier[age]*multiplier[race]*multiplier[risk]
-      }
-    }
-  }
+  dim(full.array) = sapply(dim.names,length)
+  dimnames(full.array) = dim.names
   
   # Second array with only the risk multipliers 
   risk.only.array = array(multiplier[1],
                           dim = sapply(dim.names, length),
                           dimnames = dim.names)
   
-  for(risk in dim.names$risk){
-    risk.only.array[,,risk] = risk.only.array[,,risk]*multiplier[risk]
-  }
+  risk.only.array = sapply(dim.names$risk, function(risk){
+    risk.only.array[,,risk]*multiplier[risk]
+  })
+
+  dim(risk.only.array) = sapply(dim.names,length)
+  dimnames(risk.only.array) = dim.names
   
   # Average the two arrays 
   combined.arrays = array(c(full.array,risk.only.array),
