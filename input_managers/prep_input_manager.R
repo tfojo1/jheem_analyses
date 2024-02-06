@@ -5,18 +5,17 @@ if (1==2)
     source('source_code.R')
     source('applications/EHE/ehe_specification.R')
     metadata = get.specification.metadata('ehe', location ='c.12580')
-    source('prep_data.R')
+    source('applications/prep_upscale/prep_data.R')
 }
 
 # Reading in PrEP data
 
-source('applications/prep_upscale/prep_data.R')
+
 
 #-- The Functions to Implement --#
 
 
-get.prep.use.functional.form <- function(specification.metadata)
-{
+get.prep.use.functional.form <- function(specification.metadata){
   source('applications/prep_upscale/prep_data.R')
     # Some variables you will use
     anchor.year = 2015 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
@@ -93,9 +92,9 @@ get.prep.use.functional.form <- function(specification.metadata)
 }
 
 get.prep.indication.functional.form <- function(specification.metadata){
-  
+  source('applications/prep_upscale/prep_data.R')
   # Some variables you will use
-  anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
+  anchor.year = 2009 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
   max.prep.indication = 0.85 # modify as you see fit
   
   # Set up our intercept/slope arrays
@@ -192,13 +191,12 @@ get.prep.indication.functional.form <- function(specification.metadata){
     max = max.prep.indication,
     parameters.are.on.logit.scale = T
   )
-  
 }
 
-get.prep.persistence.functional.form <- function(specification.metadata)
-{
+get.prep.persistence.functional.form <- function(specification.metadata){
+  source('applications/prep_upscale/prep_data.R')
   # Some variables you will use
-  anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
+  anchor.year = 2009 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
   max.prep.persistence = 0.8 # modify as you see fit
   
   # Set up our intercept/slope arrays

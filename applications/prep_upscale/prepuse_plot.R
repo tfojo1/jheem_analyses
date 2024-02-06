@@ -1,37 +1,22 @@
+# PrEP use plots -----
 
-# prep use plots -----
-# ff.linear <-  get.prep.use.functional.form(specification.metadata = metadata)
 ff <-  get.prep.use.functional.form(specification.metadata = metadata)
+anchor.year <- 2009
+x <- ff$project(anchor.year:2030, alphas = NULL, dim.names = ff$minimum.dim.names)
 
-# ff.linear$betas$intercept
-# ff.logistict$betas$intercept[1,,,"active_IDU"] 
-
-x <- ff$project(2015:2030, alphas = NULL, dim.names = ff$minimum.dim.names)
-
-# saveRDS(ff.logistict, file = "ff.logistict.rds")
-
-# x <- ff.logistict$project(2017:2030, alphas = NULL, dim.names = ff.logistict$minimum.dim.names)
-
-# length(x)
-# x[[1]]
-# sapply(x, max)
-# sapply(x, min)
-# sapply(x, mean)
 y <- sapply(x, function(z) {return(z)})
-dim.names <- c(ff$minimum.dim.names, list('year'=2015:2030))
+dim.names <- c(ff$minimum.dim.names, list('year'=anchor.year:2030))
 dim(y) <- sapply(dim.names, length)
 dimnames(y) <- dim.names
 
 y2 <- apply(y, c('year','race'), mean)
 
-seq.break <- seq(2015,2030,1)
+seq.break <- seq(anchor.year,2030,1)
 
-# y2
 
 df <- reshape2::melt(y2)
 race.plot <- ggplot(df, aes(x=year, y=value, color=race)) + geom_line(linewidth = 1) +
   ylim(0,1) + 
-  # geom_point(aes(x=year, y = p, color=raceid), data = df.pts)
   scale_x_continuous(breaks = seq.break) +
   theme_minimal() 
 
@@ -196,7 +181,7 @@ het.sex.plot <- ggplot(het.sex, aes(year, value, color=sex)) +
 het.plots <- ggpubr::ggarrange(het.race.plot, het.age.plot, het.sex.plot, nrow = 3, ncol = 1, 
                                labels=c("Het - Race", "Het - Age", "Het - Sex"))
 
-pdf("PrEP_Use_Plots.pdf", width = 15, height = 15)
+pdf("PrEP_Use_Plots.pdf", width = 18, height = 10)
 combined.plot
 msm.plots
 idu.plots
