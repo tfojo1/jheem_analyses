@@ -338,7 +338,7 @@ data.manager$register.source('nsduh', parent.source= "NSDUH", full.name = "Natio
 data.manager$register.source('lhd', parent.source= "LHD", full.name = "Local Health Department", short.name='lhd')
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory')
-data.manager$register.source('cdc.aggregated.county', parent.source= "cdc.hiv", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "US Census Bureau Death Data", short.name='census.deaths')
 data.manager$register.source('cdc.sti', parent.source= "NNHSS", full.name = "CDC STI Data", short.name='cdc.sti')
