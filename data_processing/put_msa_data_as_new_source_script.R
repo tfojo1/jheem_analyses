@@ -10,9 +10,11 @@ put.msa.data.as.new.source = function(outcome,
                                       data.manager) {
     
     error.prefix = "Cannot estimate data from contained location data: "
-    
     # validate if desired
+    if (!(from.source.name %in% names(data.manager$data[[outcome]][[metric]])))
+        stop(paste0(error.prefix, "'", from.source.name, "' is not a registered source for outcome '", outcome, "'"))
     
+    # print(outcome)
     outcome.data.all.ontologies = data.manager$data[[outcome]][[metric]][[from.source.name]]
     outcome.details.all.ontologies = data.manager$details[[outcome]][[metric]][[from.source.name]]
     outcome.url.all.ontologies = data.manager$url[[outcome]][[metric]][[from.source.name]]
@@ -21,13 +23,11 @@ put.msa.data.as.new.source = function(outcome,
         from.locations = locations::get.contained.locations(to.location, geographic.type.from)
         for (ont.name in names(outcome.data.all.ontologies)) {
             for (strat.name in names(outcome.data.all.ontologies[[ont.name]])) {
-                # browser()
                 strat.data = outcome.data.all.ontologies[[ont.name]][[strat.name]]
                 strat.details = outcome.details.all.ontologies[[ont.name]][[strat.name]]
                 strat.url = outcome.url.all.ontologies[[ont.name]][[strat.name]]
                 
                 from.locations.in.this.strat.data = intersect(dimnames(strat.data)$location, from.locations)
-                
                 if (length(from.locations.in.this.strat.data) == 0) next
                 
                 if (!is.null(years)) years.in.this.strat.data = intersect(dimnames(strat.data)$year, years)
@@ -36,7 +36,6 @@ put.msa.data.as.new.source = function(outcome,
                 strat.data.from.locs.only = do.call('[', get.subset.arguments(strat.data, years.in.this.strat.data, from.locations.in.this.strat.data))
                 strat.details.from.locs.only = do.call('[', get.subset.arguments(strat.details, years.in.this.strat.data, from.locations.in.this.strat.data))
                 strat.url.from.locs.only = do.call('[', get.subset.arguments(strat.url, years.in.this.strat.data, from.locations.in.this.strat.data))
-                
                 if (is.null(strat.data.from.locs.only)) next # CHECK THAT THIS IS THE RIGHT THING TO SAY
                 
                 # Aggregate across location
