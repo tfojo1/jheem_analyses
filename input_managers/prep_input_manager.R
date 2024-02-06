@@ -17,7 +17,7 @@ if (1==2)
 get.prep.use.functional.form <- function(specification.metadata)
 {
     # Some variables you will use
-    anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
+    anchor.year = 2015 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
     max.prep.coverage = 0.6 # modify as you see fit
       
     # Set up our intercept/slope arrays

@@ -1308,6 +1308,8 @@ pi.msm.amis.long$sexid <- rep("msm", length(pi.msm.amis.long$pi))
 pi.msm.amis.long$riskid <- rep("msm", length(pi.msm.amis.long$pi))
 pi.msm.amis.long$dataid <- rep("amis", length(pi.msm.amis.long$pi))
 
+# pi.msm.combined <- pi.msm.cdc.long
+
 pi.msm.combined <- rbind(pi.msm.cdc.long, pi.msm.amis.long)
 
 pi.idu.df.long <- gather(pi.idu.df, key = "group", value = "pi", -years)
@@ -1377,7 +1379,9 @@ het.pi.df <- subset(pi.big.df, riskid=="het")
 
 pi.max <- 0.85
 
+# fit.pi.msm <- lm(logit(pi/pi.max) ~ years + raceid, data = msm.pi.df)
 fit.pi.msm <- lm(logit(pi/pi.max) ~ years + raceid + ageid, data = msm.pi.df)
+
 fit.pi.msm
 
 fit.pi.idu <- lm(logit(pi) ~ years + raceid + ageid + female, data = idu.pi.df)
