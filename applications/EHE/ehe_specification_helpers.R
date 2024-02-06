@@ -1146,9 +1146,9 @@ get.undiagnosed.testing.rr <- function(location, specification.metadata, populat
   # df$age = factor(df$age, levels = c("all","13-24 years","25-34 years","35-44 years","45-54 years","55+ years"))
   # fit = lm(log(value) ~ age + race + risk, data = df)
   
-  dim.names = list(age = names(multiplier)[2:6],
-                   race = names(multiplier)[7:9],
-                   risk = names(multiplier)[10:13])
+  dim.names = list(age = names(tests.age.restratified),
+                   race = names(tests.race),
+                   risk = names(tests.risk))
   
   # First array with all of the multipliers multiplied out
   full.array = array(multiplier[1],
