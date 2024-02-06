@@ -1265,10 +1265,15 @@ pi.msm.amis.df <- data.frame(
   total = pi.msm.total
 ) 
 
-pi.ratio.msm <- (pi.msm.amis.df/pi.msm.cdc.df) %>% select(-years)
+pi.msm.2017.new <- pi.msm.2017 %>% 
+  rename(age18.24 = age15.24, age50ge = age40ge) %>%
+  mutate(age40.49 = age50ge) %>%
+  select(total, age18.24, age25.29, age30.39, age40.49, age50ge,
+         black, hisp, nbnh, age1, age2, age3, age4, age5)
 
-pi.ratio.df <- pi.ratio.msm %>%
-  summarize(across(everything(), mean))
+pi.ratio.msm <- (pi.msm.2017.new/pi.msm.cdc.2017) 
+# pi.ratio.df <- pi.ratio.msm %>%
+#   summarize(across(everything(), mean))
 
 pi.idu.df <- data.frame(
   years = years.pi.idu,
@@ -1304,7 +1309,7 @@ pi.het.df <- data.frame(
 
 pi.het.df <- pi.het.df %>%
   select(-years) %>%
-  mutate(across(everything(), ~ . * pi.ratio.df[[cur_column()]])) %>%
+  mutate(across(everything(), ~ . * pi.ratio.msm[[cur_column()]])) %>%
   mutate(years = pi.years.het) %>% 
   select(years, everything())
 
