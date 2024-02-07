@@ -49,9 +49,9 @@ get.testing.intercepts.and.slopes = function(version, location){
   df$sex = factor(df$sex, levels = c('msm', 'heterosexual_male','female'))
   
   fit.p.testing = glm(tested.past.year ~ age + sex + race + year + year:age + year:sex + year:race, data=df,
-                                       family='binomial', weights = df$weighting.var)
+                      family='binomial', weights = df$weighting.var)
   dim.names = specification.metadata$dim.names[c('age','race','sex')]
-
+  
   intercepts = sapply(dim.names$sex, function(sex){
     sapply(dim.names$race, function(race){
       sapply(dim.names$age, function(age){
