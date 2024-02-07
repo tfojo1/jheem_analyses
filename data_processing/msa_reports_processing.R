@@ -474,40 +474,58 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   data$division= ifelse(grepl("Division", data$msa), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
-  ##Manually Remove MSAs Todd decided to take out bc they are out of date##
-  ##The problem is these may have different symbols and things##
-  # data= subset(data, data$msa != "Middlesex-Somerset-Hunterdon, NJ")
-  # data= subset(data, data$msa != "Monmouth-Ocean City, NJ")
-  # data= subset(data, data$msa != "Nassau-Suffolk, NJ")
-  # data= subset(data, data$msa != "West Palm Beach-Boca Raton, FL")
-  # data= subset(data, data$msa != "West Palm Beach, FL")
+  #Update 2/6/24: Decided to add these old MSAs back in so that data isn't compromised
+   data$msa<- gsub("Bergen-Passaic, N.J.", "New York, NY",
+gsub("Bergen-Passaic, NJ", "New York, NY",
+gsub("Middlesex, NJ", "New York, NY",
+gsub("Middlesex, N.J.", "New York, NY",
+gsub("Middlesex-Somerset-Hunterdon, NJ", "New York, NY",
+gsub("Orange County, Calif.", "Los Angeles, CA",
+gsub("Orange County, CA", "Los Angeles, CA",
+gsub("West Palm Beach, Fla.", "Miami, FL",
+gsub("West Palm Beach, FL", "Miami, FL",
+gsub("West Palm Beach-Boca Raton, FL", "Miami, FL",
+gsub("Nassau-Suffolk, N.Y.", "New York, NY",
+gsub("Nassau-Suffolk, NJ", "New York, NY",
+gsub("Nassau/Suffolk, N.Y.", "New York, NY",
+gsub("Monmouth-Ocean City, N.J.", "New York, NY",
+gsub("Monmouth-Ocean, N.J.", "New York, NY",
+gsub("Monmouth-Ocean, NJ", "New York, NY",
+gsub("Gary, Ind.", "Chicago, IL",
+gsub("Gary, IN", "Chicago, IL",
+gsub("Charlotte–Gastonia–Concord, NC–SC", "Charlotte, NC",
+gsub("Charlotte-Gast.-Rock Hill, NC-SC", "Charlotte, NC",
+gsub("Charlotte, N.C.", "Charlotte, NC",
+gsub("Philadelphia, PA–NJ–DE–MD", "Philadelphia, PA",
+gsub("Philadelphia, Pa.", "Philadelphia, PA",
+gsub("Philadelphia, PA-NJ", "Philadelphia, PA",
+gsub("Philadelphia, Pa–NJ–Del–Md", "Philadelphia, PA",
+gsub("Portland–Vancouver–Beaverton, OR–WA", "Portland, OR",
+gsub("Portland–Vancouver–Beaverton, Ore–Wash", "Portland, OR",
+gsub("Portland-Vancourver, OR-WA", "Portland, OR",
+gsub("Portland, Oreg","Portland, OR",
+gsub("Washington, DC-MD-VA-WV", "Washington, DC",
+gsub("Washington, D.C.", "Washington, DC",
+gsub("Washington, DC–VA–MD–WV", "Washington, DC",
+gsub("Washington, DC–Va–Md–WV", "Washington, DC",
+gsub("Las Vegas, NV-AZ", "Las Vegas, NV",
+gsub("Wilmington, Del.", "Wilmington, DE",
+gsub("Wilmington-Newark, DE-MD", "Wilmington, DE",
+gsub("Norfolk, Va.", "Norfolk, VA",
+gsub( "Springfield, MA Necma", "Springfield, MA",
+gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa)))))))))))))))))))))))))))))))))))))))
   
-#############################################################################
   
-  ####UPDATED 11-3 THESE ARE 2009 SPECIFIC LOCATIONS CAUSING PROBLEMS####
-  data= subset(data, data$msa != "Bergen-Passaic, N.J.") #fixed#
-  data= subset(data, data$msa != "Gary, Ind.") #fixed
-  data= subset(data, data$msa != "Middlesex, N.J.") #fixed
-  data= subset(data, data$msa != "Monmouth-Ocean, N.J.") #fixed
-  data= subset(data, data$msa != "Nassau-Suffolk, N.Y.")  #fixed
-  
-  data$msa = if_else(data$msa == "Charlotte, N.C.", "Charlotte-Concord,NC-SC", data$msa)
-  data$msa = if_else(data$msa == "Philadelphia, Pa.", "Philadelphia-Camden, PA-NJ-DE-MD", data$msa)
-  data$msa = if_else(data$msa =="Portland, Oreg", "Portland-Vancouver, OR-WA", data$msa)
-  data$msa = if_else(data$msa == "Washington, D.C.", "Washington-Arlington-Alexandria, DC-VA-MD-WV", data$msa)
-  
-  #I can't figure out if these are valid
-  data= subset(data, data$msa != "West Palm Beach, Fla.")  
-  data= subset(data, data$msa != "Wilmington, Del.")  
-  data= subset(data, data$msa != "Orange County, Calif.")
-  data= subset(data, data$msa != "Norfolk, Va.")
-
+  #Removing Puerto Rico
+  data= subset(data, data$msa != "San Juan, P.R.")
+  data= subset(data, data$msa != "San Juan–Caguas–Guaynabo, PR")
+  data= subset(data, data$msa != "San Juan-Bayamon, PR")
  ##############################################################################
   data$location = as.character(locations::get.cbsa.for.msa.name(data$msa))
   
   #Removing locations that do not work- they are just variations of those listed above#
-  data$check_loc = locations::is.location.valid(data$location)
-  data= subset(data, data$check_loc == "TRUE")
+  # data$check_loc = locations::is.location.valid(data$location)
+  # data= subset(data, data$check_loc == "TRUE")
 
   ##add year section##
   if(grepl("1993 new 1992", filename)){
