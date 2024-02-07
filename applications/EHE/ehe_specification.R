@@ -1575,6 +1575,21 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          save = F)
 
 track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'prep.indications',
+                         outcome.metadata = create.outcome.metadata(display.name = 'PrEP Indications',
+                                                                    description = "The Number of People with an Indication for PrEP",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Number indicated for PrEP',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'uninfected',
+                         multiply.by = 'prep.indication', 
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'prep.indications',
+                         save = T
+                         )
+
+track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'prep.uptake',
                          outcome.metadata = create.outcome.metadata(display.name = 'PrEP Uptake',
                                                                     description = "The Number of People who Received a PrEP Prescription in the Past Year",
@@ -1586,6 +1601,20 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          multiply.by = 'proportion.receiving.prep', 
                          keep.dimensions = c('location','age','race','sex'),
                          corresponding.data.outcome = 'prep',
+                         save = T) 
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'prep.uptake.proportion',
+                         outcome.metadata = create.outcome.metadata(display.name = 'PrEP Uptake',
+                                                                    description = "The Proportion of People who Received a PrEP Prescription in the Past Year",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion with PrEP prescription',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = 'prep.uptake',
+                         value.is.numerator = T,
+                         denominator.outcome = 'prep.indications',
+                         keep.dimensions = c('location','age','race','sex'),
                          save = T) 
 
 track.integrated.outcome(EHE.SPECIFICATION,
@@ -1611,8 +1640,8 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          subset.dimension.values = list(continuum='diagnosed.states'),
                          value.to.integrate = 'infected',
                          value.is.numerator = T,
-                         multiply.by = 'suppression',
-                         denominator.outcome = 'cumulative.infected',
+                         multiply.by = 'suppression.of.diagnosed',
+                         denominator.outcome = 'diagnosed.prevalence',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          corresponding.data.outcome = 'suppression',
                          save = T)
@@ -1653,22 +1682,11 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          value.to.integrate = 'infected',
+                         subset.dimension.values = list(continuum = "diagnosed.states"),
                          corresponding.data.outcome = 'diagnosed.prevalence',
                          keep.dimensions = c('location','age','race','sex','risk')
                          )
 
-track.dynamic.outcome(EHE.SPECIFICATION,
-                      name = 'test.dynamic.suppression',
-                      outcome.metadata = create.outcome.metadata(display.name = 'N Suppressed (Dynamically Tracked',
-                                                                 description = "The Proportion of People with Diagnosed HIV who are Virally Suppressed",
-                                                                 scale = 'non.negative.number',
-                                                                 axis.name = 'Number Suppressed',
-                                                                 units = 'individuals'),
-                      dynamic.quantity.name = 'population',
-                      multiply.by = 'suppression.of.diagnosed',
-                      groups = 'infected',
-                      keep.dimensions = c('location','age','race','sex','risk'),
-                      subset.dimension.values = list(continuum='diagnosed.states'))
 
 
 track.dynamic.outcome(EHE.SPECIFICATION,
