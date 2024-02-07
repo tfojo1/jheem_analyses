@@ -1,6 +1,8 @@
+source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
+get.high.testing.rate.ratios
 
- load("Q:data_clean/brfss/brfss.subset.RData")
+load("Q:data_clean/brfss/brfss.subset.RData")
 
 
 
