@@ -5,22 +5,22 @@ if (1==2)
     source('source_code.R')
     source('applications/EHE/ehe_specification.R')
     metadata = get.specification.metadata('ehe', location ='c.12580')
-    source('prep_data.R')
-    # source('prepuse_plot.R')
-    # source('prepindication_plot.R')
-    # source('preppersistence_plot.R')
+    source('applications/prep_upscale/prep_data.R')
 }
+
+# Reading in PrEP data
 
 #-- The Functions to Implement --#
 
 
-get.prep.use.functional.form <- function(specification.metadata)
-{
+get.prep.use.functional.form <- function(specification.metadata){
+  source('applications/prep_upscale/prep_data.R')
     # Some variables you will use
-    anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
+    anchor.year = 2015 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
     max.prep.coverage = 0.6 # modify as you see fit
       
     # Set up our intercept/slope arrays
+    
     # We are going to define these on the LOGIT scale
     dim.names = specification.metadata$dim.names[c('age','race','sex','risk')]
     int = array(0, dim=sapply(dim.names, length),
@@ -33,14 +33,12 @@ get.prep.use.functional.form <- function(specification.metadata)
     age.info = parse.age.strata.names(dim.names$age)
     age.spans = age.info$upper - age.info$lower
   
-    # Do the work
+    # Setting up the array
     
-    # int[,,"msm",] <- int[,,"msm",] + coef(fit.p.msm)["(Intercept)"]
     int[,,"msm",] <- int[,,"msm",] + coef(fit.p.msm)["(Intercept)"]
     int[,,"female",] <- int[,,"female",] + coef(fit.p.nonmsm)["(Intercept)"]
     int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.p.nonmsm)["(Intercept)"]
     
-    # int[,"black","msm",] <- int[,"black","msm",] + coef(fit.p.msm)["raceidblack"]
     int[,"black","msm",] <- int[,"black","msm",] + coef(fit.p.msm)["raceidblack"]
     int[,"hispanic","msm",] <- int[,"hispanic","msm",] + coef(fit.p.msm)["raceidhispanic"]
     int[,"other","msm",] <- int[,"other","msm",] + coef(fit.p.msm)["raceidother"]
@@ -72,56 +70,29 @@ get.prep.use.functional.form <- function(specification.metadata)
     int["55+ years",,"female",] <- int["55+ years",,"female",] + coef(fit.p.nonmsm)["ageidage5"]
     
     int[,,"female",] <- int[,,"female",] + coef(fit.p.nonmsm)["female"]
-    # int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit2.big.df)["nonmsm"]
-    # int[,,"msm",] <- int[,,"msm",] + 0 # msm is sexrisk REF
     
-    # int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit.p.nonmsm)["idu"]
     int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit.p.nonmsm)["idu"]
     int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit.p.nonmsm)["idu"] #coef(fit2.big.df)[14] (NA)
 
     slope[,,"msm",] <- slope[,,"msm",] + coef(fit.p.msm)["year"]
     slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit.p.nonmsm)["year"]
     slope[,,"female",] <- slope[,,"female",] + coef(fit.p.nonmsm)["year"]
-    
-    # slope[,,"female",] <- slope[,,"female",] + coef(fit2.big.df)["year:nonmsm"]
-    # slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit2.big.df)["year:nonmsm"]
-    
-    # 
-    # # Make and return the functional form object
-    # create.logistic.linear.functional.form(
-    #     intercept = int,
-    #     slope = slope,
-    #     anchor.year = anchor.year,
-    #     min = 0,
-    #     max = max.prep.coverage,
-    #     parameters.are.on.logit.scale = T
-    # )
 
     create.logistic.tail.functional.form(
-      # everything else the same
       intercept = pmax(int,0),
       slope = slope,
       anchor.year = anchor.year,
       min = 0,
       max = max.prep.coverage,
-      # parameters.are.on.logit.scale = T,
       logistic.after.frac.of.span = 0.5,
       parameters.are.on.transformed.scale = F
     )
-
-    # create.linear.functional.form(
-    #   intercept = int,
-    #   slope = slope,
-    #   anchor.year = anchor.year,
-    #   min = 0,
-    #   max = max.prep.coverage
-    # )
 }
 
 get.prep.indication.functional.form <- function(specification.metadata){
-  
+  source('applications/prep_upscale/prep_data.R')
   # Some variables you will use
-  anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
+  anchor.year = 2009 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
   max.prep.indication = 0.85 # modify as you see fit
   
   # Set up our intercept/slope arrays
@@ -218,13 +189,12 @@ get.prep.indication.functional.form <- function(specification.metadata){
     max = max.prep.indication,
     parameters.are.on.logit.scale = T
   )
-  
 }
 
-get.prep.persistence.functional.form <- function(specification.metadata)
-{
+get.prep.persistence.functional.form <- function(specification.metadata){
+  source('applications/prep_upscale/prep_data.R')
   # Some variables you will use
-  anchor.year = 2017 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
+  anchor.year = 2009 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
   max.prep.persistence = 0.8 # modify as you see fit
   
   # Set up our intercept/slope arrays
@@ -259,18 +229,6 @@ get.prep.persistence.functional.form <- function(specification.metadata)
   int[,,"heterosexual_male",] <- int[,,"heterosexual_male",] + coef(fit.pp)["riskidhet"]
   int[,,"female",] <- int[,,"female",] + coef(fit.pp)["riskidhet"]
   int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit.pp)["riskididu"]
-  
-  # slope[,,,] <- slope[,,,] + coef(fit.pp)["years"]
-  
-  # Make and return the functional form object
-  # create.logistic.linear.functional.form(
-  #   intercept = int,
-  #   slope = slope,
-  #   anchor.year = anchor.year,
-  #   min = 0,
-  #   max = max.prep.persistence, 
-  #   parameters.are.on.logit.scale = T
-  # ) 
   
   create.linear.functional.form(
     intercept = int,
