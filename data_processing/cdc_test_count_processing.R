@@ -11,7 +11,9 @@ test_files <- Sys.glob(paste0(DATA.DIR.TESTS, '/*.xlsx'))
                             
 data.list.tests <- lapply(test_files, function(x){
   skip=1
-  list(filename=x, data=read_excel(x, skip=skip))
+  list(filename=x, data=read_excel(x, 
+                                     
+                                    skip=skip))
 })
 ################################################################################
                     ###Clean HIV Test Data- State###
@@ -67,8 +69,8 @@ data.list.tests.clean = lapply(data.list.tests, function(file){
     data$year = "2021"
   }
   
-  data <- data %>%
-    select( year, location, value, outcome)
+  # data <- data %>%
+  #   select( year, location, value, outcome)
   
   data= as.data.frame(data)
   
@@ -89,6 +91,9 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
   
   data$location =ifelse(data$`CDC Funded Jurisdiction` == "District of Columbia", "DC", data$location) 
   data$location =ifelse(data$`CDC Funded Jurisdiction` == "Puerto Rico", "PR", data$location) 
+  
+  data$numerator = as.numeric(data$`Number of persons newly diagnosed with HIV`)
+  data$denominator = as.numeric(data$`Number of HIV tests conducted`)
   
   if(grepl("2011", filename)) {
     data$year = "2011"
@@ -125,13 +130,13 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
   }
 
   data$outcome = "hiv.test.positivity"
-  data$value = (data$`Number of persons newly diagnosed with HIV`)/(data$`Number of HIV tests conducted`)
+  data$value = (data$numerator)/(data$denominator)
   data$value = round(data$value, digits=3)
-  
-  data$value_check = (as.numeric(data$`Percent of persons newly diagnosed with HIV`))/100
-  
-  data <- data %>%
-    select( year, location, value, outcome)
+   
+  # data$value_check = (as.numeric(data$`Percent of persons newly diagnosed with HIV`))/100
+   
+   # data <- data %>%
+   #   select( year, location, value, outcome)
   
   data= as.data.frame(data)
   
