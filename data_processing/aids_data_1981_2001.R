@@ -89,8 +89,8 @@ aids.data.clean = lapply(data.list.aids, function(file){
   
 
     data$location = locations::get.cbsa.for.msa.name(data$Location)
-    
   }
+  
   if(grepl("all", filename)) {
     data$outcome= "aids.diagnoses"
     
@@ -134,7 +134,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
   data <- data %>%
     select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
 
-  data$location = as.character(data$location)
+  #data$location = as.character(data$location)
 
   # data <- data %>%
   #   mutate(location_check = locations::is.location.valid(location))%>%
@@ -163,3 +163,84 @@ aids.data.clean = lapply(data.list.aids, function(file){
      url = 'https://wonder.cdc.gov/AIDSPublic.html',
      details = 'CDC Wonder AIDS Public Information Data')  
  }
+
+##############################################################################
+#Adding in aids.deaths (this will require a second ontology)
+##############################################################################
+DATA.DIR.AIDS.DEATHS="../../data_raw/aids_diagnoses/aids.deaths"
+
+aids.deaths.files <- list.files(DATA.DIR.AIDS.DEATHS, pattern = ".txt", full.names = "TRUE")
+
+data.list.aids.deaths <- lapply(aids.deaths.files, function(x) {
+  list(filename=x, data=read.delim2(x))
+  
+})
+##############################################################################
+#Aids.deaths processing (this will require a second ontology)
+##############################################################################
+
+aids.deaths.clean = lapply(data.list.aids.deaths, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$year = "1981-2001"
+  data$outcome = "aids.deaths"
+  
+  data$Cases[data$Cases %in% c("Data suppressed")] = NA    
+  data$Cases[data$Cases %in% c("Data not available")] = NA  
+  data$value = as.numeric(gsub(",", '', data$Cases))   
+    
+    #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
+    data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
+                      gsub("Greenvile, SC", "Greenville, SC",
+                      gsub("Middlesex, NJ", "New York, NY",
+                      gsub("Orange County, CA", "Los Angeles, CA",
+                      gsub("West Palm Beach, FL", "Miami, FL", 
+                      gsub("Middlesex, NJ", "New York, NY",
+                      gsub("Nassau-Suffolk, NY", "New York, NY",
+                      gsub("Monmouth-Ocean City, NJ", "New York, NY",
+                      gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
+    
+    data$location = locations::get.cbsa.for.msa.name(data$Location)
+  
+  ##Demographic conditionals##
+  
+  if(grepl("sex", filename)) {
+    data$sex = aids.sex.mappings[data$Sex.and.Sexual.Orientation]
+  }
+  if(grepl("race", filename)) {
+    data$race = aids.race.mappings[data$Race.or.Ethnicity]
+  }
+  if(grepl("age", filename)) {
+    data$age = aids.age.mappings[data$Age.at.Diagnosis]
+  }
+  if(grepl("risk", filename)) {
+    data$risk = aids.risk.mappings[data$HIV.Exposure.Category]
+  }
+
+  data$location = as.character(data$location)
+
+  #Removing PR bc invalid location
+  data= subset(data, data$Location != "San Juan, PR")
+  
+  list(filename, data) 
+  
+})
+
+##############################################################################
+#Put in aids.deaths (this will require a second ontology)
+##############################################################################
+
+# aids.deaths.put = lapply(aids.deaths.clean, `[[`, 2)  
+# 
+# for (data in aids.deaths.put) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'cdc.aids.deaths', 
+#     source = 'cdc.aids', #UPDATE THIS
+#     dimension.values = list(),
+#     url = 'https://wonder.cdc.gov/AIDSPublic.html',
+#     details = 'CDC Wonder AIDS Public Information Data')  
+# }
