@@ -69,8 +69,8 @@ data.list.tests.clean = lapply(data.list.tests, function(file){
     data$year = "2021"
   }
   
-  # data <- data %>%
-  #   select( year, location, value, outcome)
+   data <- data %>%
+     select( year, location, value, outcome)
   
   data= as.data.frame(data)
   
@@ -135,8 +135,8 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
    
   # data$value_check = (as.numeric(data$`Percent of persons newly diagnosed with HIV`))/100
    
-   # data <- data %>%
-   #   select( year, location, value, outcome)
+    data <- data %>%
+      select( year, location, value, outcome)
   
   data= as.data.frame(data)
   
@@ -189,15 +189,16 @@ data.list.city.test.clean = lapply(city_tests, function(file){
   data = subset(data, data$`CDC Funded Jurisdiction` == "Los Angeles" | data$`CDC Funded Jurisdiction` == "San Francisco" |
                   data$`CDC Funded Jurisdiction` == "Chicago" | data$`CDC Funded Jurisdiction` == "Baltimore" | 
                   data$`CDC Funded Jurisdiction` == "New York City" | data$`CDC Funded Jurisdiction` == "Philadelphia" |
-                  data$`CDC Funded Jurisdiction` == "Houston"  )
+                  data$`CDC Funded Jurisdiction` == "Houston" | data$`CDC Funded Jurisdiction` == "Atlanta" )
   
   data$msa = ifelse (data$`CDC Funded Jurisdiction` == "Los Angeles", "Los Angeles-Long Beach-Anaheim, CA",
                      ifelse(data$`CDC Funded Jurisdiction` == "San Francisco",  "San Francisco-Oakland-Berkeley, CA",
                             ifelse(data$`CDC Funded Jurisdiction` == "Chicago", "Chicago-Naperville-Elgin, IL-IN-WI",
                                    ifelse (data$`CDC Funded Jurisdiction` == "Baltimore", "Baltimore-Columbia-Towson, MD",
-                                   ifelse(data$`CDC Funded Jurisdiction` == "New York City", "New York-Newark-Jersey City, NY-NJ-PA",
-                                          ifelse(data$`CDC Funded Jurisdiction` == "Philadelphia", "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
-                                               ifelse(data$`CDC Funded Jurisdiction` == "Houston", "Houston-The Woodlands-Sugar Land, TX", "")))))))
+                                           ifelse(data$`CDC Funded Jurisdiction` == "New York City", "New York-Newark-Jersey City, NY-NJ-PA",
+                                                  ifelse(data$`CDC Funded Jurisdiction` == "Philadelphia", "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
+                                                         ifelse(data$`CDC Funded Jurisdiction` == "Atlanta", "Atlanta, GA",
+                                                                ifelse(data$`CDC Funded Jurisdiction` == "Houston", "Houston-The Woodlands-Sugar Land, TX", ""))))))))
   
   data$location =locations::get.cbsa.for.msa.name(data$msa)
   
@@ -258,7 +259,7 @@ data.list.city.positivity.clean = lapply(city_tests, function(file){
   data = subset(data, data$`CDC Funded Jurisdiction` == "Los Angeles" | data$`CDC Funded Jurisdiction` == "San Francisco" |
                   data$`CDC Funded Jurisdiction` == "Chicago" | data$`CDC Funded Jurisdiction` == "Baltimore" | 
                   data$`CDC Funded Jurisdiction` == "New York City" | data$`CDC Funded Jurisdiction` == "Philadelphia" |
-                  data$`CDC Funded Jurisdiction` == "Houston"  )
+                  data$`CDC Funded Jurisdiction` == "Houston" | data$`CDC Funded Jurisdiction` == "Atlanta" )
   
   data$msa = ifelse (data$`CDC Funded Jurisdiction` == "Los Angeles", "Los Angeles-Long Beach-Anaheim, CA",
                      ifelse(data$`CDC Funded Jurisdiction` == "San Francisco",  "San Francisco-Oakland-Berkeley, CA",
@@ -266,7 +267,8 @@ data.list.city.positivity.clean = lapply(city_tests, function(file){
                                    ifelse (data$`CDC Funded Jurisdiction` == "Baltimore", "Baltimore-Columbia-Towson, MD",
                                            ifelse(data$`CDC Funded Jurisdiction` == "New York City", "New York-Newark-Jersey City, NY-NJ-PA",
                                                   ifelse(data$`CDC Funded Jurisdiction` == "Philadelphia", "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
-                                                         ifelse(data$`CDC Funded Jurisdiction` == "Houston", "Houston-The Woodlands-Sugar Land, TX", "")))))))
+                                                         ifelse(data$`CDC Funded Jurisdiction` == "Atlanta", "Atlanta, GA",
+                                                         ifelse(data$`CDC Funded Jurisdiction` == "Houston", "Houston-The Woodlands-Sugar Land, TX", ""))))))))
   
   data$location =locations::get.cbsa.for.msa.name(data$msa)
   
