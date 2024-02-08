@@ -319,6 +319,15 @@ data.manager$register.outcome(
     units = 'population',
     description = "AIDS Diagnoses Deceased by 2001"))
 
+data.manager$register.outcome(
+  'aids.deaths',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'AIDS Deaths',
+    axis.name = 'AIDS Deaths',
+    units = 'population',
+    description = "AIDS Deaths"))
+
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
@@ -485,6 +494,17 @@ data.manager$register.ontology(
   'cdc.aids',
   ont = ontology(
     year= NULL,
+    location= NULL,
+    age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White', 'Unknown'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
+data.manager$register.ontology(
+  'cdc.aids.deaths',
+  ont = ontology(
+    year= ("1981-2001"),
     location= NULL,
     age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
     race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White', 'Unknown'),
