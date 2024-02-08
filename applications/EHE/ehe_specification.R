@@ -1666,6 +1666,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          corresponding.data.outcome = 'suppression',
                          save = T)
 
+
 track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
                                       name = 'proportion.general.population.tested',
                                       outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
@@ -1677,42 +1678,42 @@ track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
                                       denominator.outcome = 'cumulative.uninfected',
                                       corresponding.data.outcome = 'proportion.tested',
                                       keep.dimensions = c('location','age','race','sex','risk'))
-# 
-# track.integrated.outcome(EHE.SPECIFICATION,
-#                          name = 'number.of.tests.in.uninfected',
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Number of HIV Tests Among Uninfected',
-#                                                                     description = "Number of HIV Tests Done Among Uninfected in the Past Year",
-#                                                                     scale = 'non.negative.number',
-#                                                                     axis.name = 'Tests',
-#                                                                     units = 'tests',
-#                                                                     singular.unit = 'test'),
-#                          scale = 'non.negative.number',
-#                          value.to.integrate = 'uninfected',
-#                          multiply.by = 'general.population.testing',
-#                          save = F)
-# 
-# track.cumulative.outcome(EHE.SPECIFICATION,
-#                          name = 'total.hiv.tests',
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Total Number of HIV Tests',
-#                                                                     description = "Number of HIV Tests Done in the Past Year",
-#                                                                     scale = 'non.negative.number',
-#                                                                     axis.name = 'Tests',
-#                                                                     units = 'tests',
-#                                                                     singular.unit = 'test'),
-#                          value = expression(number.of.tests.in.uninfected+new),
-#                          keep.dimensions = c("age","race","sex","risk"))
-# 
-# track.cumulative.outcome(EHE.SPECIFICATION,
-#                          name = 'hiv.test.positivity',
-#                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Total HIV Tests that are Positive',
-#                                                                     description = "Proportion of Total HIV Tests that are Positive",
-#                                                                     scale = 'proportion',
-#                                                                     axis.name = 'Proportion positive',
-#                                                                     units = '%',
-#                                                                     singular.unit = '%'),
-#                          value = expression(new/total.hiv.tests),
-#                          denominator.outcome = 'total.hiv.tests',
-#                          keep.dimensions = c("age","race","sex","risk"))
+ 
+track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'number.of.tests.in.uninfected',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Number of HIV Tests Among Uninfected',
+                                                                    description = "Number of HIV Tests Done Among Uninfected in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Tests',
+                                                                    units = 'tests',
+                                                                    singular.unit = 'test'),
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'uninfected',
+                         multiply.by = 'general.population.testing',
+                         save = F)
+ 
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'total.hiv.tests',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Total Number of HIV Tests',
+                                                                    description = "Number of HIV Tests Done in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Tests',
+                                                                    units = 'tests',
+                                                                    singular.unit = 'test'),
+                         value = expression(number.of.tests.in.uninfected+new),
+                         keep.dimensions = c("age","race","sex","risk"))
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'hiv.test.positivity',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Total HIV Tests that are Positive',
+                                                                    description = "Proportion of Total HIV Tests that are Positive",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion positive',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = expression(new/total.hiv.tests),
+                         denominator.outcome = 'total.hiv.tests',
+                         keep.dimensions = c("age","race","sex","risk"))
 
 track.dynamic.outcome(EHE.SPECIFICATION,
                       name = 'hiv.mortality',

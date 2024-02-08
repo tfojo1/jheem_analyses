@@ -15,10 +15,12 @@ DEP.SPECIFICATION <- create.jheem.specification(version="dep",
 ##--------------------------------##
 ##--------------------------------##
 
-register.transition(DEP.SPECIFICATION, dimension="dep", from.compartments="depressed", to.compartments="not_depressed", 
+register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments="depressed", to.compartments="not_depressed", 
+                    groups = c('infected','uninfected'),
                     value=expression(1/depression.length))
 
-register.transition(DEP.SPECIFICATION, dimension="dep", from.compartments="not_depressed", to.compartments="depressed", 
+register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments="not_depressed", to.compartments="depressed", 
+                    groups = c('infected','uninfected'),
                     value=expression(depression.prevalence)) 
 
 
@@ -131,8 +133,8 @@ register.model.element(DEP.SPECIFICATION, name="rr.idu.dep.notx",
 ##--    Testing     --##
 ##--------------------##
 
-register.model.quantity(DEP.SPECIFICATION, name = "testing", 
-                        value = expression(super.testing*depression.effect.on.testing))
+register.model.quantity(DEP.SPECIFICATION, name = "general.population.testing", 
+                        value = expression(super.general.population.testing*depression.effect.on.testing))
 
 register.model.quantity(DEP.SPECIFICATION, name = "depression.effect.on.testing", 
                         value = 1)
@@ -146,3 +148,4 @@ register.model.element(DEP.SPECIFICATION, name="rr.testing.depressed",
 
 
 register.model.specification(DEP.SPECIFICATION)
+

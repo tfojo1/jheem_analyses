@@ -53,6 +53,7 @@ source('../jheem_analyses/applications/EHE/ehe_ontology_mappings.R')
 # General
 source('../jheem_analyses/commoncode/target_populations.R')
 source('../jheem_analyses/commoncode/age_mappings.R')
+source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
 
 # Data Loads
 load('../jheem_analyses/cached/google_mobility_data.Rdata')
