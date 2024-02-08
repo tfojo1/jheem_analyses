@@ -17,6 +17,9 @@ get.testing.intercepts.and.slopes = function(version, location){
   specification.metadata = get.specification.metadata(version=version,
                                                       location=location)
   
+  df = df[(df$year<2020 | df$year>2022),]
+  # df$is.after.covid = df$year>=2020 & df$year<=2022 # USE THIS LATER FOR COVID EFFECT
+  
   # Restratify the ages
   given.ages = unique(df$age)
   age.map = get.age.bracket.mapping(given.ages, specification.metadata$dim.names$age)
@@ -48,10 +51,15 @@ get.testing.intercepts.and.slopes = function(version, location){
   df$sex[df$sex=='male'] = 'heterosexual_male'
   df$sex = factor(df$sex, levels = c('msm', 'heterosexual_male','female'))
   
-  fit.p.testing = glm(tested.past.year ~ age + sex + race + year + year:age + year:sex + year:race, data=df,
-                      family='binomial', weights = df$weighting.var)
+  # try one interaction term - probably race with something 
+  # add anchor year 
+  fit.p.testing = glm(tested.past.year ~ age + sex + race + 
+                        # these are the ORs to get effect of covid on testing
+                        # is.after.covid:age + is.after.covid:sex + is.after.covid:race + is.after.covid + 
+                        year + year:age + year:sex + year:race, data=df,
+                                       family='binomial', weights = df$weighting.var)
   dim.names = specification.metadata$dim.names[c('age','race','sex')]
-  
+
   intercepts = sapply(dim.names$sex, function(sex){
     sapply(dim.names$race, function(race){
       sapply(dim.names$age, function(age){

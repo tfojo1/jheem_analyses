@@ -96,6 +96,11 @@ data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
 data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
 data= subset(data, data$MSA != "West Palm Beach, FL")
 
+#Update 2-8-24
+data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRc")
+data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PR")
+data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PR")
+
 ##Rename a few MSAs that are causing problems
 data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
 data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
@@ -169,6 +174,11 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  #Update 2-8-24
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRc")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PR")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PR")
   
   ##Rename a few MSAs that are causing problems
   data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
@@ -252,6 +262,11 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  #Update 2-8-24
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRc")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PR")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PR")
   
   ##Rename a few MSAs that are causing problems
   data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
@@ -341,6 +356,11 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  #Update 2-8-24
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRc")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PR")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PR")
   
   ##Rename a few MSAs that are causing problems
   data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
@@ -803,6 +823,16 @@ data.list.msa_sex_race.clean = lapply(data.list.msa_sex_race, function(file){
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
   
+  #Update 2-8-24
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRc")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PR")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PR")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PRd")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PRe")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRd")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRe")
+  
+  
   ##Rename a few MSAs that are causing problems
   data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
   data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
@@ -947,6 +977,16 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
   
+  #Update 2-8-24
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRc")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PR")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PR")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PRd")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PRe")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRd")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRe")
+
+
   ##Rename a few MSAs that are causing problems
   data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
   data$MSA = if_else(data$MSA == "Philadelphia, PA–NJ–DE–MD", "Philadelphia-Camden, PA-NJ-DE-MD", data$MSA)
@@ -1096,6 +1136,11 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   data= subset(data, data$MSA != "Nassau-Suffolk, NJ")
   data= subset(data, data$MSA != "West Palm Beach-Boca Raton, FL")
   data= subset(data, data$MSA != "West Palm Beach, FL")
+  
+  #Update 2-8-24
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PRc")
+  data= subset(data, data$MSA != "San Juan–Caguas–Guaynabo, PR")
+  data= subset(data, data$MSA != "San Juan–Carolina–Caguas, PR")
   
   ##Rename a few MSAs that are causing problems
   data$MSA = if_else(data$MSA == "Charlotte–Gastonia–Concord, NC–SC", "Charlotte-Concord,NC-SC", data$MSA)
