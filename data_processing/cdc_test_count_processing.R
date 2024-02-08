@@ -33,6 +33,27 @@ data.list.tests.clean = lapply(data.list.tests, function(file){
 
   data$value = as.numeric(data$`Number of HIV tests conducted`)
   
+  if(grepl("2011", filename)) {
+    data$year = "2011"
+  }
+  if(grepl("2012", filename)) {
+    data$year = "2012"
+  }
+  if(grepl("2013", filename)) {
+    data$year = "2013"
+  }
+  if(grepl("2014", filename)) {
+    data$year = "2014"
+  }
+  if(grepl("2015", filename)) {
+    data$year = "2015"
+  }
+  if(grepl("2016", filename)) {
+    data$year = "2016"
+  }
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
   if(grepl("2018", filename)) {
     data$year = "2018"
   }
@@ -69,6 +90,27 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
   data$location =ifelse(data$`CDC Funded Jurisdiction` == "District of Columbia", "DC", data$location) 
   data$location =ifelse(data$`CDC Funded Jurisdiction` == "Puerto Rico", "PR", data$location) 
   
+  if(grepl("2011", filename)) {
+    data$year = "2011"
+  }
+  if(grepl("2012", filename)) {
+    data$year = "2012"
+  }
+  if(grepl("2013", filename)) {
+    data$year = "2013"
+  }
+  if(grepl("2014", filename)) {
+    data$year = "2014"
+  }
+  if(grepl("2015", filename)) {
+    data$year = "2015"
+  }
+  if(grepl("2016", filename)) {
+    data$year = "2016"
+  }
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
   if(grepl("2018", filename)) {
     data$year = "2018"
   }
@@ -158,6 +200,27 @@ data.list.city.test.clean = lapply(city_tests, function(file){
   
   data$value = as.numeric(data$`Number of HIV tests conducted`)
   
+  if(grepl("2011", filename)) {
+    data$year = "2011"
+  }
+  if(grepl("2012", filename)) {
+    data$year = "2012"
+  }
+  if(grepl("2013", filename)) {
+    data$year = "2013"
+  }
+  if(grepl("2014", filename)) {
+    data$year = "2014"
+  }
+  if(grepl("2015", filename)) {
+    data$year = "2015"
+  }
+  if(grepl("2016", filename)) {
+    data$year = "2016"
+  }
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
   if(grepl("2018", filename)) {
     data$year = "2018"
   }
@@ -209,6 +272,27 @@ data.list.city.positivity.clean = lapply(city_tests, function(file){
   
   data$value_check = (as.numeric(data$`Percent of persons newly diagnosed with HIV`))/100
   
+  if(grepl("2011", filename)) {
+    data$year = "2011"
+  }
+  if(grepl("2012", filename)) {
+    data$year = "2012"
+  }
+  if(grepl("2013", filename)) {
+    data$year = "2013"
+  }
+  if(grepl("2014", filename)) {
+    data$year = "2014"
+  }
+  if(grepl("2015", filename)) {
+    data$year = "2015"
+  }
+  if(grepl("2016", filename)) {
+    data$year = "2016"
+  }
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
   if(grepl("2018", filename)) {
     data$year = "2018"
   }
