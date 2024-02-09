@@ -181,7 +181,9 @@ aids.deaths.clean = lapply(data.list.aids.deaths, function(file){
   
   data$Cases[data$Cases %in% c("Data suppressed")] = NA    
   data$Cases[data$Cases %in% c("Data not available")] = NA  
-  data$value = as.numeric(gsub(",", '', data$Cases))   
+  data$value = as.numeric(gsub(",", '', data$Cases)) 
+  
+  data= subset(data, data$Location != "San Juan, PR")
     
     #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
     data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
@@ -212,9 +214,6 @@ aids.deaths.clean = lapply(data.list.aids.deaths, function(file){
   }
 
   data$location = as.character(data$location)
-
-  #Removing PR bc invalid location
-  data= subset(data, data$Location != "San Juan, PR")
   
   list(filename, data) 
   
@@ -224,15 +223,15 @@ aids.deaths.clean = lapply(data.list.aids.deaths, function(file){
 #Put in aids.deaths (this will require a second ontology)
 ##############################################################################
 
-# aids.deaths.put = lapply(aids.deaths.clean, `[[`, 2)  
-# 
-# for (data in aids.deaths.put) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc.aids.deaths', 
-#     source = 'cdc.aids', #UPDATE THIS
-#     dimension.values = list(),
-#     url = 'https://wonder.cdc.gov/AIDSPublic.html',
-#     details = 'CDC Wonder AIDS Public Information Data')  
-# }
+aids.deaths.put = lapply(aids.deaths.clean, `[[`, 2)
+
+for (data in aids.deaths.put) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.aids.deaths',
+    source = 'cdc.aids',
+    dimension.values = list(),
+    url = 'https://wonder.cdc.gov/AIDSPublic.html',
+    details = 'CDC Wonder AIDS Public Information Data')
+}
