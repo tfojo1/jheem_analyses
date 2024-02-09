@@ -65,7 +65,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
   
   data$Cases[data$Cases %in% c("Data suppressed")] = NA    
   data$Cases[data$Cases %in% c("Data not available")] = NA  
-  data$value = as.numeric(gsub(",", '', data$Cases))   
+  data$value = as.numeric(gsub(",", '', data$Cases)) 
   
   if(grepl("alive", filename)) {
     data$location = "US"
@@ -73,39 +73,39 @@ aids.data.clean = lapply(data.list.aids, function(file){
   }
   
   if(grepl("deceased", filename)) {
-    data$outcome= "aids.diagnoses.deceased.by.2001"
-    
+    data= subset(data, data$Location != "San Juan, PR")
     
     #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
     data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
                              gsub("Greenvile, SC", "Greenville, SC",
                               gsub("Middlesex, NJ", "New York, NY",
                               gsub("Orange County, CA", "Los Angeles, CA",
-                              gsub("West Palm Beach, FL", "Miami, FL", 
+                              gsub("West Palm Beach, FL", "Miami, FL",
                               gsub("Middlesex, NJ", "New York, NY",
                               gsub("Nassau-Suffolk, NY", "New York, NY",
                               gsub("Monmouth-Ocean City, NJ", "New York, NY",
                               gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
-  
 
     data$location = locations::get.cbsa.for.msa.name(data$Location)
+    data$outcome= "aids.diagnoses.deceased.by.2001"
   }
   
   if(grepl("all", filename)) {
-    data$outcome= "aids.diagnoses"
+    data= subset(data, data$Location != "San Juan, PR")
     
     #Decided 2/2/24: There are old locations that do not map to a current MSA.  Because this is older data I"m going to manually add those in so we have more AIDS data.
     data$Location <- gsub("Bergen-Passaic, NJ", "New York, NY",
                           gsub("Greenvile, SC", "Greenville, SC",
                           gsub("Middlesex, NJ", "New York, NY",
                           gsub("Orange County, CA", "Los Angeles, CA",
-                          gsub("West Palm Beach, FL", "Miami, FL", 
+                          gsub("West Palm Beach, FL", "Miami, FL",
                           gsub("Middlesex, NJ", "New York, NY",
                           gsub("Nassau-Suffolk, NY", "New York, NY",
                           gsub("Monmouth-Ocean City, NJ", "New York, NY",
                          gsub("Gary, IN", "Chicago, IL", data$Location)))))))))
     
     data$location = locations::get.cbsa.for.msa.name(data$Location)
+    data$outcome= "aids.diagnoses"
   }
 
   ##Demographic conditionals##
@@ -134,16 +134,8 @@ aids.data.clean = lapply(data.list.aids, function(file){
   data <- data %>%
     select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
 
-  #data$location = as.character(data$location)
+  data$location = as.character(data$location)
 
-  # data <- data %>%
-  #   mutate(location_check = locations::is.location.valid(location))%>%
-  #   filter(location_check == "TRUE")%>%
-  #   filter(!is.na(location))
-  
-  #Removing PR bc invalid location
-  data= subset(data, data$Location != "San Juan, PR")
-  
   list(filename, data) 
 })
 
