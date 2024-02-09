@@ -37,6 +37,7 @@ put.msa.data.as.new.source = function(outcome,
                 strat.details.from.locs.only = do.call('[', get.subset.arguments(strat.details, years.in.this.strat.data, from.locations.in.this.strat.data))
                 strat.url.from.locs.only = do.call('[', get.subset.arguments(strat.url, years.in.this.strat.data, from.locations.in.this.strat.data))
                 if (is.null(strat.data.from.locs.only)) next # CHECK THAT THIS IS THE RIGHT THING TO SAY
+                if (all(is.na(strat.data.from.locs.only))) next
                 
                 # Aggregate across location
                 non.location.margin = setdiff(names(dim(strat.data.from.locs.only)), 'location')
@@ -45,6 +46,7 @@ put.msa.data.as.new.source = function(outcome,
                 aggregated.data = array(aggregated.data, sapply(post.agg.dimnames, length), post.agg.dimnames)
                 aggregated.details = aggregate.details.or.url(strat.details.from.locs.only, names(post.agg.dimnames), post.agg.dimnames)
                 aggregated.url = aggregate.details.or.url(strat.url.from.locs.only, names(post.agg.dimnames), post.agg.dimnames)
+                if (all(is.na(aggregated.data))) next
                 
                 # Details and url should be the same for all the data, but check just in case they aren't.
                 details = aggregated.details[[1]]
