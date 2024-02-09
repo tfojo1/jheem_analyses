@@ -1389,7 +1389,7 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
  #                     census.manager = smaller.census.manager)
  
  #Use function to sum county data into MSA values for diagnosed.prevalence and new diagnoses
- put.msa.data.as.new.source = function(outcome = 'diagnosed.prevalence',
+ put.msa.data.as.new.source(outcome = 'diagnosed.prevalence',
            from.source.name = 'cdc.hiv',
            to.source.name = 'cdc.aggregated.county',
            to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
