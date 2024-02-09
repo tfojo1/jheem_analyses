@@ -246,7 +246,7 @@ data.list.emory.msm.county = lapply(data.list.emory.msm, function(file){
   data$year = "2013"
   data$outcome= "proportion.msm"
 
-  data$value = as.numeric(data$MSM12MTH/data$ADULTMEN)
+  data$value = as.numeric(data$MSM5YEAR/data$ADULTMEN)
   data$value = round(data$value, digits=2)
   
   #To create location- combine state and county FIPS
@@ -272,7 +272,7 @@ data.list.emory.msm.msa = lapply(data.list.emory.msm, function(file){
   data$year = "2013"
   data$outcome= "proportion.msm"
   
-  data$value = as.numeric(data$MSM12MTH/data$ADULTMEN)
+  data$value = as.numeric(data$MSM5YEAR/data$ADULTMEN)
   data$value = round(data$value, digits=2)
   
   #To create location- for MSA use 'CBSACODE' and also 'METMICSA' ==1 for metropolitian statistical area
