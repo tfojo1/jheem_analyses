@@ -49,9 +49,8 @@ put.msa.data.as.new.source = function(outcome,
                 if (all(is.na(aggregated.data))) next
                 
                 # Details and url should be the same for all the data, but check just in case they aren't.
-                details = aggregated.details[[1]]
-                url = aggregated.url[[1]]
-                
+                details = aggregated.details[!sapply(aggregated.details, is.null)][[1]]
+                url = aggregated.url[!sapply(aggregated.url, is.null)][[1]]
                 if (any(sapply(aggregated.details, function(x) {!identical(x, details) && !is.null(x)})))
                     stop(paste0(error.prefix, "'", from.source.name, "' data do not all have the same 'details'"))
                 if (any(sapply(aggregated.url, function(x) {!identical(x, url) && !is.null(x)})))
