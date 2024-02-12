@@ -15,8 +15,9 @@ get.testing.intercepts.and.slopes = function(version, location,
   
   #-- RESTRATIFY THE DATA --#
   
-  # Just keep when we know MSM and high-risk
+  # Just keep when we know MSM; remove high-risk
   df = appended[!is.na(appended$msm),]
+  # df = df[!is.na(df$high.risk) & df$high.risk==0,]
   specification.metadata = get.specification.metadata(version=version,
                                                       location=location)
   
@@ -59,11 +60,11 @@ get.testing.intercepts.and.slopes = function(version, location,
   df$year = df$year-testing.anchor.year
   
   if(model=="two.way"){
-    fit = glm(tested.past.year ~ age:sex + age:race + race:sex + 
+    fit = glm(tested.past.year ~ age*sex + age*race + race*sex + 
                           year + year:age + year:sex + year:race, data=df,
                         family='binomial', weights = df$weighting.var)    
   } else if(model=="fully.interacted"){
-    fit = glm(tested.past.year ~ age:sex:race +
+    fit = glm(tested.past.year ~ age*sex*race +
                           year + year:age + year:sex + year:race, data=df,
                         family='binomial', weights = df$weighting.var)
   } else if(model=="one.way"){
@@ -123,6 +124,17 @@ if(1==2){
                                                                    anchor.year = 2010,
                                                                    parameters.are.on.logit.scale = T)  
   
+  testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9),
+                                                                   slope = testing.prior$slopes,
+                                                                   anchor.year = 2010,
+                                                                   max = 0.9,
+                                                                   parameters.are.on.logit.scale = T)  
+  
+  values = testing.functional.form$project(2015:2035) 
+  values = array(unlist(values), 
+                         dim = c(sapply(dim.names, length),length(2015:2035)),
+                         dimnames = c(dim.names, list(year=2015:2035)))
+  
   values.two.way = testing.functional.form.two.way$project(2015:2035) 
   values.two.way = array(unlist(values.two.way), 
                  dim = c(sapply(dim.names, length),length(2015:2035)),
@@ -144,11 +156,7 @@ if(1==2){
   head(sort(values.two.way,decreasing = T),50) # highest 50 values
   head(sort(values.one.way,decreasing = T),50) # highest 50 values
   head(sort(values.fully.interacted,decreasing = T),50) # highest 50 values
-  #original.top.50 = head(sort(values,decreasing = T),50) 
-  #fully.interacted.top.50 = head(sort(values,decreasing = T),50) 
-  #two.way.top.50 = head(sort(values,decreasing = T),50) 
-  
-  
+
   # add datapoints from actual brfss data
   brfss.means = sapply(4:12, function(year){ # 2014-2022 (year anchored at 2010)
     sapply(dim.names$sex, function(sex){
@@ -163,7 +171,7 @@ if(1==2){
   dim(brfss.means) = c(sapply(dim.names, length), length(2014:2022))
   dimnames(brfss.means) = c(dim.names,list(year=2014:2022))
   
-  values = values.fully.interacted # values.two.way - no real differences in the plots for these two; both better than one-way
+  #values = values.two.way # values.two.way - no real differences in the plots for two-way vs full; both better than one-way
   
   # plot.age = 
     ggplot() + 
@@ -198,8 +206,11 @@ if(1==2){
          plot.sex,width = 10,height = 7,dpi = 350)
   
   # mean(df$tested.past.year[df$race=="black" & df$msm==1 & df$age=="13-24 years" & df$year=="2019"])
-  # delta = values[,,,"2030"] - values[,,,"2020"]
-  # apply(delta,c("age","race"),max)
+  delta = values[,,,"2030"] - values[,,,"2020"]
+  range(delta)
+  rel.delta = delta/values[,,,"2020"]
+  range(rel.delta)
+  apply(delta,c("sex"),range)
 }
 
 # old code - these are the same (off by tiny fractions); but would have to redo the formula each time I added interactions

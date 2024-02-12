@@ -1029,10 +1029,11 @@ get.testing.functional.form = function(location, specification.metadata,
   testing.prior = get.cached.object.for.version(name = "testing.prior",
                                                 version = specification.metadata$version) 
   
-  testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts,
+  testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9), #helps counteract max value below a bit
                                                                    slope = testing.prior$slopes,
                                                                    anchor.year = 2010,
-                                                                   parameters.are.on.logit.scale = T)                                          
+                                                                   max = 0.9,
+                                                                   parameters.are.on.logit.scale = T)                                         
     
   testing.functional.form
 }
