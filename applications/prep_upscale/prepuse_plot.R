@@ -2,7 +2,7 @@
 
 ff <-  get.prep.use.functional.form(specification.metadata = metadata)
 anchor.year <- 2009
-x <- ff$project(anchor.year:2030, alphas = NULL, dim.names = ff$minimum.dim.names)
+x <- ff$project(anchor.year:2030)
 
 y <- sapply(x, function(z) {return(z)})
 dim.names <- c(ff$minimum.dim.names, list('year'=anchor.year:2030))
@@ -82,8 +82,8 @@ msm.risk.plot <- ggplot(msm.risk, aes(year, value, color = risk)) +
   theme_minimal()
 # msm.risk.plot
 
-msm.plots <- ggpubr::ggarrange(msm.race.plot, msm.age.plot, msm.risk.plot,
-                               ncol=1, nrow=3, labels = c("MSM - Race", "MSM - Age", "MSM - Risk")) 
+msm.plots <- ggpubr::ggarrange(msm.race.plot, msm.age.plot, 
+                               ncol=1, nrow=2, labels = c("MSM - Race", "MSM - Age")) 
 msm.plots
 
 # idu plots

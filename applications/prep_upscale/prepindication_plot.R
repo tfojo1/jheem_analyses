@@ -74,9 +74,11 @@ msm.age.plot <- ggplot(msm.age, aes(year, value, color = age)) +
   ylab("PrEP indication") +
   theme_minimal()
 
+
+
 msm.plots.pi <- ggpubr::ggarrange(msm.race.plot, msm.age.plot,
                                   ncol=1, nrow=2, 
-                                  labels = c("MSM - Race", "MSM - Age", "MSM - Risk")) 
+                                  labels = c("MSM - Race", "MSM - Age")) 
 msm.plots.pi
 
 # idu plots
