@@ -51,15 +51,43 @@ get.testing.intercepts.and.slopes = function(version, location){
   df$sex[df$sex=='male'] = 'heterosexual_male'
   df$sex = factor(df$sex, levels = c('msm', 'heterosexual_male','female'))
   
-  # try one interaction term - probably race with something 
-  # add anchor year 
+  testing.anchor.year = 2010
+  df$year = df$year-testing.anchor.year
+  
+  # try one interaction term - probably race with something; try with everything interacted with everything; then two-ways
+  # check for extreme single cell values (e.g., 97% black 13-24 msm in 2035)
+  # mean(df$tested.past.year[df$race=="black" & df$msm==1 & df$age=="13-24 years" & df$year=="2019"])
+  # delta = values[,,,"2030"] - values[,,,"2020"]
+  # apply(delta,c("age","race"),max)
   fit.p.testing = glm(tested.past.year ~ age + sex + race + 
-                        # these are the ORs to get effect of covid on testing
-                        # is.after.covid:age + is.after.covid:sex + is.after.covid:race + is.after.covid + 
                         year + year:age + year:sex + year:race, data=df,
                                        family='binomial', weights = df$weighting.var)
+  
+  # these are the ORs to get effect of covid on testing: is.after.covid + is.after.covid:age + ...
+  
   dim.names = specification.metadata$dim.names[c('age','race','sex')]
 
+  iterated.values = as.data.frame(get.every.combination(dim.names))
+  
+  # predicting with year = 0 cancels out all of the year terms --> gives you the intercepts for each stratum 
+  year0.data = cbind(iterated.values, year=0) 
+  year1.data = cbind(iterated.values, year=1)
+  
+  # this will work, even with interaction terms as long as you use a standard linear year term (not squared, splined, etc.), 
+  intercepts = predict(fit.p.testing, year0.data, type = 'link') 
+  slopes = predict(fit.p.testing, year1.data, type='link') - intercept
+  
+  dim(intercepts) = dim(slopes) = sapply(dim.names, length)
+  dimnames(intercepts) = dimnames(slopes) = dim.names
+  
+  rv = list(intercepts=intercepts,
+            slopes=slopes)
+  rv
+}
+
+
+# old code - these are the same (off by tiny fractions); but would have to redo the formula each time I added interactions
+if(1==2){
   intercepts = sapply(dim.names$sex, function(sex){
     sapply(dim.names$race, function(race){
       sapply(dim.names$age, function(age){
@@ -71,9 +99,6 @@ get.testing.intercepts.and.slopes = function(version, location){
       })
     })
   })
-  
-  dim(intercepts) = sapply(dim.names,length)
-  dimnames(intercepts) = dim.names
   
   slopes = sapply(dim.names$sex, function(sex){
     sapply(dim.names$race, function(race){
@@ -87,17 +112,9 @@ get.testing.intercepts.and.slopes = function(version, location){
     })
   })
   
-  dim(slopes) = sapply(dim.names,length)
-  dimnames(slopes) = dim.names
-  
-  rv = list(intercepts=intercepts,
-            slopes=slopes)
-  
-  rv
+  dim(intercepts) = dim(slopes) = sapply(dim.names, length)
+  dimnames(intercepts) = dimnames(slopes) = dim.names
 }
-
-
-
 
 
 

@@ -1029,10 +1029,9 @@ get.testing.functional.form = function(location, specification.metadata,
   testing.prior = get.cached.object.for.version(name = "testing.prior",
                                                 version = specification.metadata$version) 
   
-  # anchor year???
   testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts,
                                                                    slope = testing.prior$slopes,
-                                                                   anchor.year = 0,
+                                                                   anchor.year = 2010,
                                                                    parameters.are.on.logit.scale = T)                                          
     
   # review projections to make sure they look okay in the future 
@@ -1042,10 +1041,8 @@ get.testing.functional.form = function(location, specification.metadata,
                    dim = c(sapply(dim.names, length),length(2015:2035)),
                    dimnames = c(dim.names, list(year=2015:2035)))
     
-    sapply(2014:2022, function(year){apply(df$tested.past.year[df$year==year], "age",mean)})
-    
     # add datapoints from actual brfss data
-    brfss.means = sapply(2014:2022, function(year){
+    brfss.means = sapply(4:12, function(year){ # 2014-2022 (year anchored at 2010)
       sapply(dim.names$sex, function(sex){
         sapply(dim.names$race, function(race){
           sapply(dim.names$age, function(age){
@@ -1062,21 +1059,21 @@ get.testing.functional.form = function(location, specification.metadata,
       geom_line(data=reshape2::melt(apply(values, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
       geom_point(data=reshape2::melt(apply(brfss.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
       ylim(0,1) + 
-      ggtitle("Testing Projection vs. BRFSS data, Age") +
+      #ggtitle("Testing Projection vs. BRFSS data, Age") +
       theme(plot.title = element_text(hjust = 0.5,size = 25))
     
     plot.race = ggplot() + 
       geom_line(data=reshape2::melt(apply(values, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
       geom_point(data=reshape2::melt(apply(brfss.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
       ylim(0,1) + 
-      ggtitle("Testing Projection vs. BRFSS data, Race") +
+      #ggtitle("Testing Projection vs. BRFSS data, Race") +
       theme(plot.title = element_text(hjust = 0.5,size = 25))
     
     plot.sex = ggplot() + 
       geom_line(data=reshape2::melt(apply(values, c("sex","year"),mean)), aes(x=year, y=value, color=sex)) + 
       geom_point(data=reshape2::melt(apply(brfss.means, c("sex","year"),mean)), aes(x=year, y=value, color=sex)) + 
       ylim(0,1) + 
-      ggtitle("Testing Projection vs. BRFSS data, Sex") +
+      #ggtitle("Testing Projection vs. BRFSS data, Sex") +
       theme(plot.title = element_text(hjust = 0.5,size = 25))
     
 
