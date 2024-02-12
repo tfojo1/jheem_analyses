@@ -19,6 +19,8 @@ get.high.risk.testing.ratios = function(version, location){
   
   specification.metadata = get.specification.metadata(version=version, location=location)
   
+  df = df[(df$year<2020 | df$year>2022),]
+  
   # Restratify the ages
   given.ages = unique(df$age)
   age.map = get.age.bracket.mapping(given.ages, specification.metadata$dim.names$age)
