@@ -1266,9 +1266,9 @@ pi.msm.amis.df <- data.frame(
 ) 
 
 pi.msm.2017.new <- pi.msm.2017 %>% 
-  rename(age18.24 = age15.24, age50ge = age40ge) %>%
-  mutate(age40.49 = age50ge) %>%
-  select(total, age18.24, age25.29, age30.39, age40.49, age50ge,
+  dplyr::rename(age18.24 = age15.24, age50ge = age40ge) %>%
+  dplyr::mutate(age40.49 = age50ge) %>%
+  dplyr::select(total, age18.24, age25.29, age30.39, age40.49, age50ge,
          black, hisp, nbnh, age1, age2, age3, age4, age5)
 
 pi.ratio.msm <- (pi.msm.2017.new/pi.msm.cdc.2017) 
@@ -1308,10 +1308,10 @@ pi.het.df <- data.frame(
 # multiplying it by the amis/cdc proportion of PrEP indication
 
 pi.het.df <- pi.het.df %>%
-  select(-years) %>%
-  mutate(across(everything(), ~ . * pi.ratio.msm[[cur_column()]])) %>%
-  mutate(years = pi.years.het) %>% 
-  select(years, everything())
+  dplyr::select(-years) %>%
+  dplyr::mutate(across(everything(), ~ . * pi.ratio.msm[[dplyr::cur_column()]])) %>%
+  dplyr::mutate(years = pi.years.het) %>% 
+  dplyr::select(years, everything())
 
 pi.msm.cdc.long <- gather(pi.msm.cdc.df, key = "group", value = "pi", -years)
 pi.msm.cdc.long$sexid <- rep("msm", length(pi.msm.cdc.long$pi))

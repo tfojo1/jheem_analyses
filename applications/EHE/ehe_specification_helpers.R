@@ -444,6 +444,19 @@ get.best.guess.msm.proportions.by.race <- function(location,
     
     males = apply(males, keep.dimensions, mean, na.rm=T)
     
+    # A hack for now while we wait for the real function
+    states = get.overlapping.locations(location, 'state')
+    raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                       keep.dimensions = c('year','location','race'),
+                                                       dimension.values = list(location = states,
+                                                                               sex = 'male'))
+    raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
+    proportion.msm.by.race = c(black = as.numeric(raw.proportion.msm.by.race['Black']),
+                               hispanic = as.numeric(raw.proportion.msm.by.race['Hispanic']),
+                               white = as.numeric(raw.proportion.msm.by.race['White']),
+                               other = mean(raw.proportion.msm.by.race[setdiff(names(raw.proportion.msm.by.race),
+                                                                               c("Black",'Hispanic','White','Native Hawaiian/Other Pacific Islander','American Indian/Alaska Native'))]))
+    
     if (min.age > 0)
     {
         parsed.ages = parse.age.strata.names(dimnames(males)$age)
