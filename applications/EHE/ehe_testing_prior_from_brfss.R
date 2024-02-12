@@ -3,11 +3,14 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
 testing.prior = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580')
+
 cache.object.for.version(object = testing.prior, 
                          name = "testing.prior", 
                          version = 'ehe', overwrite=T)
 
-get.testing.intercepts.and.slopes = function(version, location){
+get.testing.intercepts.and.slopes = function(version, location,
+                                             model="two.way" # or fully.interacted or one.way
+                                             ){
   load("../jheem_analyses/cached/brfss.subset.RData")
   
   #-- RESTRATIFY THE DATA --#
@@ -19,6 +22,7 @@ get.testing.intercepts.and.slopes = function(version, location){
   
   df = df[(df$year<2020 | df$year>2022),]
   # df$is.after.covid = df$year>=2020 & df$year<=2022 # USE THIS LATER FOR COVID EFFECT
+  # these are the ORs to get effect of covid on testing: is.after.covid + is.after.covid:age + ...
   
   # Restratify the ages
   given.ages = unique(df$age)
@@ -54,16 +58,21 @@ get.testing.intercepts.and.slopes = function(version, location){
   testing.anchor.year = 2010
   df$year = df$year-testing.anchor.year
   
-  # try one interaction term - probably race with something; try with everything interacted with everything; then two-ways
-  # check for extreme single cell values (e.g., 97% black 13-24 msm in 2035)
-  # mean(df$tested.past.year[df$race=="black" & df$msm==1 & df$age=="13-24 years" & df$year=="2019"])
-  # delta = values[,,,"2030"] - values[,,,"2020"]
-  # apply(delta,c("age","race"),max)
-  fit.p.testing = glm(tested.past.year ~ age + sex + race + 
-                        year + year:age + year:sex + year:race, data=df,
-                                       family='binomial', weights = df$weighting.var)
-  
-  # these are the ORs to get effect of covid on testing: is.after.covid + is.after.covid:age + ...
+  if(model=="two.way"){
+    fit = glm(tested.past.year ~ age:sex + age:race + race:sex + 
+                          year + year:age + year:sex + year:race, data=df,
+                        family='binomial', weights = df$weighting.var)    
+  } else if(model=="fully.interacted"){
+    fit = glm(tested.past.year ~ age:sex:race +
+                          year + year:age + year:sex + year:race, data=df,
+                        family='binomial', weights = df$weighting.var)
+  } else if(model=="one.way"){
+    fit = glm(tested.past.year ~ age + sex + race +
+                          year + year:age + year:sex + year:race, data=df,
+                        family='binomial', weights = df$weighting.var)
+  } else
+    stop("model can only be two.way, fully.interacted, or one.way")
+
   
   dim.names = specification.metadata$dim.names[c('age','race','sex')]
 
@@ -74,8 +83,8 @@ get.testing.intercepts.and.slopes = function(version, location){
   year1.data = cbind(iterated.values, year=1)
   
   # this will work, even with interaction terms as long as you use a standard linear year term (not squared, splined, etc.), 
-  intercepts = predict(fit.p.testing, year0.data, type = 'link') 
-  slopes = predict(fit.p.testing, year1.data, type='link') - intercept
+  intercepts = predict(fit, year0.data, type = 'link') 
+  slopes = predict(fit, year1.data, type='link') - intercepts
   
   dim(intercepts) = dim(slopes) = sapply(dim.names, length)
   dimnames(intercepts) = dimnames(slopes) = dim.names
@@ -85,6 +94,113 @@ get.testing.intercepts.and.slopes = function(version, location){
   rv
 }
 
+
+
+
+# review projections to make sure they look okay in the future 
+if(1==2){
+  testing.prior.two.way = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580',
+                                                            model="two.way")
+  
+  testing.prior.one.way = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580',
+                                                            model="one.way")
+  
+  testing.prior.fully.interacted = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580',
+                                                            model="fully.interacted")
+  
+  testing.functional.form.two.way = create.logistic.linear.functional.form(intercept = testing.prior.two.way$intercepts,
+                                                                   slope = testing.prior.two.way$slopes,
+                                                                   anchor.year = 2010,
+                                                                   parameters.are.on.logit.scale = T)  
+  
+  testing.functional.form.one.way = create.logistic.linear.functional.form(intercept = testing.prior.one.way$intercepts,
+                                                                   slope = testing.prior.one.way$slopes,
+                                                                   anchor.year = 2010,
+                                                                   parameters.are.on.logit.scale = T)  
+  
+  testing.functional.form.fully.interacted = create.logistic.linear.functional.form(intercept = testing.prior.fully.interacted$intercepts,
+                                                                   slope = testing.prior.fully.interacted$slopes,
+                                                                   anchor.year = 2010,
+                                                                   parameters.are.on.logit.scale = T)  
+  
+  values.two.way = testing.functional.form.two.way$project(2015:2035) 
+  values.two.way = array(unlist(values.two.way), 
+                 dim = c(sapply(dim.names, length),length(2015:2035)),
+                 dimnames = c(dim.names, list(year=2015:2035)))
+  
+  values.one.way = testing.functional.form.one.way$project(2015:2035) 
+  values.one.way = array(unlist(values.one.way), 
+                 dim = c(sapply(dim.names, length),length(2015:2035)),
+                 dimnames = c(dim.names, list(year=2015:2035)))
+  
+  values.fully.interacted = testing.functional.form.fully.interacted$project(2015:2035) 
+  values.fully.interacted = array(unlist(values.fully.interacted), 
+                 dim = c(sapply(dim.names, length),length(2015:2035)),
+                 dimnames = c(dim.names, list(year=2015:2035)))
+  
+  # check for extreme single cell values (e.g., 97% black 13-24 msm in 2035)
+  values["13-24 years","black","msm","2035"]
+  
+  head(sort(values.two.way,decreasing = T),50) # highest 50 values
+  head(sort(values.one.way,decreasing = T),50) # highest 50 values
+  head(sort(values.fully.interacted,decreasing = T),50) # highest 50 values
+  #original.top.50 = head(sort(values,decreasing = T),50) 
+  #fully.interacted.top.50 = head(sort(values,decreasing = T),50) 
+  #two.way.top.50 = head(sort(values,decreasing = T),50) 
+  
+  
+  # add datapoints from actual brfss data
+  brfss.means = sapply(4:12, function(year){ # 2014-2022 (year anchored at 2010)
+    sapply(dim.names$sex, function(sex){
+      sapply(dim.names$race, function(race){
+        sapply(dim.names$age, function(age){
+          mean(df$tested.past.year[df$year==year & df$race==race & df$sex==sex & df$age==age])
+        })
+      })
+    })
+  })
+  
+  dim(brfss.means) = c(sapply(dim.names, length), length(2014:2022))
+  dimnames(brfss.means) = c(dim.names,list(year=2014:2022))
+  
+  values = values.fully.interacted # values.two.way - no real differences in the plots for these two; both better than one-way
+  
+  # plot.age = 
+    ggplot() + 
+    geom_line(data=reshape2::melt(apply(values, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+    geom_point(data=reshape2::melt(apply(brfss.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+    ylim(0,1) + 
+    #ggtitle("Testing Projection vs. BRFSS data, Age") +
+    theme(plot.title = element_text(hjust = 0.5,size = 25))
+  
+  # plot.race = 
+    ggplot() + 
+    geom_line(data=reshape2::melt(apply(values, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+    geom_point(data=reshape2::melt(apply(brfss.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+    ylim(0,1) + 
+    #ggtitle("Testing Projection vs. BRFSS data, Race") +
+    theme(plot.title = element_text(hjust = 0.5,size = 25))
+  
+  # plot.sex = 
+    ggplot() + 
+    geom_line(data=reshape2::melt(apply(values, c("sex","year"),mean)), aes(x=year, y=value, color=sex)) + 
+    geom_point(data=reshape2::melt(apply(brfss.means, c("sex","year"),mean)), aes(x=year, y=value, color=sex)) + 
+    ylim(0,1) + 
+    #ggtitle("Testing Projection vs. BRFSS data, Sex") +
+    theme(plot.title = element_text(hjust = 0.5,size = 25))
+  
+  
+  ggsave(filename = "prelim_results/testing_comparison_age.jpeg",
+         plot.age,width = 10,height = 7,dpi = 350)
+  ggsave(filename = "prelim_results/testing_comparison_race.jpeg",
+         plot.race,width = 10,height = 7,dpi = 350)
+  ggsave(filename = "prelim_results/testing_comparison_sex.jpeg",
+         plot.sex,width = 10,height = 7,dpi = 350)
+  
+  # mean(df$tested.past.year[df$race=="black" & df$msm==1 & df$age=="13-24 years" & df$year=="2019"])
+  # delta = values[,,,"2030"] - values[,,,"2020"]
+  # apply(delta,c("age","race"),max)
+}
 
 # old code - these are the same (off by tiny fractions); but would have to redo the formula each time I added interactions
 if(1==2){
