@@ -182,9 +182,8 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'oral.prep.uptake',
                        scale = 'proportion',
-                       get.functional.form.function = get.prep.model, # FOR NOW, replace with get.prep.uptake.model when available
+                       get.functional.form.function = get.prep.use.functional.form,
                        functional.form.from.time = 2014,
-                       prep.manager = ALL.DATA.MANAGERS$prep,
                        ramp.times = 2011,
                        ramp.values = 0)
 
@@ -229,7 +228,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'oral.prep.persistence',
                        scale = 'proportion',
-                       value = EHE_BASE_PARAMETER_VALUES['prep.persistence'])
+                       get.functional.form.function = get.prep.persistence.functional.form)
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'oral.prep.coverage',
@@ -267,7 +266,8 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name='prep.indication',
                        scale='proportion',
-                       value=0.25) # FOR NOW, EVENTUALLY A FUNCTIONAL FORM (dependent on race/sex/risk)
+                       get.functional.form.function = get.prep.indication.functional.form,
+                       functional.form.from.time = 2011)
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'proportion.receiving.prep',

@@ -267,7 +267,7 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     age5.prep.or = Lognormal.Distribution(0, log(2)),
     
     prep.efficacy.z = Normal.Distribution(0, 1),
-    oral.prep.persistence = Normal.Distribution(0.56, 0.0587, lower=0, upper=1),
+    #oral.prep.persistence = Normal.Distribution(0.56, 0.0587, lower=0, upper=1),
     #from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6378757/
     # with Wald CI inflated 10x
     
@@ -638,8 +638,8 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   msm.prep = c(
     'msm.prep.intercept.or',
-    'msm.prep.slope.or',
-    'oral.prep.persistence'
+    'msm.prep.slope.or'#,
+   # 'oral.prep.persistence'
   ),
   
   non.msm.prep = c(

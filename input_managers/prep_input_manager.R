@@ -2,10 +2,10 @@
 #-- Test Code --#
 if (1==2)
 {
-    source('source_code.R')
-    source('applications/EHE/ehe_specification.R')
+    source('../jheem_analyses/source_code.R')
+    source('../jheem_analyses/applications/EHE/ehe_specification.R')
     metadata = get.specification.metadata('ehe', location ='c.12580')
-    source('applications/prep_upscale/prep_data.R')
+    source('../jheem_analyses/applications/prep_upscale/prep_data.R')
 }
 
 # Reading in PrEP data
@@ -14,7 +14,7 @@ if (1==2)
 
 
 get.prep.use.functional.form <- function(specification.metadata){
-  source('applications/prep_upscale/prep_data.R')
+  source('../jheem_analyses/applications/prep_upscale/prep_data.R')
     # Some variables you will use
     anchor.year = 2009 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
     max.prep.coverage = 0.6 # modify as you see fit
@@ -90,7 +90,7 @@ get.prep.use.functional.form <- function(specification.metadata){
 }
 
 get.prep.indication.functional.form <- function(specification.metadata){
-  source('applications/prep_upscale/prep_data.R')
+  source('../jheem_analyses/applications/prep_upscale/prep_data.R')
   # Some variables you will use
   anchor.year = 2009 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
   max.prep.indication = 0.85 # modify as you see fit
@@ -192,7 +192,7 @@ get.prep.indication.functional.form <- function(specification.metadata){
 }
 
 get.prep.persistence.functional.form <- function(specification.metadata){
-  source('applications/prep_upscale/prep_data.R')
+  source('../jheem_analyses/applications/prep_upscale/prep_data.R')
   # Some variables you will use
   anchor.year = 2009 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
   max.prep.persistence = 0.8 # modify as you see fit
@@ -230,12 +230,17 @@ get.prep.persistence.functional.form <- function(specification.metadata){
   int[,,"female",] <- int[,,"female",] + coef(fit.pp)["riskidhet"]
   int[,,,"active_IDU"] <- int[,,,"active_IDU"] + coef(fit.pp)["riskididu"]
   
-  create.linear.functional.form(
-    intercept = int,
-    slope = slope,
-    anchor.year = anchor.year,
-    min = 0,
-    max = max.prep.persistence, 
-  )
+  # create.linear.functional.form(
+  #   intercept = int,
+  #   slope = slope,
+  #   anchor.year = anchor.year,
+  #   min = 0,
+  #   max = max.prep.persistence, 
+  # )
   
+  create.static.functional.form(
+    value = int,
+    min = 0,
+    max = max.prep.persistence
+  )
 }

@@ -58,20 +58,26 @@ get.high.risk.testing.ratios = function(version, location){
   
   ##-- GET TESTING RATE MULTIPLIERS --##
   
-  fit = glm(tested.past.year ~ age + sex + race + high.risk + age:high.risk + sex:high.risk + race:high.risk,
-            family='binomial', data=df, weights = df$weighting.var)
+  fit.high.risk = glm(tested.past.year ~ age*sex + age*race + race*sex +
+                        high.risk + age:high.risk + sex:high.risk + race:high.risk,
+                      family='binomial', data=df, weights = df$weighting.var)
+  
+  # fit.high.risk = glm(tested.past.year ~ age*sex*high.risk + age*race*high.risk + race*sex*high.risk,
+  #                     family='binomial', data=df, weights = df$weighting.var)
+  
+  fit.overall = glm(tested.past.year ~ age*sex + age*race + race*sex,
+                    family='binomial', data=df, weights = df$weighting.var)
   
   # make this into an array
   dim.names = specification.metadata$dim.names[c('age','race','sex')]
   iterated.values = as.data.frame(get.every.combination(dim.names))
   
-  low.risk.values = cbind(iterated.values, high.risk=F)
-  low.risk.p = predict(fit, low.risk.values, type = 'response')
+  overall.p = predict(fit.overall, iterated.values, type = 'response')
   
   high.risk.values = cbind(iterated.values, high.risk=T)
-  high.risk.p = predict(fit, high.risk.values, type = 'response')
+  high.risk.p = predict(fit.high.risk, high.risk.values, type = 'response')
   
-  high.risk.testing.rate.ratios = -log(1-high.risk.p) / -log(1-low.risk.p)
+  high.risk.testing.rate.ratios = -log(1-high.risk.p) / -log(1-overall.p)
   dim(high.risk.testing.rate.ratios) = sapply(dim.names, length)
   dimnames(high.risk.testing.rate.ratios) = dim.names
   
