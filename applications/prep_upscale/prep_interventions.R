@@ -1,4 +1,4 @@
-source("applications/ehe/ehe_specification.R")
+# source("applications/ehe/ehe_specification.R")
 
 BLACK
 HISPANIC
@@ -8,7 +8,7 @@ start.year <- 2025
 end.year <- 2035
 
 prepuse_10 <- create.intervention.effect(
-  quantity.name = "prep.uptake",
+  quantity.name = "oral.prep.uptake",
   start.time = start.year,
   effect.values = 0.1, 
   times = end.year,
@@ -19,7 +19,7 @@ prepuse_10 <- create.intervention.effect(
   )
 
 prepuse_25 <- create.intervention.effect(
-  quantity.name = "prep.uptake",
+  quantity.name = "oral.prep.uptake",
   start.time = start.year,
   effect.values = 0.25, 
   times = end.year,
