@@ -1313,6 +1313,18 @@ pi.het.df <- pi.het.df %>%
   dplyr::mutate(years = pi.years.het) %>% 
   dplyr::select(years, everything())
 
+pi.msm.cdc.df <- pi.msm.cdc.df %>%
+  dplyr::select(-years) %>%
+  dplyr::mutate(across(everything(), ~ . * pi.ratio.msm[[dplyr::cur_column()]])) %>%
+  dplyr::mutate(years = sort(unique(pi.msm.cdc.df$years))) %>% 
+  dplyr::select(years, everything())
+
+pi.msm.amis.df <- pi.msm.amis.df %>%
+  dplyr::select(-years) %>%
+  dplyr::mutate(across(everything(), ~ . * pi.ratio.msm[[dplyr::cur_column()]])) %>%
+  dplyr::mutate(years = sort(unique(pi.msm.amis.df$years))) %>% 
+  dplyr::select(years, everything())
+
 pi.msm.cdc.long <- gather(pi.msm.cdc.df, key = "group", value = "pi", -years)
 pi.msm.cdc.long$sexid <- rep("msm", length(pi.msm.cdc.long$pi))
 pi.msm.cdc.long$riskid <- rep("msm", length(pi.msm.cdc.long$pi))

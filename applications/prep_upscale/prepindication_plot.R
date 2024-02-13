@@ -2,7 +2,7 @@
 
 ff <-  get.prep.indication.functional.form(specification.metadata = metadata)
 anchor.year <- 2009
-x <- ff$project(anchor.year:2030, alphas = NULL, dim.names = ff$minimum.dim.names)
+x <- ff$project(anchor.year:2030)
 
 y <- sapply(x, function(z) {return(z)})
 dim.names <- c(ff$minimum.dim.names, list('year'=anchor.year:2030))
