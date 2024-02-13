@@ -4,6 +4,8 @@
 library(locations)
 library(distributions)
 
+source('../jheem_analyses/commoncode/cache_manager.R')
+
 
 
 # This 'source' call is equivalent to loading the jheem2 package
@@ -14,19 +16,28 @@ source('../jheem_analyses/commoncode/file_paths.R')
 
 # Load the data managers
 if (is.null(get.default.data.manager()))
-  SURVEILLANCE.MANAGER = load.data.manager('../jheem_analyses/cached/surveillance.manager.rdata', set.as.default = T)
+{
+    cat("Loading Surveillance Manager (may take a minute or two)...")
+    SURVEILLANCE.MANAGER = load.data.manager.from.cache('surveillance.manager.rdata', set.as.default=T)
+    cat("Done!\n")
+}
+  
 
 if (!exists('CENSUS.MANAGER'))
-  CENSUS.MANAGER = load.data.manager('../jheem_analyses/cached/smaller.census.manager.rdata', set.as.default = F)
+{
+    cat("Loading Census Manager (may take a minute or two)...")
+    SURVEILLANCE.MANAGER = load.data.manager.from.cache('smaller.census.manager.rdata', set.as.default=F)
+    cat("Done!\n")
+}
   
 
 # Load the data - this will eventually be replaced with jheem2's native data manager
 if (!exists('ALL.DATA.MANAGERS'))
-  load('../jheem_analyses/cached/ALL.DATA.MANAGERS.Rdata')
+  load(file.path(JHEEM.CACHE.DIR, 'ALL.DATA.MANAGERS.Rdata'))
 if (!exists('DEFAULT.LOCALE.MAPPING'))
-  load('../jheem_analyses/cached/DEFAULT.LOCALE.MAPPING.Rdata')
+  load(file.path(JHEEM.CACHE.DIR, 'DEFAULT.LOCALE.MAPPING.Rdata'))
 if (!exists('msa.surveillance'))
-  load('../jheem_analyses/cached/msa.surveillance.Rdata')
+  load(file.path(JHEEM.CACHE.DIR, 'msa.surveillance.Rdata'))
 
 # These supporting files are hold-overs from the previous version, and will eventually need to be replaced
 source('../jheem_analyses/data_managers/census_manager.R')
@@ -57,4 +68,4 @@ source('../jheem_analyses/commoncode/age_mappings.R')
 source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
 
 # Data Loads
-load('../jheem_analyses/cached/google_mobility_data.Rdata')
+load(file.path(JHEEM.CACHE.DIR, 'google_mobility_data.Rdata'))
