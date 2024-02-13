@@ -7,6 +7,9 @@ CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 N.ITER = 10000
 
+# load params manual
+load("applications/EHE/calibration_runs/params.manual_2024_02_13.Rdata") 
+
 print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
 par.names.pop = c("black.birth.rate.multiplier",
@@ -77,6 +80,7 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           parameter.names = c(par.names.transmission),
                           n.iter = N.ITER,
                           thin = 50, 
+                          fixed.initial.parameter.values = params.manual[par.names.transmission], 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get transmission parameters in the general vicinity",
