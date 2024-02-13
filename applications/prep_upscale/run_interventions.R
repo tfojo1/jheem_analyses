@@ -1,3 +1,6 @@
+source("../jheem2/R/ONTOLOGY_ontology.R")
+source("../jheem2/R/tests/ENGINE_test.R")
+
 simset <- join.simulation.sets(sim, sim, sim)
 
 sim_upscale10 <- prepuse_upscale10$run(sim, start.year = 2025, end.year = 2035)

@@ -198,8 +198,8 @@ p.msm.df.long$ageid <- ifelse(grepl("age1", p.msm.df.long$variable), "age1",
 p.msm.df.long$risk <- rep("msm", length(p.msm.df.long$raceid))
 p.msm.df.long$year <- p.msm.df.long$year - anchor.year
 
-fit.p.msm <- lm(logit(p.msm.df.long$p/p.max) ~ year + factor(raceid) + factor(ageid), 
-                data = p.msm.df.long)
+# fit.p.msm <- lm(logit(p.msm.df.long$p/p.max) ~ year + factor(raceid) + factor(ageid), 
+#                 data = p.msm.df.long)
 
 # years <- c(2017:2019,2021) - 2020
 # p.max <- 0.6
@@ -343,7 +343,7 @@ p.idu.df.long$ageid <- ifelse(p.idu.df.long$group == "p.idu.age1", "age1",
 p.idu.df.long$sexid <- ifelse(p.idu.df.long$group == "p.idu.male", "male",
                               ifelse(p.idu.df.long$group == "p.idu.female", "female", "ALL"))
 
-fit.p.idu <- lm(logit(p) ~ year + raceid + ageid + sexid, data = p.idu.df.long)
+# fit.p.idu <- lm(logit(p) ~ year + raceid + ageid + sexid, data = p.idu.df.long)
 
 
 ## Heterosexual -----
@@ -472,7 +472,7 @@ p.het.df.long$ageid <- ifelse(p.het.df.long$group == "p.het.age1", "age1",
 p.het.df.long$sexid <- ifelse(p.het.df.long$group == "p.het.female", "female",
                               ifelse(p.het.df.long$group == "p.het.male", "male", "ALL"))
 
-fit.p.het <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid, data = p.het.df.long) 
+# fit.p.het <- lm(logit(p/p.max) ~ year + raceid + ageid + sexid, data = p.het.df.long) 
 
 # fit.het.black <- lm(logit(p.het.black/p.max) ~ years.het)
 # fit.het.hisp <- lm(logit(p.het.hisp/p.max) ~ years.het)
@@ -524,23 +524,15 @@ het.big.df <- subset(big.df, risk == "het")
 # fit.p.msm <- lm(logit(p/p.max) ~ year + raceid + ageid,
 #                 data = msm.bigp.df)
 
-fit.p.msm <- lm((p) ~ year + raceid + ageid,
+fit.p.msm <- lm((p/p.max) ~ year + raceid + ageid,
                 data = msm.bigp.df)
 fit.p.msm
 
-fit.p.nonmsm <- lm((p) ~ year + raceid + ageid + female + idu,
+fit.p.nonmsm <- lm((p/p.max) ~ year + raceid + ageid + female + idu,
                    data = nonmsm.big.df)
 
 fit.p.idu <- lm(p ~ year + raceid + ageid + female, data = idu.big.df)
 fit.p.het <- lm(p ~ year + raceid + ageid + female, data = het.big.df)
-
-
-# 
-# create.logistic.tail.functional.form(
-#   # everything else the same
-#   
-#   logistic.after.frac.of.span = 0.5,
-#   )
 
 
 # PrEP Indications ------

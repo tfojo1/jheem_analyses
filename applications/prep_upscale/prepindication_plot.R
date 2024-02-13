@@ -17,6 +17,7 @@ df <- reshape2::melt(y2)
 df.pts <- subset(p.msm.df.long, raceid != "ALL") |> dplyr::mutate(year = year + anchor.year)
 race.plot <- ggplot(df, aes(x=year, y=value, color=race)) + geom_line(linewidth = 1) +
   ylim(0,1) + 
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a"))+
   # geom_point(aes(x=year, y = p, color=raceid), data = df.pts)
   scale_x_continuous(breaks = seq(anchor.year, 2030, 1)) +
   theme_minimal() 
@@ -24,6 +25,7 @@ race.plot <- ggplot(df, aes(x=year, y=value, color=race)) + geom_line(linewidth 
 df3 <- reshape2::melt(apply(y, c('year','sex'), mean))
 sex.plot <- ggplot(df3, aes(x=year, y=value, color=sex)) + geom_line(linewidth = 1) + 
   ylim(0,1) + 
+  scale_color_manual(values = c("#008080", "#FF8C00", "#9932CC")) +
   scale_x_continuous(breaks = seq(anchor.year, 2030, 1)) +
   theme_minimal()
 
@@ -31,12 +33,14 @@ sex.plot <- ggplot(df3, aes(x=year, y=value, color=sex)) + geom_line(linewidth =
 df4 <- reshape2::melt(apply(y, c('year','risk'), mean))
 risk.plot <- ggplot(df4, aes(x=year, y=value, color=risk)) + geom_line(linewidth = 1) + 
   ylim(0,1) + 
+  scale_color_manual(values = c("#008080", "#FF8C00", "#9932CC"))+
   scale_x_continuous(breaks = seq(anchor.year, 2030, 1)) +
   theme_minimal()
 
 df5 <- reshape2::melt(apply(y, c('year','age'), mean))
 age.plot <- ggplot(df5, aes(x=year, y=value, color=age)) + geom_line(linewidth = 1) + 
   ylim(0,1) + 
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a", "#984ea3", "#ff7f00"))+
   scale_x_continuous(breaks = seq(anchor.year, 2030, 1)) +
   theme_minimal() 
 

@@ -12,7 +12,6 @@ if (1==2)
 
 #-- The Functions to Implement --#
 
-
 get.prep.use.functional.form <- function(specification.metadata){
   source('../jheem_analyses/applications/prep_upscale/prep_data.R')
     # Some variables you will use
@@ -27,7 +26,7 @@ get.prep.use.functional.form <- function(specification.metadata){
                dimnames = dim.names)
     slope = array(0, dim=sapply(dim.names, length),
                dimnames = dim.names)
-    
+  
     
     # The code for how you can parse the age strata we need
     age.info = parse.age.strata.names(dim.names$age)
@@ -72,7 +71,7 @@ get.prep.use.functional.form <- function(specification.metadata){
     int[,,"female",] <- int[,,"female",] + coef(fit.p.nonmsm)["female"]
     
     int[,,"female","active_IDU"] <- int[,,"female","active_IDU"] + coef(fit.p.nonmsm)["idu"]
-    int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit.p.nonmsm)["idu"] #coef(fit2.big.df)[14] (NA)
+    int[,,"heterosexual_male","active_IDU"] <- int[,,"heterosexual_male","active_IDU"] + coef(fit.p.nonmsm)["idu"] 
 
     slope[,,"msm",] <- slope[,,"msm",] + coef(fit.p.msm)["year"]
     slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit.p.nonmsm)["year"]
