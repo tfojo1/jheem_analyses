@@ -15,7 +15,9 @@ seq.break <- seq(anchor.year,2030,1)
 
 
 df <- reshape2::melt(y2)
-race.plot <- ggplot(df, aes(x=year, y=value, color=race)) + geom_line(linewidth = 1) +
+race.plot <- ggplot(df, aes(x=year, y=value, color=race)) + 
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a")) +
   ylim(0,1) + 
   scale_x_continuous(breaks = seq.break) +
   theme_minimal() 
@@ -23,6 +25,7 @@ race.plot <- ggplot(df, aes(x=year, y=value, color=race)) + geom_line(linewidth 
 df3 <- reshape2::melt(apply(y, c('year','sex'), mean))
 sex.plot <- ggplot(df3, aes(x=year, y=value, color=sex)) + geom_line(linewidth = 1) + 
   ylim(0,1) + 
+  scale_color_manual(values = c("#008080", "#FF8C00", "#9932CC")) +
   scale_x_continuous(breaks = seq.break) +
   theme_minimal()
 
@@ -30,11 +33,14 @@ sex.plot <- ggplot(df3, aes(x=year, y=value, color=sex)) + geom_line(linewidth =
 df4 <- reshape2::melt(apply(y, c('year','risk'), mean))
 risk.plot <- ggplot(df4, aes(x=year, y=value, color=risk)) + geom_line(linewidth = 1) + 
   ylim(0,1) + 
+  scale_color_manual(values = c("#008080", "#FF8C00", "#9932CC"))+
   scale_x_continuous(breaks = seq.break) +
   theme_minimal()
 
 df5 <- reshape2::melt(apply(y, c('year','age'), mean))
-age.plot <- ggplot(df5, aes(x=year, y=value, color=age)) + geom_line(linewidth = 1) + 
+age.plot <- ggplot(df5, aes(x=year, y=value, color=age)) + 
+  geom_line(linewidth = 1) + 
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a", "#984ea3", "#ff7f00"))+
   ylim(0,1) + 
   scale_x_continuous(breaks = seq.break) +
   theme_minimal() 
@@ -49,6 +55,7 @@ msm.race <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','race'), mean
 df.pts <- subset(p.msm.df.long, raceid != "ALL") |> dplyr::mutate(year = year + anchor.year)
 msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + geom_line(linewidth = 1) +
   geom_point(aes(x=year, y = p, color=raceid), data = df.pts) +
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a")) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
   ylab("PrEP use") +
@@ -64,22 +71,23 @@ levels(df.pts$ageid) <- levels(msm.age$age)
 
 msm.age.plot <- ggplot(msm.age, aes(year, value, color = age)) + 
   geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a", "#984ea3", "#ff7f00")) +
   geom_point(aes(x=year, y = p, color=ageid), data = df.pts) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
   ylab("PrEP use") +
   theme_minimal()
 
-msm.risk <- reshape2::melt(apply(y[,,'msm',,], c('year','risk'), mean))
-# df.pts <- p.idu.df.long |> dplyr::mutate(year = year + anchor.year)
-# df.pts$risk[df.pts$risk=="idu"] <- "active_IDU"
-msm.risk.plot <- ggplot(msm.risk, aes(year, value, color = risk)) +
-  geom_line(linewidth =1)  +
-  # geom_point(aes(x=year+2, y = p, color=risk), data=df.pts) +
-  ylim(0,1) +
-  scale_x_continuous(breaks = seq.break) + 
-  ylab("PrEP use") +
-  theme_minimal()
+# msm.risk <- reshape2::melt(apply(y[,,'msm',,], c('year','risk'), mean))
+# # df.pts <- p.idu.df.long |> dplyr::mutate(year = year + anchor.year)
+# # df.pts$risk[df.pts$risk=="idu"] <- "active_IDU"
+# msm.risk.plot <- ggplot(msm.risk, aes(year, value, color = risk)) +
+#   geom_line(linewidth =1)  +
+#   # geom_point(aes(x=year+2, y = p, color=risk), data=df.pts) +
+#   ylim(0,1) +
+#   scale_x_continuous(breaks = seq.break) + 
+#   ylab("PrEP use") +
+#   theme_minimal()
 # msm.risk.plot
 
 msm.plots <- ggpubr::ggarrange(msm.race.plot, msm.age.plot, 
@@ -91,6 +99,7 @@ idu.race <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),'active_IDU
 df.pts <- subset(p.idu.df.long, raceid != "ALL") |> dplyr::mutate(year = year + anchor.year)
 idu.race.plot <- ggplot(idu.race, aes(year, value, color=race)) +
   geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a")) +
   geom_point(aes(x=year, y = p, color=raceid), data = df.pts) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
@@ -107,6 +116,7 @@ levels(df.pts$ageid) <- levels(idu.age$age)
 
 idu.age.plot <- ggplot(idu.age, aes(year, value, color=age)) +
   geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a", "#984ea3", "#ff7f00")) +
   geom_point(aes(x = year, y = p, color=ageid), data = df.pts) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
@@ -124,6 +134,7 @@ levels(df.pts$sexid) <- levels(idu.sex$sex)
 
 idu.sex.plot <- ggplot(idu.sex, aes(year, value, color=sex)) +
   geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#4169E1", "#DC143C")) +
   geom_point(aes(x = year, y = p, color=sexid), data = df.pts) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
@@ -140,6 +151,7 @@ het.race <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),"never_IDU"
 df.pts <- subset(p.het.df.long, raceid != "ALL") |> dplyr::mutate(year = year + anchor.year)
 het.race.plot <- ggplot(het.race, aes(year, value, color=race)) +
   geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a")) +
   geom_point(aes(x=year, y = p, color=raceid), data = df.pts) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
@@ -156,6 +168,7 @@ levels(df.pts$ageid) <- levels(het.age$age)
 
 het.age.plot <- ggplot(idu.age, aes(year, value, color=age)) +
   geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a", "#984ea3", "#ff7f00")) +
   geom_point(aes(x = year, y = p, color=ageid), data = df.pts) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
@@ -172,6 +185,7 @@ levels(df.pts$sexid) <- levels(het.sex$sex)
 
 het.sex.plot <- ggplot(het.sex, aes(year, value, color=sex)) +
   geom_line(linewidth = 1) +
+  scale_color_manual(values = c("#4169E1", "#DC143C")) +
   geom_point(aes(x = year, y = p, color=sexid), data = df.pts) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
