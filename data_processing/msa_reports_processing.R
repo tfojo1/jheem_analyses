@@ -1108,6 +1108,9 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   data$risk= risk.msa.mappings[data$risk]
   data$outcome = outcome.mappings.v2[data$outcome]
   
+  #update 2-13-24, manually removing outlier risk data for 2013
+  data = subset(data, data$year != "2013")
+  
   data= as.data.frame(data)
   
   list(filename, data) 
@@ -1286,6 +1289,9 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   
   data$risk= risk.msa.mappings[data$risk]
   data$outcome = outcome.mappings.v2[data$outcome]
+  
+  #update 2-13-24, manually removing outlier risk data for 2013
+  data = subset(data, data$year != "2013")
   
   data= as.data.frame(data)
   
