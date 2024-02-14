@@ -8,7 +8,7 @@ CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 N.ITER = 10000
 
 # load params manual
-load("applications/EHE/calibration_runs/params.manual_2024_02_13.Rdata") 
+load("applications/EHE/calibration_runs/params.manual_2024_02_14.Rdata") 
 
 print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
@@ -74,13 +74,14 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                                                 EHE.PARAMETERS.PRIOR@var.names)]
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
-                          likelihood.instructions = one.way.transmission.likelihood.instructions,
+                          # removed pop likelihoods, added aids diagnoses 
+                          likelihood.instructions = one.way.transmission.and.aids.likelihood.instructions, 
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission),
                           n.iter = N.ITER,
                           thin = 50, 
-                          fixed.initial.parameter.values = params.manual[par.names.transmission], 
+                          fixed.initial.parameter.values = params.manual.new[par.names.transmission], 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get transmission parameters in the general vicinity",

@@ -110,10 +110,31 @@ prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                           equalize.weight.by.year = T 
 )
 
+
+#-- AIDS DIAGNOSES  --#
+aids.diagnoses.likelihood.instructions = 
+  create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
+                                                                outcome.for.sim = "aids.diagnoses", 
+                                                                dimensions = c("race","risk"), # ADD BACK AGE AND SEX LATER
+                                                                levels.of.stratification = c(0,1), 
+                                                                from.year = as.integer(1980),
+                                                                to.year = as.integer(2001),
+                                                                observation.correlation.form = 'compound.symmetry', 
+                                                                measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up
+                                                                weights = list(1), 
+                                                                equalize.weight.by.year = T,
+                                                                included.multiplier = 1.4,
+                                                                included.multiplier.sd = 0.2, # rounding up from 10%, 0.14
+                                                                included.multiplier.correlation = 0.5
+  )
+
 #-- JOIN THE TRANSMISSION-RELATED LIKELIHOODS  --#
-one.way.transmission.likelihood.instructions = join.likelihood.instructions(race.risk.one.way.new.diagnoses.likelihood.instructions,
-                                                                            race.risk.one.way.prevalence.likelihood.instructions
-)
+one.way.transmission.and.aids.likelihood.instructions = 
+  join.likelihood.instructions(race.risk.one.way.new.diagnoses.likelihood.instructions,
+                               race.risk.one.way.prevalence.likelihood.instructions,
+                               aids.diagnoses.likelihood.instructions
+                               
+  )
 
 #-- HIV-MORTALITY  --#
 # all-cause mortality among pwh
@@ -238,42 +259,6 @@ if(1==2){
 
 # TO DO: 
 # proportion tested, awareness, IDU (heroin/cocaine ratios)
-
-#-- AIDS DIAGNOSES  --#
-aids.diagnoses.likelihood.instructions = 
-  create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
-                                                                outcome.for.sim = "aids.diagnoses", 
-                                                                dimensions = c("age","sex","race","risk"),
-                                                                levels.of.stratification = c(0,1), 
-                                                                from.year = as.integer(1980),
-                                                                to.year = as.integer(2001),
-                                                                observation.correlation.form = 'compound.symmetry', 
-                                                                measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up
-                                                                weights = list(1), 
-                                                                equalize.weight.by.year = T,
-                                                                included.multiplier = 1.4,
-                                                                included.multiplier.sd = 0.2, # rounding up from 10%, 0.14
-                                                                included.multiplier.correlation = 0.5
-  )
-
-aids.diagnoses.likelihood.instructions.basic = 
-  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                                                outcome.for.sim = "aids.diagnoses", 
-                                                                dimensions = c("age","sex","race","risk"),
-                                                                levels.of.stratification = c(0,1), 
-                                                                from.year = as.integer(1980),
-                                                                to.year = as.integer(2001),
-                                                                observation.correlation.form = 'compound.symmetry', 
-                                                                measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up
-                                                                weights = list(1), 
-                                                                equalize.weight.by.year = T
-  )
-
-## ANDREW CHECK HERE
-if(1==2){
-  aids.lik.basic = aids.diagnoses.likelihood.instructions.basic$instantiate.likelihood('ehe','C.12580')
-  aids.lik = aids.diagnoses.likelihood.instructions$instantiate.likelihood('ehe','C.12580')  
-}
 
 
 #-- AIDS DEATHS  --#
