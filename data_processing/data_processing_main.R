@@ -1396,7 +1396,7 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
            geographic.type.from = 'COUNTY',
            geographic.type.to = 'CBSA',
            details.for.new.data = 'estimated from county data',
-           data.manager = SURVEILLANCE.MANAGER)
+           data.manager = surveillance.manager)
  
  put.msa.data.as.new.source(outcome = 'diagnoses',
                             from.source.name = 'cdc.hiv',
@@ -1405,7 +1405,7 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
                             geographic.type.from = 'COUNTY',
                             geographic.type.to = 'CBSA',
                             details.for.new.data = 'estimated from county data',
-                            data.manager = SURVEILLANCE.MANAGER)
+                            data.manager = surveillance.manager)
 
  
  ################################################################################
