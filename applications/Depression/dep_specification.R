@@ -2,6 +2,9 @@
 
 ## source dependencies
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
+source('applications/Depression/dep_parameters.R')
+source('applications/Depression/dep_parameter_mapping.R')
+
 
 DEP.SPECIFICATION <- create.jheem.specification(version="dep", 
                                                 parent.version = "ehe", 
@@ -39,8 +42,11 @@ register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx",
                                                                        value.is.on.transformed.scale = F), 
                        scale = "proportion")
 
+depression.inc.betas <- array(c(.33/.5, .28/.5, .28/.5, .28/.5, .15/.5), dim=c(age=5),  # add gender
+                              dimnames = list(age=c("13-24 years", "25-34 years","35-44 years", "45-54 years", "55+ years")))
+
 register.model.element(DEP.SPECIFICATION, name="depression.incidence",
-                       functional.form = create.static.functional.form(value = 0.091/(6/12), link = "logit",
+                       functional.form = create.static.functional.form(value = depression.inc.betas, link = "logit",
                                                                        value.is.on.transformed.scale = F), 
                        scale = "rate") ## incidence among general population
 
@@ -149,3 +155,13 @@ register.model.element(DEP.SPECIFICATION, name="rr.testing.depressed",
 
 register.model.specification(DEP.SPECIFICATION)
 
+
+
+##
+
+register.calibrated.parameters.for.version('dep',
+                                           distribution = DEP.PARAMETERS.PRIOR,
+                                           apply.function = DEP.APPLY.PARAMETERS.FN,
+                                           sampling.blocks = DEP.PARAMETER.SAMPLING.BLOCKS,
+                                           calibrate.to.year = 2025,
+                                           join.with.previous.version = T)
