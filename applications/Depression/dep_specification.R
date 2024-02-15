@@ -35,14 +35,14 @@ register.model.element(DEP.SPECIFICATION, name="depression.length",
                        scale="time") # average length of depressive episode
 
 register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx", 
-                       functional.form = create.static.functional.form(value=0.18, link = "logit", 
+                       functional.form = create.static.functional.form(value=0.18, link = "logit", # adults 18-24
                                                                        value.is.on.transformed.scale = F), 
                        scale = "proportion")
 
-register.model.element(DEP.SPECIFICATION, name="depression.prevalence", ## CHANGE THIS TO INC RATE ##
-                       functional.form = create.static.functional.form(value = 0.091, link = "logit",
+register.model.element(DEP.SPECIFICATION, name="depression.incidence",
+                       functional.form = create.static.functional.form(value = 0.091/(6/12), link = "logit",
                                                                        value.is.on.transformed.scale = F), 
-                       scale = "proportion") # prevalence of depression in the general population ## can be stratified by age and race ## CHANGE THIS TO INC RATE ##
+                       scale = "rate") ## incidence among general population
 
 
 ##--------------------------------------##
