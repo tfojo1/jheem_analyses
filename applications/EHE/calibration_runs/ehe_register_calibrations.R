@@ -8,7 +8,7 @@ CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 N.ITER = 10000
 
 # load params manual
-load("applications/EHE/calibration_runs/params.manual_2024_02_14.Rdata") 
+load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_14.Rdata") 
 
 print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
