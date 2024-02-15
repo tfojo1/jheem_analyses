@@ -21,7 +21,7 @@ register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments
 
 register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments="not_depressed", to.compartments="depressed", 
                     groups = c('infected','uninfected'),
-                    value=expression(depression.prevalence)) 
+                    value=expression(depression.incidence)) 
 
 
 ##--------------------------------------##

@@ -38,13 +38,13 @@ DEP.PARAMETERS.PRIOR <- join.distributions(
   black.depression.incidence    <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
   hispanic.depression.incidence <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
   
-  msm.depression.incidence      <- Lognormal.Distribution(log(0.091/(6/12)), log(2)), # no difference from general population by sexual orientation **
+  msm.depression.incidence      <- Lognormal.Distribution(log(0.091/(6/12)*1.5), log(2)), # increased risk, like females *
   hetero.depression.incidence   <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
   female.depression.incidence   <- Lognormal.Distribution(log(0.091/(6/12)*1.5), log(2)), # females 1.5-2 times more likely to have depression than males
   
-  idu.prior.depression.incidence    <- Lognormal.Distribution(0, log(2)),
-  idu.current.depression.incidence  <- Lognormal.Distribution(0, log(2)),
-  idu.never.depression.incidence    <- Lognormal.Distribution(0, log(2)),
+  idu.prior.depression.incidence    <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
+  idu.current.depression.incidence  <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
+  idu.never.depression.incidence    <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
   
   #-- Suppression --#
   rr.suppression.dep.tx   <- Lognormal.Distribution(0, log(2)), 
