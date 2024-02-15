@@ -25,3 +25,5 @@ print(paste0("DONE RUNNING MCMC: Took ",
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
 save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+
+sim$save()
