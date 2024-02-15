@@ -524,11 +524,11 @@ het.big.df <- subset(big.df, risk == "het")
 # fit.p.msm <- lm(logit(p/p.max) ~ year + raceid + ageid,
 #                 data = msm.bigp.df)
 
-fit.p.msm <- lm((p/p.max) ~ year + raceid + ageid,
+fit.p.msm <- lm(p ~ year + raceid + ageid,
                 data = msm.bigp.df)
 fit.p.msm
 
-fit.p.nonmsm <- lm((p/p.max) ~ year + raceid + ageid + female + idu,
+fit.p.nonmsm <- lm(p ~ year + raceid + ageid + female + idu,
                    data = nonmsm.big.df)
 
 fit.p.idu <- lm(p ~ year + raceid + ageid + female, data = idu.big.df)

@@ -76,15 +76,13 @@ get.prep.use.functional.form <- function(specification.metadata){
     slope[,,"msm",] <- slope[,,"msm",] + coef(fit.p.msm)["year"]
     slope[,,"heterosexual_male",] <- slope[,,"heterosexual_male",] + coef(fit.p.nonmsm)["year"]
     slope[,,"female",] <- slope[,,"female",] + coef(fit.p.nonmsm)["year"]
-
-    create.logistic.tail.functional.form(
-      intercept = pmax(int,0),
+    
+    create.linear.functional.form(
+      intercept = int,
       slope = slope,
       anchor.year = anchor.year,
       min = 0,
       max = max.prep.coverage,
-      logistic.after.frac.of.span = 0.5,
-      parameters.are.on.transformed.scale = F
     )
 }
 
