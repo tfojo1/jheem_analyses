@@ -40,8 +40,11 @@ is.cached.object.out.of.date <- function(file,
                     JHEEM.CACHE.DIR, "') - you need to get this from Todd's One-Drive"))
     
     file.metadata = file.info(file.path(JHEEM.CACHE.DIR, file))
-    
-    file.metadata$mtime < cache.metadata[file,'mtime']
+
+    (as.numeric(file.metadata$mtime) - as.numeric(cache.metadata[file,'mtime'])) < -1
+      # this formulation approximates 
+      # file.metadata$mtime < cache.metadata[file,'mtime']
+      # but allows for numeric rounding errors
 }
 
 CACHE.FILES.TO.TRACK = c(
