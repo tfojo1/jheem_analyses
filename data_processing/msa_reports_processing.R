@@ -1110,6 +1110,10 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   
   #update 2-13-24, manually removing outlier risk data for 2013
   data = subset(data, data$year != "2013")
+  data = subset(data, data$year != "2012")
+  data = subset(data, data$year != "2011")
+  data = subset(data, data$year != "2010")
+  data = subset(data, data$year != "2009")
   
   data= as.data.frame(data)
   
@@ -1292,6 +1296,10 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   
   #update 2-13-24, manually removing outlier risk data for 2013
   data = subset(data, data$year != "2013")
+  data = subset(data, data$year != "2012")
+  data = subset(data, data$year != "2011")
+  data = subset(data, data$year != "2010")
+  data = subset(data, data$year != "2009")
   
   data= as.data.frame(data)
   

@@ -2,6 +2,9 @@
 
 ## source dependencies
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
+source('applications/Depression/dep_parameters.R')
+source('applications/Depression/dep_parameter_mapping.R')
+
 
 DEP.SPECIFICATION <- create.jheem.specification(version="dep", 
                                                 parent.version = "ehe", 
@@ -21,7 +24,7 @@ register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments
 
 register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments="not_depressed", to.compartments="depressed", 
                     groups = c('infected','uninfected'),
-                    value=expression(depression.prevalence)) 
+                    value=expression(depression.incidence)) 
 
 
 ##--------------------------------------##
@@ -35,14 +38,17 @@ register.model.element(DEP.SPECIFICATION, name="depression.length",
                        scale="time") # average length of depressive episode
 
 register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx", 
-                       functional.form = create.static.functional.form(value=0.18, link = "logit", 
+                       functional.form = create.static.functional.form(value=0.18, link = "logit", # adults 18-24
                                                                        value.is.on.transformed.scale = F), 
                        scale = "proportion")
 
-register.model.element(DEP.SPECIFICATION, name="depression.prevalence", ## CHANGE THIS TO INC RATE ##
-                       functional.form = create.static.functional.form(value = 0.091, link = "logit",
+depression.inc.betas <- array(c(.33/.5, .28/.5, .28/.5, .28/.5, .15/.5), dim=c(age=5),  # add gender
+                              dimnames = list(age=c("13-24 years", "25-34 years","35-44 years", "45-54 years", "55+ years")))
+
+register.model.element(DEP.SPECIFICATION, name="depression.incidence",
+                       functional.form = create.static.functional.form(value = depression.inc.betas, link = "logit",
                                                                        value.is.on.transformed.scale = F), 
-                       scale = "proportion") # prevalence of depression in the general population ## can be stratified by age and race ## CHANGE THIS TO INC RATE ##
+                       scale = "rate") ## incidence among general population
 
 
 ##--------------------------------------##
@@ -149,3 +155,13 @@ register.model.element(DEP.SPECIFICATION, name="rr.testing.depressed",
 
 register.model.specification(DEP.SPECIFICATION)
 
+
+
+##
+
+register.calibrated.parameters.for.version('dep',
+                                           distribution = DEP.PARAMETERS.PRIOR,
+                                           apply.function = DEP.APPLY.PARAMETERS.FN,
+                                           sampling.blocks = DEP.PARAMETER.SAMPLING.BLOCKS,
+                                           calibrate.to.year = 2025,
+                                           join.with.previous.version = T)

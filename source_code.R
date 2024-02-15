@@ -7,13 +7,12 @@ library(distributions)
 source('../jheem_analyses/commoncode/cache_manager.R')
 
 
-
 # This 'source' call is equivalent to loading the jheem2 package
 source('../jheem2/R/tests/source_jheem2_package.R')
+source('../jheem_analyses/commoncode/file_paths.R')
+set.jheem.root.directory(ROOT.DIR)
 
 # Set up file paths
-source('../jheem_analyses/commoncode/file_paths.R')
-
 # Load the data managers
 if (is.null(get.default.data.manager()))
 {
