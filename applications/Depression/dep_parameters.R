@@ -15,17 +15,17 @@ DEP.PARAMETERS.PRIOR <- join.distributions(
   age4.depression.proportion.tx     <- Lognormal.Distribution(log(.18), log(2)),
   age5.depression.proportion.tx     <- Lognormal.Distribution(log(.18), log(2)),
   
-  white.depression.proportion.tx    <- Lognormal.Distribution(0, log(2)), ## make relative to white?
-  black.depression.proportion.tx    <- Lognormal.Distribution(0, log(2)),
-  hispanic.depression.proportion.tx <- Lognormal.Distribution(0, log(2)),
+  white.depression.proportion.tx    <- Lognormal.Distribution(log(.18), log(2)), ## make relative to white?
+  black.depression.proportion.tx    <- Lognormal.Distribution(log(.18), log(2)),
+  hispanic.depression.proportion.tx <- Lognormal.Distribution(log(.18), log(2)),
   
-  msm.depression.proportion.tx      <- Lognormal.Distribution(0, log(2)),
-  hetero.depression.proportion.tx   <- Lognormal.Distribution(0, log(2)),
-  female.depression.proportion.tx   <- Lognormal.Distribution(0, log(2)), ## make relative to female?
+  msm.depression.proportion.tx      <- Lognormal.Distribution(log(.18), log(2)),
+  hetero.depression.proportion.tx   <- Lognormal.Distribution(log(.18), log(2)),
+  female.depression.proportion.tx   <- Lognormal.Distribution(log(.18), log(2)), ## make relative to female?
   
-  idu.prior.depression.proportion.tx    <- Lognormal.Distribution(0, log(2)),
-  idu.current.depression.proportion.tx  <- Lognormal.Distribution(0, log(2)),
-  idu.never.depression.proportion.tx    <- Lognormal.Distribution(0, log(2)),
+  idu.prior.depression.proportion.tx    <- Lognormal.Distribution(log(.18), log(2)),
+  idu.current.depression.proportion.tx  <- Lognormal.Distribution(log(.18), log(2)),
+  idu.never.depression.proportion.tx    <- Lognormal.Distribution(log(.18), log(2)),
   
   #-Incidence
   age1.depression.incidence     <- Lognormal.Distribution(log(.33*1/2), log(2)), # 13-24
@@ -34,13 +34,13 @@ DEP.PARAMETERS.PRIOR <- join.distributions(
   age4.depression.incidence     <- Lognormal.Distribution(log(.28*1/2), log(2)), # 45-54
   age5.depression.incidence     <- Lognormal.Distribution(log(.15*1/2), log(2)), # 55+
   
-  white.depression.incidence    <- Lognormal.Distribution(0, log(2)),
-  black.depression.incidence    <- Lognormal.Distribution(0, log(2)),
-  hispanic.depression.incidence <- Lognormal.Distribution(0, log(2)),
+  white.depression.incidence    <- Lognormal.Distribution(log(0.091/(6/12)), log(2)), # no difference from general population by race
+  black.depression.incidence    <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
+  hispanic.depression.incidence <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
   
-  msm.depression.incidence      <- Lognormal.Distribution(0, log(2)),
-  hetero.depression.incidence   <- Lognormal.Distribution(0, log(2)),
-  female.depression.incidence   <- Lognormal.Distribution(0, log(2)),
+  msm.depression.incidence      <- Lognormal.Distribution(log(0.091/(6/12)), log(2)), # no difference from general population by sexual orientation **
+  hetero.depression.incidence   <- Lognormal.Distribution(log(0.091/(6/12)), log(2)),
+  female.depression.incidence   <- Lognormal.Distribution(log(0.091/(6/12)*1.5), log(2)), # females 1.5-2 times more likely to have depression than males
   
   idu.prior.depression.incidence    <- Lognormal.Distribution(0, log(2)),
   idu.current.depression.incidence  <- Lognormal.Distribution(0, log(2)),
