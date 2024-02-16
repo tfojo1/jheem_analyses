@@ -114,6 +114,11 @@ test <- function(msa.name,
   
   #2-16-24: You need to change the list of arrays (list.of.states.proportions.in.msa) into a stacked array with the same dimensions as state.metro.death.rate so you can multiply them
   #To do this and keep data in the correct place, use Todd's function 'expand.array'
+  expanded.dimnames = list(age, race, ethnicity, sex, source=c('cdc_wonder', 'census.population'))
+  #REMEBER FOR THE SQUISHING IT'S THE STATES IN THE LIST
+  #lol this did not work
+  proper.smoosh.array = array(list.of.states.proportions.in.msa[[1]], list.of.states.proportions.in.msa[[2]])
+  
   
   #Apply weights to create a final scaled mortality rate
   #final will be array stratified by age, race, eth, sex
