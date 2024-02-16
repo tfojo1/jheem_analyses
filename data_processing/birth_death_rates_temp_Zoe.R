@@ -111,6 +111,10 @@ test <- function(msa.name,
     states.proportion = states.population/msa.population 
   }) #Returns list of one array per state
 
+  
+  #2-16-24: You need to change the list of arrays (list.of.states.proportions.in.msa) into a stacked array with the same dimensions as state.metro.death.rate so you can multiply them
+  #To do this and keep data in the correct place, use Todd's function 'expand.array'
+  
   #Apply weights to create a final scaled mortality rate
   #final will be array stratified by age, race, eth, sex
   #Could have different array for each states and multiple it by the metro death rate array (then add all together)
@@ -120,72 +124,72 @@ test <- function(msa.name,
 
 
 ##############################################################################
-#NOTE FROM 2-1-24 THIS IS OUT OF DATE##
-
-#Working with one MSA at a time
-
-get.location.mortality.rates.new <- function(msa.name,
-                                             #specification.metadata,
-                                             year.ranges = c('2006-2010','2011-2015'),
-                                             census.manager = smaller.census.manager)
-  
-{
-
-  states = locations::get.containing.locations(msa.name, "state")
-  counties = locations::get.contained.locations(msa.name, 'county')
-  
-  #Pull state metro deaths (numerator)
-  state.metro.deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', dimension.values = list(location = states, year= year.ranges), keep.dimensions = c('location', 'age', 'race', 'ethnicity', 'sex'))
-  
-  #Set up for if deaths = 0, need to set to the minimum value calculated in other stratum
-  
-  #Question: How to have the function apply the minimum value calculated here?
-  
-  if (is.null(deaths))
-    stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
-  
-  #Pull state metro population (denominator)
-  state.metro.pop = census.manager$pull(outcome = 'metro.deaths.denominator', location = states, year= year, keep.dimensions = c('location', 'age', 'race', 'ethnicity', 'sex'))
-  if (is.null(population))
-    stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
-  
-  #Divide to get state metro mortality rate *But you could have multiple of these if the MSA is in multiple states*
-  state.metro.death.rate = (state.metro.deaths/state.metro.pop) #this will be used in the final equation
-  
-  #Question: How to get the proportion each state contributes to the MSA?
-  #Question: How to account for not knowing how many states could be covered in a particular MSA? 
-  
-  #First get the population of the MSA (by summing county population values from census)
-  msa.population = census.manager$pull(outcome = 'population', location = counties, year = year, keep.dimensions = c('age', 'race', 'ethnicity', 'sex')) #this would add up all populations from counties#
-  
-  #Question: How to apply this in a useful way?
-  
-  #Use locations package to determine counties in each MSA and which MSA are in multiple states
-  #get.overlapping.locations("C.35620", "state")
-  #This function will only apply to one MSA at a time so this won't be MSAs of Interest it'll be the singular MSA (aka location)
-  counties.in.this.msa = locations::get.contained.locations(msa.name, "county")
-  browser()
-  counties.in.state.1 = locations::get.contained.locations(states[[1]], "county") #get the counties in the state (then can compare this to vector above for counties in MSA)
-  counties.in.state.1.and.msa = union(counties.in.this.msa, counties.in.state.1) #use this value as location below to get pop of all relevant counties in msa in state
-  
-  #Determine what proportion of the MSA is in State One
-  state.1.msa.pop = census.manager$pull(outcome='population', location=counties.in.state.1.and.msa, year = year, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
-  state.1.proportion = (state.1.msa.pop/msa.population)  #This the proportion value the state contributes to the MSA
-  
-  #Determine what proportion of the MSA is in State Two
-  state.2.msa.pop = census.manager$pull(outcome='population', location=counties.in.each.msa, year = year, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
-  state.2.proportion = (state.2.msa.pop/msa.population)  #This the proportion value the state contributes to the MSA
-  
-  #Apply weights to create a final scaled mortality rate
-  final.msa.death.rate = (proportion.state.1 * state.metro.death.rate) + (proportion.state.2 * state.metro.death.rate) + (proportion.state.3 * state.metro.death.rate) #use apply here; create vector of proportion for example
-  
-  
-  #Question: How to have the function return an array of values?
-  
-  # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
-  # then divide the two
-  target.dim.names = specification.metadata$dim.names[c('age','race','sex')]
-  map.value.ontology(deaths, target.dim.names=target.dim.names) / 
-    map.value.ontology(population, target.dim.names=target.dim.names)
-  
-}
+# #NOTE FROM 2-1-24 THIS IS OUT OF DATE##
+# 
+# #Working with one MSA at a time
+# 
+# get.location.mortality.rates.new <- function(msa.name,
+#                                              #specification.metadata,
+#                                              year.ranges = c('2006-2010','2011-2015'),
+#                                              census.manager = smaller.census.manager)
+#   
+# {
+# 
+#   states = locations::get.containing.locations(msa.name, "state")
+#   counties = locations::get.contained.locations(msa.name, 'county')
+#   
+#   #Pull state metro deaths (numerator)
+#   state.metro.deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', dimension.values = list(location = states, year= year.ranges), keep.dimensions = c('location', 'age', 'race', 'ethnicity', 'sex'))
+#   
+#   #Set up for if deaths = 0, need to set to the minimum value calculated in other stratum
+#   
+#   #Question: How to have the function apply the minimum value calculated here?
+#   
+#   if (is.null(deaths))
+#     stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
+#   
+#   #Pull state metro population (denominator)
+#   state.metro.pop = census.manager$pull(outcome = 'metro.deaths.denominator', location = states, year= year, keep.dimensions = c('location', 'age', 'race', 'ethnicity', 'sex'))
+#   if (is.null(population))
+#     stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
+#   
+#   #Divide to get state metro mortality rate *But you could have multiple of these if the MSA is in multiple states*
+#   state.metro.death.rate = (state.metro.deaths/state.metro.pop) #this will be used in the final equation
+#   
+#   #Question: How to get the proportion each state contributes to the MSA?
+#   #Question: How to account for not knowing how many states could be covered in a particular MSA? 
+#   
+#   #First get the population of the MSA (by summing county population values from census)
+#   msa.population = census.manager$pull(outcome = 'population', location = counties, year = year, keep.dimensions = c('age', 'race', 'ethnicity', 'sex')) #this would add up all populations from counties#
+#   
+#   #Question: How to apply this in a useful way?
+#   
+#   #Use locations package to determine counties in each MSA and which MSA are in multiple states
+#   #get.overlapping.locations("C.35620", "state")
+#   #This function will only apply to one MSA at a time so this won't be MSAs of Interest it'll be the singular MSA (aka location)
+#   counties.in.this.msa = locations::get.contained.locations(msa.name, "county")
+#   browser()
+#   counties.in.state.1 = locations::get.contained.locations(states[[1]], "county") #get the counties in the state (then can compare this to vector above for counties in MSA)
+#   counties.in.state.1.and.msa = union(counties.in.this.msa, counties.in.state.1) #use this value as location below to get pop of all relevant counties in msa in state
+#   
+#   #Determine what proportion of the MSA is in State One
+#   state.1.msa.pop = census.manager$pull(outcome='population', location=counties.in.state.1.and.msa, year = year, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
+#   state.1.proportion = (state.1.msa.pop/msa.population)  #This the proportion value the state contributes to the MSA
+#   
+#   #Determine what proportion of the MSA is in State Two
+#   state.2.msa.pop = census.manager$pull(outcome='population', location=counties.in.each.msa, year = year, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
+#   state.2.proportion = (state.2.msa.pop/msa.population)  #This the proportion value the state contributes to the MSA
+#   
+#   #Apply weights to create a final scaled mortality rate
+#   final.msa.death.rate = (proportion.state.1 * state.metro.death.rate) + (proportion.state.2 * state.metro.death.rate) + (proportion.state.3 * state.metro.death.rate) #use apply here; create vector of proportion for example
+#   
+#   
+#   #Question: How to have the function return an array of values?
+#   
+#   # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
+#   # then divide the two
+#   target.dim.names = specification.metadata$dim.names[c('age','race','sex')]
+#   map.value.ontology(deaths, target.dim.names=target.dim.names) / 
+#     map.value.ontology(population, target.dim.names=target.dim.names)
+#   
+# }
