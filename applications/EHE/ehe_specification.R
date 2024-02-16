@@ -765,10 +765,18 @@ register.transmission(EHE.SPECIFICATION,
 ##-- Susceptibility --##
 ##--------------------##
 
+register.model.element(EHE.SPECIFICATION,
+                       name = 'proportion.of.sexual.transmissions.in.prep.eligible',
+                       scale = 'proportion',
+                       value = 0.9) # want to come up with a better number for this; maybe by risk group 
+  
+
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.susceptibility',
                         value = expression( base.sexual.susceptibility *
-                                                (all.prep.risk + 1-all.prep.coverage) )
+                                              (proportion.of.sexual.transmissions.in.prep.eligible*
+                                              (all.prep.risk + 1-all.prep.coverage) + 
+                                                (1-proportion.of.sexual.transmissions.in.prep.eligible)))
 )
 
 register.model.quantity(EHE.SPECIFICATION,
