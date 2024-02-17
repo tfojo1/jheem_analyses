@@ -39,10 +39,10 @@ prepuse_upscale10 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPAN
 
 prepuse_upscale25 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
                                          prepuse_25, 
-                                         code = "prepuse25") # can pass more than 1
+                                         code = "prepu25") # can pass more than 1
 
 prep_persistence_30 <- create.intervention.effect(
-  quantity.name = "prep.persistence",
+  quantity.name = "oral.prep.persistence",
   start.time = start.year,
   effect.values = 0.3, 
   times = end.year,
@@ -57,7 +57,7 @@ preppers_upscale30 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPA
                                          code = "preppers30") # can pass more than 1
 
 prep_persistence_55 <- create.intervention.effect(
-  quantity.name = "prep.persistence",
+  quantity.name = "oral.prep.persistence",
   start.time = start.year,
   effect.values = 0.55, 
   times = end.year,
