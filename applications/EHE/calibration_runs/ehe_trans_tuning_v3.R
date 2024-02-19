@@ -4,6 +4,7 @@ source('../jheem_analyses/applications/EHE/ehe_specification.R')
 load("../jheem_analyses/prelim_results/init.pop.migration.sim_2024-01-25_C.12580.Rdata")
 sim.pop = sim
 params.pop = sim.pop$parameters[,1]
+params.pop = params.pop[EHE.PARAMETERS.PRIOR@var.names]
 
 # load transmission parameters from old calibration 
 load("../jheem_analyses/applications/EHE/calibration_runs/params.old.baltimore.Rdata")
@@ -26,12 +27,22 @@ het.mask = het.trate.0.mask | het.trate.1.mask | het.trate.2.mask
 
 msm.trate.mask = grepl("msm\\.trate",names(params.manual))
 
-params.manual[het.mask] = 0.1*reference.params[het.mask]
+params.manual[het.mask] = 0.05*reference.params[het.mask]
+params.manual["black.heterosexual.trate.0"] = 0.05 # 0.07228892
+params.manual["black.heterosexual.trate.1"] = 0.04 # 0.0620035
+params.manual["black.heterosexual.trate.2"] = 0.005 # 0.0545
+params.manual["other.heterosexual.trate.0"] = 0.0005 # 0.01551151
+params.manual["other.heterosexual.trate.1"] = 0.0005 # 0.003613145
+params.manual["other.heterosexual.trate.2"] = 0.0005 # 0.002512622
+#params.manual[het.trate.1.mask] = 0.05*reference.params[het.trate.1.mask]
+#params.manual[het.trate.2.mask] = 0.05*reference.params[het.trate.2.mask]
 params.manual["black.idu.trate.0"] = 2.5 # 1.930838
-params.manual[msm.trate.mask] = 0.7*reference.params[msm.trate.mask]
+params.manual[msm.trate.mask] = 0.55*reference.params[msm.trate.mask]
   
-params.manual["other.other.sexual.oe"] = 50 # 1.593826
-params.manual["black.black.sexual.oe"]= 50 # 3.16107
+params.manual["other.other.sexual.oe"] = 3 # 1.593826
+params.manual["black.black.sexual.oe"] = 15 # 3.16107
+
+save(params.manual,file="applications/EHE/calibration_runs/params.manual_2024_02_19.Rdata")
 
 sim.manual = engine$run(parameters = params.manual) 
 
@@ -72,11 +83,6 @@ simplot(sim.manual,
 simplot(sim.manual,
         facet.by = "risk", split.by = "race",
         outcomes = c("new"),
-        dimension.values = list(year = 2000:2020)) 
-
-simplot(sim.manual,
-        facet.by = "risk", split.by = "race",
-        outcomes = c("incidence"),
         dimension.values = list(year = 2000:2020)) 
 
 simplot(#sim.old.params,
