@@ -1409,6 +1409,18 @@ smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.
 
  
  ################################################################################
+ #Identify Potential Outliers
+ ################################################################################
+source('../jheem2/R/HELPERS_array_helpers.R')
+source('data_processing/outlier_finder.R')
+ 
+outlier.df <- get.outliers.for.outcome(outcome = 'diagnosed.prevalence',
+                          data.manager = surveillance.manager,
+                          locations = MSAS.OF.INTEREST,
+                          percent.change.per.year= 0.2, 
+                          ignore.below= 100)
+ 
+ ################################################################################
  ###Save surveillance manager####
   save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
  
