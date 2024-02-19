@@ -105,20 +105,26 @@ test <- function(msa.name,
     intersect(counties.in.this.msa, counties.in.this.state)
   })
   browser()
-  #2-1-24 this is where I'm starting off
+  #2-19-24 this is where I'm starting off
   list.of.states.proportions.in.msa = lapply(counties.in.states.and.msa, function(msa.counties.in.each.state){
     states.population = census.manager$pull(outcome='population', location=msa.counties.in.each.state, year = 2006:2015, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
     states.proportion = states.population/msa.population 
   }) #Returns list of one array per state
-
+    current.dimnames = c('age', 'race', 'ethnicity', 'sex', 'source')
+    new.dimnames = c(current.dimnames, list(location = c("MA", "NH")))
+    
+    combined.state.proportion.array = array(c(list.of.states.proportions.in.msa[[1]], list.of.states.proportions.in.msa[[2]], dim=sapply(new.dimnames, length), dimnames(new.dimanes)))
+    
   
-  #2-16-24: You need to change the list of arrays (list.of.states.proportions.in.msa) into a stacked array with the same dimensions as state.metro.death.rate so you can multiply them
+  #2-16-24: You need to change the list of arrays (list.of.states.proportions.in.msa) into a stacked array with location as the last dimension
   #To do this and keep data in the correct place, use Todd's function 'expand.array'
   expanded.dimnames = list(age, race, ethnicity, sex, source=c('cdc_wonder', 'census.population'))
   #REMEBER FOR THE SQUISHING IT'S THE STATES IN THE LIST
   #lol this did not work
+  
   proper.smoosh.array = array(list.of.states.proportions.in.msa[[1]], list.of.states.proportions.in.msa[[2]])
   
+  #Next issue: you are going to attempt to multiply arrays but they have different categories for their dimensions
   
   #Apply weights to create a final scaled mortality rate
   #final will be array stratified by age, race, eth, sex
