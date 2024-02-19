@@ -1125,7 +1125,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.race',
                                applies.to = list(race.from='other', race.to='other'),
-                               value = expression(black.population.count * other.other.sexual.oe /
+                               value = expression(other.population.count * other.other.sexual.oe /
                                                       (black.population.count + hispanic.population.count + other.population.count * other.other.sexual.oe)))
 
 # The race sub-values
