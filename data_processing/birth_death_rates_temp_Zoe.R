@@ -110,10 +110,10 @@ test <- function(msa.name,
     states.population = census.manager$pull(outcome='population', location=msa.counties.in.each.state, year = 2006:2015, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
     states.proportion = states.population/msa.population 
   }) #Returns list of one array per state
-    current.dimnames = c('age', 'race', 'ethnicity', 'sex', 'source')
+    current.dimnames = dimnames(list.of.states.proportions.in.msa[[1]])
     new.dimnames = c(current.dimnames, list(location = c("MA", "NH")))
     
-    combined.state.proportion.array = array(c(list.of.states.proportions.in.msa[[1]], list.of.states.proportions.in.msa[[2]], dim=sapply(new.dimnames, length), dimnames(new.dimanes)))
+    combined.state.proportion.array = array(c(list.of.states.proportions.in.msa[[1]], list.of.states.proportions.in.msa[[2]]), dim=sapply(new.dimnames, length), dimnames= new.dimnames)
     
   
   #2-16-24: You need to change the list of arrays (list.of.states.proportions.in.msa) into a stacked array with location as the last dimension
