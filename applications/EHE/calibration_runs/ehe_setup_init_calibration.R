@@ -6,12 +6,10 @@ CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION # or CALIBRATION.CODE.PO
 for(location in LOCATIONS){
   clear.calibration.cache(version='ehe',
                           location=location,
-                          calibration.code = CALIBRATION.CODE.TO.RUN,
-                          root.dir = ROOT.DIR)
+                          calibration.code = CALIBRATION.CODE.TO.RUN)
   
   set.up.calibration(version='ehe',
                      location=location,
                      calibration.code = CALIBRATION.CODE.TO.RUN,
-                     root.dir = ROOT.DIR,
                      cache.frequency = 250)  
 }

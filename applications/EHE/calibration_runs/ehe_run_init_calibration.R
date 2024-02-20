@@ -9,7 +9,6 @@ print(paste0("STARTING MCMC RUN AT ",Sys.time()))
 mcmc = run.calibration(version = 'ehe',
                 location = LOCATION,
                 calibration.code = CALIBRATION.CODE.TO.RUN,
-                root.dir = ROOT.DIR,
                 chains = 1,
                 update.frequency = 100,
                 update.detail = 'med')
