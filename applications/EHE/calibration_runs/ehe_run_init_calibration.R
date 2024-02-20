@@ -9,7 +9,6 @@ print(paste0("STARTING MCMC RUN AT ",Sys.time()))
 mcmc = run.calibration(version = 'ehe',
                 location = LOCATION,
                 calibration.code = CALIBRATION.CODE.TO.RUN,
-                root.dir = ROOT.DIR,
                 chains = 1,
                 update.frequency = 100,
                 update.detail = 'med')
@@ -25,3 +24,5 @@ print(paste0("DONE RUNNING MCMC: Took ",
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
 save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+
+sim$save()

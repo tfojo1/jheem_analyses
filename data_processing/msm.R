@@ -232,6 +232,58 @@ data.list.emory.msm <- lapply(emory_files, function(x){
   list(filename=x, data=read.csv(x, header=TRUE, colClasses=c(COUNTYFP="character", STATEFP= "character")))
 })
 
+state.to.fips.mappings.emory = c('01' = 'AL',
+                           '02'='AK',
+                           '04'='AZ',
+                           '05'='AR',
+                           '06'='CA',
+                           '08'='CO',
+                           '09'='CT',
+                           '10'='DE',
+                           '11'='DC',
+                           '12'='FL',
+                           '13'='GA',
+                           '15'='HI',
+                           '16'='ID',
+                           '17'='IL',
+                           '18'='IN',
+                           '19'='IA',
+                           '20'='KS',
+                           '21'='KY',
+                           '22'='LA',
+                           '23'='ME',
+                           '24'='MD',
+                           '25'='MA',
+                           '26'='MI',
+                           '27'='MN',
+                           '28'='MS',
+                           '29'='MO',
+                           '30'='MT',
+                           '31'='NE',
+                           '32'='NV',
+                           '33'='NH',
+                           '34'='NJ',
+                           '35'='NM',
+                           '36'='NY',
+                           '37'='NC',
+                           '38'='ND',
+                           '39'='OH',
+                           '40'='OK',
+                           '41'='OR',
+                           '42'='PA',
+                           '44'='RI',
+                           '45'='SC',
+                           '46'='SD',
+                           '47'='TN',
+                           '48'='TX',
+                           '49'='UT',
+                           '50'='VT',
+                           '51'='VA',
+                           '53'='WA',
+                           '54'='WV',
+                           '55'='WI',
+                           '56'='WY',
+                           '72'= 'PR')
 ###############################################################################
                 ##Clean Emory data##
 ###############################################################################
@@ -272,18 +324,67 @@ data.list.emory.msm.msa = lapply(data.list.emory.msm, function(file){
   data$year = "2013"
   data$outcome= "proportion.msm"
   
-  data$value = as.numeric(data$MSM5YEAR/data$ADULTMEN)
-  data$value = round(data$value, digits=2)
-  
   #To create location- for MSA use 'CBSACODE' and also 'METMICSA' ==1 for metropolitian statistical area
     data = subset(data, data$METMICSA == "1") #Select msas only
     data$location = sub("^", "C.", data$CBSACODE)
     data$location_check = locations::is.location.valid(data$location)
-  #Removing invalid MSA locations#
-    data=subset(data, data$location_check == 'TRUE')
+    
+   #Removing invalid MSA locations#
+     data=subset(data, data$location_check == 'TRUE')
+    
+    #Group by location to sum across MSAs
+     data <- data %>%
+       group_by(location)%>%
+       mutate(sum_msm = sum(MSM5YEAR))%>%
+       mutate(sum_adult_men = sum(ADULTMEN))
+    
+    data$value = as.numeric(data$sum_msm/data$sum_adult_men)
+    data$value = round(data$value, digits=2)
     
     #Need to add sex column in for put statment dimensions
     data$sex = "male"
+    
+    data <- data %>%
+      select(year, location, outcome, sex, value)
+  
+    data<- data[!duplicated(data), ]
+    
+  data= as.data.frame(data)
+  
+  list(filename, data)
+})
+
+##########
+##State
+#########
+data.list.emory.msm.state = lapply(data.list.emory.msm, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$year = "2013"
+  data$outcome= "proportion.msm"
+  
+  #To create location- combine state and county FIPS
+  data$state_code= str_pad(data$STATEFP, width=2, side="left", pad="0")
+  data$location = state.to.fips.mappings.emory[data$state_code]
+  
+  #Group by location to sum across states
+  data <- data %>%
+    group_by(location)%>%
+    mutate(sum_msm = sum(MSM5YEAR))%>%
+    mutate(sum_adult_men = sum(ADULTMEN))
+  
+  data$value = as.numeric(data$sum_msm/data$sum_adult_men)
+  data$value = round(data$value, digits=2)
+  
+  #Need to add sex column in for put statement dimensions
+  data$sex = "male"
+  
+    data <- data %>%
+      select(year, location, outcome, sex, value)
+  
+  data<- data[!duplicated(data), ]
   
   data= as.data.frame(data)
   
@@ -312,6 +413,21 @@ msm.emory.msa = lapply(data.list.emory.msm.msa, `[[`, 2)
 
 for (data in msm.emory.msa ) {
 
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'emory',
+    source = 'emory',
+    dimension.values = list(sex = "male"),
+    url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
+    details = 'Emory University MSM Research from American Community Survey')
+}
+
+##Emory MSM by States
+
+msm.emory.state = lapply(data.list.emory.msm.state, `[[`, 2)
+
+for (data in msm.emory.state ) {
+  
   data.manager$put.long.form(
     data = data,
     ontology.name = 'emory',

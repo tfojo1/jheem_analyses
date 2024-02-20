@@ -1,8 +1,17 @@
-# source("applications/ehe/ehe_specification.R")
+
+# File to set PrEP Upscale Interventions
+
+source("../jheem_analyses/applications/EHE/ehe_specification.R") # re-source to wipe out codes
 
 BLACK
 HISPANIC
 NON.BLACK.NON.HISPANIC
+
+BLACK.MSM <- create.target.population(race = "black", sex = "msm", name = "Black MSM")
+HISPANIC.MSM <- create.target.population(race = "hispanic", sex = "msm", name = "Hispanic MSM")
+NON.BLACK.NON.HISPANIC.MSM <- create.target.population(race = "other", sex = "msm",
+                                                       name = "Non-Black non-Hispanic MSM")
+
 
 start.year <- 2025
 end.year <- 2035
@@ -29,45 +38,76 @@ prepuse_25 <- create.intervention.effect(
   allow.values.greater.than.otherwise = TRUE
 )
 
-# intervention <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
-#                                     prepuse_10, 
-#                                        code = "prepup10") # can pass more than 1
-
-prepuse_upscale10 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
+prep.use10 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
                                     prepuse_10, 
                                     code = "prepuse10") # can pass more than 1
 
-prepuse_upscale25 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
+prep.use25 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
                                          prepuse_25, 
                                          code = "prepuse25") # can pass more than 1
 
+prep.use10.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM, NON.BLACK.NON.HISPANIC.MSM), 
+                                         prepuse_10, 
+                                         code = "msmprepuse10") # can pass more than 1
+
+prep.use25.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM, NON.BLACK.NON.HISPANIC.MSM), 
+                                         prepuse_25, 
+                                         code = "msmprepuse25") # can pass more than 1
+
 prep_persistence_30 <- create.intervention.effect(
-  quantity.name = "prep.persistence",
+  quantity.name = "oral.prep.persistence",
   start.time = start.year,
   effect.values = 0.3, 
   times = end.year,
   scale = "proportion",
-  apply.effects.as = "addend",
+  apply.effects.as = "value",
   allow.values.less.than.otherwise = FALSE,
   allow.values.greater.than.otherwise = TRUE
 )
 
-preppers_upscale30 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
+prep.pers30 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
                                          prep_persistence_30, 
                                          code = "preppers30") # can pass more than 1
 
+prep.pers30.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM, NON.BLACK.NON.HISPANIC.MSM), 
+                                   prep_persistence_30, 
+                                   code = "preppers30msm") # can pass more than 1
+
 prep_persistence_55 <- create.intervention.effect(
-  quantity.name = "prep.persistence",
+  quantity.name = "oral.prep.persistence",
   start.time = start.year,
   effect.values = 0.55, 
   times = end.year,
   scale = "proportion",
-  apply.effects.as = "addend",
+  apply.effects.as = "value",
   allow.values.less.than.otherwise = FALSE,
   allow.values.greater.than.otherwise = TRUE
 )
 
-preppers_upscale55 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
-                                          prep_persistence_30, 
-                                         code = "prepuse55") # can pass more than 1
-# 80
+prep.pers55 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC), 
+                                          prep_persistence_55, 
+                                         code = "preppers55") # can pass more than 1
+
+prep.pers55.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM, NON.BLACK.NON.HISPANIC.MSM), 
+                                   prep_persistence_55, 
+                                   code = "preppers55msm") # can pass more than 1
+
+prep_persistence_80 <- create.intervention.effect(
+  quantity.name = "oral.prep.persistence",
+  start.time = start.year,
+  effect.values = 0.80, 
+  times = end.year,
+  scale = "proportion",
+  apply.effects.as = "value",
+  allow.values.less.than.otherwise = FALSE,
+  allow.values.greater.than.otherwise = TRUE 
+) 
+
+prep.pers80 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC),
+                                          prep_persistence_80,
+                                          code = "prepers80")
+
+prep.pers80.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM, NON.BLACK.NON.HISPANIC.MSM),
+                                          prep_persistence_80,
+                                          code = "prepers80msm")
+

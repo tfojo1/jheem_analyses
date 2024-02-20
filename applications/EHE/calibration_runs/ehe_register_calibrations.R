@@ -5,10 +5,10 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
-N.ITER = 10000
+N.ITER = 20000
 
 # load params manual
-load("applications/EHE/calibration_runs/params.manual_2024_02_13.Rdata") 
+load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_19.Rdata") 
 
 print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
@@ -71,16 +71,19 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
 #-- REGISTER TRANSMISSION CALIBRATION  --#
 par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('msm.vs.heterosexual.male.idu.susceptibility', 
-                                                                EHE.PARAMETERS.PRIOR@var.names)]
+                                                                EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('sexual.oe', EHE.PARAMETERS.PRIOR@var.names)]
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
-                          likelihood.instructions = one.way.transmission.likelihood.instructions,
+                          # removed pop likelihoods, added aids diagnoses 
+                          likelihood.instructions = one.way.transmission.and.aids.likelihood.instructions, 
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission),
                           n.iter = N.ITER,
                           thin = 50, 
                           fixed.initial.parameter.values = params.manual[par.names.transmission], 
+                          pull.parameters.and.values.from.preceding = F,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get transmission parameters in the general vicinity",

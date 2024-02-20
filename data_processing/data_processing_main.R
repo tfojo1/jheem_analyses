@@ -1363,7 +1363,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  
  ################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
-smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata")
+smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.rdata")
  
  #this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
  #this function currently defaults to population, when using it for mortality you need to define mortality as the outome#
@@ -1396,7 +1396,7 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
            geographic.type.from = 'COUNTY',
            geographic.type.to = 'CBSA',
            details.for.new.data = 'estimated from county data',
-           data.manager = SURVEILLANCE.MANAGER)
+           data.manager = surveillance.manager)
  
  put.msa.data.as.new.source(outcome = 'diagnoses',
                             from.source.name = 'cdc.hiv',
@@ -1405,12 +1405,28 @@ smaller.census.manager = load.data.manager("cached/smaller.census.manager.rdata"
                             geographic.type.from = 'COUNTY',
                             geographic.type.to = 'CBSA',
                             details.for.new.data = 'estimated from county data',
-                            data.manager = SURVEILLANCE.MANAGER)
+                            data.manager = surveillance.manager)
+
+ 
+ ################################################################################
+ #Identify Potential Outliers
+ ################################################################################
+source('../jheem2/R/HELPERS_array_helpers.R')
+source('data_processing/outlier_finder.R')
+
+
+find.outlier.data (outcome = 'diagnosed.prevalence',
+                  data.manager = surveillance.manager,
+                  locations = MSAS.OF.INTEREST,
+                  stratification.dimensions = c("risk", "sex", "age"), #do not include year or location here#
+                  phi = 0.2, #percent change from year to year
+                  theta=  5,
+                    minimum.flagged.change = 2000)
 
  
  ################################################################################
  ###Save surveillance manager####
-  save(surveillance.manager, file="cached/surveillance.manager.rdata")
+  save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
  
 #Also save to Q drive
  save(surveillance.manager, file="Q:/data_managers/surveillance.manager.rdata")
