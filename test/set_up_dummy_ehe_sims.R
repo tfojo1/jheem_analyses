@@ -5,6 +5,9 @@ source('../jheem_analyses/applications/EHE/ehe_specification.R')
 orig.root.dir = ROOT.DIR
 set.jheem.root.directory(LAPTOP.ROOT.DIR)
 
+# Pull default params
+params = suppressWarnings(get.medians(EHE.PARAMETERS.PRIOR))
+params['global.trate'] = 0.075
 
 # set up baltimore
 engine = create.jheem.engine('ehe', 'C.12580', 2025)
