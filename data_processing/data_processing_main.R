@@ -1413,12 +1413,16 @@ smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.
  ################################################################################
 source('../jheem2/R/HELPERS_array_helpers.R')
 source('data_processing/outlier_finder.R')
- 
-outlier.df <- get.outliers.for.outcome(outcome = 'diagnosed.prevalence',
-                          data.manager = surveillance.manager,
-                          locations = MSAS.OF.INTEREST,
-                          percent.change.per.year= 0.2, 
-                          ignore.below= 100)
+
+
+find.outlier.data (outcome = 'diagnosed.prevalence',
+                  data.manager = surveillance.manager,
+                  locations = MSAS.OF.INTEREST,
+                  stratification.dimensions = c("risk", "sex", "age"), #do not include year or location here#
+                  phi = 0.2, #percent change from year to year
+                  theta=  5,
+                    minimum.flagged.change = 2000)
+
  
  ################################################################################
  ###Save surveillance manager####

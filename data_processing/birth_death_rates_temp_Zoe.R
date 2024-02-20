@@ -2,6 +2,8 @@
 # library(jheem2)
 # library(locations)
 
+source('../jheem2/R/HELPERS_array_helpers.R')
+
 # TEST CODE
 if (1==2)
 {
@@ -104,22 +106,26 @@ test <- function(msa.name,
   counties.in.states.and.msa = lapply(counties.in.states, function(counties.in.this.state){
     intersect(counties.in.this.msa, counties.in.this.state)
   })
-  browser()
-  #2-1-24 this is where I'm starting off
+
+  #Creates a list of the proportion that each state contributes to the MSA
+  #Then we turn this list into an array of states and their proportions
   list.of.states.proportions.in.msa = lapply(counties.in.states.and.msa, function(msa.counties.in.each.state){
     states.population = census.manager$pull(outcome='population', location=msa.counties.in.each.state, year = 2006:2015, keep.dimensions = c('age', 'race', 'ethnicity', 'sex'))
     states.proportion = states.population/msa.population 
   }) #Returns list of one array per state
+    current.dimnames = dimnames(list.of.states.proportions.in.msa[[1]])
+    new.dimnames = c(current.dimnames, list(location = c("MA", "NH")))
 
-  
-  #2-16-24: You need to change the list of arrays (list.of.states.proportions.in.msa) into a stacked array with the same dimensions as state.metro.death.rate so you can multiply them
-  #To do this and keep data in the correct place, use Todd's function 'expand.array'
-  expanded.dimnames = list(age, race, ethnicity, sex, source=c('cdc_wonder', 'census.population'))
-  #REMEBER FOR THE SQUISHING IT'S THE STATES IN THE LIST
-  #lol this did not work
-  proper.smoosh.array = array(list.of.states.proportions.in.msa[[1]], list.of.states.proportions.in.msa[[2]])
-  
-  
+    combined.state.proportion.array = array(c(list.of.states.proportions.in.msa[[1]], list.of.states.proportions.in.msa[[2]]), dim=sapply(new.dimnames, length), dimnames= new.dimnames)
+    #QUESTION: How to properly use this function Todd wrote?
+    # combined.state.proportion.array = expand.array(to.expand=(list.of.states.proportions.in.msa[[1]], list.of.states.proportions.in.msa[[2]]), 
+    #                                                target.dim.names = new.dimnames)
+    
+
+  #Next issue: you are going to attempt to multiply arrays but they have different categories for their dimensions
+    final.msa.death.rate = (combined.state.proportion.array * state.metro.death.rate) #need to be the same size with dimnames in the same order
+    
+    
   #Apply weights to create a final scaled mortality rate
   #final will be array stratified by age, race, eth, sex
   #Could have different array for each states and multiple it by the metro death rate array (then add all together)
