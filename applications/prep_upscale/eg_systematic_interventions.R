@@ -9,7 +9,8 @@ if (1==2)
 CALIBRATION.CODE = NULL #for now, we are going to use 'uncalibrated' (ie, manually generated) simulations
 LOCATIONS = c('C.12580','C.33100') # for now, Baltimore and Miami
 
-PREP.UPSCALE.INTERVENTION.CODES = c('yourcode1', 'yourcode2') #@padma - update this
+PREP.UPSCALE.INTERVENTION.CODES = c('msmprepuse10', 'msmprepuse25',
+                                    'preppers30msm', 'preppers55msm', 'preppers80msm') #@padma - update this
 
 # Build a simset collection of the cities and interventions you want to consider
 collection = create.simset.collection(version='ehe',
@@ -31,3 +32,5 @@ results = collection$get(outcomes = c('incidence','population'),
 
 
 #you should be able to get your irr's by dividing the 'incidence' values by the 'population' values
+
+results[,,"incidence",,"msmprepuse10"]
