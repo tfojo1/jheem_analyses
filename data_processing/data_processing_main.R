@@ -1408,20 +1408,28 @@ smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.
                             data.manager = surveillance.manager)
 
  
- ################################################################################
+################################################################################
  #Identify Potential Outliers
- ################################################################################
-source('../jheem2/R/HELPERS_array_helpers.R')
-source('data_processing/outlier_finder.R')
+################################################################################
+# source('../jheem2/R/HELPERS_array_helpers.R')
+# source('data_processing/outlier_finder.R')
 
-
-find.outlier.data (outcome = 'diagnosed.prevalence',
-                  data.manager = surveillance.manager,
-                  locations = MSAS.OF.INTEREST,
-                  stratification.dimensions = c("risk", "sex", "age"), #do not include year or location here#
-                  phi = 0.2, #percent change from year to year
-                  theta=  5,
-                    minimum.flagged.change = 2000)
+##Identify outliers
+#  outlier.df <- find.outlier.data (outcome = 'diagnosed.prevalence',
+#                    data.manager = surveillance.manager,
+#                    locations = MSAS.OF.INTEREST, #need to source locations of interest code for this
+#                    stratification.dimensions = c("risk")) #do not include year or location here# #currently only works at one stratification at a time#
+#  
+# ##Create corrected vector (Below is a example)
+#  corrections = rep(T, 59)
+ 
+###Add in corrected vector (*MUST KEEP A RECORD OF THIS)
+# outlier.df.corrected <- find.outlier.data (outcome = 'diagnosed.prevalence',
+#                   data.manager = surveillance.manager,
+#                   locations = MSAS.OF.INTEREST,
+#                   stratification.dimensions = c("risk"),
+#                   adjudication.data.frame = outlier.df,
+#                   adjudication.vector = corrections) #do not include year or location here# #currently only works at one stratification at a time#
 
  
  ################################################################################
