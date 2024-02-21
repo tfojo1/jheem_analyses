@@ -73,8 +73,6 @@ census.manager$register.parent.source('NCHS', full.name = 'National Center for H
 census.manager$register.source('census.population', parent.source= "census", full.name = "Census Population Data", short.name='census.population')
 census.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
 census.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
-data.manager$register.source('census.aggregated.county', parent.source= "NCHS", full.name = 'Census Aggregated County', short.name = 'census aggd county') #Note this is for the aggregated county data being used to represent MSAs for deaths
-
 
 census.manager$register.ontology(
   'census.cdc.wonder.population',
@@ -334,19 +332,7 @@ for (data in county_deaths) {
     details = 'Census Reporting')
 }
 
-################################################################################
-###Put- Sum deaths by county into deaths by MSA using this code/function
-################################################################################
-source('commoncode/locations_of_interest.R')
-source('data_processing/simple_aggregate_county_to_msa_script.R')
 
-get.msa.totals.from.county.simple = function(outcome = 'deaths', # deaths
-                                             metric='estimate',
-                                             msas= MSAS.OF.INTEREST, # MSAS.OF.INTEREST
-                                             source.from, # census.deaths
-                                             source.to, # census.deaths.aggregated or something?
-                                             details.for.put,
-                                             census.manager= census.manager)
 ################################################################################
                   ###Save Census Manager###
 ################################################################################ 
