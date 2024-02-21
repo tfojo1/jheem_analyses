@@ -7,14 +7,19 @@ params = sim$parameters[,1]
 params.manual = params
 engine = create.jheem.engine('ehe',sim$location,end.year = 2030) 
 
-# I am having a hard time making any improvements with these - going to just give them to be sampled instead 
-params.manual["msm.incident.idu.multiplier.0"] = 0.9*params["msm.incident.idu.multiplier.0"]
-params.manual["black.incident.idu.multiplier.0"] = 1*params["black.incident.idu.multiplier.0"]
-params.manual["other.incident.idu.multiplier.0"] = 0.75*params["other.incident.idu.multiplier.0"]
+save(params.manual,file="applications/EHE/calibration_runs/params.manual_2024_02_21.Rdata")
 
-params.manual["msm.vs.heterosexual.male.idu.susceptibility.rr.0"] = 1*params["msm.vs.heterosexual.male.idu.susceptibility.rr.0"]
-params.manual["msm.vs.heterosexual.male.idu.susceptibility.rr.1"] = 1*params["msm.vs.heterosexual.male.idu.susceptibility.rr.1"]
-params.manual["msm.vs.heterosexual.male.idu.susceptibility.rr.peak"] = 1.05*params["msm.vs.heterosexual.male.idu.susceptibility.rr.peak"]
+if(1==2){
+  # I am having a hard time making any improvements with these - going to just give them to be sampled instead 
+  params.manual["msm.incident.idu.multiplier.0"] = 0.9*params["msm.incident.idu.multiplier.0"]
+  params.manual["black.incident.idu.multiplier.0"] = 1*params["black.incident.idu.multiplier.0"]
+  params.manual["other.incident.idu.multiplier.0"] = 0.75*params["other.incident.idu.multiplier.0"]
+  
+  params.manual["msm.vs.heterosexual.male.idu.susceptibility.rr.0"] = 1*params["msm.vs.heterosexual.male.idu.susceptibility.rr.0"]
+  params.manual["msm.vs.heterosexual.male.idu.susceptibility.rr.1"] = 1*params["msm.vs.heterosexual.male.idu.susceptibility.rr.1"]
+  params.manual["msm.vs.heterosexual.male.idu.susceptibility.rr.peak"] = 1.05*params["msm.vs.heterosexual.male.idu.susceptibility.rr.peak"]
+  
+}
 
 sim.manual = engine$run(parameters = params.manual) 
 
