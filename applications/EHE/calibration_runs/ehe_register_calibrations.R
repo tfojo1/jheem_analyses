@@ -72,7 +72,8 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
 par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('msm.vs.heterosexual.male.idu.susceptibility', 
                                                                 EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('sexual.oe', EHE.PARAMETERS.PRIOR@var.names)]
+                                                          grepl('sexual.oe', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('incident.idu', EHE.PARAMETERS.PRIOR@var.names)]
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           # removed pop likelihoods, added aids diagnoses 
