@@ -79,38 +79,26 @@ upscale_table <- function(intervention.code, intervention.name){
   hisp.irr <- colMeans(hispanic.msm.ir/other.msm.ir) # hisp msm vs other msm IRR
   black.hisp.irr <- colMeans(black.hisp.msm.ir/other.msm.ir) # black & hisp msm vs other msm IRR
   
-  # print results
-  # 
-  # print(paste("Reduction in Incidence among Black MSM population with", intervention.name))
-  # print(black.id)
-  # 
-  # print(paste("Reduction in Incidence among Hispanic MSM population with", intervention.name))
-  # print(hisp.id)
-  # 
-  # print(paste("Reduction in Incidence among Black and Hispanic MSM population with", intervention.name))
-  # print(black.hisp.id)
-  # 
-  # print(paste("Incidence Rate Ratio between Black MSM versus Other MSM with", intervention.name))
-  # print(black.irr)
-  # 
-  # print(paste("Incidence Rate Ratio between Hispanic MSM versus Other MSM with", intervention.name))
-  # print(hisp.irr)
-  # 
-  # print(paste("Incidence Rate Ratio between Black and Hispanic MSM versus Other MSM with", intervention.name))
-  # print(black.hisp.irr)
+  black.irr.ci <- quantile(black.irr, probs = c(0.025, 0.975))
+  hisp.irr.ci <- quantile(hisp.irr, probs = c(0.025, 0.975))
+  black.hisp.irr.ci <- quantile(black.hisp.irr, probs = c(0.025, 0.975))
   
-  # Creating a data frame for results
+  
+  # creating a data frame for results
   results_df <- data.frame(
     intervention = intervention.name,
     reduction_Black_MSM = black.id,
     reduction_Hispanic_MSM = hisp.id,
     reduction_Black_and_Hispanic_MSM = black.hisp.id,
-    irr_Black_MSM_vs_Other_MSM = black.irr,
-    irr_Hispanic_MSM_vs_Other_MSM = hisp.irr,
-    irr_Black_and_Hispanic_MSM_vs_Other_MSM = black.hisp.irr
+    irr_Black_MSM = black.irr,
+    irr_Black_CI = black.irr.ci,
+    irr_Hispanic_MSM = hisp.irr,
+    irr_Hispanic_CI = hisp.ci,
+    irr_Black_and_Hispanic_MSM = black.hisp.irr,
+    irr_BlackHispanic_CI = black.hisp.irr.ci,
   ) 
   
-  # Transpose the data frame
+  # transpose the data frame
   results_df <- as.data.frame(t(results_df))
   
   return(results_df)
