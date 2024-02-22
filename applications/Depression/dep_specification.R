@@ -2,8 +2,8 @@
 
 ## source dependencies
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
-source('applications/Depression/dep_parameters.R')
-source('applications/Depression/dep_parameter_mapping.R')
+source('../jheem_analyses/applications/Depression/dep_parameters.R')
+source('../jheem_analyses/applications/Depression/dep_parameter_mapping.R')
 
 
 DEP.SPECIFICATION <- create.jheem.specification(version="dep", 

@@ -15,7 +15,7 @@ DEP.PARAMETERS.PRIOR <- join.distributions(
   age4.depression.proportion.tx.or     = Lognormal.Distribution(0, log(2)/2),
   age5.depression.proportion.tx.or     = Lognormal.Distribution(0, log(2)/2),
   
-  white.depression.proportion.tx.or    = Lognormal.Distribution(0, log(2)/2), ## make relative to white?
+  other.depression.proportion.tx.or    = Lognormal.Distribution(0, log(2)/2), ## make relative to white?
   black.depression.proportion.tx.or    = Lognormal.Distribution(0, log(2)/2),
   hispanic.depression.proportion.tx.or = Lognormal.Distribution(0, log(2)/2),
   
@@ -34,7 +34,7 @@ DEP.PARAMETERS.PRIOR <- join.distributions(
   age4.depression.incidence.rr     = Lognormal.Distribution(0, log(2)/2), # 45-54
   age5.depression.incidence.rr     = Lognormal.Distribution(0, log(2)/2), # 55+
   
-  white.depression.incidence.rr    = Lognormal.Distribution(0, log(2)/2), # no difference from general population by race
+  other.depression.incidence.rr    = Lognormal.Distribution(0, log(2)/2), # no difference from general population by race
   black.depression.incidence.rr    = Lognormal.Distribution(0, log(2)/2),
   hispanic.depression.incidence.rr = Lognormal.Distribution(0, log(2)/2),
   
