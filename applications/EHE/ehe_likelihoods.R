@@ -3,8 +3,7 @@
 # population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, AIDS diagnoses
 
 # TO DO: 
-# fix year range issue: AIDS deaths
-# fix aggregations to MSA level: prep uptake, prep indications
+# fix year range issue: AIDS deaths (should be fixed with next surv manager)
 # nested proportions: suppression,  proportion tested, awareness, IDU (heroin/cocaine ratios)
 
 #-- POPULATION  --#
@@ -134,6 +133,15 @@ one.way.transmission.and.aids.likelihood.instructions =
   join.likelihood.instructions(race.risk.one.way.new.diagnoses.likelihood.instructions,
                                race.risk.one.way.prevalence.likelihood.instructions,
                                aids.diagnoses.likelihood.instructions
+                               
+  )
+
+#-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
+one.way.transmission.aids.pop.likelihood.instructions = 
+  join.likelihood.instructions(race.risk.one.way.new.diagnoses.likelihood.instructions,
+                               race.risk.one.way.prevalence.likelihood.instructions,
+                               aids.diagnoses.likelihood.instructions,
+                               population.likelihood.instructions
                                
   )
 
