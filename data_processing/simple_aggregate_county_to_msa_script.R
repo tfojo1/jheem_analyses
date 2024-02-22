@@ -7,13 +7,14 @@ get.msa.totals.from.county.simple = function(outcome, # deaths
                                              source.from, # census.deaths
                                              source.to, # census.deaths.aggregated or something?
                                              details.for.put,
-                                             census.manager)
+                                             data.manager.from,
+                                             data.manager.to)
 {
     error.prefix = paste0("Error aggregating county data to msa totals for outcome '", outcome, "'")
     for (location in msas) {
         counties = locations::get.contained.locations(location, "county")
-        county.data.all.ontologies = census.manager$data[[outcome]][[metric]][[source.from]]
-        county.url.all.ontologies = census.manager$url[[outcome]][[metric]][[source.from]]
+        county.data.all.ontologies = data.manager.from$data[[outcome]][[metric]][[source.from]]
+        county.url.all.ontologies = data.manager.from$url[[outcome]][[metric]][[source.from]]
         
         for (ont.name in names(county.data.all.ontologies)) {
             
@@ -53,15 +54,15 @@ get.msa.totals.from.county.simple = function(outcome, # deaths
                     stop(paste0(error.prefix, "'", outcome, "'data for ontology '", ont.name, "' do not all have the same 'url'"))
 
                 # put data
-                census.manager$put(data = data.aggregated.to.msa.total,
-                                   outcome = outcome,
-                                   metric = metric,
-                                   source = source.to,
-                                   ontology.name = ont.name,
-                                   dimension.values = list(location=location),
-                                   url = url,
-                                   details = details.for.put,
-                                   allow.na.to.overwrite = F)
+                data.manager.to$put(data = data.aggregated.to.msa.total,
+                                    outcome = outcome,
+                                    metric = metric,
+                                    source = source.to,
+                                    ontology.name = ont.name,
+                                    dimension.values = list(location=location),
+                                    url = url,
+                                    details = details.for.put,
+                                    allow.na.to.overwrite = F)
                 
                 }
             
