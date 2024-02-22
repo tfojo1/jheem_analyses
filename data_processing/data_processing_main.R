@@ -328,6 +328,17 @@ data.manager$register.outcome(
     units = 'population',
     description = "AIDS Deaths"))
 
+#Registering 'deaths' as an outcome for the deaths from the census manager aggregated from county to MSA in the surveillance manager
+#this is general mortality (NOT hiv specific deaths)
+data.manager$register.outcome(
+  'deaths',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Deaths',
+    axis.name = 'Deaths',
+    units = 'deaths',
+    description = "Deaths"))
+
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
@@ -360,8 +371,10 @@ data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", 
 data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids')
 
 #Creating these separately bc they have separate parent sources
-data.manager$register.source('prep.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP Aggregated County', short.name = 'prep aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('prep.aidsvu.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP AIDS Vu Aggregated County', short.name = 'prep aidsvu aggd county') #For aggregated prep data from AIDS Vu
+data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP CDC Aggregated County', short.name = 'prep cdc aggd county') #For aggregated prep data from Atlas Plus (CDC)
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated')
 
 
 data.manager$register.ontology(
@@ -1392,7 +1405,7 @@ source('../jheem2/R/HELPERS_array_helpers.R')
  #Prep data
  put.msa.data.as.new.source(outcome = 'prep',
                             from.source.name = 'cdc.prep',
-                            to.source.name = 'prep.aggregated.county',
+                            to.source.name = 'prep.cdc.aggregated.county',
                             to.locations =  MSAS.OF.INTEREST,
                             geographic.type.from = 'COUNTY',
                             geographic.type.to = 'CBSA',
@@ -1401,7 +1414,7 @@ source('../jheem2/R/HELPERS_array_helpers.R')
  
   put.msa.data.as.new.source(outcome = 'prep',
                             from.source.name = 'aidsvu',
-                            to.source.name = 'prep.aggregated.county',
+                            to.source.name = 'prep.aidsvu.aggregated.county',
                             to.locations =  MSAS.OF.INTEREST,
                             geographic.type.from = 'COUNTY',
                             geographic.type.to = 'CBSA',
@@ -1421,18 +1434,17 @@ source('../jheem2/R/HELPERS_array_helpers.R')
  ################################################################################
  ###Put- Sum deaths by county into deaths by MSA using this code/function
  ################################################################################
- # data.manager$register.source('census.aggregated.county', parent.source= "NCHS", full.name = 'Census Aggregated County', short.name = 'census aggd county') #Note this is for the aggregated county data being used to represent MSAs for deaths
- # 
- # 
- # source('data_processing/simple_aggregate_county_to_msa_script.R')
- # 
- # get.msa.totals.from.county.simple = function(outcome = 'deaths', 
- #                                              metric='estimate',
- #                                              msas= MSAS.OF.INTEREST, 
- #                                              source.from= 'census.deaths', 
- #                                              source.to= 'census.aggregated.county', 
- #                                              details.for.put= 'estimated from county data',
- #                                              census.manager= smaller.census.manager)
+  source('data_processing/simple_aggregate_county_to_msa_script.R')
+
+ get.msa.totals.from.county.simple(outcome= 'deaths', 
+                                   metric='estimate',
+                                   msas= MSAS.OF.INTEREST,
+                                   source.from = 'census.deaths', 
+                                   source.to='census.deaths.aggregated',
+                                   details.for.put= 'estimated from county data',
+                                   data.manager.from=smaller.census.manager,
+                                   data.manager.to= surveillance.manager)
+ 
   
 ################################################################################
  #Identify Potential Outliers
