@@ -127,8 +127,8 @@ year_inc <- function(int.year, race, sex = "msm", intervention.code){
   }
 }
 
-# to plot reduction in incidence by location
-plotinc_byloc <- function(race, intervention.code, intervention.name){
+# to plot reduction in incidence by code
+plotinc_bycode <- function(race, intervention.code, intervention.name){
   inc_df <- as.data.frame(year_inc(2025, race, "msm", intervention.code))
   inc_df["year_2035"] <- as.data.frame(year_inc(2035, race, "msm", intervention.code))
   colnames(inc_df) <- c("year_2025", "year_2035")
@@ -163,46 +163,76 @@ otherinc_plots <- list()
 for (i in 1:length(prep.upscale.intervention.names)) {
   blackinc_plots[[prep.upscale.intervention.names[i]]] <- plotinc_byloc("black",PREP.UPSCALE.INTERVENTION.CODES[i],
                                                          prep.upscale.intervention.names[i])
-  hispinc_plots[[prep.upscale.intervention.names[i]]] <- plotinc_byloc("hispanic",PREP.UPSCALE.INTERVENTION.CODES[i], prep.upscale.intervention.names[i])
-  otherinc_plots[[prep.upscale.intervention.names[i]]] <- plotinc_byloc("other",PREP.UPSCALE.INTERVENTION.CODES[i], prep.upscale.intervention.names[i])
+  hispinc_plots[[prep.upscale.intervention.names[i]]] <- plotinc_byloc("hispanic",PREP.UPSCALE.INTERVENTION.CODES[i], 
+                                                                       prep.upscale.intervention.names[i])
+  otherinc_plots[[prep.upscale.intervention.names[i]]] <- plotinc_byloc("other",PREP.UPSCALE.INTERVENTION.CODES[i],
+                                                                        prep.upscale.intervention.names[i])
 }
 
+plotinc_bylocation <- function(intervention.codes, intervention.names, loc) {
+  all_combined_inc_long <- list()  # Initialize an empty list to store combined data for all races
+  
+  for (race in c("black", "hispanic", "other")) {
+    combined_inc_long <- data.frame()  # Initialize an empty dataframe to store combined data for current race
+    
+    for (i in seq_along(intervention.codes)) {
+      inc_df <- as.data.frame(year_inc(2025, race, "msm", intervention.codes[i]))
+      inc_df["year_2035"] <- as.data.frame(year_inc(2035, race, "msm", intervention.codes[i]))
+      colnames(inc_df) <- c("year_2025", "year_2035")
+      inc_df$location <- rownames(inc_df)
+      
+      inc_long <- pivot_longer(inc_df,
+                               cols = starts_with("year_"),
+                               names_to = c(".value", "Year"),  # separate entity and year
+                               names_pattern = "^(.*?)_(.*)$",  # regex pattern to separate entity and year
+                               values_to = "Value") %>% dplyr::rename(ir = year, year = Year)
+    
+      inc_long <- subset(inc_long, location == loc)
+  
+      inc_long$intervention_code <- rep(intervention.codes[i], length(inc_long$ir))
+      inc_long$race <- rep(race, length(inc_long$ir))
+      
+      # Append current inc_long to combined_inc_long
+      combined_inc_long <- rbind(combined_inc_long, inc_long)
+    }
+    
+    # Append combined_inc_long for current race to all_combined_inc_long list
+    all_combined_inc_long[[race]] <- combined_inc_long
+  }
+  
+  all_combined_inc_long <- do.call(rbind, all_combined_inc_long)
+  
+  print(all_combined_inc_long)
+
+  p <- ggplot(data = all_combined_inc_long, aes(year, ir*100000, color = intervention_code)) +
+    geom_point(aes(color = intervention_code)) +
+    geom_line(aes(group = intervention_code, color = intervention_code)) +
+    labs(x = "Year", y = "Incidence Rate (per 100,000 population)",
+         title = "Reduction in HIV incidence from 2025 to 2035 with Different Interventions",
+         subtitle = paste("In location", loc)) +
+    facet_wrap(~race) +  
+    theme_minimal()
+  
+  return(p)
+}
+
+for(l in LOCATIONS){
+  print(plotinc_bylocation(PREP.UPSCALE.INTERVENTION.CODES, 
+                     prep.upscale.intervention.names, l))
+}
+
+
+
+
+# patchwork stuff ----
 library(patchwork)
 (blackinc_plots[[1]]+blackinc_plots[[2]]) / ((blackinc_plots[[3]]+blackinc_plots[[4]])+(blackinc_plots[[5]]))
+(hispinc_plots[[1]]+hispinc_plots[[2]]) / ((hispinc_plots[[3]]+hispinc_plots[[4]])+(hispinc_plots[[5]]))
+(otherinc_plots[[1]]+otherinc_plots[[2]]) / ((otherinc_plots[[3]]+otherinc_plots[[4]])+(otherinc_plots[[5]]))
 
 
 
-# 
-# # to plot reduction in incidence by location
-# plotinc_bycode <- function(race, intervention.code, intervention.name, location){
-#   inc_df <- as.data.frame(year_inc(2025, race, "msm", intervention.code))
-#   inc_df["year_2035"] <- as.data.frame(year_inc(2035, race, "msm", intervention.code))
-#   colnames(inc_df) <- c("year_2025", "year_2035")
-#   inc_df$location <- rownames(inc_df)
-#   
-#   inc_long <- pivot_longer(inc_df, 
-#                            cols = starts_with("year_"), 
-#                            names_to = c(".value", "Year"),  # separate entity and year
-#                            names_pattern = "^(.*?)_(.*)$",  # regex pattern to separate entity and year
-#                            values_to = "Value") %>% dplyr::rename(ir = year, year = Year)
-#   
-#   if(race == "other"){
-#     race <- "Non-Black non-Hispanic"
-#   }
-#   
-#   # print(inc_long)
-#   
-#   inc_long <- inc_long |> dplyr::filter(location == location)
-#   
-#   return(ggplot(data = inc_long, aes(year,ir*100000)) +
-#            geom_point(aes(color = location)) +
-#            geom_line(aes(group = location, color = location)) +
-#            labs(x = "Year", y = "Incidence Rate (per 100,000 population)",
-#                 title = paste("Reduction in HIV incidence from 2025 to 2035 with",
-#                               intervention.name), 
-#                 subtitle = paste("Among the", race, "population")) +
-#            theme_minimal())
-# }
+
 
 #   
 # blackinc_df <- as.data.frame(year_inc(2025, "black", intervention.code = "msmprepuse10")) %>% 
