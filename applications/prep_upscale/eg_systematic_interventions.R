@@ -91,11 +91,14 @@ upscale_table <- function(intervention.code, intervention.name){
     reduction_Hispanic_MSM = hisp.id,
     reduction_Black_and_Hispanic_MSM = black.hisp.id,
     irr_Black_MSM = black.irr,
-    irr_Black_CI = black.irr.ci,
+    irr_Black_LCI = black.irr.ci[1],
+    irr_Black_UCI = black.irr.ci[2],
     irr_Hispanic_MSM = hisp.irr,
-    irr_Hispanic_CI = hisp.ci,
+    irr_Hispanic_LCI = hisp.irr.ci[1],
+    irr_Hispanic_UCI = hisp.irr.ci[2],
     irr_Black_and_Hispanic_MSM = black.hisp.irr,
-    irr_BlackHispanic_CI = black.hisp.irr.ci,
+    irr_BlackHispanic_LCI = black.hisp.irr.ci[1],
+    irr_BlackHispanic_UCI = black.hisp.irr.ci[2]
   ) 
   
   # transpose the data frame
