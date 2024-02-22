@@ -73,10 +73,9 @@ full.intervention = create.criteria.based.intervention(base.intervention = base.
                                                                             uninitiated.multiplier = 'proportion.staying'),
                                                       #initial.parameter.values = function(sim){
                                                       #    2 / sim$get('testing', year='2026')},
-                                                       initial.parameter.values = c(testing.multiplier = 10,
-                                                                                   unsuppressed.multiplier = 0.05,
-                                                                                   uninitiated.multiplier = 0.5),
+                                                       initial.parameter.values = c(testing.multiplier = 5,
+                                                                                   unsuppressed.multiplier = 0.1,
+                                                                                   uninitiated.multiplier = 0.75),
                                                        #to limit computational time
                                                       max.iterations = 50,
                                                       max.failure.rate = 0.05)
-
