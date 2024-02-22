@@ -105,9 +105,9 @@ prep_persistence_80 <- create.intervention.effect(
 
 prep.pers80 <- create.intervention(c(BLACK, HISPANIC, NON.BLACK.NON.HISPANIC),
                                           prep_persistence_80,
-                                          code = "prepers80")
+                                          code = "preppers80")
 
 prep.pers80.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM, NON.BLACK.NON.HISPANIC.MSM),
                                           prep_persistence_80,
-                                          code = "prepers80msm")
+                                          code = "preppers80msm")
 

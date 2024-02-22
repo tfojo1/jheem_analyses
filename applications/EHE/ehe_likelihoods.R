@@ -1,10 +1,11 @@
 
 # LIKELIHOODS INCLUDED: 
-# population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, suppression 
-
+# population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, AIDS diagnoses
 
 # TO DO: 
-# AIDS diagnoses, AIDS deaths, proportion tested, awareness, PrEP, IDU (heroin/cocaine ratios)
+# fix year range issue: AIDS deaths
+# fix aggregations to MSA level: prep uptake, prep indications
+# nested proportions: suppression,  proportion tested, awareness, IDU (heroin/cocaine ratios)
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -269,7 +270,7 @@ aids.deaths.likelihood.instructions = create.basic.likelihood.instructions(outco
                                                                            outcome.for.sim = "aids.deaths", 
                                                                            dimensions = c("sex","race","risk"),
                                                                            levels.of.stratification = c(0,1), 
-                                                                           from.year = as.integer(1980), 
+                                                                           from.year = as.integer(1981), 
                                                                            to.year = as.integer(2001),
                                                                            observation.correlation.form = 'compound.symmetry', 
                                                                            measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up 
@@ -279,15 +280,31 @@ aids.deaths.likelihood.instructions = create.basic.likelihood.instructions(outco
 
 #-- PREP UPTAKE  --#
 prep.uptake.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "prep",
-                                                                              outcome.for.sim = "prep.uptake", 
-                                                                              dimensions = c("age","sex","race"),
-                                                                              levels.of.stratification = c(0,1,2), 
-                                                                              from.year = as.integer(2007),
-                                                                              observation.correlation.form = 'compound.symmetry', 
-                                                                              measurement.error.coefficient.of.variance = 0.03, 
-                                                                              weights = list(1), 
-                                                                              equalize.weight.by.year = T 
+                                                                           outcome.for.sim = "prep.uptake", 
+                                                                           dimensions = c("age","sex","race"),
+                                                                           levels.of.stratification = c(0,1,2), 
+                                                                           from.year = as.integer(2007),
+                                                                           observation.correlation.form = 'compound.symmetry', 
+                                                                           measurement.error.coefficient.of.variance = 0.03, 
+                                                                           weights = list(1), 
+                                                                           equalize.weight.by.year = T 
 )
+
+#-- PREP INDICATIONS  --#
+# this is an absolute count, not a proportion 
+prep.indications.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "prep.indications",
+                                                                           outcome.for.sim = "prep.indications",
+                                                                           dimensions = c("age","sex"),
+                                                                           levels.of.stratification = c(0,1), 
+                                                                           from.year = 2017, 
+                                                                           to.year = 2018, # they carried forwar 2018 numbers 
+                                                                           observation.correlation.form = 'compound.symmetry', 
+                                                                           measurement.error.coefficient.of.variance = 0.5, # high uncertainty
+                                                                           # ^ this means you can range from 0 to 2x the number of prep indications
+                                                                           weights = list(1), 
+                                                                           equalize.weight.by.year = T 
+)
+
 
 #-- PROPORTION TESTED --#
 if(1==2){

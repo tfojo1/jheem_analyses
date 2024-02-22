@@ -359,6 +359,11 @@ data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = 
 data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports')
 data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids')
 
+#Creating these separately bc they have separate parent sources
+data.manager$register.source('prep.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP Aggregated County', short.name = 'prep aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
+
+
 data.manager$register.ontology(
   'cdc',
   ont = ontology(
@@ -1344,24 +1349,11 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
  }
  
 ################################################################################
- ###Use various pull statements to check that data you put in is correct###
- 
- # x = (data.manager$pull(
- #   outcome = 'diagnoses',
- #   keep.dimensions = c('year', 'age'),
- #   dimension.values = list(sex=c('male', 'female'))))
- # 
- # y =(data.manager$pull(
- #   outcome='hiv.deaths',
- #   keep.dimensions = c('location', 'year')))
- # 
- 
-################################################################################
 ###Rename surveillance manager####
   
  surveillance.manager= data.manager #Add this here so you don't have to change data.manager throughout entire code#
  
- ################################################################################
+################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
 smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.rdata")
  
@@ -1371,24 +1363,13 @@ smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.
  put.msa.data.strict(locations = MSAS.OF.INTEREST, 
                             data.manager = surveillance.manager, 
                             census.manager = smaller.census.manager) 
-
+################################################################################
+ #Create aggregated outcomes 
+  #This is mainly county data being aggregated to MSA level
+################################################################################
+source('../jheem2/R/HELPERS_array_helpers.R')
  
-#Use function to put adult.mortality based on deaths from Census Manager
-#Commenting out this until we have sorted out the calculation of adult.deaths 1-17-24
- #1-19-24 Need to ask Andrew if this is okay now that we decided not to use adult.deaths
- # put.msa.data.strict(census.outcome.name = 'deaths',
- #                     put.outcome.name = 'deaths',
- #                     locations = MSAS.OF.INTEREST,
- #                     contained.geographic.type = 'county',
- #                     fully.stratified.dimensions = 'year',
- #                     put.stratifications = list(),
- #                     age.lower.limit = 13,
- #                     age.penultimate.upper = 84,
- #                     age.upper.limit.name = '85+',
- #                     data.manager = surveillance.manager,
- #                     census.manager = smaller.census.manager)
- 
- #Use function to sum county data into MSA values for diagnosed.prevalence and new diagnoses
+ #CDC Atlas Plus data
  put.msa.data.as.new.source(outcome = 'diagnosed.prevalence',
            from.source.name = 'cdc.hiv',
            to.source.name = 'cdc.aggregated.county',
@@ -1406,22 +1387,73 @@ smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.
                             geographic.type.to = 'CBSA',
                             details.for.new.data = 'estimated from county data',
                             data.manager = surveillance.manager)
+ 
+ #Prep data
+ put.msa.data.as.new.source(outcome = 'prep',
+                            from.source.name = 'cdc.prep',
+                            to.source.name = 'prep.aggregated.county',
+                            to.locations =  MSAS.OF.INTEREST,
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager = surveillance.manager)
+ 
+  put.msa.data.as.new.source(outcome = 'prep',
+                            from.source.name = 'aidsvu',
+                            to.source.name = 'prep.aggregated.county',
+                            to.locations =  MSAS.OF.INTEREST,
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager = surveillance.manager)
+ 
+ put.msa.data.as.new.source(outcome = 'prep.indications',
+                            from.source.name = 'cdc.prep.indications',
+                            to.source.name = 'prep.indications.aggregated.county',
+                            to.locations =  MSAS.OF.INTEREST,
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager = surveillance.manager)
 
  
  ################################################################################
- #Identify Potential Outliers
+ ###Put- Sum deaths by county into deaths by MSA using this code/function
  ################################################################################
-source('../jheem2/R/HELPERS_array_helpers.R')
-source('data_processing/outlier_finder.R')
+ # data.manager$register.source('census.aggregated.county', parent.source= "NCHS", full.name = 'Census Aggregated County', short.name = 'census aggd county') #Note this is for the aggregated county data being used to represent MSAs for deaths
+ # 
+ # 
+ # source('data_processing/simple_aggregate_county_to_msa_script.R')
+ # 
+ # get.msa.totals.from.county.simple = function(outcome = 'deaths', 
+ #                                              metric='estimate',
+ #                                              msas= MSAS.OF.INTEREST, 
+ #                                              source.from= 'census.deaths', 
+ #                                              source.to= 'census.aggregated.county', 
+ #                                              details.for.put= 'estimated from county data',
+ #                                              census.manager= smaller.census.manager)
+  
+################################################################################
+ #Identify Potential Outliers
+################################################################################
+# source('data_processing/outlier_finder.R')
 
-
-find.outlier.data (outcome = 'diagnosed.prevalence',
-                  data.manager = surveillance.manager,
-                  locations = MSAS.OF.INTEREST,
-                  stratification.dimensions = c("risk", "sex", "age"), #do not include year or location here#
-                  phi = 0.2, #percent change from year to year
-                  theta=  5,
-                    minimum.flagged.change = 2000)
+##Identify outliers
+#  outlier.df <- find.outlier.data (outcome = 'diagnosed.prevalence',
+#                    data.manager = surveillance.manager,
+#                    locations = MSAS.OF.INTEREST, #need to source locations of interest code for this
+#                    stratification.dimensions = c("risk")) #do not include year or location here# #currently only works at one stratification at a time#
+#  
+# ##Create corrected vector (Below is a example)
+#  corrections = rep(T, 59)
+ 
+###Add in corrected vector (*MUST KEEP A RECORD OF THIS)
+# outlier.df.corrected <- find.outlier.data (outcome = 'diagnosed.prevalence',
+#                   data.manager = surveillance.manager,
+#                   locations = MSAS.OF.INTEREST,
+#                   stratification.dimensions = c("risk"),
+#                   adjudication.data.frame = outlier.df,
+#                   adjudication.vector = corrections) #do not include year or location here# #currently only works at one stratification at a time#
 
  
  ################################################################################
