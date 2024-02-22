@@ -1,7 +1,5 @@
 ### Model EHE Intervention Effects on Racial Disparity in HIV Incidence
-#test
 
-#Back-end code to run interventions in JHEEM
 #source('../jheem2/R/tests/ENGINE_test.R')
 #source("../jheem_analyses/applications/EHE/ehe_specification.R")
 
@@ -79,3 +77,12 @@ full.intervention = create.criteria.based.intervention(base.intervention = base.
                                                        #to limit computational time
                                                       max.iterations = 50,
                                                       max.failure.rate = 0.05)
+
+test.intervention = create.intervention(WHOLE.POPULATION,
+testing.increase,
+suppression.increase,
+prep.increase, parameter.distribution = join.distributions(
+  testing.multiplier=Uniform.Distribution(4,6),
+  unsuppressed.multiplier=Uniform.Distribution(0.09,0.11),
+  uninitiated.multiplier=Uniform.Distribution(0.7,0.8)
+),code="testdisp")
