@@ -11,17 +11,17 @@ DEP.PARAMETERS.PRIOR <- join.distributions(
   #-Depression treatment
   age1.depression.proportion.tx.or     = Lognormal.Distribution(0, log(2)/2), ## logit function!
   age2.depression.proportion.tx.or     = Lognormal.Distribution(0, log(2)/2),
-  age3.depression.proportion.tx.or     = Lognormal.Distribution(0, log(2)/2), ## make relative to age 3, 35-44yo?
+  age3.depression.proportion.tx.or     = Lognormal.Distribution(0, log(2)/2), 
   age4.depression.proportion.tx.or     = Lognormal.Distribution(0, log(2)/2),
   age5.depression.proportion.tx.or     = Lognormal.Distribution(0, log(2)/2),
   
-  other.depression.proportion.tx.or    = Lognormal.Distribution(0, log(2)/2), ## make relative to white?
+  other.depression.proportion.tx.or    = Lognormal.Distribution(0, log(2)/2), 
   black.depression.proportion.tx.or    = Lognormal.Distribution(0, log(2)/2),
   hispanic.depression.proportion.tx.or = Lognormal.Distribution(0, log(2)/2),
   
   msm.depression.proportion.tx.or      = Lognormal.Distribution(0, log(2)/2),
-  hetero.depression.proportion.tx.or   = Lognormal.Distribution(0, log(2)/2),
-  female.depression.proportion.tx.or   = Lognormal.Distribution(0, log(2)/2), ## make relative to female?
+  heterosexual_male.depression.proportion.tx.or   = Lognormal.Distribution(0, log(2)/2),
+  female.depression.proportion.tx.or   = Lognormal.Distribution(0, log(2)/2), 
   
   idu.prior.depression.proportion.tx.or    = Lognormal.Distribution(0, log(2)/2),
   idu.current.depression.proportion.tx.or  = Lognormal.Distribution(0, log(2)/2),
@@ -39,7 +39,7 @@ DEP.PARAMETERS.PRIOR <- join.distributions(
   hispanic.depression.incidence.rr = Lognormal.Distribution(0, log(2)/2),
   
   msm.depression.incidence.rr      = Lognormal.Distribution(0, log(2)/2), # increased risk, like females *
-  hetero.depression.incidence.rr   = Lognormal.Distribution(0, log(2)/2),
+  heterosexual_male.depression.incidence.rr   = Lognormal.Distribution(0, log(2)/2),
   female.depression.incidence.rr   = Lognormal.Distribution(0, log(2)/2), # females 1.5-2 times more likely to have depression than males
   
   idu.prior.depression.incidence.rr    = Lognormal.Distribution(0, log(2)/2),

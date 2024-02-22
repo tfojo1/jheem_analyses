@@ -42,7 +42,7 @@ register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx",
                                                                        value.is.on.transformed.scale = F), 
                        scale = "proportion")
 
-depression.inc.betas <- array(c(.33/.5, .28/.5, .28/.5, .28/.5, .15/.5), dim=c(age=5),  # add gender
+depression.inc.betas <- array(c(.33/.5, .28/.5, .28/.5, .28/.5, .15/.5), dim=c(age=5),  ## add gender + interaction term ##
                               dimnames = list(age=c("13-24 years", "25-34 years","35-44 years", "45-54 years", "55+ years")))
 
 register.model.element(DEP.SPECIFICATION, name="depression.incidence",
