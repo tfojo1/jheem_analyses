@@ -221,9 +221,6 @@ for(l in LOCATIONS){
                      prep.upscale.intervention.names, l))
 }
 
-
-
-
 # patchwork stuff ----
 library(patchwork)
 (blackinc_plots[[1]]+blackinc_plots[[2]]) / ((blackinc_plots[[3]]+blackinc_plots[[4]])+(blackinc_plots[[5]]))
