@@ -397,6 +397,7 @@ get.proportion.msm.of.male.by.race.functional.form <- function(location, specifi
 {
     best.guess.proportions = get.best.guess.msm.proportions(location = location,
                                                             specification.metadata = specification.metadata,
+                                                            years = DEFAULT.POPULATION.YEARS,
                                                             keep.race = T,
                                                             keep.age = F)
   
