@@ -395,11 +395,17 @@ do.get.empiric.hiv.aging.rates <- function(location,
 
 get.proportion.msm.of.male.by.race.functional.form <- function(location, specification.metadata)
 {
-    best.guess.proportions = get.best.guess.msm.proportions.by.race(location,
-                                                                    specification.metadata = specification.metadata,
-                                                                    years = DEFAULT.POPULATION.YEARS,
-                                                                    min.age = specification.metadata$age.lower.bounds[1],
-                                                                    return.proportions = T)
+    best.guess.proportions = get.best.guess.msm.proportions(location = location,
+                                                            specification.metadata = specification.metadata,
+                                                            years = DEFAULT.POPULATION.YEARS,
+                                                            keep.race = T,
+                                                            keep.age = F)
+  
+    # best.guess.proportions = get.best.guess.msm.proportions.by.race(location,
+    #                                                                 specification.metadata = specification.metadata,
+    #                                                                 years = DEFAULT.POPULATION.YEARS,
+    #                                                                 min.age = specification.metadata$age.lower.bounds[1],
+    #                                                                 return.proportions = T)
     
     #best.guess.proportions = array(best.guess.proportions, 
     #                               dim=c(race=length(best.guess.proportions)),
@@ -409,6 +415,146 @@ get.proportion.msm.of.male.by.race.functional.form <- function(location, specifi
                                   link = 'log',
                                   value.is.on.transformed.scale = F)
 }
+
+
+get.best.guess.msm.proportions <- function(location,
+                                           specification.metadata,
+                                           years = 2013,
+                                           ages = specification.metadata$dim.names$age,
+                                           keep.age = T,
+                                           keep.race = T,
+                                           return.proportions = T)
+{
+    counties = get.contained.locations(location, 'county')
+    states = get.overlapping.locations(location, 'state')
+    
+    # Get county-level proportions
+    proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                         dimension.values = list(location=counties,
+                                                                                 sex='male'))
+    if (is.null(proportion.msm.by.county) || !setequal(counties, dimnames(proportion.msm.by.county)$location))
+        stop(paste0("Cannot get best-guess msm proportions: we don't have data on proportion msm for all counties in location '", location, "'"))
+    
+    proportion.msm.by.county = apply(proportion.msm.by.county, 'location', mean, na.rm=T)
+    if (any(is.na(proportion.msm.by.county)))
+        stop(paste0("Cannot get best-guess msm proportions: we don't have data on proportion msm for all counties in location '", location, "' (we get some NAs)"))
+    
+    # Get number male and flatten race/ethnicity
+    males = CENSUS.MANAGER$pull(outcome = 'population',
+                                keep.dimensions = c('location', 'age','race','ethnicity'),
+                                dimension.values = list(location = counties,
+                                                        year = years,
+                                                        sex = 'male'))[,,,,1]
+    
+    if (is.null(males))
+        stop("Cannot get best-guess msm proportions: we are unable to pull any census data on the number of males")
+    
+    if (is.null(ages))
+        ages = dimnames(males)$age
+        
+    
+    flat.census.reth = c(dimnames(males)$race, 'hispanic')
+    flat.census.reth.mapping = create.ontology.mapping(
+        from.dimensions = c('race','ethnicity'),
+        to.dimensions = 'race',
+        mappings = rbind(
+            cbind(dimnames(males)$race,
+                  'not hispanic',
+                  dimnames(males)$race),
+            cbind(dimnames(males)$race,
+                  'hispanic',
+                  'hispanic')
+        )
+    )
+    
+    
+    males = flat.census.reth.mapping$apply(males)
+    males[males==0] = 1
+    
+    # Estimate a proportion msm for each race
+    raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                           keep.dimensions = c('year','location','race'),
+                                                           dimension.values = list(location = states,
+                                                                                   sex = 'male'))
+    raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
+    
+    proportions.msm.by.race = c(
+        white = as.numeric(raw.proportion.msm.by.race['White']),
+        black = as.numeric(raw.proportion.msm.by.race['Black']),
+        'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['American Indian/Alaska Native']),
+        'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['Asian'] + .1*raw.proportion.msm.by.race['Native Hawaiian/Other Pacific Islander']),
+        hispanic = as.numeric(raw.proportion.msm.by.race['Hispanic'])
+    )
+    proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
+    
+    if (any(is.na(proportions.msm.by.race)))
+        stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
+    
+    # Make a guess as to the n msm
+    first.guess.n.msm = sapply(dimnames(males)$race, function(r){
+        males[,,r] * proportions.msm.by.race[r]
+    })
+    dim.names = dimnames(males)
+    dim(first.guess.n.msm) = sapply(dim.names, length)
+    dimnames(first.guess.n.msm) = dim.names
+    
+    # Scale it to hit the overall proportions in each msm
+    parsed.census.ages = parse.age.strata.names(dimnames(first.guess.n.msm)$age)
+    adult.mask = parsed.census.ages$lower >=13
+    
+    first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,]) / rowSums(males[,adult.mask,])
+    scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county
+    
+    fitted.n.msm = first.guess.n.msm * scale.factor.by.county
+    
+    # Map races
+    if (keep.race)
+    {
+        race.mapping = get.ontology.mapping(from.ontology = dimnames(males)['race'],
+                                            to.ontology = specification.metadata$dim.names['race'])
+        if (is.null(race.mapping))
+            stop("Cannot get best-guess msm proportions: we don't have a mapping from census races to the specification's races")
+        
+        fitted.n.msm = race.mapping$apply(fitted.n.msm)
+        if (return.proportions)
+            males = race.mapping$apply(males)
+    }
+    
+    # Map ages
+    age.mapping = get.ontology.mapping(from.ontology = dimnames(males)['age'],
+                                       to.ontology = list(age=ages))
+    if (is.null(age.mapping))
+        stop("Cannot get best-guess msm proportions: we don't have a mapping from census ages to the specification's age brackets")
+    
+    fitted.n.msm = age.mapping$apply(fitted.n.msm)
+    if (return.proportions)
+        males = age.mapping$apply(males)
+
+    # Marginalize to get the probabilities
+    keep.dimensions = c('age','race')[c(keep.age, keep.race)]
+    
+    if (length(keep.dimensions)==0)
+    {
+        if (return.proportions)
+            sum(fitted.n.msm) / sum(males)
+        else
+            sum(fitted.n.msm)
+    }
+    else
+    {
+        if (return.proportions)
+            rv = apply(fitted.n.msm, keep.dimensions, sum) / apply(males, keep.dimensions, sum)
+        else
+            rv = apply(fitted.n.msm, keep.dimensions, sum)
+        
+        dim.names = dimnames(fitted.n.msm)[keep.dimensions]
+        
+        dim(rv) = sapply(dim.names, length)
+        dimnames(rv) = dim.names
+        rv
+    }
+}
+
 
 # Assumes that within each county, relative risks of being MSM are as in MSM.PROPORTIONS
 # and total risk of being MSM is as per read.msm.proportions
@@ -421,6 +567,7 @@ get.best.guess.msm.proportions.by.race <- function(location,
                                                    return.proportions=T,
                                                    keep.ages = F)
 {
+  stop("This function is deprecated - use get.best.guess.msm.proportions() instead")
     fips = get.contained.locations(location, 'county')
     
     proportion.msm.by.location = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
@@ -474,7 +621,7 @@ get.best.guess.msm.proportions.by.race <- function(location,
         stop(paste0("Cannot get best-guess msm proportions: we don't have census data for all counties in location '", location, "'"))
     
     if (names(dim(males))[1]!='location')
-      stop(paste0("Cannot get best-guess msm proportions: we assume that 'location' is the first dimension in the census data"))
+        stop(paste0("Cannot get best-guess msm proportions: we assume that 'location' is the first dimension in the census data"))
     if (all(dimnames(males)$race != 'white') || all(dimnames(males)$race != 'black'))
         stop("Cannot get best-guess msm proportions: we assume that population data include 'black' and 'white' race categories")
     if (all(dimnames(males)$ethnicity != 'hispanic') || all(dimnames(males)$race != 'black'))
@@ -482,12 +629,12 @@ get.best.guess.msm.proportions.by.race <- function(location,
     
     msm.proportions.aligned.to.males = sapply(dimnames(males)$ethnicity, function(e){
         if (e=='hispanic')
-            rep(as.numeric(msm.proportions.by.race['hispanic']), dim(males)['race'])
+            rep(as.numeric(proportion.msm.by.race['hispanic']), dim(males)['race'])
         else
           sapply(dimnames(males)$race, function(r){
-              rv = as.numeric(msm.proportions.by.race[r])
+              rv = as.numeric(proportion.msm.by.race[r])
               if (is.na(rv))
-                  as.numeric(msm.proportions.by.race['other'])
+                  as.numeric(proportion.msm.by.race['other'])
               else
                   rv
           })
@@ -866,15 +1013,28 @@ get.female.single.year.age.counts <- function(location, population.years=DEFAULT
 get.msm.single.year.age.counts <- function(location, specification.metadata,
                                            population.years=DEFAULT.POPULATION.YEARS)
 {
-    rv = rowSums(get.best.guess.msm.proportions.by.race(location,
-                                                        specification.metadata = specification.metadata,
-                                                        years = population.years,
-                                                        return.proportions = F,
-                                                        min.age = 0,
-                                                        keep.ages = T))
-    ages = parse.age.strata.names(names(rv))$lower
-    dim(rv) = c(age=length(rv))
-    dimnames(rv) = list(age=ages)
+    # rv = rowSums(get.best.guess.msm.proportions.by.race(location,
+    #                                                     specification.metadata = specification.metadata,
+    #                                                     years = population.years,
+    #                                                     return.proportions = F,
+    #                                                     min.age = 0,
+    #                                                     keep.ages = T))
+    # 
+    # ages = parse.age.strata.names(names(rv))$lower
+    # dim(rv) = c(age=length(rv))
+    # dimnames(rv) = list(age=ages)
+    # 
+    # rv
+    
+    rv = get.best.guess.msm.proportions(location,
+                                   specification.metadata = specification.metadata,
+                                   years=population.years,
+                                   keep.age = T,
+                                   keep.race = F,
+                                   return.proportions = F,
+                                   ages = NULL)
+    ages = parse.age.strata.names(dimnames(rv)$age)$lower
+    dimnames(rv)$age = as.character(ages)
     
     rv
 }
