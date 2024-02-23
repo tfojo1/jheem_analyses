@@ -309,9 +309,9 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.004), 0.5*log(2), upper=1),
     oe.never.idu.pairings.with.idu = Lognormal.Distribution(log(0.2), 0.5*log(2), upper=1), #see calculations below
     
-    black.black.sexual.oe = Lognormal.Distribution(log(3.76), 0.25*log(2), lower=1), #see below
-    hispanic.hispanic.sexual.oe = Lognormal.Distribution(log(2.19), 0.25*log(2), lower=1),
-    other.other.sexual.oe = Lognormal.Distribution(log(1.55), 0.25*log(2), lower=1),
+    black.black.sexual.oe = Normal.Distribution((3.76), 0.5*3.76, lower=1), # changed 2/23/24
+    hispanic.hispanic.sexual.oe = Normal.Distribution((2.19), 0.5*2.19, lower=1),
+    other.other.sexual.oe = Normal.Distribution((1.55), 0.5*1.55, lower=1),
     
     #-- Acute HIV and the Effect of Diagnosis --#
     acute.transmissibility.rr = Lognormal.Distribution(log(12), 0.25*log(2)), #do I have a more evidence based range?
