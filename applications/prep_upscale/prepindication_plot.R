@@ -1,3 +1,4 @@
+
 # prep indication plots -----
 
 ff <-  get.prep.indication.functional.form(specification.metadata = metadata)
@@ -50,7 +51,7 @@ combined.plot.pi <- ggpubr::ggarrange(race.plot, sex.plot, risk.plot, age.plot,
 combined.plot.pi
 
 msm.pi.df$shape <- ifelse(msm.pi.df$dataid=="cdc", 1, 8)
-  
+
 msm.race <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','race'), mean))
 df.pts <- subset(msm.pi.df, raceid != "ALL") %>%
   dplyr::mutate(years = years + anchor.year)
@@ -149,8 +150,8 @@ idu.sex.plot <- ggplot(idu.sex, aes(year, value, color=sex)) +
   theme_minimal()  
 
 idu.plots.pi <- ggpubr::ggarrange(idu.race.plot, idu.age.plot, idu.sex.plot,
-                               nrow = 3, ncol=1, labels = c("PWID - Race", "PWID - Age", 
-                                                            "PWID - Sex"))
+                                  nrow = 3, ncol=1, labels = c("PWID - Race", "PWID - Age", 
+                                                               "PWID - Sex"))
 idu.plots.pi
 
 het.race <- reshape2::melt(apply(y[,,c("heterosexual_male","female"),"never_IDU",], c('year', 'race'), mean))
@@ -197,7 +198,7 @@ df.pts <- subset(het.pi.df, sexid!="ALL" &
                    ageid == "ALL") %>%
   dplyr::mutate(years = years + anchor.year)
 
-df.pts$sexid <- factor(df.pts$sexid, levels = c("het-male", "het-female"))
+df.pts$sexid <- factor(df.pts$sexid, levels = c("male", "female"))
 het.sex$sex <- factor(het.sex$sex, levels = c("heterosexual_male", "female"))
 
 levels(df.pts$sexid) <- levels(het.sex$sex) 
@@ -214,7 +215,7 @@ het.sex.plot <- ggplot(het.sex, aes(year, value, color=sex)) +
 het.plots.pi <- ggpubr::ggarrange(het.race.plot, het.age.plot, het.sex.plot,
                                   nrow = 3, ncol = 1, labels=c("Het - Race", "Het - Age", "Het - Sex"))
 
-pdf("PrEP_Indication_Plots.pdf", width = 18, height = 10)
+pdf("PrEP_Indication_Plots_Gon.pdf", width = 18, height = 10)
 combined.plot.pi
 msm.plots.pi
 idu.plots.pi

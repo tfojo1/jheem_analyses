@@ -87,7 +87,7 @@ get.prep.use.functional.form <- function(specification.metadata){
 }
 
 get.prep.indication.functional.form <- function(specification.metadata){
-  source('../jheem_analyses/applications/prep_upscale/prep_data.R')
+  source('../jheem_analyses/applications/prep_upscale/prepindication_hetGon.R')
   # Some variables you will use
   anchor.year = 2009 # "year" should be relative to this. ie, 2021 will be 1 (2021-anchor.year)
   max.prep.indication = 0.85 # modify as you see fit
