@@ -92,9 +92,10 @@ test <- function(msa.name,
   state.metro.pop = census.manager$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('location','year', 'age', 'race', 'ethnicity', 'sex'))
   state.metro.death.rate = (state.metro.deaths/state.metro.pop) 
 
-  #Returns the population of the MSA
+  #Returns the population of the MSA (will be denominator for proportion)
     #Eventually need to fix year 
-  msa.population = census.manager$pull(outcome = 'population', dimension.values = list(location = counties, year= 2006:2015), keep.dimensions = c()) 
+  msa.population = census.manager$pull(outcome = 'population', dimension.values = list(location = counties, year= 2006:2015), keep.dimensions = c('year')) 
+
   
   #Return what counties are in the MSA
   counties.in.this.msa = locations::get.contained.locations(msa.name, "county")
@@ -102,18 +103,29 @@ test <- function(msa.name,
   counties.in.states = lapply(states, function(state){
     counties.in.this.state = locations::get.contained.locations(state, "county")
   })
+
   #Returns the overlap of what counties are in the MSA and in each state
   counties.in.states.and.msa = lapply(counties.in.states, function(counties.in.this.state){
     intersect(counties.in.this.msa, counties.in.this.state)
   })
-
   browser()
+  #Need state populations within the MSA (will be numerator for proportion) #2-21-24 this is where I am stuck#
+   state.proportions.in.msa = sapply(counties.in.states.and.msa, function(msa.counties.in.each.state){
+     
+     state.population = census.manager$pull(outcome = 'population', dimension.values = list(location = msa.counties.in.each.state, year= 2006:2015), keep.dimensions = c('year'))
+     state.proportion.in.msa = (sum(state.population))/(sum(msa.population))
+     
+
+     #states.population = census.manager$pull(outcome='population', location=msa.counties.in.each.state, year = 2006:2015, keep.dimensions = c("year")) #2-20-24 this isn't running
+     #states.proportion = states.population/msa.population 
+     })
+
 
   #Need to find the proportion that each state contributes to the MSA
-  list.of.states.proportions.in.msa = lapply(counties.in.states.and.msa, function(msa.counties.in.each.state){
-    states.population = census.manager$pull(outcome='population', location=msa.counties.in.each.state, year = 2006:2015, keep.dimensions = c("year")) #2-20-24 this isn't running
-    states.proportion = states.population/msa.population 
-  }) 
+  # list.of.states.proportions.in.msa = lapply(counties.in.states.and.msa, function(msa.counties.in.each.state){
+  #   states.population = census.manager$pull(outcome='population', location=msa.counties.in.each.state, year = 2006:2015, keep.dimensions = c("year")) #2-20-24 this isn't running
+  #   states.proportion = states.population/msa.population 
+  }
   
 ####################################################
   #I dont think you need this section anymore:
