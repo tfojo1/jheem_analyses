@@ -58,8 +58,8 @@ upscale_table <- function(intervention.code, intervention.name){
                         results.2035["hispanic","msm",,"incidence",,intervention.code])
   
   ## both 
-  black.hisp.id <- colMeans(colSums(results.2025[c("black","hispanic"),"msm",,"incidence",,intervention.code])-
-                              colSums(results.2035[c("black","hispanic"),"msm",,"incidence",,intervention.code])/
+  black.hisp.id <- colMeans((colSums(results.2025[c("black","hispanic"),"msm",,"incidence",,intervention.code])-
+                              colSums(results.2035[c("black","hispanic"),"msm",,"incidence",,intervention.code]))/
                               colSums(results.2025[c("black","hispanic"),"msm",,"incidence",,intervention.code]))
   
   
