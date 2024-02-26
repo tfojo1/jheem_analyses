@@ -1,10 +1,10 @@
 
 # LIKELIHOODS INCLUDED: 
-# population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, AIDS diagnoses
+# population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
+# AIDS diagnoses, AIDS deaths, suppression
 
 # TO DO: 
-# fix year range issue: AIDS deaths (should be fixed with next surv manager)
-# nested proportions: suppression,  proportion tested, awareness, IDU (heroin/cocaine ratios)
+# nested proportions: proportion tested, awareness, IDU (heroin/cocaine ratios)
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -66,10 +66,10 @@ joint.pop.migration.likelihood.instructions = join.likelihood.instructions(popul
                                                                            emigration.likelihood.instructions
                                                                            )
 #-- NEW DIAGNOSES  --#
-race.risk.one.way.new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+race.risk.two.way.new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                                                              outcome.for.sim = "new",
                                                                              dimensions = c("race","risk"),
-                                                                             levels.of.stratification = c(0,1), 
+                                                                             levels.of.stratification = c(0,1,2), 
                                                                              from.year = as.integer(2008), 
                                                                              observation.correlation.form = 'compound.symmetry', 
                                                                              measurement.error.coefficient.of.variance = 0.03,
@@ -89,10 +89,10 @@ new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(out
 
 
 #-- PREVALENCE  --#
-race.risk.one.way.prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+race.risk.two.way.prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                                                                             outcome.for.sim = "diagnosed.prevalence",
                                                                                             dimensions = c("race","risk"),
-                                                                                            levels.of.stratification = c(0,1), 
+                                                                                            levels.of.stratification = c(0,1,2), 
                                                                                             from.year = as.integer(2008), 
                                                                                             observation.correlation.form = 'compound.symmetry', 
                                                                                             measurement.error.coefficient.of.variance = 0.03,
@@ -128,22 +128,15 @@ aids.diagnoses.likelihood.instructions =
                                                                 included.multiplier.correlation = 0.5
   )
 
-#-- JOIN THE TRANSMISSION-RELATED LIKELIHOODS  --#
-one.way.transmission.and.aids.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.one.way.new.diagnoses.likelihood.instructions,
-                               race.risk.one.way.prevalence.likelihood.instructions,
-                               aids.diagnoses.likelihood.instructions
-                               
-  )
-
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
-one.way.transmission.aids.pop.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.one.way.new.diagnoses.likelihood.instructions,
-                               race.risk.one.way.prevalence.likelihood.instructions,
+two.way.transmission.aids.pop.likelihood.instructions = 
+  join.likelihood.instructions(race.risk.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.two.way.prevalence.likelihood.instructions,
                                aids.diagnoses.likelihood.instructions,
                                population.likelihood.instructions
                                
   )
+
 
 #-- HIV-MORTALITY  --#
 # all-cause mortality among pwh
@@ -161,114 +154,103 @@ hiv.mortality.likelihood.instructions = create.basic.likelihood.instructions(out
 #-- GENERAL MORTALITY  --#
 # everyone in the population, regardless of HIV 
 general.mortality.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "deaths",
-                                                                         outcome.for.sim = "total.mortality", 
-                                                                         dimensions = character(),
-                                                                         levels.of.stratification = c(0), 
-                                                                         from.year = as.integer(2007), 
-                                                                         observation.correlation.form = 'compound.symmetry', 
-                                                                         measurement.error.coefficient.of.variance = 0.03, 
-                                                                         weights = list(1), 
-                                                                         equalize.weight.by.year = T 
+                                                                                 outcome.for.sim = "total.mortality", 
+                                                                                 dimensions = character(),
+                                                                                 levels.of.stratification = c(0), 
+                                                                                 from.year = as.integer(2007), 
+                                                                                 observation.correlation.form = 'compound.symmetry', 
+                                                                                 measurement.error.coefficient.of.variance = 0.03, 
+                                                                                 weights = list(1), 
+                                                                                 equalize.weight.by.year = T 
 )
 
-#-- SUPPRESSION  --#
-# Right now there's a data manager error that messes this up - check applied_test file for how to pick source 
-# this is going to be too slow - have a separate file that runs and saves all the p.bias.estimates 
-# and then load those when I actually do the likelihoods
-# suppression.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
-#                                                  dimensions = c("age","race","sex","risk"),
-#                                                  levels.of.stratification = c(0,1),
-#                                                  outcome.for.p = "suppression",
-#                                                  outcome.for.n = "diagnosed.prevalence",
-#                                                  sub.location.type = "COUNTY",
-#                                                  super.location.type = "STATE",
-#                                                  main.location.type = "CBSA")
-# proportion.tested.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
-#                                                         dimensions = c("age","race","sex","risk"),
-#                                                         levels.of.stratification = c(0,1),
-#                                                         outcome.for.p = "proportion.tested",
-#                                                         outcome.for.n = "adult.population",
-#                                                         sub.location.type = "COUNTY",
-#                                                         super.location.type = "STATE",
-#                                                         main.location.type = "CBSA") 
-
-p.bias.inside = 0
-p.bias.outside = 0
-p.bias.sd.inside = 0.03
-p.bias.sd.outside = 0.03
+#-- BIAS ESTIMATES FOR NESTED PROPORTIONS  --#
+suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
+                                                           version = 'ehe')
 
 if(1==2){
-  ehe.partitioning.function = function(arr, version='ehe')
-  {
-    # LATER THERE WILL A DEFAULT PARTITIONING FUNCTION THAT IS USED IF THE USER LEAVES THE ARGUMENT NULL IN THE INSTRUCTIONS
-    # For now, partition the different dimensions separately. Later, could have it do only one partition, a custom combined one, if you have risk and sex together
-    dimensions.to.partition = intersect(c('risk', 'sex'), names(dim(arr)))
-    # if (identical(dimensions.to.partition, c('risk')))
-    if ("risk" %in% names(dim(arr))) {
-      risk.partition.dimnames = list(risk = c('active_IDU', 'IDU_in_remission'))
-      risk.partition.arr = array(c(0.25, 0.75), dim=sapply(risk.partition.dimnames, length), risk.partition.dimnames)
-      risk.modified = array.access(arr, risk.partition.dimnames)
-      risk.modified = risk.modified * expand.array(risk.partition.arr, dimnames(risk.modified))
-      array.access(arr, dimnames(risk.modified)) = risk.modified
-    }
-    if ("sex" %in% names(dim(arr))) {
-      #sex.partition.dimnames = list(sex = c('heterosexual_male', 'msm'))
-      #sex.partition.arr = array(c(0.5, 0.5), dim=sapply(sex.partition.dimnames, length), sex.partition.dimnames)
-      
-      specification.metadata = get.specification.metadata(version=version, location=location)
-      sex.partition.arr = get.best.guess.msm.proportions.by.race(location,
-                                                                 specification.metadata = specification.metadata,
-                                                                 years = DEFAULT.POPULATION.YEARS,
-                                                                 min.age = specification.metadata$age.lower.bounds[1],
-                                                                 return.proportions = T)
-      sex.partition.dimnames = dimnames(sex.partition.arr)
-      browser()
-      sex.modified = array.access(arr, sex.partition.dimnames)
-      sex.modified = sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
-      array.access(arr, dimnames(sex.modified)) = sex.modified
-    }
-    arr
-    
-  }
-
-  suppression.likelihood.instructions = 
-    create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
-                                                     outcome.for.sim = "suppression",
-                                                     denominator.outcome.for.data = 'diagnosed.prevalence',
-                                                     denominator.outcome.for.sim = 'diagnosed.prevalence',
-                                                     
-                                                     location.types = c('COUNTY','STATE','CBSA'),
-                                                     minimum.geographic.resolution.type = 'COUNTY',
-                                                     
-                                                     # dimensions = c("age","sex","race","risk"),
-                                                     dimensions = c("sex"),
-                                                     levels.of.stratification = c(0,1), 
-                                                     from.year = as.integer(2008), 
-                                                     
-                                                     p.bias.inside.location = p.bias.inside, # suppression.bias.estimates$...
-                                                     p.bias.outside.location = p.bias.outside,
-                                                     p.bias.sd.inside.location = p.bias.sd.inside,
-                                                     p.bias.sd.outside.location = p.bias.sd.outside,
-                                                     
-                                                     within.location.p.error.correlation = 0.5,
-                                                     within.location.n.error.correlation = 0.5,
-                                                     
-                                                     observation.correlation.form = 'compound.symmetry', 
-                                                     measurement.error.sd = 0.03,
-                                                     
-                                                     partitioning.function = ehe.partitioning.function, # there will be a default.partitioning.function
-                                                     
-                                                     weights = list(1), 
-                                                     equalize.weight.by.year = T 
-    )
-  
-    
+  # not ready yet 
+  proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
+                                                                   version = 'ehe')  
 }
 
 
-# TO DO: 
-# proportion tested, awareness, IDU (heroin/cocaine ratios)
+EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
+{
+  if ("risk" %in% names(dim(arr)) &&
+      all(array.access(arr, risk='active_IDU')==array.access(arr, risk='IDU_in_remission')))
+  {
+    risk.partition.dimnames = list(risk = c('active_IDU', 'IDU_in_remission'))
+    risk.partition.arr = array(c(0.25, 0.75), dim=sapply(risk.partition.dimnames, length), risk.partition.dimnames)
+    risk.modified = array.access(arr, risk.partition.dimnames)
+    risk.modified = risk.modified * expand.array(risk.partition.arr, dimnames(risk.modified))
+    array.access(arr, dimnames(risk.modified)) = risk.modified
+  }
+  if ("sex" %in% names(dim(arr)) &&
+      all(array.access(arr, sex='msm')==array.access(arr, sex='heterosexual_male')))
+  {
+    #sex.partition.dimnames = list(sex = c('heterosexual_male', 'msm'))
+    #sex.partition.arr = array(c(0.5, 0.5), dim=sapply(sex.partition.dimnames, length), sex.partition.dimnames)
+    
+    specification.metadata = get.specification.metadata(version=version, location=location)
+    proportion.msm = get.best.guess.msm.proportions(location,
+                                                    specification.metadata = specification.metadata,
+                                                    keep.age = any(names(dim(arr))=='age'),
+                                                    keep.race = any(names(dim(arr))=='race'))
+    # sex.partition.arr = get.best.guess.msm.proportions.by.race(location,
+    #                                                            specification.metadata = specification.metadata,
+    #                                                            years = DEFAULT.POPULATION.YEARS,
+    #                                                            min.age = specification.metadata$age.lower.bounds[1],
+    #                                                            return.proportions = T)
+    
+    sex.partition.arr = c(as.numeric(proportion.msm), 1-as.numeric(proportion.msm))
+    sex.partition.dimnames = c(dimnames(proportion.msm), list(sex=c('msm','heterosexual_male')))
+    dim(sex.partition.arr) = sapply(sex.partition.dimnames, length)
+    dimnames(sex.partition.arr) = sex.partition.dimnames
+    
+    sex.modified = array.access(arr, sex.partition.dimnames)
+    sex.modified = sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
+    array.access(arr, dimnames(sex.modified)) = sex.modified
+  }
+  arr
+  
+}
 
+
+#-- SUPPRESSION  --#
+suppression.likelihood.instructions = 
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
+                                                   outcome.for.sim = "suppression",
+                                                   denominator.outcome.for.data = 'diagnosed.prevalence',
+                                                   denominator.outcome.for.sim = 'diagnosed.prevalence',
+                                                   
+                                                   # want to be able to specify max # for each location type;
+                                                   # have to decide how to order (probably by denominator)
+                                                   location.types = c('COUNTY','STATE','CBSA'), 
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   # limit.to.n.location
+                                                   
+                                                   # dimensions = c("age","sex","race","risk"),
+                                                   dimensions = c("sex"),
+                                                   levels.of.stratification = c(0,1), 
+                                                   from.year = as.integer(2008), 
+                                                   
+                                                   p.bias.inside.location = suppression.bias.estimates$in.mean, 
+                                                   p.bias.outside.location = suppression.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = suppression.bias.estimates$in.sd,
+                                                   p.bias.sd.outside.location = suppression.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry', 
+                                                   measurement.error.sd = 0.03,
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(1), 
+                                                   equalize.weight.by.year = T 
+  )
 
 #-- AIDS DEATHS  --#
 # in the data, this is the cumulative estimate of aids.diagnoses.deceased.by.2001 from 1980-2001 
@@ -329,10 +311,10 @@ if(1==2){
                                                      levels.of.stratification = c(0,1),
                                                      from.year = as.integer(2008),
                                                      
-                                                     p.bias.inside.location = p.bias.inside, # proportion.tested.bias.estimates$...
-                                                     p.bias.outside.location = p.bias.outside,
-                                                     p.bias.sd.inside.location = p.bias.sd.inside,
-                                                     p.bias.sd.outside.location = p.bias.sd.outside,
+                                                     p.bias.inside.location = proportion.tested.bias.estimates$in.mean, 
+                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$in.sd,
+                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
                                                      
                                                      within.location.p.error.correlation = 0.5,
                                                      within.location.n.error.correlation = 0.5,
@@ -340,7 +322,7 @@ if(1==2){
                                                      observation.correlation.form = 'compound.symmetry',
                                                      measurement.error.sd = 0.03,
                                                      
-                                                     partitioning.function = ehe.partitioning.function, # there will be a default.partitioning.function
+                                                     partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                      
                                                      weights = list(1),
                                                      equalize.weight.by.year = T

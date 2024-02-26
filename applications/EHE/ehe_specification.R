@@ -1825,6 +1825,19 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       from.year = 1980, 
                       to.year = 2001)
 
+track.dynamic.outcome(EHE.SPECIFICATION,
+                      name = 'total.mortality',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Total Deaths',
+                                                                 description = "Number of People who Died of Any Cause in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Deaths',
+                                                                 units = 'deaths',
+                                                                 singular.unit = 'death'),
+                      dynamic.quantity.name = 'mortality',
+                      corresponding.data.outcome = 'deaths',
+                      groups = NULL,
+                      exclude.tags = "emigration",
+                      keep.dimensions = character())
 
 ##--------------------------------##
 ##--------------------------------##
