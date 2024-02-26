@@ -1,7 +1,7 @@
 put.msa.data.strict = function(census.outcome.name = 'population',
                                put.outcome.name = 'adult.population',
                                locations,
-                               contained.geographic.type = 'county',
+                               contained.geographic.type = 'county', # if this is NULL, it won't get any subtype, just stay at the main geographic level
                                fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
                                put.stratifications = list('age', c('race', 'ethnicity'), 'sex', c('age', 'race', 'ethnicity'), c('age', 'sex'), c('race', 'ethnicity', 'sex')),
                                age.lower.limit = 13,
@@ -39,7 +39,8 @@ put.msa.data.strict = function(census.outcome.name = 'population',
 
         error.prefix = paste0("Error putting '", put.outcome.name, "' data for '", location, "':")
         
-        contained.locations = locations::get.contained.locations(location, sub.type = contained.geographic.type)
+        if (!is.null(contained.geographic.type)) contained.locations = locations::get.contained.locations(location, sub.type = contained.geographic.type)
+        else contained.locations = location
         
         for (source.name in names(census.manager$source.info))
         {
