@@ -1,6 +1,6 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
-LOCATIONS = c(BALTIMORE.MSA)
+LOCATIONS = c(BALTIMORE.MSA,MIAMI.MSA,ATLANTA.MSA,HOUSTON.MSA)
 CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION # or CALIBRATION.CODE.POPULATION
 
 for(location in LOCATIONS){
