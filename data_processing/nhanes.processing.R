@@ -223,5 +223,21 @@ age.grouping.at.sex.table <- nhanes.total%>%
   rename(age.group.count=n)%>%
   mutate(proportion.age.at.first.sex.unweighted = round(age.group.count/sum(age.group.count), digits=2))
 
+new.age.grouping.at.sex.table <- nhanes.total%>%
+  mutate(age.at.first.sex = ifelse(age.at.first.sex == 99, NA, age.at.first.sex))%>%
+  mutate(age.at.first.sex = ifelse(age.at.first.sex == 77, NA, age.at.first.sex))%>%
+  mutate(age.group = case_when(
+                               age.at.first.sex >= 10 & age.at.first.sex <= 12 ~ "10-12 years",
+                               age.at.first.sex >= 13 & age.at.first.sex <= 17 ~ "13-17 years",
+                               age.at.first.sex >= 18 & age.at.first.sex <= 24 ~ "18-24 years",
+                               age.at.first.sex >= 25 & age.at.first.sex <=34 ~ "25-34 years",
+                               age.at.first.sex >= 35 & age.at.first.sex <= 44 ~ "35-44 years",
+                               age.at.first.sex >= 45 & age.at.first.sex <= 54 ~ "45-54 years",
+                               age.at.first.sex >= 55~ "55+ years",
+                               TRUE ~ 'missing'))%>%
+  count(age.group)%>%
+  rename(age.group.count=n)%>%
+  mutate(proportion.age.at.first.sex.unweighted = round(age.group.count/sum(age.group.count), digits=2))
+
 
  
