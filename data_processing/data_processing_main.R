@@ -1376,7 +1376,19 @@ smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.
  #adult.population
  put.msa.data.strict(locations = MSAS.OF.INTEREST, 
                             data.manager = surveillance.manager, 
-                            census.manager = smaller.census.manager) 
+                            census.manager = smaller.census.manager)
+ 
+ #Put adult population for specific locations
+ put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST), 
+                        contained.geographic.type = NULL, 
+                        fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
+                        put.stratifications = list('age', 'sex', c('race', 'ethnicity')),
+                        age.lower.limit = 13,
+                        age.penultimate.upper = 84,
+                        age.upper.limit.name = '85+',
+                        data.manager = surveillance.manager,
+                        census.manager = smaller.census.manager)
+ 
 ################################################################################
  #Create aggregated outcomes 
   #This is mainly county data being aggregated to MSA level
@@ -1444,7 +1456,7 @@ source('../jheem2/R/HELPERS_array_helpers.R')
                                    details.for.put= 'estimated from county data',
                                    data.manager.from=smaller.census.manager,
                                    data.manager.to= surveillance.manager)
- 
+
   
 ################################################################################
  #Identify Potential Outliers
