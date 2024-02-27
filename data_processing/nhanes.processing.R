@@ -165,41 +165,31 @@ nhanes.subset = nhanes.total
 ################################################################################
 
 total.msm.table <- nhanes.total%>%
-mutate(msm = case_when(men.ever.sex.with.men == "1" ~ "yes",
-                       men.ever.sex.with.men == "2" ~ "no",
-                       men.ever.sex.with.men == "7" ~ "refused",
-                       men.ever.sex.with.men == "9" ~ "don't know",
-                       is.na(men.ever.sex.with.men) ~ "missing"))%>%
-  count(msm)%>%
-  rename(count.msm.unweighted = n)%>%
-  mutate(proportion.msm.unweighted = round(count.msm.unweighted/sum(count.msm.unweighted), digits=2))
+# mutate(msm = case_when(men.ever.sex.with.men == "1" ~ "yes",
+#                        men.ever.sex.with.men == "2" ~ "no",
+#                        men.ever.sex.with.men == "7" ~ "refused",
+#                        men.ever.sex.with.men == "9" ~ "don't know",
+#                        is.na(men.ever.sex.with.men) ~ "missing"))%>%
+  count(men.ever.sex.with.men)%>%
+  rename(men.ever.sex.with.men.count  = n)%>%
+  mutate(proportion.msm.unweighted = round(men.ever.sex.with.men.count/sum(men.ever.sex.with.men.count), digits=2))
 
 race.msm.table <- nhanes.total%>%
-  mutate(msm = case_when(men.ever.sex.with.men == "1" ~ "yes",
-                         men.ever.sex.with.men == "2" ~ "no",
-                         men.ever.sex.with.men == "7" ~ "refused",
-                         men.ever.sex.with.men == "9" ~ "don't know",
-                         is.na(men.ever.sex.with.men) ~ "missing"))%>%
-  filter(msm == "yes")%>%
+  filter(men.ever.sex.with.men == "yes")%>%
   count(race)%>%
-  rename(count.msm.unweighted = n)%>%
-  mutate(proportion.msm.unweighted = round(count.msm.unweighted/sum(count.msm.unweighted), digits=2))
+  rename(men.ever.sex.with.men.count = n)%>%
+  mutate(proportion.msm.unweighted = round(men.ever.sex.with.men.count/sum(men.ever.sex.with.men.count), digits=2))
 
 age.msm.table <- nhanes.total%>%
-  mutate(msm = case_when(men.ever.sex.with.men == "1" ~ "yes",
-                         men.ever.sex.with.men == "2" ~ "no",
-                         men.ever.sex.with.men == "7" ~ "refused",
-                         men.ever.sex.with.men == "9" ~ "don't know",
-                         is.na(men.ever.sex.with.men) ~ "missing"))%>%
   mutate(age.group = case_when(age <= 24 ~ "18-24 years",
                                age >= 25 & age <=34 ~ "25-34 years",
                                age >= 35 & age <= 44 ~ "35-44 years",
                                age >= 45 & age <= 54 ~ "45-54 years",
                                age >= 55~ "55+ years"))%>%
-  filter(msm == "yes")%>%
+  filter(men.ever.sex.with.men == "yes")%>%
   count(age.group)%>%
-  rename(count.msm.unweighted = n)%>%
-  mutate(proportion.msm.unweighted = round(count.msm.unweighted/sum(count.msm.unweighted), digits=2))
+  rename(men.ever.sex.with.men.count = n)%>%
+  mutate(proportion.msm.unweighted = round(men.ever.sex.with.men.count/sum(men.ever.sex.with.men.count), digits=2))
 
 
 ################################################################################
