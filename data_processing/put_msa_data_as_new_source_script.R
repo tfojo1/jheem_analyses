@@ -236,15 +236,15 @@ aggregate.details.or.url = function(data, keep.dimensions, post.agg.dimnames) {
 
 # for testing
 
-ss=SURVEILLANCE.MANAGER$clone()
-ss$register.source(source = 'cdc.aggregated.proportion', parent.source='NHSS', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
-put.msa.data.as.new.source('suppression',
-                           from.source.name = 'cdc.hiv',
-                           to.source.name='cdc.aggregated.proportion',
-                           to.locations = MSAS.OF.INTEREST,
-                           geographic.type.from = 'county',
-                           geographic.type.to = 'cbsa',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = ss,
-                           source.for.denominator = 'cdc.hiv',
-                           ontology.for.denominator = 'cdc')
+# ss=SURVEILLANCE.MANAGER$clone()
+# ss$register.source(source = 'cdc.aggregated.proportion', parent.source='NHSS', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
+# put.msa.data.as.new.source('suppression',
+#                            from.source.name = 'cdc.hiv',
+#                            to.source.name='cdc.aggregated.proportion',
+#                            to.locations = MSAS.OF.INTEREST,
+#                            geographic.type.from = 'county',
+#                            geographic.type.to = 'cbsa',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = ss,
+#                            source.for.denominator = 'cdc.hiv',
+#                            ontology.for.denominator = 'cdc')
