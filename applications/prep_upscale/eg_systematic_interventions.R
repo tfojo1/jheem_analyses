@@ -9,14 +9,16 @@ if (1==2)
 CALIBRATION.CODE = NULL #for now, we are going to use 'uncalibrated' (ie, manually generated) simulations
 LOCATIONS = c('C.12580','C.33100') # for now, Baltimore and Miami
 
-PREP.UPSCALE.INTERVENTION.CODES = c('msmprepuse10', 'msmprepuse25',
-                                    'preppers30msm', 'preppers55msm', 'preppers80msm') #@padma - update this
+PREP.UPSCALE.INTERVENTION.CODES = c('msmprepuse10', 'msmprepuse20', 'msmprepuse35', 'msmprepuse50',
+                                    'preppers30msm', 'preppers50msm', 'preppers80msm') #@padma - update this
 
 prep.upscale.intervention.names = c(
   "Additional 10% PrEP Use",
-  "Additional 25% PrEP Use",
+  "Additional 20% PrEP Use",
+  "Additional 35% PrEP Use",
+  "Additional 50% PrEP Use",
   "30% PrEP Persistence",
-  "55% PrEP Persistence",
+  "50% PrEP Persistence",
   "80% PrEP Persistence"
 )
 
@@ -111,6 +113,8 @@ upscale_table <- function(intervention.code, intervention.name){
 for (i in 1:length(prep.upscale.intervention.names)) {
     print(upscale_table(PREP.UPSCALE.INTERVENTION.CODES[i], prep.upscale.intervention.names[i]))
 }
+
+
 
 year_inc <- function(int.year, race, sex = "msm", intervention.code){
   # returns average incidence race for int.year x race x sex group across simulations for the locations
