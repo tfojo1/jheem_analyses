@@ -145,6 +145,7 @@ put.msa.data.as.new.source = function(outcome,
                         max.expected.from.suppression = sum(is.na(x))*maximum.suppressed.value
                         non.na.sum = sum(x, na.rm=T)
                         max.sum = non.na.sum + max.expected.from.suppression
+                        if (max.sum==0) return (NA)
                         if (max.expected.from.suppression / max.sum > tolerable.fraction.suppressed.in.denominator) return (NA)
                         else return(max.sum)
                     })
@@ -235,15 +236,15 @@ aggregate.details.or.url = function(data, keep.dimensions, post.agg.dimnames) {
 
 # for testing
 
-# ss=SURVEILLANCE.MANAGER$clone()
-# ss$register.source(source = 'cdc.agg.county', parent.source='NHSS', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
-# put.msa.data.as.new.source(outcome = 'diagnosed.prevalence', # suppression
-#                            from.source.name = 'cdc.hiv',
-#                            to.source.name = 'cdc.agg.county',
-#                            source.for.denominator = 'cdc.hiv',
-#                            ontology.for.denominator = 'cdc',
-#                            to.locations = 'C.12580',
-#                            geographic.type.from = 'COUNTY',
-#                            geographic.type.to = 'CBSA',
-#                            details.for.new.data = 'estimated from county data',
-#                            data.manager = ss)
+ss=SURVEILLANCE.MANAGER$clone()
+ss$register.source(source = 'cdc.aggregated.proportion', parent.source='NHSS', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
+put.msa.data.as.new.source('suppression',
+                           from.source.name = 'cdc.hiv',
+                           to.source.name='cdc.aggregated.proportion',
+                           to.locations = MSAS.OF.INTEREST,
+                           geographic.type.from = 'county',
+                           geographic.type.to = 'cbsa',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = ss,
+                           source.for.denominator = 'cdc.hiv',
+                           ontology.for.denominator = 'cdc')
