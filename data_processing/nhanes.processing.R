@@ -61,7 +61,8 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
       rename(ID = SEQN)%>%
       rename(age = RIDAGEYR)%>%
       rename(race = RIDRETH1)%>%
-      rename(gender = RIAGENDR)
+      rename(gender = RIAGENDR)%>%
+      mutate(survey.year = as.character(survey.year))
     
     data$survey.year = survey.year.mappings[data$survey.year]
     data$race = race.mappings[data$race]
