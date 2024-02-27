@@ -92,7 +92,7 @@ data.manager$register.outcome(
     display.name = 'Awareness of HIV Status',
     axis.name = 'Proportion Aware of HIV Status',
     units = '%',
-    description = "Awareness of HIV Status"), denominator.outcome = 'total.prevalence') #creating outcome that is pop values for awarness#
+    description = "Awareness of HIV Status"), denominator.outcome = 'total.prevalence') #creating outcome that is pop values for awareness#
 
 data.manager$register.outcome(
   'prep', 
@@ -375,6 +375,7 @@ data.manager$register.source('prep.aidsvu.aggregated.county', parent.source= "IQ
 data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP CDC Aggregated County', short.name = 'prep cdc aggd county') #For aggregated prep data from Atlas Plus (CDC)
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated')
+data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
 
 
 data.manager$register.ontology(
@@ -440,7 +441,7 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('12 or Older', '12 to 17', '18 or Older', '18 to 25', '26 or Older'))
+    age=c('12 or Older', '26 or Older'))
   )
 
 data.manager$register.ontology(
@@ -1442,6 +1443,28 @@ source('../jheem2/R/HELPERS_array_helpers.R')
                             details.for.new.data = 'estimated from county data',
                             data.manager = surveillance.manager)
 
+ #Put proportion outcomes (awareness and suppression)
+ put.msa.data.as.new.source(outcome = 'awareness',
+                            from.source.name= 'cdc.hiv',
+                            to.source.name = 'cdc.aggregated.proportion',
+                            to.locations = MSAS.OF.INTEREST,
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager= surveillance.manager,
+                            source.for.denominator= 'cdc.hiv',
+                            ontology.for.denominator= 'cdc') 
+ 
+ put.msa.data.as.new.source(outcome = 'suppression',
+                            from.source.name= 'cdc.hiv',
+                            to.source.name = 'cdc.aggregated.proportion',
+                            to.locations = MSAS.OF.INTEREST,
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager= surveillance.manager,
+                            source.for.denominator= 'cdc.hiv',
+                            ontology.for.denominator= 'cdc') 
  
  ################################################################################
  ###Put- Sum deaths by county into deaths by MSA using this code/function
