@@ -1,6 +1,6 @@
-source('../jheem_analyses/applications/EHE/calibration_runs/ehe_setup_init_calibration.R')
+source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
-LOCATION = BALTIMORE.MSA 
+LOCATION = CHICAGO.MSA 
 CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION # or CALIBRATION.CODE.POPULATION
 
 set.seed(12345)
