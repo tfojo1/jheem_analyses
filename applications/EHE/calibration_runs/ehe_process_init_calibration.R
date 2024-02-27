@@ -9,7 +9,11 @@ mcmc = assemble.mcmc.from.calibration(version = 'ehe',
                                       allow.incomplete=T)
 
 # Pull all the simulations into a simset
-simset = join.simulation.sets(as.numeric(mcmc@simulations[mcmc@simulation.indices]))
+simset = join.simulation.sets((mcmc@simulations[mcmc@simulation.indices]))
+# simset.new = simset$burn(keep = 0.5)
+# simset.new = simset.new$thin(keep = 100)
 
-# Pull just the last simulatin
+# Pull just the last simulation
 sim = mcmc@simulations[[length(mcmc@simulations)]]
+
+save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",ONE.LOCATION,".Rdata"))
