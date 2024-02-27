@@ -5,7 +5,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
-N.ITER = 40000
+N.ITER = 20000
 
 # load params manual
 load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_21.Rdata") 
@@ -77,7 +77,10 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           #  added aids diagnoses, added population back in 
-                          likelihood.instructions = two.way.transmission.aids.pop.likelihood.instructions, 
+                          likelihood.instructions = two.way.transmission.pop.likelihood.instructions, # no aids at all 
+                          # two.way.transmission.aids.pop.likelihood.instructions, # total and one-way aids
+                          # two.way.transmission.total.aids.pop.likelihood.instructions, # total aids only 
+                          # two.way.transmission.pop.likelihood.instructions, # no aids at all 
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission),

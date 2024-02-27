@@ -128,12 +128,43 @@ aids.diagnoses.likelihood.instructions =
                                                                 included.multiplier.correlation = 0.5
   )
 
+total.aids.diagnoses.likelihood.instructions = 
+  create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
+                                                                outcome.for.sim = "aids.diagnoses", 
+                                                                dimensions = c("race","risk"), # ADD BACK AGE AND SEX LATER
+                                                                levels.of.stratification = c(0), 
+                                                                from.year = as.integer(1980),
+                                                                to.year = as.integer(2001),
+                                                                observation.correlation.form = 'compound.symmetry', 
+                                                                measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up
+                                                                weights = list(1), 
+                                                                equalize.weight.by.year = T,
+                                                                included.multiplier = 1.4,
+                                                                included.multiplier.sd = 0.2, # rounding up from 10%, 0.14
+                                                                included.multiplier.correlation = 0.5
+  )
+
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
 two.way.transmission.aids.pop.likelihood.instructions = 
   join.likelihood.instructions(race.risk.two.way.new.diagnoses.likelihood.instructions,
                                race.risk.two.way.prevalence.likelihood.instructions,
                                aids.diagnoses.likelihood.instructions,
                                population.likelihood.instructions
+                               
+  )
+
+two.way.transmission.total.aids.pop.likelihood.instructions = 
+  join.likelihood.instructions(race.risk.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.two.way.prevalence.likelihood.instructions,
+                               total.aids.diagnoses.likelihood.instructions, # total aids only 
+                               population.likelihood.instructions
+                               
+  )
+
+two.way.transmission.pop.likelihood.instructions = 
+  join.likelihood.instructions(race.risk.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.two.way.prevalence.likelihood.instructions,
+                               population.likelihood.instructions # no aids
                                
   )
 
