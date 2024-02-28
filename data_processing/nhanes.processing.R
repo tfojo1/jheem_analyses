@@ -27,7 +27,7 @@ gender.mappings = c('1'= 'male',
                     '2'= 'female',
                     '.' = 'missing')
 
-msm.mappings = c('1' = 'yes',
+nhanes.mappings = c('1' = 'yes',
                 '2' = 'no',
                 '7' = 'refused',
                 '9' = 'dont know',
@@ -68,45 +68,94 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
     data$race = race.mappings[data$race]
     data$gender = gender.mappings[data$gender]
   }
-  
-  if(grepl("sexual_behavior_ok", filename)) {
-    data <- data %>%
-      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294)%>%
-      rename(ID = SEQN)%>%
-      rename(ever.had.sex =SXD021)%>%
-      rename(men.ever.sex.with.men =SXQ809)%>%
-      rename(age.at.first.sex = SXD031)%>%
-      rename(number.sex.wo.condom.past.year = SXQ251)%>%
-      rename(hx.gonorrhea = SXQ270)%>%
-      rename(sexual.orientation.male = SXQ292)%>%
-      rename(sexual.orientation.female = SXQ294)
 
-  }
-  
-  if(grepl("sexual_behavior_fix1", filename)) { #NEED TO ADD IN HERE SOMETHNG FOR CALCULATE SEX WITH MEN SXQ101
+  if(grepl("07.08_sexual_behavior", filename)) { 
     data <- data %>%
-      select(SEQN, SXQ021,  SXQ410, SXD031, SXQ251, SXQ270, SXQ292, SXQ294)%>%
+      select(SEQN, SXQ021,  SXQ410, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXQ510, SXQ550, SXQ450, SXQ490)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXQ021)%>%
       rename(men.ever.sex.with.men =SXQ410)%>%    #You will need to use gender from demos to re-calculate this bc it's different from other vars in other years but I'm relabeling for the purpose of merge
       rename(age.at.first.sex = SXD031)%>%
       rename(number.sex.wo.condom.past.year = SXQ251)%>%
-      rename(hx.gonorrhea = SXQ270)%>%
+      rename(gonorrhea.past.year = SXQ270)%>%
       rename(sexual.orientation.male = SXQ292)%>%
-      rename(sexual.orientation.female = SXQ294)
+      rename(sexual.orientation.female = SXQ294)%>%
+      rename(male.sex.with.female.past.year= SXQ510)%>%
+      rename(male.sex.with.male.past.year = SXQ550)%>%
+      rename(female.sex.with.male.past.year=SXQ450)%>%
+      rename(female.sex.with.female.past.year=SXQ490)
+    
   }
-  
-  if(grepl("sexual_behavior_fix2", filename)) {
+  if(grepl("09.10_sexual_behavior", filename)) {
     data <- data %>%
-      select(SEQN, SXD021,  SXQ809, SXD031, SXQ251, SXQ270, SXQ295, SXQ296)%>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
       rename(age.at.first.sex = SXD031)%>%
       rename(number.sex.wo.condom.past.year = SXQ251)%>%
-      rename(hx.gonorrhea = SXQ270)%>%
+      rename(gonorrhea.past.year = SXQ270)%>%
+      rename(sexual.orientation.male = SXQ292)%>%
+      rename(sexual.orientation.female = SXQ294)%>%
+      rename(male.sex.with.female.past.year= SXD510)%>%
+      rename(male.sex.with.male.past.year = SXQ550)%>%
+      rename(female.sex.with.male.past.year=SXD450)%>%
+      rename(female.sex.with.female.past.year=SXQ490)
+
+    
+  }
+  if(grepl("11.12_sexual_behavior", filename)) {
+    data <- data %>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490)%>%
+      rename(ID = SEQN)%>%
+      rename(ever.had.sex =SXD021)%>%
+      rename(men.ever.sex.with.men =SXQ809)%>%
+      rename(age.at.first.sex = SXD031)%>%
+      rename(number.sex.wo.condom.past.year = SXQ251)%>%
+      rename(gonorrhea.past.year = SXQ270)%>%
+      rename(sexual.orientation.male = SXQ292)%>%
+      rename(sexual.orientation.female = SXQ294)%>%
+      rename(male.sex.with.female.past.year= SXD510)%>%
+      rename(male.sex.with.male.past.year = SXQ550)%>%
+      rename(female.sex.with.male.past.year=SXD450)%>%
+      rename(female.sex.with.female.past.year=SXQ490)
+
+    
+  }
+  if(grepl("13.14_sexual_behavior", filename)) {
+    data <- data %>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490)%>%
+      rename(ID = SEQN)%>%
+      rename(ever.had.sex =SXD021)%>%
+      rename(men.ever.sex.with.men =SXQ809)%>%
+      rename(age.at.first.sex = SXD031)%>%
+      rename(number.sex.wo.condom.past.year = SXQ251)%>%
+      rename(gonorrhea.past.year = SXQ270)%>%
+      rename(sexual.orientation.male = SXQ292)%>%
+      rename(sexual.orientation.female = SXQ294)%>%
+      rename(male.sex.with.female.past.year= SXD510)%>%
+      rename(male.sex.with.male.past.year = SXQ550)%>%
+      rename(female.sex.with.male.past.year=SXD450)%>%
+      rename(female.sex.with.female.past.year=SXQ490)
+
+  }
+  
+  if(grepl("15.16_sexual_behavior", filename)) {
+    data <- data %>%
+      select(SEQN, SXD021,  SXQ809, SXD031, SXQ251, SXQ270, SXQ295, SXQ296, SXD510, SXQ550, SXD450, SXQ490)%>%
+      rename(ID = SEQN)%>%
+      rename(ever.had.sex =SXD021)%>%
+      rename(men.ever.sex.with.men =SXQ809)%>%
+      rename(age.at.first.sex = SXD031)%>%
+      rename(number.sex.wo.condom.past.year = SXQ251)%>%
+      rename(gonorrhea.past.year = SXQ270)%>%
       rename(sexual.orientation.male = SXQ296)%>%
-      rename(sexual.orientation.female = SXQ295)
+      rename(sexual.orientation.female = SXQ295)%>%
+      rename(male.sex.with.female.past.year= SXD510)%>%
+      rename(male.sex.with.male.past.year = SXQ550)%>%
+      rename(female.sex.with.male.past.year=SXD450)%>%
+      rename(female.sex.with.female.past.year=SXQ490)
+
   }
   list(filename, data) 
   
@@ -115,15 +164,21 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
 ################################################################################
 #Merge all the years for demo and sexual behavior
 ################################################################################
+#Do an inner join- only want people who took the sexual health survey and demos
+
 demo = nhanes.clean[[1]]
 demo = demo [[2]]
 sex = nhanes.clean[[2]]
 sex = sex [[2]]
-total.07.08= merge(demo, sex, by="ID")
+total.07.08= inner_join(demo, sex, by="ID")
+
 total.07.08 <- total.07.08 %>%
   mutate(men.ever.sex.with.men = ifelse(men.ever.sex.with.men == 99999, NA, men.ever.sex.with.men))%>%
   mutate(men.ever.sex.with.men = ifelse(men.ever.sex.with.men == 77777, NA, men.ever.sex.with.men))%>%
-  mutate(fixed.msm = ifelse(gender == "1" & men.ever.sex.with.men > 0, 1, 2))%>% #1= msm; 2=not msm
+  mutate(fixed.msm = case_when(gender == "female" ~ NA,
+                               gender == "male" & men.ever.sex.with.men > 0 ~ "1",
+                               gender == "male" & men.ever.sex.with.men <= 0 ~"0"))%>%
+  
   select(-men.ever.sex.with.men)%>%
   rename(men.ever.sex.with.men = fixed.msm)
 
@@ -131,104 +186,195 @@ demo = nhanes.clean[[3]]
 demo = demo [[2]]
 sex = nhanes.clean[[4]]
 sex = sex [[2]]
-total.09.10= merge(demo, sex, by="ID")
+total.09.10= inner_join(demo, sex, by="ID")
 
 demo = nhanes.clean[[5]]
 demo = demo [[2]]
 sex = nhanes.clean[[6]]
 sex = sex [[2]]
-total.11.12= merge(demo, sex, by="ID")
+total.11.12= inner_join(demo, sex, by="ID")
 
 demo = nhanes.clean[[7]]
 demo = demo [[2]]
 sex = nhanes.clean[[8]]
 sex = sex [[2]]
-total.13.14= merge(demo, sex, by="ID")
+total.13.14= inner_join(demo, sex, by="ID")
 
 demo = nhanes.clean[[9]]
 demo = demo [[2]]
 sex = nhanes.clean[[10]]
 sex = sex [[2]]
-total.15.16= merge(demo, sex, by="ID")
+total.15.16= inner_join(demo, sex, by="ID")
 
 nhanes.total = rbind(total.07.08, total.09.10, total.11.12, total.13.14, total.15.16)
 
-nhanes.total$men.ever.sex.with.men = msm.mappings[nhanes.total$men.ever.sex.with.men]
-
-nhanes.total$hx.gonorrhea = gonorrhea.mappings[nhanes.total$hx.gonorrhea]
+#Add mappings for variables
+nhanes.total$men.ever.sex.with.men = nhanes.mappings[nhanes.total$men.ever.sex.with.men]
+nhanes.total$gonorrhea.past.year = gonorrhea.mappings[nhanes.total$gonorrhea.past.year]
 nhanes.total$sexual.orientation.male = sexual.orientation.mappings[nhanes.total$sexual.orientation.male]
 nhanes.total$sexual.orientation.female = sexual.orientation.mappings[nhanes.total$sexual.orientation.female]
+nhanes.total$ever.had.sex = nhanes.mappings[nhanes.total$ever.had.sex]
 
+#Subset data by only those who have had sex (ever.had.sex = yes)
+nhanes.total = subset(nhanes.total, nhanes.total$ever.had.sex == "yes")
+
+#Removing 12 individuals for who age.at.first.sex is NA (the rest of their surveys are also NA)
+nhanes.total = subset(nhanes.total, !is.na(nhanes.total$age.at.first.sex))
+
+#Formatting age.at.first.sex
+nhanes.total$age.at.first.sex = ifelse(nhanes.total$age.at.first.sex == 99, "dont know", nhanes.total$age.at.first.sex)
+nhanes.total$age.at.first.sex = ifelse(nhanes.total$age.at.first.sex == 77, "refused", nhanes.total$age.at.first.sex)
+nhanes.total$age.at.first.sex = ifelse(nhanes.total$age.at.first.sex == 9, "9 years or younger", nhanes.total$age.at.first.sex)
+
+#Formatting partners in past year
+# nhanes.total$male.sex.with.female.past.year = ifelse(nhanes.total$male.sex.with.female.past.year == 99999, "dont know", nhanes.total$male.sex.with.female.past.year)
+# nhanes.total$male.sex.with.female.past.year = ifelse(nhanes.total$male.sex.with.female.past.year == 77777, "refused", nhanes.total$male.sex.with.female.past.year)
+# 
+# nhanes.total$male.sex.with.male.past.year = ifelse(nhanes.total$male.sex.with.male.past.year == 99999, "dont know", nhanes.total$male.sex.with.male.past.year)
+# nhanes.total$male.sex.with.male.past.year = ifelse(nhanes.total$male.sex.with.male.past.year == 77777, "refused", nhanes.total$male.sex.with.male.past.year)
+# 
+# nhanes.total$female.sex.with.male.past.year = ifelse(nhanes.total$female.sex.with.male.past.year == 99999, "dont know", nhanes.total$female.sex.with.male.past.year)
+# nhanes.total$female.sex.with.male.past.year = ifelse(nhanes.total$female.sex.with.male.past.year == 77777, "refused", nhanes.total$female.sex.with.male.past.year)
+# 
+# nhanes.total$female.sex.with.female.past.year = ifelse(nhanes.total$female.sex.with.female.past.year == 99999, "dont know", nhanes.total$female.sex.with.female.past.year)
+# nhanes.total$female.sex.with.female.past.year = ifelse(nhanes.total$female.sex.with.female.past.year == 77777, "refused", nhanes.total$female.sex.with.female.past.year)
+
+#There are 1370 MALES who report sexual orientation as homosexual but report no for MSM.  I'm going to change these to MSM (there's also 47 bisexual but I'm going to leave these)
+ nhanes.total <- nhanes.total %>%
+   mutate(msm.adjusted = case_when(gender == 'male' & sexual.orientation.male == 'homosexual' & men.ever.sex.with.men == 'no' ~ 'yes',
+                                       gender == 'male' & men.ever.sex.with.men == 'yes' ~ 'yes',
+                                       gender == 'male' & men.ever.sex.with.men == 'no' ~ 'no',
+                                       gender == 'male' & is.na(men.ever.sex.with.men) ~ NA))
+#Data Subset for Todd 
 nhanes.subset = nhanes.total
-################################################################################
-#MSM Tables
-#Should these be by year?
-################################################################################
-
-total.msm.table <- nhanes.total%>%
-# mutate(msm = case_when(men.ever.sex.with.men == "1" ~ "yes",
-#                        men.ever.sex.with.men == "2" ~ "no",
-#                        men.ever.sex.with.men == "7" ~ "refused",
-#                        men.ever.sex.with.men == "9" ~ "don't know",
-#                        is.na(men.ever.sex.with.men) ~ "missing"))%>%
-  count(men.ever.sex.with.men)%>%
-  rename(men.ever.sex.with.men.count  = n)%>%
-  mutate(proportion.msm.unweighted = round(men.ever.sex.with.men.count/sum(men.ever.sex.with.men.count), digits=2))
-
-race.msm.table <- nhanes.total%>%
-  filter(men.ever.sex.with.men == "yes")%>%
-  count(race)%>%
-  rename(men.ever.sex.with.men.count = n)%>%
-  mutate(proportion.msm.unweighted = round(men.ever.sex.with.men.count/sum(men.ever.sex.with.men.count), digits=2))
-
-age.msm.table <- nhanes.total%>%
-  mutate(age.group = case_when(age <= 24 ~ "18-24 years",
-                               age >= 25 & age <=34 ~ "25-34 years",
-                               age >= 35 & age <= 44 ~ "35-44 years",
-                               age >= 45 & age <= 54 ~ "45-54 years",
-                               age >= 55~ "55+ years"))%>%
-  filter(men.ever.sex.with.men == "yes")%>%
-  count(age.group)%>%
-  rename(men.ever.sex.with.men.count = n)%>%
-  mutate(proportion.msm.unweighted = round(men.ever.sex.with.men.count/sum(men.ever.sex.with.men.count), digits=2))
-
 
 ################################################################################
-#Age at first time of sex Tables
+##Metrics Todd wants 
 ################################################################################
-single.age.at.sex.table <- nhanes.total%>%
+#Proportion of Heterosexuals who report Gonorrhea in Past Year
+#QUESTION: Should I adjust this to be only sexually active people?
+#QUESTION: Should I apply weights?
+#Do I need to regroup so anyone who is not MSM is heterosexual?
+
+proportion.heterosexual.with.gonorrhea.past.year <- nhanes.subset %>%
+  mutate(heterosexual.indicator.one = ifelse(sexual.orientation.male == "heterosexual" | sexual.orientation.female== "heterosexual", "1", "0"))%>%
+  mutate(heterosexual.indicator.two = case_when(gender == "male" & male.sex.with.female.past.year >0 & male.sex.with.female.past.year < 7777 ~ "1",
+                                                gender == "female" & female.sex.with.male.past.year >0 & female.sex.with.male.past.year < 7777 ~ "1",
+                                                TRUE ~ "0"))%>%
+  mutate(heterosexual.indicator.final = case_when(is.na(heterosexual.indicator.one) & heterosexual.indicator.two == "1" ~ "1",
+                                                   heterosexual.indicator.one == "1" & heterosexual.indicator.two == "1" ~ "1",
+                                                   is.na(heterosexual.indicator.one) & heterosexual.indicator.two == "0" ~ "0"))%>%
+  filter(heterosexual.indicator.final == "1")%>%  #Calculate recent gc for heterosexual
+  group_by(survey.year, gonorrhea.past.year)%>%
+  count(gonorrhea.past.year)%>%
+  rename(count.gonorrhea.past.year = n)%>%
+  group_by(survey.year)%>%
+  mutate(proportion.gonorrhea.past.year = round(count.gonorrhea.past.year/ sum(count.gonorrhea.past.year), digits=2))
+
+#Proportion of MSM Reporting Casual Partner
+#QUESTION: Should this be a proportion of MSM? Or of everyone?  (I'm going to do a proportion of MSM)
+#QUESTION: Should this only be currently sexually active msm?
+#Once you have questions answered you can do this for race and age
+#Should race and age be by total or also by year?
+proportion.msm.with.casual.partner <- nhanes.subset %>%
+  filter(msm.adjusted == "yes")%>%
+  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  group_by(survey.year, active.condomless.msm)%>%
+  count(active.condomless.msm)%>%
+  rename(count.active.condomless.msm = n)%>%
+  group_by(survey.year)%>%
+  mutate(proportion.active.condomless.msm = round(count.active.condomless.msm/ sum(count.active.condomless.msm), digits=2))
+
+#Cumulative Proportion of Age at sex initiation
+#QUESTION: Should this be by year
+#Need to fix the under 9
+cumulative.proportion.age.at.sex.initiation <- nhanes.subset%>%
   count(age.at.first.sex)%>%
   rename(age.at.first.sex.count=n)%>%
-  mutate(proportion.age.at.first.sex.unweighted = round(age.at.first.sex.count/sum(age.at.first.sex.count), digits=2))
-
-age.grouping.at.sex.table <- nhanes.total%>%
-  mutate(age.at.first.sex = ifelse(age.at.first.sex == 99, NA, age.at.first.sex))%>%
-  mutate(age.at.first.sex = ifelse(age.at.first.sex == 77, NA, age.at.first.sex))%>%
-  mutate(age.group = case_when(age.at.first.sex <= 24 ~ "18-24 years",
-                               age.at.first.sex >= 25 & age.at.first.sex <=34 ~ "25-34 years",
-                               age.at.first.sex >= 35 & age.at.first.sex <= 44 ~ "35-44 years",
-                               age.at.first.sex >= 45 & age.at.first.sex <= 54 ~ "45-54 years",
-                               age.at.first.sex >= 55~ "55+ years",
-                               TRUE ~ 'missing'))%>%
-  count(age.group)%>%
-  rename(age.group.count=n)%>%
-  mutate(proportion.age.at.first.sex.unweighted = round(age.group.count/sum(age.group.count), digits=2))
-
-new.age.grouping.at.sex.table <- nhanes.total%>%
-  mutate(age.at.first.sex = ifelse(age.at.first.sex == 99, NA, age.at.first.sex))%>%
-  mutate(age.at.first.sex = ifelse(age.at.first.sex == 77, NA, age.at.first.sex))%>%
-  mutate(age.group = case_when(
-                               age.at.first.sex >= 10 & age.at.first.sex <= 12 ~ "10-12 years",
-                               age.at.first.sex >= 13 & age.at.first.sex <= 17 ~ "13-17 years",
-                               age.at.first.sex >= 18 & age.at.first.sex <= 24 ~ "18-24 years",
-                               age.at.first.sex >= 25 & age.at.first.sex <=34 ~ "25-34 years",
-                               age.at.first.sex >= 35 & age.at.first.sex <= 44 ~ "35-44 years",
-                               age.at.first.sex >= 45 & age.at.first.sex <= 54 ~ "45-54 years",
-                               age.at.first.sex >= 55~ "55+ years",
-                               TRUE ~ 'missing'))%>%
-  count(age.group)%>%
-  rename(age.group.count=n)%>%
-  mutate(proportion.age.at.first.sex.unweighted = round(age.group.count/sum(age.group.count), digits=2))
+  mutate(proportion.age.at.first.sex.unweighted = round(age.at.first.sex.count/sum(age.at.first.sex.count), digits=2))%>%
+  mutate(cumulative.proportion = cumsum(proportion.age.at.first.sex.unweighted))
 
 
- 
+#Proportion: for each age, what proportion of people who are that age had sex in the past year?
+#what proportion of 25 years old had sex in past yr
+proportion.sex.in.past.year.by.age <- nhanes.subset%>%
+  mutate(sex.in.past.year = case_when(male.sex.with.female.past.year > 0 & male.sex.with.female.past.year < 7777
+                                    | male.sex.with.male.past.year > 0 & male.sex.with.male.past.year < 7777
+                                    | female.sex.with.male.past.year > 0 & female.sex.with.male.past.year < 7777
+                                    | female.sex.with.female.past.year > 0 & female.sex.with.female.past.year < 7777 ~ "1", 
+                                    TRUE ~ "0"))%>%
+  group_by(age)%>%
+  count(sex.in.past.year)%>%
+  rename(count.sex.in.past.year = n)%>%
+  mutate(proportion.count.sex.in.past.year.unweighted = round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))
+  
+
+################################################################################
+##TABLE ARCHIVE
+################################################################################
+# 
+# total.msm.table <- nhanes.total%>%
+#   filter(gender=="male")%>%
+#   count(msm.adjusted)%>%
+#   rename(msm.adjusted.count  = n)%>%
+#   mutate(proportion.msm.unweighted = round(msm.adjusted.count/sum(msm.adjusted.count), digits=2))
+# 
+# race.msm.table <- nhanes.total%>%
+#   filter(gender=="male")%>%
+#   filter(msm.adjusted == "yes")%>%
+#   count(race)%>%
+#   rename(msm.adjusted.count = n)%>%
+#   mutate(proportion.msm.unweighted = round(msm.adjusted.count/sum(msm.adjusted.count), digits=2))
+# 
+# age.msm.table <- nhanes.total%>%
+#   filter(gender=="male")%>%
+#   mutate(age.group = case_when(age <= 24 ~ "18-24 years",
+#                                age >= 25 & age <=34 ~ "25-34 years",
+#                                age >= 35 & age <= 44 ~ "35-44 years",
+#                                age >= 45 & age <= 54 ~ "45-54 years",
+#                                age >= 55~ "55+ years"))%>%
+#   filter(msm.adjusted == "yes")%>%
+#   count(age.group)%>%
+#   rename(msm.adjusted.count = n)%>%
+#   mutate(proportion.msm.unweighted = round(msm.adjusted.count/sum(men.ever.sex.with.men.count), digits=2))
+# 
+# 
+# ################################################################################
+# #Age at first time of sex Tables
+# ################################################################################
+# single.age.at.sex.table <- nhanes.total%>%
+#   count(age.at.first.sex)%>%
+#   rename(age.at.first.sex.count=n)%>%
+#   mutate(proportion.age.at.first.sex.unweighted = round(age.at.first.sex.count/sum(age.at.first.sex.count), digits=2))
+# 
+# age.grouping.at.sex.table <- nhanes.total%>%
+#   mutate(age.at.first.sex = ifelse(age.at.first.sex == 99, NA, age.at.first.sex))%>%
+#   mutate(age.at.first.sex = ifelse(age.at.first.sex == 77, NA, age.at.first.sex))%>%
+#   mutate(age.group = case_when(age.at.first.sex <= 24 ~ "18-24 years",
+#                                age.at.first.sex >= 25 & age.at.first.sex <=34 ~ "25-34 years",
+#                                age.at.first.sex >= 35 & age.at.first.sex <= 44 ~ "35-44 years",
+#                                age.at.first.sex >= 45 & age.at.first.sex <= 54 ~ "45-54 years",
+#                                age.at.first.sex >= 55~ "55+ years",
+#                                TRUE ~ 'missing'))%>%
+#   count(age.group)%>%
+#   rename(age.group.count=n)%>%
+#   mutate(proportion.age.at.first.sex.unweighted = round(age.group.count/sum(age.group.count), digits=2))
+# 
+# new.age.grouping.at.sex.table <- nhanes.total%>%
+#   mutate(age.at.first.sex = ifelse(age.at.first.sex == 99, NA, age.at.first.sex))%>%
+#   mutate(age.at.first.sex = ifelse(age.at.first.sex == 77, NA, age.at.first.sex))%>%
+#   mutate(age.group = case_when(
+#                                age.at.first.sex >= 10 & age.at.first.sex <= 12 ~ "10-12 years",
+#                                age.at.first.sex >= 13 & age.at.first.sex <= 17 ~ "13-17 years",
+#                                age.at.first.sex >= 18 & age.at.first.sex <= 24 ~ "18-24 years",
+#                                age.at.first.sex >= 25 & age.at.first.sex <=34 ~ "25-34 years",
+#                                age.at.first.sex >= 35 & age.at.first.sex <= 44 ~ "35-44 years",
+#                                age.at.first.sex >= 45 & age.at.first.sex <= 54 ~ "45-54 years",
+#                                age.at.first.sex >= 55~ "55+ years",
+#                                TRUE ~ 'missing'))%>%
+#   count(age.group)%>%
+#   rename(age.group.count=n)%>%
+#   mutate(proportion.age.at.first.sex.unweighted = round(age.group.count/sum(age.group.count), digits=2))
+# 
+# 
+#  
