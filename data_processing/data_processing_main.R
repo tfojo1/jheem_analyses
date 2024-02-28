@@ -1371,6 +1371,7 @@ total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)
 ################################################################################
  ##Put summation of census counties to create msa populations within the surveillance manager
 smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.rdata")
+census.manager = load.data.manager("../../cached/census.manager.rdata")
  
  #this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
  #this function currently defaults to population, when using it for mortality you need to define mortality as the outome#
@@ -1388,7 +1389,7 @@ smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.
                         age.penultimate.upper = 84,
                         age.upper.limit.name = '85+',
                         data.manager = surveillance.manager,
-                        census.manager = smaller.census.manager)
+                        census.manager = census.manager)
  
 ################################################################################
  #Create aggregated outcomes 
