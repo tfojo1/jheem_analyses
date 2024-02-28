@@ -5,13 +5,13 @@ library(locations)
 source('commoncode/locations_of_interest.R')
 COUNTIES.OF.INTEREST <- unlist(COUNTIES.OF.INTEREST)
 
-census.manager.filepath = "cached/census.manager.rdata"
+census.manager.filepath = "../../cached/census.manager.rdata"
 
 load(census.manager.filepath)
 
 smaller.census.manager = census.manager$subset.data(dimension.values = list(location = COUNTIES.OF.INTEREST))
 
-save(census.manager, file="cached/smaller.census.manager.rdata")
+save(census.manager, file="../../cached/smaller.census.manager.rdata")
 
 #Also save to Q drive
 save(smaller.census.manager, file="Q:/data_managers/smaller.census.manager.rdata")
