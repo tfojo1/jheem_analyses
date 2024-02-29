@@ -66,16 +66,18 @@ joint.pop.migration.likelihood.instructions = join.likelihood.instructions(popul
                                                                            emigration.likelihood.instructions
                                                                            )
 #-- NEW DIAGNOSES  --#
-race.risk.two.way.new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                                                             outcome.for.sim = "new",
-                                                                             dimensions = c("race","risk"),
-                                                                             levels.of.stratification = c(0,1,2), 
-                                                                             from.year = as.integer(2008), 
-                                                                             observation.correlation.form = 'compound.symmetry', 
-                                                                             measurement.error.coefficient.of.variance = 0.03,
-                                                                             weights = list(1), 
-                                                                             equalize.weight.by.year = T 
-)
+race.risk.sex.two.way.new.diagnoses.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                       outcome.for.sim = "new",
+                                       dimensions = c("race","risk","sex"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = as.integer(2008), 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       measurement.error.coefficient.of.variance = 0.03,
+                                       weights = list(1), 
+                                       equalize.weight.by.year = T 
+  )
+
 new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                                                              outcome.for.sim = "new",
                                                                              dimensions = c("age","sex","race","risk"),
@@ -89,16 +91,18 @@ new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(out
 
 
 #-- PREVALENCE  --#
-race.risk.two.way.prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                                                                            outcome.for.sim = "diagnosed.prevalence",
-                                                                                            dimensions = c("race","risk"),
-                                                                                            levels.of.stratification = c(0,1,2), 
-                                                                                            from.year = as.integer(2008), 
-                                                                                            observation.correlation.form = 'compound.symmetry', 
-                                                                                            measurement.error.coefficient.of.variance = 0.03,
-                                                                                            weights = list(1),
-                                                                                            equalize.weight.by.year = T 
-)
+race.risk.sex.two.way.prevalence.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                       outcome.for.sim = "diagnosed.prevalence",
+                                       dimensions = c("race","risk","sex"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = as.integer(2008), 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       measurement.error.coefficient.of.variance = 0.03,
+                                       weights = list(1),
+                                       equalize.weight.by.year = T 
+  )
+
 prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                                                           outcome.for.sim = "diagnosed.prevalence",
                                                                           dimensions = c("age","sex","race","risk"),
@@ -145,25 +149,25 @@ total.aids.diagnoses.likelihood.instructions =
   )
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
-two.way.transmission.aids.pop.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.two.way.new.diagnoses.likelihood.instructions,
-                               race.risk.two.way.prevalence.likelihood.instructions,
+two.way.transmission.aids.pop.likelihood.instructions =
+  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.sex.two.way.prevalence.likelihood.instructions,
                                aids.diagnoses.likelihood.instructions,
                                population.likelihood.instructions
-                               
+
   )
 
 two.way.transmission.total.aids.pop.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.two.way.new.diagnoses.likelihood.instructions,
-                               race.risk.two.way.prevalence.likelihood.instructions,
+  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.sex.two.way.prevalence.likelihood.instructions,
                                total.aids.diagnoses.likelihood.instructions, # total aids only 
                                population.likelihood.instructions
                                
   )
 
 two.way.transmission.pop.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.two.way.new.diagnoses.likelihood.instructions,
-                               race.risk.two.way.prevalence.likelihood.instructions,
+  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.sex.two.way.prevalence.likelihood.instructions,
                                population.likelihood.instructions # no aids
                                
   )
