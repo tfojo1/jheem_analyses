@@ -3,20 +3,23 @@
 # You just need to do this once to set up dummy simsets on your local machine
 if (1==2)
 {
-    source('test/set_up_dummy_ehe_sims.R')
+  source('test/set_up_dummy_ehe_sims.R')
+  # load simulation data
+  simset$save() # this will save them in the proper place in the file tree
 }
 
-CALIBRATION.CODE = NULL #for now, we are going to use 'uncalibrated' (ie, manually generated) simulations
-LOCATIONS = c('C.12580','C.33100') # for now, Baltimore and Miami
 
-PREP.UPSCALE.INTERVENTION.CODES = c('msmprepuse10', 'msmprepuse20', 'msmprepuse35', 'msmprepuse50',
+CALIBRATION.CODE = 'init.transmission.ehe' #for now, we are going to use 'uncalibrated' (ie, manually generated) simulations
+LOCATIONS = c('C.12580','C.26420','C.33100','C.16980') # for now, Baltimore and Miami
+
+PREP.UPSCALE.INTERVENTION.CODES = c('msmprepuse10', 'msmprepuse20', 'msmprepuse35', 'msmprepuse40',
                                     'preppers30msm', 'preppers50msm', 'preppers80msm') #@padma - update this
 
 prep.upscale.intervention.names = c(
   "Additional 10% PrEP Use",
   "Additional 20% PrEP Use",
   "Additional 35% PrEP Use",
-  "Additional 50% PrEP Use",
+  "Additional 40% PrEP Use",
   "30% PrEP Persistence",
   "50% PrEP Persistence",
   "80% PrEP Persistence"
@@ -26,7 +29,7 @@ prep.upscale.intervention.names = c(
 collection = create.simset.collection(version='ehe',
                                       calibration.code=CALIBRATION.CODE,
                                       locations = LOCATIONS,
-                                      interventions = PREP.UPSCALE.INTERVENTION.CODES)
+                                      interventions = PREP.UPSCALE.INTERVENTION.CODES, n.sim=100)
 
 # Run all the interventions - you should just need to do this once
 collection$run(start.year = 2025, end.year = 2035, 

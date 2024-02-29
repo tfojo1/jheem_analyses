@@ -38,17 +38,17 @@ prepuse_20 <- create.intervention.effect(
   allow.values.greater.than.otherwise = TRUE
 )
 
-# 
-# prepuse_25 <- create.intervention.effect(
-#   quantity.name = "oral.prep.uptake",
-#   start.time = start.year,
-#   effect.values = 0.25, 
-#   times = end.year,
-#   scale = "proportion",
-#   apply.effects.as = "addend",
-#   allow.values.less.than.otherwise = FALSE,
-#   allow.values.greater.than.otherwise = TRUE
-# )
+
+prepuse_25 <- create.intervention.effect(
+  quantity.name = "oral.prep.uptake",
+  start.time = start.year,
+  effect.values = 0.25,
+  times = end.year,
+  scale = "proportion",
+  apply.effects.as = "addend",
+  allow.values.less.than.otherwise = FALSE,
+  allow.values.greater.than.otherwise = TRUE
+)
 
 prepuse_35 <- create.intervention.effect(
   quantity.name = "oral.prep.uptake",
@@ -61,6 +61,17 @@ prepuse_35 <- create.intervention.effect(
   allow.values.greater.than.otherwise = TRUE
 )
 
+
+prepuse_40 <- create.intervention.effect(
+  quantity.name = "oral.prep.uptake",
+  start.time = start.year,
+  effect.values = 0.40, 
+  times = end.year,
+  scale = "proportion",
+  apply.effects.as = "addend",
+  allow.values.less.than.otherwise = FALSE,
+  allow.values.greater.than.otherwise = TRUE
+)
 
 prepuse_50 <- create.intervention.effect(
   quantity.name = "oral.prep.uptake",
@@ -96,6 +107,10 @@ prep.use25.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM),
 prep.use35.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM), 
                                       prepuse_35, 
                                       code = "msmprepuse35") # can pass more than 1
+
+prep.use40.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM), 
+                                      prepuse_40, 
+                                      code = "msmprepuse40") # can pass more than 1
 
 prep.use50.msm <- create.intervention(c(BLACK.MSM, HISPANIC.MSM), 
                                       prepuse_50, 
