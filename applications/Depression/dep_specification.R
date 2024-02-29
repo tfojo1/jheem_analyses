@@ -42,8 +42,11 @@ register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx",
                                                                        value.is.on.transformed.scale = F), 
                        scale = "proportion")
 
-depression.inc.betas <- array(c(.33/.5, .28/.5, .28/.5, .28/.5, .15/.5), dim=c(age=5),  ## add gender + interaction term ##
-                              dimnames = list(age=c("13-24 years", "25-34 years","35-44 years", "45-54 years", "55+ years")))
+depression.inc.betas <- array(c(.42/.5, .34/.5, .34/.5, .34/.5, .18/.5,
+                                .42/.5, .34/.5, .34/.5, .34/.5, .18/.5,
+                                .26/.5, .22/.5, .22/.5, .22/.5, .12/.5), dim=c(sex=3,age=5),  ## add gender + interaction term ##
+                              dimnames = list(sex=c("female","msm","heterosexual_male"),
+                                              age=c("13-24 years", "25-34 years","35-44 years", "45-54 years", "55+ years")))
 
 register.model.element(DEP.SPECIFICATION, name="depression.incidence",
                        functional.form = create.static.functional.form(value = depression.inc.betas, link = "logit",
