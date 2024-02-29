@@ -313,6 +313,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     hispanic.hispanic.sexual.oe = Normal.Distribution((2.19), 0.5*2.19, lower=1),
     other.other.sexual.oe = Normal.Distribution((1.55), 0.5*1.55, lower=1),
     
+    black.black.idu.oe = Normal.Distribution((9.12), 0.5*9.12, lower=1), # added 2/29/24
+    hispanic.hispanic.idu.oe = Normal.Distribution((1.05), 0.5*1.05, lower=1),
+    other.other.idu.oe = Normal.Distribution((1.05), 0.5*1.05, lower=1),
+    
     #-- Acute HIV and the Effect of Diagnosis --#
     acute.transmissibility.rr = Lognormal.Distribution(log(12), 0.25*log(2)), #do I have a more evidence based range?
     diagnosed.transmission.rr = Lognormal.Distribution(log(mean(c(1-.68, 1/3.5))), 0.25*log(2), upper=1), #avg of Marks 2006 and Marks 2005
@@ -492,6 +496,12 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'black.black.sexual.oe',
     'hispanic.hispanic.sexual.oe',
     'other.other.sexual.oe'
+  ),
+  
+  idu.mixing = c(
+    'black.black.idu.oe',
+    'hispanic.hispanic.idu.oe',
+    'other.other.idu.oe'
   ),
   
   msm.age1.susceptibility = c(
