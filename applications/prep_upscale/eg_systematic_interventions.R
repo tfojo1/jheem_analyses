@@ -10,7 +10,10 @@ if (1==2)
 
 
 CALIBRATION.CODE = 'init.transmission.ehe' #for now, we are going to use 'uncalibrated' (ie, manually generated) simulations
-LOCATIONS = c('C.12580','C.26420','C.33100','C.16980') # for now, Baltimore and Miami
+LOCATIONS = c('C.16980') 
+# LOCATIONS = c('C.12580','C.26420','C.33100','C.16980') 
+
+# BALTIMORE, HOUSTON, MIAMI, CHICAGO
 
 PREP.UPSCALE.INTERVENTION.CODES = c('msmprepuse10', 'msmprepuse20', 'msmprepuse35', 'msmprepuse40',
                                     'preppers30msm', 'preppers50msm', 'preppers80msm') #@padma - update this
@@ -29,12 +32,13 @@ prep.upscale.intervention.names = c(
 collection = create.simset.collection(version='ehe',
                                       calibration.code=CALIBRATION.CODE,
                                       locations = LOCATIONS,
-                                      interventions = PREP.UPSCALE.INTERVENTION.CODES, n.sim=100)
+                                      interventions = PREP.UPSCALE.INTERVENTION.CODES,
+                                      n.sim = 100)
 
 # Run all the interventions - you should just need to do this once
 collection$run(start.year = 2025, end.year = 2035, 
                verbose = T,
-               overwrite.prior = F) #NB: this last argument means it is not going to re-run interventions - so if you change the intervention, you need to set this to T to re-run
+               overwrite.prior = T) #NB: this last argument means it is not going to re-run interventions - so if you change the intervention, you need to set this to T to re-run
 
 # Get statistics out of your run simsets
 # Do this as often as you like
