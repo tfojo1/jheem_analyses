@@ -2,7 +2,7 @@ library(haven)
 library(dplyr)
 ################################################################################
 ##Read in NHANES Data
-DATA.DIR.NHANES="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES"
+DATA.DIR.NHANES="Q:/data_clean/nhanes/raw_data"
 
 nhanes.files <- list.files(DATA.DIR.NHANES, pattern = ".XPT", full.names = "TRUE")
 
@@ -364,4 +364,9 @@ proportion.sex.in.past.year.by.age.by.year <- nhanes.subset%>%
   count(sex.in.past.year)%>%
   rename(count.sex.in.past.year = n)%>%
   mutate(proportion.count.sex.in.past.year.unweighted = round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))
+
+#Save
+
+#save(nhanes.subset, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.subset.RData")
+#save(cumulative.proportion.age.at.sex.initiation.all.years, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/cumulative.proportion.age.at.sex.initiation.all.years.RData")
 
