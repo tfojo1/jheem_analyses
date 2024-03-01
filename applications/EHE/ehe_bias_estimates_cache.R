@@ -30,6 +30,26 @@ awareness.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                         main.location.type = "COUNTY",
                                                         main.location.type.n.source = "cdc.hiv")
 
+cocaine.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+                                              dimensions = c("age"),
+                                              levels.of.stratification = c(0,1),
+                                              outcome.for.p = "cocaine",
+                                              outcome.for.n = "adult.population",
+                                              sub.location.type = NULL, # want to be able to do this 
+                                              super.location.type = "STATE",
+                                              main.location.type = "NSDUH",
+                                              main.location.type.n.source = "cdc.hiv")
+
+heroin.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+                                              dimensions = c("age"),
+                                              levels.of.stratification = c(0,1),
+                                              outcome.for.p = "heroin",
+                                              outcome.for.n = "adult.population",
+                                              sub.location.type = NULL, # want to be able to do this 
+                                              super.location.type = "STATE",
+                                              main.location.type = "NSDUH",
+                                              main.location.type.n.source = "cdc.hiv")
+
 # already cached
 if(1==2){
   cache.object.for.version(object = suppression.bias.estimates, 
