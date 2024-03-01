@@ -15,6 +15,8 @@ CENSUS.BHO.RACE.MAPPING = create.other.catchall.ontology.mapping('race',
                                                                  from.values=ALL.DATA.MANAGERS$census.full$races,
                                                                  to.values=c('black','hispanic','other'))
 
+CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
+
 ##-----------##
 ##-- Aging --##
 ##-----------##
@@ -579,7 +581,6 @@ get.best.guess.msm.proportions.by.race <- function(location,
     
     proportion.msm.by.location = apply(proportion.msm.by.location, 'location', mean, na.rm=T)
     
-    #proportion.msm.by.location = ALL.DATA.MANAGERS$msm.proportions[as.character(as.numeric(fips))]
     keep.dimensions = c('location', 'age','race','ethnicity')
     males = CENSUS.MANAGER$pull(outcome = 'population',
                                       keep.dimensions = keep.dimensions,
@@ -667,47 +668,40 @@ get.best.guess.msm.proportions.by.race <- function(location,
 ##---------------##
 
 # for this to be different, will also need to add alphas into ehe_parameters and map them in ehe_parameter_mapping
-get.model.fertility.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+get.location.birth.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
   
-  rates = get.model.fertility.rates(location=location,
+  rates = get.location.birth.rates(location=location,
                                     specification.metadata = specification.metadata) 
   
   create.static.functional.form(value = rates,
                                 link = "log",
                                 value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
-  
-  
-  #create.log.linear.functional.form(intercept = rates,
-  #                                  slope = 1, # log(1) = 0, so this means no slope on the non-transformed scale
-  #                                  parameters.are.on.log.scale = F,
-  #                                  anchor.year = 2007)
-  
 }
 
-get.model.fertility.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
+get.location.birth.rates <- function(location,
+                                     specification.metadata,
+                                     years = DEFAULT.POPULATION.YEARS)
 {
-    counties = get.contained.locations(location, 'county')
+    counties = locations::get.contained.locations(location, 'county')
     
-    # Get the population (to weight as we aggregate across races)
-    county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
-                                         year=population.years, aggregate.years = T) / length(population.years)
-    population = colSums(county.populations)
+    # Pull the births into an array
+    # I imagine this should be indexed [year, county, race, ethnicity] - not necessarily in that order
+    births=CENSUS.MANAGER$pull(outcome = 'births', location = counties, year= years, keep.dimensions = c('race', 'ethnicity', 'location'), na.rm=TRUE)[,,,1] #keep all race, all ethnicities, first source#
+    births = apply(births, c('race','ethnicity'), sum, na.rm=T)
     
-    # Weight rates by population
-    birth.rates = get.birth.rates(ALL.DATA.MANAGERS$fertility,
-                                  fips=counties,
-                                  census=ALL.DATA.MANAGERS$census.collapsed,
-                                  aggregate.counties = T)
-    birth.rates = array(birth.rates, dim=c(race=length(birth.rates)), dimnames=list(race=names(birth.rates)))
-    pop.by.race = apply(population, 'race', sum)
-    pop.by.race = array(pop.by.race, dim=c(race=length(pop.by.race)), dimnames=list(race=names(pop.by.race)))
+    # Pull population into an array
+    # I imagine this should be indexed [year, county, race, ethnicity] - not necessarily in that order
+    population=SURVEILLANCE.MANAGER$pull(outcome = 'adult.population', location = location, year= years, keep.dimensions = c('race', 'ethnicity'), na.rm=TRUE)[,,1]
     
-    numerators = CENSUS.BHO.RACE.MAPPING$apply(pop.by.race * birth.rates)
-    denominators = CENSUS.BHO.RACE.MAPPING$apply(pop.by.race)
+    # Map the ontologies
+    target.dim.names = specification.metadata$dim.names[c('race')]
+    rv = map.value.ontology(births, target.dim.names=target.dim.names) / 
+        map.value.ontology(population, target.dim.names=target.dim.names)
     
-    numerators / denominators
+    dim(rv) = sapply(specification.metadata$dim.names['race'], length)
+    dimnames(rv) = specification.metadata$dim.names['race']
+    rv
 }
-
 
 ##---------------##
 ##-- MORTALITY --##
@@ -941,32 +935,38 @@ get.covid.max.testing.effect = function(specification.metadata){
 
 get.base.initial.male.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
 {
-    if (length(specification.metadata$dim.names$location)>1)
-        stop("We need to specify what to do with more than one location")
-    
-    counties = get.contained.locations(location, 'county')
-    
-    county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
-                                         sexes = 'male', aggregate.sexes = T,
-                                         aggregate.counties = T,
-                                         year=years, aggregate.years = T) / length(years)
-    
-    CENSUS.BHO.RACE.MAPPING$apply(county.populations)
+    get.base.initial.male.population.for.sex(location,
+                                             specification.metadata = specification.metadata,
+                                             sex = 'male',
+                                             years = years)
 }
 
 get.base.initial.female.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
 {
+    get.base.initial.male.population.for.sex(location,
+                                             specification.metadata = specification.metadata,
+                                             sex = 'female',
+                                             years = years)
+}
+
+get.base.initial.male.population.for.sex <- function(location, specification.metadata, sex, years=DEFAULT.POPULATION.YEARS)
+{
     if (length(specification.metadata$dim.names$location)>1)
         stop("We need to specify what to do with more than one location")
     
-    counties = get.contained.locations(location, 'county')
+    counties = locations::get.contained.locations(location, 'county')
+    pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=years, location=counties, sex=sex),
+                              keep.dimensions = c('age','race','ethnicity','sex')) / length(years)
     
-    county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
-                                         sexes = 'female', aggregate.sexes = T,
-                                         aggregate.counties = T,
-                                         year=years, aggregate.years = T) / length(years)
+    mapping = get.ontology.mapping(from.ontology = dimnames(pop),
+                                   to.ontology = specification.metadata$dim.names[c('age','race')])
     
-    CENSUS.BHO.RACE.MAPPING$apply(county.populations)
+    if (is.null(mapping))
+        stop(paste0("Cannot get.base.initial.male.population.for.sex('",
+                    sex,
+                    "') - unable to find a mapping from the census to the specification's age and race categorizations"))
+    
+    mapping$apply(pop, to.dim.names = specification.metadata$dim.names[c('age','race')])
 }
 
 get.location.ever.idu.prevalence <- function(location, specification.metadata)
@@ -1109,16 +1109,19 @@ get.race.population.counts <- function(location,
 get.female.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
 {
     counties = get.contained.locations(location, 'county')
-    rv = get.census.data(ALL.DATA.MANAGERS$census.full, 
-                         fips = counties,
-                         years = population.years,
-                         sexes = 'female',
-                         aggregate.years = T,
-                         aggregate.counties = T,
-                         aggregate.ages = F,
-                         aggregate.races = T,
-                         aggregate.sexes = T) / length(population.years)
-    array(rv, dim=c(age=length(rv)), dimnames=list(age=names(rv)))
+    pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=population.years, location=counties, sex='female'),
+                              keep.dimensions = c('age','race','sex','ethnicity')) / length(population.years)
+    
+    array(apply(pop, 'age', sum), dim=c(age=length(CENSUS.AGES)), dimnames=list(age=CENSUS.AGES))
+}
+
+get.male.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
+{
+    counties = get.contained.locations(location, 'county')
+    pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=population.years, location=counties, sex='male'),
+                              keep.dimensions = c('age','race','sex','ethnicity')) / length(population.years)
+    
+    array(apply(pop, 'age', sum), dim=c(age=length(CENSUS.AGES)), dimnames=list(age=CENSUS.AGES))
 }
 
 get.msm.single.year.age.counts <- function(location, specification.metadata,
@@ -1153,16 +1156,7 @@ get.msm.single.year.age.counts <- function(location, specification.metadata,
 get.heterosexual.male.single.year.age.counts <- function(location, specification.metadata,
                                                          population.years=DEFAULT.POPULATION.YEARS)
 {
-    counties = get.contained.locations(location, 'county')
-    get.census.data(ALL.DATA.MANAGERS$census.full,
-                    fips=counties,
-                    years = population.years,
-                    sexes = 'male',
-                    aggregate.years = T,
-                    aggregate.counties = T,
-                    aggregate.ages = F,
-                    aggregate.races = T,
-                    aggregate.sexes = T) / length(population.years) - 
+    get.male.single.year.age.counts(location = location, population.years = population.years)
         get.msm.single.year.age.counts(location=location, specification.metadata=specification.metadata,
                                        population.years=population.years)
 }
@@ -1176,7 +1170,7 @@ get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
     do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                              location=location,
                                              age.mixing.sd.mult = age.mixing.sd.mult,
-                                             age.model = ALL.DATA.MANAGERS$pairing$sex.age.models$msm,
+                                             age.model = PAIRING.INPUT.MANAGER$sex.age.models$msm,
                                              age.counts = single.year.msm.age.counts,
                                              availability = single.year.age.sexual.availability)
 }
@@ -1189,7 +1183,7 @@ get.heterosexual.male.sexual.age.contact.proportions <- function(age.mixing.sd.m
     do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                              location=location,
                                              age.mixing.sd.mult = age.mixing.sd.mult,
-                                             age.model = ALL.DATA.MANAGERS$pairing$sex.age.models$heterosexual_male,
+                                             age.model = PAIRING.INPUT.MANAGER$sex.age.models$heterosexual_male,
                                              age.counts = single.year.heterosexual.male.age.counts,
                                              availability = single.year.age.sexual.availability)
 }
@@ -1202,7 +1196,7 @@ get.female.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
     do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                              location=location,
                                              age.mixing.sd.mult = age.mixing.sd.mult,
-                                             age.model = ALL.DATA.MANAGERS$pairing$sex.age.models$female,
+                                             age.model = PAIRING.INPUT.MANAGER$sex.age.models$female,
                                              age.counts = single.year.female.age.counts,
                                              availability = single.year.age.sexual.availability)
 }
@@ -1215,7 +1209,7 @@ get.idu.age.contact.proportions <- function(age.mixing.sd.mult,
     do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
                                              location=location,
                                              age.mixing.sd.mult = age.mixing.sd.mult,
-                                             age.model = ALL.DATA.MANAGERS$pairing$idu.age.model,
+                                             age.model = PAIRING.INPUT.MANAGER$idu.age.model,
                                              age.counts = single.year.age.counts,
                                              availability = single.year.age.idu.availability)
 }
@@ -1238,7 +1232,7 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
 {
     #-- Call the function --#
     age.cutoffs = specification.metadata$age.endpoints
-    age.cutoffs[length(age.cutoffs)] = min(age.cutoffs[length(age.cutoffs)],
+    age.cutoffs[length(age.cutoffs)] = min(age.cutoffs[length(age.cutoffs)], 
                                            max(as.numeric(names(age.counts))))
     
     get.age.mixing.proportions(age.delta.intercept.mean=age.model['mean.intercept'],
@@ -1253,8 +1247,8 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
 
 get.sexual.availability <- function()
 {
-    rv = rep(1, length(ALL.DATA.MANAGERS$census.full$age.names))
-    names(rv) = ALL.DATA.MANAGERS$census.full$age.names
+    rv = rep(1, length(CENSUS.AGES))
+    names(rv) = CENSUS.AGES
     
     # Assume no sex under 13
     rv[as.character(0:12)] = 0
@@ -1280,8 +1274,8 @@ get.sexual.availability <- function()
 
 get.idu.availability <- function()
 {
-    rv = rep(1, length(ALL.DATA.MANAGERS$census.full$age.names))
-    names(rv) = ALL.DATA.MANAGERS$census.full$age.names
+    rv = rep(1, length(CENSUS.AGES))
+    names(rv) = CENSUS.AGES
     
     # Assume no IDU under 13
     rv[as.character(0:12)] = 0
