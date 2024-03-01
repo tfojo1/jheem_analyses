@@ -105,7 +105,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     {
         model.settings$set.element.functional.form.interaction.alphas(element.name = 'race.sexual.oes', 
                                                                       alpha.name = 'value', 
-                                                                      value = parameters['race.sexual.assortativity.multiplier'],
+                                                                      value = parameters[paste0(race,'.sexual.assortativity.multiplier')],
                                                                       applies.to.dimension.values=c(race.from=race, race.to=race))
       
         model.settings$set.element.functional.form.interaction.alphas(element.name = 'race.idu.oes', 

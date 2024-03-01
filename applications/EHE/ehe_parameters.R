@@ -309,7 +309,9 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.004), 0.5*log(2), upper=1),
     oe.never.idu.pairings.with.idu = Lognormal.Distribution(log(0.2), 0.5*log(2), upper=1), #see calculations below
     
-    race.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
+    black.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
+    hispanic.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
+    other.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
     race.needle.sharing.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
 
     # black.black.sexual.oe = Normal.Distribution((3.76), 0.5*3.76, lower=1), # changed 2/23/24
@@ -493,7 +495,9 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   ),
   
   assortativity = c(
-      'race.sexual.assortativity.multiplier',
+      'black.sexual.assortativity.multiplier',
+      'hispanic.sexual.assortativity.multiplier',
+      'other.sexual.assortativity.multiplier',
       'race.needle.sharing.assortativity.multiplier'
   ),
   # 

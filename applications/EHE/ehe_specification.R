@@ -312,8 +312,7 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'general.population.testing.without.covid',
                        scale = 'rate',
                        
-                       get.functional.form.function = get.testing.model,
-                      # continuum.manager = ALL.DATA.MANAGERS$continuum,
+                       get.functional.form.function = get.testing.functional.form,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010,
                        
@@ -341,7 +340,7 @@ register.model.quantity(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'undiagnosed.testing.rr.without.covid',
-                       value = 1, # for now, eventually have to do get.functional.form.function
+                       get.functional.form.function = get.undiagnosed.testing.rr.functional.form, 
                        scale = 'ratio')
 
 register.model.quantity(EHE.SPECIFICATION,

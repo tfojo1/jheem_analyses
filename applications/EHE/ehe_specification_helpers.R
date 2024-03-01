@@ -1307,8 +1307,7 @@ get.idu.availability <- function()
 ##-- Testing --##
 ##-------------##
 
-get.testing.functional.form = function(location, specification.metadata, 
-                                       population.years=DEFAULT.POPULATION.YEARS){
+get.testing.functional.form = function(specification.metadata){
   
   testing.prior = get.cached.object.for.version(name = "testing.prior",
                                                 version = specification.metadata$version) 
@@ -1324,11 +1323,9 @@ get.testing.functional.form = function(location, specification.metadata,
 
 
 
-get.undiagnosed.testing.rr.functional.form <- function(location, specification.metadata, 
-                                                       population.years=DEFAULT.POPULATION.YEARS){
+get.undiagnosed.testing.rr.functional.form <- function(specification.metadata){
   
-  multipliers = get.undiagnosed.testing.rr(location=location,
-                                           specification.metadata = specification.metadata) 
+  multipliers = get.undiagnosed.testing.rr(specification.metadata = specification.metadata) 
 
   create.static.functional.form(value = multipliers,
                                 link = "log",
@@ -1336,7 +1333,7 @@ get.undiagnosed.testing.rr.functional.form <- function(location, specification.m
   
 }
 
-get.undiagnosed.testing.rr <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+get.undiagnosed.testing.rr <- function(specification.metadata){
   
   high.risk.testing.rate.ratios = get.cached.object.for.version(name = "high.risk.testing.rate.ratios",
                                                 version = specification.metadata$version) 

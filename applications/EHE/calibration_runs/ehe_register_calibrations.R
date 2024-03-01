@@ -72,8 +72,8 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
 par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('msm.vs.heterosexual.male.idu.susceptibility', 
                                                                 EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('sexual.oe', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('idu.oe', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('sexual.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('needle.sharing.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('incident.idu', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('fraction.heterosexual', EHE.PARAMETERS.PRIOR@var.names)]
 
