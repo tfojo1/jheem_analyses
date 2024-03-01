@@ -99,6 +99,21 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
       
     }
 
+    #-- Assortativity --#
+    
+    for (race in races)
+    {
+        model.settings$set.element.functional.form.interaction.alphas(element.name = 'race.sexual.oes', 
+                                                                      alpha.name = 'value', 
+                                                                      value = parameters['race.sexual.assortativity.multiplier'],
+                                                                      applies.to.dimension.values=c(race.from=race, race.to=race))
+      
+        model.settings$set.element.functional.form.interaction.alphas(element.name = 'race.idu.oes', 
+                                                                      alpha.name = 'value', 
+                                                                      value = parameters['race.needle.sharing.assortativity.multiplier'],
+                                                                      applies.to.dimension.values=c(race.from=race, race.to=race))
+    }
+    
     #-- Suppression --#
     set.ehe.alphas.from.parameters(model.settings,
                                    element.name = 'suppression.of.diagnosed',
