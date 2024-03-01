@@ -267,7 +267,7 @@ nhanes.subset = nhanes.total
 ##Metrics Todd wants 
 ################################################################################
 #Proportion of Heterosexuals who report Gonorrhea in Past Year
-  #QUESTION: Should I adjust this to be only sexually active people?
+  #QUESTION: Should I adjust this to be only sexually active people? #Don't do this
   #QUESTION: Do I need to regroup so anyone who is not MSM is heterosexual?
 
 proportion.heterosexual.with.gonorrhea.past.year <- nhanes.subset %>%
@@ -324,6 +324,7 @@ proportion.msm.with.casual.partner.age <- nhanes.subset %>%
 cumulative.proportion.age.at.sex.initiation.all.years <- nhanes.subset%>%
   filter(age.at.first.sex != "dont know")%>%
   filter(age.at.first.sex != "refused")%>%
+  filter(age.at.first.sex < 31)%>% #Adjusted so Todd can see values in only under 30
   count(age.at.first.sex)%>%
   rename(age.at.first.sex.count=n)%>%
   mutate(proportion.age.at.first.sex.unweighted = round(age.at.first.sex.count/sum(age.at.first.sex.count), digits=2))%>%
