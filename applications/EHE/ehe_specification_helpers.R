@@ -11,10 +11,6 @@ DEFAULT.POPULATION.YEARS = 2007
 TRATE.KNOT.TIMES = c(rate0=2000, rate1=2010, rate2=2020)
 TRATE.AFTER.TIME = 2030
 
-CENSUS.BHO.RACE.MAPPING = create.other.catchall.ontology.mapping('race', 
-                                                                 from.values=ALL.DATA.MANAGERS$census.full$races,
-                                                                 to.values=c('black','hispanic','other'))
-
 CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
 
 ##-----------##
@@ -767,49 +763,6 @@ get.location.mortality.rates <- function(location,
     }
 }
 
-##---------------##
-##-- MORTALITY --##
-##---------------##
-get.non.idu.general.mortality.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
-  
-  rates = get.non.idu.general.mortality.rates(location=location,
-                                              specification.metadata = specification.metadata) 
-  
-  create.static.functional.form(value = rates,
-                                link = "log",
-                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
-  
-}
-
-get.non.idu.general.mortality.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
-{
-    counties = get.contained.locations(location, 'county')
-    
-    # Get the raw rates
-    raw.mortality.rates = get.mortality.rates(ALL.DATA.MANAGERS$mortality, 
-                                              states=get.overlapping.locations(location, 'state'), 
-                                              verbose=F)
-    
-    # Get the population (to weight as we aggregate across races)
-    county.populations = get.census.data(ALL.DATA.MANAGERS$census.collapsed, fips=counties,
-                                         year=population.years, aggregate.years = T) / length(population.years)
-    population = colSums(county.populations)
-    
-    # Weight rates by population
-    mortality.numerators = rowSums(sapply(counties, function(county){
-        county.populations[county,,,] * 
-            raw.mortality.rates[get.containing.locations(county, 'state'),,,]
-    }))
-    mortality.rates.all.counties = mortality.numerators / population
-    
-    numerators = CENSUS.BHO.RACE.MAPPING$apply(population * mortality.rates.all.counties)
-    denominators = CENSUS.BHO.RACE.MAPPING$apply(population)
-    
-    mortality.rates = numerators / denominators
-    
-    # Stratify into MSM
-    stratify.males.by.orientation(mortality.rates, msm.multiplier = 1, heterosexual.multiplier = 1) #this function is in the JHEEM package
-}
 
 ##-------------##
 ##-- Pairing --##
@@ -909,7 +862,11 @@ get.immigration.rates.functional.form <- function(location, specification.metada
   
   create.natural.spline.functional.form(knot.times = c(time.1 = 2010,time.2 = 2020),
                                         knot.values = list(time.1 = rates, time.2 = rates),
-                                        link = "log",
+                                        link = "identity",
+                                        knot.link = 'log',
+                                        min = 0,
+                                        after.time = 2030,
+                                        after.modifier = 0.1,
                                         knots.are.on.transformed.scale = F)
   
   # create.static.functional.form(value = rates,
@@ -942,7 +899,11 @@ get.emigration.rates.functional.form <- function(location, specification.metadat
   
   create.natural.spline.functional.form(knot.times = c(time.1 = 2010,time.2 = 2020),
                                         knot.values = list(time.1 = rates, time.2 = rates),
-                                        link = "log",
+                                        link = "identity",
+                                        knot.link = 'log',
+                                        min = 0,
+                                        after.time = 2030,
+                                        after.modifier = 0.1,
                                         knots.are.on.transformed.scale = F)
   
   # create.static.functional.form(value = rates,
@@ -1476,6 +1437,7 @@ get.idu.availability <- function()
     # Return
     array(rv, dim=c(age=length(rv)), dimnames=list(age=names(rv)))
 }
+
 
 ##-------------##
 ##-- Testing --##

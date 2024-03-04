@@ -405,8 +405,8 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'suppression.of.diagnosed',
                        scale = 'proportion',
                        
-                       get.functional.form.function = get.suppression.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
+                       get.functional.form.function = get.suppression.functional.form,
+                       national.surveillance = national.surveillance,
                        functional.form.from.time = 2010,     
                        
                        ramp.times = 1996,

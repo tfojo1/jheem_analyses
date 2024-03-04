@@ -394,3 +394,85 @@ get.idu.relapse.model <- function(specification.metadata,
                                           modifiers.apply.to.change = T)
   }
 }
+
+
+##-------------------------##
+##-- AVAILABILITY BY AGE --##
+##-------------------------##
+
+
+get.idu.availability.13.24 <- function(dir='../jheem_analyses/data_files/idu_age_availability', years=2015:2018)
+{
+    arr = get.idu.by.age.counts(dir=dir, years=years)
+    
+    arr = get.idu.by.age.counts(dir=dir, years=years)
+    
+    ages = as.character(13:24)
+    dim.names = list(age=ages, use=c('active','prior','never'))
+    rv = array(0, dim=sapply(dim.names, length), dimnames=dim.names)
+    
+    rv[1:9,] = arr[2:10,]
+    rv['22',] = arr[11,] / 2
+    rv['23',] = arr[11,] / 2
+    rv['24',] = arr[12,] / 2
+    
+    rv = rv/rowSums(rv)
+    
+    c('13-14'=sum(rv[as.character(13:14),1]) / sum(rv[as.character(19:24),1]),
+      '15-18'=sum(rv[as.character(15:18),1]) / sum(rv[as.character(19:24),1]),
+      '19-24'=1)
+}
+
+get.idu.by.age.counts <- function(dir, years=2015:2018)
+{
+    age.mapping = c('1 - Respondent is 12 years old'='12 yo',
+                    '2 - Respondent is 13 years old'='13 yo',
+                    '3 - Respondent is 14 years old'='14 yo',
+                    '4 - Respondent is 15 years old'='15 yo',
+                    '5 - Respondent is 16 years old'='16 yo',
+                    '6 - Respondent is 17 years old'='17 yo',
+                    '7 - Respondent is 18 years old'='18 yo',
+                    '8 - Respondent is 19 years old'='19 yo',
+                    '9 - Respondent is 20 years old'='20 yo',
+                    '10 - Respondent is 21 years old'='21 yo',
+                    '11 - Respondent is 22 or 23 years old'='22-23 yo',
+                    '12 - Respondent is 24 or 25 years old'='24-25 yo',
+                    '13 - Respondent is between 26 and 29 years old'= '26-29 yo',
+                    '14 - Respondent is between 30 and 34 years old'= '30-34 yo',
+                    '15 - Respondent is between 35 and 49 years old'= '35-49 yo',
+                    '16 - Respondent is between 50 and 64 years old'= '50-64 yo',
+                    '17 - Respondent is 65 years old or older'= '65+yo',
+                    'Overall'=NA)
+
+    use.mapping = c('1 - Within the past 30 days'= 'Within_30d',
+                    '13 - More than 12 months ago LOGICALLY ASSIGNED'= 'More_than_30d',
+                    '2 - More than 30 days ago but within the past 12 mos'= 'More_than_30d',
+                    '3 - More than 12 months ago'= 'More_than_30d',
+                    '81 - NEVER USED COC/HER/STM W/NEEDLE Log assn'= 'Never',
+                    '9 - At some point in the lifetime LOG ASSN'= 'More_than_30d',
+                    '91 - NEVER USED COC/HER/STM WITH A NEEDLE'= "Never",
+                    '97 - REFUSED'= NA,
+                    '98 - MISSING'= NA,
+                    'Overall'= NA)
+
+    ages = age.mapping[!is.na(age.mapping)]
+    uses = c('Within_30d', 'More_than_30d', 'Never')
+    dim.names = list(age=ages, use=uses)
+    rv = array(0, dim=sapply(dim.names, length), dimnames=dim.names)
+    for (year in years)
+    {
+        file = file.path(dir, paste0('NSDUH_', year, '_IDU_single_age.csv'))
+        df = read.csv(file, stringsAsFactors = F)
+
+        for (i in 1:dim(df)[1])
+        {
+            age = age.mapping[df$RECODE...FINAL.EDITED.AGE[i]]
+            use = use.mapping[df$RC.MOST.RECENT.USE.OF.ANY.DRUG.WITH.A.NEEDLE[i]]
+
+            if (!is.na(age) && !is.na(use))
+                rv[age, use] =  rv[age, use] + df$Weighted.Count[i]
+        }
+    }
+
+    rv
+}
