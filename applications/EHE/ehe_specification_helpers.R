@@ -703,6 +703,70 @@ get.location.birth.rates <- function(location,
     rv
 }
 
+get.location.mortality.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
+{
+    rates = get.location.mortality.rates(location=location,
+                                     specification.metadata = specification.metadata) 
+    
+    create.static.functional.form(value = rates,
+                                  link = "log",
+                                  value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+}
+
+get.location.mortality.rates <- function(location,
+                                         specification.metadata,
+                                         year.ranges = c('2006-2010','2011-2015'))
+  
+{
+#    states = locations::get.overlapping.locations(location, "state")
+    counties = locations::get.contained.locations(location, 'county')
+    states = unique(locations::get.containing.locations(counties, 'state'))
+    
+    # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
+    deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', location = states, year= year.ranges, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
+    
+    if (is.null(deaths))
+      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
+    
+    # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
+    population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
+    
+    if (is.null(population))
+      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
+    
+    #You have this denominator it should align wit the metro deaths
+    
+    # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
+    # then divide the two
+    target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
+    rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names) / 
+        map.value.ontology(population, target.dim.names=target.dim.names)
+    
+    if (length(states)==1)
+        rates.by.state[1,,,]
+    else
+    {
+        county.populations = CENSUS.MANAGER$pull(outcome = 'population',
+                                                 dimension.values = list(location=counties,
+                                                                         year=year.ranges))
+        
+        if (is.null(county.populations))
+            stop("Error in get.location.mortality.rates(): cannot get populations for the component counties")
+        county.populations = apply(county.populations,
+                                   'location', mean, na.rm=T)
+        total.population = sum(county.populations, na.rm=T)
+        
+        state.weights = sapply(states, function(st){
+            counties.in.state.and.loc = intersect(counties,
+                                                  locations::get.contained.locations(st, 'county'))
+            
+            sum(county.populations[counties.in.state.and.loc], na.rm=T)/total.population
+        })
+        
+        apply(state.weights * rates.by.state, c('age','race','sex'), sum)
+    }
+}
+
 ##---------------##
 ##-- MORTALITY --##
 ##---------------##
@@ -983,6 +1047,111 @@ get.location.ever.idu.prevalence <- function(location, specification.metadata)
     idu.ever.prevalence
 }
 
+X.get.location.active.idu.prevalence <- function(location,
+                                               specification.metadata,
+                                               idu.incidence,
+                                               idu.relapse,
+                                               idu.remission,
+                                               uninfected.aging)
+{
+  
+}
+
+get.prior.to.active.idu.ratio <- function(location,
+                                          specification.metadata,
+                                          population.year = DEFAULT.POPULATION.YEARS[1])
+{
+    n.ages = specification.metadata$n.ages
+    
+    remission = get.idu.remission.rates(specification.metadata)
+    relapse = get.idu.relapse.rates(specification.metadata)
+    
+    raw.aging = do.get.empiric.aging.rates(location, specification.metadata, years = population.year)[[1]][,,,'IDU_in_remission']
+
+    target.dim.names = dimnames(raw.aging)
+    target.dim.names[names(dimnames(remission))] = dimnames(remission)
+    target.dim.names[names(dimnames(relapse))] = dimnames(relapse)
+    
+    aging = array(0, dim=sapply(target.dim.names, length), dimnames=target.dim.names)
+    array.access(aging, age=1:(n.ages-1)) = raw.aging * (1-(0:(n.ages-2))/(n.ages-1))^2
+
+    #array.access(aging, age=1) = array.access(raw.aging, age=1)
+    
+    remission = expand.array(remission, target.dim.names)
+    relapse = expand.array(relapse, target.dim.names)
+    
+    # From first principles, we would get steady state by either:
+    #  active * remission = prior * relapse
+    # But in empirical testing, adding aging in to the denominator 
+    #   in the first age bracket helps us approximate
+    #   the steady solution better, so here it is
+    remission / (relapse + aging)
+}
+
+get.active.to.never.idu.ratio <- function(location,
+                                        specification.metadata,
+                                        population.year = DEFAULT.POPULATION.YEARS[1])
+{
+    n.ages = specification.metadata$n.ages
+    
+    raw.incidence = get.idu.incidence.rates(specification.metadata)
+    raw.mortality = EHE_BASE_PARAMETER_VALUES['idu.mortality']
+    raw.aging = do.get.empiric.aging.rates(location, specification.metadata, years = population.year)[[1]][,,,'active_IDU']
+    raw.female.pop = get.base.initial.female.population('C.12580', specification.metadata)
+    raw.male.pop = get.base.initial.male.population('C.12580', specification.metadata)
+    pop.dim.names = c(dimnames(raw.female.pop), specification.metadata$dim.names['sex'])
+    raw.pop = expand.array(raw.male.pop, pop.dim.names)
+    array.access(raw.pop, sex='female') = raw.female.pop
+    
+    if (!setequal(specification.metadata$dim.names$sex, c('msm','female','heterosexual_male')))
+      stop("Cannot get.active.to.non.idu.ratio() - the function as written assumes that sex is <'heterosexual_male','msm','female'>")
+    
+    
+    non.age.dim.names = dimnames(raw.aging)
+    non.age.dim.names[names(dimnames(raw.incidence))] = dimnames(raw.incidence)
+    # we know that mortality is a scalar
+    non.age.dim.names = non.age.dim.names[setdiff(names(non.age.dim.names), 'age')]
+    
+    incidence = lapply(1:n.ages, function(i){
+        expand.array(array.access(raw.incidence, age=i, drop = T), non.age.dim.names)
+    })
+    
+    aging = lapply(1:(n.ages-1), function(i){
+        expand.array(array.access(raw.aging, age=i, drop = T), non.age.dim.names)
+    })    
+    aging[[n.ages]] = 0
+    
+    mortality = lapply(1:n.ages, function(i){
+        raw.mortality
+    })
+    
+    pop = lapply(1:n.ages, function(i){
+        expand.array(array.access(raw.pop, age=i, drop = T), non.age.dim.names)
+    })
+    
+    # Put it together into a list
+    p.active = list()
+    p.active[[1]] = incidence[[1]] / (incidence[[1]] + mortality[[1]] + aging[[1]])
+    for (i in 2:n.ages)
+        p.active[[i]] = (incidence[[i]] + p.active[[i-1]]*aging[[i-1]]*pmin(1,pop[[i-1]]/pop[[i]])) /
+                        (incidence[[i]] + mortality[[i]] + aging[[i]])
+
+    # Turn into an array
+    rv = t(sapply(p.active, function(p){
+        p / (1-p)
+    }))
+    dim.names = c(specification.metadata$dim.names['age'],
+                  non.age.dim.names)
+    dim(rv) = sapply(dim.names, length)
+    dimnames(rv) = dim.names
+    
+    # Scale to age-specific targets
+    print("In get.active.to.non.idu.ratio(), we need to implement scaling to the p observed in data")
+    
+    # Return
+    rv
+}
+  
 get.location.active.idu.prevalence <- function(location, specification.metadata)
 {
     counties = get.contained.locations(location, 'county')
@@ -995,6 +1164,17 @@ get.location.active.idu.prevalence <- function(location, specification.metadata)
                                             aggregate.counties = T)
     
     idu.30d.prevalence
+}
+
+get.seed.population <- function(location, specification.metadata)
+{
+    dim.names = specification.metadata$dim.names[c('age','sex')]
+    rv = array(0, dim=sapply(dim.names, length), dimnames = dim.names)
+    
+    seed.age = ceiling(specification.metadata$n.ages/2)
+    array.access(rv, age=seed.age, sex='msm') = 1
+    
+    rv
 }
 
 get.seed.rate.per.stratum <- function(location, specification.metadata, population.year=DEFAULT.POPULATION.YEARS)

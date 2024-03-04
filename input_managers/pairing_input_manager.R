@@ -3,7 +3,7 @@
 ##-- SET-UP WITH ACTUAL DATA --##
 ##-----------------------------##
 
-create.pairing.manager <- function(dir='data_files/pairing')
+create.pairing.manager <- function(dir='../jheem_analyses/data_files/pairing')
 {
   
     rv = list()
@@ -270,6 +270,20 @@ get.age.mixing.proportions <- function(age.delta.intercept.mean,
     dim.names = list(age.from = age.labels, age.to = age.labels)
     dim(rv) = sapply(dim.names, length)
     dimnames(rv) = dim.names
+    
+    rv
+}
+
+get.pairing.proportions <- function(oe.ratios, marginal.counts)
+{
+    if (dim(oe.ratios)[1] != dim(oe.ratios)[2])
+      stop("The 'oe.ratios' argument must be a square matrix")
+    if (dim(oe.ratios)[1] != length(marginal.counts))
+      stop("The length of 'marginal.counts' must be the same as the dimension of 'oe.ratios")
+    
+    marginals = marginal.counts / sum(marginal.counts)
+    rv = oe.ratios * marginals
+    rv = rv / rep(colSums(rv), each=length(marginal.counts))
     
     rv
 }

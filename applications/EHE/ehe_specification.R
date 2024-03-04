@@ -80,7 +80,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'initial.population.infected',
                                applies.to = list(continuum='undiagnosed',
                                                  stage = 1),
-                               value = expression(base.initial.population * seed.rate.per.stratum))
+                               value = expression(0*base.initial.population + seed.population)) #the 0* gives us the right dimensions
 
 
 
@@ -90,7 +90,7 @@ register.initial.population(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'initial.population.uninfected',
-                        value = expression(base.initial.population * (1-seed.rate.per.stratum)))
+                        value = expression(base.initial.population - seed.population))
 
 
 
@@ -143,27 +143,37 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'prevalence.ever.idu',
-                       get.value.function = get.location.ever.idu.prevalence,
+                       name = 'active.to.never.idu.ratio',
+                       get.value.function = get.active.to.never.idu.ratio,
                        scale = 'proportion')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'prevalence.active.idu',
-                       get.value.function = get.location.active.idu.prevalence,
+                       name = 'prior.to.active.idu.ratio',
+                       get.value.function = get.prior.to.active.idu.ratio,
                        scale = 'proportion')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'seed.rate.per.stratum',
-                       get.value.function = get.seed.rate.per.stratum,
-                       scale = 'proportion')
+                       name = 'seed.population',
+                       get.value.function = get.seed.population,
+                       scale = 'non.negative.number')
+
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'prevalence.active.idu',
+                        value = expression(1 / (1 + prior.to.active.idu.ratio + 1/active.to.never.idu.ratio)))
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'prevalence.prior.idu',
-                        value = expression(prevalence.ever.idu-prevalence.active.idu))
+                        value = expression(prevalence.active.idu * prior.to.active.idu.ratio))
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'prevalence.never.idu',
-                        value = expression(1-prevalence.ever.idu))
+                        value = expression(prevalence.active.idu / active.to.never.idu.ratio))
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'prevalence.ever.idu',
+                        value = expression(1-prevalence.never.idu))
+
 
 
 ##--------------------------------------##
@@ -628,7 +638,7 @@ register.mortality(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'non.idu.general.mortality',
-                       get.functional.form.function = get.non.idu.general.mortality.rates.functional.form,
+                       get.functional.form.function = get.location.mortality.rates.functional.form,
                        scale = 'rate')
 
 register.model.element(EHE.SPECIFICATION,
@@ -654,14 +664,14 @@ register.model.element(EHE.SPECIFICATION,
 #                    groups='all')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'default.aging',
+                       name = 'uninfected.aging',
                        scale = 'rate',
                        get.functional.form.function = get.empiric.aging.rates,
                        functional.form.from.time = 2007)
 
 register.aging(EHE.SPECIFICATION,
                groups = 'uninfected',
-               aging.rate.value = 'default.aging')
+               aging.rate.value = 'uninfected.aging')
 
 ##--------------------##
 ##-- Infected Aging --##
