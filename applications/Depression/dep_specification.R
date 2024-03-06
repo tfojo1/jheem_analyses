@@ -34,7 +34,8 @@ register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments
 ##--------------------------------------##
 
 register.model.element(DEP.SPECIFICATION, name="depression.length", 
-                       functional.form = create.static.functional.form(value=6/12, link = "log"), 
+                  #     functional.form = create.static.functional.form(value=6/12, link = "log"), 
+                      value = 6/12,
                        scale="time") # average length of depressive episode
 
 register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx", 
@@ -53,6 +54,66 @@ register.model.element(DEP.SPECIFICATION, name="depression.incidence",
                                                                        value.is.on.transformed.scale = F), 
                        scale = "rate") ## incidence among general population
 
+##------------------------##
+##-- INITIAL POPULATION --##
+##------------------------##
+
+register.model.element(DEP.SPECIFICATION,
+                       name = 'init.proportion.depressed',
+                       value = 0.05,
+                       scale = 'proportion')
+
+register.model.quantity(DEP.SPECIFICATION,
+                        name = 'initial.depression.distribution',
+                        value = 0)
+register.model.quantity.subset(DEP.SPECIFICATION,
+                               name = 'initial.depression.distribution',
+                               value = 'init.proportion.depressed',
+                               applies.to = list(depression='depressed'))
+register.model.quantity.subset(DEP.SPECIFICATION,
+                               name = 'initial.depression.distribution',
+                               value = expression(1-init.proportion.depressed),
+                               applies.to = list(depression='not_depressed'))
+
+register.model.quantity(DEP.SPECIFICATION,
+                        'base.initial.population',
+                        value = expression(super.base.initial.population * initial.depression.distribution))
+
+##-- BIRTHS --##
+
+register.natality(specification = DEP.SPECIFICATION,
+                  parent.groups = 'uninfected',
+                  child.groups = 'uninfected',
+                  fertility.rate.value = 'fertility',
+                  birth.proportions.value = 'birth.proportions',
+                  parent.child.concordant.dimensions = 'race',
+                  all.births.into.compartments = list(age=1, risk=1, depression='not_depressed'))
+
+register.natality(specification = DEP.SPECIFICATION,
+                  parent.groups = 'infected',
+                  child.groups = 'uninfected',
+                  fertility.rate.value = 'fertility',
+                  birth.proportions.value = 'birth.proportions',
+                  parent.child.concordant.dimensions = 'race',
+                  all.births.into.compartments = list(age=1, risk=1, depression='not_depressed'))
+
+register.natality(specification = DEP.SPECIFICATION,
+                  parent.groups = 'uninfected',
+                  child.groups = 'uninfected',
+                  fertility.rate.value = 'immigration',
+                  birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
+                  parent.child.concordant.dimensions = c('age','race','sex','risk','depression'),
+                  all.births.into.compartments = list(),
+                  tag = "immigration")
+
+register.natality(specification = DEP.SPECIFICATION,
+                  parent.groups = 'infected',
+                  child.groups = 'infected',
+                  fertility.rate.value = 'immigration',
+                  birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
+                  parent.child.concordant.dimensions = c('age','race','sex','risk','depression','continuum','stage'),
+                  all.births.into.compartments = list(),
+                  tag = "immigration")
 
 ##--------------------------------------##
 ##--------------------------------------##
@@ -156,6 +217,26 @@ register.model.element(DEP.SPECIFICATION, name="rr.testing.depressed",
                        value = 1.4, scale = "ratio") # rate ratio
 
 
+
+
+##--------------##
+##-- OUTCOMES --##
+##--------------##
+
+track.point.outcome(DEP.SPECIFICATION,
+                    'point.population',
+                    outcome.metadata = NULL,
+                    scale = 'non.negative.number',
+                    value = expression(uninfected+infected),
+                    keep.dimensions = c('location','age','race','sex','risk','depression'),
+                    save = F)
+
+
+
+##--------------##
+##-- FINALIZE --##
+##--------------##
+
 register.model.specification(DEP.SPECIFICATION)
 
 
@@ -168,3 +249,4 @@ register.calibrated.parameters.for.version('dep',
                                            sampling.blocks = DEP.PARAMETER.SAMPLING.BLOCKS,
                                            calibrate.to.year = 2025,
                                            join.with.previous.version = T)
+
