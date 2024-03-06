@@ -449,7 +449,6 @@ pi.het.2016 <- data.frame(
 
 pi.het.2016 <- age_mutate(pi.het.2016)/100
 
-# criteria - any STI
 pi.het.2019 <- data.frame(
   total = 2.9,
   male = 2.4,
