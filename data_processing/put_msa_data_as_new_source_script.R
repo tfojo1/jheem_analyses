@@ -128,7 +128,7 @@ put.msa.data.as.new.source = function(outcome,
                         apply(denominator.data.from.locs.only, c('year', 'location'), function(x) {all(is.na(x))}),
                         MARGIN='year',
                         function(x) {
-                            sum(is.na(x)) < (2/3) * length(x)
+                            sum(x) < (2/3) * length(x)
                         }
                     )
                     denominator.data.from.locs.only = array.access(denominator.data.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
@@ -140,14 +140,24 @@ put.msa.data.as.new.source = function(outcome,
                     strat.details.from.locs.only = array.access(strat.details.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
                     strat.url.from.locs.only = array.access(strat.url.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
                     
-                    # Aggregate denominator
+                    # Decide which denominator values are absent either in denominator or proportion. Use negative numbers to represent this since denominator already has its own NAs
+                    proportion.values.absent = set.array.dimnames(is.na(strat.data.from.locs.only), dimnames(strat.data.from.locs.only))
+                    proportion.indices.in.denominator = get.array.access.indices(dimnames(denominator.data.from.locs.only), dimnames(proportion.values.absent))
+                    denominator.data.from.locs.only[proportion.indices.in.denominator][proportion.values.absent] =
+                        denominator.data.from.locs.only[proportion.indices.in.denominator][proportion.values.absent] * -1
+                    
+                    # Decide if our denominator data that is absent from the proportion data + max suppressed values is enough
                     aggregated.denominator = apply.robust(denominator.data.from.locs.only, non.location.margin, function(x) {
                         max.expected.from.suppression = sum(is.na(x))*maximum.suppressed.value
-                        non.na.sum = sum(x, na.rm=T)
-                        max.sum = non.na.sum + max.expected.from.suppression
+                        values.only.absent.from.proportion = x<0
+                        sum.values.only.absent.from.proportion = -1 * sum(x[values.only.absent.from.proportion], na.rm=T)
+                        values.not.absent.anywhere = x>0
+                        sum.values.not.absent.anywhere = sum(x[values.not.absent.anywhere], na.rm=T)
+                        max.sum = sum.values.not.absent.anywhere + sum.values.only.absent.from.proportion + max.expected.from.suppression
                         if (max.sum==0) return (NA)
-                        if (max.expected.from.suppression / max.sum > tolerable.fraction.suppressed.in.denominator) return (NA)
-                        else return(max.sum)
+                        if (max.expected.from.suppression + sum.values.only.absent.from.proportion / max.sum > tolerable.fraction.suppressed.in.denominator) return (NA)
+                        if (sum.values.not.absent.anywhere==0) return (NA)
+                        else return(sum.values.not.absent.anywhere)
                     })
                     
                     # Subset denominator to match locations available in proportion data
@@ -166,10 +176,11 @@ put.msa.data.as.new.source = function(outcome,
                     
                 }
                 
+                if (all(is.na(aggregated.data))) next
                 post.agg.dimnames = dimnames(aggregated.data)
                 aggregated.details = aggregate.details.or.url(strat.details.from.locs.only, names(post.agg.dimnames), post.agg.dimnames)
                 aggregated.url = aggregate.details.or.url(strat.url.from.locs.only, names(post.agg.dimnames), post.agg.dimnames)
-                if (all(is.na(aggregated.data))) next
+                
                 
                 # Details and url should be the same for all the data, but check just in case they aren't.
                 details = aggregated.details[!sapply(aggregated.details, is.null)][[1]]
@@ -237,10 +248,10 @@ aggregate.details.or.url = function(data, keep.dimensions, post.agg.dimnames) {
 # for testing
 
 # ss=SURVEILLANCE.MANAGER$clone()
-# ss$register.source(source = 'cdc.aggregated.proportion', parent.source='NHSS', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
+# ss$register.source(source = 'cdc.aggregated.proportion2', parent.source='NHSS', full.name = 'CDC Aggregated County', short.name = 'cdc aggd county')
 # put.msa.data.as.new.source('suppression',
 #                            from.source.name = 'cdc.hiv',
-#                            to.source.name='cdc.aggregated.proportion',
+#                            to.source.name='cdc.aggregated.proportion2',
 #                            to.locations = MSAS.OF.INTEREST,
 #                            geographic.type.from = 'county',
 #                            geographic.type.to = 'cbsa',

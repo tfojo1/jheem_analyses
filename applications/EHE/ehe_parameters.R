@@ -309,13 +309,18 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.004), 0.5*log(2), upper=1),
     oe.never.idu.pairings.with.idu = Lognormal.Distribution(log(0.2), 0.5*log(2), upper=1), #see calculations below
     
-    black.black.sexual.oe = Normal.Distribution((3.76), 0.5*3.76, lower=1), # changed 2/23/24
-    hispanic.hispanic.sexual.oe = Normal.Distribution((2.19), 0.5*2.19, lower=1),
-    other.other.sexual.oe = Normal.Distribution((1.55), 0.5*1.55, lower=1),
-    
-    black.black.idu.oe = Normal.Distribution((9.12), 0.5*9.12, lower=1), # added 2/29/24
-    hispanic.hispanic.idu.oe = Normal.Distribution((1.05), 0.5*1.05, lower=1),
-    other.other.idu.oe = Normal.Distribution((1.05), 0.5*1.05, lower=1),
+    black.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
+    hispanic.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
+    other.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
+    race.needle.sharing.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
+
+    # black.black.sexual.oe = Normal.Distribution((3.76), 0.5*3.76, lower=1), # changed 2/23/24
+    # hispanic.hispanic.sexual.oe = Normal.Distribution((2.19), 0.5*2.19, lower=1),
+    # other.other.sexual.oe = Normal.Distribution((1.55), 0.5*1.55, lower=1),
+    # 
+    # black.black.idu.oe = Normal.Distribution((9.12), 0.5*9.12, lower=1), # added 2/29/24
+    # hispanic.hispanic.idu.oe = Normal.Distribution((1.05), 0.5*1.05, lower=1),
+    # other.other.idu.oe = Normal.Distribution((1.05), 0.5*1.05, lower=1),
     
     #-- Acute HIV and the Effect of Diagnosis --#
     acute.transmissibility.rr = Lognormal.Distribution(log(12), 0.25*log(2)), #do I have a more evidence based range?
@@ -489,20 +494,25 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'msm.fraction.trate.change.after.t2'
   ),
   
-
-  
-  
-  sexual.mixing = c(
-    'black.black.sexual.oe',
-    'hispanic.hispanic.sexual.oe',
-    'other.other.sexual.oe'
+  assortativity = c(
+      'black.sexual.assortativity.multiplier',
+      'hispanic.sexual.assortativity.multiplier',
+      'other.sexual.assortativity.multiplier',
+      'race.needle.sharing.assortativity.multiplier'
   ),
-  
-  idu.mixing = c(
-    'black.black.idu.oe',
-    'hispanic.hispanic.idu.oe',
-    'other.other.idu.oe'
-  ),
+  # 
+  # 
+  # sexual.mixing = c(
+  #   'black.black.sexual.oe',
+  #   'hispanic.hispanic.sexual.oe',
+  #   'other.other.sexual.oe'
+  # ),
+  # 
+  # idu.mixing = c(
+  #   'black.black.idu.oe',
+  #   'hispanic.hispanic.idu.oe',
+  #   'other.other.idu.oe'
+  # ),
   
   msm.age1.susceptibility = c(
     'age1.msm.susceptibility.rr.mult.1',

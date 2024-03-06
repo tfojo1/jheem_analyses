@@ -80,7 +80,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'initial.population.infected',
                                applies.to = list(continuum='undiagnosed',
                                                  stage = 1),
-                               value = expression(base.initial.population * seed.rate.per.stratum))
+                               value = expression(0*base.initial.population + seed.population)) #the 0* gives us the right dimensions
 
 
 
@@ -90,7 +90,7 @@ register.initial.population(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'initial.population.uninfected',
-                        value = expression(base.initial.population * (1-seed.rate.per.stratum)))
+                        value = expression(base.initial.population - seed.population))
 
 
 
@@ -143,27 +143,37 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'prevalence.ever.idu',
-                       get.value.function = get.location.ever.idu.prevalence,
+                       name = 'active.to.never.idu.ratio',
+                       get.value.function = get.active.to.never.idu.ratio,
                        scale = 'proportion')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'prevalence.active.idu',
-                       get.value.function = get.location.active.idu.prevalence,
+                       name = 'prior.to.active.idu.ratio',
+                       get.value.function = get.prior.to.active.idu.ratio,
                        scale = 'proportion')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'seed.rate.per.stratum',
-                       get.value.function = get.seed.rate.per.stratum,
-                       scale = 'proportion')
+                       name = 'seed.population',
+                       get.value.function = get.seed.population,
+                       scale = 'non.negative.number')
+
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'prevalence.active.idu',
+                        value = expression(1 / (1 + prior.to.active.idu.ratio + 1/active.to.never.idu.ratio)))
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'prevalence.prior.idu',
-                        value = expression(prevalence.ever.idu-prevalence.active.idu))
+                        value = expression(prevalence.active.idu * prior.to.active.idu.ratio))
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'prevalence.never.idu',
-                        value = expression(1-prevalence.ever.idu))
+                        value = expression(prevalence.active.idu / active.to.never.idu.ratio))
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'prevalence.ever.idu',
+                        value = expression(1-prevalence.never.idu))
+
 
 
 ##--------------------------------------##
@@ -312,8 +322,7 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'general.population.testing.without.covid',
                        scale = 'rate',
                        
-                       get.functional.form.function = get.testing.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
+                       get.functional.form.function = get.testing.functional.form,
                        functional.form.scale = 'proportion',
                        functional.form.from.time = 2010,
                        
@@ -341,7 +350,7 @@ register.model.quantity(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'undiagnosed.testing.rr.without.covid',
-                       value = 1, # for now, eventually have to do get.functional.form.function
+                       get.functional.form.function = get.undiagnosed.testing.rr.functional.form, 
                        scale = 'ratio')
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -396,8 +405,8 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'suppression.of.diagnosed',
                        scale = 'proportion',
                        
-                       get.functional.form.function = get.suppression.model,
-                       continuum.manager = ALL.DATA.MANAGERS$continuum,
+                       get.functional.form.function = get.suppression.functional.form,
+                       national.surveillance = national.surveillance,
                        functional.form.from.time = 2010,     
                        
                        ramp.times = 1996,
@@ -534,7 +543,7 @@ register.natality(specification = EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'fertility',
-                       get.functional.form.function = get.model.fertility.rates.functional.form,
+                       get.functional.form.function = get.location.birth.rates.functional.form,
                        functional.form.from.time = 2007,
                        scale = 'rate')
 
@@ -629,7 +638,7 @@ register.mortality(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'non.idu.general.mortality',
-                       get.functional.form.function = get.non.idu.general.mortality.rates.functional.form,
+                       get.functional.form.function = get.location.mortality.rates.functional.form,
                        scale = 'rate')
 
 register.model.element(EHE.SPECIFICATION,
@@ -655,14 +664,14 @@ register.model.element(EHE.SPECIFICATION,
 #                    groups='all')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'default.aging',
+                       name = 'uninfected.aging',
                        scale = 'rate',
                        get.functional.form.function = get.empiric.aging.rates,
                        functional.form.from.time = 2007)
 
 register.aging(EHE.SPECIFICATION,
                groups = 'uninfected',
-               aging.rate.value = 'default.aging')
+               aging.rate.value = 'uninfected.aging')
 
 ##--------------------##
 ##-- Infected Aging --##
@@ -925,7 +934,7 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'fraction.msm.pairings.with.female',
-                       value = mean(ALL.DATA.MANAGERS$pairing$msm.sex.with.female.estimates), 
+                       value = mean(PAIRING.INPUT.MANAGER$msm.sex.with.female.estimates), 
                        scale = 'ratio')
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -1044,28 +1053,28 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.age.sexual.availability',
                        value = get.sexual.availability(),
-                       dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       dimension.values = list(age=CENSUS.AGES),
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.female.age.counts',
                        get.value.function = get.female.single.year.age.counts,
-                       dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       dimension.values = list(age=CENSUS.AGES),
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.msm.age.counts',
                        get.value.function = get.msm.single.year.age.counts,
-                       dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       dimension.values = list(age=CENSUS.AGES),
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.heterosexual.male.age.counts',
                        get.value.function = get.heterosexual.male.single.year.age.counts,
-                       dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       dimension.values = list(age=CENSUS.AGES),
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
@@ -1073,96 +1082,27 @@ register.model.element(EHE.SPECIFICATION,
 #-- Sexual Contact by Race --#
 #----------------------------#
 
+baseline.sexual.oes = array(c(3.76,1,1,1,2.19,1,1,1,1.55),
+                            dim = c(race.to=3, race.from=3),
+                            dimnames = list(race.to=c('black','hispanic','other'),
+                                            race.from=c('black','hispanic','other')))
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'race.sexual.oes',
+                       scale = 'ratio',
+                       get.functional.form.function = get.geographically.aggregated.race.oes,
+                       within.county.race.oes = baseline.sexual.oes)
+
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.contact.by.race',
-                        value = 0)
-
-# To Black
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='black', race.to='black'),
-                               value = expression(black.population.count * black.black.sexual.oe /
-                                                      (black.population.count * black.black.sexual.oe + hispanic.population.count + other.population.count)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='hispanic', race.to='black'),
-                               value = expression(hispanic.population.count /
-                                                      (black.population.count * black.black.sexual.oe + hispanic.population.count + other.population.count)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='other', race.to='black'),
-                               value = expression(other.population.count /
-                                                      (black.population.count * black.black.sexual.oe + hispanic.population.count + other.population.count)))
-
-# To Hispanic
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='black', race.to='hispanic'),
-                               value = expression(black.population.count /
-                                                      (black.population.count + hispanic.population.count * hispanic.hispanic.sexual.oe + other.population.count)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='hispanic', race.to='hispanic'),
-                               value = expression(hispanic.population.count * hispanic.hispanic.sexual.oe /
-                                                      (black.population.count + hispanic.population.count * hispanic.hispanic.sexual.oe + other.population.count)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='other', race.to='hispanic'),
-                               value = expression(other.population.count /
-                                                      (black.population.count + hispanic.population.count * hispanic.hispanic.sexual.oe + other.population.count)))
-
-# To Other
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='black', race.to='other'),
-                               value = expression(black.population.count /
-                                                      (black.population.count + hispanic.population.count + other.population.count * other.other.sexual.oe)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='hispanic', race.to='other'),
-                               value = expression(hispanic.population.count /
-                                                      (black.population.count + hispanic.population.count + other.population.count * other.other.sexual.oe)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'sexual.contact.by.race',
-                               applies.to = list(race.from='other', race.to='other'),
-                               value = expression(other.population.count * other.other.sexual.oe /
-                                                      (black.population.count + hispanic.population.count + other.population.count * other.other.sexual.oe)))
+                        value = sexual.oes.to.contact.proportions)
 
 # The race sub-values
 
-register.model.element.values(EHE.SPECIFICATION,
-                              scale = 'non.negative.number',
-                              black.population.count = function(location, specification.metadata){sum(get.census.data(ALL.DATA.MANAGERS$census.full,
-                                                                                                             races = 'black',
-                                                                                                             years = DEFAULT.POPULATION.YEARS,
-                                                                                                             ages = (specification.metadata$age.endpoints[1]):min(specification.metadata$age.endpoints[length(specification.metadata$age.endpoints)],
-                                                                                                                                                       ALL.DATA.MANAGERS$census.full$age.lowers[length(ALL.DATA.MANAGERS$census.full$age.lowers)]),
-                                                                                                             fips=get.contained.locations(location, 'county')))/ length(DEFAULT.POPULATION.YEARS)},
-                              hispanic.population.count = function(location, specification.metadata){sum(get.census.data(ALL.DATA.MANAGERS$census.full,
-                                                                                                                races = 'hispanic',
-                                                                                                                years=DEFAULT.POPULATION.YEARS,
-                                                                                                                ages = (specification.metadata$age.endpoints[1]):min(specification.metadata$age.endpoints[length(specification.metadata$age.endpoints)],
-                                                                                                                                                                 ALL.DATA.MANAGERS$census.full$age.lowers[length(ALL.DATA.MANAGERS$census.full$age.lowers)]),
-                                                                                                                fips=get.contained.locations(location, 'county')))/ length(DEFAULT.POPULATION.YEARS)},
-                              other.population.count = function(location, specification.metadata){sum(get.census.data(ALL.DATA.MANAGERS$census.full,
-                                                                                                             races = setdiff(ALL.DATA.MANAGERS$census.full$races, c('black','hispanic')),
-                                                                                                             years=DEFAULT.POPULATION.YEARS,
-                                                                                                             ages = (specification.metadata$age.endpoints[1]):min(specification.metadata$age.endpoints[length(specification.metadata$age.endpoints)],
-                                                                                                                                                              ALL.DATA.MANAGERS$census.full$age.lowers[length(ALL.DATA.MANAGERS$census.full$age.lowers)]),
-                                                                                                             fips=get.contained.locations(location, 'county')))/ length(DEFAULT.POPULATION.YEARS)}
-)
-
-register.model.element.values(EHE.SPECIFICATION,
-                              scale='ratio',
-                              black.black.sexual.oe=mean(sapply( c(ALL.DATA.MANAGERS$pairing$msm.sex.by.race.oe, ALL.DATA.MANAGERS$pairing$het.sex.by.race.oe), function(oe){
-                                  oe['black','black']
-                              })),
-                              hispanic.hispanic.sexual.oe=mean(sapply( c(ALL.DATA.MANAGERS$pairing$msm.sex.by.race.oe, ALL.DATA.MANAGERS$pairing$het.sex.by.race.oe), function(oe){
-                                  oe['hispanic','hispanic']
-                              })),
-                              other.other.sexual.oe=mean(sapply( c(ALL.DATA.MANAGERS$pairing$msm.sex.by.race.oe, ALL.DATA.MANAGERS$pairing$het.sex.by.race.oe), function(oe){
-                                  oe['other','other']
-                              })))
+register.model.element(EHE.SPECIFICATION,
+                       'race.population.counts',
+                       scale = 'non.negative.number',
+                       get.value.function = get.race.population.counts)
 
 #----------------------------#
 #-- Sexual Contact by Risk --#
@@ -1354,7 +1294,7 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'single.year.age.idu.availability',
                        value = get.idu.availability(),
-                       dimension.values = list(age=ALL.DATA.MANAGERS$census.full$age.names),
+                       dimension.values = list(age=CENSUS.AGES),
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
@@ -1370,77 +1310,27 @@ register.model.quantity(EHE.SPECIFICATION,
 
 #-- IDU Contact by Race --#
 
+baseline.idu.oes = array(c(9.12,1,1,1,1.05,1,1,1,1.05),
+                            dim = c(race.to=3, race.from=3),
+                            dimnames = list(race.to=c('black','hispanic','other'),
+                                            race.from=c('black','hispanic','other')))
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'race.idu.oes',
+                       scale = 'ratio',
+                       get.functional.form.function = get.geographically.aggregated.race.oes,
+                       within.county.race.oes = baseline.idu.oes)
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'idu.contact.by.race',
-                        value = 0)
-
-# To Black
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='black', race.to='black'),
-                               value = expression(black.population.count * black.black.idu.oe /
-                                                      (black.population.count * black.black.idu.oe + hispanic.population.count + other.population.count)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='hispanic', race.to='black'),
-                               value = expression(hispanic.population.count /
-                                                      (black.population.count * black.black.idu.oe + hispanic.population.count + other.population.count)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='other', race.to='black'),
-                               value = expression(other.population.count /
-                                                      (black.population.count * black.black.idu.oe + hispanic.population.count + other.population.count)))
-
-# To Hispanic
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='black', race.to='hispanic'),
-                               value = expression(black.population.count /
-                                                      (black.population.count + hispanic.population.count * hispanic.hispanic.idu.oe + other.population.count)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='hispanic', race.to='hispanic'),
-                               value = expression(hispanic.population.count * hispanic.hispanic.idu.oe /
-                                                      (black.population.count + hispanic.population.count * hispanic.hispanic.idu.oe + other.population.count)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='other', race.to='hispanic'),
-                               value = expression(other.population.count /
-                                                      (black.population.count + hispanic.population.count * hispanic.hispanic.idu.oe + other.population.count)))
-
-# To Other
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='black', race.to='other'),
-                               value = expression(black.population.count /
-                                                      (black.population.count + hispanic.population.count + other.population.count * other.other.idu.oe)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='hispanic', race.to='other'),
-                               value = expression(hispanic.population.count /
-                                                      (black.population.count + hispanic.population.count + other.population.count * other.other.idu.oe)))
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'idu.contact.by.race',
-                               applies.to = list(race.from='other', race.to='other'),
-                               value = expression(other.population.count * other.other.idu.oe /
-                                                      (black.population.count + hispanic.population.count + other.population.count * other.other.idu.oe)))
-
-# The race sub-values
-
-register.model.element.values(EHE.SPECIFICATION,
-                              scale='ratio',
-                              black.black.idu.oe=ALL.DATA.MANAGERS$pairing$idu.oe.race['black','black'],
-                              hispanic.hispanic.idu.oe=ALL.DATA.MANAGERS$pairing$idu.oe.race['hispanic','hispanic'],
-                              other.other.idu.oe=ALL.DATA.MANAGERS$pairing$idu.oe.race['other','other'])
-
+                        value = idu.oes.to.contact.proportions)
 
 #-- IDU Contact by Sex --#
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.transmission.sex.oes',
                        scale = 'ratio',
-                       value = ALL.DATA.MANAGERS$pairing$idu.oe.sex,
+                       value = PAIRING.INPUT.MANAGER$idu.oe.sex,
                        dimensions = c('sex.from','sex.to'))
 
 register.model.quantity(EHE.SPECIFICATION,

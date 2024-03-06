@@ -99,6 +99,21 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
       
     }
 
+    #-- Assortativity --#
+    
+    for (race in races)
+    {
+        model.settings$set.element.functional.form.interaction.alphas(element.name = 'race.sexual.oes', 
+                                                                      alpha.name = 'value', 
+                                                                      value = parameters[paste0(race,'.sexual.assortativity.multiplier')],
+                                                                      applies.to.dimension.values=c(race.from=race, race.to=race))
+      
+        model.settings$set.element.functional.form.interaction.alphas(element.name = 'race.idu.oes', 
+                                                                      alpha.name = 'value', 
+                                                                      value = parameters['race.needle.sharing.assortativity.multiplier'],
+                                                                      applies.to.dimension.values=c(race.from=race, race.to=race))
+    }
+    
     #-- Suppression --#
     set.ehe.alphas.from.parameters(model.settings,
                                    element.name = 'suppression.of.diagnosed',
@@ -284,7 +299,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     for(spline.i in 1:length(spline.times)){
       
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = "default.aging",
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = "uninfected.aging",
                                                                       alpha.name = as.character(spline.times[spline.i]),
                                                                       value = parameters[paste0('age',non.interacted.ages,'.aging.multiplier')],
                                                                       applies.to.dimension.values = non.interacted.ages,
@@ -300,7 +315,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                     aging.multiplier = aging.multiplier * parameters[paste0(race,'.domino.aging.multiplier')]
                 
                 set.element.functional.form.interaction.alphas(model.settings,
-                                                               element.name = "default.aging",
+                                                               element.name = "uninfected.aging",
                                                                alpha.name = as.character(spline.times[spline.i]),
                                                                value = aging.multiplier,
                                                                applies.to.dimension.values=list(age=age,

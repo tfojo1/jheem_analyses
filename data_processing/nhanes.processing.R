@@ -2,7 +2,7 @@ library(haven)
 library(dplyr)
 ################################################################################
 ##Read in NHANES Data
-DATA.DIR.NHANES="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES"
+DATA.DIR.NHANES="Q:/data_clean/nhanes/raw_data"
 
 nhanes.files <- list.files(DATA.DIR.NHANES, pattern = ".XPT", full.names = "TRUE")
 
@@ -267,9 +267,6 @@ nhanes.subset = nhanes.total
 ##Metrics Todd wants 
 ################################################################################
 #Proportion of Heterosexuals who report Gonorrhea in Past Year
-  #QUESTION: Should I adjust this to be only sexually active people?
-  #QUESTION: Do I need to regroup so anyone who is not MSM is heterosexual?
-
 proportion.heterosexual.with.gonorrhea.past.year <- nhanes.subset %>%
   mutate(heterosexual.indicator.one = ifelse(sexual.orientation.male == "heterosexual" | sexual.orientation.female== "heterosexual", "1", "0"))%>%
   mutate(heterosexual.indicator.two = case_when(gender == "male" & male.sex.with.female.past.year >0 & male.sex.with.female.past.year < 7777 ~ "1",
@@ -287,8 +284,6 @@ proportion.heterosexual.with.gonorrhea.past.year <- nhanes.subset %>%
   mutate(proportion.gonorrhea.past.year = round(count.gonorrhea.past.year/ sum(count.gonorrhea.past.year), digits=2))
 
 #Proportion of MSM Reporting Casual Partner
-  #QUESTION: Should this be a proportion of MSM? Or of everyone?  (I'm going to do a proportion of MSM)
-  #QUESTION: Should this only be currently sexually active msm?
 proportion.msm.with.casual.partner <- nhanes.subset %>%
   filter(msm.adjusted == "yes")%>%
   mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
@@ -320,10 +315,10 @@ proportion.msm.with.casual.partner.age <- nhanes.subset %>%
   mutate(proportion.active.condomless.msm = round(count.active.condomless.msm/ sum(count.active.condomless.msm), digits=2))
 
 #Cumulative Proportion of Age at sex initiation
-  
 cumulative.proportion.age.at.sex.initiation.all.years <- nhanes.subset%>%
   filter(age.at.first.sex != "dont know")%>%
   filter(age.at.first.sex != "refused")%>%
+  filter(age.at.first.sex < 31)%>% #Adjusted so Todd can see values in only under 30
   count(age.at.first.sex)%>%
   rename(age.at.first.sex.count=n)%>%
   mutate(proportion.age.at.first.sex.unweighted = round(age.at.first.sex.count/sum(age.at.first.sex.count), digits=2))%>%
@@ -363,4 +358,9 @@ proportion.sex.in.past.year.by.age.by.year <- nhanes.subset%>%
   count(sex.in.past.year)%>%
   rename(count.sex.in.past.year = n)%>%
   mutate(proportion.count.sex.in.past.year.unweighted = round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))
+
+#Save
+
+#save(nhanes.subset, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.subset.RData")
+#save(cumulative.proportion.age.at.sex.initiation.all.years, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/cumulative.proportion.age.at.sex.initiation.all.years.RData")
 
