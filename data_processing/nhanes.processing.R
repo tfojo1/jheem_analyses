@@ -2,7 +2,12 @@ library(haven)
 library(dplyr)
 ################################################################################
 ##Read in NHANES Data
-DATA.DIR.NHANES="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES"
+
+#running on local:
+#DATA.DIR.NHANES="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES"
+
+#If running on remote:
+DATA.DIR.NHANES="Q:/data_clean/nhanes/raw_data"
 
 nhanes.files <- list.files(DATA.DIR.NHANES, pattern = ".XPT", full.names = "TRUE")
 
@@ -270,21 +275,11 @@ nhanes.subset = nhanes.total
 cumulative.proportion.age.at.sex.initiation.all.years <- nhanes.subset%>%
   filter(age.at.first.sex != "dont know")%>%
   filter(age.at.first.sex != "refused")%>%
-  filter(age.at.first.sex < 31)%>% #Adjusted so Todd can see values in only under 30
+  filter(age < 24)%>% #adjust age of respondents to get this chart to look more like the next
   count(age.at.first.sex)%>%
   rename(age.at.first.sex.count=n)%>%
   mutate(proportion.age.at.first.sex.unweighted = round(age.at.first.sex.count/sum(age.at.first.sex.count), digits=2))%>%
   mutate(cumulative.proportion = cumsum(proportion.age.at.first.sex.unweighted))
-
-cumulative.proportion.age.at.sex.initiation.by.year <- nhanes.subset%>%
-  filter(survey.year == "2007-2008")%>%  #SELECT YEAR OF INTEREST- it's a lot to look at all years at once
-  filter(age.at.first.sex != "dont know")%>%
-  filter(age.at.first.sex != "refused")%>%
-  count(age.at.first.sex)%>%
-  rename(age.at.first.sex.count=n)%>%
-  mutate(proportion.age.at.first.sex.unweighted = round(age.at.first.sex.count/sum(age.at.first.sex.count), digits=2))%>%
-  mutate(cumulative.proportion = cumsum(proportion.age.at.first.sex.unweighted))
-
 
 #Proportion: for each age, what proportion of people who are that age had sex in the past year?
 #what proportion of 25 years old had sex in past yr
@@ -297,19 +292,8 @@ proportion.sex.in.past.year.by.age.total <- nhanes.subset%>%
   group_by(age)%>%
   count(sex.in.past.year)%>%
   rename(count.sex.in.past.year = n)%>%
-  mutate(proportion.count.sex.in.past.year.unweighted = round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))
-
-  #This is by year but it's a lot to look at
-proportion.sex.in.past.year.by.age.by.year <- nhanes.subset%>%
-  mutate(sex.in.past.year = case_when(male.sex.with.female.past.year > 0 & male.sex.with.female.past.year < 7777
-                                      | male.sex.with.male.past.year > 0 & male.sex.with.male.past.year < 7777
-                                      | female.sex.with.male.past.year > 0 & female.sex.with.male.past.year < 7777
-                                      | female.sex.with.female.past.year > 0 & female.sex.with.female.past.year < 7777 ~ "1", 
-                                      TRUE ~ "0"))%>%
-  group_by(survey.year, age)%>%
-  count(sex.in.past.year)%>%
-  rename(count.sex.in.past.year = n)%>%
-  mutate(proportion.count.sex.in.past.year.unweighted = round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))
+  mutate(proportion.count.sex.in.past.year.unweighted = round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))%>%
+  filter(sex.in.past.year == "1")
 
 ################################################################################
 ##Adjusting the initial tables to get proportions for meeting 3.7.24
@@ -388,16 +372,16 @@ hetero.female.casual.partner  <- nhanes.subset %>%
 
 nhanes.msm <- nhanes.subset%>%
   filter(msm.adjusted == "yes")
-save(nhanes.msm, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.msm.RData") ##UPDATE LOCATION
+#save(nhanes.msm, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.msm.RData") ##UPDATE LOCATION
 
 nhanes.hetero.males <- nhanes.subset%>%
   filter(msm.adjusted != "yes")%>%
   filter(gender == "male") 
 ##Update location
-save(nhanes.hetero.males, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.hetero.males") ##UPDATE LOCATION
+#save(nhanes.hetero.males, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.hetero.males.RData") ##UPDATE LOCATION
 
 nhanes.hetero.females <- nhanes.subset%>%
   filter(gender == "female") #I think we are assuming anyone who is not MSM is heterosexual so that means all females?
 ##Update location
-save(nhanes.hetero.females, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.hetero.females") ##UPDATE LOCATION
+#save(nhanes.hetero.females, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.hetero.females.RData") ##UPDATE LOCATION
 
