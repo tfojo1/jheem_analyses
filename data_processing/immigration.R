@@ -47,7 +47,24 @@ data.list.move.clean = lapply(data.list.move, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$year = "2011-2015"
+  if(grepl("11.15", filename)) {
+    data$year = "2011-2015"
+  }
+  if(grepl("12.16", filename)) {
+    data$year = "2012-2016"
+  }
+  if(grepl("13.17", filename)) {
+    data$year = "2013-2017"
+  }
+  if(grepl("14.18", filename)) {
+    data$year = "2014-2018"
+  }
+  if(grepl("15.19", filename)) {
+    data$year = "2015-2019"
+  }
+  if(grepl("16.20", filename)) {
+    data$year = "2016-2020"
+  }
   
 ##TOTAL##
     if(grepl("immigration_total", filename)) {
