@@ -2,7 +2,7 @@ library(haven)
 library(dplyr)
 ################################################################################
 ##Read in NHANES Data
-DATA.DIR.NHANES="Q:/data_clean/nhanes/raw_data"
+DATA.DIR.NHANES="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES"
 
 nhanes.files <- list.files(DATA.DIR.NHANES, pattern = ".XPT", full.names = "TRUE")
 
@@ -363,4 +363,77 @@ proportion.sex.in.past.year.by.age.by.year <- nhanes.subset%>%
 
 #save(nhanes.subset, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.subset.RData")
 #save(cumulative.proportion.age.at.sex.initiation.all.years, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/cumulative.proportion.age.at.sex.initiation.all.years.RData")
+
+
+################################################################################
+##Adjusting the initial tables to get proportions for meeting
+################################################################################
+#Proportion of Heterosexual Males who report Gonorrhea in Past Year
+all.hetero.male.prep.indications <- nhanes.subset %>%
+  filter(msm.adjusted != "yes")%>%
+  filter(gender == "male") %>%
+  filter(!is.na(gonorrhea.past.year)) %>% #REMOVING NA VALUES
+  group_by(gonorrhea.past.year)%>%
+  count(gonorrhea.past.year)%>%
+  rename(count.gonorrhea.past.year = n)%>%
+  group_by()%>%
+  mutate(proportion.gonorrhea.past.year = round(count.gonorrhea.past.year/ sum(count.gonorrhea.past.year), digits=5))
+
+#Proportion of Heterosexual Females who report Gonorrhea in Past Year
+all.hetero.female.prep.indications <- nhanes.subset %>%
+  filter(gender == "female") %>%
+  filter(!is.na(gonorrhea.past.year)) %>% #REMOVING NA VALUES
+  group_by(gonorrhea.past.year)%>%
+  count(gonorrhea.past.year)%>%
+  rename(count.gonorrhea.past.year = n)%>%
+  group_by()%>%
+  mutate(proportion.gonorrhea.past.year = round(count.gonorrhea.past.year/ sum(count.gonorrhea.past.year), digits=5))
+
+#MSM with gonorrhea in past year
+msm.gonorrhea.prep.indications <- nhanes.subset %>%
+  filter(msm.adjusted == "yes")%>%
+  filter(!is.na(gonorrhea.past.year)) %>% #REMOVING NA VALUES
+  group_by(gonorrhea.past.year)%>%
+  count(gonorrhea.past.year)%>%
+  rename(count.gonorrhea.past.year = n)%>%
+  group_by()%>%
+  mutate(proportion.gonorrhea.past.year = round(count.gonorrhea.past.year/ sum(count.gonorrhea.past.year), digits=2))
+
+####
+
+#Proportion of MSM Reporting Casual Partner
+proportion.msm.with.casual.partner.denom1 <- nhanes.subset %>%
+  filter(msm.adjusted == "yes")%>%
+  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  filter(!is.na(active.condomless.msm)) %>% #REMOVING NA VALUES
+  group_by(active.condomless.msm)%>%
+  count(active.condomless.msm)%>%
+  rename(count.active.condomless.msm = n)%>%
+  group_by()%>%
+  mutate(proportion.active.condomless.msm = round(count.active.condomless.msm/ sum(count.active.condomless.msm), digits=2))
+
+#Heterosexual Male- casual partner
+hetero.male.casual.partner <- nhanes.subset %>%
+  filter(msm.adjusted != "yes")%>%
+  filter(gender == "male") %>%
+  mutate(active.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
+  group_by(active.condomless)%>%
+  count(active.condomless)%>%
+  rename(count.active.condomless = n)%>%
+  group_by()%>%
+  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
+
+#Heterosexual female- casual partner
+hetero.female.casual.partner  <- nhanes.subset %>%
+  filter(gender == "female")%>%
+  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
+  group_by(active.condomless)%>%
+  count(active.condomless)%>%
+  rename(count.active.condomless = n)%>%
+  group_by()%>%
+  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
+
+
 
