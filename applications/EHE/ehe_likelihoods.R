@@ -38,7 +38,7 @@ population.likelihood.instructions = create.basic.likelihood.instructions(outcom
 #-- IMMIGRATION  --#
 immigration.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
                                                                            outcome.for.sim = "immigration",
-                                                                           dimensions = c("race"), # eventually will include age
+                                                                           dimensions = c("age","race"), 
                                                                            levels.of.stratification = c(0,1),
                                                                            from.year = 2011, 
                                                                            observation.correlation.form = 'compound.symmetry', 
@@ -50,7 +50,7 @@ immigration.likelihood.instructions = create.basic.likelihood.instructions(outco
 #-- EMIGRATION  --#
 emigration.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
                                                                           outcome.for.sim = "emigration",
-                                                                          dimensions = c("race"), # eventually will include age
+                                                                          dimensions = c("age","race"), 
                                                                           levels.of.stratification = c(0,1),
                                                                           from.year = 2011, 
                                                                           observation.correlation.form = 'compound.symmetry', 
