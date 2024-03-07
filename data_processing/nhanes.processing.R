@@ -371,17 +371,23 @@ hetero.female.casual.partner  <- nhanes.subset %>%
 ################################################################################
 
 nhanes.msm <- nhanes.subset%>%
-  filter(msm.adjusted == "yes")
+  filter(msm.adjusted == "yes")%>%
+  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 #save(nhanes.msm, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.msm.RData") ##UPDATE LOCATION
 
 nhanes.hetero.males <- nhanes.subset%>%
   filter(msm.adjusted != "yes")%>%
-  filter(gender == "male") 
+  filter(gender == "male") %>%
+  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 ##Update location
 #save(nhanes.hetero.males, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.hetero.males.RData") ##UPDATE LOCATION
 
 nhanes.hetero.females <- nhanes.subset%>%
-  filter(gender == "female") #I think we are assuming anyone who is not MSM is heterosexual so that means all females?
+  filter(gender == "female")%>% #I think we are assuming anyone who is not MSM is heterosexual so that means all females?
+  mutate(sex.in.past.year.and.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 ##Update location
 #save(nhanes.hetero.females, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.hetero.females.RData") ##UPDATE LOCATION
 
