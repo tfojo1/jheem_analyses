@@ -266,54 +266,6 @@ nhanes.subset = nhanes.total
 ################################################################################
 ##Metrics Todd wants 
 ################################################################################
-#Proportion of Heterosexuals who report Gonorrhea in Past Year
-proportion.heterosexual.with.gonorrhea.past.year <- nhanes.subset %>%
-  mutate(heterosexual.indicator.one = ifelse(sexual.orientation.male == "heterosexual" | sexual.orientation.female== "heterosexual", "1", "0"))%>%
-  mutate(heterosexual.indicator.two = case_when(gender == "male" & male.sex.with.female.past.year >0 & male.sex.with.female.past.year < 7777 ~ "1",
-                                                gender == "female" & female.sex.with.male.past.year >0 & female.sex.with.male.past.year < 7777 ~ "1",
-                                                TRUE ~ "0"))%>%
-  mutate(heterosexual.indicator.final = case_when(is.na(heterosexual.indicator.one) & heterosexual.indicator.two == "1" ~ "1",
-                                                   heterosexual.indicator.one == "1" & heterosexual.indicator.two == "1" ~ "1",
-                                                   is.na(heterosexual.indicator.one) & heterosexual.indicator.two == "0" ~ "0"))%>%
-  filter(heterosexual.indicator.final == "1")%>%  #Calculate recent gc for heterosexual
-  filter(!is.na(gonorrhea.past.year)) %>% #REMOVING NA VALUES
-  group_by(survey.year, gonorrhea.past.year)%>%
-  count(gonorrhea.past.year)%>%
-  rename(count.gonorrhea.past.year = n)%>%
-  group_by(survey.year)%>%
-  mutate(proportion.gonorrhea.past.year = round(count.gonorrhea.past.year/ sum(count.gonorrhea.past.year), digits=2))
-
-#Proportion of MSM Reporting Casual Partner
-proportion.msm.with.casual.partner <- nhanes.subset %>%
-  filter(msm.adjusted == "yes")%>%
-  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
-  filter(!is.na(active.condomless.msm)) %>% #REMOVING NA VALUES
-  group_by(survey.year, active.condomless.msm)%>%
-  count(active.condomless.msm)%>%
-  rename(count.active.condomless.msm = n)%>%
-  group_by(survey.year)%>%
-  mutate(proportion.active.condomless.msm = round(count.active.condomless.msm/ sum(count.active.condomless.msm), digits=2))
-
-proportion.msm.with.casual.partner.race <- nhanes.subset %>%
-  filter(msm.adjusted == "yes")%>%
-  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
-  filter(!is.na(active.condomless.msm)) %>% #REMOVING NA VALUES
-  group_by(survey.year, race, active.condomless.msm)%>%
-  count(active.condomless.msm)%>%
-  rename(count.active.condomless.msm = n)%>%
-  group_by(survey.year, race)%>%
-  mutate(proportion.active.condomless.msm = round(count.active.condomless.msm/ sum(count.active.condomless.msm), digits=2))
-
-proportion.msm.with.casual.partner.age <- nhanes.subset %>%
-  filter(msm.adjusted == "yes")%>%
-  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
-  filter(!is.na(active.condomless.msm)) %>% #REMOVING NA VALUES
-  group_by(survey.year, age.group, active.condomless.msm)%>%
-  count(active.condomless.msm)%>%
-  rename(count.active.condomless.msm = n)%>%
-  group_by(survey.year, age.group)%>%
-  mutate(proportion.active.condomless.msm = round(count.active.condomless.msm/ sum(count.active.condomless.msm), digits=2))
-
 #Cumulative Proportion of Age at sex initiation
 cumulative.proportion.age.at.sex.initiation.all.years <- nhanes.subset%>%
   filter(age.at.first.sex != "dont know")%>%
@@ -359,14 +311,8 @@ proportion.sex.in.past.year.by.age.by.year <- nhanes.subset%>%
   rename(count.sex.in.past.year = n)%>%
   mutate(proportion.count.sex.in.past.year.unweighted = round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))
 
-#Save
-
-#save(nhanes.subset, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.subset.RData")
-#save(cumulative.proportion.age.at.sex.initiation.all.years, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/cumulative.proportion.age.at.sex.initiation.all.years.RData")
-
-
 ################################################################################
-##Adjusting the initial tables to get proportions for meeting
+##Adjusting the initial tables to get proportions for meeting 3.7.24
 ################################################################################
 #Proportion of Heterosexual Males who report Gonorrhea in Past Year
 all.hetero.male.prep.indications <- nhanes.subset %>%
@@ -436,4 +382,22 @@ hetero.female.casual.partner  <- nhanes.subset %>%
   mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
 
 
+################################################################################
+##3 datasets needed for regression
+################################################################################
+
+nhanes.msm <- nhanes.subset%>%
+  filter(msm.adjusted == "yes")
+save(nhanes.msm, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.msm.RData") ##UPDATE LOCATION
+
+nhanes.hetero.males <- nhanes.subset%>%
+  filter(msm.adjusted != "yes")%>%
+  filter(gender == "male") 
+##Update location
+save(nhanes.hetero.males, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.hetero.males") ##UPDATE LOCATION
+
+nhanes.hetero.females <- nhanes.subset%>%
+  filter(gender == "female") #I think we are assuming anyone who is not MSM is heterosexual so that means all females?
+##Update location
+save(nhanes.hetero.females, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/NHANES/nhanes.hetero.females") ##UPDATE LOCATION
 
