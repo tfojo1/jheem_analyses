@@ -489,7 +489,7 @@ data.manager$register.ontology(
 data.manager$register.ontology(
   'census.immigration.adults',
   ont = ontology(
-    year= c("2006-2010", "2011-2015", "2016-2020"),
+    year= c("2011-2015", "2012-2016", "2013-2017", "2014-2018", "2015-2019", "2016-2020"),
     location= NULL,
     age = c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
             "65-69 years", "70-74 years", "75+ years"),
