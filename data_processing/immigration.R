@@ -268,6 +268,7 @@ for (data in movement_data) {
 ###############################################################################
 #Calculate the 'other' race category
 #Pulling the individual variables from the other dfs to make one df
+#Note that 2011-2015 is the only stratified immigration data so this only applies to datasets from that year range
 ###############################################################################
 #Pulled from cdc wonder
 #Proportion of Black who are Hispanic: 14,568,073 / 218,869,956 = 0.067
