@@ -7,6 +7,23 @@ TRATE.RR.1.2.SPAN = 2#1.5
 TRATE.RR.0.1.SPAN = 4#2#1.5
 TRATE.RR.0.PEAK.SPAN = 8#3
 
+create.auto.regressive.covariance.matrix = function(correlation.coefficient,
+                                                    n,sd){
+  delta = matrix(rep(1:n,n)-rep(1:n,each=n),nrow=n)
+  corr.matrix = correlation.coefficient^abs(delta)
+  corr.matrix*(sd^2)
+  
+}
+
+create.compound.symmetry.covariance.matrix = function(correlation.coefficient,
+                                                      n,sd){
+
+  corr.matrix = matrix(correlation.coefficient,nrow=n,ncol=n)
+  diag(corr.matrix) = 1
+  corr.matrix*(sd^2)
+  
+}
+
 BASE.PARAMETERS.PRIOR = join.distributions(
     global.trate = Loguniform.Distribution(0,Inf),
     
@@ -33,27 +50,26 @@ BASE.PARAMETERS.PRIOR = join.distributions(
  
     immigration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
     emigration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
+
+    Multivariate.Lognormal.Distribution(mu=0,sigma = create.compound.symmetry.covariance.matrix(
+                                          correlation.coefficient = 0.5,n=3,sd=0.5*log(2)),
+                                        var.names = paste0(c("black","hispanic","other"),".migration.multiplier.time.1")),
     
-    black.migration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    hispanic.migration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    other.migration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age1.migration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age2.migration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age3.migration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age4.migration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age5.migration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
+    Multivariate.Lognormal.Distribution(mu=0,sigma = create.auto.regressive.covariance.matrix(
+                                          correlation.coefficient = 0.7,n=5,sd=0.5*log(2)),
+                                        var.names = paste0("age",c(1:5),".migration.multiplier.time.1")),
+    
     
     immigration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
     emigration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
     
-    black.migration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    hispanic.migration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    other.migration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age1.migration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age2.migration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age3.migration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age4.migration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    age5.migration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
+    Multivariate.Lognormal.Distribution(mu=0,sigma = create.compound.symmetry.covariance.matrix(
+                                          correlation.coefficient = 0.5,n=3,sd=0.5*log(2)),
+                                        var.names = paste0(c("black","hispanic","other"),".migration.multiplier.time.2")),
+
+    Multivariate.Lognormal.Distribution(mu=0,sigma = create.auto.regressive.covariance.matrix(
+                                          correlation.coefficient = 0.7,n=5,sd=0.5*log(2)),
+                                        var.names = paste0("age",c(1:5),".migration.multiplier.time.2")),
 
     
     #-- MSM Transmission --#
