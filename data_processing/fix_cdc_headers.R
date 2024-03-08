@@ -13,6 +13,7 @@ DATA.DIR.DIAGNOSES="../../data_raw/diagnoses"
 DATA.DIR.DEATHS="../../data_raw/deaths"
 DATA.DIR.PREVALENCE="../../data_raw/prevalence"
 DATA.DIR.SLE="../../data_raw/sle"
+DATA.DIR.NATIONAL.SUPPRESSION="../../data_raw/sle/national_suppression"
 DATA.DIR.KNOWLEDGE="../../data_raw/knowledge"
 DATA.DIR.ATLAS.PREP="../../data_raw/prep/atlas_plus"
 
@@ -46,6 +47,13 @@ data.list.sle <- lapply(sle_files, function(x){
     list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
   }
   else  skip=11
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+})
+
+#---National Level Suppression--#
+national_suppression_files <- Sys.glob(paste0(DATA.DIR.NATIONAL.SUPPRESSION, '/*.csv'))
+data.list.national.suppression <- lapply(national_suppression_files, function(x){
+    skip=9
   list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 

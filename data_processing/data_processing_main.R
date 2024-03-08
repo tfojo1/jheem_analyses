@@ -958,6 +958,54 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   
 })
 
+#---Clean National Suppression---#
+
+national.suppression = lapply(data.list.national.suppression , function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$outcome = outcome.mappings[data$Indicator]
+  data = data[!is.na(data$outcome),]
+  
+  names(data)[names(data)=='Year'] = 'year'   
+  data$year = substring(data$year,1, 4)                                          
+  data$year = as.character(data$year)
+  
+  #Pulling from 'percent' variable
+  data$Percent[data$Percent %in% c("Data suppressed")] = NA    
+  data$Percent[data$Percent %in% c("Data not available")] = NA 
+  data$Percent = as.numeric(data$Percent)
+  data$value = (data$Percent/100) 
+  
+  data$location = "US"
+  
+  if(grepl("age", filename)) {
+    data$age = age.mappings[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    names(data)[names(data)=='Race.Ethnicity'] = 'race'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("male", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("female", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  if(grepl("risk", filename)) {
+    data$risk = risk.mappings[data$Transmission.Category]
+  }
+  
+  list(filename, data) 
+  
+})
+
 #---Clean Knowledge---#
 
 data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
@@ -1296,6 +1344,20 @@ for (data in deaths_notes) {
  sle_all = lapply(data.list.clean.sle, `[[`, 2) 
  
  for (data in sle_all) {
+   
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc.hiv',
+     dimension.values = list(),
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+     details = 'CDC Atlas Plus data')
+ }
+ 
+ ##National Suppression 
+ national_suppression_all = lapply(national.suppression, `[[`, 2) 
+ 
+ for (data in national_suppression_all) {
    
    data.manager$put.long.form(
      data = data,
