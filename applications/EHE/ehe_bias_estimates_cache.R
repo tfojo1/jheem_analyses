@@ -1,5 +1,6 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
+# works
 suppression.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                   dimensions = c("age","race","sex","risk"),
                                                   levels.of.stratification = c(0,1),
@@ -8,6 +9,7 @@ suppression.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                   sub.location.type = "COUNTY",
                                                   super.location.type = "STATE",
                                                   main.location.type = "CBSA",
+                                                  main.location.type.p.source = "cdc.aggregated.proportion", #@Andrew added this
                                                   main.location.type.n.source = "cdc.hiv")
 
 proportion.tested.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
@@ -18,7 +20,7 @@ proportion.tested.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                         sub.location.type = NULL, # want to be able to do this 
                                                         super.location.type = "STATE",
                                                         main.location.type = "CBSA",
-                                                        main.location.type.n.source = "brfss")
+                                                        main.location.type.n.source = "census.population") #@Andrew chose this one but there was another possible choice
 
 awareness.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                         dimensions = c("age","race","sex","risk"),
