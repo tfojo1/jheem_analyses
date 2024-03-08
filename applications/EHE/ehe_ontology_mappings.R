@@ -156,3 +156,10 @@ register.ontology.mapping('proportion.tested.to.adult.population.2',
                                            c('Native Hawaiian/Other Pacific Islander', 'Asian/Pacific Islander'),
                                            c('Other race', 'other'),
                                            c('White', 'White')))
+register.ontology.mapping('nhanes.to.jheem.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('black, non hispanic', 'black'),
+                                           c('hispanic', 'hispanic'),
+                                           c('other', 'other'),
+                                           c('white, non hispanic', 'other')))
