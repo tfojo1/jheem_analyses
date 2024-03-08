@@ -4,10 +4,10 @@ library(dplyr)
 ##Read in NHANES Data
 
 #running on local:
-#DATA.DIR.NHANES="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES"
+DATA.DIR.NHANES="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES"
 
 #If running on remote:
-DATA.DIR.NHANES="Q:/data_clean/nhanes/raw_data"
+#DATA.DIR.NHANES="Q:/data_clean/nhanes/raw_data"
 
 nhanes.files <- list.files(DATA.DIR.NHANES, pattern = ".XPT", full.names = "TRUE")
 
@@ -295,6 +295,22 @@ proportion.sex.in.past.year.by.age.total <- nhanes.subset%>%
   mutate(proportion.count.sex.in.past.year.unweighted = round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))%>%
   filter(sex.in.past.year == "1")
 
+#Combining
+snippet.1 <- cumulative.proportion.age.at.sex.initiation.all.years%>%
+  rename(age = age.at.first.sex)%>%
+  filter(age < 18)%>%
+  rename(count.sex.in.past.year= age.at.first.sex.count)%>%
+  select(age, count.sex.in.past.year)
+
+snippet.2 <- proportion.sex.in.past.year.by.age.total%>%
+  mutate(age = as.character(age))%>%
+  select(age, count.sex.in.past.year)
+
+sexual.availability.by.age <- rbind(snippet.1, snippet.2, by="age")%>%
+  filter(age != "age")%>%
+  mutate(count.sex.in.past.year = as.numeric(count.sex.in.past.year))%>%
+  mutate(proportion= round(count.sex.in.past.year/sum(count.sex.in.past.year), digits=2))%>%
+  mutate(cumulative.proportion = cumsum(proportion))
 ################################################################################
 ##Adjusting the initial tables to get proportions for meeting 3.7.24
 ################################################################################
@@ -363,8 +379,20 @@ hetero.female.casual.partner  <- nhanes.subset %>%
   count(active.condomless)%>%
   rename(count.active.condomless = n)%>%
   group_by()%>%
-  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
+  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))%>%
+  filter(active.condomless == "1")
 
+#Heterosexual female with casual partner by age group
+hetero.female.casual.partner.by.age  <- nhanes.subset %>%
+  filter(gender == "female")%>%
+  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
+  group_by(age.group, active.condomless)%>%
+  count(active.condomless)%>%
+  rename(count.active.condomless = n)%>%
+  group_by()%>%
+  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))%>%
+  filter(active.condomless == "1")
 
 ################################################################################
 ##3 datasets needed for regression
