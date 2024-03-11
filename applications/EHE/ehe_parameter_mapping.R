@@ -328,6 +328,56 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     #                               parameters = parameters,
     #                               times = c('.pre.spike', 0:3))
     
+    #-- HIV Aging --#
+    hiv.aging.spline.times = c("pre.spike","time0","time1","time2") 
+    
+    for(spline.i in 1:length(hiv.aging.spline.times)){
+    
+      spline.time = hiv.aging.spline.times[spline.i]
+      time.suffix = max(0,spline.i-2)
+      
+    # Race
+      for(race in specification.metadata$dim.names$race){
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "hiv.positive.aging.rates",
+                                                       alpha.name = spline.time, 
+                                                       values = parameters[paste0(race,'.hiv.aging.multiplier.',time.suffix)],
+                                                       applies.to.dimension.values=list(race=race))
+      }
+      
+      # Age
+      for(age in 1:(length(specification.metadata$dim.names$age)-1)){
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "hiv.positive.aging.rates",
+                                                       alpha.name = spline.time,
+                                                       values = parameters[paste0('age',age,'.hiv.aging.multiplier.',time.suffix)],
+                                                       applies.to.dimension.values=list(age=age))
+      }
+      
+      # Sex/risk 
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "hiv.positive.aging.rates",
+                                                     alpha.name = spline.time,
+                                                     values = parameters[paste0('msm.hiv.aging.multiplier.',time.suffix)],
+                                                     applies.to.dimension.values=c(sex='msm')) 
+      
+      # when cutting across two dimensions, have to use interaction alphas 
+      set.element.functional.form.interaction.alphas(model.settings,
+                                                     element.name = "hiv.positive.aging.rates",
+                                                     alpha.name = spline.time,
+                                                     value = parameters[paste0('idu.hiv.aging.multiplier.',time.suffix)],
+                                                     applies.to.dimension.values=c(sex='heterosexual_male', sex='female', idu.states))
+      
+      set.element.functional.form.interaction.alphas(model.settings,
+                                                     element.name = "hiv.positive.aging.rates",
+                                                     alpha.name = spline.time,
+                                                     value = parameters[paste0('heterosexual.hiv.aging.multiplier.',time.suffix)],
+                                                     applies.to.dimension.values=c(sex='heterosexual_male', sex='female', non.idu.states))
+      
+    
+    }
+    
+
     #-- IDU --#
     set.ehe.idu.from.parameters(model.settings,
                                 parameters = parameters)
