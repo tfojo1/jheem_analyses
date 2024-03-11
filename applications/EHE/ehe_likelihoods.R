@@ -42,7 +42,7 @@ immigration.likelihood.instructions = create.basic.likelihood.instructions(outco
                                                                            levels.of.stratification = c(0,1),
                                                                            from.year = 2011, 
                                                                            observation.correlation.form = 'compound.symmetry', 
-                                                                           measurement.error.coefficient.of.variance = 0.05, # look up how far off migration data may be
+                                                                           measurement.error.coefficient.of.variance = 0.25, # look up how far off migration data may be
                                                                            weights = 1,
                                                                            equalize.weight.by.year = T 
 )
@@ -54,7 +54,7 @@ emigration.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                           levels.of.stratification = c(0,1),
                                                                           from.year = 2011, 
                                                                           observation.correlation.form = 'compound.symmetry', 
-                                                                          measurement.error.coefficient.of.variance = 0.05, # look up how far off migration data may be
+                                                                          measurement.error.coefficient.of.variance = 0.25, # look up how far off migration data may be
                                                                           weights = 1,
                                                                           equalize.weight.by.year = T 
 )
