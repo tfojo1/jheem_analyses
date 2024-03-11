@@ -3,15 +3,14 @@
 # data.manager: SURVEILLANCE.MANAGER
 # locations: 'MSAS.OF.INTEREST'
 # stratification.dimensions: something like c('risk', 'sex') -- don't include 'year' or 'location', which are implied
-# adjudication.data.frame: an optional data frame that describes values you will say keep or don't keep on. Has columns year, location, source, ontology, and another column per additional dimension in 'stratification.dimensions'.
-# adjudication.vector: an optional logical vector that matches adjudication.data.frame, saying whether the i'th row in the data frame refers to a point that should be thrown out (T) or kept (F)
+# adjudication.data.frame: an optional data frame that describes values you will say keep or don't keep on. Has columns year, location, source, ontology, and another column per additional dimension in 'stratification.dimensions'. The last column should be "adjudication" and contain 'T' for keeping a row, 'F' for retaining a row, and NA for undecided rows.
 # phi: a percent change from one year to another that does not depend on how many years apart the data points are from
 # theta: a multiplier that produces a percent change based on how many years apart two samples are. The maximum allowed percent change uses phi + (1 + theta)^(year difference) - 1.
 # minimum.flagged.change: an integer that indicates what the smallest change between years that will be flagged as problematic is.
 ## ---------------------------##
 
 ## ONLY USE THIS. THE REST ARE ITS HELPERS.
-find.outlier.data = function(outcome, data.manager = get.default.data.manager(), locations, stratification.dimensions=c(), adjudication.data.frame=NULL, adjudication.vector=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50) {
+find.outlier.data = function(outcome, data.manager = get.default.data.manager(), locations, stratification.dimensions=c(), adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50) {
     
     error.prefix = "Error finding outliers: "
     
@@ -22,13 +21,12 @@ find.outlier.data = function(outcome, data.manager = get.default.data.manager(),
     if (length(stratification.dimensions)>0)
         stratification.name = paste0(stratification.name, "__", paste0(stratification.dimensions, collapse = "__"))
 
-    expected.col.names = c('year', 'location', 'source', 'ontology', stratification.dimensions)
+    expected.col.names = c('year', 'location', 'source', 'ontology', stratification.dimensions, 'adjudication')
     if (!is.null(adjudication.data.frame) && (!is.data.frame(adjudication.data.frame) ||  !setequal(colnames(adjudication.data.frame), expected.col.names)))
-        stop(paste0(error.prefix, "'adjudication.data.frame' must be either NULL or a data frame with columns year, location, source, ontology, and one per additional dimension in 'stratification.dimensions'."))
-    if (!is.null(adjudication.data.frame) && (!is.logical(adjudication.vector) || length(adjudication.vector) != nrow(adjudication.data.frame)) || any(is.na(adjudication.vector)))
-        stop(paste0(error.prefix, "'adjudication.vector must be NULL or a non-NA logical vector of the same length as 'adjudication.data.frame' if the latter is not NULL"))
+        stop(paste0(error.prefix, "'adjudication.data.frame' must be either NULL or a data frame with columns year, location, source, ontology, adjudication, and one per additional dimension in 'stratification.dimensions'."))
     
-    
+    adjudication.vector = adjudication.data.frame[['adjudication']]
+
     flag.list = do.get.outliers.for.outcome(outcome,
                                             data.manager=data.manager,
                                             locations=locations,
@@ -87,6 +85,7 @@ convert.to.data.frame = function(list.of.lists, stratification.name) {
             }
         }
     }
+    df = cbind(df, adjudication=as.logical(rep(NA, nrow(df))))
     return(df)
 }
 
@@ -206,6 +205,12 @@ generate.find.outliers.function = function(phi, theta, minimum.flagged.change) {
                 else
                     last.good.year = y
             }
+            else if (TRUE) {
+                tryCatch(
+                    {if (!adjudication.result[y]) last.good.year=y},
+                    error=function(e) {browser()}
+                )
+            }
             else if (!adjudication.result[y])
                 last.good.year = y
         }
@@ -240,8 +245,8 @@ get.adjudication = function(years, location, source, ontology, stratum.vars, adj
     return (result)
 }
 
-# city.names = c('C.47900', 'C.16980')
-# jj = find.outlier.data('diagnosed.prevalence', ss, city.names, stratification.dimensions = c('age', 'sex'))
-# input.df = jj
+city.names = c('C.47900', 'C.16980')
+jj = find.outlier.data('diagnosed.prevalence', ss, city.names, stratification.dimensions = c('age', 'sex'))
 # input.v = rep(c(T,F), nrow(jj)/2) # works if jj has even number of rows
-# jj2 = find.outlier.data('diagnosed.prevalence', ss, city.names, stratification.dimensions = c('age', 'sex'), adjudication.data.frame = input.df, adjudication.vector = input.v)
+jj$adjudication[[1]] = T
+jj2 = find.outlier.data('diagnosed.prevalence', ss, city.names, stratification.dimensions = c('age', 'sex'), adjudication.data.frame = jj)
