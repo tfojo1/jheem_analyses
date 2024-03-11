@@ -392,7 +392,7 @@ for (data in adult.imm.em.list) {
 }
 
 ###############################################################################
-##Update March 11: Using proportion of adults calculated above to apply to 
+##Update March 11 2024: Using proportion of adults calculated above to apply to 
 #new years of data that are not available with age strata
 #you don't need to do this for 11-15 bc it's already done
 #Uses these from above: adult.prop.df.em; adult.prop.df.imm
@@ -432,7 +432,11 @@ data <- data %>%
   mutate(new.value = value * adult.proportion)%>%
   rename(old.value = value)%>%
   rename(value = new.value) %>%
-  filter(!is.na(adult.proportion))
+  filter(!is.na(adult.proportion))%>%
+  filter(!is.na(old.value))
+  
+
+data= as.data.frame(data)
   
 list(filename, data)
 
