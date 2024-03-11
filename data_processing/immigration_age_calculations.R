@@ -418,7 +418,7 @@ adult.movement.data.unstratified.years = lapply(select.years.of.interest, functi
     data <- data%>%
       full_join(proportion.df.immigration, by = "location")%>%
       select(-outcome)%>%
-      mutate(outcome = "adult.emigration")
+      mutate(outcome = "adult.immigration")
   }
   
   if(grepl("emigration", filename)) {
