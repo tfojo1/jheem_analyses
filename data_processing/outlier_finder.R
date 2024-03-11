@@ -179,40 +179,48 @@ do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratif
 
 generate.find.outliers.function = function(phi, theta, minimum.flagged.change) {
     
+    # NEW ALGORITHM: START AT 2019. GO FORWARDS WITH ALGORITHM AND ALSO GO BACKWARDS. IF 2019 ISN'T AVAILABLE START WITH THE NEXT EARLIER YEAR, OR IF NONE AVAILABLE BELOW 2020, PICK FIRST YEAR ABOVE 2019.
+    
     do.find.outliers = function(data.vector, years, adjudication.result, debug=F) {
         if (debug) browser()
-        # Check that we can find a starting point that isn't zero, because we'll need to divide by it
-        last.good.year = NULL
-        used.years = NULL
-        for (y in years) {
-            if (data.vector[[y]] != 0) {
-                last.good.year = y
-                used.years = years[y:length(years)]
-                break
-            }
-        }
-        if (is.null(last.good.year)) return(character(0))
-        
-        # Find change from the last.good.year to another
         flagged.years = character(0)
-        for (y in years) {
-            abs.difference = abs(data.vector[[y]] - data.vector[[last.good.year]])
-            difference.in.years = as.numeric(y)-as.numeric(last.good.year)
-            tolerable.percent.difference = phi + (1 + theta) ^ difference.in.years - 1
-            if (is.na(adjudication.result[y])) {
-                if (abs.difference >= minimum.flagged.change && abs.difference / data.vector[[last.good.year]] > tolerable.percent.difference)
-                    flagged.years = c(flagged.years, y)
-                else
+        
+        # Pick 2019 or earlier, else pick first year above 2019. Must be nonzero because we divide by it to find a percent change.
+        if (any(as.numeric(years)<=2019 & as.numeric(years)!=0))
+            baseline.year = max(as.numeric(years)[as.numeric(years)<2020 & as.numeric(years)!=0])
+        else if (any(as.numeric(years)>2019) & as.numeric(years)!=0)
+            baseline.year = min(as.numeric(years)[as.numeric(years)!=0])
+        else return(flagged.years)
+        
+        backward.years = years[as.numeric(years)<baseline.year]
+        forward.years = years[as.numeric(years)>baseline.year]
+        
+        baseline.year = as.character(baseline.year)
+        
+        for (direction in c('forward', 'backward')) {
+            
+            if (direction=='forward' && length(forward.years)==0) next
+            if (direction=='backward' && length(backward.years)==0) next
+            
+            last.good.year = baseline.year
+            if (direction=='forward') years.to.check = forward.years
+            if (direction=='backward') years.to.check = rev(backward.years)
+            
+            # Flag years whose values are too different from the last acceptable year's value, updating the last acceptable year when the change is small enough
+            for (y in years.to.check) {
+                abs.difference = abs(data.vector[[y]] - data.vector[[last.good.year]])
+                difference.in.years = as.numeric(y)-as.numeric(last.good.year)
+                tolerable.percent.difference = phi + (1 + theta) ^ difference.in.years - 1
+                if (is.na(adjudication.result[y])) {
+                    if (abs.difference >= minimum.flagged.change && abs.difference / data.vector[[last.good.year]] > tolerable.percent.difference)
+                        flagged.years = c(flagged.years, y)
+                    else
+                        last.good.year = y
+                }
+                else if (!adjudication.result[y])
                     last.good.year = y
             }
-            else if (TRUE) {
-                tryCatch(
-                    {if (!adjudication.result[y]) last.good.year=y},
-                    error=function(e) {browser()}
-                )
-            }
-            else if (!adjudication.result[y])
-                last.good.year = y
+            
         }
         return (flagged.years)
     }
