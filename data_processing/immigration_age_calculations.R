@@ -390,3 +390,65 @@ for (data in adult.imm.em.list) {
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
     details = 'Census Metro Area to Metro Area Migration Flows')
 }
+
+###############################################################################
+##Update March 11: Using proportion of adults calculated above to apply to 
+#new years of data that are not available with age strata
+#you don't need to do this for 11-15 bc it's already done
+#Uses these from above: adult.prop.df.em; adult.prop.df.imm
+###############################################################################
+proportion.df.immigration <- adult.prop.df.imm %>%
+  select(location, Freq)%>%
+  rename(adult.proportion = Freq)
+
+proportion.df.emigration <- adult.prop.df.em %>%
+  select(location, Freq)%>%
+  rename(adult.proportion = Freq)
+
+#immigration for 12.16, 13.17, 14.18, 15.19, 16.29
+select.total.years <- data.list.move.clean[grep("_total", names(data.list.move.clean))]
+select.years.of.interest <- select.total.years[grep("12.16|13.17|14.18|15.19|16.20", names(select.total.years))]
+
+adult.movement.data.unstratified.years = lapply(select.years.of.interest, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  if(grepl("immigration", filename)) {
+    data <- data%>%
+      full_join(proportion.df.immigration, by = "location")%>%
+      select(-outcome)%>%
+      mutate(outcome = "adult.emigration")
+  }
+  
+  if(grepl("emigration", filename)) {
+    data <- data%>%
+      full_join(  proportion.df.emigration, by = "location")%>%
+      select(-outcome)%>%
+      mutate(outcome = "adult.emigration")
+  }
+  
+data <- data %>%
+  mutate(new.value = value * adult.proportion)%>%
+  rename(old.value = value)%>%
+  rename(value = new.value) %>%
+  filter(!is.na(adult.proportion))
+  
+list(filename, data)
+
+})
+
+#PUT INTO DATA MANAGER
+
+updated.adult.movement = lapply(adult.movement.data.unstratified.years, `[[`, 2)  
+
+for (data in updated.adult.movement) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'census.immigration.adults',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
+    details = 'Census Metro Area to Metro Area Migration Flows')
+}
