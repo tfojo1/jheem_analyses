@@ -1143,6 +1143,44 @@ data.list.clean.awareness.population = lapply(data.list.knowledge, function(file
   list(filename, data) 
 } )
 
+##Creating this to put the RSE associated with Knowledge; note the outcome is still knowledge/awareness but the value represents RSE
+
+knowledge.rse = lapply(data.list.knowledge, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$outcome = outcome.mappings[data$Indicator]
+  data = data[!is.na(data$outcome),]
+  
+  names(data)[names(data)=='Year'] = 'year'   
+  data$year = substring(data$year,1, 4)                                          
+  data$year = as.character(data$year)
+  
+  #Pulling from 'RSE' variable
+  data$RSE[data$RSE %in% c("Data suppressed")] = NA    
+  data$RSE[data$RSE %in% c("Data not available")] = NA 
+  data$RSE = as.numeric(data$RSE)
+  data$value = (data$RSE/100)   
+  
+  
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name 
+    data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
+    names(data)[names(data)=='Geography'] = 'state'
+    data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
+  }
+  if(grepl("ehe", filename)) {
+    data$location = as.character(data$FIPS)
+  }
+  
+  data<- data%>%
+    select(year, location, outcome, value)
+  
+  list(filename, data) 
+  
+})
+
 #############################################################################
   ###Adding in Section for Atlas Plus PrEP data- outcomes are PrEP and
   ##PrEP indications
@@ -1369,7 +1407,7 @@ for (data in deaths_notes) {
  }
  
 
- ##Outcome=knowledge 
+ ##Outcome=knowledge/awareness 
  knowledge_all = lapply(data.list.clean.knowledge, `[[`, 2)  
  
  for (data in knowledge_all) {
@@ -1378,6 +1416,21 @@ for (data in deaths_notes) {
      data = data,
      ontology.name = 'cdc',
      source = 'cdc.hiv',
+     dimension.values = list(),
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+     details = 'CDC Atlas Plus data')
+ }
+ 
+ #RSE for knowledge/awareness
+ awareness.rse= lapply(knowledge.rse, `[[`, 2)  
+ 
+ for (data in awareness.rse) {
+   
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc.hiv',
+     metric = 'coefficient.of.variance',
      dimension.values = list(),
      url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
      details = 'CDC Atlas Plus data')
