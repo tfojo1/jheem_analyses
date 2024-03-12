@@ -4,7 +4,7 @@
 # AIDS diagnoses, AIDS deaths, suppression
 
 # TO DO: 
-# nested proportions: proportion tested, awareness, IDU (heroin/cocaine ratios)
+# nested proportions: proportion tested (should work, just need to cache p bias), awareness, IDU (heroin/cocaine ratios)
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -42,7 +42,7 @@ immigration.likelihood.instructions = create.basic.likelihood.instructions(outco
                                                                            levels.of.stratification = c(0,1),
                                                                            from.year = 2011, 
                                                                            observation.correlation.form = 'compound.symmetry', 
-                                                                           measurement.error.coefficient.of.variance = 0.25, # look up how far off migration data may be
+                                                                           measurement.error.coefficient.of.variance = 0.13, # using MOEs from data - see migration_MOE_summary
                                                                            weights = 1,
                                                                            equalize.weight.by.year = T 
 )
@@ -54,7 +54,7 @@ emigration.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                           levels.of.stratification = c(0,1),
                                                                           from.year = 2011, 
                                                                           observation.correlation.form = 'compound.symmetry', 
-                                                                          measurement.error.coefficient.of.variance = 0.25, # look up how far off migration data may be
+                                                                          measurement.error.coefficient.of.variance = 0.13, # using MOEs from data - see migration_MOE_summary
                                                                           weights = 1,
                                                                           equalize.weight.by.year = T 
 )
@@ -366,4 +366,41 @@ if(1==2){
 }
 
 
+#-- AWARENESS --#
+if(1==2){
+  awareness.likelihood.instructions =
+    create.nested.proportion.likelihood.instructions(outcome.for.data = "awareness",
+                                                     outcome.for.sim = "awareness",
+                                                     denominator.outcome.for.data = "total.prevalence",
+                                                     denominator.outcome.for.sim = NULL, # @Andrew code it so this pulls the denominator from the sim outcome
+                                                     
+                                                     location.types = c('STATE','CBSA','COUNTY'),
+                                                     minimum.geographic.resolution.type = 'COUNTY',
+                                                     
+                                                     dimensions = c("age","sex","race","risk"),
+                                                     levels.of.stratification = c(0,1),
+                                                     from.year = as.integer(2008),
+                                                     
+                                                     p.bias.inside.location = 0, # awareness.bias.estimates$in.mean is NA
+                                                     p.bias.outside.location = awareness.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = awareness.bias.estimates$out.sd, # awareness.bias.estimates$in.sd is NA
+                                                     p.bias.sd.outside.location = awareness.bias.estimates$out.sd,
+                                                     
+                                                     within.location.p.error.correlation = 0.5,
+                                                     within.location.n.error.correlation = 0.5,
+                                                     
+                                                     observation.correlation.form = 'compound.symmetry',
+                                                     measurement.error.sd = .016, # .018*90 - rough estimate from HIV Atlas (for now)
+                                                     # @Andrew want two arguments here: 
+                                                     # measurement.error = NULL,
+                                                     # measurement.error.type = "data.cv", 
+                                                     # options: cv, sd, data.cv (pull cv off of data), data.interval (take lower/upper bounds from data)
+                                                     
+                                                     partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                     
+                                                     weights = list(1),
+                                                     equalize.weight.by.year = T
+    )
+  
+}
 
