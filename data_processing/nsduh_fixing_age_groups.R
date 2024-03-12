@@ -1,4 +1,4 @@
-census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
+#census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
 
 ages.of.interest.13.17 = c("13 years", "14 years", "15 years", "16 years", "17 years")
 ages.of.interest.18.25 = c("18 years", "19 years", "20 years", "21 years", "22 years", "23 years", "24 years", "25 years")
@@ -99,12 +99,12 @@ younger.population = lapply(lower.age.list, function(file){
   
   data=file[1]
   
-   data= as.data.frame(data)
-    data = rownames_to_column(data, var = 'location.county')
+  data= as.data.frame(data)
+  
+   data = rownames_to_column(data, var = 'location.county')
 
    data$location.state.fips = substr(data$location.county, start = 1, stop = 2)
    data$location.state = state.to.fips.mappings[data$location.state.fips]
-
   
 list(data) 
 })
@@ -117,5 +117,5 @@ counties.in.states = lapply(states, function(state){
   counties.in.this.state = locations::get.contained.locations(state, "county")
 })
 
-#Could you make a variable for eah county that corresponds to each 'state' or 'substate region' and then group_by + sum to get values for locations
+#Could you make a variable for each county that corresponds to each 'state' or 'substate region' and then group_by + sum to get values for locations
 #Then join to NSDUH data
