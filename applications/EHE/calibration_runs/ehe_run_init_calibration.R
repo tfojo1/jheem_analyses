@@ -1,10 +1,11 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
-LOCATION = CHICAGO.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION # or CALIBRATION.CODE.POPULATION
+LOCATION = CLEVELAND.MSA 
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.POPULATION # or CALIBRATION.CODE.TRANSMISSION
 
 set.seed(12345)
 start.time = Sys.time()
+
 print(paste0("STARTING MCMC RUN AT ",Sys.time()))
 mcmc = run.calibration(version = 'ehe',
                 location = LOCATION,
@@ -23,6 +24,5 @@ print(paste0("DONE RUNNING MCMC: Took ",
 
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
-save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-
-sim$save()
+save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+# save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
