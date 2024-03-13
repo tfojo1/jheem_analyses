@@ -461,8 +461,8 @@ if(1==2){
                                                      within.location.n.error.correlation = 0.5,
                                                      
                                                      observation.correlation.form = 'compound.symmetry', 
-                                                     measurement.error.sd = 0.6*0.005, # for now, double the NSDUH calcs and multiply by .005 from MD data
-                                                     # measurement.error = 0.3, # get this from NSDUH calcs - Melissa to do 
+                                                     measurement.error.sd = 0.54*0.005, # for now, double the NSDUH calcs and multiply by .005 from MD data
+                                                     # measurement.error = 0.27, # NSDUH calcs 
                                                      # measurement.error.type = "cv",
                                                      
                                                      partitioning.function = EHE.PARTITIONING.FUNCTION, 
@@ -495,7 +495,7 @@ if(1==2){
                                                      
                                                      observation.correlation.form = 'compound.symmetry', 
                                                      measurement.error.sd = 0.42*0.02, # for now, double the NSDUH calcs and multiply by .02 from MD data
-                                                     # measurement.error = 0.21, # get this from NSDUH calcs - Melissa to do 
+                                                     # measurement.error = 0.21, # NSDUH calcs 
                                                      # measurement.error.type = "cv",
                                                      
                                                      partitioning.function = EHE.PARTITIONING.FUNCTION, 
