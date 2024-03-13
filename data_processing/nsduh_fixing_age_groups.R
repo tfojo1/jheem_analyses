@@ -57,7 +57,7 @@ state.to.fips.mappings = c('01' = 'AL',
                            '56'='WY',
                            '72'= 'PR')
 ##################################################################################
-#There is not single year age groups for 2013
+#There is not single year age groups for 2003
 #population.2003.12.17 = as.data.frame(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2003", ,ages.of.interest.13.17,,,])
 population.2005.12.17 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2005", ,ages.of.interest.13.17,,,]))
 population.2007.12.17 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2007", ,ages.of.interest.13.17,,,]))
@@ -67,55 +67,108 @@ population.2013.12.17 = as.data.frame(rowSums(census.manager$data$population$est
 population.2015.12.17 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2015", ,ages.of.interest.13.17,,,]))
 population.2017.12.17 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2017", ,ages.of.interest.13.17,,,]))
 
-##Messy formatting bc idk how else to do this##
+population.2005.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2005", ,ages.of.interest.18.25 ,,,]))
+population.2007.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2007", ,ages.of.interest.18.25 ,,,]))
+population.2009.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2009", ,ages.of.interest.18.25 ,,,]))
+population.2011.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2011", ,ages.of.interest.18.25 ,,,]))
+population.2013.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2013", ,ages.of.interest.18.25 ,,,]))
+population.2015.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2015", ,ages.of.interest.18.25 ,,,]))
+population.2017.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2017", ,ages.of.interest.18.25 ,,,]))
+
 #####################################################################################################################
 population.2005.12.17 <- population.2005.12.17%>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2005", , ages.of.interest.13.17, , , ])`)%>%
-mutate(year = "2005")
+mutate(year = "2004-2006") #i pulled the middle year for population but NSDUH uses ranges
   population.2007.12.17 <- population.2007.12.17%>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2007", , ages.of.interest.13.17, , , ])`)%>%
-  mutate(year = "2007")
+  mutate(year = "2006-2008")
 population.2009.12.17  <- population.2009.12.17 %>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2009", , ages.of.interest.13.17, , , ])`)%>%
-  mutate(year = "2009")
+  mutate(year = "2008-2010")
 population.2011.12.17 <- population.2011.12.17%>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2011", , ages.of.interest.13.17, , , ])`)%>%
-  mutate(year = "2011")
+  mutate(year = "2010-2012")
 population.2013.12.17 <- population.2013.12.17%>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2013", , ages.of.interest.13.17, , , ])`)%>%
-  mutate(year = "2013")
+  mutate(year = "2012-2014")
 population.2015.12.17  <- population.2015.12.17 %>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2015", , ages.of.interest.13.17, , , ])`)%>%
-  mutate(year = "2015")
+  mutate(year = "2014-2016")
 population.2017.12.17 <- population.2017.12.17%>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2017", , ages.of.interest.13.17, , , ])`)%>%
-  mutate(year = "2017")
+  mutate(year = "2016-2018")
+
+
+population.2005.18.25 <- population.2005.18.25%>%
+  rename(population.18.25 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2005", , ages.of.interest.18.25, , , ])`)%>%
+  mutate(year = "2004-2006") #i pulled the middle year for population but NSDUH uses ranges
+population.2007.18.25 <- population.2007.18.25%>%
+  rename(population.18.25 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2007", , ages.of.interest.18.25, , , ])`)%>%
+  mutate(year = "2006-2008")
+population.2009.18.25  <- population.2009.18.25 %>%
+  rename(population.18.25 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2009", , ages.of.interest.18.25, , , ])`)%>%
+  mutate(year = "2008-2010")
+population.2011.18.25 <- population.2011.18.25%>%
+  rename(population.18.25 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2011", , ages.of.interest.18.25, , , ])`)%>%
+  mutate(year = "2010-2012")
+population.2013.18.25 <- population.2013.18.25%>%
+  rename(population.18.25 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2013", , ages.of.interest.18.25, , , ])`)%>%
+  mutate(year = "2012-2014")
+population.2015.18.25 <- population.2015.18.25%>%
+  rename(population.18.25 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2015", , ages.of.interest.18.25, , , ])`)%>%
+  mutate(year = "2014-2016")
+population.2017.18.25 <- population.2017.18.25%>%
+  rename(population.18.25 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2017", , ages.of.interest.18.25, , , ])`)%>%
+  mutate(year = "2016-2018")
+
+ages.2005 = merge(population.2005.12.17, population.2005.18.25, by='row.names')
+ages.2007 = merge(population.2007.12.17, population.2007.18.25, by='row.names')
+ages.2009 = merge(population.2009.12.17, population.2009.18.25, by='row.names')
+ages.2011 = merge(population.2011.12.17, population.2011.18.25, by='row.names')
+ages.2013 = merge(population.2013.12.17, population.2013.18.25, by='row.names')
+ages.2015 = merge(population.2015.12.17, population.2015.18.25, by='row.names')
+ages.2017 = merge(population.2017.12.17, population.2017.18.25, by='row.names')
+
+
 #####################################################################################################################
 #This creates a list of census population values for ages 12-17 by county
 
-lower.age.list <- list(population.2005.12.17, population.2007.12.17, population.2009.12.17, population.2011.12.17, population.2013.12.17, population.2015.12.17, population.2017.12.17)
+complete.age.list <- list(ages.2005, ages.2007, ages.2009, ages.2011, ages.2013, ages.2015, ages.2017)
             
-younger.population = lapply(lower.age.list, function(file){
+population.state = lapply(complete.age.list, function(file){
   
-  data=file[1]
+  data=file[1:2]
   
   data= as.data.frame(data)
   
-   data = rownames_to_column(data, var = 'location.county')
+   data <- data %>%
+     rename(location = Row.names)%>%
+     rename(year = `year.x`)
 
    data$location.state.fips = substr(data$location.county, start = 1, stop = 2)
    data$location.state = state.to.fips.mappings[data$location.state.fips]
+   
+   data <- data %>%
+     select(year, location.state, (one_of("population.13.17", "population.18.25")))
   
 list(data) 
 })
 
+#give names to poulation.state
+state.population.names = c("younger.04.06", "younger.06.08", "younger.08.10", "younger.10.12", "younger.12.14",
+                           "younger.14.16", "younger.16.18", "older.04.06", "older.06.08", "older.08.10", "older.10.12", "older.12.14",
+                           "older.14.16", "older.16.18")
+names(population.state) = state.population.names
+
+
+save(younger.population.state , file="C:/Users/zthomps5/Documents/JHEEM/code/jheem_analyses/data_processing/younger.population.state.RData")
 #########################################################################################################
-#Now need to srt out locations
-#NSDUH has national, states, and substate regions.  Census has county
-
-counties.in.states = lapply(states, function(state){
-  counties.in.this.state = locations::get.contained.locations(state, "county")
-})
-
-#Could you make a variable for each county that corresponds to each 'state' or 'substate region' and then group_by + sum to get values for locations
-#Then join to NSDUH data
+# #Now need to srt out locations
+# #NSDUH has national, states, and substate regions.  Census has county
+# 
+# counties.in.states = lapply(states, function(state){
+#   counties.in.this.state = locations::get.contained.locations(state, "county")
+# })
+# 
+# #Could you make a variable for each county that corresponds to each 'state' or 'substate region' and then group_by + sum to get values for locations
+# #Then join to NSDUH data
