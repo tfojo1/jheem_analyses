@@ -311,8 +311,14 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
             {
                 aging.multiplier = parameters[paste0(race, '.age', age, '.aging.multiplier')]
               
-                if (spline.i == age)
+                if (spline.i == age){
+                  if(age==1){
+                    aging.multiplier = aging.multiplier * parameters[paste0(race,'.age1.domino.aging.multiplier')]
+                  } else{
                     aging.multiplier = aging.multiplier * parameters[paste0(race,'.domino.aging.multiplier')]
+                  }
+                }
+                    
                 
                 set.element.functional.form.interaction.alphas(model.settings,
                                                                element.name = "uninfected.aging",
