@@ -1603,6 +1603,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'hiv.test.positivity',
+                         corresponding.data.outcome = 'hiv.test.positivity',
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Total HIV Tests that are Positive',
                                                                     description = "Proportion of Total HIV Tests that are Positive",
                                                                     scale = 'proportion',
@@ -1728,6 +1729,60 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       groups = NULL,
                       exclude.tags = "emigration",
                       keep.dimensions = character())
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'number.injecting.drugs',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Number Injecting Drugs',
+                                                                    description = "Number of Individuals Injecting Drugs",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Number Injecting',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value = "population",
+                         subset.dimension.values = list(risk = "active_IDU"),
+                         keep.dimensions = c("location","age"),
+                         save=F)
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'proportion.injecting.drugs',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Injecting Drugs',
+                                                                    description = "Proportion of Total Population Injecting Drugs",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion Injecting',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = "number.injecting.drugs",
+                         denominator.outcome = 'population',
+                         value.is.numerator = T,
+                         keep.dimensions = c("location","age"))
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'proportion.using.cocaine',
+                         corresponding.data.outcome = "cocaine",
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Using Cocaine',
+                                                                    description = "Proportion of Total Population Using Cocaine",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion Using Cocaine',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = expression(proportion.injecting.drugs*5.97), # multiplier from NSDUH, large metro, 2015-2018
+                         denominator.outcome = 'population',
+                         value.is.numerator = F,
+                         keep.dimensions = c("location","age"))
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'proportion.using.heroin',
+                         corresponding.data.outcome = "heroin",
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Using Heroin',
+                                                                    description = "Proportion of Total Population Using Heroin",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion Using Heroin',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = expression(proportion.injecting.drugs*1.15), # multiplier from NSDUH, large metro, 2015-2018
+                         denominator.outcome = 'population',
+                         value.is.numerator = F,
+                         keep.dimensions = c("location","age"))
 
 ##--------------------------------##
 ##--------------------------------##
