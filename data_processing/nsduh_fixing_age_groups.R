@@ -56,7 +56,7 @@ state.to.fips.mappings = c('01' = 'AL',
                            '55'='WI',
                            '56'='WY',
                            '72'= 'PR')
-##################################################################################
+################################################################################
 #There is not single year age groups for 2003
 #population.2003.12.17 = as.data.frame(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2003", ,ages.of.interest.13.17,,,])
 population.2005.12.17 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2005", ,ages.of.interest.13.17,,,]))
@@ -75,7 +75,7 @@ population.2013.18.25 = as.data.frame(rowSums(census.manager$data$population$est
 population.2015.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2015", ,ages.of.interest.18.25 ,,,]))
 population.2017.18.25 = as.data.frame(rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2017", ,ages.of.interest.18.25 ,,,]))
 
-#####################################################################################################################
+################################################################################
 population.2005.12.17 <- population.2005.12.17%>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2005", , ages.of.interest.13.17, , , ])`)%>%
 mutate(year = "2004-2006") #i pulled the middle year for population but NSDUH uses ranges
@@ -97,7 +97,6 @@ population.2015.12.17  <- population.2015.12.17 %>%
 population.2017.12.17 <- population.2017.12.17%>%
   rename(population.13.17 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2017", , ages.of.interest.13.17, , , ])`)%>%
   mutate(year = "2016-2018")
-
 
 population.2005.18.25 <- population.2005.18.25%>%
   rename(population.18.25 = `rowSums(census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex["2005", , ages.of.interest.18.25, , , ])`)%>%
@@ -129,32 +128,35 @@ ages.2013 = merge(population.2013.12.17, population.2013.18.25, by='row.names')
 ages.2015 = merge(population.2015.12.17, population.2015.18.25, by='row.names')
 ages.2017 = merge(population.2017.12.17, population.2017.18.25, by='row.names')
 
-
-#####################################################################################################################
-#This creates a list of census population values for ages 12-17 by county
-
+################################################################################
+#This creates a list of census population values by state
 complete.age.list <- list(ages.2005, ages.2007, ages.2009, ages.2011, ages.2013, ages.2015, ages.2017)
             
 population.state = lapply(complete.age.list, function(file){
   
-  data=file[1:2]
-  
+  data=file[1:5]
+ 
   data= as.data.frame(data)
   
-   data <- data %>%
-     rename(location = Row.names)%>%
-     rename(year = `year.x`)
 
-   data$location.state.fips = substr(data$location.county, start = 1, stop = 2)
-   data$location.state = state.to.fips.mappings[data$location.state.fips]
-   
-   data <- data %>%
-     select(year, location.state, (one_of("population.13.17", "population.18.25")))
+  
+  data <- data %>%
+    rename(location = Row.names)%>%
+    rename(year = year.y)%>%
+    select(-year.x)
+
+    
+    
+    #data$location.state.fips = substr(data$location.county, start = 1, stop = 2)
+    #data$location.state = state.to.fips.mappings[data$location.state.fips]
+    
+    # data <- data %>%
+    #   select(year, location.state, (one_of("population.13.17", "population.18.25")))
   
 list(data) 
 })
 
-#give names to poulation.state
+#give names to population.state
 state.population.names = c("younger.04.06", "younger.06.08", "younger.08.10", "younger.10.12", "younger.12.14",
                            "younger.14.16", "younger.16.18", "older.04.06", "older.06.08", "older.08.10", "older.10.12", "older.12.14",
                            "older.14.16", "older.16.18")
