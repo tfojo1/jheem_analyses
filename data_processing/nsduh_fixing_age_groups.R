@@ -138,32 +138,21 @@ population.state = lapply(complete.age.list, function(file){
  
   data= as.data.frame(data)
   
-
-  
   data <- data %>%
-    rename(location = Row.names)%>%
+    rename(location.county = Row.names)%>%
     rename(year = year.y)%>%
     select(-year.x)
 
+    data$location.state.fips = substr(data$location.county, start = 1, stop = 2)
+    data$location.state = state.to.fips.mappings[data$location.state.fips]
     
-    
-    #data$location.state.fips = substr(data$location.county, start = 1, stop = 2)
-    #data$location.state = state.to.fips.mappings[data$location.state.fips]
-    
-    # data <- data %>%
-    #   select(year, location.state, (one_of("population.13.17", "population.18.25")))
+     data <- data %>%
+       select(year, location.state, (one_of("population.13.17", "population.18.25")))
   
 list(data) 
 })
 
-#give names to population.state
-state.population.names = c("younger.04.06", "younger.06.08", "younger.08.10", "younger.10.12", "younger.12.14",
-                           "younger.14.16", "younger.16.18", "older.04.06", "older.06.08", "older.08.10", "older.10.12", "older.12.14",
-                           "older.14.16", "older.16.18")
-names(population.state) = state.population.names
-
-
-save(younger.population.state , file="C:/Users/zthomps5/Documents/JHEEM/code/jheem_analyses/data_processing/younger.population.state.RData")
+save(population.state , file="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/population.state.for.nsduh.RData")
 #########################################################################################################
 # #Now need to srt out locations
 # #NSDUH has national, states, and substate regions.  Census has county
