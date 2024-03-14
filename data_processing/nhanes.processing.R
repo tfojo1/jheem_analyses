@@ -460,8 +460,7 @@ hetero.female.casual.partner  <- nhanes.subset %>%
   count(active.condomless)%>%
   rename(count.active.condomless = n)%>%
   group_by()%>%
-  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))%>%
-  filter(active.condomless == "1")
+  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
 
 #Heterosexual female with casual partner by age group
 hetero.female.casual.partner.by.age  <- nhanes.subset %>%
