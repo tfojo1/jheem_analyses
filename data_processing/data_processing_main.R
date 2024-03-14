@@ -440,9 +440,9 @@ data.manager$register.ontology(
   'nsduh',
   ont = ontology(
     year= NULL,
-    location= NULL,
-    age=c('12 or Older', '26 or Older'))
-  )
+    location= NULL
+    #age=c('12 or Older', '26 or Older'))
+  ))
 
 data.manager$register.ontology(
   'lhd',
