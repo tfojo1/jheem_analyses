@@ -335,7 +335,17 @@ nhanes.total$age.at.first.sex = ifelse(nhanes.total$age.at.first.sex == 9, "0-9"
    mutate(msm.adjusted = case_when(gender == 'male' & sexual.orientation.male == 'homosexual' & men.ever.sex.with.men == 'no' ~ 'yes',
                                        gender == 'male' & men.ever.sex.with.men == 'yes' ~ 'yes',
                                        gender == 'male' & men.ever.sex.with.men == 'no' ~ 'no',
-                                       gender == 'male' & is.na(men.ever.sex.with.men) ~ NA))
+                                       gender == 'male' & is.na(men.ever.sex.with.men) ~ NA))%>%
+   mutate(test = case_when(number.sex.wo.condom.past.year == 1 ~ "0",
+                                                     number.sex.wo.condom.past.year == 2 ~ "1",
+                                                     number.sex.wo.condom.past.year == 3 ~ "1",
+                                                     number.sex.wo.condom.past.year == 4 ~ "1",
+                                                     number.sex.wo.condom.past.year == 5 ~ "1",
+                                                     number.sex.wo.condom.past.year == 77 ~ NA,
+                                                     number.sex.wo.condom.past.year == 99 ~ NA,
+                                                     TRUE ~ NA))#Need to change this to dichotomous variable
+ 
+
 #Data Subset for Todd 
 nhanes.subset = nhanes.total
 
@@ -421,7 +431,7 @@ msm.gonorrhea.prep.indications <- nhanes.subset %>%
 #Proportion of MSM Reporting Casual Partner
 proportion.msm.with.casual.partner.denom1 <- nhanes.subset %>%
   filter(msm.adjusted == "yes")%>%
-  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless.msm)) %>% #REMOVING NA VALUES
   group_by(active.condomless.msm)%>%
   count(active.condomless.msm)%>%
@@ -433,7 +443,7 @@ proportion.msm.with.casual.partner.denom1 <- nhanes.subset %>%
 hetero.male.casual.partner <- nhanes.subset %>%
   filter(msm.adjusted != "yes")%>%
   filter(gender == "male") %>%
-  mutate(active.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year=="1", "1", "0"))%>%
   filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
   group_by(active.condomless)%>%
   count(active.condomless)%>%
@@ -444,7 +454,7 @@ hetero.male.casual.partner <- nhanes.subset %>%
 #Heterosexual female- casual partner
 hetero.female.casual.partner  <- nhanes.subset %>%
   filter(gender == "female")%>%
-  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
   group_by(active.condomless)%>%
   count(active.condomless)%>%
@@ -456,7 +466,7 @@ hetero.female.casual.partner  <- nhanes.subset %>%
 #Heterosexual female with casual partner by age group
 hetero.female.casual.partner.by.age  <- nhanes.subset %>%
   filter(gender == "female")%>%
-  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
   group_by(age.group, active.condomless)%>%
   count(active.condomless)%>%
@@ -471,21 +481,21 @@ hetero.female.casual.partner.by.age  <- nhanes.subset %>%
 
 nhanes.msm <- nhanes.subset%>%
   filter(msm.adjusted == "yes")%>%
-  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 #save(nhanes.msm, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.msm.RData") ##UPDATE LOCATION
 
 nhanes.hetero.males <- nhanes.subset%>%
   filter(msm.adjusted != "yes")%>%
   filter(gender == "male") %>%
-  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 ##Update location
 #save(nhanes.hetero.males, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.hetero.males.RData") ##UPDATE LOCATION
 
 nhanes.hetero.females <- nhanes.subset%>%
   filter(gender == "female")%>% #I think we are assuming anyone who is not MSM is heterosexual so that means all females?
-  mutate(sex.in.past.year.and.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(sex.in.past.year.and.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 ##Update location
 #save(nhanes.hetero.females, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.hetero.females.RData") ##UPDATE LOCATION
@@ -496,10 +506,10 @@ nhanes.hetero.females <- nhanes.subset%>%
 ##############################################################################
 
 #Heterosexual Male- casual partner-NEW
-hetero.male.casual.partner <- nhanes.subset %>%
+NEW.hetero.male.casual.partner <- nhanes.subset %>%
   filter(msm.adjusted != "yes")%>%
   filter(gender == "male") %>%
-  mutate(active.condomless = ifelse(sex.in.past.year == 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless = ifelse(sex.in.past.year == 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
   group_by(active.condomless)%>%
   count(active.condomless)%>%
@@ -508,9 +518,9 @@ hetero.male.casual.partner <- nhanes.subset %>%
   mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
 
 #Heterosexual female- casual partner-NEW
-hetero.female.casual.partner  <- nhanes.subset %>%
+NEW.hetero.female.casual.partner  <- nhanes.subset %>%
   filter(gender == "female")%>%
-  mutate(active.condomless = ifelse(sex.in.past.year == 1  & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless = ifelse(sex.in.past.year == 1  & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
   group_by(active.condomless)%>%
   count(active.condomless)%>%
@@ -519,9 +529,9 @@ hetero.female.casual.partner  <- nhanes.subset %>%
   mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
 
 #Proportion of MSM Reporting Casual Partner-NEW
-proportion.msm.with.casual.partner.denom1 <- nhanes.subset %>%
+NEW.proportion.msm.with.casual.partner.denom1 <- nhanes.subset %>%
   filter(msm.adjusted == "yes")%>%
-  mutate(active.condomless.msm = ifelse(sex.in.past.year == 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless.msm = ifelse(sex.in.past.year == 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless.msm)) %>% #REMOVING NA VALUES
   group_by(active.condomless.msm)%>%
   count(active.condomless.msm)%>%
