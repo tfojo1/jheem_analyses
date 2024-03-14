@@ -340,13 +340,14 @@ prep.indications.likelihood.instructions = create.basic.likelihood.instructions(
                                                                            equalize.weight.by.year = T 
 )
 
+
+# LIKELIHOOD COMPONENT STILL NOT WORKING
 if(1==2){
   #-- PROPORTION TESTED --#
   proportion.tested.likelihood.instructions =
     create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
-                                                     outcome.for.sim = "proportion.tested",
+                                                     outcome.for.sim = "proportion.general.population.tested",
                                                      denominator.outcome.for.data = "adult.population",
-                                                     denominator.outcome.for.sim = "population",
                                                      
                                                      location.types = c('STATE','CBSA'),
                                                      minimum.geographic.resolution.type = 'COUNTY',
@@ -355,9 +356,9 @@ if(1==2){
                                                      levels.of.stratification = c(0,1),
                                                      from.year = as.integer(2008),
                                                      
-                                                     p.bias.inside.location = proportion.tested.bias.estimates$in.mean, 
+                                                     p.bias.inside.location = 0, 
                                                      p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
-                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$in.sd,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
                                                      p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
                                                      
                                                      within.location.p.error.correlation = 0.5,
@@ -371,6 +372,9 @@ if(1==2){
                                                      weights = list(1),
                                                      equalize.weight.by.year = T
     )
+  
+  #@Andrew - pull.age.robust
+  prop.tested.lik = proportion.tested.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
   
   #-- HIV TEST POSITIVITY --#
   hiv.test.positivity.likelihood.instructions =
@@ -402,6 +406,9 @@ if(1==2){
                                                      weights = list(1),
                                                      equalize.weight.by.year = T
     )
+  
+  #@Todd - ontology is_complete
+  hiv.test.positivity.lik = hiv.test.positivity.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
   
   #-- AWARENESS --#
   awareness.likelihood.instructions =
@@ -437,6 +444,8 @@ if(1==2){
                                                      equalize.weight.by.year = T
     )
   
+  #@Andrew
+  awareness.lik = awareness.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
   
   #-- HEROIN  --#
   heroin.likelihood.instructions = 
