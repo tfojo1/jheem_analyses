@@ -106,45 +106,45 @@ nsduh.region.total = lapply(nsduh.clean, function(file){
   list(filename, data)
 })
 
-nsduh.region.age= lapply(nsduh.clean, function(file){
-  
-  data=file[[2]]
-  filename = file[[1]]
-  
-  data= subset(data, data$geography != "United States")
-  
-  #Create state abbreviations to get regions by filtering by those w/o a state abbrev
-  data <- data%>%
-    mutate(state_abbrev = state.abb[match(geography, state.name)])%>%
-    mutate(state_abbrev = if_else(geography == "District of Columbia", "DC", state_abbrev ))%>%
-    filter(is.na(state_abbrev))
-  
-  data$location = locations::get.location.code(data$geography, "NSDUH")
-  data$location = as.character(data$location)
-  
-  #####Removing Invalid MSAs (instructed by Todd 11/9########
-  data <- data %>%
-    mutate(location_check = locations::is.location.valid(location))%>%
-    filter(location_check == "TRUE")
-  #I'm going to remove locations that are NA
-  data = subset(data, !is.na(data$location))
-  
-  data$value = as.numeric(data$estimate)
-  #I think you need to take out NA values from values col in order to put into manager#
-  data = subset(data, !is.na(data$value))
-  
-  #Decide on 2-27-24 to change age group ontology:
-  data <- data%>%
-    filter(age_group == "26 or Older")
-  data$age = data$age_group
-  
-  data <- data %>%
-    select(year, outcome, value, location, age)
-  
-  data= as.data.frame(data)
-  
-  list(filename, data)
-})
+# nsduh.region.age= lapply(nsduh.clean, function(file){
+#   
+#   data=file[[2]]
+#   filename = file[[1]]
+#   
+#   data= subset(data, data$geography != "United States")
+#   
+#   #Create state abbreviations to get regions by filtering by those w/o a state abbrev
+#   data <- data%>%
+#     mutate(state_abbrev = state.abb[match(geography, state.name)])%>%
+#     mutate(state_abbrev = if_else(geography == "District of Columbia", "DC", state_abbrev ))%>%
+#     filter(is.na(state_abbrev))
+#   
+#   data$location = locations::get.location.code(data$geography, "NSDUH")
+#   data$location = as.character(data$location)
+#   
+#   #####Removing Invalid MSAs (instructed by Todd 11/9########
+#   data <- data %>%
+#     mutate(location_check = locations::is.location.valid(location))%>%
+#     filter(location_check == "TRUE")
+#   #I'm going to remove locations that are NA
+#   data = subset(data, !is.na(data$location))
+#   
+#   data$value = as.numeric(data$estimate)
+#   #I think you need to take out NA values from values col in order to put into manager#
+#   data = subset(data, !is.na(data$value))
+#   
+#   #Decide on 2-27-24 to change age group ontology:
+#   data <- data%>%
+#     filter(age_group == "26 or Older")
+#   data$age = data$age_group
+#   
+#   data <- data %>%
+#     select(year, outcome, value, location, age)
+#   
+#   data= as.data.frame(data)
+#   
+#   list(filename, data)
+# })
 ################################################################################
 ###STATE### (age and total)
 ################################################################################
@@ -178,34 +178,34 @@ nsduh.state.total = lapply(nsduh.clean, function(file){
   list(filename, data) 
 })
 
-nsduh.state.age = lapply(nsduh.clean, function(file){
-  
-  data=file[[2]] 
-  filename = file[[1]] 
-  
-  data= subset(data, data$geography != "United States")
-  
-  data <- data%>%
-    mutate(state = state.abb[match(geography, state.name)])%>%
-    mutate(location = ifelse(geography == "District of Columbia", "DC", state))
-  
-  data= subset(data, !is.na(data$location)) #remove any location that isn't a state
-  
-  data$value = as.numeric(data$estimate)
-  
-  #Decide on 2-27-24 to change age group ontology:
-  data <- data%>%
-    filter(age_group == "26 or Older")
-  
-  data$age = data$age_group
-  
-  data <- data %>%
-    select(year, outcome, value, location, age)
-  
-  data= as.data.frame(data)
-  
-  list(filename, data) 
-})
+# nsduh.state.age = lapply(nsduh.clean, function(file){
+#   
+#   data=file[[2]] 
+#   filename = file[[1]] 
+#   
+#   data= subset(data, data$geography != "United States")
+#   
+#   data <- data%>%
+#     mutate(state = state.abb[match(geography, state.name)])%>%
+#     mutate(location = ifelse(geography == "District of Columbia", "DC", state))
+#   
+#   data= subset(data, !is.na(data$location)) #remove any location that isn't a state
+#   
+#   data$value = as.numeric(data$estimate)
+#   
+#   #Decide on 2-27-24 to change age group ontology:
+#   data <- data%>%
+#     filter(age_group == "26 or Older")
+#   
+#   data$age = data$age_group
+#   
+#   data <- data %>%
+#     select(year, outcome, value, location, age)
+#   
+#   data= as.data.frame(data)
+#   
+#   list(filename, data) 
+# })
 
 ################################################################################
 ###NATIONAL###
@@ -235,30 +235,30 @@ nsduh.national.total = lapply(nsduh.clean, function(file){
   list(filename, data) 
 })
 
-
-nsduh.national.age = lapply(nsduh.clean, function(file){
-  
-  data=file[[2]] 
-  filename = file[[1]] 
-  
-  data= subset(data, data$geography == "United States")
-  
-  data$value = as.numeric(data$estimate)
-  data$location = "US"
-
-  #Decide on 2-27-24 to change age group ontology:
-  data <- data%>%
-    filter(age_group == "26 or Older")
-  
-  data$age = data$age_group
-  
-  data <- data %>%
-    select(year, outcome, value, location, age)
-  
-  data= as.data.frame(data)
-  
-  list(filename, data) 
-})
+# 
+# nsduh.national.age = lapply(nsduh.clean, function(file){
+#   
+#   data=file[[2]] 
+#   filename = file[[1]] 
+#   
+#   data= subset(data, data$geography == "United States")
+#   
+#   data$value = as.numeric(data$estimate)
+#   data$location = "US"
+# 
+#   #Decide on 2-27-24 to change age group ontology:
+#   data <- data%>%
+#     filter(age_group == "26 or Older")
+#   
+#   data$age = data$age_group
+#   
+#   data <- data %>%
+#     select(year, outcome, value, location, age)
+#   
+#   data= as.data.frame(data)
+#   
+#   list(filename, data) 
+# })
 ################################################################################
 ###Put Data into Data Manager###
 ################################################################################
@@ -274,18 +274,18 @@ for (data in nsduh_region) {
     url = 'https://pdas.samhsa.gov/saes/substate',
     details = 'NSDUH Substate Estimates')
 }
-nsduh_region_age = lapply(nsduh.region.age, `[[`, 2)
-
-for (data in nsduh_region_age) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'nsduh',
-    source = 'nsduh',
-    dimension.values = list(),
-    url = 'https://pdas.samhsa.gov/saes/substate',
-    details = 'NSDUH Substate Estimates')
-}
+# nsduh_region_age = lapply(nsduh.region.age, `[[`, 2)
+# 
+# for (data in nsduh_region_age) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'nsduh',
+#     source = 'nsduh',
+#     dimension.values = list(),
+#     url = 'https://pdas.samhsa.gov/saes/substate',
+#     details = 'NSDUH Substate Estimates')
+# }
 ##
 nsduh_state = lapply(nsduh.state.total, `[[`, 2)
 
@@ -299,18 +299,18 @@ for (data in nsduh_state) {
     url = 'https://pdas.samhsa.gov/saes/substate',
     details = 'NSDUH Substate Estimates')
 }
-nsduh_state_age = lapply(nsduh.state.age, `[[`, 2)
-
-for (data in nsduh_state_age) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'nsduh',
-    source = 'nsduh',
-    dimension.values = list(),
-    url = 'https://pdas.samhsa.gov/saes/substate',
-    details = 'NSDUH Substate Estimates')
-}
+# nsduh_state_age = lapply(nsduh.state.age, `[[`, 2)
+# 
+# for (data in nsduh_state_age) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'nsduh',
+#     source = 'nsduh',
+#     dimension.values = list(),
+#     url = 'https://pdas.samhsa.gov/saes/substate',
+#     details = 'NSDUH Substate Estimates')
+# }
 ##
 nsduh_national_total = lapply(nsduh.national.total, `[[`, 2)
 
@@ -324,15 +324,15 @@ for (data in nsduh_national_total) {
     url = 'https://pdas.samhsa.gov/saes/substate',
     details = 'NSDUH Substate Estimates')
 }
-nsduh_national_age = lapply(nsduh.national.age, `[[`, 2)
-
-for (data in nsduh_national_age) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'nsduh',
-    source = 'nsduh',
-    dimension.values = list(),
-    url = 'https://pdas.samhsa.gov/saes/substate',
-    details = 'NSDUH Substate Estimates')
-}
+# nsduh_national_age = lapply(nsduh.national.age, `[[`, 2)
+# 
+# for (data in nsduh_national_age) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'nsduh',
+#     source = 'nsduh',
+#     dimension.values = list(),
+#     url = 'https://pdas.samhsa.gov/saes/substate',
+#     details = 'NSDUH Substate Estimates')
+# }
