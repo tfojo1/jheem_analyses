@@ -409,6 +409,7 @@ if(1==2){
   
   #@Todd - ontology is_complete
   hiv.test.positivity.lik = hiv.test.positivity.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
+  hiv.test.positivity.lik$compute(sim)
   
   #-- AWARENESS --#
   awareness.likelihood.instructions =
@@ -419,8 +420,10 @@ if(1==2){
                                                      location.types = c('STATE','CBSA','COUNTY'),
                                                      minimum.geographic.resolution.type = 'COUNTY',
                                                      
-                                                     dimensions = c("age","sex","race","risk"),
-                                                     levels.of.stratification = c(0,1),
+                                                     dimensions = character(), # would like to write NULL
+                                                     levels.of.stratification = 0, # would like to have an auto of 0:length(d)
+                                                     
+                                                     
                                                      from.year = as.integer(2008),
                                                      
                                                      p.bias.inside.location = 0, # awareness.bias.estimates$in.mean is NA
@@ -434,7 +437,7 @@ if(1==2){
                                                      observation.correlation.form = 'compound.symmetry',
                                                      measurement.error.sd = .016, # .018*90 - rough estimate from HIV Atlas (for now)
                                                      # @Andrew want two arguments here: 
-                                                     # measurement.error = NULL,
+                                                     # measurement.error.term = NULL,
                                                      # measurement.error.type = "data.cv", 
                                                      # options: cv, sd, data.cv (pull cv off of data), data.interval (take lower/upper bounds from data)
                                                      
@@ -504,7 +507,7 @@ if(1==2){
                                                      
                                                      observation.correlation.form = 'compound.symmetry', 
                                                      measurement.error.sd = 0.42*0.02, # for now, double the NSDUH calcs and multiply by .02 from MD data
-                                                     # measurement.error = 0.21, # NSDUH calcs 
+                                                     # measurement.error.term = 0.21, # NSDUH calcs 
                                                      # measurement.error.type = "cv",
                                                      
                                                      partitioning.function = EHE.PARTITIONING.FUNCTION, 
