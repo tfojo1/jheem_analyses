@@ -106,45 +106,67 @@ nsduh.region.total = lapply(nsduh.clean, function(file){
   list(filename, data)
 })
 
-# nsduh.region.age= lapply(nsduh.clean, function(file){
-#   
-#   data=file[[2]]
-#   filename = file[[1]]
-#   
-#   data= subset(data, data$geography != "United States")
-#   
-#   #Create state abbreviations to get regions by filtering by those w/o a state abbrev
-#   data <- data%>%
-#     mutate(state_abbrev = state.abb[match(geography, state.name)])%>%
-#     mutate(state_abbrev = if_else(geography == "District of Columbia", "DC", state_abbrev ))%>%
-#     filter(is.na(state_abbrev))
-#   
-#   data$location = locations::get.location.code(data$geography, "NSDUH")
-#   data$location = as.character(data$location)
-#   
-#   #####Removing Invalid MSAs (instructed by Todd 11/9########
-#   data <- data %>%
-#     mutate(location_check = locations::is.location.valid(location))%>%
-#     filter(location_check == "TRUE")
-#   #I'm going to remove locations that are NA
-#   data = subset(data, !is.na(data$location))
-#   
-#   data$value = as.numeric(data$estimate)
-#   #I think you need to take out NA values from values col in order to put into manager#
-#   data = subset(data, !is.na(data$value))
-#   
-#   #Decide on 2-27-24 to change age group ontology:
-#   data <- data%>%
-#     filter(age_group == "26 or Older")
-#   data$age = data$age_group
-#   
-#   data <- data %>%
-#     select(year, outcome, value, location, age)
-#   
-#   data= as.data.frame(data)
-#   
-#   list(filename, data)
-# })
+#Bring in file made up of census data to use to create new age groupings
+load("data_processing/age_regroup_substate_region.RData")
+
+nsduh.region.age= lapply(nsduh.clean, function(file){
+  
+
+  data=file[[2]]
+  filename = file[[1]]
+
+  data= subset(data, data$geography != "United States")
+
+  #Create state abbreviations to get regions by filtering by those w/o a state abbrev
+  data <- data%>%
+    mutate(state_abbrev = state.abb[match(geography, state.name)])%>%
+    mutate(state_abbrev = if_else(geography == "District of Columbia", "DC", state_abbrev ))%>%
+    filter(is.na(state_abbrev))
+
+  data$location = locations::get.location.code(data$geography, "NSDUH")
+  data$location = as.character(data$location)
+
+  #####Removing Invalid MSAs (instructed by Todd 11/9########
+  data <- data %>%
+    mutate(location_check = locations::is.location.valid(location))%>%
+    filter(location_check == "TRUE")
+  #I'm going to remove locations that are NA
+  data = subset(data, !is.na(data$location))
+
+  
+  ##March 2024: Creating new age groupings
+  data <- data %>% 
+    filter(age_group != "12 or Older")%>% #remove age groups we don't need
+    filter (age_group != "18 or Older")%>% #remove age groups we don't need
+    filter(!is.na(estimate)) #remove estimate is missing
+
+  data =left_join(data, age_regroup_substate_region, by=join_by("location", "year"), relationship = "many-to-many") #join with census data
+  
+  data$estimate = as.numeric(data$estimate)
+  
+  data$multiplied = ifelse(data$age_group == "12 to 17",
+                            data$estimate * data$population.13.17,
+                            NA)
+  
+  data$multiplied = ifelse(data$age_group == "18 to 25",
+                            data$estimate * data$population.18.25,
+                            data$multiplied)
+  
+  data <- data %>%
+    filter(age_group != "26 or Older")%>%
+    group_by(location, year)%>%
+    mutate(numerator.sum = sum(multiplied))%>%
+    mutate(denominator.sum = population.13.17 + population.18.25)%>%
+    mutate(new.age.group.value = numerator.sum / denominator.sum)%>%
+    mutate(new.age.group.name = "13-24")
+
+  # data <- data %>%
+  #   select(year, outcome, value, location, age)
+
+  data= as.data.frame(data)
+
+  list(filename, data)
+})
 ################################################################################
 ###STATE### (age and total)
 ################################################################################
