@@ -440,9 +440,9 @@ data.manager$register.ontology(
   'nsduh',
   ont = ontology(
     year= NULL,
-    location= NULL,
-    age=c('12 or Older', '26 or Older'))
-  )
+    location= NULL
+    #age=c('12 or Older', '26 or Older'))
+  ))
 
 data.manager$register.ontology(
   'lhd',
@@ -1422,19 +1422,19 @@ for (data in deaths_notes) {
  }
  
  #RSE for knowledge/awareness
- awareness.rse= lapply(knowledge.rse, `[[`, 2)  
- 
- for (data in awareness.rse) {
-   
-   data.manager$put.long.form(
-     data = data,
-     ontology.name = 'cdc',
-     source = 'cdc.hiv',
-     metric = 'coefficient.of.variance',
-     dimension.values = list(),
-     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-     details = 'CDC Atlas Plus data')
- }
+ # awareness.rse= lapply(knowledge.rse, `[[`, 2)  
+ # 
+ # for (data in awareness.rse) {
+ #   
+ #   data.manager$put.long.form(
+ #     data = data,
+ #     ontology.name = 'cdc',
+ #     source = 'cdc.hiv',
+ #     metric = 'coefficient.of.variance',
+ #     dimension.values = list(),
+ #     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+ #     details = 'CDC Atlas Plus data')
+ # }
  
  ##outcome= total.prevalence (for population for knowledge
 total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)  

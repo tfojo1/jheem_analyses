@@ -294,25 +294,35 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     spline.times = c(2010,2020,2030,2040)
     age.indices = 1:(length(specification.metadata$dim.names$age)-1)
     
-    age.race.interaction.ages = c(1,2,3)
-    non.interacted.ages = setdiff(age.indices, age.race.interaction.ages)
+    age.race.time.ages = c(1,2)
+    age.race.ages = 3
+    non.interacted.ages = setdiff(age.indices, c(age.race.time.ages, age.race.ages))
     
-    for(spline.i in 1:length(spline.times)){
-      
+    for(spline.i in 1:length(spline.times))
+    {
         model.settings$set.element.functional.form.main.effect.alphas(element.name = "uninfected.aging",
                                                                       alpha.name = as.character(spline.times[spline.i]),
                                                                       value = parameters[paste0('age',non.interacted.ages,'.aging.multiplier')],
                                                                       applies.to.dimension.values = non.interacted.ages,
                                                                       dimensions = 'age')
-        
         for (race in specification.metadata$dim.names$race)
         {
-            for (age in age.race.interaction.ages)
+            for (age in age.race.ages)
             {
-                aging.multiplier = parameters[paste0(race, '.age', age, '.aging.multiplier')]
-              
-                if (spline.i == age)
-                    aging.multiplier = aging.multiplier * parameters[paste0(race,'.domino.aging.multiplier')]
+                set.element.functional.form.interaction.alphas(model.settings,
+                                                               element.name = "uninfected.aging",
+                                                               alpha.name = as.character(spline.times[spline.i]),
+                                                               value = parameters[paste0(race, '.age', age, '.aging.multiplier')],
+                                                               applies.to.dimension.values=list(age=age,
+                                                                                                race=race))
+            }
+          
+            for (age in age.race.time.ages)
+            {
+                if (spline.i<=1)
+                    aging.multiplier = parameters[paste0(race, '.age', age, '.aging.multiplier.1')]
+                else
+                    aging.multiplier = parameters[paste0(race, '.age', age, '.aging.multiplier.2')]
                 
                 set.element.functional.form.interaction.alphas(model.settings,
                                                                element.name = "uninfected.aging",
@@ -322,11 +332,44 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                                                                 race=race))
             }
         }
+        
     }
     
-    # set.ehe.aging.from.parameters(model.settings,
-    #                               parameters = parameters,
-    #                               times = c('.pre.spike', 0:3))
+    # age.race.interaction.ages = c(1,2,3)
+    # non.interacted.ages = setdiff(age.indices, age.race.interaction.ages)
+    # 
+    # for(spline.i in 1:length(spline.times)){
+    #   
+    #     model.settings$set.element.functional.form.main.effect.alphas(element.name = "uninfected.aging",
+    #                                                                   alpha.name = as.character(spline.times[spline.i]),
+    #                                                                   value = parameters[paste0('age',non.interacted.ages,'.aging.multiplier')],
+    #                                                                   applies.to.dimension.values = non.interacted.ages,
+    #                                                                   dimensions = 'age')
+    #     
+    #     for (race in specification.metadata$dim.names$race)
+    #     {
+    #         for (age in age.race.interaction.ages)
+    #         {
+    #             aging.multiplier = parameters[paste0(race, '.age', age, '.aging.multiplier')]
+    #           
+    #             if (spline.i == age){
+    #               if(age==1){
+    #                 aging.multiplier = aging.multiplier * parameters[paste0(race,'.age1.domino.aging.multiplier')]
+    #               } else{
+    #                 aging.multiplier = aging.multiplier * parameters[paste0(race,'.domino.aging.multiplier')]
+    #               }
+    #             }
+    #                 
+    #             
+    #             set.element.functional.form.interaction.alphas(model.settings,
+    #                                                            element.name = "uninfected.aging",
+    #                                                            alpha.name = as.character(spline.times[spline.i]),
+    #                                                            value = aging.multiplier,
+    #                                                            applies.to.dimension.values=list(age=age,
+    #                                                                                             race=race))
+    #         }
+    #     }
+    # }
     
     #-- HIV Aging --#
     hiv.aging.spline.times = c("pre.spike","time0","time1","time2") 

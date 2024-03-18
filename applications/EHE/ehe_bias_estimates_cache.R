@@ -1,6 +1,6 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
-# works
+# ALL CACHED
 suppression.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                   dimensions = c("age","race","sex","risk"),
                                                   levels.of.stratification = c(0,1),
@@ -21,6 +21,15 @@ proportion.tested.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                         super.location.type = "STATE",
                                                         main.location.type = "CBSA",
                                                         main.location.type.n.source = "census.population") 
+
+hiv.test.positivity.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+                                             dimensions = character(),
+                                             levels.of.stratification = c(0), 
+                                             outcome.for.p = "hiv.test.positivity",
+                                             outcome.for.n = "hiv.tests",
+                                             sub.location.type = NULL, 
+                                             super.location.type = "STATE",
+                                             main.location.type = "CBSA")
 
 awareness.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                         dimensions = c("age","race","sex","risk"),
@@ -49,19 +58,29 @@ heroin.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                               sub.location.type = NULL, 
                                               super.location.type = "STATE",
                                               main.location.type = "NSDUH")
-
-# already cached
+# ALL ALREADY CACHED
 if(1==2){
   cache.object.for.version(object = suppression.bias.estimates, 
                            name = "suppression.bias.estimates", 
                            version = 'ehe', overwrite=T)  
+  
+  cache.object.for.version(object = proportion.tested.bias.estimates, 
+                           name = "proportion.tested.bias.estimates", 
+                           version = 'ehe', overwrite=T)
+  
+  cache.object.for.version(object = hiv.test.positivity.bias.estimates, 
+                           name = "hiv.test.positivity.bias.estimates", 
+                           version = 'ehe', overwrite=T)
+  
+  cache.object.for.version(object = awareness.bias.estimates, 
+                           name = "awareness.bias.estimates", 
+                           version = 'ehe', overwrite=T)
+  
+  cache.object.for.version(object = awareness.bias.estimates, 
+                           name = "cocaine.bias.estimates", 
+                           version = 'ehe', overwrite=T)
+  
+  cache.object.for.version(object = awareness.bias.estimates, 
+                           name = "heroin.bias.estimates", 
+                           version = 'ehe', overwrite=T)
 }
-
-# not yet cached
-cache.object.for.version(object = proportion.tested.bias.estimates, 
-                         name = "proportion.tested.bias.estimates", 
-                         version = 'ehe', overwrite=T)
-
-cache.object.for.version(object = awareness.bias.estimates, 
-                         name = "awareness.bias.estimates", 
-                         version = 'ehe', overwrite=T)

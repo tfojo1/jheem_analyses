@@ -91,7 +91,18 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
 
   if(grepl("07.08_sexual_behavior", filename)) { 
     data <- data %>%
-      select(SEQN, SXQ021,  SXQ410, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXQ510, SXQ550, SXQ450, SXQ490)%>%
+      mutate(sex.in.past.year = case_when(SXQ530 > 0 & SXQ530 < 7777 #oral sex with female (males)
+                                          | SXQ570 > 0 & SXQ570 < 7777 #oral sex with males (male)
+                                          | SXQ470 > 0 & SXQ470 < 7777 #oral sex with males (female)
+                                          | SXQ590 > 0 & SXQ590 < 7777 #number older partners past year
+                                          | SXQ600 > 0 & SXQ600 < 7777 #number younger partners past year
+                                          | SXQ610 > 0 & SXQ610 < 77 # number of anal or vaginal sex past year
+                                          | SXQ510 > 0 & SXQ510 < 7777 
+                                          | SXQ550 > 0 & SXQ550 < 7777 
+                                          | SXQ450 > 0 & SXQ450 < 7777 
+                                          | SXQ490 > 0 & SXQ490 < 7777  ~ "1", 
+                                          TRUE ~ "0"))%>%
+      select(SEQN, SXQ021,  SXQ410, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXQ510, SXQ550, SXQ450, SXQ490, sex.in.past.year)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXQ021)%>%
       rename(men.ever.sex.with.men =SXQ410)%>%    #You will need to use gender from demos to re-calculate this bc it's different from other vars in other years but I'm relabeling for the purpose of merge
@@ -108,7 +119,22 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
   }
   if(grepl("09.10_sexual_behavior", filename)) {
     data <- data %>%
-      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490)%>%
+      mutate(sex.in.past.year = case_when(SXD510 > 0 & SXD510 < 7777 #male.sex.with.female.past.year
+                                          | SXQ550 > 0 & SXQ550 < 7777 #male.sex.with.male.past.year 
+                                          | SXD450 > 0 & SXD450 < 7777 #female.sex.with.male.past.year
+                                          | SXQ490 > 0 & SXQ490 < 7777 #female.sex.with.female.past.year
+                                          | SXQ827 > 0 & SXQ827 < 7777 # number female vaginal sex partners past year (males)
+                                          | SXQ727 > 0 & SXQ727 < 7777 #number of male vaginal sex past year (females)
+                                          | SXQ639 > 0 & SXQ639 < 7777 # number female oral sex partners past yr
+                                          | SXQ841 > 0 & SXQ841 < 7777 #number of male anal sex partners past year (males)
+                                          | SXQ627 > 0 & SXQ627 < 7777 #number of male oral sex partners past year
+                                          | SXQ648 == 1 #sex with new partner past year
+                                          | SXQ590 > 0 & SXQ590 < 7777 #number older partners past year
+                                          | SXQ600 > 0 & SXQ600 < 7777 #number younger partners past year
+                                          | SXQ727 > 0 & SXQ727 < 7777
+                                          ~ "1", 
+                                          TRUE ~ "0"))%>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
@@ -121,12 +147,27 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
       rename(male.sex.with.male.past.year = SXQ550)%>%
       rename(female.sex.with.male.past.year=SXD450)%>%
       rename(female.sex.with.female.past.year=SXQ490)
-
     
   }
+  
   if(grepl("11.12_sexual_behavior", filename)) {
     data <- data %>%
-      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490)%>%
+      mutate(sex.in.past.year = case_when(SXD510 > 0 & SXD510 < 7777 #male.sex.with.female.past.year
+                                          | SXQ550 > 0 & SXQ550 < 7777 #male.sex.with.male.past.year 
+                                          | SXD450 > 0 & SXD450 < 7777 #female.sex.with.male.past.year
+                                          | SXQ490 > 0 & SXQ490 < 7777 #female.sex.with.female.past.year
+                                          | SXQ827 > 0 & SXQ827 < 7777 # number female vaginal sex partners past year (males)
+                                          | SXQ727 > 0 & SXQ727 < 7777 #number of male vaginal sex past year (females)
+                                          | SXQ639 > 0 & SXQ639 < 7777 # number female oral sex partners past yr
+                                          | SXQ841 > 0 & SXQ841 < 7777 #number of male anal sex partners past year (males)
+                                          | SXQ627 > 0 & SXQ627 < 7777 #number of male oral sex partners past year
+                                          | SXQ648 == 1 #sex with new partner past year
+                                          | SXQ590 > 0 & SXQ590 < 7777 #number older partners past year
+                                          | SXQ600 > 0 & SXQ600 < 7777 #number younger partners past year
+                                          | SXQ727 > 0 & SXQ727 < 7777
+                                          ~ "1", 
+                                          TRUE ~ "0"))%>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
@@ -139,12 +180,27 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
       rename(male.sex.with.male.past.year = SXQ550)%>%
       rename(female.sex.with.male.past.year=SXD450)%>%
       rename(female.sex.with.female.past.year=SXQ490)
-
     
   }
+  
   if(grepl("13.14_sexual_behavior", filename)) {
     data <- data %>%
-      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490)%>%
+      mutate(sex.in.past.year = case_when(SXD510 > 0 & SXD510 < 7777 #male.sex.with.female.past.year
+                                          | SXQ550 > 0 & SXQ550 < 7777 #male.sex.with.male.past.year 
+                                          | SXD450 > 0 & SXD450 < 7777 #female.sex.with.male.past.year
+                                          | SXQ490 > 0 & SXQ490 < 7777 #female.sex.with.female.past.year
+                                          | SXQ827 > 0 & SXQ827 < 7777 # number female vaginal sex partners past year (males)
+                                          | SXQ727 > 0 & SXQ727 < 7777 #number of male vaginal sex past year (females)
+                                          | SXQ639 > 0 & SXQ639 < 7777 # number female oral sex partners past yr
+                                          | SXQ841 > 0 & SXQ841 < 7777 #number of male anal sex partners past year (males)
+                                          | SXQ627 > 0 & SXQ627 < 7777 #number of male oral sex partners past year
+                                          | SXQ648 == 1 #sex with new partner past year
+                                          | SXQ590 > 0 & SXQ590 < 7777 #number older partners past year
+                                          | SXQ600 > 0 & SXQ600 < 7777 #number younger partners past year
+                                          | SXQ727 > 0 & SXQ727 < 7777
+                                          ~ "1", 
+                                          TRUE ~ "0"))%>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
@@ -162,7 +218,22 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
   
   if(grepl("15.16_sexual_behavior", filename)) {
     data <- data %>%
-      select(SEQN, SXD021,  SXQ809, SXD031, SXQ251, SXQ270, SXQ295, SXQ296, SXD510, SXQ550, SXD450, SXQ490)%>%
+      mutate(sex.in.past.year = case_when(SXD510 > 0 & SXD510 < 7777 #male.sex.with.female.past.year
+                                          | SXQ550 > 0 & SXQ550 < 7777 #male.sex.with.male.past.year 
+                                          | SXD450 > 0 & SXD450 < 7777 #female.sex.with.male.past.year
+                                          | SXQ490 > 0 & SXQ490 < 7777 #female.sex.with.female.past.year
+                                          | SXQ827 > 0 & SXQ827 < 7777 # number female vaginal sex partners past year (males)
+                                          | SXQ727 > 0 & SXQ727 < 7777 #number of male vaginal sex past year (females)
+                                          | SXQ639 > 0 & SXQ639 < 7777 # number female oral sex partners past yr
+                                          | SXQ841 > 0 & SXQ841 < 7777 #number of male anal sex partners past year (males)
+                                          | SXQ627 > 0 & SXQ627 < 7777 #number of male oral sex partners past year
+                                          | SXQ648 == 1 #sex with new partner past year
+                                          | SXQ590 > 0 & SXQ590 < 7777 #number older partners past year
+                                          | SXQ600 > 0 & SXQ600 < 7777 #number younger partners past year
+                                          | SXQ727 > 0 & SXQ727 < 7777
+                                          ~ "1", 
+                                          TRUE ~ "0"))%>%
+      select(SEQN, SXD021,  SXQ809, SXD031, SXQ251, SXQ270, SXQ295, SXQ296, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
@@ -264,7 +335,17 @@ nhanes.total$age.at.first.sex = ifelse(nhanes.total$age.at.first.sex == 9, "0-9"
    mutate(msm.adjusted = case_when(gender == 'male' & sexual.orientation.male == 'homosexual' & men.ever.sex.with.men == 'no' ~ 'yes',
                                        gender == 'male' & men.ever.sex.with.men == 'yes' ~ 'yes',
                                        gender == 'male' & men.ever.sex.with.men == 'no' ~ 'no',
-                                       gender == 'male' & is.na(men.ever.sex.with.men) ~ NA))
+                                       gender == 'male' & is.na(men.ever.sex.with.men) ~ NA))%>%
+   mutate(test = case_when(number.sex.wo.condom.past.year == 1 ~ "0",
+                                                     number.sex.wo.condom.past.year == 2 ~ "1",
+                                                     number.sex.wo.condom.past.year == 3 ~ "1",
+                                                     number.sex.wo.condom.past.year == 4 ~ "1",
+                                                     number.sex.wo.condom.past.year == 5 ~ "1",
+                                                     number.sex.wo.condom.past.year == 77 ~ NA,
+                                                     number.sex.wo.condom.past.year == 99 ~ NA,
+                                                     TRUE ~ NA))#Need to change this to dichotomous variable
+ 
+
 #Data Subset for Todd 
 nhanes.subset = nhanes.total
 
@@ -284,7 +365,7 @@ cumulative.proportion.age.at.sex.initiation.all.years <- nhanes.subset%>%
 #Proportion: for each age, what proportion of people who are that age had sex in the past year?
 #what proportion of 25 years old had sex in past yr
 proportion.sex.in.past.year.by.age.total <- nhanes.subset%>%
-  mutate(sex.in.past.year = case_when(male.sex.with.female.past.year > 0 & male.sex.with.female.past.year < 7777
+  mutate(sex.in.past.year.old = case_when(male.sex.with.female.past.year > 0 & male.sex.with.female.past.year < 7777
                                     | male.sex.with.male.past.year > 0 & male.sex.with.male.past.year < 7777
                                     | female.sex.with.male.past.year > 0 & female.sex.with.male.past.year < 7777
                                     | female.sex.with.female.past.year > 0 & female.sex.with.female.past.year < 7777 ~ "1", 
@@ -350,7 +431,7 @@ msm.gonorrhea.prep.indications <- nhanes.subset %>%
 #Proportion of MSM Reporting Casual Partner
 proportion.msm.with.casual.partner.denom1 <- nhanes.subset %>%
   filter(msm.adjusted == "yes")%>%
-  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless.msm = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless.msm)) %>% #REMOVING NA VALUES
   group_by(active.condomless.msm)%>%
   count(active.condomless.msm)%>%
@@ -362,7 +443,7 @@ proportion.msm.with.casual.partner.denom1 <- nhanes.subset %>%
 hetero.male.casual.partner <- nhanes.subset %>%
   filter(msm.adjusted != "yes")%>%
   filter(gender == "male") %>%
-  mutate(active.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year=="1", "1", "0"))%>%
   filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
   group_by(active.condomless)%>%
   count(active.condomless)%>%
@@ -373,19 +454,18 @@ hetero.male.casual.partner <- nhanes.subset %>%
 #Heterosexual female- casual partner
 hetero.female.casual.partner  <- nhanes.subset %>%
   filter(gender == "female")%>%
-  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
   group_by(active.condomless)%>%
   count(active.condomless)%>%
   rename(count.active.condomless = n)%>%
   group_by()%>%
-  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))%>%
-  filter(active.condomless == "1")
+  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
 
 #Heterosexual female with casual partner by age group
 hetero.female.casual.partner.by.age  <- nhanes.subset %>%
   filter(gender == "female")%>%
-  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(active.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
   group_by(age.group, active.condomless)%>%
   count(active.condomless)%>%
@@ -400,22 +480,60 @@ hetero.female.casual.partner.by.age  <- nhanes.subset %>%
 
 nhanes.msm <- nhanes.subset%>%
   filter(msm.adjusted == "yes")%>%
-  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 #save(nhanes.msm, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.msm.RData") ##UPDATE LOCATION
 
 nhanes.hetero.males <- nhanes.subset%>%
   filter(msm.adjusted != "yes")%>%
   filter(gender == "male") %>%
-  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(sex.in.past.year.and.condomless = ifelse(male.sex.with.female.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 ##Update location
 #save(nhanes.hetero.males, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.hetero.males.RData") ##UPDATE LOCATION
 
 nhanes.hetero.females <- nhanes.subset%>%
   filter(gender == "female")%>% #I think we are assuming anyone who is not MSM is heterosexual so that means all females?
-  mutate(sex.in.past.year.and.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year > 0, "1", "0"))%>%
+  mutate(sex.in.past.year.and.condomless = ifelse(female.sex.with.male.past.year > 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
   select(ID, survey.year, age, race, gender, age.group, gonorrhea.past.year, sex.in.past.year.and.condomless)
 ##Update location
 #save(nhanes.hetero.females, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/nhanes.hetero.females.RData") ##UPDATE LOCATION
 
+
+###############################################################################
+##Tables with new definition of sex in past year
+##############################################################################
+
+#Heterosexual Male- casual partner-NEW
+NEW.hetero.male.casual.partner <- nhanes.subset %>%
+  filter(msm.adjusted != "yes")%>%
+  filter(gender == "male") %>%
+  mutate(active.condomless = ifelse(sex.in.past.year == 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
+  filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
+  group_by(active.condomless)%>%
+  count(active.condomless)%>%
+  rename(count.active.condomless = n)%>%
+  group_by()%>%
+  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
+
+#Heterosexual female- casual partner-NEW
+NEW.hetero.female.casual.partner  <- nhanes.subset %>%
+  filter(gender == "female")%>%
+  mutate(active.condomless = ifelse(sex.in.past.year == 1  & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
+  filter(!is.na(active.condomless)) %>% #REMOVING NA VALUES
+  group_by(active.condomless)%>%
+  count(active.condomless)%>%
+  rename(count.active.condomless = n)%>%
+  group_by()%>%
+  mutate(proportion.active.condomless = round(count.active.condomless/ sum(count.active.condomless), digits=2))
+
+#Proportion of MSM Reporting Casual Partner-NEW
+NEW.proportion.msm.with.casual.partner.denom1 <- nhanes.subset %>%
+  filter(msm.adjusted == "yes")%>%
+  mutate(active.condomless.msm = ifelse(sex.in.past.year == 1 & number.sex.wo.condom.past.year =="1", "1", "0"))%>%
+  filter(!is.na(active.condomless.msm)) %>% #REMOVING NA VALUES
+  group_by(active.condomless.msm)%>%
+  count(active.condomless.msm)%>%
+  rename(count.active.condomless.msm = n)%>%
+  group_by()%>%
+  mutate(proportion.active.condomless.msm = round(count.active.condomless.msm/ sum(count.active.condomless.msm), digits=2))

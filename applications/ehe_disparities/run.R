@@ -1,6 +1,7 @@
+#Run a test simulation and get results for 2 MSAs
+
 source("applications/EHE/ehe_specification.R")
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
-
 
 CALIBRATION.CODE=NULL
 LOCATIONS=c("C.12580","C.33100") #Baltimore & Miami
