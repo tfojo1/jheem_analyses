@@ -38,7 +38,7 @@ younger.age.by.region.df <- younger.age.by.region.df %>%
 #reformat to match nsduh data for join
 younger.age.by.region.df <- younger.age.by.region.df%>%
   mutate(age.group = "13 - 17 years")%>%
-  rename(value.13.17 = value)%>%
+  rename(population.13.17 = value)%>%
   rename(year.original = year)%>%
   filter(year.original  != "2006" & year.original  != "2008" & year.original  != "2010" & year.original != "2012" & year.original  != "2014" & year.original  != "2016")%>%
   mutate(year = case_when(year.original  == "2005" ~ "2004-2006",
@@ -94,7 +94,7 @@ older.age.by.region.df <- older.age.by.region.df %>%
 older.age.by.region.df <- older.age.by.region.df%>%
   mutate(age.group = "18-25 years")%>%
   rename(year.original = year)%>%
-  rename(value.18.25 = value)%>%
+  rename(population.18.25 = value)%>%
   filter(year.original  != "2006" & year.original  != "2008" & year.original  != "2010" & year.original != "2012" & year.original  != "2014" & year.original  != "2016")%>%
   mutate(year = case_when(year.original  == "2005" ~ "2004-2006",
                           year.original  == "2007" ~"2006-2008",

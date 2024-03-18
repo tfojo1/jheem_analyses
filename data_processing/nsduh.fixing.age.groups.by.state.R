@@ -13,9 +13,9 @@ counties.in.states = counties.in.states[xx]
 xy = census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex #going to aggregate this into year, location, age (bc we don't need race/eth)
 xyz = apply(xy, c('year', 'location', 'age'), function(x){sum(x)}) #using applying bc xy is an array; function tells us how to aggregate the data.  Use dim(xyz) to check 
 
-all.states.younger.populations =lapply(counties.in.states, function(my.states){
-  my.state.young.population = xyz[ , my.states, ages.of.interest.13.17] #subsetting for what we want
-  state.younger.population = apply(my.state.young.population, 'year', function(x){sum(x)})#now need to aggregate the ages; margin is what you want  
+all.states.younger.populations =lapply(counties.in.states, function(my.counties){
+  my.county.young.population = xyz[, my.counties, ages.of.interest.13.17]  #I cannot figure out why this is giving subscript out of bounds bc it has 3 dimensions
+  state.younger.population = apply(my.county.young.population, 'year', function(x){sum(x)})
 })
 
 names(all.states.younger.populations) = states #need to give this names of what the substate region is
