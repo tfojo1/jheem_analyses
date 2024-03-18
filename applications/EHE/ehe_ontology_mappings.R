@@ -22,6 +22,20 @@ register.ontology.mapping('jheem.to.cdc.sex.risk',
                                            c('female', 'IDU_in_remission', 'female', 'idu'))
 )
 
+register.ontology.mapping('jheem.to.msm.or.not.risk',
+                          from.dimensions = c('sex', 'risk'),
+                          to.dimensions = c('sex', 'risk'),
+                          mappings = rbind(c('msm', 'never_IDU', 'male', 'msm'),
+                                           c('msm', 'active_IDU', 'male', 'msm'),
+                                           c('msm', 'IDU_in_remission', 'male', 'msm'),
+                                           c('heterosexual_male', 'never_IDU', 'male', 'not_msm'),
+                                           c('heterosexual_male', 'active_IDU', 'male', 'not_msm'),
+                                           c('heterosexual_male', 'IDU_in_remission', 'male', 'not_msm'),
+                                           c('female', 'never_IDU', 'female', 'not_msm'),
+                                           c('female', 'active_IDU', 'female', 'not_msm'),
+                                           c('female', 'IDU_in_remission', 'female', 'not_msm'))
+)
+
 register.ontology.mapping('cdc.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
@@ -156,6 +170,17 @@ register.ontology.mapping('proportion.tested.to.adult.population.2',
                                            c('Native Hawaiian/Other Pacific Islander', 'Asian/Pacific Islander'),
                                            c('Other race', 'other'),
                                            c('White', 'White')))
+register.ontology.mapping('proportion.tested.to.jheem.race',
+                          from.dimension = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black', 'black'),
+                                           c('Hispanic', 'hispanic'),
+                                           c('Multiracial', 'other'),
+                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
+                                           c('Other race', 'other'),
+                                           c('White', 'other')))
 register.ontology.mapping('census.to.brfss.race.ethnicity',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',

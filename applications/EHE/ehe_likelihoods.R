@@ -4,8 +4,9 @@
 # AIDS diagnoses, AIDS deaths, suppression
 
 # TO DO: 
-# proportion tested (need to fix p bias), hiv.test.positivity (odd error), awareness (annoying error), 
-# heroin/cocaine (should be fixed with age issue)
+# proportion tested (deciding what to do for 12-17 year olds), 
+# hiv.test.positivity & awareness (should be fixed when totals are fixed), 
+# heroin/cocaine (waiting for age data, but for now totals will have same error as hiv.test.positivity & awareness)
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -340,13 +341,14 @@ prep.indications.likelihood.instructions = create.basic.likelihood.instructions(
                                                                            equalize.weight.by.year = T 
 )
 
+
+# LIKELIHOOD COMPONENT STILL NOT WORKING
 if(1==2){
   #-- PROPORTION TESTED --#
   proportion.tested.likelihood.instructions =
     create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
-                                                     outcome.for.sim = "proportion.tested",
+                                                     outcome.for.sim = "proportion.general.population.tested",
                                                      denominator.outcome.for.data = "adult.population",
-                                                     denominator.outcome.for.sim = "population",
                                                      
                                                      location.types = c('STATE','CBSA'),
                                                      minimum.geographic.resolution.type = 'COUNTY',
@@ -355,9 +357,9 @@ if(1==2){
                                                      levels.of.stratification = c(0,1),
                                                      from.year = as.integer(2008),
                                                      
-                                                     p.bias.inside.location = proportion.tested.bias.estimates$in.mean, 
+                                                     p.bias.inside.location = 0, 
                                                      p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
-                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$in.sd,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
                                                      p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
                                                      
                                                      within.location.p.error.correlation = 0.5,
@@ -371,6 +373,9 @@ if(1==2){
                                                      weights = list(1),
                                                      equalize.weight.by.year = T
     )
+  
+  #@Andrew - pull.age.robust
+  prop.tested.lik = proportion.tested.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
   
   #-- HIV TEST POSITIVITY --#
   hiv.test.positivity.likelihood.instructions =
@@ -403,6 +408,10 @@ if(1==2){
                                                      equalize.weight.by.year = T
     )
   
+  #@Todd - ontology is_complete
+  hiv.test.positivity.lik = hiv.test.positivity.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
+  hiv.test.positivity.lik$compute(sim)
+  
   #-- AWARENESS --#
   awareness.likelihood.instructions =
     create.nested.proportion.likelihood.instructions(outcome.for.data = "awareness",
@@ -412,8 +421,10 @@ if(1==2){
                                                      location.types = c('STATE','CBSA','COUNTY'),
                                                      minimum.geographic.resolution.type = 'COUNTY',
                                                      
-                                                     dimensions = c("age","sex","race","risk"),
-                                                     levels.of.stratification = c(0,1),
+                                                     dimensions = character(), # would like to write NULL
+                                                     levels.of.stratification = 0, # would like to have an auto of 0:length(d)
+                                                     
+                                                     
                                                      from.year = as.integer(2008),
                                                      
                                                      p.bias.inside.location = 0, # awareness.bias.estimates$in.mean is NA
@@ -427,7 +438,7 @@ if(1==2){
                                                      observation.correlation.form = 'compound.symmetry',
                                                      measurement.error.sd = .016, # .018*90 - rough estimate from HIV Atlas (for now)
                                                      # @Andrew want two arguments here: 
-                                                     # measurement.error = NULL,
+                                                     # measurement.error.term = NULL,
                                                      # measurement.error.type = "data.cv", 
                                                      # options: cv, sd, data.cv (pull cv off of data), data.interval (take lower/upper bounds from data)
                                                      
@@ -437,6 +448,8 @@ if(1==2){
                                                      equalize.weight.by.year = T
     )
   
+  #@Andrew
+  awareness.lik = awareness.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
   
   #-- HEROIN  --#
   heroin.likelihood.instructions = 
@@ -495,7 +508,7 @@ if(1==2){
                                                      
                                                      observation.correlation.form = 'compound.symmetry', 
                                                      measurement.error.sd = 0.42*0.02, # for now, double the NSDUH calcs and multiply by .02 from MD data
-                                                     # measurement.error = 0.21, # NSDUH calcs 
+                                                     # measurement.error.term = 0.21, # NSDUH calcs 
                                                      # measurement.error.type = "cv",
                                                      
                                                      partitioning.function = EHE.PARTITIONING.FUNCTION, 

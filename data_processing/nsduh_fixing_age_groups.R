@@ -152,14 +152,33 @@ population.state = lapply(complete.age.list, function(file){
 list(data) 
 })
 
-save(population.state , file="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/NHANES/population.state.for.nsduh.RData")
+#save(population.state , file="C:/Users/zthomps5/Desktop/current/population.state.for.nsduh.RData")
 #########################################################################################################
-# #Now need to srt out locations
-# #NSDUH has national, states, and substate regions.  Census has county
-# 
-# counties.in.states = lapply(states, function(state){
-#   counties.in.this.state = locations::get.contained.locations(state, "county")
-# })
-# 
-# #Could you make a variable for each county that corresponds to each 'state' or 'substate region' and then group_by + sum to get values for locations
-# #Then join to NSDUH data
+population.names = c("population.2004.2006", "population.2006.2008", "population.2008.2010", "population.2010.2012", "population.2012.2014",
+                     "population.2014.2016", "population.2016.2018")
+names(population.state)=population.names
+################################################################################
+
+# df.04.06 <- population.state[grep("2004.2006", names(population.state))] 
+# df.04.06 <- as.data.frame(population.state$population.2004.2006) 
+#create names for nsduh data then merge by names?
+
+nsduh.names = c("population.2002.2004", "population.2004.2006", "population.2006.2008", "population.2008.2010", "population.2010.2012", "population.2012.2014",
+                "population.2014.2016", "population.2016.2018", "population.2014.2016", "population.2016.2018")
+names(data.list.nsduh.state.clean) = nsduh.names
+###################################################################
+
+updated.nsduh.ages = lapply(data.list.nsduh.state.clean, function(function.name){
+
+  #for each part of the state.clean list I want to match the right population value and multiply the proportions and then sum the values
+  merge(merging, population.state, by.x=names(data.list.nsduh.state.clean)[2], by.y=names(population.state)[1])
+  
+})
+
+younger.pop.state = bind_rows(population.state)
+younger.pop.state <- younger.pop.state%>%
+  rename(location = location.state)
+
+nsduh.state.age = bind_rows(data.list.nsduh.state.clean)
+
+everything.you.need = full_join(nsduh.state.age, younger.pop.state, by=c("year", "location"))

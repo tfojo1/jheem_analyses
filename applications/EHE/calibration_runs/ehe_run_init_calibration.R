@@ -1,10 +1,12 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
-LOCATION = BALTIMORE.MSA 
+LOCATION = MIAMI.MSA 
 CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.POPULATION # or CALIBRATION.CODE.TRANSMISSION
 
 set.seed(12345)
 start.time = Sys.time()
+
+print(ggplot2::qplot(1,1) + ggplot2::ggtitle(paste0(LOCATION, " - ", locations::get.location.name(LOCATION))))
 
 print(paste0("STARTING MCMC RUN AT ",Sys.time()))
 mcmc = run.calibration(version = 'ehe',
