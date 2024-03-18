@@ -4,8 +4,9 @@
 # AIDS diagnoses, AIDS deaths, suppression
 
 # TO DO: 
-# proportion tested (need to fix p bias), hiv.test.positivity (odd error), awareness (annoying error), 
-# heroin/cocaine (should be fixed with age issue)
+# proportion tested (deciding what to do for 12-17 year olds), 
+# hiv.test.positivity & awareness (should be fixed when totals are fixed), 
+# heroin/cocaine (waiting for age data, but for now totals will have same error as hiv.test.positivity & awareness)
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
