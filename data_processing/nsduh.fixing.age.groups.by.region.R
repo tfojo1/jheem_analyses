@@ -108,9 +108,6 @@ older.age.by.region.df <- older.age.by.region.df%>%
 #Combine and save
 ################################################################################
 
-older.age.by.region.df
-younger.age.by.region.df
-
 age_regroup_substate_region = full_join(younger.age.by.region.df, older.age.by.region.df, by=join_by("location", "year")) 
 
 age_regroup_substate_region <- age_regroup_substate_region %>%

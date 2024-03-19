@@ -28,7 +28,6 @@ all.states.younger.populations =lapply(counties.in.states.fixed, function(my.cou
 
 names(all.states.younger.populations) = states #need to give this names of what the substate region is
 
-
 #Set up into data frame for pivoting
 younger.age.by.state.df= data.frame(all.states.younger.populations)
 
@@ -44,7 +43,7 @@ younger.age.by.state.df <- younger.age.by.state.df %>%
 #reformat to match nsduh data for join
 younger.age.by.state.df <- younger.age.by.state.df%>%
   mutate(age.group = "13 - 17 years")%>%
-  rename(value.13.17 = value)%>%
+  rename(population.13.17 = value)%>%
   rename(year.original = year)%>%
   filter(year.original  != "2006" & year.original  != "2008" & year.original  != "2010" & year.original != "2012" & year.original  != "2014" & year.original  != "2016")%>%
   mutate(year = case_when(year.original  == "2005" ~ "2004-2006",
@@ -54,3 +53,52 @@ younger.age.by.state.df <- younger.age.by.state.df%>%
                           year.original  == "2013" ~"2012-2014",
                           year.original  == "2015" ~"2014-2016",
                           year.original  == "2017" ~"2016-2018"))
+
+################################################################################
+#now for 18-25
+################################################################################
+all.states.older.populations =lapply(counties.in.states.fixed, function(my.counties){
+  my.county.young.population = xyz[, my.counties, ages.of.interest.18.25] 
+  state.older.population = apply(my.county.young.population, 'year', function(x){sum(x, na.rm= TRUE)})
+})
+
+names(all.states.older.populations) = states
+
+#Set up into data frame for pivoting
+older.age.by.state.df= data.frame(all.states.older.populations)
+
+older.age.by.state.df$year <- row.names(older.age.by.state.df)
+rownames(older.age.by.state.df) <- NULL
+
+older.age.by.state.df <- older.age.by.state.df %>%
+  pivot_longer(cols = -c("year"), 
+               names_to= c("location"), 
+               #names_pattern = ".", 
+               values_to = "value")
+
+#reformat to match nsduh data for join
+older.age.by.state.df <- older.age.by.state.df%>%
+  mutate(age.group = "18-25 years")%>%
+  rename(year.original = year)%>%
+  rename(population.18.25 = value)%>%
+  filter(year.original  != "2006" & year.original  != "2008" & year.original  != "2010" & year.original != "2012" & year.original  != "2014" & year.original  != "2016")%>%
+  mutate(year = case_when(year.original  == "2005" ~ "2004-2006",
+                          year.original  == "2007" ~"2006-2008",
+                          year.original  == "2009" ~"2008-2010",
+                          year.original  == "2011" ~"2010-2012",
+                          year.original  == "2013" ~"2012-2014",
+                          year.original  == "2015" ~"2014-2016",
+                          year.original  == "2017" ~"2016-2018"))
+
+################################################################################
+#Combine and save
+################################################################################
+
+age_regroup_state = full_join(younger.age.by.state.df, older.age.by.state.df, by=join_by("location", "year")) 
+
+age_regroup_state <- age_regroup_state %>%
+  select(-year.original.x)%>%
+  rename(year.original = year.original.y)%>%
+  select(-age.group.x, -age.group.y)
+
+save(age_regroup_state , file="data_processing/age_regroup_state.RData")
