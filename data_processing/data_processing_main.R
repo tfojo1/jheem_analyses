@@ -1496,7 +1496,7 @@ census.manager = load.data.manager("../../cached/census.manager.rdata")
                             census.manager = smaller.census.manager)
  
  #Put adult population for specific locations
- put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST), 
+ put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST), 
                         contained.geographic.type = "county", #it will look for counties in the regions above
                         fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
                         put.stratifications = list('age', 'sex', c('race', 'ethnicity')),
