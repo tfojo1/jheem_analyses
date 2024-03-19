@@ -36,6 +36,15 @@ register.ontology.mapping('jheem.to.msm.or.not.risk',
                                            c('female', 'IDU_in_remission', 'female', 'not_msm'))
 )
 
+# Not sure if this would work - might give us some unwanted dimensions in the mapped result
+# register.ontology.mapping('jheem.to.msm.or.not.risk',
+#                           from.dimensions = c('sex'),
+#                           to.dimensions = c('sex', 'risk'),
+#                           mappings = rbind(c('msm', 'male', 'msm'),
+#                                            c('heterosexual_male', 'male', 'not_msm'),
+#                                            c('female', 'female', 'not_msm'))
+# )
+
 register.ontology.mapping('cdc.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
