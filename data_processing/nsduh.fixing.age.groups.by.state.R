@@ -1,9 +1,13 @@
 ##Fixing NSDUH Regions for Younger Age Groups##
+#census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
+
+ages.of.interest.13.17 = c("13 years", "14 years", "15 years", "16 years", "17 years")
+ages.of.interest.18.25 = c("18 years", "19 years", "20 years", "21 years", "22 years", "23 years", "24 years", "25 years")
 
 ################################################################################
 #Starting with 13-17
 ################################################################################
-states = locations::get.all.for.type("state") #start processing of figuring out which counties are in which regions
+states = setdiff(locations::get.all.for.type("state"), "PR") #start processing of figuring out which counties are in which regions; setdiff takes anything from second vector out
 counties.in.states = locations::get.contained.locations(states, "COUNTY", return.list = T)
 names(counties.in.states)=states #converted it from a list to a named list
 
@@ -12,10 +16,19 @@ counties.in.states = counties.in.states[xx]
 
 xy = census.manager$data$population$estimate$census.population$census$year__location__age__race__ethnicity__sex #going to aggregate this into year, location, age (bc we don't need race/eth)
 xyz = apply(xy, c('year', 'location', 'age'), function(x){sum(x)}) #using applying bc xy is an array; function tells us how to aggregate the data.  Use dim(xyz) to check 
+counties.in.states.fixed = lapply(counties.in.states, function(my.counties){
+  counties.we.have.data.for = my.counties[my.counties %in% dimnames(xyz)$location] #more consolidated way to do this than what we have below; this will return T/F for every county
+})
 
-all.states.younger.populations =lapply(counties.in.states, function(my.counties){
-  my.county.young.population = xyz[, my.counties, ages.of.interest.13.17]  #I cannot figure out why this is giving subscript out of bounds bc it has 3 dimensions
-  state.younger.population = apply(my.county.young.population, 'year', function(x){sum(x)})
+all.states.younger.populations =lapply(counties.in.states.fixed, function(my.counties){
+  tryCatch(
+    {my.county.young.population = xyz[, my.counties, ages.of.interest.13.17]}, #try line 22 and if there is an error try the next thing (could also use warning in place of error)
+    error = function(e){
+      browser()
+    }
+  )
+  #my.county.young.population = xyz[, my.counties, ages.of.interest.13.17]  #I cannot figure out why this is giving subscript out of bounds bc it has 3 dimensions; may be happening in the 3 iteration, etc
+  state.younger.population = apply(my.county.young.population, 'year', function(x){sum(x, na.rm= TRUE)})
 })
 
 names(all.states.younger.populations) = states #need to give this names of what the substate region is
