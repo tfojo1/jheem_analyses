@@ -1,4 +1,8 @@
 ##Fixing NSDUH Regions for Younger Age Groups##
+#census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
+
+ages.of.interest.13.17 = c("13 years", "14 years", "15 years", "16 years", "17 years")
+ages.of.interest.18.25 = c("18 years", "19 years", "20 years", "21 years", "22 years", "23 years", "24 years", "25 years")
 
 ################################################################################
 #Starting with 13-17
@@ -115,4 +119,4 @@ age_regroup_substate_region <- age_regroup_substate_region %>%
   rename(year.original = year.original.y)%>%
   select(-age.group.x, -age.group.y)
 
-save(age_regroup_substate_region , file="C:/Users/zthomps5/Desktop/current/age_regroup_substate_region.RData")
+save(age_regroup_substate_region , file="data_processing/age_regroup_substate_region.RData")
