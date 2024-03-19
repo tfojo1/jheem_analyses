@@ -59,3 +59,4 @@ cowplot::plot_grid(houston_risk, miami_risk, chicago_risk,
 cowplot::plot_grid(houston_race, miami_race, chicago_race,
                    nrow = 3, 
                    labels = c("Houston", "Miami", "Chicago"))
+
