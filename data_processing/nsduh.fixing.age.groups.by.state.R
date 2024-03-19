@@ -7,7 +7,8 @@ ages.of.interest.18.25 = c("18 years", "19 years", "20 years", "21 years", "22 y
 ################################################################################
 #Starting with 13-17
 ################################################################################
-states = setdiff(locations::get.all.for.type("state"), "PR") #start processing of figuring out which counties are in which regions; setdiff takes anything from second vector out
+states.to.remove = c("PR", "GU", "AS", "FM", "MH", "MP", "VI", "PW")
+states = setdiff(locations::get.all.for.type("state"), states.to.remove) #start processing of figuring out which counties are in which regions; setdiff takes anything from second vector out (in this case Puerto Rico)
 counties.in.states = locations::get.contained.locations(states, "COUNTY", return.list = T)
 names(counties.in.states)=states #converted it from a list to a named list
 
@@ -21,14 +22,8 @@ counties.in.states.fixed = lapply(counties.in.states, function(my.counties){
 })
 
 all.states.younger.populations =lapply(counties.in.states.fixed, function(my.counties){
-  tryCatch(
-    {my.county.young.population = xyz[, my.counties, ages.of.interest.13.17]}, #try line 22 and if there is an error try the next thing (could also use warning in place of error)
-    error = function(e){
-      browser()
-    }
-  )
-  #my.county.young.population = xyz[, my.counties, ages.of.interest.13.17]  #I cannot figure out why this is giving subscript out of bounds bc it has 3 dimensions; may be happening in the 3 iteration, etc
-  state.younger.population = apply(my.county.young.population, 'year', function(x){sum(x, na.rm= TRUE)})
+    my.county.young.population = xyz[, my.counties, ages.of.interest.13.17] #try line 22 and if there is an error try the next thing (could also use warning in place of error)
+    state.younger.population = apply(my.county.young.population, 'year', function(x){sum(x, na.rm= TRUE)})
 })
 
 names(all.states.younger.populations) = states #need to give this names of what the substate region is
