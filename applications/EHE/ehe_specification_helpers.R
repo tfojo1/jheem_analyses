@@ -387,6 +387,47 @@ do.get.empiric.hiv.aging.rates <- function(location,
     interpolated.aging.rates.by.year
 }
 
+get.fraction.over.age <- function(location,
+                                 specification.metadata,
+                                 age,
+                                 years=DEFAULT.POPULATION.YEARS)
+{
+    counties = locations::get.contained.locations(location, 'COUNTY')
+    n.per = prod(sapply(specification.metadata$dim.names[c('race','sex')], length))
+    
+    rv = t(sapply(1:specification.metadata$n.ages, function(i){
+      
+        if (specification.metadata$age.upper.bounds[i]<=18)
+            rep(0, n.per)
+        else if (specification.metadata$age.lower.bounds[i]>=18)
+            rep(1,n.per)
+        else
+        {
+            ages = specification.metadata$age.lower.bounds[i]:(specification.metadata$age.upper.bounds[i]-1)
+            
+            pop = CENSUS.MANAGER$pull(outcome='population',
+                                      dimension.values = list(location=counties,
+                                                              year=years,
+                                                              age=paste0(ages, ' years')),
+                                      keep.dimensions = c('age','sex','race','ethnicity'))
+            
+            age.brackets = make.age.strata.names(endpoints = c(age1.ages[1], 18, age1.ages[length(age1.ages)]))
+            
+            pop2 = map.value.ontology(pop, 
+                                      target.dim.names = c(list(age=age.brackets),
+                                                           specification.metadata$dim.names[c('race','sex')]))
+            
+            pop2[2,,] / colSums(pop2)
+        }
+    }))
+
+    dim.names = specification.metadata$dim.names[c('age','race','sex')]
+    dim(rv) = sapply(dim.names, length)
+    dimnames(rv) = dim.names
+    
+    rv
+}
+
 ##--------------------##
 ##-- Proportion MSM --##
 ##--------------------##

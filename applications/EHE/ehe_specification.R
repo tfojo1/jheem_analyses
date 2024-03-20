@@ -1567,7 +1567,8 @@ track.integrated.outcome(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        'fraction.population.over.18',
                        scale = 'proportion',
-                       value = array(c(0.5,1,1,1,1), dim=c(age=5), dimnames=list(age=c('13-24 years','25-34 years','35-44 years','45-54 years','55+ years'))))
+                       get.value.function = get.fraction.over.age,
+                       age = 18)
 
 register.model.element(EHE.SPECIFICATION,
                        'fraction.tests.over.18',
@@ -1582,14 +1583,9 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          scale = 'non.negative.number',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
-                         save = T,
-#                         outcome.metadata = NULL
-                           outcome.metadata = create.outcome.metadata(display.name = 'Population',
-                                                                      description = "The Number of Uninfected Individuals Over 18 in the Population",
-                                                                      scale = 'non.negative.number',
-                                                                      axis.name = 'Population',
-                                                                      units = 'people',
-                                                                      singular.unit = 'person'),)
+                         save = F,
+                         outcome.metadata = NULL
+)
 
 track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
                                       name = 'proportion.general.population.tested.including.under.18',
