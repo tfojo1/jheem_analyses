@@ -411,7 +411,7 @@ get.fraction.over.age <- function(location,
                                                               age=paste0(ages, ' years')),
                                       keep.dimensions = c('age','sex','race','ethnicity'))
             
-            age.brackets = make.age.strata.names(endpoints = c(age1.ages[1], 18, age1.ages[length(age1.ages)]))
+            age.brackets = make.age.strata.names(endpoints = c(ages[1], 18, ages[length(ages)]))
             
             pop2 = map.value.ontology(pop, 
                                       target.dim.names = c(list(age=age.brackets),
