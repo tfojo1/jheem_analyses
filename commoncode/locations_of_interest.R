@@ -106,3 +106,6 @@ STATES.CONTAINING.LOCATIONS.OF.INTEREST = unique(locations::get.overlapping.loca
 COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST = unique(locations::get.overlapping.locations(LOCATIONS.OF.INTEREST,"county"))
 NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST = 
   unique(locations::get.overlapping.locations(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST,"nsduh"))
+
+COUNTIES.FOR.LIMITED.POPULATION.DATA = setdiff(locations::get.contained.locations(STATES.CONTAINING.LOCATIONS.OF.INTEREST, 'COUNTY'),
+                                               COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST)
