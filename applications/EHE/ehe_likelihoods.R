@@ -4,9 +4,10 @@
 # AIDS diagnoses, AIDS deaths, suppression
 
 # TO DO: 
-# proportion tested (deciding what to do for 12-17 year olds), 
-# hiv.test.positivity & awareness (should be fixed when totals are fixed), 
-# heroin/cocaine (waiting for age data, but for now totals will have same error as hiv.test.positivity & awareness)
+# proportion tested (redefining sim outcome to be 18-24yo; Todd working through bugs), 
+# hiv.test.positivity (should be fixed when totals are fixed; Andrew working through code), 
+# awareness (totals issue; new n multipliers argument), 
+# heroin/cocaine (waiting for age data; theoretically will work once year range issue is fixed)
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -417,6 +418,7 @@ if(1==2){
     create.nested.proportion.likelihood.instructions(outcome.for.data = "awareness",
                                                      outcome.for.sim = "awareness",
                                                      denominator.outcome.for.data = "total.prevalence",
+                                                     outcome.for.n.multipliers = "diagnosed.prevalence",
                                                      
                                                      location.types = c('STATE','CBSA','COUNTY'),
                                                      minimum.geographic.resolution.type = 'COUNTY',
