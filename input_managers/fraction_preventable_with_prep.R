@@ -47,7 +47,9 @@ total.het = total.het.1 + total.het.2
 # to account for growth in STI prevalence over time, double this estimate
 het.proportion.avoidable.mean = het.proportion.avoidable.mean*2 # --> 25% 
 
-# assuming 75% of heterosexuals are on PrEP because of an STI
+# assuming 75% of heterosexuals are on PrEP because of an STI, so: 
+# total.p.on.prep * 0.75 = p.on.prep.due.to.sti
+# total.p.on.prep = p.on.prep.due.to.sti / 0.75
 het.proportion.avoidable.mean = het.proportion.avoidable.mean/0.75 # --> 34%
 het.proportion.avoidable.sd = sqrt(total.het*het.proportion.avoidable.mean*(1-het.proportion.avoidable.mean))
 
