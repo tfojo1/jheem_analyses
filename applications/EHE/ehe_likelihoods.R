@@ -5,7 +5,7 @@
 
 # TO DO: 
 # proportion tested - working out bugs
-# Melissa checking: hiv.test.positivity, heroin/cocaine with age included, awareness 
+# hiv.test.positivity
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -309,6 +309,110 @@ prep.indications.likelihood.instructions = create.basic.likelihood.instructions(
                                                                            equalize.weight.by.year = T 
 )
 
+#-- AWARENESS --#
+awareness.likelihood.instructions =
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "awareness",
+                                                   outcome.for.sim = "awareness",
+                                                   denominator.outcome.for.data = "total.prevalence",
+                                                   outcome.for.n.multipliers = "diagnosed.prevalence",
+                                                   
+                                                   location.types = c('STATE','CBSA','COUNTY'),
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = character(), # would like to write NULL
+                                                   levels.of.stratification = 0, # would like to have an auto of 0:length(d)
+                                                   
+                                                   
+                                                   from.year = as.integer(2008),
+                                                   
+                                                   p.bias.inside.location = 0, # awareness.bias.estimates$in.mean is NA
+                                                   p.bias.outside.location = awareness.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = awareness.bias.estimates$out.sd, # awareness.bias.estimates$in.sd is NA
+                                                   p.bias.sd.outside.location = awareness.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry',
+                                                   measurement.error.sd = .016, # .018*90 - rough estimate from HIV Atlas (for now)
+                                                   # @Andrew want two arguments here: 
+                                                   # measurement.error.term = NULL,
+                                                   # measurement.error.type = "data.cv", 
+                                                   # options: cv, sd, data.cv (pull cv off of data), data.interval (take lower/upper bounds from data)
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(1),
+                                                   equalize.weight.by.year = T
+  )
+
+#-- HEROIN  --#
+heroin.likelihood.instructions = 
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
+                                                   outcome.for.sim = "proportion.using.heroin",
+                                                   denominator.outcome.for.data = 'adult.population',
+                                                   denominator.outcome.for.sim = 'population',
+                                                   
+                                                   location.types = c('STATE','NSDUH'), 
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = c("age"),
+                                                   levels.of.stratification = c(0,1), 
+                                                   from.year = as.integer(2008), 
+                                                   
+                                                   p.bias.inside.location = 0, 
+                                                   p.bias.outside.location = heroin.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = heroin.bias.estimates$out.sd,
+                                                   p.bias.sd.outside.location = heroin.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry', 
+                                                   measurement.error.sd = 0.54*0.005, # for now, double the NSDUH calcs and multiply by .005 from MD data
+                                                   # measurement.error = 0.27, # NSDUH calcs 
+                                                   # measurement.error.type = "cv",
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(1), 
+                                                   equalize.weight.by.year = T 
+  )
+
+#-- COCAINE  --#
+cocaine.likelihood.instructions = 
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "cocaine",
+                                                   outcome.for.sim = "proportion.using.cocaine",
+                                                   denominator.outcome.for.data = 'adult.population',
+                                                   denominator.outcome.for.sim = 'population',
+                                                   
+                                                   location.types = c('STATE','NSDUH'), 
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = c("age"),
+                                                   levels.of.stratification = c(0,1), 
+                                                   from.year = as.integer(2008), 
+                                                   
+                                                   p.bias.inside.location = 0, 
+                                                   p.bias.outside.location = cocaine.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = cocaine.bias.estimates$out.sd,
+                                                   p.bias.sd.outside.location = cocaine.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry', 
+                                                   measurement.error.sd = 0.42*0.02, # for now, double the NSDUH calcs and multiply by .02 from MD data
+                                                   # measurement.error.term = 0.21, # NSDUH calcs 
+                                                   # measurement.error.type = "cv",
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(1), 
+                                                   equalize.weight.by.year = T 
+  )
+
+
 
 # LIKELIHOOD COMPONENT STILL NOT WORKING
 if(1==2){
@@ -378,112 +482,10 @@ if(1==2){
   hiv.test.positivity.lik = hiv.test.positivity.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
   hiv.test.positivity.lik$compute(sim)
   
-  #-- AWARENESS --#
-  awareness.likelihood.instructions =
-    create.nested.proportion.likelihood.instructions(outcome.for.data = "awareness",
-                                                     outcome.for.sim = "awareness",
-                                                     denominator.outcome.for.data = "total.prevalence",
-                                                     outcome.for.n.multipliers = "diagnosed.prevalence",
-                                                     
-                                                     location.types = c('STATE','CBSA','COUNTY'),
-                                                     minimum.geographic.resolution.type = 'COUNTY',
-                                                     
-                                                     dimensions = character(), # would like to write NULL
-                                                     levels.of.stratification = 0, # would like to have an auto of 0:length(d)
-                                                     
-                                                     
-                                                     from.year = as.integer(2008),
-                                                     
-                                                     p.bias.inside.location = 0, # awareness.bias.estimates$in.mean is NA
-                                                     p.bias.outside.location = awareness.bias.estimates$out.mean,
-                                                     p.bias.sd.inside.location = awareness.bias.estimates$out.sd, # awareness.bias.estimates$in.sd is NA
-                                                     p.bias.sd.outside.location = awareness.bias.estimates$out.sd,
-                                                     
-                                                     within.location.p.error.correlation = 0.5,
-                                                     within.location.n.error.correlation = 0.5,
-                                                     
-                                                     observation.correlation.form = 'compound.symmetry',
-                                                     measurement.error.sd = .016, # .018*90 - rough estimate from HIV Atlas (for now)
-                                                     # @Andrew want two arguments here: 
-                                                     # measurement.error.term = NULL,
-                                                     # measurement.error.type = "data.cv", 
-                                                     # options: cv, sd, data.cv (pull cv off of data), data.interval (take lower/upper bounds from data)
-                                                     
-                                                     partitioning.function = EHE.PARTITIONING.FUNCTION, 
-                                                     
-                                                     weights = list(1),
-                                                     equalize.weight.by.year = T
-    )
   
-  awareness.lik = awareness.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
   
-  #-- HEROIN  --#
-  heroin.likelihood.instructions = 
-    create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
-                                                     outcome.for.sim = "proportion.using.heroin",
-                                                     denominator.outcome.for.data = 'adult.population',
-                                                     denominator.outcome.for.sim = 'population',
-                                                     
-                                                     location.types = c('STATE','NSDUH'), 
-                                                     minimum.geographic.resolution.type = 'COUNTY',
-                                                     
-                                                     dimensions = c("age"),
-                                                     levels.of.stratification = c(0,1), 
-                                                     from.year = as.integer(2008), 
-                                                     
-                                                     p.bias.inside.location = 0, 
-                                                     p.bias.outside.location = heroin.bias.estimates$out.mean,
-                                                     p.bias.sd.inside.location = heroin.bias.estimates$out.sd,
-                                                     p.bias.sd.outside.location = heroin.bias.estimates$out.sd,
-                                                     
-                                                     within.location.p.error.correlation = 0.5,
-                                                     within.location.n.error.correlation = 0.5,
-                                                     
-                                                     observation.correlation.form = 'compound.symmetry', 
-                                                     measurement.error.sd = 0.54*0.005, # for now, double the NSDUH calcs and multiply by .005 from MD data
-                                                     # measurement.error = 0.27, # NSDUH calcs 
-                                                     # measurement.error.type = "cv",
-                                                     
-                                                     partitioning.function = EHE.PARTITIONING.FUNCTION, 
-                                                     
-                                                     weights = list(1), 
-                                                     equalize.weight.by.year = T 
-    )
-  
-  #-- COCAINE  --#
-  cocaine.likelihood.instructions = 
-    create.nested.proportion.likelihood.instructions(outcome.for.data = "cocaine",
-                                                     outcome.for.sim = "proportion.using.cocaine",
-                                                     denominator.outcome.for.data = 'adult.population',
-                                                     denominator.outcome.for.sim = 'population',
-                                                     
-                                                     location.types = c('STATE','NSDUH'), 
-                                                     minimum.geographic.resolution.type = 'COUNTY',
-                                                     
-                                                     dimensions = c("age"),
-                                                     levels.of.stratification = c(0,1), 
-                                                     from.year = as.integer(2008), 
-                                                     
-                                                     p.bias.inside.location = 0, 
-                                                     p.bias.outside.location = cocaine.bias.estimates$out.mean,
-                                                     p.bias.sd.inside.location = cocaine.bias.estimates$out.sd,
-                                                     p.bias.sd.outside.location = cocaine.bias.estimates$out.sd,
-                                                     
-                                                     within.location.p.error.correlation = 0.5,
-                                                     within.location.n.error.correlation = 0.5,
-                                                     
-                                                     observation.correlation.form = 'compound.symmetry', 
-                                                     measurement.error.sd = 0.42*0.02, # for now, double the NSDUH calcs and multiply by .02 from MD data
-                                                     # measurement.error.term = 0.21, # NSDUH calcs 
-                                                     # measurement.error.type = "cv",
-                                                     
-                                                     partitioning.function = EHE.PARTITIONING.FUNCTION, 
-                                                     
-                                                     weights = list(1), 
-                                                     equalize.weight.by.year = T 
-    )
-  
-}
+
+  }
 
 
 
