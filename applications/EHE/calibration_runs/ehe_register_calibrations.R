@@ -93,9 +93,6 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           #  added aids diagnoses, added population back in 
                           likelihood.instructions = two.way.transmission.pop.likelihood.instructions, # no aids at all; added sex 2/29
-                          # two.way.transmission.aids.pop.likelihood.instructions, # total and one-way aids
-                          # two.way.transmission.total.aids.pop.likelihood.instructions, # total aids only 
-                          # two.way.transmission.pop.likelihood.instructions, # no aids at all 
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission),

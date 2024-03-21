@@ -4,10 +4,8 @@
 # AIDS diagnoses, AIDS deaths, suppression
 
 # TO DO: 
-# proportion tested (redefining sim outcome to be 18-24yo; Todd working through bugs), 
-# hiv.test.positivity (should be fixed when totals are fixed; Andrew working through code), 
-# awareness (totals issue; new n multipliers argument), 
-# heroin/cocaine (waiting for age data; theoretically will work once year range issue is fixed)
+# proportion tested - working out bugs
+# Melissa checking: hiv.test.positivity, heroin/cocaine with age included, awareness 
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -135,39 +133,8 @@ aids.diagnoses.likelihood.instructions =
                                                                 included.multiplier.correlation = 0.5
   )
 
-total.aids.diagnoses.likelihood.instructions = 
-  create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
-                                                                outcome.for.sim = "aids.diagnoses", 
-                                                                dimensions = c("race","risk"), # ADD BACK AGE AND SEX LATER
-                                                                levels.of.stratification = c(0), 
-                                                                from.year = as.integer(1980),
-                                                                to.year = as.integer(2001),
-                                                                observation.correlation.form = 'compound.symmetry', 
-                                                                measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up
-                                                                weights = list(1), 
-                                                                equalize.weight.by.year = T,
-                                                                included.multiplier = 1.4,
-                                                                included.multiplier.sd = 0.2, # rounding up from 10%, 0.14
-                                                                included.multiplier.correlation = 0.5
-  )
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
-two.way.transmission.aids.pop.likelihood.instructions =
-  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
-                               race.risk.sex.two.way.prevalence.likelihood.instructions,
-                               aids.diagnoses.likelihood.instructions,
-                               population.likelihood.instructions
-
-  )
-
-two.way.transmission.total.aids.pop.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
-                               race.risk.sex.two.way.prevalence.likelihood.instructions,
-                               total.aids.diagnoses.likelihood.instructions, # total aids only 
-                               population.likelihood.instructions
-                               
-  )
-
 two.way.transmission.pop.likelihood.instructions = 
   join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
                                race.risk.sex.two.way.prevalence.likelihood.instructions,
@@ -375,7 +342,6 @@ if(1==2){
                                                      equalize.weight.by.year = T
     )
   
-  #@Andrew - pull.age.robust
   prop.tested.lik = proportion.tested.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
   
   #-- HIV TEST POSITIVITY --#
@@ -409,7 +375,6 @@ if(1==2){
                                                      equalize.weight.by.year = T
     )
   
-  #@Todd - ontology is_complete
   hiv.test.positivity.lik = hiv.test.positivity.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
   hiv.test.positivity.lik$compute(sim)
   
@@ -450,7 +415,6 @@ if(1==2){
                                                      equalize.weight.by.year = T
     )
   
-  #@Andrew
   awareness.lik = awareness.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
   
   #-- HEROIN  --#
@@ -464,7 +428,7 @@ if(1==2){
                                                      minimum.geographic.resolution.type = 'COUNTY',
                                                      
                                                      dimensions = c("age"),
-                                                     levels.of.stratification = c(0), # eventually 0,1 with age
+                                                     levels.of.stratification = c(0,1), 
                                                      from.year = as.integer(2008), 
                                                      
                                                      p.bias.inside.location = 0, 
@@ -497,7 +461,7 @@ if(1==2){
                                                      minimum.geographic.resolution.type = 'COUNTY',
                                                      
                                                      dimensions = c("age"),
-                                                     levels.of.stratification = c(0), # eventually 0,1 with age
+                                                     levels.of.stratification = c(0,1), 
                                                      from.year = as.integer(2008), 
                                                      
                                                      p.bias.inside.location = 0, 
