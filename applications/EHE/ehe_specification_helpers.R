@@ -526,8 +526,10 @@ get.best.guess.msm.proportions <- function(location,
     )
     proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
     
-    if (any(is.na(proportions.msm.by.race)))
+    if (all(is.na(proportions.msm.by.race)))
         stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
+    
+    proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(proportions.msm.by.race[setdiff(names(proportions.msm.by.race), 'american indian or alaska native')], na.rm=T)
     
     # Make a guess as to the n msm
     first.guess.n.msm = sapply(dimnames(males)$race, function(r){

@@ -22,28 +22,28 @@ register.ontology.mapping('jheem.to.cdc.sex.risk',
                                            c('female', 'IDU_in_remission', 'female', 'idu'))
 )
 
-register.ontology.mapping('jheem.to.msm.or.not.risk',
-                          from.dimensions = c('sex', 'risk'),
-                          to.dimensions = c('sex', 'risk'),
-                          mappings = rbind(c('msm', 'never_IDU', 'male', 'msm'),
-                                           c('msm', 'active_IDU', 'male', 'msm'),
-                                           c('msm', 'IDU_in_remission', 'male', 'msm'),
-                                           c('heterosexual_male', 'never_IDU', 'male', 'not_msm'),
-                                           c('heterosexual_male', 'active_IDU', 'male', 'not_msm'),
-                                           c('heterosexual_male', 'IDU_in_remission', 'male', 'not_msm'),
-                                           c('female', 'never_IDU', 'female', 'not_msm'),
-                                           c('female', 'active_IDU', 'female', 'not_msm'),
-                                           c('female', 'IDU_in_remission', 'female', 'not_msm'))
-)
+# register.ontology.mapping('jheem.to.msm.or.not.risk',
+#                           from.dimensions = c('sex', 'risk'),
+#                           to.dimensions = c('sex', 'risk'),
+#                           mappings = rbind(c('msm', 'never_IDU', 'male', 'msm'),
+#                                            c('msm', 'active_IDU', 'male', 'msm'),
+#                                            c('msm', 'IDU_in_remission', 'male', 'msm'),
+#                                            c('heterosexual_male', 'never_IDU', 'male', 'not_msm'),
+#                                            c('heterosexual_male', 'active_IDU', 'male', 'not_msm'),
+#                                            c('heterosexual_male', 'IDU_in_remission', 'male', 'not_msm'),
+#                                            c('female', 'never_IDU', 'female', 'not_msm'),
+#                                            c('female', 'active_IDU', 'female', 'not_msm'),
+#                                            c('female', 'IDU_in_remission', 'female', 'not_msm'))
+# )
 
 # Not sure if this would work - might give us some unwanted dimensions in the mapped result
-# register.ontology.mapping('jheem.to.msm.or.not.risk',
-#                           from.dimensions = c('sex'),
-#                           to.dimensions = c('sex', 'risk'),
-#                           mappings = rbind(c('msm', 'male', 'msm'),
-#                                            c('heterosexual_male', 'male', 'not_msm'),
-#                                            c('female', 'female', 'not_msm'))
-# )
+register.ontology.mapping('jheem.to.msm.or.not.risk',
+                          from.dimensions = c('sex'),
+                          to.dimensions = c('sex', 'risk'),
+                          mappings = rbind(c('msm', 'male', 'msm'),
+                                           c('heterosexual_male', 'male', 'not_msm'),
+                                           c('female', 'female', 'not_msm'))
+)
 
 register.ontology.mapping('cdc.to.jheem.race',
                           from.dimensions = 'race',
