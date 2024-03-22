@@ -1157,11 +1157,14 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   data = subset(data, data$year != "2009")
   
   #Update 2/20/24: Removing data prior to 2014 for outcome = diagnosed.prevalence; Decided this in the calibration process.  Keeping year=2014.
+  #Adjusting on 3/22/24- diagnoses not for 2014 or earlier; diagnosed.prevalence not for 2013 or earlier (for risk only)
   data <- data %>%
     mutate(year_helper = as.numeric(year))%>%
-    mutate(drop_var = if_else((outcome=='diagnosed.prevalence' & year_helper < 2014), "1", "0")) #drop 1
+    mutate(drop_var = if_else((outcome=='diagnosed.prevalence' & year_helper <= 2013), "1", "0"))%>% #drop 1
+    mutate(drop_var_2 = if_else((outcome == 'diagnoses' & year_helper <= 2014), "1", "0"))
   
   data = subset(data, data$drop_var != "1")
+  data = subset(data, data$drop_var_2 != "1")
   ##
   
   data= as.data.frame(data)
@@ -1351,11 +1354,14 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   data = subset(data, data$year != "2009")
   
   #Update 2/20/24: Removing data prior to 2014 for outcome = diagnosed.prevalence; Decided this in the calibration process.  Keeping year=2014.
+  #Adjusting on 3/22/24- diagnoses not for 2014 or earlier; diagnosed.prevalence not for 2013 or earlier (for risk only)
   data <- data %>%
     mutate(year_helper = as.numeric(year))%>%
-    mutate(drop_var = if_else((outcome=='diagnosed.prevalence' & year_helper < 2014), "1", "0")) #drop 1
+    mutate(drop_var = if_else((outcome=='diagnosed.prevalence' & year_helper <= 2013), "1", "0"))%>% #drop 1
+    mutate(drop_var_2 = if_else((outcome == 'diagnoses' & year_helper <= 2014), "1", "0"))
   
   data = subset(data, data$drop_var != "1")
+  data = subset(data, data$drop_var_2 != "1")
   ##
   
   data= as.data.frame(data)
