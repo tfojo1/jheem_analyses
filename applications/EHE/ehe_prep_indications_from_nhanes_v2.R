@@ -140,90 +140,62 @@ if(1==2){
   ggplot(plotting.df,aes(x=year,y=value,color=age,group=age)) + geom_line() + facet_wrap(~race,scales = "free_y")
   
   
-  ## OLD CODE ##
+
   
-  # check for extreme single cell values (e.g., 93% black 25-34 msm in 2035, 95% black 35-44 male in 2035??)
-  values.msm["25-34 years","black","2035"]
-  values.male["35-44 years","black","2035"]
-  
-  head(sort(values.msm,decreasing = T),50) # highest 50 values
-  head(sort(values.female,decreasing = T),50) # highest 50 values
-  head(sort(values.male,decreasing = T),50) # highest 50 values
   
   # add datapoints from actual nhanes data
-  nhanes.msm.means = sapply(c(1,3,5,7,9), function(year){ # 2007-2016 (year anchored at 2006)
+  nhanes.msm.cdc.means = sapply(c(1,3,5,7,9), function(year){ # 2007-2016 (year anchored at 2006)
       sapply(dim.names$race, function(race){
         sapply(dim.names$age, function(age){
-          mean(prep.indications.msm$df$sex.in.past.year.and.condomless[
-            prep.indications.msm$df$year==year & prep.indications.msm$df$race==race & prep.indications.msm$df$age==age],na.rm=T)
+          mean(prep.indications.msm.cdc$df$mmwr.prep.indications[
+            prep.indications.msm.cdc$df$year==year & prep.indications.msm.cdc$df$race==race & prep.indications.msm.cdc$df$age==age],na.rm=T)
         })
       })
     })
-  nhanes.female.means = sapply(c(1,3,5,7,9), function(year){ # 2007-2016 (year anchored at 2006)
+
+  nhanes.het.means = sapply(c(1,3,5,7,9), function(year){ # 2007-2016 (year anchored at 2006)
     sapply(dim.names$race, function(race){
       sapply(dim.names$age, function(age){
-        mean(prep.indications.female$df$gonorrhea.past.year[
-          prep.indications.female$df$year==year & prep.indications.female$df$race==race & prep.indications.female$df$age==age],na.rm=T)
-      })
-    })
-  })
-  nhanes.male.means = sapply(c(1,3,5,7,9), function(year){ # 2007-2016 (year anchored at 2006)
-    sapply(dim.names$race, function(race){
-      sapply(dim.names$age, function(age){
-        mean(prep.indications.male$df$gonorrhea.past.year[
-          prep.indications.male$df$year==year & prep.indications.male$df$race==race & prep.indications.male$df$age==age],na.rm=T)
+        mean(prep.indications.het$df$hx.any.sti[
+          prep.indications.het$df$year==year & prep.indications.het$df$race==race & prep.indications.het$df$age==age],na.rm=T)
       })
     })
   })
   
-  dim(nhanes.msm.means) = dim(nhanes.female.means) =  dim(nhanes.male.means) = 
+  dim(nhanes.msm.cdc.means) = dim(nhanes.het.means) = 
     c(sapply(dim.names, length), length(c(1,3,5,7,9)))
-  dimnames(nhanes.msm.means) =dimnames(nhanes.female.means) =dimnames(nhanes.male.means) = 
+  dimnames(nhanes.msm.cdc.means) =dimnames(nhanes.het.means) =
     c(dim.names,list(year=c(2007,2009,2011,2013,2015)))
   
   # plot.age = 
   ggplot() + 
-    geom_line(data=reshape2::melt(apply(values.msm, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    geom_line(data=reshape2::melt(apply(nhanes.msm.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    geom_point(data=reshape2::melt(apply(nhanes.msm.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+    geom_line(data=reshape2::melt(apply(values.msm.cdc, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+    geom_line(data=reshape2::melt(apply(nhanes.msm.cdc.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+    geom_point(data=reshape2::melt(apply(nhanes.msm.cdc.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
     ylim(0,1) + 
-    ggtitle("MSM, age") 
+    ggtitle("MSM (CDC definition), age") 
   
   ggplot() + 
-    geom_line(data=reshape2::melt(apply(values.female, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    geom_line(data=reshape2::melt(apply(nhanes.female.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    geom_point(data=reshape2::melt(apply(nhanes.female.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+    geom_line(data=reshape2::melt(apply(values.het, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+    geom_line(data=reshape2::melt(apply(nhanes.het.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+    geom_point(data=reshape2::melt(apply(nhanes.het.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
     ylim(0,0.1) + 
-    ggtitle("Female, age") 
-  
-  ggplot() + 
-    geom_line(data=reshape2::melt(apply(values.male, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    geom_line(data=reshape2::melt(apply(nhanes.male.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    geom_point(data=reshape2::melt(apply(nhanes.male.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    ylim(0,0.4) + 
-    ggtitle("Male, age") 
+    ggtitle("Heterosexual, age") 
   
   # plot.race = 
   ggplot() + 
-    geom_line(data=reshape2::melt(apply(values.msm, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    geom_line(data=reshape2::melt(apply(nhanes.msm.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    geom_point(data=reshape2::melt(apply(nhanes.msm.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+    geom_line(data=reshape2::melt(apply(values.msm.cdc, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+    geom_line(data=reshape2::melt(apply(nhanes.msm.cdc.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+    geom_point(data=reshape2::melt(apply(nhanes.msm.cdc.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
     ylim(0,1) + 
-    ggtitle("MSM, race") 
+    ggtitle("MSM (CDC definition), race") 
   
   ggplot() + 
-    geom_line(data=reshape2::melt(apply(values.female, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    geom_line(data=reshape2::melt(apply(nhanes.female.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    geom_point(data=reshape2::melt(apply(nhanes.female.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+    geom_line(data=reshape2::melt(apply(values.het, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+    geom_line(data=reshape2::melt(apply(nhanes.het.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+    geom_point(data=reshape2::melt(apply(nhanes.het.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
     ylim(0,.25) + 
-    ggtitle("Female, race") 
-  
-  ggplot() + 
-    geom_line(data=reshape2::melt(apply(values.male, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    geom_line(data=reshape2::melt(apply(nhanes.male.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    geom_point(data=reshape2::melt(apply(nhanes.male.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    ylim(0,.4) + 
-    ggtitle("Male, race") 
+    ggtitle("Heterosexual, race") 
 
 }
 
