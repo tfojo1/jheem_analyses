@@ -88,7 +88,8 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                                           grepl('sexual.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('needle.sharing.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('incident.idu', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('fraction.heterosexual', EHE.PARAMETERS.PRIOR@var.names)]
+                                                          grepl('fraction.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('female.vs.heterosexual.male.idu.susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) ]
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           #  added aids diagnoses, added population back in 
