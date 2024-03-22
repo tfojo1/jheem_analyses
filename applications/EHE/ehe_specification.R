@@ -1631,7 +1631,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     units = 'tests',
                                                                     singular.unit = 'test'),
                          value = expression(number.of.tests.in.uninfected+new),
-                         keep.dimensions = c("age","race","sex","risk"))
+                         keep.dimensions = c("location","age","race","sex","risk"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'hiv.test.positivity',
@@ -1644,7 +1644,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = '%'),
                          value = expression(new/total.hiv.tests),
                          denominator.outcome = 'total.hiv.tests',
-                         keep.dimensions = c("age","race","sex","risk"))
+                         keep.dimensions = c("location","age","race","sex","risk"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'awareness',
