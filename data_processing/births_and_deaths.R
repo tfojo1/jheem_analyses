@@ -160,14 +160,11 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   names(state.abb) <- state.name
   data$location =ifelse(data$State == "District of Columbia", "DC", state.abb[data$State]) 
   
-  if(grepl("06.10", filename)) {
-    data$year = "2006-2010"
+  if(grepl("01.10", filename)) {
+    data$year = "2001-2010"
   }
-  if(grepl("11.15", filename)) {
-    data$year = "2011-2015"
-  }
-  if(grepl("16.20", filename)) {
-    data$year = "2016-2020"
+  if(grepl("11.20", filename)) {
+    data$year = "2011-2020"
   }
 
   data$outcome= "metro.deaths"
@@ -177,7 +174,8 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   data = subset(data, data$Deaths != "Suppressed")
   data$value = as.numeric(data$'Deaths')
   
-  data$age = data$"Single.Year.Ages"
+  data$age = data$"Five.Year.Age.Groups"
+  data$age = if_else(data$age == "60-64 years ", "60-64 years", data$age) #removing weird space formatting
   data$sex = tolower(data$Gender)
   data$ethnicity = data$'Hispanic.Origin'
   
@@ -203,14 +201,11 @@ data.list.deaths.denom = lapply(data.list.deaths, function(file){
   names(state.abb) <- state.name
   data$location =ifelse(data$State == "District of Columbia", "DC", state.abb[data$State]) 
   
-  if(grepl("06.10", filename)) {
-    data$year = "2006-2010"
+  if(grepl("01.10", filename)) {
+    data$year = "2001-2010"
   }
-  if(grepl("11.15", filename)) {
-    data$year = "2011-2015"
-  }
-  if(grepl("16.20", filename)) {
-    data$year = "2016-2020"
+  if(grepl("11.20", filename)) {
+    data$year = "2011-2020"
   }
   
   data$outcome= "metro.deaths.denominator"
@@ -222,7 +217,8 @@ data.list.deaths.denom = lapply(data.list.deaths, function(file){
   data = subset(data, data$Population != "Suppressed")
    data$value = as.numeric(data$'Population')
   
-  data$age = data$"Single.Year.Ages"
+  data$age = data$"Five.Year.Age.Groups"
+  data$age = if_else(data$age == "60-64 years ", "60-64 years", data$age) #removing weird space formatting
   data$sex = tolower(data$Gender)
   data$ethnicity = data$'Hispanic.Origin'
   
