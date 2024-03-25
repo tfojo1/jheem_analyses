@@ -190,12 +190,30 @@ register.model.quantity(EHE.SPECIFICATION,
 
 ##-- Oral PrEP --##
 register.model.element(EHE.SPECIFICATION,
-                       name = 'oral.prep.uptake',
+                       name = 'oral.prep.uptake.without.covid',
                        scale = 'proportion',
                        get.functional.form.function = get.prep.use.functional.form,
                        functional.form.from.time = 2014,
                        ramp.times = 2011,
                        ramp.values = 0)
+
+register.model.quantity(EHE.SPECIFICATION,
+                       name = 'oral.prep.uptake',
+                       scale = 'proportion',
+                       value = expression(oral.prep.uptake.without.covid*oral.prep.uptake.covid.multiplier))
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'oral.prep.uptake.covid.multiplier',
+                        scale = 'proportion',
+                        value = expression((1-(1-max.covid.effect.prep.uptake.reduction) * covid.on *
+                                              (1-prep.uptake.transmission.mobility.correlation+
+                                                 (prep.uptake.transmission.mobility.correlation*covid.mobility.change))))
+)
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.prep.uptake.reduction',
+                       scale = 'ratio',
+                       value=1)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'oral.prep.msm.rr',
@@ -274,10 +292,15 @@ register.model.quantity(EHE.SPECIFICATION,
 
 ##-- Common to All PrEP / Combinations of PrEP modalities --##
 register.model.element(EHE.SPECIFICATION,
-                       name='prep.indication',
+                       name='prep.indication.without.covid',
                        scale='proportion',
                        get.functional.form.function = get.prep.indication.functional.form,
                        functional.form.from.time = 2011)
+
+register.model.quantity(EHE.SPECIFICATION,
+                       name='prep.indication',
+                       scale='proportion',
+                       value = expression(prep.indication.without.covid * sexual.susceptibility.covid.multiplier))
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'proportion.receiving.prep',
@@ -335,17 +358,19 @@ register.model.element(EHE.SPECIFICATION,
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'general.population.testing',
                         scale = 'rate',
-                        value = 'general.population.testing.without.covid'
-                        # expression(
-                        # general.population.testing.without.covid *  
-                        #   (1-(1-max.covid.effect.testing.reduction) * covid.on * 
-                        #      (1-testing.mobility.correlation+(testing.mobility.correlation*covid.mobility.change))))
+                        value = expression(
+                          general.population.testing.without.covid *
+                            (1-(1-max.covid.effect.testing.reduction) * covid.on *
+                               (1-testing.mobility.correlation+(testing.mobility.correlation*covid.mobility.change))))
 )
 
-# for now, setting with covid (default) to without covid value 
 register.model.quantity(EHE.SPECIFICATION,
                        name = 'undiagnosed.testing.rr',
-                       value = 'undiagnosed.testing.rr.without.covid', # for now
+                       value = expression(
+                         undiagnosed.testing.rr.without.covid *
+                           (1-(1-max.covid.effect.undiagnosed.testing.rr.increase) * covid.on *
+                              (1-undiagnosed.testing.rr.mobility.correlation+
+                                 (undiagnosed.testing.rr.mobility.correlation*covid.mobility.change)))), 
                        scale = 'ratio')
 
 register.model.element(EHE.SPECIFICATION,
@@ -362,11 +387,13 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'ratio',
                        get.functional.form.function = get.covid.max.testing.effect)
 
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.undiagnosed.testing.rr.increase',
+                       scale = 'ratio',
+                       value = 1) # eventually want a functional form informed by something (BRFSS)
+# want the ratio of ratios - ratio during covid versus the ratio we had not during
 
-# original version: 
-# ((( 1 - (1-max.covid.effect.testing.reduction) *covid.mobility.change) * testing.mobility.correlation) + 
-# ((1 - testing.mobility.correlation)*max.covid.effect.testing.reduction))
-
+# get.covid.max.testing.effect is a relative risk (e.g., 0.8 if testing is 80% of what it would be without covid)
 # testing.no.covid is time-varying, max.covid.effect.testing.reduction is (1- relative risk) (static)
 # if testing mobility correlation is 0, always the max reduction; if testing mobility correlation is 1, moves the same as mobility
 # if covid.on = 0 , go back to testing.no.covid 
@@ -401,8 +428,26 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                value = 'suppression.of.diagnosed',
                                applies.to = list(continuum='diagnosed'))
 
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'suppression.of.diagnosed',
+                        value = expression( suppression.of.diagnosed.without.covid * suppression.of.diagnosed.covid.multiplier)
+)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'suppression.of.diagnosed.covid.multiplier',
+                        value = expression((1-(1-max.covid.effect.suppression.of.diagnosed.reduction) * covid.on *
+                                              (1-suppression.of.diagnosed.mobility.correlation+
+                                                 (suppression.of.diagnosed.mobility.correlation*covid.mobility.change))))
+)
+
 register.model.element(EHE.SPECIFICATION,
-                       name = 'suppression.of.diagnosed',
+                       name = 'max.covid.effect.suppression.of.diagnosed.reduction',
+                       scale = 'ratio',
+                       value=1)
+
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'suppression.of.diagnosed.without.covid',
                        scale = 'proportion',
                        
                        get.functional.form.function = get.suppression.functional.form,
@@ -779,9 +824,26 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'proportion',
                        value = 0.9) # want to come up with a better number for this; maybe by risk group 
   
-
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.susceptibility',
+                        value = expression( sexual.susceptibility.without.covid * sexual.susceptibility.covid.multiplier)
+)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'sexual.susceptibility.covid.multiplier',
+                        value = expression((1-(1-max.covid.effect.sexual.transmission.reduction) * covid.on *
+                                              (1-sexual.transmission.mobility.correlation+
+                                                 (sexual.transmission.mobility.correlation*covid.mobility.change))))
+                        )
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.sexual.transmission.reduction',
+                       scale = 'ratio',
+                       get.functional.form.function = get.covid.max.sexual.transmission.effect)
+
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'sexual.susceptibility.without.covid',
                         value = expression( base.sexual.susceptibility *
                                               (proportion.of.sexual.transmissions.in.prep.eligible*
                                               (all.prep.risk + 1-all.prep.coverage) + 
@@ -789,7 +851,24 @@ register.model.quantity(EHE.SPECIFICATION,
 )
 
 register.model.quantity(EHE.SPECIFICATION,
-                        name='idu.susceptibility',
+                        name = 'idu.susceptibility',
+                        value = expression( idu.susceptibility.without.covid * idu.susceptibility.covid.multiplier)
+)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'idu.susceptibility.covid.multiplier',
+                        value = expression((1-(1-max.covid.effect.idu.transmission.reduction) * covid.on *
+                                              (1-idu.transmission.mobility.correlation+
+                                                 (idu.transmission.mobility.correlation*covid.mobility.change))))
+)
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.idu.transmission.reduction',
+                       scale = 'ratio',
+                       value=1)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name='idu.susceptibility.without.covid',
                         value = expression( base.idu.susceptibility *
                                                 (all.prep.risk + 1-all.prep.coverage) *
                                                 (1 + needle.exchange*(needle.exchange.rr-1)) )
@@ -1409,20 +1488,41 @@ register.model.element(EHE.SPECIFICATION,
                        get.functional.form.function = get.covid.mobility.for.location,
                        functional.form.from.time = 2020)
 
+#-- Testing --#
 register.model.element(EHE.SPECIFICATION,
                        name = 'testing.mobility.correlation',
                        scale = 'proportion',
                        value = 1)
 
-#-- Testing --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'undiagnosed.testing.rr.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
 
 #-- Sexual Transmission --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'sexual.transmission.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
+
 
 #-- IV Transmission --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'idu.transmission.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
 
 #-- Suppression --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'suppression.of.diagnosed.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
 
 #-- PrEP --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'prep.uptake.transmission.mobility.correlation',
+                       scale = 'ratio',
+                       value=1)
 
 ##--------------------------##
 ##--------------------------##

@@ -116,7 +116,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     #-- Suppression --#
     set.ehe.alphas.from.parameters(model.settings,
-                                   element.name = 'suppression.of.diagnosed',
+                                   element.name = 'suppression.of.diagnosed.without.covid',
                                    parameters = parameters,
                                    parameter.suffixes = c(intercept='.suppressed.or', slope='.suppressed.slope.or'),
                                    idu.applies.to.in.remission = F)
@@ -137,7 +137,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     # parameters for PrEP x age and race - are used for both interecept and slope
     set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
-                                                       element.name = 'oral.prep.uptake',
+                                                       element.name = 'oral.prep.uptake.without.covid',
                                                        alpha.name = 'intercept',
                                                        parameters = parameters,
                                                        parameter.name.prefix = '',
@@ -146,7 +146,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                        dimensions.with.values.referred.to.by.index = 'age')
     
     set.element.functional.form.alphas.from.parameters(model.settings = model.settings,
-                                                       element.name = 'oral.prep.uptake',
+                                                       element.name = 'oral.prep.uptake.without.covid',
                                                        alpha.name = 'slope',
                                                        parameters = parameters,
                                                        parameter.name.prefix = '',
@@ -163,12 +163,12 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     
     # Intercepts (only for msm vs non-msm)
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.uptake',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.uptake.without.covid',
                                                                 alpha.name = 'intercept',
                                                                 values = parameters['msm.prep.intercept.or'],
                                                                 applies.to.dimension.values = 'msm',
                                                                 dimensions = 'sex')
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.uptake',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.uptake.without.covid',
                                                                 alpha.name = 'intercept',
                                                                 values = parameters['non.msm.prep.intercept.or'],
                                                                 applies.to.dimension.values = c('heterosexual_male','female'),
@@ -177,17 +177,17 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
 
     # Slopes x3 - msm slope applies to all msm regardless of IDU status (a main effect)
     #             wherease heterosexual and idu slopes are an interaction between sex and risk
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.uptake',
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.uptake.without.covid',
                                                                 alpha.name = 'slope',
                                                                 values = parameters['msm.prep.slope.or'],
                                                                 applies.to.dimension.values = 'msm',
                                                                 dimensions = 'sex')
     
-    model.settings$set.element.functional.form.interaction.alphas(element.name = 'oral.prep.uptake',
+    model.settings$set.element.functional.form.interaction.alphas(element.name = 'oral.prep.uptake.without.covid',
                                                                 alpha.name = 'slope',
                                                                 value = parameters['idu.prep.slope.or'],
                                                                 applies.to.dimension.values=c(sex='heterosexual_male', sex='female', idu.states))
-    model.settings$set.element.functional.form.interaction.alphas(element.name = 'oral.prep.uptake',
+    model.settings$set.element.functional.form.interaction.alphas(element.name = 'oral.prep.uptake.without.covid',
                                                                 alpha.name = 'slope',
                                                                 value = parameters['heterosexual.prep.slope.or'],
                                                                 applies.to.dimension.values=c(sex='heterosexual_male', sex='female', non.idu.states))

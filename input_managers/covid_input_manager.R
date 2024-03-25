@@ -179,6 +179,9 @@ get.q2.full.stratified.covid.reduction.in.testing = function(specification.metad
 # max.covid.effect.testing.reduction = get.q2.full.stratified.covid.reduction.in.testing(
 #   specification.metadata = specification.metadata)
 
+# max.covid.effect.sexual.transmission.reduction = get.covid.reduction.in.sexual.transmission(
+#   specification.metadata = specification.metadata)
+
 
 
 

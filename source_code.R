@@ -56,6 +56,7 @@ if (!exists('national.surveillance'))
 
 # Input Managers
 source('../jheem_analyses/input_managers/covid_mobility_manager.R')
+source('../jheem_analyses/input_managers/covid_input_manager.R')
 source('../jheem_analyses/input_managers/idu_input_manager.R')
 source('../jheem_analyses/input_managers/prep_input_manager.R')
 source('../jheem_analyses/input_managers/pairing_input_manager.R')

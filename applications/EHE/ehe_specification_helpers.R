@@ -997,6 +997,13 @@ get.covid.max.testing.effect = function(specification.metadata){
                                 value.is.on.transformed.scale = F)
 }
 
+get.covid.max.sexual.transmission.effect = function(specification.metadata){
+  
+  create.static.functional.form(value = get.covid.reduction.in.sexual.transmission(specification.metadata),
+                                link = 'log',
+                                value.is.on.transformed.scale = F)
+}
+
 ##------------------------##
 ##-- Initial Population --##
 ##------------------------##
