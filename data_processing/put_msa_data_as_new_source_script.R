@@ -74,6 +74,10 @@ put.msa.data.as.new.source = function(outcome,
                 # Aggregate across location
                 non.location.margin = setdiff(names(dim(strat.data.from.locs.only)), 'location')
                 
+                ## IMPORTANT: unhash url and details
+                strat.details.from.locs.only = data.manager$unhash.url.or.details.arr(strat.details.from.locs.only)
+                strat.url.from.locs.only = data.manager$unhash.url.or.details.arr(strat.url.from.locs.only)
+
                 if (scale == 'non.negative.number') {
                     # skip years where >=2/3 of counties are missing from all strata
                     years.with.enough.data = apply(

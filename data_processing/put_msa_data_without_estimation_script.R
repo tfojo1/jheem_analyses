@@ -10,7 +10,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                data.manager,
                                census.manager)
 {
-    # browser()
+    print("Message for future Zoe and Andrew: reinspect this put.msa.data.strict script when the smaller census manager is remade to account for new details and url code.")
     
     # register the parent source(s), source(s), ontologies, and/or outcome if necessary
     if (!(put.outcome.name %in% data.manager$outcomes))
@@ -64,6 +64,10 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                     # Details and URL should be the same for all data, but check just in case they aren't
                     details = attr(census.data.stratified, 'details')[[1]]
                     url = attr(census.data.stratified, 'url')[[1]]
+                    
+                    # Unhash details and url! TURN THIS ON WHEN CENSUS MANAGER IS REMADE!!!!
+                    # details = census.manager$unhash.url.or.details.arr(details)
+                    # url = census.manager$unhash.url.or.details.arr(url)
                     
                     if (any(sapply(attr(census.data.stratified, 'details'), function(x) {!identical(x, details) && !is.null(x)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'details'"))
