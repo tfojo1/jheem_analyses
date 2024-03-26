@@ -42,7 +42,7 @@ get.msa.totals.from.county.simple = function(outcome, # deaths
                 if (is.null(relevant.county.totals.this.ontology)) next
                 
                 # Unhash url
-                relevant.county.totals.url.this.ontology = data.manager.from$unhash.url.or.details.arr(relevant.county.totals.url.this.ontology)
+                relevant.county.totals.url.this.ontology = data.manager.from$unhash.url(relevant.county.totals.url.this.ontology)
                 
                 # Aggregate county data to MSA... R apply drops the dimnames when the output is 1-d... So annoying!!!
                 data.aggregated.to.msa.total = array(apply(relevant.county.totals.this.ontology, MARGIN = "year", FUN = sum, na.rm=F),

@@ -10,8 +10,6 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                data.manager,
                                census.manager)
 {
-    print("Message for future Zoe and Andrew: reinspect this put.msa.data.strict script when the smaller census manager is remade to account for new details and url code.")
-    
     # register the parent source(s), source(s), ontologies, and/or outcome if necessary
     if (!(put.outcome.name %in% data.manager$outcomes))
       stop(paste0("Error: outcome '", put.outcome.name, "' has not yet been registered"))
@@ -47,7 +45,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
             source.ontology.names = names(census.manager$data[[census.outcome.name]][['estimate']][[source.name]])
             
             for (ont.name in source.ontology.names) {
-
+                # why did I have to pull? This will come out in the universal ontology, which *might* turn out differently someday if there are multiple ontologies.
                 census.data.stratified = census.manager$pull(outcome = census.outcome.name,
                                                              keep.dimensions = fully.stratified.dimensions,
                                                              dimension.values = list(location = contained.locations, age = census.adult.ages),
@@ -61,17 +59,17 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                     dim(census.data.stratified) = sapply(dimnames.without.source, length)
                     dimnames(census.data.stratified) = dimnames.without.source
                     
+                    # Unhash details and url
+                    all.details = census.manager$unhash.details(attr(census.data.stratified, 'details'))
+                    all.url = census.manager$unhash.url(attr(census.data.stratified, 'url'))
+                    
                     # Details and URL should be the same for all data, but check just in case they aren't
-                    details = attr(census.data.stratified, 'details')[[1]]
-                    url = attr(census.data.stratified, 'url')[[1]]
+                    details = all.details[[1]]
+                    url = all.url[[1]]
                     
-                    # Unhash details and url! TURN THIS ON WHEN CENSUS MANAGER IS REMADE!!!!
-                    # details = census.manager$unhash.url.or.details.arr(details)
-                    # url = census.manager$unhash.url.or.details.arr(url)
-                    
-                    if (any(sapply(attr(census.data.stratified, 'details'), function(x) {!identical(x, details) && !is.null(x)})))
+                    if (any(sapply(all.details, function(x) {!identical(x, details) && !is.null(x)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'details'"))
-                    if (any(sapply(attr(census.data.stratified, 'url'), function(x) {!identical(x, url) && !is.null(x)})))
+                    if (any(sapply(all.url, function(x) {!identical(x, url) && !is.null(x)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'url'"))
 
                     ## -- TOTALS -- ##
