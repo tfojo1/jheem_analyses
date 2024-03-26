@@ -172,7 +172,7 @@ if(1==2){
     geom_line(data=reshape2::melt(apply(values.msm.cdc, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
     geom_line(data=reshape2::melt(apply(nhanes.msm.cdc.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
     geom_point(data=reshape2::melt(apply(nhanes.msm.cdc.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    ylim(0,1) + 
+    ylim(0,1) 
     ggtitle("MSM (CDC definition), age") 
   
   ggplot() + 
