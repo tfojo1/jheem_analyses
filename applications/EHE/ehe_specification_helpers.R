@@ -1529,4 +1529,22 @@ get.undiagnosed.testing.rr <- function(specification.metadata){
 
 }
 
+## COVID-specific multipliers for undiagnosed testing rr
+## (regular years value) * (this multiplier) = (covid years value)
+get.undiagnosed.testing.covid.rr.functional.form <- function(specification.metadata){
+  
+  multipliers = get.undiagnosed.testing.covid.rrr(specification.metadata = specification.metadata) 
+  
+  create.static.functional.form(value = multipliers,
+                                link = "log",
+                                value.is.on.transformed.scale = F) 
+  
+}
+
+get.undiagnosed.testing.covid.rrr <- function(specification.metadata){
+  
+  high.risk.testing.covid.ratio.of.ratios = get.cached.object.for.version(name = "high.risk.testing.covid.ratio.of.ratios",
+                                                                          version = specification.metadata$version) 
+  
+}
 
