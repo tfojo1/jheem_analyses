@@ -63,7 +63,7 @@ get.female.prep.indications.atlas = function(version,
   df.female = df[df$sex=="Female",]
   df.female = df.female[,-4]
   
-  fit = glm(outcome ~ age + race + year + year:age + year:race, data=df.female,weights = df.female$weight,
+  fit = glm(outcome ~ age*race*year, data=df.female,weights = df.female$weight,
             family='gaussian')  # CHANGED TO LINEAR
   
   dim.names = specification.metadata$dim.names[c('age','race')]
@@ -101,15 +101,17 @@ values.female = array(unlist(values.female),
                       dim = c(sapply(dim.names, length),length(2010:2035)),
                       dimnames = c(dim.names, list(year=2010:2035)))
 
-# add datapoints from actual atlas data
+# add datapoints from actual atlas data 
 atlas.means = sapply(c(2012:2021), function(year){ 
   sapply(dim.names$race, function(race){
     sapply(dim.names$age, function(age){
-      mean(female.prep.indications.atlas$df$weight[
+      sum(
+        female.prep.indications.atlas$df$weight[
         female.prep.indications.atlas$df$outcome==1 & 
         female.prep.indications.atlas$df$orig.year==year & 
           female.prep.indications.atlas$df$race==race & 
-          female.prep.indications.atlas$df$age==age] / 
+          female.prep.indications.atlas$df$age==age] ,na.rm=T)/
+        sum(
           (female.prep.indications.atlas$df$weight[
             female.prep.indications.atlas$df$outcome==1 & 
               female.prep.indications.atlas$df$orig.year==year & 
@@ -119,8 +121,7 @@ atlas.means = sapply(c(2012:2021), function(year){
                female.prep.indications.atlas$df$outcome==0 & 
                  female.prep.indications.atlas$df$orig.year==year & 
                  female.prep.indications.atlas$df$race==race & 
-                 female.prep.indications.atlas$df$age==age]),
-        na.rm=T)
+                 female.prep.indications.atlas$df$age==age]),na.rm=T)
     })
   })
 })

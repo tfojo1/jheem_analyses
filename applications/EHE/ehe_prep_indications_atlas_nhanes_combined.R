@@ -1,6 +1,16 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
-get.male.prep.indication.OR.from.nhanes = function(version,
+female.prep.indications = cache.object.for.version(object = female.prep.indications.atlas, 
+                                                   name = "female.prep.indications.atlas", 
+                                                   version = 'ehe', overwrite=T)
+
+male.prep.indications.OR = cache.object.for.version(object = male.prep.indications.OR, 
+                                                    name = "male.prep.indications.OR", 
+                                                    version = 'ehe', overwrite=T)
+
+
+
+get.male.prep.indications.OR.from.nhanes = function(version,
                                                    location){
   
   load("../jheem_analyses/cached/datasets_from_Zoe/heterosexual.with.sti.RData")  
@@ -49,7 +59,6 @@ get.male.prep.indication.OR.from.nhanes = function(version,
   
   rv
 }
-
 
 get.female.prep.indications.atlas = function(version,
                                              location){
@@ -110,7 +119,7 @@ get.female.prep.indications.atlas = function(version,
   df.female = df[df$sex=="Female",]
   df.female = df.female[,-4]
   
-  fit = glm(outcome ~ age + race + year + year:age + year:race, data=df.female,weights = df.female$weight,
+  fit = glm(outcome ~ age*race*year, data=df.female,weights = df.female$weight,
             family='gaussian')  # CHANGED TO LINEAR
   
   dim.names = specification.metadata$dim.names[c('age','race')]
@@ -134,12 +143,7 @@ get.female.prep.indications.atlas = function(version,
   rv
 }
 
-
 female.prep.indications.atlas = get.female.prep.indications.atlas(version = 'ehe', location = 'C.12580')
+male.prep.indications.OR = get.male.prep.indications.OR.from.nhanes(version = 'ehe', location = 'C.12580')
 
-female.prep.indications.functional.form = create.linear.functional.form(intercept = female.prep.indications.atlas$intercepts,
-                                                                        slope = female.prep.indications.atlas$slopes,
-                                                                        anchor.year = 2010,
-                                                                        #parameters.are.on.logit.scale = F, 
-                                                                        # only for logistic.linear.functional.form
-                                                                        min = 0,max = 1)  
+
