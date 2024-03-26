@@ -1,8 +1,55 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
-library(ggplot2)
 
-specification.metadata = get.specification.metadata('ehe','C.12580')
-dim.names = specification.metadata$dim.names[c('age','race')]
+get.male.prep.indication.OR.from.nhanes = function(version,
+                                                   location){
+  
+  load("../jheem_analyses/cached/datasets_from_Zoe/heterosexual.with.sti.RData")  
+  df = heterosexual.with.sti
+  # total het = 24407 (total # of rows)
+  # prep indication = 1269 (outcome $hx.any.sti==1)
+  
+  specification.metadata = get.specification.metadata(version=version,
+                                                      location=location)
+  # Restratify the ages
+  given.ages = unique(df$age.group)
+  age.map = get.age.bracket.mapping(given.ages, specification.metadata$dim.names$age)
+  df$orig.age = df$age
+  df$orig.age.group = df$age.group
+  df$age = age.map[df$orig.age.group]
+  df = df[!is.na(df$age),]
+  
+  # Set reference levels
+  reference.age.index = ceiling(specification.metadata$n.ages/2)
+  age.levels = c(specification.metadata$dim.names$age[reference.age.index],
+                 specification.metadata$dim.names$age[-reference.age.index])
+  df$age = factor(df$age, levels=age.levels)
+  
+  # Map race
+  df$orig.race = df$race
+  race.ontology.mapping = get.ontology.mapping(from.ontology = list(race=tolower(unique(df$race))),
+                                               to.ontology = specification.metadata$dim.names['race'])   
+  race.map = race.ontology.mapping$get.mapping.vector()
+  df$race = race.map[tolower(df$orig.race)]
+  race.levels = union('other', specification.metadata$dim.names$race)
+  df$race = factor(df$race, levels = race.levels)
+  
+  df$year = as.numeric(substr(df$survey.year,1,4))
+  
+  prep.anchor.year = 2006
+  df$orig.year = df$year
+  df$year = df$year-prep.anchor.year
+  
+  # Make outcome numeric
+  df$hx.any.sti = as.numeric(df$hx.any.sti)
+  
+  fit = glm(hx.any.sti ~ age + race + gender + year, data=df, #weights = df$WTMEC2YR,
+            family='binomial')  
+  
+  rv = unname(exp(fit$coefficients["gendermale"]))
+  
+  rv
+}
+
 
 get.female.prep.indications.atlas = function(version,
                                              location){
@@ -87,6 +134,7 @@ get.female.prep.indications.atlas = function(version,
   rv
 }
 
+
 female.prep.indications.atlas = get.female.prep.indications.atlas(version = 'ehe', location = 'C.12580')
 
 female.prep.indications.functional.form = create.linear.functional.form(intercept = female.prep.indications.atlas$intercepts,
@@ -95,59 +143,3 @@ female.prep.indications.functional.form = create.linear.functional.form(intercep
                                                                         #parameters.are.on.logit.scale = F, 
                                                                         # only for logistic.linear.functional.form
                                                                         min = 0,max = 1)  
-
-values.female = female.prep.indications.functional.form$project(2010:2035) 
-values.female = array(unlist(values.female), 
-                      dim = c(sapply(dim.names, length),length(2010:2035)),
-                      dimnames = c(dim.names, list(year=2010:2035)))
-
-# add datapoints from actual atlas data
-atlas.means = sapply(c(2012:2021), function(year){ 
-  sapply(dim.names$race, function(race){
-    sapply(dim.names$age, function(age){
-      mean(female.prep.indications.atlas$df$weight[
-        female.prep.indications.atlas$df$outcome==1 & 
-        female.prep.indications.atlas$df$orig.year==year & 
-          female.prep.indications.atlas$df$race==race & 
-          female.prep.indications.atlas$df$age==age] / 
-          (female.prep.indications.atlas$df$weight[
-            female.prep.indications.atlas$df$outcome==1 & 
-              female.prep.indications.atlas$df$orig.year==year & 
-              female.prep.indications.atlas$df$race==race & 
-              female.prep.indications.atlas$df$age==age] + 
-             female.prep.indications.atlas$df$weight[
-               female.prep.indications.atlas$df$outcome==0 & 
-                 female.prep.indications.atlas$df$orig.year==year & 
-                 female.prep.indications.atlas$df$race==race & 
-                 female.prep.indications.atlas$df$age==age]),
-        na.rm=T)
-    })
-  })
-})
-
-dim(atlas.means) = c(sapply(dim.names, length), length(c(2012:2021)))
-dimnames(atlas.means) =c(dim.names,list(year=c(2012:2021)))
-
-ggplot() + 
-  geom_line(data=reshape2::melt(apply(values.female, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-  geom_line(data=reshape2::melt(apply(atlas.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-  geom_point(data=reshape2::melt(apply(atlas.means, c("age","year"),mean)), aes(x=year, y=value, color=age))
-
-ggplot() + 
-  geom_line(data=reshape2::melt(apply(values.female, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-  geom_line(data=reshape2::melt(apply(atlas.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-  geom_point(data=reshape2::melt(apply(atlas.means, c("race","year"),mean)), aes(x=year, y=value, color=race))
-
-ggplot() + 
-  geom_line(data=reshape2::melt(values.female), aes(x=year, y=value, color=age)) +
-  geom_line(data=reshape2::melt(atlas.means), aes(x=year, y=value, color=age)) + 
-  geom_point(data=reshape2::melt(atlas.means), aes(x=year, y=value, color=age)) + facet_wrap(~race,scales = "free_y")
-
-
-#plotting.df = reshape2::melt((values.female))
-#ggplot(plotting.df,aes(x=year,y=value,color=age,group=age)) + geom_line() + facet_wrap(~race,scales = "free_y")
-
-# add actual data to plots (naive average marginals); as geom_point
-# if we don't believe exponential takeoffs once compared to actual data; change to linear regression; min 0 in functional form 
-
-# remove 2022 data 
