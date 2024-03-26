@@ -725,12 +725,19 @@ get.location.birth.rates <- function(location,
     
     # Pull the births into an array
     # I imagine this should be indexed [year, county, race, ethnicity] - not necessarily in that order
-    births=CENSUS.MANAGER$pull(outcome = 'births', location = counties, year= years, keep.dimensions = c('race', 'ethnicity', 'location'), na.rm=TRUE)[,,,1] #keep all race, all ethnicities, first source#
+    births = CENSUS.MANAGER$pull(outcome = 'births', location = counties, year= years, keep.dimensions = c('race', 'ethnicity', 'location'), na.rm=TRUE)[,,,1] #keep all race, all ethnicities, first source#
+    if (is.null(births))
+      stop(paste0("Cannot get.location.birth.rates() - no 'births' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
+                  locations::get.location.name(location), ")"))
     births = apply(births, c('race','ethnicity'), sum, na.rm=T)
     
     # Pull population into an array
     # I imagine this should be indexed [year, county, race, ethnicity] - not necessarily in that order
     population=SURVEILLANCE.MANAGER$pull(outcome = 'adult.population', location = location, year= years, keep.dimensions = c('race', 'ethnicity'), na.rm=TRUE)[,,1]
+    
+    if (is.null(population))
+        stop(paste0("Cannot get.location.birth.rates() - no 'adult.population' data are available in the SURVEILLANCE.MANAGER for location '", location, "' (",
+                    locations::get.location.name(location), ")"))
     
     # Map the ontologies
     target.dim.names = specification.metadata$dim.names[c('race')]
