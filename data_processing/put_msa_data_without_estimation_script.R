@@ -3,7 +3,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                locations,
                                contained.geographic.type = 'county', # if this is NULL, it won't get any subtype, just stay at the main geographic level
                                fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
-                               put.stratifications = list('age', c('race', 'ethnicity'), 'sex', c('age', 'race', 'ethnicity'), c('age', 'sex'), c('race', 'ethnicity', 'sex')),
+                               put.stratifications = list('age','race', 'ethnicity', c('race', 'ethnicity'), 'sex', c('age', 'race', 'ethnicity'), c('age', 'sex'), c('race', 'ethnicity', 'sex')), # race and ethnicity are individually needed by the proportion tested likelihood obs-n calculation
                                age.lower.limit = 13,
                                age.penultimate.upper = 84,
                                age.upper.limit.name = '85+',
