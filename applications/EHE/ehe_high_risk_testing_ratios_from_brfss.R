@@ -1,13 +1,13 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
-
-# put.local.cache.object function or something - save high.risk.testing.rate.ratios
+# NON-COVID YEARS
 high.risk.testing.rate.ratios = get.high.risk.testing.ratios(version = 'ehe', location = 'C.12580')
 
 cache.object.for.version(object = high.risk.testing.rate.ratios, 
                          name = "high.risk.testing.rate.ratios", 
                          version = 'ehe', overwrite=T)
 
+# COVID YEARS
 high.risk.testing.rate.ratios.covid = get.high.risk.testing.ratios.during.covid(version = 'ehe', location = 'C.12580')
 high.risk.testing.covid.ratio.of.ratios = high.risk.testing.rate.ratios.covid/high.risk.testing.rate.ratios
 # ^ this multiplier * non-covid values = covid values
@@ -15,6 +15,7 @@ high.risk.testing.covid.ratio.of.ratios = high.risk.testing.rate.ratios.covid/hi
 cache.object.for.version(object = high.risk.testing.covid.ratio.of.ratios, 
                          name = "high.risk.testing.covid.ratio.of.ratios", 
                          version = 'ehe', overwrite=T)
+
 
 get.high.risk.testing.ratios = function(version, location){
   
@@ -104,8 +105,8 @@ get.high.risk.testing.ratios.during.covid = function(version, location){
   
   specification.metadata = get.specification.metadata(version=version, location=location)
   
-  # COVID YEARS THIS TIME - 2020, 2021, 2022
-  df = df[(df$year>2019 & df$year<2023),]
+  # ONLY 2020 THIS TIME 
+  df = df[(df$year==2020),]
   
   # Restratify the ages
   given.ages = unique(df$age)
