@@ -754,7 +754,7 @@ get.location.mortality.rates.functional.form = function(location, specification.
 
 get.location.mortality.rates <- function(location,
                                          specification.metadata,
-                                         year.ranges = c('2006-2010','2011-2015'))
+                                         year.ranges = c('2001-2010','2011-2020'))
   
 {
 #    states = locations::get.overlapping.locations(location, "state")
@@ -762,24 +762,27 @@ get.location.mortality.rates <- function(location,
     states = unique(locations::get.containing.locations(counties, 'state'))
     
     # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
-    deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', location = states, year= year.ranges, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
+    deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', location = states, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     
     if (is.null(deaths))
       stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
     
     # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
-    population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('age','race', 'ethnicity', 'sex', 'location'))
+    population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     
     if (is.null(population))
       stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
     
-    #You have this denominator it should align wit the metro deaths
+    population[is.na(deaths)] = NA
     
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two
     target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
-    rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names) / 
-        map.value.ontology(population, target.dim.names=target.dim.names)
+    rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
+        map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
+    
+    if (any(is.na(rates.by.state)))
+      stop("getting NA values in rates.by.state in get.location.mortality.rates()")
     
     if (length(states)==1)
         rates.by.state[1,,,]
