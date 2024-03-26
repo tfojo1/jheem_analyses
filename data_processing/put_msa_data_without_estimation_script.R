@@ -58,18 +58,14 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                     dimnames.without.source = dimnames(census.data.stratified)[names(dim(census.data.stratified)) != 'source']
                     dim(census.data.stratified) = sapply(dimnames.without.source, length)
                     dimnames(census.data.stratified) = dimnames.without.source
-                    
-                    # Unhash details and url
-                    all.details = census.manager$unhash.details(attr(census.data.stratified, 'details'))
-                    all.url = census.manager$unhash.url(attr(census.data.stratified, 'url'))
-                    
+
                     # Details and URL should be the same for all data, but check just in case they aren't
-                    details = all.details[[1]]
-                    url = all.url[[1]]
+                    details = attr(census.data.stratified, "details")[[1]]
+                    url = attr(census.data.stratified, "url")[[1]]
                     
-                    if (any(sapply(all.details, function(x) {!identical(x, details) && !is.null(x)})))
+                    if (any(sapply(attr(census.data.stratified, "details"), function(x) {!identical(x, details) && !is.null(x)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'details'"))
-                    if (any(sapply(all.url, function(x) {!identical(x, url) && !is.null(x)})))
+                    if (any(sapply(attr(census.data.stratified, "url"), function(x) {!identical(x, url) && !is.null(x)})))
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'url'"))
 
                     ## -- TOTALS -- ##
