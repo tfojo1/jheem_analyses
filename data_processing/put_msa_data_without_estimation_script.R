@@ -34,6 +34,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
   census.adult.ages = paste0(c(as.character(age.lower.limit:age.penultimate.upper), age.upper.limit.name), " years")
     
     for (location in locations) {
+        print(paste0("on location: ", location, " at time ", Sys.time()))
 
         error.prefix = paste0("Error putting '", put.outcome.name, "' data for '", location, "':")
         
@@ -42,9 +43,12 @@ put.msa.data.strict = function(census.outcome.name = 'population',
         
         for (source.name in names(census.manager$source.info))
         {
+            print(paste0("on source: ", source.name, " at time ", Sys.time()))
             source.ontology.names = names(census.manager$data[[census.outcome.name]][['estimate']][[source.name]])
             
             for (ont.name in source.ontology.names) {
+                print(paste0("on ontology: ", ont.name, " at time ", Sys.time()))
+                tm = Sys.time()
                 # why did I have to pull? This will come out in the universal ontology, which *might* turn out differently someday if there are multiple ontologies.
                 census.data.stratified = census.manager$pull(outcome = census.outcome.name,
                                                              keep.dimensions = fully.stratified.dimensions,
@@ -53,6 +57,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                                              sources = source.name,
                                                              append.attributes = c('details', 'url'),
                                                              debug = F)
+                print(paste0("pull took ", Sys.time() - tm))
 
                 if (!is.null(census.data.stratified)) {
                     dimnames.without.source = dimnames(census.data.stratified)[names(dim(census.data.stratified)) != 'source']
@@ -69,7 +74,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                         stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'url'"))
 
                     ## -- TOTALS -- ##
-                    
+                    # browser()
                     # Hand-aggregate the stratified data to total
                     aggregated.totals.data = apply(census.data.stratified, 'year', sum, na.rm=T)
                     dimnames.because.r.apply.is.annoying = list(year=names(aggregated.totals.data))
@@ -84,7 +89,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                     
                     ## -- STRATIFIED -- ##
                     for (stratification in put.stratifications) {
-                        
+                        print(paste0("on stratification: ", stratification, " at time ", Sys.time()))
                         # Hand-aggregate the stratified data to each stratification
                         margin.of.aggregation = c('year', stratification)
                         aggregated.data = apply(census.data.stratified, margin.of.aggregation, sum, na.rm=T)
