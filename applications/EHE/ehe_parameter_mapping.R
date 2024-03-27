@@ -132,6 +132,27 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     model.settings$set.element.ramp.values(element.name = 'general.population.testing.without.covid',
                                          values = parameters['testing.ramp.up.vs.current.rr'] * c(TESTING.FIRST.YEAR.FRACTION.OF.RAMP,1),
                                          indices = 2:3)
+    
+    set.element.functional.form.interaction.alphas(model.settings,
+                                                   element.name = "undiagnosed.testing.increase",
+                                                   alpha.name = "value",
+                                                   value = parameters["msm.undiagnosed.testing.increase.rr"],
+                                                   applies.to.dimension.values=list(sex="msm"))
+    
+    set.element.functional.form.interaction.alphas(model.settings,
+                                                   element.name = "undiagnosed.testing.increase",
+                                                   alpha.name = "value",
+                                                   value = parameters["heterosexual.undiagnosed.testing.increase.rr"],
+                                                   applies.to.dimension.values=list(sex=c("female","heterosexual_male"),
+                                                                                    risk = non.idu.states))
+    
+    set.element.functional.form.interaction.alphas(model.settings,
+                                                   element.name = "undiagnosed.testing.increase",
+                                                   alpha.name = "value",
+                                                   value = parameters["idu.undiagnosed.testing.increase.rr"],
+                                                   applies.to.dimension.values=list(sex=c("female","heterosexual_male"),
+                                                                                    risk = idu.states))
+    
 
     #-- PrEP --#
     

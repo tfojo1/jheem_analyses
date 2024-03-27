@@ -1519,11 +1519,17 @@ get.testing.functional.form = function(specification.metadata){
 
 
 
-get.undiagnosed.testing.rr.functional.form <- function(specification.metadata){
+get.undiagnosed.testing.increase.functional.form <- function(specification.metadata){
   
   multipliers = get.undiagnosed.testing.rr(specification.metadata = specification.metadata) 
-
-  create.static.functional.form(value = multipliers,
+  if(any(mulipliers<=1))
+    stop("Error in get.undiagnosed.testing.increase.functional.form must be >1")
+  
+  # do this so that when we sample the multiplier, we're actually sampling a multiplier of how much greater than 1 it is 
+  #(don't want it to go below 1)
+  increase = multipliers - 1 
+  
+  create.static.functional.form(value = increase,
                                 link = "log",
                                 value.is.on.transformed.scale = F) 
   
@@ -1555,3 +1561,36 @@ get.undiagnosed.testing.covid.rrr <- function(specification.metadata){
   
 }
 
+# will eventually have to put below on the logit scale to keep bounded between 0 and 1
+get.fraction.sexual.transmission.avoidable.with.prep.logit.means = function(){
+  # values from ~../jheem_analyses/input_managers/fraction_preventable_with_prep.R
+  # MSM: >1 partner in the past year & condomless sex
+  # msm.mean = 0.9529412
+  # msm.sd =  0.02296911
+  # 
+  # Heterosexual: STI in the past year
+  # het.mean = 0.3447421
+  # het.sd =  0.08971986
+  
+  rv = array(c(0.3447421,0.9529412,0.3447421),
+             dim = c(sex=3),
+             dimnames = list(sex=c("heterosexual_male","msm","female")))
+  
+}
+
+
+get.fraction.sexual.transmission.avoidable.with.prep.logit.sds = function(){
+  # values from ~../jheem_analyses/input_managers/fraction_preventable_with_prep.R
+  # MSM: >1 partner in the past year & condomless sex
+  # msm.mean = 0.9529412
+  # msm.sd =  0.02296911
+  # 
+  # Heterosexual: STI in the past year
+  # het.mean = 0.3447421
+  # het.sd =  0.08971986
+  
+  rv = array(c(0.08971986,0.02296911,0.08971986),
+             dim = c(sex=3),
+             dimnames = list(sex=c("heterosexual_male","msm","female")))
+  
+}

@@ -354,7 +354,6 @@ register.model.element(EHE.SPECIFICATION,
                        ramp.values = c(0,0.5*TESTING.FIRST.YEAR.FRACTION.OF.RAMP,0.5),
                        ramp.interpolate.links = c('identity','log','identity'))
 
-# for now, setting with covid (default) to without covid value 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'general.population.testing',
                         scale = 'rate',
@@ -365,22 +364,22 @@ register.model.quantity(EHE.SPECIFICATION,
 )
 
 register.model.quantity(EHE.SPECIFICATION,
-                       name = 'undiagnosed.testing.rr',
+                       name = 'undiagnosed.testing.increase',
                        value = expression(
-                         undiagnosed.testing.rr.without.covid *
+                         undiagnosed.testing.increase.without.covid *
                            (1-(1-max.covid.effect.undiagnosed.testing.rr.increase) * covid.on *
                               (1-undiagnosed.testing.rr.mobility.correlation+
                                  (undiagnosed.testing.rr.mobility.correlation*covid.mobility.change)))), 
-                       scale = 'ratio')
+                       scale = 'non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'undiagnosed.testing.rr.without.covid',
-                       get.functional.form.function = get.undiagnosed.testing.rr.functional.form, 
-                       scale = 'ratio')
+                       name = 'undiagnosed.testing.increase.without.covid',
+                       get.functional.form.function = get.undiagnosed.testing.increase.functional.form, 
+                       scale = 'non.negative.number')
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'testing.of.undiagnosed',
-                        value = expression(general.population.testing*undiagnosed.testing.rr))
+                        value = expression(general.population.testing*(1+undiagnosed.testing.increase)))
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'max.covid.effect.testing.reduction',
@@ -818,11 +817,30 @@ register.transmission(EHE.SPECIFICATION,
 ##-- Susceptibility --##
 ##--------------------##
 
-register.model.element(EHE.SPECIFICATION,
+register.model.quantity(EHE.SPECIFICATION,
                        name = 'proportion.of.sexual.transmissions.in.prep.eligible',
                        scale = 'proportion',
-                       value = 0.9) # want to come up with a better number for this; maybe by risk group 
-  
+                       value = expression(1/(1+exp(-( # expit because this will be a logit normal distribution
+                         # mean + (z score*standard dev)
+                         logit.mean.proportion.prep.eligible + 
+                           prep.fraction.sexual.transmission.avoidable.z*logit.sd.proportion.prep.eligible)  
+                         )))) 
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'logit.mean.proportion.prep.eligible',
+                       value = get.fraction.sexual.transmission.avoidable.with.prep.logit.means(),
+                       scale='ratio')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'logit.sd.proportion.prep.eligible',
+                       value = get.fraction.sexual.transmission.avoidable.with.prep.logit.sds(),
+                       scale='non.negative.number') # CORRECT?
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'prep.fraction.sexual.transmission.avoidable.z',
+                       value = 0,
+                       scale='non.negative.number') # CORRECT?
+
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.susceptibility',
                         value = expression( sexual.susceptibility.without.covid * sexual.susceptibility.covid.multiplier)

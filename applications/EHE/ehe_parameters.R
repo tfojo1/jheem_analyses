@@ -303,6 +303,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     
     testing.ramp.up.vs.current.rr = Lognormal.Distribution(log(0.5), 0.25*log(2), upper = 1),
     
+    msm.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    heterosexual.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    idu.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    
     
     #-- PrEP --#
     
@@ -335,7 +339,8 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6378757/
     # with Wald CI inflated 10x
     
-    
+    prep.fraction.sexual.transmission.avoidable.z = Normal.Distribution(0,1),
+
     #-- Proportion MSM --#
     proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
     
@@ -738,16 +743,25 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   acute.transmissibility = c('acute.transmissibility.rr',
                              'global.trate'),
   
-  msm.heterosexual.testing = c(
+# = Normal.Distribution(0,1),
+
+
+  msm.testing = c(
     'msm.proportion.tested.or',
     'msm.proportion.tested.slope.or',
-    'heterosexual.proportion.tested.or',
-    'heterosexual.proportion.tested.slope.or'
+    'msm.undiagnosed.testing.increase.rr'
   ),
   
+  heterosexual.testing = c(
+    'heterosexual.proportion.tested.or',
+    'heterosexual.proportion.tested.slope.or',
+    'heterosexual.undiagnosed.testing.increase.rr'
+  ),
+
   idu.testing = c(
     'idu.proportion.tested.or',
-    'idu.proportion.tested.slope.or'
+    'idu.proportion.tested.slope.or',
+    'idu.undiagnosed.testing.increase.rr'
   ),
   
   msm.idu.testing = c(
@@ -780,6 +794,9 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'heterosexual.prep.slope.or'
   ),
   
+  prep.fraction.avoidable = c(
+    'prep.fraction.sexual.transmission.avoidable.z'),
+
   prep.by.race = c('black.prep.or',
                    'hispanic.prep.or',
                    'prep.efficacy.z'),
