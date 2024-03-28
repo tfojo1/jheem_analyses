@@ -1561,6 +1561,10 @@ get.undiagnosed.testing.covid.rrr <- function(specification.metadata){
   
 }
 
+##----------##
+##-- PrEP --##
+##----------##
+
 get.fraction.sexual.transmission.avoidable.logit.parameter <- function(get.mean=T)
 {  
   # values from ~../jheem_analyses/input_managers/fraction_preventable_with_prep.R
@@ -1579,31 +1583,4 @@ get.fraction.sexual.transmission.avoidable.logit.parameter <- function(get.mean=
     array(c(het.param, het.param, het.param),
           dim = c(sex=3),
           dimnames = list(sex=c("heterosexual_male","msm","female")))
-}
-
-# will eventually have to put below on the logit scale to keep bounded between 0 and 1
-get.fraction.sexual.transmission.avoidable.with.prep.logit.means = function(){
-  # values from ~../jheem_analyses/input_managers/fraction_preventable_with_prep.R
-  # MSM: >1 partner in the past year & condomless sex
-  # msm.mean = 0.9529412
-  # msm.sd =  0.02296911
-  # 
-  # Heterosexual: STI in the past year
-  # het.mean = 0.3447421
-  # het.sd =  0.08971986
-  
-  rv = array(c(0.3447421,0.9529412,0.3447421),
-             dim = c(sex=3),
-             dimnames = list(sex=c("heterosexual_male","msm","female")))
-  
-}
-
-
-get.fraction.sexual.transmission.avoidable.with.prep.logit.sds = function(){
-
-  
-  rv = array(c(0.08971986,0.02296911,0.08971986),
-             dim = c(sex=3),
-             dimnames = list(sex=c("heterosexual_male","msm","female")))
-  
 }
