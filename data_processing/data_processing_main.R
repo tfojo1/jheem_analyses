@@ -1578,6 +1578,25 @@ source('../jheem2/R/HELPERS_array_helpers.R')
                             source.for.denominator= 'cdc.hiv',
                             ontology.for.denominator= 'cdc') 
  
+ #Aggregating STI data
+ put.msa.data.as.new.source(outcome = 'gonorrhea',
+                            from.source.name = 'cdc.sti',
+                            to.source.name = 'cdc.aggregated.county',
+                            to.locations =  MSAS.OF.INTEREST,  
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager = surveillance.manager)
+ 
+ put.msa.data.as.new.source(outcome = 'ps.syphilis',
+                            from.source.name = 'cdc.sti',
+                            to.source.name = 'cdc.aggregated.county',
+                            to.locations =  MSAS.OF.INTEREST,  
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager = surveillance.manager)
+ 
  ################################################################################
  ###Put- Sum deaths by county into deaths by MSA using this code/function
  ################################################################################
