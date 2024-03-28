@@ -210,7 +210,8 @@ EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
     proportion.msm = get.best.guess.msm.proportions(location,
                                                     specification.metadata = specification.metadata,
                                                     keep.age = any(names(dim(arr))=='age'),
-                                                    keep.race = any(names(dim(arr))=='race'))
+                                                    keep.race = any(names(dim(arr))=='race'),
+                                                    ages = dimnames(arr)$age)
     # sex.partition.arr = get.best.guess.msm.proportions.by.race(location,
     #                                                            specification.metadata = specification.metadata,
     #                                                            years = DEFAULT.POPULATION.YEARS,
@@ -224,6 +225,7 @@ EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
     
     sex.modified = array.access(arr, sex.partition.dimnames)
     sex.modified = sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
+    
     array.access(arr, dimnames(sex.modified)) = sex.modified
   }
   arr
