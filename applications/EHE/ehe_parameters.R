@@ -341,6 +341,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     
     prep.fraction.sexual.transmission.avoidable.z = Normal.Distribution(0,1),
 
+    msm.prep.indications.or = Lognormal.Distribution(0, 0.5*log(4)), 
+    non.msm.prep.indications.or = Lognormal.Distribution(0, 0.5*log(4)),
+    prep.indications.slope.or = Lognormal.Distribution(0, 0.5*log(4)/5),
+    
     #-- Proportion MSM --#
     proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
     

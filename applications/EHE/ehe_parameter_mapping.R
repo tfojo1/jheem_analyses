@@ -234,6 +234,29 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                                 dimensions = 'all')
 
 
+    # PrEP Indications
+    set.element.functional.form.main.effect.alphas(model.settings = model.settings,
+                                                   element.name = 'prep.indication.without.covid',
+                                                   alpha.name = 'intercept',
+                                                   values = parameters['msm.prep.indications.or'],
+                                                   applies.to.dimension.values = 'msm',
+                                                   dimensions = 'sex')
+    
+    set.element.functional.form.main.effect.alphas(model.settings = model.settings,
+                                                   element.name = 'prep.indication.without.covid',
+                                                   alpha.name = 'intercept',
+                                                   values = parameters['non.msm.prep.indications.or'],
+                                                   applies.to.dimension.values = c('heterosexual_male','female'),
+                                                   dimensions = 'sex')
+    
+    set.element.functional.form.main.effect.alphas(model.settings = model.settings,
+                                                   element.name = 'prep.indication.without.covid',
+                                                   alpha.name = 'slope',
+                                                   values = parameters['prep.indications.slope.or'],
+                                                   applies.to.dimension.values = 'all',
+                                                   dimensions = 'all')
+    
+    
     #-- Proportion MSM of Male --#
     
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'proportion.msm.of.male',
