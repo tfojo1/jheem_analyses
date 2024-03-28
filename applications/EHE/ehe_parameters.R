@@ -788,18 +788,21 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   msm.prep = c(
     'msm.prep.intercept.or',
-    'msm.prep.slope.or'#,
+    'msm.prep.slope.or',
+    'msm.prep.indications.or'
    # 'oral.prep.persistence'
   ),
   
   non.msm.prep = c(
     'non.msm.prep.intercept.or',
     'idu.prep.slope.or',
-    'heterosexual.prep.slope.or'
+    'heterosexual.prep.slope.or',
+    'non.msm.prep.indications.or'
   ),
   
-  prep.fraction.avoidable = c(
-    'prep.fraction.sexual.transmission.avoidable.z'),
+  prep.eligible.and.indications = c(
+    'prep.fraction.sexual.transmission.avoidable.z',
+    'prep.indications.slope.or'),
 
   prep.by.race = c('black.prep.or',
                    'hispanic.prep.or',
