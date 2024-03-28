@@ -7,6 +7,11 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
 {
     specification.metadata = model.settings$specification.metadata
     
+    idu.states = specification.metadata$compartment.aliases$active.idu.states
+    names(idu.states) = rep("risk", length(idu.states))
+    non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
+    names(non.idu.states) = rep("risk", length(non.idu.states))
+    
     #-- Birth rates --#
     for(race in specification.metadata$dim.names$race){
       set.element.functional.form.main.effect.alphas(model.settings,
@@ -133,21 +138,21 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                          values = parameters['testing.ramp.up.vs.current.rr'] * c(TESTING.FIRST.YEAR.FRACTION.OF.RAMP,1),
                                          indices = 2:3)
     
-    set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = "undiagnosed.testing.increase",
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "undiagnosed.testing.increase.without.covid",
                                                    alpha.name = "value",
                                                    value = parameters["msm.undiagnosed.testing.increase.rr"],
                                                    applies.to.dimension.values=list(sex="msm"))
     
     set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = "undiagnosed.testing.increase",
+                                                   element.name = "undiagnosed.testing.increase.without.covid",
                                                    alpha.name = "value",
                                                    value = parameters["heterosexual.undiagnosed.testing.increase.rr"],
                                                    applies.to.dimension.values=list(sex=c("female","heterosexual_male"),
                                                                                     risk = non.idu.states))
     
     set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = "undiagnosed.testing.increase",
+                                                   element.name = "undiagnosed.testing.increase.without.covid",
                                                    alpha.name = "value",
                                                    value = parameters["idu.undiagnosed.testing.increase.rr"],
                                                    applies.to.dimension.values=list(sex=c("female","heterosexual_male"),
@@ -175,14 +180,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                        dimensions.with.values.referred.to.by.name = 'race',
                                                        dimensions.with.values.referred.to.by.index = 'age')
     
-    
-    # parameters for PrEP x sex/risk
-    idu.states = specification.metadata$compartment.aliases$active.idu.states
-    names(idu.states) = rep("risk", length(idu.states))
-    non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
-    names(non.idu.states) = rep("risk", length(non.idu.states))
-    
-    
+
     # Intercepts (only for msm vs non-msm)
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'oral.prep.uptake.without.covid',
                                                                 alpha.name = 'intercept',

@@ -829,7 +829,7 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'logit.mean.proportion.prep.eligible',
                        value = get.fraction.sexual.transmission.avoidable.logit.parameter(get.mean = T),
-                       scale='non.negative.number')
+                       scale='number')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'logit.sd.proportion.prep.eligible',
@@ -839,7 +839,7 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'prep.fraction.sexual.transmission.avoidable.z',
                        value = 0,
-                       scale='non.negative.number') 
+                       scale='number') 
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.susceptibility',

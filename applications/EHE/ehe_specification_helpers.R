@@ -1580,7 +1580,7 @@ get.fraction.sexual.transmission.avoidable.logit.parameter <- function(get.mean=
     msm.param = get.approx.logitnorm.params(expit.mean = 0.9529412,
                                             expit.sd = 0.02296911)[c(get.mean, !get.mean)][[1]]
     
-    array(c(het.param, het.param, het.param),
+    array(c(het.param, msm.param, het.param),
           dim = c(sex=3),
           dimnames = list(sex=c("heterosexual_male","msm","female")))
 }
