@@ -828,12 +828,12 @@ register.model.quantity(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'logit.mean.proportion.prep.eligible',
-                       value = get.fraction.sexual.transmission.avoidable.with.prep.logit.means(),
+                       value = get.fraction.sexual.transmission.avoidable.logit.parameter(get.mean = T),
                        scale='ratio')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'logit.sd.proportion.prep.eligible',
-                       value = get.fraction.sexual.transmission.avoidable.with.prep.logit.sds(),
+                       value = get.fraction.sexual.transmission.avoidable.logit.parameter(get.mean = F),
                        scale='non.negative.number') # CORRECT?
 
 register.model.element(EHE.SPECIFICATION,

@@ -1522,7 +1522,7 @@ get.testing.functional.form = function(specification.metadata){
 get.undiagnosed.testing.increase.functional.form <- function(specification.metadata){
   
   multipliers = get.undiagnosed.testing.rr(specification.metadata = specification.metadata) 
-  if(any(mulipliers<=1))
+  if(any(multipliers<=1))
     stop("Error in get.undiagnosed.testing.increase.functional.form must be >1")
   
   # do this so that when we sample the multiplier, we're actually sampling a multiplier of how much greater than 1 it is 
@@ -1561,6 +1561,26 @@ get.undiagnosed.testing.covid.rrr <- function(specification.metadata){
   
 }
 
+get.fraction.sexual.transmission.avoidable.logit.parameter <- function(get.mean=T)
+{  
+  # values from ~../jheem_analyses/input_managers/fraction_preventable_with_prep.R
+
+   # Heterosexual: STI in the past year
+  # het.mean = 0.3447421
+  # het.sd =  0.08971986
+    het.param = get.approx.logitnorm.params(expit.mean = 0.3447421,
+                                            expit.sd = 0.08971986)[c(get.mean, !get.mean)][[1]]
+    # MSM: >1 partner in the past year & condomless sex
+    # msm.mean = 0.9529412
+    # msm.sd =  0.02296911
+    msm.param = get.approx.logitnorm.params(expit.mean = 0.9529412,
+                                            expit.sd = 0.02296911)[c(get.mean, !get.mean)][[1]]
+    
+    array(c(het.param, het.param, het.param),
+          dim = c(sex=3),
+          dimnames = list(sex=c("heterosexual_male","msm","female")))
+}
+
 # will eventually have to put below on the logit scale to keep bounded between 0 and 1
 get.fraction.sexual.transmission.avoidable.with.prep.logit.means = function(){
   # values from ~../jheem_analyses/input_managers/fraction_preventable_with_prep.R
@@ -1580,14 +1600,7 @@ get.fraction.sexual.transmission.avoidable.with.prep.logit.means = function(){
 
 
 get.fraction.sexual.transmission.avoidable.with.prep.logit.sds = function(){
-  # values from ~../jheem_analyses/input_managers/fraction_preventable_with_prep.R
-  # MSM: >1 partner in the past year & condomless sex
-  # msm.mean = 0.9529412
-  # msm.sd =  0.02296911
-  # 
-  # Heterosexual: STI in the past year
-  # het.mean = 0.3447421
-  # het.sd =  0.08971986
+
   
   rv = array(c(0.08971986,0.02296911,0.08971986),
              dim = c(sex=3),
