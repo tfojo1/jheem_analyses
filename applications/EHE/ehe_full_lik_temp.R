@@ -39,16 +39,16 @@ for (i in 1:length(likelihoods)) {
 }
 
 
+problem.likelihoods = list("hiv.test.positivity" = hiv.test.positivity.likelihood.instructions,
+                           "proportion.tested" = proportion.tested.likelihood.instructions)
+
+for (i in 1:length(problem.likelihoods)) {
+  print(paste0("testing ",names(problem.likelihoods)[i]," likelihood"))
+  lik = problem.likelihoods[[i]]$instantiate.likelihood('ehe',"C.12580")
+  print(lik$compute(sim))
+}
+
 if(1==2){
-  
-  problem.likelihoods = list("hiv.test.positivity" = hiv.test.positivity.likelihood.instructions,
-                             "proportion.tested" = proportion.tested.likelihood.instructions)
-  
-  for (i in 1:length(problem.likelihoods)) {
-    print(paste0("testing ",names(problem.likelihoods)[i]," likelihood"))
-    lik = problem.likelihoods[[i]]$instantiate.likelihood('ehe',"C.12580")
-    print(lik$compute(sim))
-  }
   
   FULL.likelihood.instructions =  join.likelihood.instructions(# POPULATION LIKELIHOODS
                                                              population.likelihood.instructions, 

@@ -1,7 +1,7 @@
-#source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
+source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
-LOCATION = SEATTLE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.POPULATION # or CALIBRATION.CODE.TRANSMISSION
+LOCATION = BALTIMORE.MSA 
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION  # or CALIBRATION.CODE.POPULATION
 
 set.seed(12345)
 
@@ -40,5 +40,8 @@ print(paste0("DONE RUNNING MCMC: Took ",
 
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
-save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-# save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TRANSMISSION){
+  save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POPULATION){
+  save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else stop("invalid calibration code")
