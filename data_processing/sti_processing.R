@@ -99,6 +99,10 @@ data.list.sti.clean = lapply(data.list.sti, function(file){
   list(filename, data)
 })
 
+#Assign names to data list
+sti.file.names = file_path_sans_ext(basename(sti_files), compression = FALSE)
+names(data.list.sti.clean) = sti.file.names
+
 ################################################################################
                ###Clean Early Syphilis Data###
 ################################################################################
