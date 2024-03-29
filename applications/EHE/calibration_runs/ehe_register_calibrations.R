@@ -116,13 +116,12 @@ register.calibration.info(CALIBRATION.CODE.FULL,
                           likelihood.instructions = FULL.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, # CORRECT? 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
                           n.iter = N.ITER.FULL, # 40,000
-                          thin = 50, 
+                          thin = 200, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.POPULATION, # CORRECT TO INCLUDE THESE?
-                                                          CALIBRATION.CODE.TRANSMISSION),
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
                           description = "A first test of the full likelihood"
 )

@@ -414,6 +414,71 @@ cocaine.likelihood.instructions =
                                                    equalize.weight.by.year = T 
   )
 
+#-- PROPORTION TESTED --#
+proportion.tested.likelihood.instructions =
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
+                                                   outcome.for.sim = "proportion.general.population.tested",
+                                                   denominator.outcome.for.data = "adult.population",
+                                                   
+                                                   location.types = c('STATE','CBSA'),
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = c("age","sex","race","risk"),
+                                                   levels.of.stratification = c(0,1),
+                                                   from.year = as.integer(2008),
+                                                   
+                                                   p.bias.inside.location = 0, 
+                                                   p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                   p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry',
+                                                   measurement.error.sd = 0.03,
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(1),
+                                                   equalize.weight.by.year = T
+  )
+
+
+#-- HIV TEST POSITIVITY --#
+hiv.test.positivity.likelihood.instructions =
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "hiv.test.positivity",
+                                                   outcome.for.sim = "hiv.test.positivity",
+                                                   denominator.outcome.for.data = "hiv.tests",
+                                                   outcome.for.n.multipliers = 'adult.population',
+                                                   #"total.hiv.tests",
+                                                   
+                                                   location.types = c('STATE','CBSA'),
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = character(),
+                                                   levels.of.stratification = c(0),
+                                                   from.year = as.integer(2008),
+                                                   redundant.location.threshold = 0,
+                                                   
+                                                   p.bias.inside.location = 0, 
+                                                   p.bias.outside.location = hiv.test.positivity.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = hiv.test.positivity.bias.estimates$out.sd,
+                                                   p.bias.sd.outside.location = hiv.test.positivity.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry',
+                                                   measurement.error.sd = 0.03,
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(1),
+                                                   equalize.weight.by.year = T
+  )
+
+
 
 #-- JOIN THE FULL LIKELIHOOD  --#
 FULL.likelihood.instructions =  join.likelihood.instructions(
@@ -432,8 +497,8 @@ FULL.likelihood.instructions =  join.likelihood.instructions(
   aids.deaths.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
-  #proportion.tested.likelihood.instructions,
-  #hiv.test.positivity.likelihood.instructions, # does this one work?
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
   awareness.likelihood.instructions,
   suppression.likelihood.instructions,
   
@@ -445,81 +510,6 @@ FULL.likelihood.instructions =  join.likelihood.instructions(
   heroin.likelihood.instructions,
   cocaine.likelihood.instructions
 )
-
-# LIKELIHOOD COMPONENT STILL NOT WORKING
-if(1==2){
-  #-- PROPORTION TESTED --#
-  proportion.tested.likelihood.instructions =
-    create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
-                                                     outcome.for.sim = "proportion.general.population.tested",
-                                                     denominator.outcome.for.data = "adult.population",
-                                                     
-                                                     location.types = c('STATE','CBSA'),
-                                                     minimum.geographic.resolution.type = 'COUNTY',
-                                                     
-                                                     dimensions = c("age","sex","race","risk"),
-                                                     levels.of.stratification = c(0,1),
-                                                     from.year = as.integer(2008),
-                                                     
-                                                     p.bias.inside.location = 0, 
-                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
-                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
-                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
-                                                     
-                                                     within.location.p.error.correlation = 0.5,
-                                                     within.location.n.error.correlation = 0.5,
-                                                     
-                                                     observation.correlation.form = 'compound.symmetry',
-                                                     measurement.error.sd = 0.03,
-                                                     
-                                                     partitioning.function = EHE.PARTITIONING.FUNCTION, 
-                                                     
-                                                     weights = list(1),
-                                                     equalize.weight.by.year = T
-    )
-  
-  prop.tested.lik = proportion.tested.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
-  
-  #-- HIV TEST POSITIVITY --#
-  hiv.test.positivity.likelihood.instructions =
-    create.nested.proportion.likelihood.instructions(outcome.for.data = "hiv.test.positivity",
-                                                     outcome.for.sim = "hiv.test.positivity",
-                                                     denominator.outcome.for.data = "hiv.tests",
-                                                     outcome.for.n.multipliers = 'adult.population',
-                                                     #"total.hiv.tests",
-                                                     
-                                                     location.types = c('STATE','CBSA'),
-                                                     minimum.geographic.resolution.type = 'COUNTY',
-                                                     
-                                                     dimensions = character(),
-                                                     levels.of.stratification = c(0),
-                                                     from.year = as.integer(2008),
-                                                     redundant.location.threshold = 0,
-                                                     
-                                                     p.bias.inside.location = 0, 
-                                                     p.bias.outside.location = hiv.test.positivity.bias.estimates$out.mean,
-                                                     p.bias.sd.inside.location = hiv.test.positivity.bias.estimates$out.sd,
-                                                     p.bias.sd.outside.location = hiv.test.positivity.bias.estimates$out.sd,
-                                                     
-                                                     within.location.p.error.correlation = 0.5,
-                                                     within.location.n.error.correlation = 0.5,
-                                                     
-                                                     observation.correlation.form = 'compound.symmetry',
-                                                     measurement.error.sd = 0.03,
-                                                     
-                                                     partitioning.function = EHE.PARTITIONING.FUNCTION, 
-                                                     
-                                                     weights = list(1),
-                                                     equalize.weight.by.year = T
-    )
-  
-  hiv.test.positivity.lik = hiv.test.positivity.likelihood.instructions$instantiate.likelihood('ehe', 'C.12580')
-  hiv.test.positivity.lik$compute(sim)
-  
-  
-  
-
-  }
 
 
 
