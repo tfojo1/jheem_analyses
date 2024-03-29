@@ -181,3 +181,81 @@ for (data in early_syphilis_data) {
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Reporting')
 }
+
+################################################################################
+##Calculating year over year ratio for STI data (by county only)
+################################################################################
+# 
+# list.for.ratio.calculation <- data.list.sti.clean[grep("county", names(data.list.sti.clean))] 
+# 
+# county.ratio.total <- list.for.ratio.calculation[grep("total", names(list.for.ratio.calculation))]
+# county.ratio.total <- rbind(county.ratio.total [[1]][[2]], county.ratio.total [[2]][[2]]) 
+# 
+# county.ratio.sex <- list.for.ratio.calculation[grep("sex", names(list.for.ratio.calculation))]
+# county.ratio.sex <- rbind(county.ratio.sex [[1]][[2]], county.ratio.sex [[2]][[2]]) 
+# 
+# county.ratio.race <- list.for.ratio.calculation[grep("race", names(list.for.ratio.calculation))]
+# county.ratio.race <- rbind(county.ratio.race [[1]][[2]], county.ratio.race [[2]][[2]]) 
+# 
+# county.ratio.age <- list.for.ratio.calculation[grep("age", names(list.for.ratio.calculation))]
+# county.ratio.age <- rbind(county.ratio.age [[1]][[2]], county.ratio.age [[2]][[2]]) 
+# 
+# county.ratio.total  <- county.ratio.total %>%
+#   mutate(year = as.numeric(year))%>%
+#   group_by(location,outcome)%>%
+#   arrange(year, .by_group = T)%>%
+#   mutate(year.over.year=value/lag(value,1)) %>%
+#   filter(!is.na(year.over.year))%>% #Remove rows without a year over year value (so 2018 bc it's the first year)
+#   select(outcome, location, year, year.over.year)%>%
+#   rename(value = year.over.year) #Need to figure out how to handle years that have zero cases bc calculation is 10/0 which returns 'inf'
+# 
+# county.ratio.sex  <- county.ratio.sex %>%
+#   mutate(year = as.numeric(year))%>%
+#   filter(!is.na(value))%>% #beacuse this is so stratified there are certain rows where value = NA bc the 'data is not available'
+#   group_by(location,outcome, sex)%>%
+#   arrange(year, .by_group = T)%>%
+#   mutate(year.over.year=value/lag(value,1)) %>%
+#   filter(!is.na(year.over.year))%>% #Remove rows without a year over year value (so 2018 bc it's the first year)
+#   select(outcome, location, year, sex, year.over.year)%>%
+#   rename(value = year.over.year) #Need to figure out how to handle years that have zero cases bc calculation is 10/0 which returns 'inf'
+# 
+# county.ratio.race  <- county.ratio.race %>%
+#   mutate(year = as.numeric(year))%>%
+#   filter(!is.na(value))%>% 
+#   group_by(location,outcome, race)%>%
+#   arrange(year, .by_group = T)%>%
+#   mutate(year.over.year=value/lag(value,1)) %>%
+#   filter(!is.na(year.over.year))%>% 
+#   select(outcome, location, year, race, year.over.year)%>%
+#   rename(value = year.over.year) 
+# 
+# county.ratio.age  <- county.ratio.age %>%
+#   mutate(year = as.numeric(year))%>%
+#   filter(!is.na(value))%>% 
+#   group_by(location,outcome, age)%>%
+#   arrange(year, .by_group = T)%>%
+#   mutate(year.over.year=value/lag(value,1)) %>%
+#   filter(!is.na(year.over.year))%>% 
+#   select(outcome, location, year, age, year.over.year)%>%
+#   rename(value = year.over.year) 
+# 
+# ##Put into data manager##
+# sti.county.ratios = list(
+#   "df.total" = county.ratio.total, 
+#   "df.age" = county.ratio.sex,
+#   "df.race" = county.ratio.race, 
+#   "df.age" = county.ratio.age)
+# 
+# 
+# #PUT INTO DATA MANAGER
+# for (data in sti.county.ratios) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'cdc.sti',
+#     source = 'cdc.sti',
+#     dimension.values = list(),
+#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+#     details = 'CDC Reporting')
+# }
+
