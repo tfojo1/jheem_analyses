@@ -415,6 +415,36 @@ cocaine.likelihood.instructions =
   )
 
 
+#-- JOIN THE FULL LIKELIHOOD  --#
+FULL.likelihood.instructions =  join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # MORTALITY LIKELIHOODS
+  hiv.mortality.likelihood.instructions,
+  general.mortality.likelihood.instructions,
+  aids.deaths.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  #proportion.tested.likelihood.instructions,
+  #hiv.test.positivity.likelihood.instructions, # does this one work?
+  awareness.likelihood.instructions,
+  suppression.likelihood.instructions,
+  
+  # PREP LIKELIHOODS
+  prep.uptake.likelihood.instructions,
+  prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions,
+  cocaine.likelihood.instructions
+)
 
 # LIKELIHOOD COMPONENT STILL NOT WORKING
 if(1==2){

@@ -28,8 +28,8 @@ likelihoods =  list(# POPULATION LIKELIHOODS
   "prep.indications" = prep.indications.likelihood.instructions,
   
   # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
+  "heroin" = heroin.likelihood.instructions,
+  "cocaine" = cocaine.likelihood.instructions
 )
 
 for (i in 1:length(likelihoods)) {
