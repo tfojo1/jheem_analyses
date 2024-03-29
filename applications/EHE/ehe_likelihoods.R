@@ -485,6 +485,7 @@ if(1==2){
     create.nested.proportion.likelihood.instructions(outcome.for.data = "hiv.test.positivity",
                                                      outcome.for.sim = "hiv.test.positivity",
                                                      denominator.outcome.for.data = "hiv.tests",
+                                                     outcome.for.n.multipliers = 'adult.population',
                                                      #"total.hiv.tests",
                                                      
                                                      location.types = c('STATE','CBSA'),
@@ -493,6 +494,7 @@ if(1==2){
                                                      dimensions = character(),
                                                      levels.of.stratification = c(0),
                                                      from.year = as.integer(2008),
+                                                     redundant.location.threshold = 0,
                                                      
                                                      p.bias.inside.location = 0, 
                                                      p.bias.outside.location = hiv.test.positivity.bias.estimates$out.mean,
