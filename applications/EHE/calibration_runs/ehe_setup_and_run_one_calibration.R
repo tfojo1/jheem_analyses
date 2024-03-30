@@ -1,7 +1,10 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 LOCATION = BALTIMORE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION  # or CALIBRATION.CODE.POPULATION
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL   # CALIBRATION.CODE.POPULATION, 
+                                                          # CALIBRATION.CODE.TRANSMISSION
+                                                          # CALIBRATION.CODE.FULL
+                                                          # CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED.AND.POSITIVITY
 
 set.seed(12345)
 
@@ -44,4 +47,9 @@ if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TRANSMISSION){
   save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POPULATION){
   save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL){
+  save(sim,file=paste0("prelim_results/init.full.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED.AND.POSITIVITY){
+  save(sim,file=paste0("prelim_results/init.full.minus.two.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else stop("invalid calibration code")
+

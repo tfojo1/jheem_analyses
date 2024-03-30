@@ -6,6 +6,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 CALIBRATION.CODE.FULL = 'init.full.ehe'
+CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED.AND.POSITIVITY = 'init.full.minus.two.ehe'
 N.ITER = 20000
 N.ITER.FULL = 40000
 
@@ -114,6 +115,22 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
 #-- REGISTER FULL CALIBRATION  --#
 register.calibration.info(CALIBRATION.CODE.FULL,
                           likelihood.instructions = FULL.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, # 40,000
+                          thin = 200, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "A first test of the full likelihood"
+)
+
+
+#-- REGISTER FULL CALIBRATION, WITHOUT PROPORTION TESTED AND TEST POSITIVITY  --#
+register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED.AND.POSITIVITY,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.two,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
