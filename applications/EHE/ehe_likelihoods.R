@@ -513,8 +513,8 @@ FULL.likelihood.instructions =  join.likelihood.instructions(
 )
 
 
-#-- JOIN THE FULL LIKELIHOOD, WITHOUT PROPORTION.TESTED AND HIV.TEST.POSITIVITY  --#
-FULL.likelihood.instructions.minus.two = join.likelihood.instructions(
+#-- JOIN THE FULL LIKELIHOOD, WITHOUT PROPORTION.TESTED  --#
+FULL.likelihood.instructions.minus.one = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -530,8 +530,8 @@ FULL.likelihood.instructions.minus.two = join.likelihood.instructions(
   aids.deaths.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
-  #proportion.tested.likelihood.instructions, WITHOUT THESE TWO
-  #hiv.test.positivity.likelihood.instructions, 
+  #proportion.tested.likelihood.instructions, WITHOUT THIS ONE
+  hiv.test.positivity.likelihood.instructions, 
   awareness.likelihood.instructions,
   suppression.likelihood.instructions,
   

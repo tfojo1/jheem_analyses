@@ -6,7 +6,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 CALIBRATION.CODE.FULL = 'init.full.ehe'
-CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED.AND.POSITIVITY = 'init.full.minus.two.ehe'
+CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED = 'init.full.minus.one.ehe'
 N.ITER = 20000
 N.ITER.FULL = 40000
 
@@ -129,8 +129,8 @@ register.calibration.info(CALIBRATION.CODE.FULL,
 
 
 #-- REGISTER FULL CALIBRATION, WITHOUT PROPORTION TESTED AND TEST POSITIVITY  --#
-register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED.AND.POSITIVITY,
-                          likelihood.instructions = FULL.likelihood.instructions.minus.two,
+register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.one,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
