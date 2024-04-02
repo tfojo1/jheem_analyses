@@ -246,8 +246,8 @@ suppression.likelihood.instructions =
                                                    minimum.geographic.resolution.type = 'COUNTY',
                                                    # limit.to.n.location
                                                    
-                                                   # dimensions = c("age","sex","race","risk"),
-                                                   dimensions = c("sex"),
+                                                   dimensions = c("age","sex","race","risk"),
+                                                   #dimensions = c("sex"),
                                                    levels.of.stratification = c(0,1), 
                                                    from.year = 2008, 
                                                    
