@@ -544,3 +544,47 @@ FULL.likelihood.instructions.minus.one = join.likelihood.instructions(
   cocaine.likelihood.instructions
 )
 
+#-- COVID LIKELIHOOD  --#
+if(1==2){
+  
+  # using nested proportion or basic likelihood with a backup location? think about this - Andrew
+  number.of.tests.year.on.year.change.likelihood.instructions = 
+    create.time.lagged.comparsion.likelihood.instructions(outcome.for.data = "hiv.tests",
+                                                          outcome.for.sim = "total.hiv.tests",
+                                                          levels.of.stratification = c(0), 
+                                                          from.year = 2008, 
+                                                          observation.correlation.form = 'compound.symmetry', 
+                                                          measurement.error.coefficient.of.variance = 0.03, # pick a smarter one
+                                                          weights = list(1), 
+                                                          equalize.weight.by.year = T 
+    )
+  
+  gonorrhea.year.on.year.change.likelihood.instructions = 
+    create.time.lagged.comparsion.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", # zoe working on this
+                                                          #outcome.for.sim = "sexual.transmission", # we have to define this outcome
+                                                          # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
+                                                          # (2020 sexual transmisson/2019 sexual transmission)
+                                                          levels.of.stratification = c(0), 
+                                                          from.year = 2008, 
+                                                          observation.correlation.form = 'compound.symmetry', 
+                                                          measurement.error.coefficient.of.variance = 0.03,# pick a smarter one
+                                                          weights = list(1), 
+                                                          equalize.weight.by.year = T 
+    )
+  
+  ps.syphilis.year.on.year.change.likelihood.instructions = 
+    create.time.lagged.comparsion.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # zoe working on this
+                                                          #outcome.for.sim = "sexual.transmission", # we have to define this outcome
+                                                          # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
+                                                          # (2020 sexual transmisson/2019 sexual transmission)
+                                                          levels.of.stratification = c(0), 
+                                                          from.year = 2008, 
+                                                          observation.correlation.form = 'compound.symmetry', 
+                                                          measurement.error.coefficient.of.variance = 0.03,# pick a smarter one
+                                                          weights = list(1), 
+                                                          equalize.weight.by.year = T 
+    )
+  
+}
+
+
