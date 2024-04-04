@@ -1,7 +1,7 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 LOCATION = BALTIMORE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL   # CALIBRATION.CODE.POPULATION, 
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TEST   # CALIBRATION.CODE.POPULATION, 
                                                           # CALIBRATION.CODE.TRANSMISSION
                                                           # CALIBRATION.CODE.FULL
                                                           # CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION
