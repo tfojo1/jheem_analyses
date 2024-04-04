@@ -269,7 +269,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
 ###############################################################################
 ##Separate into lists for population and deaths now that parent source is different
 ###############################################################################
-data.list.county.pop.00.22 = lapply(data.list.county, function(file){
+data.list.county.pop.00.23 = lapply(data.list.county, function(file){
   
   data=file[[2]]
   filename = file[[1]]
@@ -281,7 +281,7 @@ data= as.data.frame(data)
 list(filename, data) #what to return# 
 })
 
-data.list.county.deaths.00.22 = lapply(data.list.county, function(file){
+data.list.county.deaths.00.23 = lapply(data.list.county, function(file){
   
   data=file[[2]]
   filename = file[[1]]
@@ -299,7 +299,7 @@ data.list.county.deaths.00.22 = lapply(data.list.county, function(file){
 ################################################################################  
 
 #County POPULATION Values
-county_pop = lapply(data.list.county.pop.00.22, `[[`, 2)
+county_pop = lapply(data.list.county.pop.00.23, `[[`, 2)
 
 for (data in county_pop) {
   
@@ -314,7 +314,7 @@ for (data in county_pop) {
 
 
 #County DEATH Values
-county_deaths = lapply(data.list.county.deaths.00.22, `[[`, 2)
+county_deaths = lapply(data.list.county.deaths.00.23, `[[`, 2)
 
 for (data in county_deaths) {
   
