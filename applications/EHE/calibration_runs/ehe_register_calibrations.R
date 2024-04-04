@@ -1,7 +1,7 @@
 print("SOURCING CODE")
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R')
+#source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
