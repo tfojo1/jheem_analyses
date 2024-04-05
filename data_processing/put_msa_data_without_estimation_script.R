@@ -79,24 +79,24 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                     else 1:dim(data.from.locs.only)[[d]]
                 })
                 # browser()
-                data.from.locs.only = do.call('[', c(list(data.from.locs.only), subset.by.locs.arguments, list(drop=F)))
-                url.from.locs.only = do.call('[', c(list(url.from.locs.only), subset.by.locs.arguments, list(drop=F)))
-                details.from.locs.only = do.call('[', c(list(details.from.locs.only), subset.by.locs.arguments, list(drop=F)))
+                data.from.this.location.only = do.call('[', c(list(data.from.locs.only), subset.by.locs.arguments, list(drop=F)))
+                url.from.this.location.only = do.call('[', c(list(url.from.locs.only), subset.by.locs.arguments, list(drop=F)))
+                details.from.this.location.only = do.call('[', c(list(details.from.locs.only), subset.by.locs.arguments, list(drop=F)))
                 
                 # Convert url and details to their character forms
-                url.from.locs.only = census.manager$unhash.url(url.from.locs.only)
-                details.from.locs.only = census.manager$unhash.details(details.from.locs.only)
+                url.from.this.location.only = census.manager$unhash.url(url.from.this.location.only)
+                details.from.this.location.only = census.manager$unhash.details(details.from.this.location.only)
                 
                 # Details and URL should be the same for all data, but check just in case they aren't
-                url = url.from.locs.only[[1]]
-                details = details.from.locs.only[[1]]
-                if (any(sapply(details.from.locs.only, function(x) {!identical(x, details) && !is.null(x)})))
+                url = url.from.this.location.only[[1]]
+                details = details.from.this.location.only[[1]]
+                if (any(sapply(details.from.this.location.only, function(x) {!identical(x, details) && !is.null(x)})))
                     stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'details'"))
-                if (any(sapply(url.from.locs.only, function(x) {!identical(x, url) && !is.null(x)})))
+                if (any(sapply(url.from.this.location.only, function(x) {!identical(x, url) && !is.null(x)})))
                     stop(paste0(error.prefix, "'", source.name, "' data do not all have the same 'url'"))
                 
                 ## -- TOTALS -- #
-                aggregated.totals.data = apply(data.from.locs.only, 'year', sum, na.rm=T)
+                aggregated.totals.data = apply(data.from.this.location.only, 'year', sum, na.rm=T)
                 post.agg.dimnames = list(year=names(aggregated.totals.data))
                 aggregated.totals.data = array(aggregated.totals.data, sapply(post.agg.dimnames, length), post.agg.dimnames)
                 data.manager$put(data = aggregated.totals.data,
@@ -112,8 +112,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                     # print(paste0("on stratification: ", stratification, " at time ", Sys.time()))
                     # Hand-aggregate the stratified data to each stratification
                     margin.of.aggregation = c('year', stratification)
-                    aggregated.data = apply(data.from.locs.only, margin.of.aggregation, sum, na.rm=T)
-                    
+                    aggregated.data = apply(data.from.this.location.only, margin.of.aggregation, sum, na.rm=T)
                     data.manager$put(data = aggregated.data,
                                      outcome = put.outcome.name,
                                      source = source.name,
