@@ -552,6 +552,7 @@ data.manager$register.ontology(
 ################################################################################
 ###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')
+source('commoncode/additional_locations_of_interest.R')
 ##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
 #This code also adjusts the population to be the 'adult.population' ages 13 and over
 source('data_processing/put_msa_data_without_estimation_script.R')
