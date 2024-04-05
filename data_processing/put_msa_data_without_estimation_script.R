@@ -50,11 +50,11 @@ put.msa.data.strict = function(census.outcome.name = 'population',
             
             if (is.null(data.this.ont) || is.null(url.this.ont) || is.null(details.this.ont))
                 stop(paste0(error.prefix, "data with stratification '", stratification.name, "' could not be found for source '", source.name, "' and ontology '", ont.name, "'"))
-            
+           
             # Subset by age
             ont.ages = dimnames(data.this.ont)$age
             parsed.ages = parse.age.strata.names(ont.ages)
-            ages.within.limit = ont.ages[parsed.ages$upper < age.upper.limit & parsed.ages$lower > age.lower.limit]
+            ages.within.limit = ont.ages[parsed.ages$upper <= age.upper.limit & parsed.ages$lower >= age.lower.limit]
             subset.by.ages.arguments = lapply(names(dim(data.this.ont)), function(d) {
                 if (d == 'age') ages.within.limit
                 else 1:dim(data.this.ont)[[d]]
@@ -71,17 +71,17 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                 else contained.locations = location
                 # loctime = Sys.time()-loctime
                 # other.time = Sys.time()
-                from.locations.present = intersect(contained.locations, dimnames(data.this.ont)$location)
+                from.locations.present = intersect(contained.locations, dimnames(data.from.locs.only)$location)
                 if (!setequal(from.locations.present, contained.locations)) next # print warning?
                 
-                subset.by.locs.arguments = lapply(names(dim(data.this.ont)), function(d) {
+                subset.by.locs.arguments = lapply(names(dim(data.from.locs.only)), function(d) {
                     if (d == 'location') from.locations.present
-                    else 1:dim(data.this.ont)[[d]]
+                    else 1:dim(data.from.locs.only)[[d]]
                 })
                 # browser()
-                data.from.locs.only = do.call('[', c(list(data.this.ont), subset.by.locs.arguments, list(drop=F)))
-                url.from.locs.only = do.call('[', c(list(url.this.ont), subset.by.locs.arguments, list(drop=F)))
-                details.from.locs.only = do.call('[', c(list(details.this.ont), subset.by.locs.arguments, list(drop=F)))
+                data.from.locs.only = do.call('[', c(list(data.from.locs.only), subset.by.locs.arguments, list(drop=F)))
+                url.from.locs.only = do.call('[', c(list(url.from.locs.only), subset.by.locs.arguments, list(drop=F)))
+                details.from.locs.only = do.call('[', c(list(details.from.locs.only), subset.by.locs.arguments, list(drop=F)))
                 
                 # Convert url and details to their character forms
                 url.from.locs.only = census.manager$unhash.url(url.from.locs.only)
