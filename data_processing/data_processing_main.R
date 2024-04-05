@@ -140,6 +140,15 @@ data.manager$register.outcome(
     description = "Gonorrhea"))
 
 data.manager$register.outcome(
+  'gonorrhea.ratio',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Gonorrhea Ratio',
+    axis.name = 'Gonorrhea Ratio',
+    units = 'cases',
+    description = "Year Over Year Ratio of Gonorrhea Cases"))
+
+data.manager$register.outcome(
   'ps.syphilis',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
@@ -147,6 +156,15 @@ data.manager$register.outcome(
     axis.name = 'Primary and Secondary Syphilis',
     units = 'cases',
     description = "Primary and Secondary Syphilis"))
+
+data.manager$register.outcome(
+  'ps.syphilis.ratio',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Syphilis Ratio',
+    axis.name = 'Syphilis Ratio',
+    units = 'cases',
+    description = "Year Over Year Ratio of Primary and Secondary Syphilis Cases"))
 
 data.manager$register.outcome(
   'early.syphilis',
@@ -1596,6 +1614,11 @@ source('../jheem2/R/HELPERS_array_helpers.R')
                             geographic.type.to = 'CBSA',
                             details.for.new.data = 'estimated from county data',
                             data.manager = surveillance.manager)
+ 
+ ################################################################################
+ ###Source code for the STI ratio calculation/put
+ ################################################################################
+ source('data_processing/sti_ratio_calculation.R')
  
  ################################################################################
  ###Put- Sum deaths by county into deaths by MSA using this code/function
