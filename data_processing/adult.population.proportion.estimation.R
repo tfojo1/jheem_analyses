@@ -51,7 +51,7 @@ estimated.population.data <- recent.years.combined%>%
   select(year, location, outcome, value)
 
 ##Put into surveillance manager:
-#data.manager = surveillance.manager
+data.manager = surveillance.manager
 
 estimated.population.data <- list(estimated.population.data)
 
@@ -66,4 +66,4 @@ for (data in estimated.population.data) {
     details = 'Census Population Estimates multiplied by proportion of adults from 2020 from CDC Wonder')
 }
 
-#surveillance.manager = data.manager
+surveillance.manager = data.manager
