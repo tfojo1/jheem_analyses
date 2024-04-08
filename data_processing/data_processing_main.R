@@ -1684,8 +1684,12 @@ source('../jheem2/R/HELPERS_array_helpers.R')
 #                   adjudication.data.frame = outlier.df,
 #                   adjudication.vector = corrections) #do not include year or location here# #currently only works at one stratification at a time#
 
- 
- ################################################################################
+################################################################################
+#Source script that applies 2020 proportion of adults to unstratified census
+#population data from 2021-2023
+ source('data_processing/adult.population.proportion.estimation.R')
+
+################################################################################
  ###Save surveillance manager####
   save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
  
