@@ -15,7 +15,7 @@ LOCATIONS = c(#NYC.MSA, #'C.35620' # non.idu.general.mortality error
               #TAMPA.MSA, #'C.45300'
               #RIVERSIDE.MSA, #'C.40140'
               #DETROIT.MSA, #'C.19820' # "control file for the 1st chain is missing"
-              BALTIMORE.MSA #'C.12580'
+              'C.12580' #'C.12580'
               #VEGAS.MSA, #'C.29820' # proportion.msm.of.male error
               #BOSTON.MSA, #'C.14460' # non.idu.general.mortality error
               #SAN.DIEGO.MSA, #'C.41740' # proportion.msm.of.male error
@@ -34,7 +34,7 @@ LOCATIONS = c(#NYC.MSA, #'C.35620' # non.idu.general.mortality error
               #CLEVELAND.MSA #'C.17460'
 )
 
-CALIBRATION.CODE.TO.PROCESS = CALIBRATION.CODE.FULL # CALIBRATION.CODE.POPULATION, 
+CALIBRATION.CODE.TO.PROCESS = CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION # CALIBRATION.CODE.POPULATION, 
                                                     # CALIBRATION.CODE.TRANSMISSION
                                                     # CALIBRATION.CODE.FULL
                                                     # CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION
@@ -50,14 +50,14 @@ for(location in LOCATIONS){
   # Pull just the last simulation
   sim = mcmc@simulations[[length(mcmc@simulations)]]
   
-  if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TRANSMISSION){
-    save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-  } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POPULATION){
-    save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-  } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL){
-    save(sim,file=paste0("prelim_results/init.full.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-  } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION){
-    save(sim,file=paste0("prelim_results/init.full.minus.two.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+  if(CALIBRATION.CODE.TO.PROCESS==CALIBRATION.CODE.TRANSMISSION){
+    save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",location,".Rdata"))
+  } else if(CALIBRATION.CODE.TO.PROCESS==CALIBRATION.CODE.POPULATION){
+    save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",location,".Rdata"))
+  } else if(CALIBRATION.CODE.TO.PROCESS==CALIBRATION.CODE.FULL){
+    save(sim,file=paste0("prelim_results/init.full.sim_",Sys.Date(),"_",location,".Rdata"))
+  } else if(CALIBRATION.CODE.TO.PROCESS==CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION){
+    save(sim,file=paste0("prelim_results/init.full.minus.two.sim_",Sys.Date(),"_",location,".Rdata"))
   } else stop("invalid calibration code")
 
 }
