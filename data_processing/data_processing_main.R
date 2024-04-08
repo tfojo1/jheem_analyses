@@ -369,6 +369,8 @@ data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillan
 data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
 data.manager$register.parent.source('cdc.retention.report.pdf', full.name = 'CDC HIV Surveillance PDF Reports', short.name= "cdc.retention.report.pdf") #These are really similar
 data.manager$register.parent.source('NHM&E', full.name = 'National HIV Prevention Program Monitoring and Evaluation', short.name= "NHM&E")
+data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
+
 
 #Register Data Sources ('children')
 data.manager$register.source('aidsvu', parent.source= "IQVIA", full.name = "AIDS Vu", short.name='aidsvu')
@@ -388,12 +390,17 @@ data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = 
 data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports')
 data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids')
 
+
 #Creating these separately bc they have separate parent sources
 data.manager$register.source('prep.aidsvu.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP AIDS Vu Aggregated County', short.name = 'prep aidsvu aggd county') #For aggregated prep data from AIDS Vu
 data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP CDC Aggregated County', short.name = 'prep cdc aggd county') #For aggregated prep data from Atlas Plus (CDC)
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated')
 data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
+
+#Creating a new source for the estimated 'adult.population' for years 2021-2023 (because we didn't have stratified data for those years)
+#This takes the adult proportion from cdc_wonder and applies to population totals from census
+data.manager$register.source('adult.population.estimate.census', parent.source= "census", full.name = 'Adult Population Estimated from Census', short.name = 'adult population estimate census')
 
 
 data.manager$register.ontology(
@@ -548,6 +555,25 @@ data.manager$register.ontology(
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other'),
     incomplete.dimensions = c("year", "location")
+  ))
+
+data.manager$register.ontology(
+  'census',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('< 1 year', '1 year', '2 years', '3 years', '4 years', '5 years', '6 years', '7 years', '8 years', '9 years', '10 years',
+          '11 years', '12 years', '13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
+          '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
+          '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
+          '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
+          '51 years', '52 years', '53 years', '54 years', '55 years', '56 years', '57 years', '58 years', '59 years', '60 years',
+          '61 years', '62 years', '63 years', '64 years', '65 years', '66 years', '67 years', '68 years', '69 years', '70 years',
+          '71 years', '72 years', '73 years', '74 years', '75 years', '76 years', '77 years', '78 years', '79 years', '80 years',
+          '81 years', '82 years', '83 years', '84 years', '85+ years'),
+    race=c('white', 'black', 'american indian or alaska native', 'asian or pacific islander'),
+    ethnicity=c('hispanic', 'not hispanic'),
+    sex=c('male','female')
   ))
 ################################################################################
 ###Source locations of interest to create MSA vector
