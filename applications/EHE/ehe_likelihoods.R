@@ -1,11 +1,72 @@
 
 # LIKELIHOODS INCLUDED: 
 # population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
-# AIDS diagnoses, AIDS deaths, suppression
+# AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
+# heroin, cocaine
 
-# TO DO: 
-# proportion tested - working out bugs
-# hiv.test.positivity
+
+#-- BIAS ESTIMATES FOR NESTED PROPORTIONS  --#
+suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
+                                                           version = 'ehe')
+
+proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
+                                                                 version = 'ehe')  
+
+hiv.test.positivity.bias.estimates = get.cached.object.for.version(name = "hiv.test.positivity.bias.estimates", 
+                                                                   version = 'ehe')  
+
+awareness.bias.estimates = get.cached.object.for.version(name = "awareness.bias.estimates", 
+                                                         version = 'ehe')  
+
+cocaine.bias.estimates = get.cached.object.for.version(name = "cocaine.bias.estimates", 
+                                                       version = 'ehe')  
+
+heroin.bias.estimates = get.cached.object.for.version(name = "heroin.bias.estimates", 
+                                                      version = 'ehe')  
+
+
+EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
+{
+  if ("risk" %in% names(dim(arr)) &&
+      all(array.access(arr, risk='active_IDU')==array.access(arr, risk='IDU_in_remission')))
+  {
+    risk.partition.dimnames = list(risk = c('active_IDU', 'IDU_in_remission'))
+    risk.partition.arr = array(c(0.25, 0.75), dim=sapply(risk.partition.dimnames, length), risk.partition.dimnames)
+    risk.modified = array.access(arr, risk.partition.dimnames)
+    risk.modified = risk.modified * expand.array(risk.partition.arr, dimnames(risk.modified))
+    array.access(arr, dimnames(risk.modified)) = risk.modified
+  }
+  if ("sex" %in% names(dim(arr)) &&
+      all(array.access(arr, sex='msm')==array.access(arr, sex='heterosexual_male')))
+  {
+    #sex.partition.dimnames = list(sex = c('heterosexual_male', 'msm'))
+    #sex.partition.arr = array(c(0.5, 0.5), dim=sapply(sex.partition.dimnames, length), sex.partition.dimnames)
+    
+    specification.metadata = get.specification.metadata(version=version, location=location)
+    proportion.msm = get.best.guess.msm.proportions(location,
+                                                    specification.metadata = specification.metadata,
+                                                    keep.age = any(names(dim(arr))=='age'),
+                                                    keep.race = any(names(dim(arr))=='race'),
+                                                    ages = dimnames(arr)$age)
+    # sex.partition.arr = get.best.guess.msm.proportions.by.race(location,
+    #                                                            specification.metadata = specification.metadata,
+    #                                                            years = DEFAULT.POPULATION.YEARS,
+    #                                                            min.age = specification.metadata$age.lower.bounds[1],
+    #                                                            return.proportions = T)
+    
+    sex.partition.arr = c(as.numeric(proportion.msm), 1-as.numeric(proportion.msm))
+    sex.partition.dimnames = c(dimnames(proportion.msm), list(sex=c('msm','heterosexual_male')))
+    dim(sex.partition.arr) = sapply(sex.partition.dimnames, length)
+    dimnames(sex.partition.arr) = sex.partition.dimnames
+    
+    sex.modified = array.access(arr, sex.partition.dimnames)
+    sex.modified = sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
+    
+    array.access(arr, dimnames(sex.modified)) = sex.modified
+  }
+  arr
+  
+}
 
 #-- POPULATION  --#
 population.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -61,11 +122,6 @@ emigration.likelihood.instructions = create.basic.likelihood.instructions(outcom
 )
 
 
-#-- JOIN THE POPULATION-RELATED LIKELIHOODS  --#
-joint.pop.migration.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
-                                                                           immigration.likelihood.instructions,
-                                                                           emigration.likelihood.instructions
-                                                                           )
 #-- NEW DIAGNOSES  --#
 race.risk.sex.two.way.new.diagnoses.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
@@ -134,15 +190,6 @@ aids.diagnoses.likelihood.instructions =
   )
 
 
-#-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
-two.way.transmission.pop.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
-                               race.risk.sex.two.way.prevalence.likelihood.instructions,
-                               population.likelihood.instructions # no aids
-                               
-  )
-
-
 #-- HIV-MORTALITY  --#
 # all-cause mortality among pwh
 hiv.mortality.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
@@ -168,70 +215,6 @@ general.mortality.likelihood.instructions = create.basic.likelihood.instructions
                                                                                  weights = list(1), 
                                                                                  equalize.weight.by.year = T 
 )
-
-#-- BIAS ESTIMATES FOR NESTED PROPORTIONS  --#
-suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
-                                                           version = 'ehe')
-
-proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
-                                                                 version = 'ehe')  
-
-hiv.test.positivity.bias.estimates = get.cached.object.for.version(name = "hiv.test.positivity.bias.estimates", 
-                                                                   version = 'ehe')  
-
-awareness.bias.estimates = get.cached.object.for.version(name = "awareness.bias.estimates", 
-                                                         version = 'ehe')  
-
-cocaine.bias.estimates = get.cached.object.for.version(name = "cocaine.bias.estimates", 
-                                                       version = 'ehe')  
-
-heroin.bias.estimates = get.cached.object.for.version(name = "heroin.bias.estimates", 
-                                                      version = 'ehe')  
-
-
-EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
-{
-  if ("risk" %in% names(dim(arr)) &&
-      all(array.access(arr, risk='active_IDU')==array.access(arr, risk='IDU_in_remission')))
-  {
-    risk.partition.dimnames = list(risk = c('active_IDU', 'IDU_in_remission'))
-    risk.partition.arr = array(c(0.25, 0.75), dim=sapply(risk.partition.dimnames, length), risk.partition.dimnames)
-    risk.modified = array.access(arr, risk.partition.dimnames)
-    risk.modified = risk.modified * expand.array(risk.partition.arr, dimnames(risk.modified))
-    array.access(arr, dimnames(risk.modified)) = risk.modified
-  }
-  if ("sex" %in% names(dim(arr)) &&
-      all(array.access(arr, sex='msm')==array.access(arr, sex='heterosexual_male')))
-  {
-    #sex.partition.dimnames = list(sex = c('heterosexual_male', 'msm'))
-    #sex.partition.arr = array(c(0.5, 0.5), dim=sapply(sex.partition.dimnames, length), sex.partition.dimnames)
-    
-    specification.metadata = get.specification.metadata(version=version, location=location)
-    proportion.msm = get.best.guess.msm.proportions(location,
-                                                    specification.metadata = specification.metadata,
-                                                    keep.age = any(names(dim(arr))=='age'),
-                                                    keep.race = any(names(dim(arr))=='race'),
-                                                    ages = dimnames(arr)$age)
-    # sex.partition.arr = get.best.guess.msm.proportions.by.race(location,
-    #                                                            specification.metadata = specification.metadata,
-    #                                                            years = DEFAULT.POPULATION.YEARS,
-    #                                                            min.age = specification.metadata$age.lower.bounds[1],
-    #                                                            return.proportions = T)
-    
-    sex.partition.arr = c(as.numeric(proportion.msm), 1-as.numeric(proportion.msm))
-    sex.partition.dimnames = c(dimnames(proportion.msm), list(sex=c('msm','heterosexual_male')))
-    dim(sex.partition.arr) = sapply(sex.partition.dimnames, length)
-    dimnames(sex.partition.arr) = sex.partition.dimnames
-    
-    sex.modified = array.access(arr, sex.partition.dimnames)
-    sex.modified = sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
-    
-    array.access(arr, dimnames(sex.modified)) = sex.modified
-  }
-  arr
-  
-}
-
 
 #-- SUPPRESSION  --#
 suppression.likelihood.instructions = 
@@ -480,6 +463,29 @@ hiv.test.positivity.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
+
+#-- JOIN THE POPULATION-RELATED LIKELIHOODS  --#
+joint.pop.migration.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
+                                                                           immigration.likelihood.instructions,
+                                                                           emigration.likelihood.instructions)
+
+#-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
+two.way.transmission.pop.likelihood.instructions = 
+  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.sex.two.way.prevalence.likelihood.instructions,
+                               population.likelihood.instructions # no aids
+                               )
+
+#-- ITERATING TO TEST LIKELIHOODS --# 
+iterative.test.likelihood.instructions = join.likelihood.instructions(  
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions)
 
 
 #-- JOIN THE FULL LIKELIHOOD  --#

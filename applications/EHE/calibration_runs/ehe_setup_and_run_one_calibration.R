@@ -5,6 +5,7 @@ CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL   # CALIBRATION.CODE.POPULATION,
                                                           # CALIBRATION.CODE.TRANSMISSION
                                                           # CALIBRATION.CODE.FULL
                                                           # CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION
+                                                          # CALIBRATION.CODE.TEST
 
 set.seed(12345)
 
@@ -51,5 +52,8 @@ if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TRANSMISSION){
   save(sim,file=paste0("prelim_results/init.full.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION){
   save(sim,file=paste0("prelim_results/init.full.minus.two.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TEST){
+  save(sim,file=paste0("prelim_results/iterative.test_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else stop("invalid calibration code")
+
 

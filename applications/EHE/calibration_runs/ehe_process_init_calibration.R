@@ -61,3 +61,52 @@ for(location in LOCATIONS){
   } else stop("invalid calibration code")
 
 }
+
+
+# looking at full mcmc results
+if(1==2){
+  library(bayesian.simulations)
+  
+  
+  # not sure why there are NA's in the # accepted
+  table(is.na(mcmc@n.accepted))
+
+  
+  sim.last = mcmc@simulations[[length(mcmc@simulations)]]
+  sim.first = mcmc@simulations[[1]]
+  load("~/jheem/code/jheem_analyses/prelim_results/init.transmission.sim_2024-03-29_C.12580.Rdata")
+  sim.trans = sim
+  
+  simplot(sim.trans,sim.first,sim.last,outcomes = "population")
+  
+  cbind(round(sim.trans$parameters,3),
+        round(sim.first$parameters,3),
+        round(sim.last$parameters,3))
+  round(exp(full.lik.without.supp$compute.piecewise(sim.last) - full.lik.without.supp$compute.piecewise(sim.first)),4)
+
+  round(exp(full.lik.without.supp$compute.piecewise(sim.first) - full.lik.without.supp$compute.piecewise(sim.trans)),4)
+  # all of these say sim.first (dashed) is better than sim.trans (solid) in the likelihood
+  simplot(sim.trans,sim.first,outcomes="proportion.general.population.tested") # not much diff
+  simplot(sim.trans,sim.first,outcomes="hiv.test.positivity",dimension.values = list(year=2000:2030))
+  simplot(sim.trans,sim.first,outcomes="awareness") # no data?
+  simplot(sim.trans,sim.first,outcomes="prep.uptake") # this could be dragging it?
+  simplot(sim.trans,sim.first,outcomes="prep.indications") # this could be dragging it?
+  simplot(sim.trans,sim.first,outcomes="proportion.using.heroin")
+  simplot(sim.trans,sim.first,outcomes="proportion.using.cocaine")
+  
+  
+  
+  round(exp(full.lik.without.supp$compute.piecewise(sim.last) - full.lik.without.supp$compute.piecewise(sim.first)),4)
+  # all of these say sim.last (dashed) is better than sim.first (solid) in the likelihood
+  simplot(sim.first,sim.last,outcomes="emigration")
+  simplot(sim.first,sim.last,outcomes="hiv.mortality") # no data?
+  simplot(sim.first,sim.last,outcomes="total.mortality",dimension.values = list(year=2008:2030))
+  simplot(sim.first,sim.last,outcomes="aids.deaths")
+  simplot(sim.first,sim.last,outcomes="proportion.general.population.tested")
+  simplot(sim.first,sim.last,outcomes="awareness") # no data?
+  simplot(sim.first,sim.last,outcomes="prep.uptake") 
+  simplot(sim.first,sim.last,outcomes="prep.indications")
+  simplot(sim.first,sim.last,outcomes="proportion.using.heroin")
+  simplot(sim.first,sim.last,outcomes="proportion.using.cocaine")
+  
+}
