@@ -1,11 +1,15 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 LOCATION = 'C.12580' #BALTIMORE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL   # CALIBRATION.CODE.POPULATION, 
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION   # CALIBRATION.CODE.POPULATION, 
                                                           # CALIBRATION.CODE.TRANSMISSION
                                                           # CALIBRATION.CODE.FULL
                                                           # CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION
-                                                          # CALIBRATION.CODE.TEST
+                                                          # CALIBRATION.CODE.POP.TRANS 
+                                                          # CALIBRATION.CODE.POP.TRANS.MORT 
+                                                          # CALIBRATION.CODE.POP.TRANS.PREP 
+                                                          # CALIBRATION.CODE.POP.TRANS.IDU 
+                                                          # CALIBRATION.CODE.POP.TRANS.CONTINUUM 
 
 set.seed(12345)
 
@@ -24,7 +28,10 @@ set.up.calibration(version='ehe',
 print(paste0("DONE setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 start.time = Sys.time()
 
-print(ggplot2::qplot(1,1) + ggplot2::ggtitle(paste0(LOCATION, " - ", locations::get.location.name(LOCATION))))
+print(ggplot2::qplot(1,1) + 
+        ggplot2::ggtitle(paste0(LOCATION, " - ", 
+                                locations::get.location.name(LOCATION), " - ",
+                                CALIBRATION.CODE.TO.RUN)))
 
 print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
 mcmc = run.calibration(version = 'ehe',
@@ -52,8 +59,16 @@ if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TRANSMISSION){
   save(sim,file=paste0("prelim_results/init.full.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION){
   save(sim,file=paste0("prelim_results/init.full.minus.two.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TEST){
-  save(sim,file=paste0("prelim_results/iterative.test_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS){
+  save(sim,file=paste0("prelim_results/pop_trans_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.MORT){
+  save(sim,file=paste0("prelim_results/pop_trans_mort",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.PREP){
+  save(sim,file=paste0("prelim_results/pop_trans_prep",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.IDU){
+  save(sim,file=paste0("prelim_results/pop_trans_prep",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.CONTINUUM){
+  save(sim,file=paste0("prelim_results/pop_trans_prep",Sys.Date(),"_",LOCATION,".Rdata"))
 } else stop("invalid calibration code")
 
 
