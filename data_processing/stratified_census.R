@@ -186,8 +186,8 @@ census.by.sex = lapply(stratified.data.clean, function(file){
   if(grepl("sex", filename)) {
 
     data<- data %>%
-      select(year, location, outcome, POPEST_MALE, POPEST_FEMALE)%>%
-      pivot_longer(cols=c(one_of("POPEST_MALE", "POPEST_FEMALE")),
+      select(year, location, outcome, POPEST_MALE, POPEST_FEM)%>%
+      pivot_longer(cols=c(one_of("POPEST_MALE", "POPEST_FEM")),
                    names_to = c("sex"),
                    values_to = "value")
   }
