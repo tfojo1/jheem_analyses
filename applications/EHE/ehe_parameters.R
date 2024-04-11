@@ -400,9 +400,9 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     diagnosed.transmission.rr = Lognormal.Distribution(log(mean(c(1-.68, 1/3.5))), 0.25*log(2), upper=1), #avg of Marks 2006 and Marks 2005
     
     #-- Uncertainty About the Future --#
-    msm.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(1.5)/2, lower=0, upper=0.35),#Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
-    heterosexual.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(1.5)/2, lower=0, upper=0.35),#Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
-    idu.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(1.5)/2, lower=0, upper=0.35)#Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5)
+    msm.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
+    heterosexual.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
+    idu.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5)
 )
 
 
