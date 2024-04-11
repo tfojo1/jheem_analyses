@@ -1,12 +1,15 @@
 print("SOURCING CODE")
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R')
+#source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 CALIBRATION.CODE.FULL = 'init.full.ehe'
-CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED = 'init.full.minus.one.ehe'
+CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION = 'init.full.minus.supp.ehe'
+CALIBRATION.CODE.TEST = 'iterative.test.ehe'
+
+N.ITER.TEST = 5000
 N.ITER = 20000
 N.ITER.FULL = 40000
 
@@ -23,12 +26,6 @@ par.names.pop = c("black.birth.rate.multiplier",
                   "age3.non.idu.general.mortality.rate.multiplier",
                   "age4.non.idu.general.mortality.rate.multiplier",
                   "age5.non.idu.general.mortality.rate.multiplier",
-                  # "black.age1.aging.multiplier",
-                  # "hispanic.age1.aging.multiplier",
-                  # "other.age1.aging.multiplier",
-                  # "black.age2.aging.multiplier",
-                  # "hispanic.age2.aging.multiplier",
-                  # "other.age2.aging.multiplier",
                   "black.age1.aging.multiplier.1",
                   "hispanic.age1.aging.multiplier.1",
                   "other.age1.aging.multiplier.1",
@@ -46,9 +43,6 @@ par.names.pop = c("black.birth.rate.multiplier",
                   "hispanic.age3.aging.multiplier",
                   "other.age3.aging.multiplier",
                   "age4.aging.multiplier",
-                  # "black.domino.aging.multiplier",
-                  # "hispanic.domino.aging.multiplier",
-                  # "other.domino.aging.multiplier",
                   "immigration.multiplier.time.1",
                   "immigration.multiplier.time.2",
                   "emigration.multiplier.time.1",
@@ -128,9 +122,9 @@ register.calibration.info(CALIBRATION.CODE.FULL,
 )
 
 
-#-- REGISTER FULL CALIBRATION, WITHOUT PROPORTION TESTED AND TEST POSITIVITY  --#
-register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED,
-                          likelihood.instructions = FULL.likelihood.instructions.minus.one,
+#-- REGISTER FULL CALIBRATION, WITHOUT SUPPRESSION  --#
+register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.supp,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -140,5 +134,21 @@ register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.PROP.TESTED,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "A first test of the full likelihood"
+                          description = "A first test of the full likelihood without suppression"
+)
+
+
+#-- REGISTER ITERATIVE TEST CALIBRATION  --#
+register.calibration.info(CALIBRATION.CODE.TEST,
+                          likelihood.instructions = iterative.test.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.TEST, # 5,000
+                          thin = 50, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Adding in likelihoods iteratively"
 )

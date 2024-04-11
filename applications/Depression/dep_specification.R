@@ -231,6 +231,139 @@ track.point.outcome(DEP.SPECIFICATION,
                     keep.dimensions = c('location','age','race','sex','risk','depression'),
                     save = F)
 
+track.point.outcome(DEP.SPECIFICATION,
+                    'point.population.noninf', 
+                    outcome.metadata = NULL,
+                    scale = 'non.negative.number',
+                    value = expression(uninfected), ## HIV- only
+                    keep.dimensions = c('location','age','race','sex','risk','depression'),
+                    save = F)
+
+track.cumulative.outcome(DEP.SPECIFICATION,
+                         name = 'proportion.depressed',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Depressed',
+                                                                    description = "The Proportion of People who are depressed in the Past Year",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion depressed',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = 'n.depressed',
+                         value.is.numerator = T,
+                         denominator.outcome = 'population',
+                         keep.dimensions = c('location','age','race','sex'),
+                         save = T)
+
+track.cumulative.outcome(DEP.SPECIFICATION, ## number of depressed individuals in the population
+                         name = 'n.depressed',
+                         value = 'population',
+                         outcome.metadata = NULL,
+                         value.is.numerator = T,
+                         denominator.outcome = NULL,
+                         keep.dimensions = c('location','age','race','sex'),
+                         save = F, 
+                         scale = "non.negative.number", 
+                         subset.dimension.values = list(depression='depressed'))
+
+track.integrated.outcome(DEP.SPECIFICATION, ## total population numbers
+                         name = 'population',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                                                                    description = "The Number of Infected and Uninfected Individuals in the Population",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Population',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'point.population',
+                         keep.dimensions = c('location','age','race','sex','risk','depression'),
+                         corresponding.data.outcome = 'adult.population',
+                         save = T)
+
+
+track.integrated.outcome(DEP.SPECIFICATION, ## HIV- individuals
+                         name = 'population_noHIV',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                                                                    description = "The Number of Uninfected Individuals in the Population",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Population',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'point.population.noninf',
+                         keep.dimensions = c('location','age','race','sex','risk','depression'),
+                         corresponding.data.outcome = 'adult.population',
+                         save = T)
+
+track.cumulative.outcome(DEP.SPECIFICATION, ## HIV- individuals with depression
+                         name = 'n.depressed.noHIV',
+                         value = 'population_noHIV',
+                         outcome.metadata = NULL,
+                         value.is.numerator = T,
+                         denominator.outcome = NULL,
+                         keep.dimensions = c('location','age','race','sex'),
+                         save = F, 
+                         scale = "non.negative.number", 
+                         subset.dimension.values = list(depression='depressed'))
+
+track.integrated.outcome(DEP.SPECIFICATION, 
+                         name = 'cumulative.infected.depressed',
+                         outcome.metadata = NULL,
+                         value.to.integrate = 'uninfected',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         scale = 'non.negative.number',
+                         save = F,
+                         subset.dimension.values = list(depression='depressed'))
+
+track.cumulative.outcome(DEP.SPECIFICATION,
+                         name = 'prevRatio',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Prevalence Ratio of Depression',
+                                                                    description = "Prevalence Ratio of Depression, PwH vs. General Population",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion aware',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = expression(cumulative.infected.depressed/n.depressed.noHIV), 
+                         denominator.outcome = 'n.depressed.noHIV',
+                         keep.dimensions = c("location"),
+                         save = T)
+
+
+track.cumulative.outcome(DEP.SPECIFICATION,
+                         name = 'proportion.HIV.depressed.treated',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Treated',
+                                                                    description = "The Proportion of PwH with Depression on Treatment",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion Treated',
+                                                                    units = '%'),
+                         value = expression(hiv.depression.treat/cumulative.infected.depressed),
+                         denominator.outcome = 'cumulative.infected',
+                         keep.dimensions = c("location"), 
+                         save = T)
+
+track.integrated.outcome(DEP.SPECIFICATION,
+                         name = 'hiv.depression.treat',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Prevalence of PwH with Depression on Treatment',
+                                                                    description = "The Number of People with HIV and Depression on Treatment",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Prevalent Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         value.to.integrate = 'infected',
+                         #subset.dimension.values = "depression.proportion.tx", ## ??
+                         corresponding.data.outcome = 'hiv.depression.treat',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = T)
+
+track.integrated.outcome(DEP.SPECIFICATION,
+                         name = 'nohiv.depression.treat',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Prevalence of General Population with Depression on Treatment',
+                                                                    description = "The Number of HIV- People with Depression on Treatment",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Prevalent Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         value.to.integrate = 'uninfected',
+                         #subset.dimension.values = "depression.proportion.tx", ## ??
+                         corresponding.data.outcome = 'nohiv.depression.treat',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = T)
 
 
 ##--------------##

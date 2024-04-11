@@ -338,8 +338,6 @@ register.model.quantity(EHE.SPECIFICATION,
 #-------------#
 #-- Testing --#
 #-------------#
-# Assume the default for all of these are 'with covid' 
-
 TESTING.FIRST.YEAR.FRACTION.OF.RAMP = 0.5^(1993-1982)
 register.model.element(EHE.SPECIFICATION,
                        name = 'general.population.testing.without.covid',
