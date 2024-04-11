@@ -477,7 +477,8 @@ two.way.transmission.pop.likelihood.instructions =
                                )
 
 #-- ITERATING TO TEST LIKELIHOODS --# 
-iterative.test.likelihood.instructions = join.likelihood.instructions(  
+# Population and transmission
+pop.trans.stratified.likelihood.instructions = join.likelihood.instructions(  
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -487,6 +488,67 @@ iterative.test.likelihood.instructions = join.likelihood.instructions(
   new.diagnoses.likelihood.instructions,
   prevalence.likelihood.instructions)
 
+# Add mortality
+pop.trans.mortality.likelihood.instructions = join.likelihood.instructions(  
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # MORTALITY LIKELIHOODS
+  hiv.mortality.likelihood.instructions,
+  general.mortality.likelihood.instructions,
+  aids.deaths.likelihood.instructions)
+
+# Add prep
+pop.trans.prep.likelihood.instructions = join.likelihood.instructions(  
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # PREP LIKELIHOODS
+  prep.uptake.likelihood.instructions,
+  prep.indications.likelihood.instructions)
+
+# Add idu
+pop.trans.idu.likelihood.instructions = join.likelihood.instructions(  
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions,
+  cocaine.likelihood.instructions)
+
+# Add continuum (without suppression, for now)
+pop.trans.continuum.likelihood.instructions = join.likelihood.instructions(  
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions)
 
 #-- JOIN THE FULL LIKELIHOOD  --#
 FULL.likelihood.instructions =  join.likelihood.instructions(

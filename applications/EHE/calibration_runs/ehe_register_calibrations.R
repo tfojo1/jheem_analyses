@@ -7,9 +7,13 @@ CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 CALIBRATION.CODE.FULL = 'init.full.ehe'
 CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION = 'init.full.minus.supp.ehe'
-CALIBRATION.CODE.TEST = 'iterative.test.ehe'
+CALIBRATION.CODE.POP.TRANS = 'pop.trans.ehe'
+CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort.ehe'
+CALIBRATION.CODE.POP.TRANS.PREP = 'pop.trans.prep'
+CALIBRATION.CODE.POP.TRANS.IDU = 'pop.trans.idu'
+CALIBRATION.CODE.POP.TRANS.CONTINUUM = 'pop.trans.continuum'
 
-N.ITER.TEST = 5000
+N.ITER.TEST = 10000
 N.ITER = 20000
 N.ITER.FULL = 40000
 
@@ -138,14 +142,74 @@ register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION,
 )
 
 
-#-- REGISTER ITERATIVE TEST CALIBRATION  --#
-register.calibration.info(CALIBRATION.CODE.TEST,
-                          likelihood.instructions = iterative.test.likelihood.instructions,
+#-- REGISTER ITERATIVE CALIBRATIONS  --#
+register.calibration.info(CALIBRATION.CODE.POP.TRANS,
+                          likelihood.instructions = pop.trans.stratified.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.TEST, # 5,000
-                          thin = 50, 
+                          n.iter = N.ITER.TEST, # 200
+                          thin = 1, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Adding in likelihoods iteratively"
+)
+
+# Add mortality
+register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT,
+                          likelihood.instructions = pop.trans.mortality.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.TEST, # 200
+                          thin = 1, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Adding in likelihoods iteratively"
+)
+
+# Add prep
+register.calibration.info(CALIBRATION.CODE.POP.TRANS.PREP,
+                          likelihood.instructions = pop.trans.prep.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.TEST, # 200
+                          thin = 1, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Adding in likelihoods iteratively"
+)
+
+# Add idu
+register.calibration.info(CALIBRATION.CODE.POP.TRANS.IDU,
+                          likelihood.instructions = pop.trans.idu.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.TEST, # 200
+                          thin = 1, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Adding in likelihoods iteratively"
+)
+
+# Add continuum
+register.calibration.info(CALIBRATION.CODE.POP.TRANS.CONTINUUM,
+                          likelihood.instructions = pop.trans.continuum.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.TEST, # 200
+                          thin = 1, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
