@@ -402,7 +402,7 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #-- Uncertainty About the Future --#
     msm.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(1.5)/2, lower=0, upper=0.35),#Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
     heterosexual.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(1.5)/2, lower=0, upper=0.35),#Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
-    idu.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(1.5)/2, lower=0, upper=0.35),#Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5)
+    idu.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(1.5)/2, lower=0, upper=0.35)#Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5)
 )
 
 
