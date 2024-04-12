@@ -144,8 +144,8 @@ census.manager$register.ontology(
     age=c('0-4 years', '5-9 years', '10-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
           '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
           '75-79 years', '80-84 years', '85+ years'),
-    race=c('white', 'black', 'american indian or alaska native', 'asian or pacific islander'),
-    ethnicity=c('hispanic', 'not hispanic'),
+    race=c('White', 'Black', 'Asian', 'American Indian and Alaska Native', 'Native Hawaiian and Other Pacific Islander'),
+    ethnicity=c('Hispanic', 'Not Hispanic'),
     sex=c('male','female')
   ))
 
