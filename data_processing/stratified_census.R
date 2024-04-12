@@ -35,24 +35,42 @@ stratified.census.race = c('WA' = 'White',
                            'NA' = 'Native Hawaiian and Other Pacific Islander',
                            'H' = 'Hispanic',
                            'NH' = 'Not Hispanic')
-stratified.census.age = c('UNDER5_TOT' = '0-4 years', 
-                          'AGE59_TOT' = '5-9 years', 
-                          'AGE1014_TOT' = '10-14 years', 
-                          'AGE1519_TOT' = '15-19 years', 
-                          'AGE2024_TOT' = '20-24 years', 
-                          'AGE2529_TOT' = '25-29 years', 
-                          'AGE3034_TOT' =  '30-34 years', 
-                          'AGE3539_TOT' = '35-39 years',
-                          'AGE4044_TOT' = '40-44 years', 
-                          'AGE4549_TOT' = '45-49 years', 
-                          'AGE5054_TOT' = '50-54 years', 
-                          'AGE5559_TOT' = '55-59 years', 
-                          'AGE6064_TOT'= '60-64 years', 
-                          'AGE6569_TOT' = '65-69 years', 
-                          'AGE7074_TOT' = '70-74 years', 
-                          'AGE7579_TOT' = '75-79 years', 
-                          'AGE8084_TOT' = '80-84 years', 
-                          'AGE85PLUS_TOT' = '85+ years')
+stratified.census.age = c('UNDER5' = '0-4 years', 
+                          'AGE59' = '5-9 years', 
+                          'AGE1014' = '10-14 years', 
+                          'AGE1519' = '15-19 years', 
+                          'AGE2024' = '20-24 years', 
+                          'AGE2529' = '25-29 years', 
+                          'AGE3034' =  '30-34 years', 
+                          'AGE3539' = '35-39 years',
+                          'AGE4044' = '40-44 years', 
+                          'AGE4549' = '45-49 years', 
+                          'AGE5054' = '50-54 years', 
+                          'AGE5559' = '55-59 years', 
+                          'AGE6064'= '60-64 years', 
+                          'AGE6569' = '65-69 years', 
+                          'AGE7074' = '70-74 years', 
+                          'AGE7579' = '75-79 years', 
+                          'AGE8084' = '80-84 years', 
+                          'AGE85PLUS' = '85+ years')
+stratified.census.age.two = c('1' = '0-4 years', 
+                          '2' = '5-9 years', 
+                          '3' = '10-14 years', 
+                          '4' = '15-19 years', 
+                          '5' = '20-24 years', 
+                          '6' = '25-29 years', 
+                          '7' =  '30-34 years', 
+                          '8' = '35-39 years',
+                          '9' = '40-44 years', 
+                          '10' = '45-49 years', 
+                          '11' = '50-54 years', 
+                          '12' = '55-59 years', 
+                          '13'= '60-64 years', 
+                          '14' = '65-69 years', 
+                          '15' = '70-74 years', 
+                          '16' = '75-79 years', 
+                          '17' = '80-84 years', 
+                          '18' = '85+ years')
 stratified.census.sex = c('POPEST_FEM' = 'female',
                           'POPEST_MALE' = 'male')
 # Clean Demographic Data --------------------------------------------------
@@ -164,6 +182,7 @@ census.by.age = lapply(stratified.data.clean, function(file){
                     names_to = c("age"),
                     values_to = "value")
      
+     data$age = str_remove(data$age, "_TOT")
      data$age = stratified.census.age[data$age]
   }
   
@@ -214,3 +233,117 @@ for (data in stratified.data.for.put) {
 }
 
 
+
+# Adding Additional Layers of Stratification ------------------------------
+
+# Age + Sex ---------------------------------------------------------------
+
+census.by.age.sex = lapply(stratified.data.clean, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  if(grepl("sex_age", filename)) {
+    
+    data<- data %>%
+      select(year, location, outcome, UNDER5_FEM, AGE59_FEM, AGE1014_FEM, AGE1519_FEM, AGE2024_FEM, AGE2529_FEM, 
+             AGE3034_FEM, AGE3539_FEM, AGE4044_FEM, AGE4549_FEM, AGE5054_FEM, AGE5559_FEM, AGE6064_FEM, 
+             AGE6569_FEM, AGE7074_FEM, AGE7579_FEM, AGE8084_FEM, AGE85PLUS_FEM, UNDER5_MALE, AGE59_MALE, 
+             AGE1014_MALE, AGE1519_MALE, AGE2024_MALE, AGE2529_MALE, AGE3034_MALE, AGE3539_MALE, AGE4044_MALE, 
+             AGE4549_MALE, AGE5054_MALE, AGE5559_MALE, AGE6064_MALE, AGE6569_MALE, AGE7074_MALE, AGE7579_MALE, 
+             AGE8084_MALE, AGE85PLUS_MALE)%>%
+      pivot_longer(cols=c(one_of("UNDER5_FEM", "AGE59_FEM", "AGE1014_FEM", "AGE1519_FEM", "AGE2024_FEM", "AGE2529_FEM", 
+                                 "AGE3034_FEM", "AGE3539_FEM", "AGE4044_FEM", "AGE4549_FEM", "AGE5054_FEM", "AGE5559_FEM", "AGE6064_FEM", 
+                                 "AGE6569_FEM", "AGE7074_FEM", "AGE7579_FEM", "AGE8084_FEM", "AGE85PLUS_FEM", "UNDER5_MALE", "AGE59_MALE", 
+                                 "AGE1014_MALE", "AGE1519_MALE", "AGE2024_MALE", "AGE2529_MALE", "AGE3034_MALE", "AGE3539_MALE", "AGE4044_MALE", 
+                                 "AGE4549_MALE", "AGE5054_MALE", "AGE5559_MALE", "AGE6064_MALE", "AGE6569_MALE", "AGE7074_MALE", "AGE7579_MALE", 
+                                 "AGE8084_MALE", "AGE85PLUS_MALE")), 
+                   names_to = c("age", "sex"),
+                   names_sep = "_",
+                   values_to = "value")
+    
+    data$age = stratified.census.age[data$age]
+    data$sex = ifelse(data$sex == "MALE", 'male', data$sex)
+    data$sex = ifelse(data$sex == "FEM", 'female', data$sex)
+  }
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+
+# Sex+Race ----------------------------------------------------------------
+census.by.race.sex = lapply(stratified.data.clean, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  #Format Race Totals
+  if(grepl("race", filename)) {
+    data= subset(data, data$AGEGRP == "0") #Filter for total age group so you can put total values for race
+    
+    data<- data %>%
+      select(year, location, outcome, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
+             NA_MALE, NA_FEMALE)%>%
+      pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
+                                 "NA_MALE", "NA_FEMALE")), 
+                   names_to = c("race", "sex"),
+                   names_sep = "_",
+                   values_to = "value")
+    
+    data$race = stratified.census.race[data$race]
+    data<- data[!duplicated(data), ]
+    data$sex = tolower(data$sex)
+  }
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+# Sex + Race + Age --------------------------------------------------------
+census.by.sex.race.age = lapply(stratified.data.clean, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  #Format Race Totals
+  if(grepl("race", filename)) {
+    
+    data= subset(data, data$AGEGRP != "0") #Remove total age group
+    
+    data<- data %>%
+      select(year, location, outcome, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
+             NA_MALE, NA_FEMALE)%>%
+      pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
+                                 "NA_MALE", "NA_FEMALE")), 
+                   names_to = c("race", "sex"),
+                   names_sep = "_",
+                   values_to = "value")
+    
+    data$race = stratified.census.race[data$race]
+    data$age = stratified.census.age.two[data$AGEGRP]
+    data$sex = tolower(data$sex)
+  }
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+
+# Put More levels of stratification into manager --------------------------
+
+two.and.three.way.strata = list(
+  census.by.age.sex = census.by.age.sex[[2]][[2]],
+  census.by.race.sex = census.by.race.sex[[1]][[2]],
+  census.by.sex.race.age = census.by.sex.race.age[[1]][[2]])
+
+for (data in two.and.three.way.strata) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'stratified.census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
