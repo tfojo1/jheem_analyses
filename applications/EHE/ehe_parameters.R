@@ -358,6 +358,9 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     hispanic.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     other.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
+    young.incident.idu.multiplier.0 = Lognormal.Distribution(0, 0.5*log(2)),
+    young.incident.idu.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
+    
     msm.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
@@ -728,6 +731,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'black.incident.idu.multiplier.0',
     'hispanic.incident.idu.multiplier.0',
     'other.incident.idu.multiplier.0',
+    'young.incident.idu.multiplier.0',
     'msm.incident.idu.multiplier.0'
   ),
   
@@ -735,6 +739,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'black.incident.idu.multiplier.2',
     'hispanic.incident.idu.multiplier.2',
     'other.incident.idu.multiplier.2',
+    'young.incident.idu.multiplier.2',
     'msm.incident.idu.multiplier.2'
   ),
   

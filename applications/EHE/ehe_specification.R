@@ -1896,7 +1896,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = 'person'),
                          value = "population",
                          subset.dimension.values = list(risk = "active_IDU"),
-                         keep.dimensions = c("location","age"),
+                         keep.dimensions = c("location","age","sex"),
                          save=F)
 
 track.cumulative.outcome(EHE.SPECIFICATION,
@@ -1910,7 +1910,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = "number.injecting.drugs",
                          denominator.outcome = 'population',
                          value.is.numerator = T,
-                         keep.dimensions = c("location","age"))
+                         keep.dimensions = c("location","age","sex"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'proportion.using.cocaine',
@@ -1924,7 +1924,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(proportion.injecting.drugs*5.97), # multiplier from NSDUH, large metro, 2015-2018
                          denominator.outcome = 'population',
                          value.is.numerator = F,
-                         keep.dimensions = c("location","age"))
+                         keep.dimensions = c("location","age","sex"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'proportion.using.heroin',
@@ -1938,7 +1938,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(proportion.injecting.drugs*1.15), # multiplier from NSDUH, large metro, 2015-2018
                          denominator.outcome = 'population',
                          value.is.numerator = F,
-                         keep.dimensions = c("location","age"))
+                         keep.dimensions = c("location","age","sex"))
 
 ##--------------------------------##
 ##--------------------------------##
