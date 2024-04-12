@@ -136,6 +136,19 @@ census.manager$register.ontology(
     sex=c('male','female')
   ))
 
+census.manager$register.ontology(
+  'stratified.census',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('0-4 years', '5-9 years', '10-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+          '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
+          '75-79 years', '80-84 years', '85+ years'),
+    race=c('white', 'black', 'american indian or alaska native', 'asian or pacific islander'),
+    ethnicity=c('hispanic', 'not hispanic'),
+    sex=c('male','female')
+  ))
+
 ################################################################################
                   ###Read in Census Files###
 ################################################################################
@@ -163,6 +176,9 @@ source('data_processing/census_sas_files.R')
 
 #This pulls birth and death data from CDC Wonder#
 source('data_processing/births_and_deaths.R')
+
+#This pulls the stratified census data by county for 2020-2022
+source('data_processing/stratified_census.R')
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
 ################################################################################
