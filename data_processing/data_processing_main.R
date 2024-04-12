@@ -398,11 +398,6 @@ data.manager$register.source('prep.indications.aggregated.county', parent.source
 data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated')
 data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
 
-#Creating a new source for the estimated 'adult.population' for years 2021-2023 (because we didn't have stratified data for those years)
-#This takes the adult proportion from cdc_wonder and applies to population totals from census
-data.manager$register.source('adult.population.estimate.census', parent.source= "census", full.name = 'Adult Population Estimated from Census', short.name = 'adult population estimate census')
-
-
 data.manager$register.ontology(
   'cdc',
   ont = ontology(
@@ -1683,11 +1678,6 @@ source('../jheem2/R/HELPERS_array_helpers.R')
 #                   stratification.dimensions = c("risk"),
 #                   adjudication.data.frame = outlier.df,
 #                   adjudication.vector = corrections) #do not include year or location here# #currently only works at one stratification at a time#
-
-################################################################################
-#Source script that applies 2020 proportion of adults to unstratified census
-#population data from 2021-2023
- source('data_processing/adult.population.proportion.estimation.R')
 
 ################################################################################
  ###Save surveillance manager####
