@@ -148,7 +148,7 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.TEST, # 200
+                          n.iter = N.ITER.TEST, # 10000
                           thin = 1, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
@@ -163,7 +163,7 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.TEST, # 200
+                          n.iter = N.ITER.TEST, # 10000
                           thin = 1, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
@@ -178,7 +178,7 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS.PREP,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.TEST, # 200
+                          n.iter = N.ITER.TEST, # 10000
                           thin = 1, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
@@ -193,7 +193,7 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS.IDU,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.TEST, # 200
+                          n.iter = N.ITER.TEST, # 10000
                           thin = 1, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
@@ -208,7 +208,7 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS.CONTINUUM,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.TEST, # 200
+                          n.iter = N.ITER.TEST, # 10000
                           thin = 1, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
