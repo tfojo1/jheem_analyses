@@ -1778,6 +1778,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     units = '%',
                                                                     singular.unit = '%'),
                          value = expression(diagnosed.prevalence/cumulative.infected),
+                         corresponding.data.outcome = 'awareness',
                          denominator.outcome = 'cumulative.infected',
                          keep.dimensions = c("location"))
 
