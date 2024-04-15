@@ -1,14 +1,19 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 LOCATION = 'C.12580' #BALTIMORE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION   # CALIBRATION.CODE.POPULATION, 
-                                                          # CALIBRATION.CODE.TRANSMISSION
-                                                          # CALIBRATION.CODE.FULL
-                                                          # CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION
-                                                          # CALIBRATION.CODE.POP.TRANS.MORT 
-                                                          # CALIBRATION.CODE.POP.TRANS.MORT.IDU 
-                                                          # CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU 
-                                                          
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION   # CALIBRATION.CODE.POPULATION
+                                                                      # CALIBRATION.CODE.TRANSMISSION
+                                                                      # CALIBRATION.CODE.FULL
+                                                                      # CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION
+                                                                      # CALIBRATION.CODE.POP.TRANS.MORT 
+                                                                      # CALIBRATION.CODE.POP.TRANS.MORT.IDU 
+                                                                      # CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU 
+                                                                      # CALIBRATION.CODE.BASE.PROP.TESTED 
+                                                                      # CALIBRATION.CODE.BASE.POSITIVITY 
+                                                                      # CALIBRATION.CODE.BASE.AWARENESS 
+                                                                      # CALIBRATION.CODE.BASE.PREP 
+
+
 
 set.seed(12345)
 
@@ -64,6 +69,12 @@ if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TRANSMISSION){
   save(sim,file=paste0("prelim_results/pop_trans_mort_idu_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU){
   save(sim,file=paste0("prelim_results/pop_trans_mort_non_idu_",Sys.Date(),"_",LOCATION,".Rdata"))
-}else stop("invalid calibration code")
-
-
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.BASE.PROP.TESTED){
+  save(sim,file=paste0("prelim_results/base_plus_prop_tested_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.BASE.POSITIVITY){
+  save(sim,file=paste0("prelim_results/base_plus_positivity_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.BASE.AWARENESS){
+  save(sim,file=paste0("prelim_results/base_plus_awareness_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.BASE.PREP){
+  save(sim,file=paste0("prelim_results/base_plus_prep_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else stop("invalid calibration code")
