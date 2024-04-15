@@ -1,15 +1,14 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 LOCATION = 'C.12580' #BALTIMORE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.POP.TRANS.CONTINUUM   # CALIBRATION.CODE.POPULATION, 
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION   # CALIBRATION.CODE.POPULATION, 
                                                           # CALIBRATION.CODE.TRANSMISSION
                                                           # CALIBRATION.CODE.FULL
                                                           # CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION
-                                                          # CALIBRATION.CODE.POP.TRANS 
                                                           # CALIBRATION.CODE.POP.TRANS.MORT 
-                                                          # CALIBRATION.CODE.POP.TRANS.PREP 
-                                                          # CALIBRATION.CODE.POP.TRANS.IDU 
-                                                          # CALIBRATION.CODE.POP.TRANS.CONTINUUM 
+                                                          # CALIBRATION.CODE.POP.TRANS.MORT.IDU 
+                                                          # CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU 
+                                                          
 
 set.seed(12345)
 
@@ -43,11 +42,11 @@ mcmc = run.calibration(version = 'ehe',
 end.time = Sys.time()
 run.time = as.numeric(end.time) - as.numeric(start.time)
 
-print(paste0("DONE RUNNING MCMC: Took ",
-             round(run.time/60, 0), " minutes to run ",
-             format(N.ITER, big.mark = ","),
-             " simulations (",
-             round(run.time / N.ITER, 1), " seconds per simulation on average)"))
+# print(paste0("DONE RUNNING MCMC: Took ",
+#              round(run.time/60, 0), " minutes to run ",
+#              format(N.ITER, big.mark = ","),
+#              " simulations (",
+#              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
 
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
@@ -58,17 +57,13 @@ if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TRANSMISSION){
 } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL){
   save(sim,file=paste0("prelim_results/init.full.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION){
-  save(sim,file=paste0("prelim_results/init.full.minus.two.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS){
-  save(sim,file=paste0("prelim_results/pop_trans_",Sys.Date(),"_",LOCATION,".Rdata"))
+  save(sim,file=paste0("prelim_results/init.full.minus.supp_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.MORT){
-  save(sim,file=paste0("prelim_results/pop_trans_mort",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.PREP){
-  save(sim,file=paste0("prelim_results/pop_trans_prep",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.IDU){
-  save(sim,file=paste0("prelim_results/pop_trans_prep",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.CONTINUUM){
-  save(sim,file=paste0("prelim_results/pop_trans_prep",Sys.Date(),"_",LOCATION,".Rdata"))
-} else stop("invalid calibration code")
+  save(sim,file=paste0("prelim_results/pop_trans_mort_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.MORT.IDU){
+  save(sim,file=paste0("prelim_results/pop_trans_mort_idu_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU){
+  save(sim,file=paste0("prelim_results/pop_trans_mort_non_idu_",Sys.Date(),"_",LOCATION,".Rdata"))
+}else stop("invalid calibration code")
 
 
