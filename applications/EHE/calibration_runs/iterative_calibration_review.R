@@ -14,6 +14,11 @@ sim.pop.trans.mort.non.idu = sim
 load("../jheem_analyses/prelim_results/init.full.minus.supp_2024-04-14_C.12580.Rdata")
 sim.full.minus.supp = sim
 
+# pop.trans.mort.lik = pop.trans.mortality.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+# pop.trans.mort.idu.lik = pop.trans.mortality.idu.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+# pop.trans.mort.non.idu.lik = pop.trans.mortality.non.idu.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+# full.minus.supp.lik = FULL.likelihood.instructions.minus.supp$instantiate.likelihood('ehe','C.12580')
+
 # all of the ones after pop.trans.mort are problematic
 simplot(sim.pop.trans.mort,
         sim.pop.trans.mort.idu,
