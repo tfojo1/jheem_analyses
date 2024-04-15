@@ -632,9 +632,6 @@ source('data_processing/national_data.R')
 #CDC Wonder AIDS data from 1981-2001
 source('data_processing/aids_data_1981_2001.R')
 
-#Source code that restructures census age groups to get adult.pop for 2020-2022
-source('data_processing/restructure.recent.census.age.groups.R')
-
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
 
@@ -1545,6 +1542,11 @@ census.manager = load.data.manager("../../cached/census.manager.rdata")
                         data.manager = surveillance.manager,
                         census.manager = census.manager)
  
+
+# Adult population for recent census data ---------------------------------
+
+ #Source code that restructures census age groups to get adult.pop for 2020-2022
+ source('data_processing/restructure.recent.census.age.groups.R')
 ################################################################################
  #Create aggregated outcomes 
   #This is mainly county data being aggregated to MSA level
