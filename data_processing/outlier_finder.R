@@ -53,7 +53,7 @@ remove.outliers = function(outcome, stratifications, data.manager, adjudication.
                 this.adj.data.frame,
                 1,
                 function(row) {!any(is.na(row[names(row)!='adjudication']))}
-            )]
+            ),]
         
         stratification.name = "year__location"
         stratification.dimensions = sort(stratification)
@@ -98,7 +98,7 @@ find.outlier.data = function(outcome, stratifications=list(), data.manager = get
                 this.adj.data.frame,
                 1,
                 function(row) {!any(is.na(row[names(row)!='adjudication']))}
-            )]
+            ),]
         find.outlier.data.per.stratification(outcome=outcome, data.manager=data.manager, locations=locations, stratification.dimensions=stratification, adjudication.data.frame=this.adj.data.frame, phi=phi, theta=theta, minimum.flagged.change = minimum.flagged.change)
     })
     
