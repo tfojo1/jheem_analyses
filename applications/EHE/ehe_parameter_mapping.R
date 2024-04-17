@@ -771,26 +771,33 @@ set.ehe.idu.from.parameters = function(model.settings,
                                        times = c(0,2))
 {
     specification.metadata = model.settings$specification.metadata
+    races = specification.metadata$dim.names$race
+    ages = specification.metadata$dim.names$age
     
     for (time in times)
     {
         alpha.name = paste0('time',time)
-        for (race in specification.metadata$dim.names$race)
-        {
-            param.name = paste0(race, '.incident.idu.multiplier.', time)
-            model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
-                                                                        alpha.name = alpha.name,
-                                                                        values = parameters[param.name],
-                                                                        applies.to.dimension.values = race,
-                                                                        dimensions = 'race')
-        }
         
-        param.name = paste0('young.incident.idu.multiplier.', time)
+        param.names = paste0(races, '.incident.idu.multiplier.', time)
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
                                                                       alpha.name = alpha.name,
-                                                                      values = parameters[param.name],
-                                                                      applies.to.dimension.values = 1, # first age only 
+                                                                      values = parameters[param.names],
+                                                                      applies.to.dimension.values = races,
+                                                                      dimensions = 'race')
+        
+        param.names = paste0('age', 1:length(ages), '.incident.idu.multiplier') #no time varying component
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
+                                                                      alpha.name = alpha.name,
+                                                                      values = parameters[param.names],
+                                                                      applies.to.dimension.values = ages,
                                                                       dimensions = 'age')
+        
+        # param.name = paste0('young.incident.idu.multiplier.', time)
+        # model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
+        #                                                               alpha.name = alpha.name,
+        #                                                               values = parameters[param.name],
+        #                                                               applies.to.dimension.values = 1, # first age only 
+        #                                                               dimensions = 'age')
         
         param.name = paste0('msm.incident.idu.multiplier.', time)
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
