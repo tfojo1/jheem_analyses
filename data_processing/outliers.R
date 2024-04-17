@@ -27,12 +27,12 @@ hiv.deaths.outliers <- run.outlier.process(outcome= 'hiv.deaths',
 diagnoses.outliers <- run.outlier.process(outcome= 'diagnoses',
                                            stratifications= list(c()), 
                                            data.manager= surveillance.manager,
-                                           locations= c(MSAS.OF.INTEREST))
+                                           locations= c(MSAS.OF.INTEREST, states, counties))
 
 diagnosed.prevalence.outliers <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                           stratifications= list(c()), 
                                           data.manager= surveillance.manager,
-                                          locations= c(MSAS.OF.INTEREST, states))
+                                          locations= c(MSAS.OF.INTEREST, states, counties))
 
 
 # This is how you will put back in the adjudicated data frame -------------
