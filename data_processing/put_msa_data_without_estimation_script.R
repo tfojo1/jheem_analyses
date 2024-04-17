@@ -48,8 +48,8 @@ put.msa.data.strict = function(census.outcome.name = 'population',
             url.this.ont = url.this.source[[ont.name]][[stratification.name]]
             details.this.ont = details.this.source[[ont.name]][[stratification.name]]
             
-            if (is.null(data.this.ont) || is.null(url.this.ont) || is.null(details.this.ont))
-                stop(paste0(error.prefix, "data with stratification '", stratification.name, "' could not be found for source '", source.name, "' and ontology '", ont.name, "'"))
+            if (is.null(data.this.ont) || is.null(url.this.ont) || is.null(details.this.ont)) next
+                # stop(paste0(error.prefix, "data with stratification '", stratification.name, "' could not be found for source '", source.name, "' and ontology '", ont.name, "'"))
            
             # Subset by age
             ont.ages = dimnames(data.this.ont)$age
