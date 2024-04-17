@@ -7,7 +7,7 @@ source('commoncode/locations_of_interest.R')
 source('commoncode/additional_locations_of_interest.R')
 
 states = c(state.abb)
-counties = locations::get.all.for.type("COUNTY")
+counties = locations::get.all.for.type("COUNTY")#do you want all counties? 
 
 # Call outlier function ---------------------------------------------------
 
@@ -32,7 +32,7 @@ diagnoses.outliers <- run.outlier.process(outcome= 'diagnoses',
 diagnosed.prevalence.outliers <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                           stratifications= list(c()), 
                                           data.manager= surveillance.manager,
-                                          locations= c(MSAS.OF.INTEREST, states, counties))
+                                          locations= c(counties[68])) #error happens for counties
 
 
 # This is how you will put back in the adjudicated data frame -------------
