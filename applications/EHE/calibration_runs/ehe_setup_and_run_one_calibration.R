@@ -8,10 +8,9 @@ CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION   # CALIBRAT
                                                                       # CALIBRATION.CODE.POP.TRANS.MORT 
                                                                       # CALIBRATION.CODE.POP.TRANS.MORT.IDU 
                                                                       # CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU 
-                                                                      # CALIBRATION.CODE.BASE.PROP.TESTED 
-                                                                      # CALIBRATION.CODE.BASE.POSITIVITY 
-                                                                      # CALIBRATION.CODE.BASE.AWARENESS 
-                                                                      # CALIBRATION.CODE.BASE.PREP 
+                                                                      # CALIBRATION.CODE.FULL.WITHOUT.PREP 
+                                                                      # CALIBRATION.CODE.FULL.WITHOUT.PREP.SUPP
+                                                                      # CALIBRATION.CODE.FULL.WITHOUT.PREP.SUPP.IDU
 
 
 
@@ -69,12 +68,11 @@ if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.TRANSMISSION){
   save(sim,file=paste0("prelim_results/pop_trans_mort_idu_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU){
   save(sim,file=paste0("prelim_results/pop_trans_mort_non_idu_",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.BASE.PROP.TESTED){
-  save(sim,file=paste0("prelim_results/base_plus_prop_tested_",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.BASE.POSITIVITY){
-  save(sim,file=paste0("prelim_results/base_plus_positivity_",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.BASE.AWARENESS){
-  save(sim,file=paste0("prelim_results/base_plus_awareness_",Sys.Date(),"_",LOCATION,".Rdata"))
-} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.BASE.PREP){
-  save(sim,file=paste0("prelim_results/base_plus_prep_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL.WITHOUT.PREP){
+  save(sim,file=paste0("prelim_results/full_minus_prep_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL.WITHOUT.PREP.SUPP){
+  save(sim,file=paste0("prelim_results/full_minus_prep_supp_",Sys.Date(),"_",LOCATION,".Rdata"))
+} else if(CALIBRATION.CODE.TO.RUN==CALIBRATION.CODE.FULL.WITHOUT.PREP.SUPP.IDU){
+  save(sim,file=paste0("prelim_results/full_minus_prep_supp_idu_",Sys.Date(),"_",LOCATION,".Rdata"))
 } else stop("invalid calibration code")
+

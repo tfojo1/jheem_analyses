@@ -541,9 +541,8 @@ pop.trans.mortality.non.idu.likelihood.instructions = join.likelihood.instructio
   
 )
 
-#-- ADDING NON-IDU LIKELIHOODS ONE AT A TIME --# 
-# proportion tested
-pop.trans.mortality.prop.tested.likelihood.instructions = join.likelihood.instructions(  
+#-- ALL EXCEPT PREP --# 
+FULL.likelihood.instructions.minus.prep =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -559,70 +558,82 @@ pop.trans.mortality.prop.tested.likelihood.instructions = join.likelihood.instru
   aids.deaths.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions
-)
-
-# hiv.test.positivity 
-pop.trans.mortality.positivity.likelihood.instructions = join.likelihood.instructions(  
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  hiv.test.positivity.likelihood.instructions
-)
-
-# awareness
-pop.trans.mortality.awareness.likelihood.instructions = join.likelihood.instructions(  
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  awareness.likelihood.instructions
-)
-
-# Add prep
-pop.trans.mortality.prep.likelihood.instructions = join.likelihood.instructions(  
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions,
+  suppression.likelihood.instructions,
   
   # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions
+  # prep.uptake.likelihood.instructions,
+  # prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions,
+  cocaine.likelihood.instructions
 )
 
+#-- ALL EXCEPT PREP AND SUPPRESSION --# 
+FULL.likelihood.instructions.minus.prep.supp =  join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # MORTALITY LIKELIHOODS
+  hiv.mortality.likelihood.instructions,
+  general.mortality.likelihood.instructions,
+  aids.deaths.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions,
+  #suppression.likelihood.instructions,
+  
+  # PREP LIKELIHOODS
+  # prep.uptake.likelihood.instructions,
+  # prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions,
+  cocaine.likelihood.instructions
+)
+
+
+#-- ALL EXCEPT PREP, SUPPRESSION, AND IDU --# 
+FULL.likelihood.instructions.minus.prep.supp.idu =  join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # MORTALITY LIKELIHOODS
+  hiv.mortality.likelihood.instructions,
+  general.mortality.likelihood.instructions,
+  aids.deaths.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions
+  #suppression.likelihood.instructions,
+  
+  # PREP LIKELIHOODS
+  # prep.uptake.likelihood.instructions,
+  # prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  # heroin.likelihood.instructions,
+  # cocaine.likelihood.instructions
+)
 
 
 #-- JOIN THE FULL LIKELIHOOD  --#

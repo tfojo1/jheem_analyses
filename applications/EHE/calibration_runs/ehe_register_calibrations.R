@@ -10,10 +10,9 @@ CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION = 'init.full.minus.supp.ehe'
 CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 CALIBRATION.CODE.POP.TRANS.MORT.IDU = 'pop.trans.mort.idu'
 CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU = 'pop.trans.mort.non.idu'
-CALIBRATION.CODE.BASE.PROP.TESTED = 'base.prop.tested'
-CALIBRATION.CODE.BASE.POSITIVITY = 'base.positivity'
-CALIBRATION.CODE.BASE.AWARENESS = 'base.awareness'
-CALIBRATION.CODE.BASE.PREP = 'base.prep'
+CALIBRATION.CODE.FULL.WITHOUT.PREP = 'full.minus.prep'
+CALIBRATION.CODE.FULL.WITHOUT.PREP.SUPP = 'full.minus.prep.supp'
+CALIBRATION.CODE.FULL.WITHOUT.PREP.SUPP.IDU = 'full.minus.prep.supp.idu'
 
 N.ITER.TEST = 10000
 N.ITER = 20000
@@ -206,11 +205,9 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT.NON.IDU,
                           description = "Adding in likelihoods iteratively, population + transmission + mortality + non-idu"
 )
 
-
-#-- ADDING NON-IDU LIKELIHOODS ONE AT A TIME --# 
-# proportion tested
-register.calibration.info(CALIBRATION.CODE.BASE.PROP.TESTED,
-                          likelihood.instructions = pop.trans.mortality.prop.tested.likelihood.instructions,
+# full without prep 
+register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.PREP,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.prep,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -220,13 +217,12 @@ register.calibration.info(CALIBRATION.CODE.BASE.PROP.TESTED,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "base + prop tested"
+                          description = "Full except prep"
 )
 
-
-# hiv.test.positivity 
-register.calibration.info(CALIBRATION.CODE.BASE.POSITIVITY,
-                          likelihood.instructions = pop.trans.mortality.positivity.likelihood.instructions,
+# full without prep/supp
+register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.PREP.SUPP,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.prep.supp,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -236,12 +232,12 @@ register.calibration.info(CALIBRATION.CODE.BASE.POSITIVITY,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "base + test positivity"
+                          description = "Full except prep/supp"
 )
 
-# awareness
-register.calibration.info(CALIBRATION.CODE.BASE.AWARENESS,
-                          likelihood.instructions = pop.trans.mortality.awareness.likelihood.instructions,
+# full without prep/supp/idu
+register.calibration.info(CALIBRATION.CODE.FULL.WITHOUT.PREP.SUPP.IDU,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.prep.supp.idu,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -251,20 +247,5 @@ register.calibration.info(CALIBRATION.CODE.BASE.AWARENESS,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "base + awareness"
-)
-
-# Add prep
-register.calibration.info(CALIBRATION.CODE.BASE.PREP,
-                          likelihood.instructions = pop.trans.mortality.prep.likelihood.instructions,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER, 
-                          thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "base + prep"
+                          description = "Full except prep/supp/idu"
 )
