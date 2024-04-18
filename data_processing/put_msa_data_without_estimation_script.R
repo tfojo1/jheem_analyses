@@ -67,7 +67,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
             for (location in locations) {
                 # print(location)
                 # loctime = Sys.time()
-                if (!is.null(contained.geographic.type)) contained.locations = locations::get.contained.locations(location, type =  contained.geographic.type)
+                if (!is.null(contained.geographic.type)) contained.locations = locations::get.contained.locations(location, sub.type =  contained.geographic.type)
                 else contained.locations = location
                 if (length(contained.locations)==0) next
                 # loctime = Sys.time()-loctime
