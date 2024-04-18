@@ -34,7 +34,7 @@ params.manual = params.pop.trans.mort
 ## incident IDU parameters IMPROVE prop using cocaine/heroin plots WITHOUT messing up population plots - GOOD
 # incident.idu.params = names(params.manual[grepl("incident.idu",names(params.manual))])
 # params.manual[incident.idu.params] = params.pop.trans.mort.idu[incident.idu.params]
-sim.manual = engine$run(parameters = params.manual) 
+# sim.manual = engine$run(parameters = params.manual) 
 
 # THESE CAUSE THE SCOOP - narrow down to a subset 
 other.params = names(params.manual[grepl("other",names(params.manual))])
@@ -54,12 +54,12 @@ params.manual["other.age3.aging.multiplier"] = params.pop.trans.mort.idu["other.
 
 sim.manual = engine$run(parameters = params.manual) 
 
-round(exp(pop.trans.mort.idu.lik$compute.piecewise(sim.pop.trans.mort.idu) - 
+round(exp(pop.trans.mort.idu.lik$compute.piecewise(sim.manual) - 
             pop.trans.mort.idu.lik$compute.piecewise(sim.pop.trans.mort)),4)
 
 # population 
 simplot(sim.pop.trans.mort,
-        #sim.manual,
+        sim.manual,
         sim.pop.trans.mort.idu, 
         facet.by = "age", split.by = "race", 
         outcomes = c("population"),
@@ -67,7 +67,7 @@ simplot(sim.pop.trans.mort,
 
 # heroin/cocaine
 simplot(sim.pop.trans.mort,
-        #sim.manual,
+        sim.manual,
         sim.pop.trans.mort.idu,
         facet.by = "age", 
         outcomes = c("proportion.using.heroin","proportion.using.cocaine"),
@@ -76,8 +76,8 @@ simplot(sim.pop.trans.mort,
 
 # prevalence
 simplot(sim.pop.trans.mort,
-        sim.pop.trans.mort.idu,
-        facet.by = "risk", 
+        sim.manual,
+        facet.by = "risk", split.by = "race",
         outcomes = c("diagnosed.prevalence"),
         dimension.values = list(year = 2000:2030)) + ggtitle(locations::get.location.name(sim$location))
 
