@@ -298,7 +298,7 @@ generate.find.outliers.function = function(phi, theta, minimum.flagged.change) {
         # Pick 2019 or earlier, else pick first year above 2019. Must be nonzero because we divide by it to find a percent change.
         if (any(as.numeric(years)<=2019 & as.numeric(years)!=0))
             baseline.year = max(as.numeric(years)[as.numeric(years)<2020 & as.numeric(years)!=0])
-        else if (any(as.numeric(years)>2019) & as.numeric(years)!=0)
+        else if (any(as.numeric(years)>2019 & as.numeric(years)!=0))
             baseline.year = min(as.numeric(years)[as.numeric(years)!=0])
         else return(flagged.years)
         
