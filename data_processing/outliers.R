@@ -38,10 +38,10 @@ diagnosed.prevalence.outliers <- run.outlier.process(outcome= 'diagnosed.prevale
 
 # This is how you will put back in the adjudicated data frame -------------
 
-run.outlier.process(outcome= 'diagnosed.prevalence',
-                    stratifications= list(c()),
-                    data.manager= surveillance.manager,
-                    locations= MSAS.OF.INTEREST,
-                    adjudication.data.frame = fixed.outliers)
+# run.outlier.process(outcome= 'diagnosed.prevalence',
+#                     stratifications= list(c()),
+#                     data.manager= surveillance.manager,
+#                     locations= MSAS.OF.INTEREST,
+#                     adjudication.data.frame = fixed.outliers)
 
 
