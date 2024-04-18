@@ -45,3 +45,41 @@ diagnosed.prevalence.outliers <- run.outlier.process(outcome= 'diagnosed.prevale
 #                     adjudication.data.frame = fixed.outliers)
 
 
+# Create Plots ------------------------------------------------------------
+hiv.deaths = as.data.frame.table(surveillance.manager$data$hiv.deaths$estimate$cdc.hiv$cdc$year__location)
+
+#Arizona: COVID?
+hiv.deaths.az <- hiv.deaths %>% filter(location == "AZ")
+ggplot(data = hiv.deaths.az)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "red")+                       
+  labs()+                                 
+  theme() 
+
+#Atlanta: This has a lot of NA
+hiv.deaths.atl <- hiv.deaths %>% filter(location == "C.12060")
+ggplot(data = hiv.deaths.atl)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "red")+                       
+  labs()+                                 
+  theme() 
+
+#Michigan: idk do we need to change scale
+hiv.deaths.mi <- hiv.deaths %>% filter(location == "MI")
+ggplot(data = hiv.deaths.mi)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "red")+                       
+  labs()+                                 
+  theme() 
+
+#Baltimore: Only data from 2019 and 2021 (deaths by msa only available for 2019-2021, is this enough data to decide?)
+hiv.deaths.baltimore <- hiv.deaths %>% filter(location == "C.12580")
+ggplot(data = hiv.deaths.baltimore)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "red")+                       
+  labs()+                                 
+  theme() 
