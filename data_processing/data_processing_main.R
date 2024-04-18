@@ -1304,6 +1304,8 @@ data.list.clean.indications = lapply(data.list.atlas.prep, function(file){
   data$year = substring(data$year,1, 4)                                          
   data$year = as.character(data$year)
   
+  data = subset(data, data$year=="2018" | data$year == "2017") #Decided 4-18-24 to remove any years after 2018 bc data is all the same
+  
   data$Population[data$Population %in% c("Data suppressed")] = NA    
   data$Population[data$Population %in% c("Data not available")] = NA  
   data$value = as.numeric(gsub(",", '', data$Population))   
