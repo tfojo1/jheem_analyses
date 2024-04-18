@@ -1,5 +1,6 @@
 
 # Set up  -----------------------------------------------------------------
+options(error=NULL)
 
 surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 source('data_processing/outlier_finder.R')
@@ -32,7 +33,7 @@ diagnoses.outliers <- run.outlier.process(outcome= 'diagnoses',
 diagnosed.prevalence.outliers <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                           stratifications= list(c()), 
                                           data.manager= surveillance.manager,
-                                          locations= c(counties[68])) #error happens for counties
+                                          locations= c(MSAS.OF.INTEREST, states, counties)) 
 
 
 # This is how you will put back in the adjudicated data frame -------------
