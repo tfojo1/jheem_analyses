@@ -176,7 +176,7 @@ prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcom
 aids.diagnoses.likelihood.instructions = 
   create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
                                                                 outcome.for.sim = "aids.diagnoses", 
-                                                                dimensions = c("race","risk"), # ADD BACK AGE AND SEX LATER
+                                                                dimensions = c("age","sex","race","risk"), 
                                                                 levels.of.stratification = c(0,1), 
                                                                 from.year = 1980,
                                                                 to.year = 2001,
@@ -184,8 +184,8 @@ aids.diagnoses.likelihood.instructions =
                                                                 measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up
                                                                 weights = list(1), 
                                                                 equalize.weight.by.year = T,
-                                                                included.multiplier = 1.4,
-                                                                included.multiplier.sd = 0.2, # rounding up from 10%, 0.14
+                                                                included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
+                                                                included.multiplier.sd = 0.2306945, # see aids_diagnoses_multiplier.R
                                                                 included.multiplier.correlation = 0.5
   )
 
@@ -493,8 +493,8 @@ pop.trans.mortality.likelihood.instructions = join.likelihood.instructions(
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions)
 
-# Add all idu-related (heroin and cocaine)
-pop.trans.mortality.idu.likelihood.instructions = join.likelihood.instructions(  
+# Base + prep 
+pop.trans.mortality.prep.likelihood.instructions = join.likelihood.instructions(  
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -508,41 +508,13 @@ pop.trans.mortality.idu.likelihood.instructions = join.likelihood.instructions(
   hiv.mortality.likelihood.instructions,
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions)
-
-# Add all non-idu-related  (continuum and prep)
-pop.trans.mortality.non.idu.likelihood.instructions = join.likelihood.instructions(  
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  #suppression.likelihood.instructions,
   
   # PREP LIKELIHOODS
   prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions
-  
-)
+  prep.indications.likelihood.instructions)
 
-#-- ALL EXCEPT PREP --# 
-FULL.likelihood.instructions.minus.prep =  join.likelihood.instructions(
+#-- ALL EXCEPT PREP, ADDED AIDS DIAGNOSES BACK --# 
+FULL.likelihood.instructions.plus.aids.diagoses.minus.prep =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -556,6 +528,9 @@ FULL.likelihood.instructions.minus.prep =  join.likelihood.instructions(
   hiv.mortality.likelihood.instructions,
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions,
+  
+  # AIDS DIAGNOSES LIKELIHOOD
+  aids.diagnoses.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,
@@ -572,8 +547,9 @@ FULL.likelihood.instructions.minus.prep =  join.likelihood.instructions(
   cocaine.likelihood.instructions
 )
 
-#-- ALL EXCEPT PREP AND SUPPRESSION --# 
-FULL.likelihood.instructions.minus.prep.supp =  join.likelihood.instructions(
+
+#-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 
+FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -588,69 +564,8 @@ FULL.likelihood.instructions.minus.prep.supp =  join.likelihood.instructions(
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions,
   
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  #suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  # prep.uptake.likelihood.instructions,
-  # prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
-)
-
-
-#-- ALL EXCEPT PREP, SUPPRESSION, AND IDU --# 
-FULL.likelihood.instructions.minus.prep.supp.idu =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions
-  #suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  # prep.uptake.likelihood.instructions,
-  # prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  # heroin.likelihood.instructions,
-  # cocaine.likelihood.instructions
-)
-
-
-#-- JOIN THE FULL LIKELIHOOD  --#
-FULL.likelihood.instructions =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
+  # AIDS DIAGNOSES LIKELIHOOD
+  aids.diagnoses.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,
@@ -668,36 +583,7 @@ FULL.likelihood.instructions =  join.likelihood.instructions(
 )
 
 
-#-- JOIN THE FULL LIKELIHOOD, WITHOUT SUPPRESSION  --#
-FULL.likelihood.instructions.minus.supp = join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions, 
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  #suppression.likelihood.instructions, WITHOUT THIS ONE
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
-)
+
 
 #-- COVID LIKELIHOOD  --#
 if(1==2){
