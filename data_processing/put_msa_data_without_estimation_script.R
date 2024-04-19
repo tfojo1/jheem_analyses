@@ -84,6 +84,9 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                 url.from.this.location.only = do.call('[', c(list(url.from.locs.only), subset.by.locs.arguments, list(drop=F)))
                 details.from.this.location.only = do.call('[', c(list(details.from.locs.only), subset.by.locs.arguments, list(drop=F)))
                 
+                # If no data found, must skip or risk errors below
+                if (all(is.na(data.from.this.location.only))) next
+                
                 # Convert url and details to their character forms
                 url.from.this.location.only = census.manager$unhash.url(url.from.this.location.only)
                 details.from.this.location.only = census.manager$unhash.details(details.from.this.location.only)
