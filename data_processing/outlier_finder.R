@@ -220,6 +220,8 @@ do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratif
                         city.data = setNames(as.vector(array.access(data.this.stratification, location=city.name, dimension.values)), years)
                         years = years[!is.na(city.data)]
                         city.data = city.data[!is.na(city.data)]
+                        if (length(years)==0) return(NULL)
+                        if (length(city.data)==0) return(NULL)
                         result = do.find.outliers(city.data,
                                                   years = years,
                                                   get.adjudication(years=years,
@@ -252,6 +254,8 @@ do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratif
                     city.data = setNames(as.vector(array.access(data.this.stratification, location=city.name)), years)
                     years = years[!is.na(city.data)]
                     city.data = city.data[!is.na(city.data)]
+                    if (length(years)==0) return(NULL)
+                    if (length(city.data)==0) return(NULL)
                     result = do.find.outliers(city.data,
                                               years = years,
                                               get.adjudication(years=years,
@@ -294,7 +298,7 @@ generate.find.outliers.function = function(phi, theta, minimum.flagged.change) {
         # Pick 2019 or earlier, else pick first year above 2019. Must be nonzero because we divide by it to find a percent change.
         if (any(as.numeric(years)<=2019 & as.numeric(years)!=0))
             baseline.year = max(as.numeric(years)[as.numeric(years)<2020 & as.numeric(years)!=0])
-        else if (any(as.numeric(years)>2019) & as.numeric(years)!=0)
+        else if (any(as.numeric(years)>2019 & as.numeric(years)!=0))
             baseline.year = min(as.numeric(years)[as.numeric(years)!=0])
         else return(flagged.years)
         

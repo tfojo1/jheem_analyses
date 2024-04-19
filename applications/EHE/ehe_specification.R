@@ -1791,7 +1791,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                                                                  units = 'deaths',
                                                                  singular.unit = 'death'),
                       dynamic.quantity.name = 'mortality',
-                      corresponding.data.outcome = 'hiv.mortality',
+                      corresponding.data.outcome = 'hiv.deaths',
                       groups = 'infected',
                       subset.dimension.values = list(continuum = "diagnosed.states"), # only those who were diagnosed, diff from aids deaths
                       exclude.tags = "emigration",
@@ -1839,7 +1839,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'aids.to.new.diagnosis.ratio',
-                       value = 1.4,
+                       value = 1.044985, # see aids_diagnoses_multiplier.R
                        scale = 'ratio')
 
 

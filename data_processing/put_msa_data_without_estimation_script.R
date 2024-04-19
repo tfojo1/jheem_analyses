@@ -67,8 +67,9 @@ put.msa.data.strict = function(census.outcome.name = 'population',
             for (location in locations) {
                 # print(location)
                 # loctime = Sys.time()
-                if (!is.null(contained.geographic.type)) contained.locations = locations::get.overlapping.locations(location, type =  contained.geographic.type)
+                if (!is.null(contained.geographic.type)) contained.locations = locations::get.contained.locations(location, sub.type =  contained.geographic.type)
                 else contained.locations = location
+                if (length(contained.locations)==0) next
                 # loctime = Sys.time()-loctime
                 # other.time = Sys.time()
                 from.locations.present = intersect(contained.locations, dimnames(data.from.locs.only)$location)
@@ -82,6 +83,9 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                 data.from.this.location.only = do.call('[', c(list(data.from.locs.only), subset.by.locs.arguments, list(drop=F)))
                 url.from.this.location.only = do.call('[', c(list(url.from.locs.only), subset.by.locs.arguments, list(drop=F)))
                 details.from.this.location.only = do.call('[', c(list(details.from.locs.only), subset.by.locs.arguments, list(drop=F)))
+                
+                # If no data found, must skip or risk errors below
+                if (all(is.na(data.from.this.location.only))) next
                 
                 # Convert url and details to their character forms
                 url.from.this.location.only = census.manager$unhash.url(url.from.this.location.only)

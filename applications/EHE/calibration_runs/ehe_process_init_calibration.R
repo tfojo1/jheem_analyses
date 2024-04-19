@@ -50,15 +50,9 @@ for(location in LOCATIONS){
   # Pull just the last simulation
   sim = mcmc@simulations[[length(mcmc@simulations)]]
   
-  if(CALIBRATION.CODE.TO.PROCESS==CALIBRATION.CODE.TRANSMISSION){
-    save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",location,".Rdata"))
-  } else if(CALIBRATION.CODE.TO.PROCESS==CALIBRATION.CODE.POPULATION){
-    save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",location,".Rdata"))
-  } else if(CALIBRATION.CODE.TO.PROCESS==CALIBRATION.CODE.FULL){
-    save(sim,file=paste0("prelim_results/init.full.sim_",Sys.Date(),"_",location,".Rdata"))
-  } else if(CALIBRATION.CODE.TO.PROCESS==CALIBRATION.CODE.FULL.WITHOUT.SUPPRESSION){
-    save(sim,file=paste0("prelim_results/init.full.minus.two.sim_",Sys.Date(),"_",location,".Rdata"))
-  } else stop("invalid calibration code")
+  
+  save(sim,file=paste0("prelim_results/",CALIBRATION.CODE.TO.PROCESS,"_",Sys.Date(),"_",location,".Rdata"))
+
 
 }
 
