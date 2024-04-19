@@ -464,9 +464,9 @@ get.best.guess.msm.proportions <- function(location,
                                            keep.race = T,
                                            return.proportions = T)
 {
-    counties = get.contained.locations(location, 'county')
-    states = get.overlapping.locations(location, 'state')
-    
+    counties = locations::get.contained.locations(location, 'county')
+    states = locations::get.overlapping.locations(location, 'state')
+   
     # Get county-level proportions
     proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
                                                          dimension.values = list(location=counties,
@@ -1110,8 +1110,8 @@ get.prior.to.active.idu.ratio <- function(location,
 }
 
 get.active.to.never.idu.ratio <- function(location,
-                                        specification.metadata,
-                                        population.year = DEFAULT.POPULATION.YEARS[1])
+                                          specification.metadata,
+                                          population.year = DEFAULT.POPULATION.YEARS[1])
 {
     n.ages = specification.metadata$n.ages
     
@@ -1125,7 +1125,7 @@ get.active.to.never.idu.ratio <- function(location,
     array.access(raw.pop, sex='female') = raw.female.pop
     
     if (!setequal(specification.metadata$dim.names$sex, c('msm','female','heterosexual_male')))
-      stop("Cannot get.active.to.non.idu.ratio() - the function as written assumes that sex is <'heterosexual_male','msm','female'>")
+      stop("Cannot get.active.to.never.idu.ratio() - the function as written assumes that sex is <'heterosexual_male','msm','female'>")
     
     
     non.age.dim.names = dimnames(raw.aging)
@@ -1167,7 +1167,8 @@ get.active.to.never.idu.ratio <- function(location,
     dimnames(rv) = dim.names
     
     # Scale to age-specific targets
-    print("In get.active.to.non.idu.ratio(), we need to implement scaling to the p observed in data")
+    # I think this is more complicated than is worthwhile
+#    print("In get.active.to.non.idu.ratio(), we need to implement scaling to the p observed in data")
     
     # Return
     rv

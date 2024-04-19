@@ -8,6 +8,20 @@ register.ontology.mapping('lump.other.risk.and.heterosexual',
                                            c('other', 'heterosexual'))
 )
 
+register.ontology.mapping('idu.to.active.prior',
+                          from.dimensions = 'risk',
+                          to.dimensions = 'risk',
+                          mappings = rbind(c('never_IDU', 'non.idu'),
+                                           c('active_IDU', 'idu'),
+                                           c('IDU_in_remission', 'idu')))
+
+register.ontology.mapping('non.idu.to.never.prior',
+                          from.dimensions = 'risk',
+                          to.dimensions = 'risk',
+                          mappings = rbind(c('never_IDU', 'non.active.idu'),
+                                           c('active_IDU', 'active.idu'),
+                                           c('IDU_in_remission', 'non.active.idu')))
+
 register.ontology.mapping('jheem.to.cdc.sex.risk',
                           from.dimensions = c('sex', 'risk'),
                           to.dimensions = c('sex', 'risk'),
