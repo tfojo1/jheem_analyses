@@ -8,9 +8,9 @@
     # mean = 0.9529412
     # SD =  0.02296911
 
-# IDU: (assuming ~100% avoidable)
-    # mean = 0.95 (assumption)
-    # SD =  0.02296911 (same as MSM)
+# IDU: receptive needle sharing 
+    # mean = 0.6871166
+    # SD =  0.02568016
 
 # Heterosexual: STI in the past year
     # mean = 0.3447421
@@ -30,8 +30,11 @@ msm.proportion.avoidable.sd = sqrt((msm.proportion.avoidable.mean*(1-msm.proport
 ##---------------##
 ##----  IDU  ----##
 ##---------------##
-idu.proportion.avoidable.mean = 0.95 # assuming ~100% 
-idu.proportion.avoidable.sd = msm.proportion.avoidable.sd
+# https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-11.pdf
+idu.with.receptive.sharing = 224
+total.idu = 326
+idu.proportion.avoidable.mean = idu.with.receptive.sharing/total.idu # assuming ~100% 
+idu.proportion.avoidable.sd = sqrt((idu.proportion.avoidable.mean*(1-idu.proportion.avoidable.mean))/total.idu) 
 
 ##------------------##
 ##-- Heterosexual --##
