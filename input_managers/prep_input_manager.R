@@ -6,6 +6,7 @@ if (1==2)
   
   library(ggplot2)
   
+  specification.metadata = get.specification.metadata('ehe', 'C.12580')
   ff = get.prep.use.functional.form(specification.metadata)
   ff = get.prep.indication.functional.form(specification.metadata)
   ff = get.prep.persistence.functional.form(specification.metadata)
@@ -39,13 +40,13 @@ if (1==2)
     ggplot(df.sex, aes(year, value, color=sex)) + geom_line() + geom_point() + ylim(0,1)
     
     df.race.het = reshape2::melt(apply(projected[,,,c('heterosexual_male','female'),'never_IDU'], c('year','race'), mean))
-    ggplot(df.race.het, aes(year, value, color=race)) + geom_line() + geom_point() + ylim(0,1)
+    ggplot(df.race.het, aes(year, value, color=race)) + geom_line() + geom_point() + ylim(0,.01)
     
     df.age.het = reshape2::melt(apply(projected[,,,c('heterosexual_male','female'),'never_IDU'], c('year','age'), mean))
-    ggplot(df.age.het, aes(year, value, color=age)) + geom_line() + geom_point() + ylim(0,1)
+    ggplot(df.age.het, aes(year, value, color=age)) + geom_line() + geom_point() + ylim(0,.01)
     
     df.sex.het = reshape2::melt(apply(projected[,,,c('heterosexual_male','female'),'never_IDU'], c('year','sex'), mean))
-    ggplot(df.sex.het, aes(year, value, color=sex)) + geom_line() + geom_point() + ylim(0,1)
+    ggplot(df.sex.het, aes(year, value, color=sex)) + geom_line() + geom_point() + ylim(0,.01)
     
     
     
@@ -268,7 +269,7 @@ get.prep.use.functional.form <- function(specification.metadata,
 }
 
 get.prep.indication.functional.form <- function(specification.metadata,
-                                                anchor.year = 2020,
+                                                anchor.year = 2010,
                                                 max.p.indicated = 0.85)
 {
     #-- MSM --#
@@ -349,8 +350,11 @@ get.prep.indication.functional.form <- function(specification.metadata,
     
     # Fit data for MSM
 #    fit.msm <- lm(logit.p ~ year + race + age, data = p.msm, weights = p.msm$weight)  
-    fit.msm <- suppressWarnings(glm(p/max.p.indicated ~ year + race + age, data = p.msm, weights = p.msm$weight, family = 'binomial')  )
-    
+#    fit.msm <- suppressWarnings(glm(p/max.p.indicated ~ year + race + age, data = p.msm, weights = p.msm$weight, family = 'binomial')  )
+ 
+    # A linear fit
+    fit.msm <- glm(p/max.p.indicated ~ year + race + age, data = p.msm, weights = p.msm$weight, family = 'gaussian')
+       
     #-- IDU --#
     
     # Set up data for IDU
@@ -411,7 +415,8 @@ get.prep.indication.functional.form <- function(specification.metadata,
     
     # Fit data for non-MSM
     
-    fit.idu <- suppressWarnings(glm(p/max.p.indicated ~ year + race + age + sex, data = p.idu, weights = p.idu$weight, family='binomial'))
+    #fit.idu <- suppressWarnings(glm(p/max.p.indicated ~ year + race + age + sex, data = p.idu, weights = p.idu$weight, family='binomial'))
+    fit.idu <- glm(p ~ year + race + age + sex, data = p.idu, weights = p.idu$weight, family='gaussian')
     
     #-- Heterosexual --#
     fitted.heterosexual.female = get.cached.object.for.version('female.prep.indications.atlas', specification.metadata$version)
@@ -453,17 +458,25 @@ get.prep.indication.functional.form <- function(specification.metadata,
     # Plug in from heterosexual fit
     non.idu.states = setdiff(dim.names$risk, idu.states)
     int[,,'female',non.idu.states] = fitted.heterosexual.female$intercepts
-    int[,,'heterosexual_male',non.idu.states] = fitted.heterosexual.female$intercepts + log(fitted.or.heterosexual.male)
+    int[,,'heterosexual_male',non.idu.states] = fitted.heterosexual.female$intercepts * fitted.or.heterosexual.male
     slope[,,'female',non.idu.states] = fitted.heterosexual.female$slopes
-    slope[,,'heterosexual_male',non.idu.states] = fitted.heterosexual.female$slopes
+    slope[,,'heterosexual_male',non.idu.states] = fitted.heterosexual.female$slopes * fitted.or.heterosexual.male
     
-    create.logistic.linear.functional.form(
+    # create.logistic.linear.functional.form(
+    #     intercept = int,
+    #     slope = slope,
+    #     anchor.year = anchor.year,
+    #     min = 0,
+    #     max = max.p.indicated,
+    #     parameters.are.on.logit.scale = T
+    # )
+    create.linear.functional.form(
       intercept = int,
       slope = slope,
       anchor.year = anchor.year,
       min = 0,
       max = max.p.indicated,
-      parameters.are.on.logit.scale = T
+      link = 'identity'
     )
 }
 
