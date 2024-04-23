@@ -428,6 +428,37 @@ proportion.tested.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
+# rename
+two.way.proportion.tested.likelihood.instructions =
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
+                                                   outcome.for.sim = "proportion.general.population.tested",
+                                                   denominator.outcome.for.data = "adult.population",
+                                                   
+                                                   location.types = c('STATE','CBSA'),
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = c("sex","race","risk"),
+                                                   levels.of.stratification = c(0,1,2),
+                                                   from.year = 2008,
+                                                   to.year = 2020,
+                                                   
+                                                   p.bias.inside.location = 0, 
+                                                   p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                   p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry',
+                                                   measurement.error.sd = 0.03,
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(1),
+                                                   equalize.weight.by.year = T
+  )
+
 
 #-- HIV TEST POSITIVITY --#
 hiv.test.positivity.likelihood.instructions =
@@ -473,6 +504,7 @@ joint.pop.migration.likelihood.instructions = join.likelihood.instructions(popul
 two.way.transmission.pop.likelihood.instructions = 
   join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
                                race.risk.sex.two.way.prevalence.likelihood.instructions,
+                               two.way.proportion.tested.likelihood.instructions, # added this in 4/23
                                population.likelihood.instructions # no aids
                                )
 
