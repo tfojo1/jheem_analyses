@@ -224,3 +224,11 @@ register.ontology.mapping('nhanes.to.jheem.race',
                                            c('hispanic', 'hispanic'),
                                            c('other', 'other'),
                                            c('white, non hispanic', 'other')))
+register.ontology.mapping('stratified.census.to.jheem.race',
+                          from.dimension = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('White', 'white'),
+                                           c('Asian', 'asian'),
+                                           c('Black', 'black'),
+                                           c('American Indian and Alaska Native', 'other'),
+                                           c('Native Hawaiian and Other Pacific Islander', 'other')))
