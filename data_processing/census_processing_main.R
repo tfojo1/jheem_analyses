@@ -234,7 +234,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
   data$"population_2023" = data$POPESTIMATE2023
 
 
-  data$"deaths_2010" = data$DEATHS2010
+  #data$"deaths_2010" = data$DEATHS2010 #removing deaths for 2010 because it doesn't represent a full year of data
   data$"deaths_2010" = data$DEATHS2010
   data$"deaths_2011" = data$DEATHS2011
   data$"deaths_2012" = data$DEATHS2012
@@ -245,7 +245,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
   data$"deaths_2017" = data$DEATHS2017
   data$"deaths_2018" = data$DEATHS2018
   data$"deaths_2019" = data$DEATHS2019
-  data$"deaths_2020" = data$DEATHS2020
+  #data$"deaths_2020" = data$DEATHS2020 #removing deaths for 2020 because it doesn't represent a full year of data
   data$"deaths_2021" = data$DEATHS2021
   data$"deaths_2022" = data$DEATHS2022
   data$"deaths_2023" = data$DEATHS2023
@@ -257,9 +257,9 @@ data.list.county = lapply(data.list.county.pop, function(file){
     select(location,(one_of("population_2000", "population_2001", "population_2002", "population_2003", "population_2004", "population_2005", "population_2006",
                             "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", "population_2012", "population_2013", 
                             "population_2014", "population_2015", "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", 
-                            "population_2021", "population_2022", "population_2023", "deaths_2010", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
+                            "population_2021", "population_2022", "population_2023", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
                             "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                            "deaths_2020", "deaths_2021", "deaths_2022", "deaths_2023")))
+                             "deaths_2021", "deaths_2022", "deaths_2023")))
   
   
   
@@ -267,9 +267,9 @@ data.list.county = lapply(data.list.county.pop, function(file){
     pivot_longer(cols=c(one_of("population_2000", "population_2001", "population_2002", "population_2003", "population_2004", "population_2005", "population_2006",
                                "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", "population_2012", "population_2013", 
                                "population_2014", "population_2015", "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", 
-                               "population_2021", "population_2022", "population_2023", "deaths_2010", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
+                               "population_2021", "population_2022", "population_2023", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
                                "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                               "deaths_2020", "deaths_2021", "deaths_2022", "deaths_2023")),
+                               "deaths_2021", "deaths_2022", "deaths_2023")),
                  names_to = c("outcome", "year"),
                  names_sep = "_",
                  values_to = "value")
