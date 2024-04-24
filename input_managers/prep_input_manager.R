@@ -40,13 +40,13 @@ if (1==2)
     ggplot(df.sex, aes(year, value, color=sex)) + geom_line() + geom_point() + ylim(0,1)
     
     df.race.het = reshape2::melt(apply(projected[,,,c('heterosexual_male','female'),'never_IDU'], c('year','race'), mean))
-    ggplot(df.race.het, aes(year, value, color=race)) + geom_line() + geom_point() + ylim(0,.01)
+    ggplot(df.race.het, aes(year, value, color=race)) + geom_line() + geom_point() + ylim(0,1)
     
     df.age.het = reshape2::melt(apply(projected[,,,c('heterosexual_male','female'),'never_IDU'], c('year','age'), mean))
-    ggplot(df.age.het, aes(year, value, color=age)) + geom_line() + geom_point() + ylim(0,.01)
+    ggplot(df.age.het, aes(year, value, color=age)) + geom_line() + geom_point() + ylim(0,1)
     
     df.sex.het = reshape2::melt(apply(projected[,,,c('heterosexual_male','female'),'never_IDU'], c('year','sex'), mean))
-    ggplot(df.sex.het, aes(year, value, color=sex)) + geom_line() + geom_point() + ylim(0,.01)
+    ggplot(df.sex.het, aes(year, value, color=sex)) + geom_line() + geom_point() + ylim(0,1)
     
     
     
@@ -258,14 +258,25 @@ get.prep.use.functional.form <- function(specification.metadata,
     int[,,non.msm.sex,] = int.non.msm
     slope[,,non.msm.sex,] = slope.non.msm
     
-    create.linear.functional.form(
-      intercept = int,
-      slope = slope,
-      anchor.year = anchor.year,
-      min = 0,
-      max = max.prep.coverage,
-    )
+    # create.linear.functional.form(
+    #   intercept = int,
+    #   slope = slope,
+    #   anchor.year = anchor.year,
+    #   min = 0,
+    #   max = max.prep.coverage,
+    # )
     
+    create.logistic.tail.functional.form(
+        intercept = int,
+        slope = slope,
+        anchor.year = anchor.year,
+        min = 0,
+        max = max.prep.coverage,
+        intercept.link = 'logit',
+        intercept.robust.to.negative = F,
+        slope.link = 'logit',
+        slope.robust.to.negative = T
+    )
 }
 
 get.prep.indication.functional.form <- function(specification.metadata,
@@ -470,13 +481,28 @@ get.prep.indication.functional.form <- function(specification.metadata,
     #     max = max.p.indicated,
     #     parameters.are.on.logit.scale = T
     # )
-    create.linear.functional.form(
-      intercept = int,
-      slope = slope,
-      anchor.year = anchor.year,
-      min = 0,
-      max = max.p.indicated,
-      link = 'identity'
+    
+    
+    # create.linear.functional.form(
+    #   intercept = int,
+    #   slope = slope,
+    #   anchor.year = anchor.year,
+    #   min = 0,
+    #   max = max.p.indicated,
+    #   link = 'identity'
+    # )
+    
+    int[int<0] = 0
+    create.logistic.tail.functional.form(
+        intercept = int,
+        slope = slope,
+        anchor.year = anchor.year,
+        min = 0,
+        max = max.p.indicated,
+        intercept.link = 'logit',
+        intercept.robust.to.negative = F,
+        slope.link = 'logit',
+        slope.robust.to.negative = T
     )
 }
 
