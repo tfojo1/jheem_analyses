@@ -144,7 +144,7 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT,
 
 # pop, trans, mort + prep 
 register.calibration.info(CALIBRATION.CODE.BASE.PLUS.PREP,
-                          likelihood.instructions = pop.trans.mortality.prep.likelihood.instructions,
+                          likelihood.instructions = pop.trans.mortality.testing.prep.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 

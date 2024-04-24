@@ -526,7 +526,7 @@ pop.trans.mortality.likelihood.instructions = join.likelihood.instructions(
   aids.deaths.likelihood.instructions)
 
 # Base + prep 
-pop.trans.mortality.prep.likelihood.instructions = join.likelihood.instructions(  
+pop.trans.mortality.testing.prep.likelihood.instructions = join.likelihood.instructions(  
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -540,6 +540,9 @@ pop.trans.mortality.prep.likelihood.instructions = join.likelihood.instructions(
   hiv.mortality.likelihood.instructions,
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions,
+  
+  # PROPORTION TESTED
+  proportion.tested.likelihood.instructions,
   
   # PREP LIKELIHOODS
   prep.uptake.likelihood.instructions,
