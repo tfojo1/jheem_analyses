@@ -510,7 +510,7 @@ variance.total = lapply(data.list.brfss.msa.totals, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = (value*(1- value)*n_weighted))%>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
     select(year, location, outcome, variance)%>%
     rename(value = variance) #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
   
@@ -526,7 +526,7 @@ variance.sex = lapply(data.list.brfss.msa.sex, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = (value*(1- value)*n_weighted))%>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
     select(year, location, outcome, variance, sex)%>%
     rename(value = variance)
   
@@ -542,7 +542,7 @@ variance.age = lapply(data.list.brfss.msa.age, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = (value*(1- value)*n_weighted))%>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
     select(year, location, outcome, variance, age)%>%
     rename(value = variance)
   
@@ -559,7 +559,7 @@ variance.race = lapply(data.list.brfss.msa.race, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = (value*(1- value)*n_weighted))%>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
     select(year, location, outcome, variance, race)%>%
     rename(value = variance)
   
