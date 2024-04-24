@@ -5,7 +5,8 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 # Need to have this file locally
 load("../jheem_analyses/prelim_results/full.with.aids.minus.prep_2024-04-20_C.12580.Rdata")
 
-simplot(simfacet.by = "age", split.by = "race", 
+simplot(sim,
+        facet.by = "age", split.by = "race", 
         outcomes = c("population"),
         dimension.values = list(year = 2000:2030)) 
 
@@ -33,10 +34,12 @@ simplot(sim,
         dimension.values = list(year = 2000:2030)) 
 
 # not plotting because the data are cumulative estimates
+# aids deaths won't plot data unless you ask for years 1981-2001 since the data is for that whole block
 simplot(sim,
         outcomes = c("aids.deaths"), 
         dimension.values = list(year = 2000:2030)) 
 
+# sim has a negative value which gets cut out since the y scale starts at 0
 simplot(sim,
         outcomes = c("aids.diagnoses"), 
         dimension.values = list(year = 1980:2030)) 
