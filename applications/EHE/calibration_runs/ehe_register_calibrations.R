@@ -108,24 +108,6 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
 )
 
 
-#-- REGISTER FULL CALIBRATION  --#
-register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
-                          likelihood.instructions = FULL.likelihood.instructions.with.aids,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, # 40,000
-                          thin = 200, 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "A first test of the full likelihood"
-)
-
-
-
-
 #-- REGISTER ITERATIVE CALIBRATIONS  --#
 # pop, trans, mort 
 register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT,
@@ -173,18 +155,20 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS.MINUS.PREP,
                           description = "Full with aids diagnoses except prep"
 )
 
-# full with aids without prep 
+
+#-- REGISTER FULL CALIBRATION  --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
                           likelihood.instructions = FULL.likelihood.instructions.with.aids,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
                           n.iter = N.ITER.FULL, 
-                          thin = 50, 
+                          thin = 200, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
                           description = "Full with aids diagnoses"
 )
+
 
