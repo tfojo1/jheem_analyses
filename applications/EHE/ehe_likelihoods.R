@@ -632,7 +632,8 @@ if(1==2){
                                                           observation.correlation.form = 'compound.symmetry', 
                                                           measurement.error.coefficient.of.variance = 0.03, # pick a smarter one
                                                           weights = list(1), 
-                                                          equalize.weight.by.year = T 
+                                                          equalize.weight.by.year = T,
+                                                          use.lognormal.approximation = T
     )
   
   gonorrhea.year.on.year.change.likelihood.instructions = 
