@@ -150,8 +150,26 @@ ggplot(data = dx.prev.ma)+
   theme()
 
 #01083 Worcester County, MA- This graph is interesting, I think 2010 is the actual outlier
-dx.prev.ma <- diagnosed.prevalence.outliers %>% filter(location == "01083")
-ggplot(data = dx.prev.ma)+                   
+dx.prev.wor <- diagnosed.prevalence.outliers %>% filter(location == "01083")
+ggplot(data = dx.prev.wor)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "purple")+                       
+  labs()+                                 
+  theme()
+
+#06005 - Amador County, CA
+dx.prev.amador <- diagnosed.prevalence.outliers %>% filter(location == "06005")
+ggplot(data = dx.prev.amador)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "purple")+                       
+  labs()+                                 
+  theme()
+
+#12121 - Suwanee County, FL
+dx.prev.suwanee <- diagnosed.prevalence.outliers %>% filter(location == "12121")
+ggplot(data = dx.prev.suwanee)+                   
   geom_point(                             
     mapping = aes(x = year, y = Freq),    
     color = "purple")+                       
