@@ -24,7 +24,7 @@ simplot(sim,
         outcomes = c("diagnosed.prevalence"),
         dimension.values = list(year = 2000:2030)) 
 
-simplot(sim.full.minus.prep,
+simplot(sim,
         facet.by = "sex", 
         outcomes = c("hiv.mortality"),
         dimension.values = list(year = 2000:2030)) 
@@ -37,7 +37,7 @@ simplot(sim,
 # aids deaths won't plot data unless you ask for years 1981-2001 since the data is for that whole block
 simplot(sim,
         outcomes = c("aids.deaths"), 
-        dimension.values = list(year = 2000:2030)) 
+        dimension.values = list(year = 1981:2001)) 
 
 # sim has a negative value which gets cut out since the y scale starts at 0
 simplot(sim,
@@ -46,6 +46,7 @@ simplot(sim,
 
 simplot(sim,
         outcomes = c("proportion.general.population.tested"),
+        facet.by = "race",
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
@@ -57,7 +58,7 @@ simplot(sim,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
-        facet.by = "risk", 
+        #facet.by = "risk", 
         outcomes = c("suppression"), # we have age/sex/race/risk all one way
         dimension.values = list(year = 2000:2030)) 
 
@@ -68,3 +69,5 @@ simplot(sim,
 simplot(sim,
         outcomes = c("prep.uptake","prep.indications"),
         dimension.values = list(year = 2000:2030)) 
+
+simplot(sim,outcomes = "total.hiv.tests")
