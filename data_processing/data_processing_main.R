@@ -357,6 +357,15 @@ data.manager$register.outcome(
     units = 'deaths',
     description = "Deaths"))
 
+data.manager$register.outcome(
+  'depression',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Major Depressive Episode in the Past Year',
+    axis.name = 'Depression',
+    units = 'population',
+    description = "Major Depressive Episode in the Past Year"))
+
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
