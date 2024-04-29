@@ -10,6 +10,74 @@ source('commoncode/additional_locations_of_interest.R')
 states = c(state.abb)
 counties = locations::get.all.for.type("COUNTY")#do you want all counties? 
 
+
+# Re-do 4-29-24 EHE Only -----------------------------------------
+diagnoses.outliers.ehe <- run.outlier.process(outcome= 'diagnoses',
+                                          stratifications= list(c()), 
+                                          data.manager= surveillance.manager,
+                                          locations= c(EHE.MSAS))
+
+#write.csv(diagnoses.outliers.ehe, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/outliers/outliers.ehe.counties/diagnoses.outliers.ehe.csv")
+
+all.diagnoses = as.data.frame.table(surveillance.manager$data$diagnoses$estimate$cdc.hiv$cdc$year__location) #only for source = cdc.hiv
+
+#1
+dx.1 <- all.diagnoses %>% filter(location == "C.35620")
+ggplot(data = dx.1)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()
+#2
+dx.2 <- all.diagnoses %>% filter(location == "C.33100")
+ggplot(data = dx.2)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme() 
+
+#3
+dx.3 <- all.diagnoses %>% filter(location == "C.12420")
+ggplot(data = dx.3)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme() 
+
+all.diagnoses.two = as.data.frame.table(surveillance.manager$data$diagnoses$estimate$cdc.surveillance.reports$cdc$year__location) #only for source = cdc.hiv
+
+#4
+dx.4 <- all.diagnoses.two %>% filter(location == "C.33100")
+ggplot(data = dx.4)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme() 
+
+#5
+dx.5 <- all.diagnoses.two %>% filter(location == "C.12060")
+ggplot(data = dx.5)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()
+
+#6
+dx.6 <- all.diagnoses.two %>% filter(location == "C.16980")
+ggplot(data = dx.6)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()
+
+
+
 # Call outlier function ---------------------------------------------------
 
 #Note from 4-17-24: We are going to start examining outliers at the total level
@@ -175,3 +243,5 @@ ggplot(data = dx.prev.suwanee)+
     color = "purple")+                       
   labs()+                                 
   theme()
+
+
