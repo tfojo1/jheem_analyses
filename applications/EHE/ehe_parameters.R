@@ -303,6 +303,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     
     testing.ramp.up.vs.current.rr = Lognormal.Distribution(log(0.5), 0.25*log(2), upper = 1),
     
+    msm.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    heterosexual.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    idu.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    
     
     #-- PrEP --#
     
@@ -335,6 +339,11 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6378757/
     # with Wald CI inflated 10x
     
+    prep.fraction.sexual.transmission.avoidable.z = Normal.Distribution(0,1),
+
+    msm.prep.indications.or = Lognormal.Distribution(0, 0.5*log(4)), 
+    non.msm.prep.indications.or = Lognormal.Distribution(0, 0.5*log(4)),
+    prep.indications.slope.or = Lognormal.Distribution(0, 0.5*log(4)/5),
     
     #-- Proportion MSM --#
     proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
@@ -349,6 +358,12 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     hispanic.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     other.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
+    age1.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age2.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age3.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age4.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age5.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+
     msm.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
@@ -393,7 +408,57 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #-- Uncertainty About the Future --#
     msm.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
     heterosexual.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
-    idu.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5)
+    idu.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
+    
+    #-- COVID Parameters --#
+    
+    # Sexual transmission: 8 alphas
+    # parameter: max.covid.effect.sexual.transmission.reduction
+    black.sexual.transmission.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    hispanic.sexual.transmission.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    other.sexual.transmission.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    age12.sexual.transmission.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    age34.sexual.transmission.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    age5.sexual.transmission.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    heterosexual.sexual.transmission.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    msm.sexual.transmission.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    # Testing: 9 alphas
+    # parameter: max.covid.effect.testing.reduction
+    black.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    hispanic.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    other.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    age12.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    age34.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    age5.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    heterosexual.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    msm.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    idu.testing.covid.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    
+    # Undiagnosed Testing RR
+    # parameter: max.covid.effect.undiagnosed.testing.rr.increase
+    max.covid.effect.undiagnosed.testing.rr.increase = Lognormal.Distribution(0, .5*log(2)),
+    
+    # PrEP use
+    # parameter: max.covid.effect.prep.uptake.reduction
+    max.covid.effect.prep.uptake.reduction = Lognormal.Distribution(0, .5*log(2)),
+    
+    # Suppression
+    # parameter: max.covid.effect.suppression.of.diagnosed.reduction
+    max.covid.effect.suppression.of.diagnosed.reduction = Lognormal.Distribution(0, .5*log(2)),
+    
+    # IDU
+    # parameter: max.covid.effect.idu.transmission.reduction
+    max.covid.effect.idu.transmission.reduction = Lognormal.Distribution(0, .5*log(2))
+    
+    # PrEP indications: 0 alphas (tied to sexual transmission alphas)
+    # parameter: sexual.susceptibility.covid.multiplier (same alphas as above)
+    
+    # ^ don't need to map these four parameters because they are named exactly as they are in the specification
 )
 
 
@@ -719,6 +784,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'black.incident.idu.multiplier.0',
     'hispanic.incident.idu.multiplier.0',
     'other.incident.idu.multiplier.0',
+ #   'young.incident.idu.multiplier.0',
     'msm.incident.idu.multiplier.0'
   ),
   
@@ -726,7 +792,16 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'black.incident.idu.multiplier.2',
     'hispanic.incident.idu.multiplier.2',
     'other.incident.idu.multiplier.2',
+#    'young.incident.idu.multiplier.2',
     'msm.incident.idu.multiplier.2'
+  ),
+
+  age.idu.transitions = c(
+    'age1.incident.idu.multiplier',
+    'age2.incident.idu.multiplier',
+    'age3.incident.idu.multiplier',
+    'age4.incident.idu.multiplier',
+    'age5.incident.idu.multiplier'
   ),
   
   other.idu.transitions = c('idu.remission.multiplier',
@@ -738,16 +813,25 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   acute.transmissibility = c('acute.transmissibility.rr',
                              'global.trate'),
   
-  msm.heterosexual.testing = c(
+# = Normal.Distribution(0,1),
+
+
+  msm.testing = c(
     'msm.proportion.tested.or',
     'msm.proportion.tested.slope.or',
-    'heterosexual.proportion.tested.or',
-    'heterosexual.proportion.tested.slope.or'
+    'msm.undiagnosed.testing.increase.rr'
   ),
   
+  heterosexual.testing = c(
+    'heterosexual.proportion.tested.or',
+    'heterosexual.proportion.tested.slope.or',
+    'heterosexual.undiagnosed.testing.increase.rr'
+  ),
+
   idu.testing = c(
     'idu.proportion.tested.or',
-    'idu.proportion.tested.slope.or'
+    'idu.proportion.tested.slope.or',
+    'idu.undiagnosed.testing.increase.rr'
   ),
   
   msm.idu.testing = c(
@@ -770,16 +854,22 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   msm.prep = c(
     'msm.prep.intercept.or',
-    'msm.prep.slope.or'#,
+    'msm.prep.slope.or',
+    'msm.prep.indications.or'
    # 'oral.prep.persistence'
   ),
   
   non.msm.prep = c(
     'non.msm.prep.intercept.or',
     'idu.prep.slope.or',
-    'heterosexual.prep.slope.or'
+    'heterosexual.prep.slope.or',
+    'non.msm.prep.indications.or'
   ),
   
+  prep.eligible.and.indications = c(
+    'prep.fraction.sexual.transmission.avoidable.z',
+    'prep.indications.slope.or'),
+
   prep.by.race = c('black.prep.or',
                    'hispanic.prep.or',
                    'prep.efficacy.z'),
@@ -793,7 +883,35 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   hiv.mortality = c('peak.hiv.mortality',
                     'hiv.mortality.0',
-                    'hiv.mortality.2')
+                    'hiv.mortality.2'),
+
+  covid.sexual.transmission.race = c('black.sexual.transmission.covid.multiplier',
+                                     'hispanic.sexual.transmission.covid.multiplier',
+                                     'other.sexual.transmission.covid.multiplier'),
+  
+  covid.sexual.transmission.age = c('age12.sexual.transmission.covid.multiplier',
+                                    'age34.sexual.transmission.covid.multiplier',
+                                    'age5.sexual.transmission.covid.multiplier'),
+  
+  covid.sexual.transmission.risk = c('heterosexual.sexual.transmission.covid.multiplier',
+                                     'msm.sexual.transmission.covid.multiplier'),
+  
+  covid.testing.race = c('black.testing.covid.multiplier',
+                         'hispanic.testing.covid.multiplier',
+                         'other.testing.covid.multiplier'),
+  
+  covid.testing.age = c('age12.testing.covid.multiplier',
+                        'age34.testing.covid.multiplier',
+                        'age5.testing.covid.multiplier'),
+  
+  covid.testing.risk = c('heterosexual.testing.covid.multiplier',
+                         'msm.testing.covid.multiplier',
+                         'idu.testing.covid.multiplier'),
+  
+  additional.covid.multipliers = c('max.covid.effect.undiagnosed.testing.rr.increase',
+                                   'max.covid.effect.prep.uptake.reduction',
+                                   'max.covid.effect.suppression.of.diagnosed.reduction',
+                                   'max.covid.effect.idu.transmission.reduction')
 )
 EHE.PARAMETER.SAMPLING.BLOCKS = 
   c(BASE.PARAMETER.SAMPLING.BLOCKS,

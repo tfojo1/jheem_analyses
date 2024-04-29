@@ -1,11 +1,19 @@
 print("SOURCING CODE")
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R')
+#source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
+CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
+
+CALIBRATION.CODE.BASE.PLUS.PREP = 'base.plus.prep'
+CALIBRATION.CODE.FULL.PLUS.AIDS.MINUS.PREP = 'full.with.aids.minus.prep'
+CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
+
+N.ITER.TEST = 10000
 N.ITER = 20000
+N.ITER.FULL = 40000
 
 # load params manual
 load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_21.Rdata") 
@@ -20,12 +28,6 @@ par.names.pop = c("black.birth.rate.multiplier",
                   "age3.non.idu.general.mortality.rate.multiplier",
                   "age4.non.idu.general.mortality.rate.multiplier",
                   "age5.non.idu.general.mortality.rate.multiplier",
-                  # "black.age1.aging.multiplier",
-                  # "hispanic.age1.aging.multiplier",
-                  # "other.age1.aging.multiplier",
-                  # "black.age2.aging.multiplier",
-                  # "hispanic.age2.aging.multiplier",
-                  # "other.age2.aging.multiplier",
                   "black.age1.aging.multiplier.1",
                   "hispanic.age1.aging.multiplier.1",
                   "other.age1.aging.multiplier.1",
@@ -43,9 +45,6 @@ par.names.pop = c("black.birth.rate.multiplier",
                   "hispanic.age3.aging.multiplier",
                   "other.age3.aging.multiplier",
                   "age4.aging.multiplier",
-                  # "black.domino.aging.multiplier",
-                  # "hispanic.domino.aging.multiplier",
-                  # "other.domino.aging.multiplier",
                   "immigration.multiplier.time.1",
                   "immigration.multiplier.time.2",
                   "emigration.multiplier.time.1",
@@ -88,14 +87,12 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                                           grepl('sexual.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('needle.sharing.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('incident.idu', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('fraction.heterosexual', EHE.PARAMETERS.PRIOR@var.names)]
+                                                          grepl('fraction.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('female.vs.heterosexual.male.idu.susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) ]
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
-                          #  added aids diagnoses, added population back in 
-                          likelihood.instructions = two.way.transmission.pop.likelihood.instructions, # no aids at all; added sex 2/29
-                          # two.way.transmission.aids.pop.likelihood.instructions, # total and one-way aids
-                          # two.way.transmission.total.aids.pop.likelihood.instructions, # total aids only 
-                          # two.way.transmission.pop.likelihood.instructions, # no aids at all 
+                          # added proportion tested 4/23
+                          likelihood.instructions = two.way.transmission.pop.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission),
@@ -108,6 +105,70 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           max.run.time.seconds = 10,
                           description = "A quick run to get transmission parameters in the general vicinity",
                           preceding.calibration.codes = CALIBRATION.CODE.POPULATION
+)
+
+
+#-- REGISTER ITERATIVE CALIBRATIONS  --#
+# pop, trans, mort 
+register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT,
+                          likelihood.instructions = pop.trans.mortality.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER, 
+                          thin = 200, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Adding in likelihoods iteratively, population + transmission + mortality"
+)
+
+# pop, trans, mort + prep 
+register.calibration.info(CALIBRATION.CODE.BASE.PLUS.PREP,
+                          likelihood.instructions = pop.trans.mortality.testing.prep.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER, 
+                          thin = 200, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "population + transmission + mortality + prep"
+)
+
+
+# full with aids without prep 
+register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS.MINUS.PREP,
+                          likelihood.instructions = FULL.likelihood.instructions.plus.aids.diagoses.minus.prep,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 50, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Full with aids diagnoses except prep"
+)
+
+
+#-- REGISTER FULL CALIBRATION  --#
+register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
+                          likelihood.instructions = FULL.likelihood.instructions.with.aids,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Full with aids diagnoses"
 )
 
 

@@ -102,19 +102,23 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
                                           | SXQ450 > 0 & SXQ450 < 7777 
                                           | SXQ490 > 0 & SXQ490 < 7777  ~ "1", 
                                           TRUE ~ "0"))%>%
-      select(SEQN, SXQ021,  SXQ410, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXQ510, SXQ550, SXQ450, SXQ490, sex.in.past.year)%>%
+      select(SEQN, SXQ021,  SXQ410, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXQ510, SXQ550, SXQ450, SXQ490, sex.in.past.year, SXQ260, SXQ265, SXQ270, SXQ272)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXQ021)%>%
       rename(men.ever.sex.with.men =SXQ410)%>%    #You will need to use gender from demos to re-calculate this bc it's different from other vars in other years but I'm relabeling for the purpose of merge
       rename(age.at.first.sex = SXD031)%>%
       rename(number.sex.wo.condom.past.year = SXQ251)%>%
-      rename(gonorrhea.past.year = SXQ270)%>%
       rename(sexual.orientation.male = SXQ292)%>%
       rename(sexual.orientation.female = SXQ294)%>%
       rename(male.sex.with.female.past.year= SXQ510)%>%
       rename(male.sex.with.male.past.year = SXQ550)%>%
       rename(female.sex.with.male.past.year=SXQ450)%>%
-      rename(female.sex.with.female.past.year=SXQ490)
+      rename(female.sex.with.female.past.year=SXQ490) %>%
+      
+      mutate(hx.any.sti = case_when(SXQ260 == "1" | SXQ265=="1" | SXQ270=="1" | SXQ272=="1" ~ "1",
+                                    TRUE ~ "0"))%>%
+      
+      rename(gonorrhea.past.year = SXQ270)
     
   }
   if(grepl("09.10_sexual_behavior", filename)) {
@@ -134,19 +138,23 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
                                           | SXQ727 > 0 & SXQ727 < 7777
                                           ~ "1", 
                                           TRUE ~ "0"))%>%
-      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year)%>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year, SXQ260, SXQ265, SXQ270, SXQ272)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
       rename(age.at.first.sex = SXD031)%>%
       rename(number.sex.wo.condom.past.year = SXQ251)%>%
-      rename(gonorrhea.past.year = SXQ270)%>%
       rename(sexual.orientation.male = SXQ292)%>%
       rename(sexual.orientation.female = SXQ294)%>%
       rename(male.sex.with.female.past.year= SXD510)%>%
       rename(male.sex.with.male.past.year = SXQ550)%>%
       rename(female.sex.with.male.past.year=SXD450)%>%
-      rename(female.sex.with.female.past.year=SXQ490)
+      rename(female.sex.with.female.past.year=SXQ490)%>%
+      
+      mutate(hx.any.sti = case_when(SXQ260 == "1" | SXQ265=="1" | SXQ270=="1" | SXQ272=="1" ~ "1",
+                                    TRUE ~ "0"))%>%
+      
+      rename(gonorrhea.past.year = SXQ270)
     
   }
   
@@ -167,19 +175,24 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
                                           | SXQ727 > 0 & SXQ727 < 7777
                                           ~ "1", 
                                           TRUE ~ "0"))%>%
-      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year)%>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year, SXQ260, SXQ265, SXQ270, SXQ272)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
       rename(age.at.first.sex = SXD031)%>%
       rename(number.sex.wo.condom.past.year = SXQ251)%>%
-      rename(gonorrhea.past.year = SXQ270)%>%
       rename(sexual.orientation.male = SXQ292)%>%
       rename(sexual.orientation.female = SXQ294)%>%
       rename(male.sex.with.female.past.year= SXD510)%>%
       rename(male.sex.with.male.past.year = SXQ550)%>%
       rename(female.sex.with.male.past.year=SXD450)%>%
-      rename(female.sex.with.female.past.year=SXQ490)
+      rename(female.sex.with.female.past.year=SXQ490)%>%
+      
+      mutate(hx.any.sti = case_when(SXQ260 == "1" | SXQ265=="1" | SXQ270=="1" | SXQ272=="1" ~ "1",
+                                    TRUE ~ "0"))%>%
+      
+      
+      rename(gonorrhea.past.year = SXQ270)
     
   }
   
@@ -200,19 +213,23 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
                                           | SXQ727 > 0 & SXQ727 < 7777
                                           ~ "1", 
                                           TRUE ~ "0"))%>%
-      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year)%>%
+      select(SEQN, SXD021, SXQ809, SXD031, SXQ251, SXQ270, SXQ292, SXQ294, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year, SXQ260, SXQ265, SXQ270, SXQ272)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
       rename(age.at.first.sex = SXD031)%>%
       rename(number.sex.wo.condom.past.year = SXQ251)%>%
-      rename(gonorrhea.past.year = SXQ270)%>%
       rename(sexual.orientation.male = SXQ292)%>%
       rename(sexual.orientation.female = SXQ294)%>%
       rename(male.sex.with.female.past.year= SXD510)%>%
       rename(male.sex.with.male.past.year = SXQ550)%>%
       rename(female.sex.with.male.past.year=SXD450)%>%
-      rename(female.sex.with.female.past.year=SXQ490)
+      rename(female.sex.with.female.past.year=SXQ490)%>%
+      
+      mutate(hx.any.sti = case_when(SXQ260 == "1" | SXQ265=="1" | SXQ270=="1" | SXQ272=="1" ~ "1",
+                                    TRUE ~ "0"))%>%
+      
+      rename(gonorrhea.past.year = SXQ270)
 
   }
   
@@ -233,19 +250,23 @@ nhanes.clean = lapply(nhanes.files.data.list, function(file){
                                           | SXQ727 > 0 & SXQ727 < 7777
                                           ~ "1", 
                                           TRUE ~ "0"))%>%
-      select(SEQN, SXD021,  SXQ809, SXD031, SXQ251, SXQ270, SXQ295, SXQ296, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year)%>%
+      select(SEQN, SXD021,  SXQ809, SXD031, SXQ251, SXQ270, SXQ295, SXQ296, SXD510, SXQ550, SXD450, SXQ490, sex.in.past.year, SXQ260, SXQ265, SXQ270, SXQ272)%>%
       rename(ID = SEQN)%>%
       rename(ever.had.sex =SXD021)%>%
       rename(men.ever.sex.with.men =SXQ809)%>%
       rename(age.at.first.sex = SXD031)%>%
       rename(number.sex.wo.condom.past.year = SXQ251)%>%
-      rename(gonorrhea.past.year = SXQ270)%>%
       rename(sexual.orientation.male = SXQ296)%>%
       rename(sexual.orientation.female = SXQ295)%>%
       rename(male.sex.with.female.past.year= SXD510)%>%
       rename(male.sex.with.male.past.year = SXQ550)%>%
       rename(female.sex.with.male.past.year=SXD450)%>%
-      rename(female.sex.with.female.past.year=SXQ490)
+      rename(female.sex.with.female.past.year=SXQ490)%>%
+      
+      mutate(hx.any.sti = case_when(SXQ260 == "1" | SXQ265=="1" | SXQ270=="1" | SXQ272=="1" ~ "1",
+                                    TRUE ~ "0"))%>%
+      
+      rename(gonorrhea.past.year = SXQ270)
 
   }
   list(filename, data) 
@@ -307,10 +328,10 @@ nhanes.total$sexual.orientation.female = sexual.orientation.mappings[nhanes.tota
 nhanes.total$ever.had.sex = nhanes.mappings[nhanes.total$ever.had.sex]
 
 #Subset data by only those who have had sex (ever.had.sex = yes)
-nhanes.total = subset(nhanes.total, nhanes.total$ever.had.sex == "yes")
-
-#Removing 12 individuals for who age.at.first.sex is NA (the rest of their surveys are also NA)
-nhanes.total = subset(nhanes.total, !is.na(nhanes.total$age.at.first.sex))
+# nhanes.total = subset(nhanes.total, nhanes.total$ever.had.sex == "yes")
+# 
+# #Removing 12 individuals for who age.at.first.sex is NA (the rest of their surveys are also NA)
+# nhanes.total = subset(nhanes.total, !is.na(nhanes.total$age.at.first.sex))
 
 #Formatting age.at.first.sex
 nhanes.total$age.at.first.sex = ifelse(nhanes.total$age.at.first.sex == 99, "dont know", nhanes.total$age.at.first.sex)
@@ -336,7 +357,7 @@ nhanes.total$age.at.first.sex = ifelse(nhanes.total$age.at.first.sex == 9, "0-9"
                                        gender == 'male' & men.ever.sex.with.men == 'yes' ~ 'yes',
                                        gender == 'male' & men.ever.sex.with.men == 'no' ~ 'no',
                                        gender == 'male' & is.na(men.ever.sex.with.men) ~ NA))%>%
-   mutate(test = case_when(number.sex.wo.condom.past.year == 1 ~ "0",
+   mutate(sex.wo.condom.formatted = case_when(number.sex.wo.condom.past.year == 1 ~ "0",
                                                      number.sex.wo.condom.past.year == 2 ~ "1",
                                                      number.sex.wo.condom.past.year == 3 ~ "1",
                                                      number.sex.wo.condom.past.year == 4 ~ "1",

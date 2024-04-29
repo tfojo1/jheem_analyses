@@ -140,6 +140,15 @@ data.manager$register.outcome(
     description = "Gonorrhea"))
 
 data.manager$register.outcome(
+  'gonorrhea.ratio',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Gonorrhea Ratio',
+    axis.name = 'Gonorrhea Ratio',
+    units = 'cases',
+    description = "Year Over Year Ratio of Gonorrhea Cases"))
+
+data.manager$register.outcome(
   'ps.syphilis',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
@@ -147,6 +156,15 @@ data.manager$register.outcome(
     axis.name = 'Primary and Secondary Syphilis',
     units = 'cases',
     description = "Primary and Secondary Syphilis"))
+
+data.manager$register.outcome(
+  'ps.syphilis.ratio',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Syphilis Ratio',
+    axis.name = 'Syphilis Ratio',
+    units = 'cases',
+    description = "Year Over Year Ratio of Primary and Secondary Syphilis Cases"))
 
 data.manager$register.outcome(
   'early.syphilis',
@@ -339,6 +357,15 @@ data.manager$register.outcome(
     units = 'deaths',
     description = "Deaths"))
 
+data.manager$register.outcome(
+  'depression',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Major Depressive Episode in the Past Year',
+    axis.name = 'Depression',
+    units = 'population',
+    description = "Major Depressive Episode in the Past Year"))
+
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
@@ -351,6 +378,8 @@ data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillan
 data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
 data.manager$register.parent.source('cdc.retention.report.pdf', full.name = 'CDC HIV Surveillance PDF Reports', short.name= "cdc.retention.report.pdf") #These are really similar
 data.manager$register.parent.source('NHM&E', full.name = 'National HIV Prevention Program Monitoring and Evaluation', short.name= "NHM&E")
+data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
+
 
 #Register Data Sources ('children')
 data.manager$register.source('aidsvu', parent.source= "IQVIA", full.name = "AIDS Vu", short.name='aidsvu')
@@ -370,13 +399,13 @@ data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = 
 data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports')
 data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids')
 
+
 #Creating these separately bc they have separate parent sources
 data.manager$register.source('prep.aidsvu.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP AIDS Vu Aggregated County', short.name = 'prep aidsvu aggd county') #For aggregated prep data from AIDS Vu
 data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP CDC Aggregated County', short.name = 'prep cdc aggd county') #For aggregated prep data from Atlas Plus (CDC)
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated')
 data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
-
 
 data.manager$register.ontology(
   'cdc',
@@ -531,9 +560,29 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other'),
     incomplete.dimensions = c("year", "location")
   ))
+
+data.manager$register.ontology(
+  'census',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('< 1 year', '1 year', '2 years', '3 years', '4 years', '5 years', '6 years', '7 years', '8 years', '9 years', '10 years',
+          '11 years', '12 years', '13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
+          '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
+          '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
+          '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
+          '51 years', '52 years', '53 years', '54 years', '55 years', '56 years', '57 years', '58 years', '59 years', '60 years',
+          '61 years', '62 years', '63 years', '64 years', '65 years', '66 years', '67 years', '68 years', '69 years', '70 years',
+          '71 years', '72 years', '73 years', '74 years', '75 years', '76 years', '77 years', '78 years', '79 years', '80 years',
+          '81 years', '82 years', '83 years', '84 years', '85+ years'),
+    race=c('white', 'black', 'american indian or alaska native', 'asian or pacific islander'),
+    ethnicity=c('hispanic', 'not hispanic'),
+    sex=c('male','female')
+  ))
 ################################################################################
 ###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')
+source('commoncode/additional_locations_of_interest.R')
 ##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
 #This code also adjusts the population to be the 'adult.population' ages 13 and over
 source('data_processing/put_msa_data_without_estimation_script.R')
@@ -1264,6 +1313,8 @@ data.list.clean.indications = lapply(data.list.atlas.prep, function(file){
   data$year = substring(data$year,1, 4)                                          
   data$year = as.character(data$year)
   
+  data = subset(data, data$year=="2018" | data$year == "2017") #Decided 4-18-24 to remove any years after 2018 bc data is all the same
+  
   data$Population[data$Population %in% c("Data suppressed")] = NA    
   data$Population[data$Population %in% c("Data not available")] = NA  
   data$value = as.numeric(gsub(",", '', data$Population))   
@@ -1422,19 +1473,19 @@ for (data in deaths_notes) {
  }
  
  #RSE for knowledge/awareness
- # awareness.rse= lapply(knowledge.rse, `[[`, 2)  
- # 
- # for (data in awareness.rse) {
- #   
- #   data.manager$put.long.form(
- #     data = data,
- #     ontology.name = 'cdc',
- #     source = 'cdc.hiv',
- #     metric = 'coefficient.of.variance',
- #     dimension.values = list(),
- #     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
- #     details = 'CDC Atlas Plus data')
- # }
+ awareness.rse= lapply(knowledge.rse, `[[`, 2)
+
+ for (data in awareness.rse) {
+
+   data.manager$put.long.form(
+     data = data,
+     ontology.name = 'cdc',
+     source = 'cdc.hiv',
+     metric = 'coefficient.of.variance',
+     dimension.values = list(),
+     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+     details = 'CDC Atlas Plus data')
+ }
  
  ##outcome= total.prevalence (for population for knowledge
 total_prev_all = lapply( data.list.clean.awareness.population, `[[`, 2)  
@@ -1496,16 +1547,17 @@ census.manager = load.data.manager("../../cached/census.manager.rdata")
                             census.manager = smaller.census.manager)
  
  #Put adult population for specific locations
- put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST), 
+ put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
                         contained.geographic.type = "county", #it will look for counties in the regions above
-                        fully.stratified.dimensions = c('year', 'age', 'race', 'ethnicity', 'sex'),
-                        put.stratifications = list('age', 'sex', c('race', 'ethnicity')),
-                        age.lower.limit = 13,
-                        age.penultimate.upper = 84,
-                        age.upper.limit.name = '85+',
+                        put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')),
                         data.manager = surveillance.manager,
                         census.manager = census.manager)
  
+
+# Adult population for recent census data ---------------------------------
+
+ #Source code that restructures census age groups to get adult.pop for 2020-2022
+ source('data_processing/restructure.recent.census.age.groups.R')
 ################################################################################
  #Create aggregated outcomes 
   #This is mainly county data being aggregated to MSA level
@@ -1582,6 +1634,30 @@ source('../jheem2/R/HELPERS_array_helpers.R')
                             source.for.denominator= 'cdc.hiv',
                             ontology.for.denominator= 'cdc') 
  
+ #Aggregating STI data
+ put.msa.data.as.new.source(outcome = 'gonorrhea',
+                            from.source.name = 'cdc.sti',
+                            to.source.name = 'cdc.aggregated.county',
+                            to.locations =  MSAS.OF.INTEREST,  
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager = surveillance.manager)
+ 
+ put.msa.data.as.new.source(outcome = 'ps.syphilis',
+                            from.source.name = 'cdc.sti',
+                            to.source.name = 'cdc.aggregated.county',
+                            to.locations =  MSAS.OF.INTEREST,  
+                            geographic.type.from = 'COUNTY',
+                            geographic.type.to = 'CBSA',
+                            details.for.new.data = 'estimated from county data',
+                            data.manager = surveillance.manager)
+ 
+ ################################################################################
+ ###Source code for the STI ratio calculation/put
+ ################################################################################
+ source('data_processing/sti_ratio_calculation.R')
+ 
  ################################################################################
  ###Put- Sum deaths by county into deaths by MSA using this code/function
  ################################################################################
@@ -1619,8 +1695,7 @@ source('../jheem2/R/HELPERS_array_helpers.R')
 #                   adjudication.data.frame = outlier.df,
 #                   adjudication.vector = corrections) #do not include year or location here# #currently only works at one stratification at a time#
 
- 
- ################################################################################
+################################################################################
  ###Save surveillance manager####
   save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
  

@@ -190,12 +190,30 @@ register.model.quantity(EHE.SPECIFICATION,
 
 ##-- Oral PrEP --##
 register.model.element(EHE.SPECIFICATION,
-                       name = 'oral.prep.uptake',
+                       name = 'oral.prep.uptake.without.covid',
                        scale = 'proportion',
                        get.functional.form.function = get.prep.use.functional.form,
                        functional.form.from.time = 2014,
                        ramp.times = 2011,
                        ramp.values = 0)
+
+register.model.quantity(EHE.SPECIFICATION,
+                       name = 'oral.prep.uptake',
+                       scale = 'proportion',
+                       value = expression(oral.prep.uptake.without.covid*oral.prep.uptake.covid.multiplier))
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'oral.prep.uptake.covid.multiplier',
+                        scale = 'proportion',
+                        value = expression((1-(1-max.covid.effect.prep.uptake.reduction) * covid.on *
+                                              (1-prep.uptake.transmission.mobility.correlation+
+                                                 (prep.uptake.transmission.mobility.correlation*covid.mobility.change))))
+)
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.prep.uptake.reduction',
+                       scale = 'ratio',
+                       value=1)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'oral.prep.msm.rr',
@@ -274,10 +292,15 @@ register.model.quantity(EHE.SPECIFICATION,
 
 ##-- Common to All PrEP / Combinations of PrEP modalities --##
 register.model.element(EHE.SPECIFICATION,
-                       name='prep.indication',
+                       name='prep.indication.without.covid',
                        scale='proportion',
                        get.functional.form.function = get.prep.indication.functional.form,
                        functional.form.from.time = 2011)
+
+register.model.quantity(EHE.SPECIFICATION,
+                       name='prep.indication',
+                       scale='proportion',
+                       value = expression(prep.indication.without.covid * sexual.susceptibility.covid.multiplier))
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'proportion.receiving.prep',
@@ -315,8 +338,6 @@ register.model.quantity(EHE.SPECIFICATION,
 #-------------#
 #-- Testing --#
 #-------------#
-# Assume the default for all of these are 'with covid' 
-
 TESTING.FIRST.YEAR.FRACTION.OF.RAMP = 0.5^(1993-1982)
 register.model.element(EHE.SPECIFICATION,
                        name = 'general.population.testing.without.covid',
@@ -331,42 +352,44 @@ register.model.element(EHE.SPECIFICATION,
                        ramp.values = c(0,0.5*TESTING.FIRST.YEAR.FRACTION.OF.RAMP,0.5),
                        ramp.interpolate.links = c('identity','log','identity'))
 
-# for now, setting with covid (default) to without covid value 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'general.population.testing',
                         scale = 'rate',
-                        value = 'general.population.testing.without.covid'
-                        # expression(
-                        # general.population.testing.without.covid *  
-                        #   (1-(1-max.covid.effect.testing.reduction) * covid.on * 
-                        #      (1-testing.mobility.correlation+(testing.mobility.correlation*covid.mobility.change))))
+                        value = expression(
+                          general.population.testing.without.covid *
+                            (1-(1-max.covid.effect.testing.reduction) * covid.on *
+                               (1-testing.mobility.correlation+(testing.mobility.correlation*covid.mobility.change))))
 )
 
-# for now, setting with covid (default) to without covid value 
 register.model.quantity(EHE.SPECIFICATION,
-                       name = 'undiagnosed.testing.rr',
-                       value = 'undiagnosed.testing.rr.without.covid', # for now
-                       scale = 'ratio')
+                       name = 'undiagnosed.testing.increase',
+                       value = expression(
+                         undiagnosed.testing.increase.without.covid *
+                           (1-(1-max.covid.effect.undiagnosed.testing.rr.increase) * covid.on *
+                              (1-undiagnosed.testing.rr.mobility.correlation+
+                                 (undiagnosed.testing.rr.mobility.correlation*covid.mobility.change)))), 
+                       scale = 'non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'undiagnosed.testing.rr.without.covid',
-                       get.functional.form.function = get.undiagnosed.testing.rr.functional.form, 
-                       scale = 'ratio')
+                       name = 'undiagnosed.testing.increase.without.covid',
+                       get.functional.form.function = get.undiagnosed.testing.increase.functional.form, 
+                       scale = 'non.negative.number')
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'testing.of.undiagnosed',
-                        value = expression(general.population.testing*undiagnosed.testing.rr))
+                        value = expression(general.population.testing*(1+undiagnosed.testing.increase)))
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'max.covid.effect.testing.reduction',
                        scale = 'ratio',
                        get.functional.form.function = get.covid.max.testing.effect)
 
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.undiagnosed.testing.rr.increase',
+                       scale = 'ratio',
+                       get.functional.form.function = get.undiagnosed.testing.covid.rr.functional.form) 
 
-# original version: 
-# ((( 1 - (1-max.covid.effect.testing.reduction) *covid.mobility.change) * testing.mobility.correlation) + 
-# ((1 - testing.mobility.correlation)*max.covid.effect.testing.reduction))
-
+# get.covid.max.testing.effect is a relative risk (e.g., 0.8 if testing is 80% of what it would be without covid)
 # testing.no.covid is time-varying, max.covid.effect.testing.reduction is (1- relative risk) (static)
 # if testing mobility correlation is 0, always the max reduction; if testing mobility correlation is 1, moves the same as mobility
 # if covid.on = 0 , go back to testing.no.covid 
@@ -401,8 +424,26 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                value = 'suppression.of.diagnosed',
                                applies.to = list(continuum='diagnosed'))
 
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'suppression.of.diagnosed',
+                        value = expression( suppression.of.diagnosed.without.covid * suppression.of.diagnosed.covid.multiplier)
+)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'suppression.of.diagnosed.covid.multiplier',
+                        value = expression((1-(1-max.covid.effect.suppression.of.diagnosed.reduction) * covid.on *
+                                              (1-suppression.of.diagnosed.mobility.correlation+
+                                                 (suppression.of.diagnosed.mobility.correlation*covid.mobility.change))))
+)
+
 register.model.element(EHE.SPECIFICATION,
-                       name = 'suppression.of.diagnosed',
+                       name = 'max.covid.effect.suppression.of.diagnosed.reduction',
+                       scale = 'ratio',
+                       value=1)
+
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'suppression.of.diagnosed.without.covid',
                        scale = 'proportion',
                        
                        get.functional.form.function = get.suppression.functional.form,
@@ -774,14 +815,50 @@ register.transmission(EHE.SPECIFICATION,
 ##-- Susceptibility --##
 ##--------------------##
 
-register.model.element(EHE.SPECIFICATION,
+register.model.quantity(EHE.SPECIFICATION,
                        name = 'proportion.of.sexual.transmissions.in.prep.eligible',
                        scale = 'proportion',
-                       value = 0.9) # want to come up with a better number for this; maybe by risk group 
-  
+                       value = expression(1/(1+exp(-( # expit because this will be a logit normal distribution
+                         # mean + (z score*standard dev)
+                         logit.mean.proportion.prep.eligible + 
+                           prep.fraction.sexual.transmission.avoidable.z*logit.sd.proportion.prep.eligible)  
+                         )))) 
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'logit.mean.proportion.prep.eligible',
+                       value = get.fraction.sexual.transmission.avoidable.logit.parameter(get.mean = T),
+                       scale='number')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'logit.sd.proportion.prep.eligible',
+                       value = get.fraction.sexual.transmission.avoidable.logit.parameter(get.mean = F),
+                       scale='non.negative.number') 
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'prep.fraction.sexual.transmission.avoidable.z',
+                       value = 0,
+                       scale='number') 
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.susceptibility',
+                        value = expression( sexual.susceptibility.without.covid * sexual.susceptibility.covid.multiplier)
+)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'sexual.susceptibility.covid.multiplier',
+                        value = expression((1-(1-max.covid.effect.sexual.transmission.reduction) * covid.on *
+                                              (1-sexual.transmission.mobility.correlation+
+                                                 (sexual.transmission.mobility.correlation*covid.mobility.change))))
+                        )
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.sexual.transmission.reduction',
+                       scale = 'ratio',
+                       get.functional.form.function = get.covid.max.sexual.transmission.effect)
+
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'sexual.susceptibility.without.covid',
                         value = expression( base.sexual.susceptibility *
                                               (proportion.of.sexual.transmissions.in.prep.eligible*
                                               (all.prep.risk + 1-all.prep.coverage) + 
@@ -789,7 +866,24 @@ register.model.quantity(EHE.SPECIFICATION,
 )
 
 register.model.quantity(EHE.SPECIFICATION,
-                        name='idu.susceptibility',
+                        name = 'idu.susceptibility',
+                        value = expression( idu.susceptibility.without.covid * idu.susceptibility.covid.multiplier)
+)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'idu.susceptibility.covid.multiplier',
+                        value = expression((1-(1-max.covid.effect.idu.transmission.reduction) * covid.on *
+                                              (1-idu.transmission.mobility.correlation+
+                                                 (idu.transmission.mobility.correlation*covid.mobility.change))))
+)
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'max.covid.effect.idu.transmission.reduction',
+                       scale = 'ratio',
+                       value=1)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name='idu.susceptibility.without.covid',
                         value = expression( base.idu.susceptibility *
                                                 (all.prep.risk + 1-all.prep.coverage) *
                                                 (1 + needle.exchange*(needle.exchange.rr-1)) )
@@ -1244,7 +1338,10 @@ register.model.element(EHE.SPECIFICATION,
                                                                                knot.values = list(rate0=1,
                                                                                                   rate1=1,
                                                                                                   rate2=1),
-                                                                               link = 'log',
+                                                                               #link = 'log',
+                                                                               link = 'identity',
+                                                                               min = 0,
+                                                                               knot.link = 'log',
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
                                                                                modifiers.apply.to.change = T,
@@ -1262,7 +1359,10 @@ register.model.element(EHE.SPECIFICATION,
                                                                                knot.values = list(rate0=1,
                                                                                                   rate1=1,
                                                                                                   rate2=1),
-                                                                               link = 'log',
+                                                                               #link = 'log',
+                                                                               link = 'identity',
+                                                                               min = 0,
+                                                                               knot.link = 'log',
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
                                                                                modifiers.apply.to.change = T,
@@ -1347,8 +1447,10 @@ register.model.element(EHE.SPECIFICATION,
                                                                                knot.values = list(rate0=1,
                                                                                                   rate1=1,
                                                                                                   rate2=1),
-                                                                               link = 'log',
-                                                                               
+                                                                               #link = 'log',
+                                                                               link = 'identity',
+                                                                               min = 0,
+                                                                               knot.link = 'log',
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
                                                                                modifiers.apply.to.change = T,
@@ -1409,20 +1511,41 @@ register.model.element(EHE.SPECIFICATION,
                        get.functional.form.function = get.covid.mobility.for.location,
                        functional.form.from.time = 2020)
 
+#-- Testing --#
 register.model.element(EHE.SPECIFICATION,
                        name = 'testing.mobility.correlation',
                        scale = 'proportion',
                        value = 1)
 
-#-- Testing --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'undiagnosed.testing.rr.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
 
 #-- Sexual Transmission --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'sexual.transmission.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
+
 
 #-- IV Transmission --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'idu.transmission.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
 
 #-- Suppression --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'suppression.of.diagnosed.mobility.correlation',
+                       scale = 'proportion',
+                       value = 1)
 
 #-- PrEP --#
+register.model.element(EHE.SPECIFICATION,
+                       name = 'prep.uptake.transmission.mobility.correlation',
+                       scale = 'ratio',
+                       value=1)
 
 ##--------------------------##
 ##--------------------------##
@@ -1487,7 +1610,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'cumulative.infected',
                          outcome.metadata = NULL,
-                         value.to.integrate = 'uninfected',
+                         value.to.integrate = 'infected',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          scale = 'non.negative.number',
                          save = F)
@@ -1564,18 +1687,50 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          corresponding.data.outcome = 'suppression',
                          save = T)
 
+register.model.element(EHE.SPECIFICATION,
+                       'fraction.population.over.18',
+                       scale = 'proportion',
+                       get.value.function = get.fraction.over.age,
+                       age = 18)
+
+register.model.element(EHE.SPECIFICATION,
+                       'fraction.tests.over.18',
+                       scale = 'proportion',
+                       dimensions = 'age',
+                       dimension.values = list(age='all.ages'),
+                       value = array(c(0.9,1,1,1,1), dim=c(age=5), dimnames=list(age=c('13-24 years','25-34 years','35-44 years','45-54 years','55+ years'))))
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'cumulative.uninfected.over.18',
+                         value = expression(cumulative.uninfected * fraction.population.over.18),
+                         scale = 'non.negative.number',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
+                         save = F,
+                         outcome.metadata = NULL
+)
 
 track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
-                                      name = 'proportion.general.population.tested',
-                                      outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
-                                                                                 description = "The Proportion of General Population who Received an HIV Test in the Past Year",
-                                                                                 scale = 'proportion',
-                                                                                 axis.name = 'Proportion Tested',
-                                                                                 units = '%'),
+                                      name = 'proportion.general.population.tested.including.under.18',
+                                      outcome.metadata = NULL,
                                       rate.value = 'general.population.testing',
                                       denominator.outcome = 'cumulative.uninfected',
-                                      corresponding.data.outcome = 'proportion.tested',
-                                      keep.dimensions = c('location','age','race','sex','risk'))
+                                      keep.dimensions = c('location','age','race','sex','risk'),
+                                      save = F)
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'proportion.general.population.tested',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
+                                                                    description = "The Proportion of General Population who Received an HIV Test in the Past Year",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion Tested',
+                                                                    units = '%'),
+                         value = expression(proportion.general.population.tested.including.under.18 * fraction.tests.over.18 / fraction.population.over.18),
+                         value.is.numerator = F,
+                         denominator.outcome = 'cumulative.uninfected.over.18',
+                         rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
+                         corresponding.data.outcome = 'proportion.tested',
+                         keep.dimensions = c('location','age','race','sex','risk'))
  
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'number.of.tests.in.uninfected',
@@ -1599,7 +1754,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     units = 'tests',
                                                                     singular.unit = 'test'),
                          value = expression(number.of.tests.in.uninfected+new),
-                         keep.dimensions = c("age","race","sex","risk"))
+                         keep.dimensions = c("location","age","race","sex","risk"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'hiv.test.positivity',
@@ -1612,7 +1767,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = '%'),
                          value = expression(new/total.hiv.tests),
                          denominator.outcome = 'total.hiv.tests',
-                         keep.dimensions = c("age","race","sex","risk"))
+                         keep.dimensions = c("location","age","race","sex","risk"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'awareness',
@@ -1623,6 +1778,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     units = '%',
                                                                     singular.unit = '%'),
                          value = expression(diagnosed.prevalence/cumulative.infected),
+                         corresponding.data.outcome = 'awareness',
                          denominator.outcome = 'cumulative.infected',
                          keep.dimensions = c("location"))
 
@@ -1635,7 +1791,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                                                                  units = 'deaths',
                                                                  singular.unit = 'death'),
                       dynamic.quantity.name = 'mortality',
-                      corresponding.data.outcome = 'hiv.mortality',
+                      corresponding.data.outcome = 'hiv.deaths',
                       groups = 'infected',
                       subset.dimension.values = list(continuum = "diagnosed.states"), # only those who were diagnosed, diff from aids deaths
                       exclude.tags = "emigration",
@@ -1683,7 +1839,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'aids.to.new.diagnosis.ratio',
-                       value = 1.4,
+                       value = 1.044985, # see aids_diagnoses_multiplier.R
                        scale = 'ratio')
 
 
@@ -1740,7 +1896,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = 'person'),
                          value = "population",
                          subset.dimension.values = list(risk = "active_IDU"),
-                         keep.dimensions = c("location","age"),
+                         keep.dimensions = c("location","age","sex"),
                          save=F)
 
 track.cumulative.outcome(EHE.SPECIFICATION,
@@ -1754,7 +1910,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = "number.injecting.drugs",
                          denominator.outcome = 'population',
                          value.is.numerator = T,
-                         keep.dimensions = c("location","age"))
+                         keep.dimensions = c("location","age","sex"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'proportion.using.cocaine',
@@ -1768,7 +1924,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(proportion.injecting.drugs*5.97), # multiplier from NSDUH, large metro, 2015-2018
                          denominator.outcome = 'population',
                          value.is.numerator = F,
-                         keep.dimensions = c("location","age"))
+                         keep.dimensions = c("location","age","sex"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'proportion.using.heroin',
@@ -1782,7 +1938,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(proportion.injecting.drugs*1.15), # multiplier from NSDUH, large metro, 2015-2018
                          denominator.outcome = 'population',
                          value.is.numerator = F,
-                         keep.dimensions = c("location","age"))
+                         keep.dimensions = c("location","age","sex"))
 
 ##--------------------------------##
 ##--------------------------------##

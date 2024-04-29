@@ -3,6 +3,7 @@
 
 library(locations)
 source('commoncode/locations_of_interest.R')
+source('commoncode/additional_locations_of_interest.R')
 COUNTIES.OF.INTEREST <- unlist(COUNTIES.OF.INTEREST)
 
 census.manager.filepath = "../../cached/census.manager.rdata"

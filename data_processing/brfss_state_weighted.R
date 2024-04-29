@@ -677,3 +677,160 @@ for (data in state.risk.denom) {
     details = 'Behavioral Risk Factor Surveillance System')
 }
 
+# Create Variance for proportion.tested.n (Added April 2024) --------
+
+#Variance- Total -----------------------------------------------------
+variance.total.state = lapply(data.list.brfss.state.totals, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    select(year, location, outcome, variance)%>%
+    rename(value = variance) #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+#Variance- Sex -----------------------------------------------------
+variance.sex.state = lapply(data.list.brfss.state.sex, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    select(year, location, outcome, variance, sex)%>%
+    rename(value = variance)
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+#Variance- Age -----------------------------------------------------
+variance.age.state = lapply(data.list.brfss.state.age, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    select(year, location, outcome, variance, age)%>%
+    rename(value = variance)
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+#Variance - Race ---------------------------------------------------
+variance.race.state = lapply(data.list.brfss.state.race, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    select(year, location, outcome, variance, race)%>%
+    rename(value = variance)
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+
+# Variance - Risk ---------------------------------------------------------
+
+variance.risk.state = lapply(data.list.brfss.state.risk.put, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    select(year, location, outcome, variance, risk)%>%
+    rename(value = variance)
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+# Put the variance data ---------------------------------------------------
+prop.tested.variance.state= lapply(variance.total.state, `[[`, 2)
+
+for (data in prop.tested.variance.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'coefficient.of.variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.tested.variance.sex.state= lapply(variance.sex.state, `[[`, 2)
+
+for (data in prop.tested.variance.sex.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'coefficient.of.variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.tested.variance.age.state= lapply(variance.age.state, `[[`, 2)
+
+for (data in prop.tested.variance.age.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'coefficient.of.variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.tested.variance.race.state= lapply(variance.race.state, `[[`, 2)
+
+for (data in prop.tested.variance.race.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'coefficient.of.variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.tested.variance.risk.state= lapply(variance.risk.state, `[[`, 2)
+
+for (data in prop.tested.variance.risk.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'coefficient.of.variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}

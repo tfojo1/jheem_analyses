@@ -98,16 +98,9 @@ census.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('< 1 year', '1 year', '2 years', '3 years', '4 years', '5 years', '6 years', '7 years', '8 years', '9 years', '10 years',
-          '11 years', '12 years', '13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
-          '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
-          '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
-          '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
-          '51 years', '52 years', '53 years', '54 years', '55 years', '56 years', '57 years', '58 years', '59 years', '60 years',
-          '61 years', '62 years', '63 years', '64 years', '65 years', '66 years', '67 years', '68 years', '69 years', '70 years',
-          '71 years', '72 years', '73 years', '74 years', '75 years', '76 years', '77 years', '78 years', '79 years', '80 years',
-          '81 years', '82 years', '83 years', '84 years', '85 years', '86 years', '87 years', '88 years', '89 years', '90 years',
-          '91 years', '92 years', '93 years', '94 years', '95 years', '96 years', '97 years', '98 years', '99 years', '100+ years', "Not Stated"),
+    age=c("< 1 year", "1-4 years", "10-14 years", "15-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years",
+          "45-49 years", "5-9 years", "50-54 years", "55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80-84 years", 
+          "85-89 years", "90-94 years", "95-99 years", "100+ years"),
     race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White', "More than one race", 'Not Reported', "Unknown or Not Stated", "Not Available"),
     ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino', 'Unknown or Not Stated', "Not Stated"),
     sex=c('male','female')
@@ -143,11 +136,24 @@ census.manager$register.ontology(
     sex=c('male','female')
   ))
 
+census.manager$register.ontology(
+  'stratified.census',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('0-4 years', '5-9 years', '10-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+          '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
+          '75-79 years', '80-84 years', '85+ years'),
+    race=c('White', 'Black', 'Asian', 'American Indian and Alaska Native', 'Native Hawaiian and Other Pacific Islander'),
+    ethnicity=c('Hispanic', 'Not Hispanic'),
+    sex=c('male','female')
+  ))
+
 ################################################################################
                   ###Read in Census Files###
 ################################################################################
 
-DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county_00.22"
+DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county_00.23"
 
 census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
 
@@ -170,6 +176,9 @@ source('data_processing/census_sas_files.R')
 
 #This pulls birth and death data from CDC Wonder#
 source('data_processing/births_and_deaths.R')
+
+#This pulls the stratified census data by county for 2020-2022
+source('data_processing/stratified_census.R')
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
 ################################################################################
@@ -222,9 +231,10 @@ data.list.county = lapply(data.list.county.pop, function(file){
   data$"population_2020" = data$POPESTIMATE2020
   data$"population_2021" = data$POPESTIMATE2021
   data$"population_2022" = data$POPESTIMATE2022
+  data$"population_2023" = data$POPESTIMATE2023
 
 
-  data$"deaths_2010" = data$DEATHS2010
+  #data$"deaths_2010" = data$DEATHS2010 #removing deaths for 2010 because it doesn't represent a full year of data
   data$"deaths_2010" = data$DEATHS2010
   data$"deaths_2011" = data$DEATHS2011
   data$"deaths_2012" = data$DEATHS2012
@@ -235,9 +245,10 @@ data.list.county = lapply(data.list.county.pop, function(file){
   data$"deaths_2017" = data$DEATHS2017
   data$"deaths_2018" = data$DEATHS2018
   data$"deaths_2019" = data$DEATHS2019
-  data$"deaths_2020" = data$DEATHS2020
+  #data$"deaths_2020" = data$DEATHS2020 #removing deaths for 2020 because it doesn't represent a full year of data
   data$"deaths_2021" = data$DEATHS2021
   data$"deaths_2022" = data$DEATHS2022
+  data$"deaths_2023" = data$DEATHS2023
   
 
   ##this will give warning that it doesn't see these vars across all dfs##
@@ -246,9 +257,9 @@ data.list.county = lapply(data.list.county.pop, function(file){
     select(location,(one_of("population_2000", "population_2001", "population_2002", "population_2003", "population_2004", "population_2005", "population_2006",
                             "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", "population_2012", "population_2013", 
                             "population_2014", "population_2015", "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", 
-                            "population_2021", "population_2022", "deaths_2010", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
+                            "population_2021", "population_2022", "population_2023", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
                             "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                            "deaths_2020", "deaths_2021", "deaths_2022")))
+                             "deaths_2021", "deaths_2022", "deaths_2023")))
   
   
   
@@ -256,9 +267,9 @@ data.list.county = lapply(data.list.county.pop, function(file){
     pivot_longer(cols=c(one_of("population_2000", "population_2001", "population_2002", "population_2003", "population_2004", "population_2005", "population_2006",
                                "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", "population_2012", "population_2013", 
                                "population_2014", "population_2015", "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", 
-                               "population_2021", "population_2022", "deaths_2010", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
+                               "population_2021", "population_2022", "population_2023", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
                                "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                               "deaths_2020", "deaths_2021", "deaths_2022")),
+                               "deaths_2021", "deaths_2022", "deaths_2023")),
                  names_to = c("outcome", "year"),
                  names_sep = "_",
                  values_to = "value")
@@ -274,7 +285,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
 ###############################################################################
 ##Separate into lists for population and deaths now that parent source is different
 ###############################################################################
-data.list.county.pop.00.22 = lapply(data.list.county, function(file){
+data.list.county.pop.00.23 = lapply(data.list.county, function(file){
   
   data=file[[2]]
   filename = file[[1]]
@@ -286,7 +297,7 @@ data= as.data.frame(data)
 list(filename, data) #what to return# 
 })
 
-data.list.county.deaths.00.22 = lapply(data.list.county, function(file){
+data.list.county.deaths.00.23 = lapply(data.list.county, function(file){
   
   data=file[[2]]
   filename = file[[1]]
@@ -304,7 +315,7 @@ data.list.county.deaths.00.22 = lapply(data.list.county, function(file){
 ################################################################################  
 
 #County POPULATION Values
-county_pop = lapply(data.list.county.pop.00.22, `[[`, 2)
+county_pop = lapply(data.list.county.pop.00.23, `[[`, 2)
 
 for (data in county_pop) {
   
@@ -319,7 +330,7 @@ for (data in county_pop) {
 
 
 #County DEATH Values
-county_deaths = lapply(data.list.county.deaths.00.22, `[[`, 2)
+county_deaths = lapply(data.list.county.deaths.00.23, `[[`, 2)
 
 for (data in county_deaths) {
   

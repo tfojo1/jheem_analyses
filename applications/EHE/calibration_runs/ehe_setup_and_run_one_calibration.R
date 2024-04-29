@@ -1,7 +1,13 @@
-#source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
+source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
-LOCATION = SEATTLE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.POPULATION # or CALIBRATION.CODE.TRANSMISSION
+LOCATION = 'C.12580' #BALTIMORE.MSA 
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.PLUS.AIDS.MINUS.PREP   # CALIBRATION.CODE.POPULATION
+                                                                      # CALIBRATION.CODE.TRANSMISSION
+                                                                      # CALIBRATION.CODE.POP.TRANS.MORT 
+
+                                                                      # CALIBRATION.CODE.BASE.PLUS.PREP 
+                                                                      # CALIBRATION.CODE.FULL.PLUS.AIDS.MINUS.PREP
+                                                                      # CALIBRATION.CODE.FULL.PLUS.AIDS
 
 set.seed(12345)
 
@@ -20,7 +26,10 @@ set.up.calibration(version='ehe',
 print(paste0("DONE setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 start.time = Sys.time()
 
-print(ggplot2::qplot(1,1) + ggplot2::ggtitle(paste0(LOCATION, " - ", locations::get.location.name(LOCATION))))
+print(ggplot2::qplot(1,1) + 
+        ggplot2::ggtitle(paste0(LOCATION, " - ", 
+                                locations::get.location.name(LOCATION), " - ",
+                                CALIBRATION.CODE.TO.RUN)))
 
 print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
 mcmc = run.calibration(version = 'ehe',
@@ -32,13 +41,15 @@ mcmc = run.calibration(version = 'ehe',
 end.time = Sys.time()
 run.time = as.numeric(end.time) - as.numeric(start.time)
 
-print(paste0("DONE RUNNING MCMC: Took ",
-             round(run.time/60, 0), " minutes to run ",
-             format(N.ITER, big.mark = ","),
-             " simulations (",
-             round(run.time / N.ITER, 1), " seconds per simulation on average)"))
+# print(paste0("DONE RUNNING MCMC: Took ",
+#              round(run.time/60, 0), " minutes to run ",
+#              format(N.ITER, big.mark = ","),
+#              " simulations (",
+#              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
 
 sim = mcmc@simulations[[length(mcmc@simulations)]]
 
-save(sim,file=paste0("prelim_results/init.pop.migration.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
-# save(sim,file=paste0("prelim_results/init.transmission.sim_",Sys.Date(),"_",LOCATION,".Rdata"))
+save(sim,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_",Sys.Date(),"_",LOCATION,".Rdata"))
+
+
+

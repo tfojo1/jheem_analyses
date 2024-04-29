@@ -56,6 +56,7 @@ if (!exists('national.surveillance'))
 
 # Input Managers
 source('../jheem_analyses/input_managers/covid_mobility_manager.R')
+source('../jheem_analyses/input_managers/covid_input_manager.R')
 source('../jheem_analyses/input_managers/idu_input_manager.R')
 source('../jheem_analyses/input_managers/prep_input_manager.R')
 source('../jheem_analyses/input_managers/pairing_input_manager.R')
@@ -70,6 +71,7 @@ source('../jheem_analyses/applications/EHE/ehe_ontology_mappings.R')
 source('../jheem_analyses/commoncode/target_populations.R')
 source('../jheem_analyses/commoncode/age_mappings.R')
 source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
+source('../jheem_analyses/commoncode/logitnorm_helpers.R')
 
 # Data Loads
 load(file.path(JHEEM.CACHE.DIR, 'google_mobility_data.Rdata'))

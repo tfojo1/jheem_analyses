@@ -8,6 +8,20 @@ register.ontology.mapping('lump.other.risk.and.heterosexual',
                                            c('other', 'heterosexual'))
 )
 
+register.ontology.mapping('idu.to.active.prior',
+                          from.dimensions = 'risk',
+                          to.dimensions = 'risk',
+                          mappings = rbind(c('never_IDU', 'non.idu'),
+                                           c('active_IDU', 'idu'),
+                                           c('IDU_in_remission', 'idu')))
+
+register.ontology.mapping('non.idu.to.never.prior',
+                          from.dimensions = 'risk',
+                          to.dimensions = 'risk',
+                          mappings = rbind(c('never_IDU', 'non.active.idu'),
+                                           c('active_IDU', 'active.idu'),
+                                           c('IDU_in_remission', 'non.active.idu')))
+
 register.ontology.mapping('jheem.to.cdc.sex.risk',
                           from.dimensions = c('sex', 'risk'),
                           to.dimensions = c('sex', 'risk'),
@@ -22,18 +36,27 @@ register.ontology.mapping('jheem.to.cdc.sex.risk',
                                            c('female', 'IDU_in_remission', 'female', 'idu'))
 )
 
+# register.ontology.mapping('jheem.to.msm.or.not.risk',
+#                           from.dimensions = c('sex', 'risk'),
+#                           to.dimensions = c('sex', 'risk'),
+#                           mappings = rbind(c('msm', 'never_IDU', 'male', 'msm'),
+#                                            c('msm', 'active_IDU', 'male', 'msm'),
+#                                            c('msm', 'IDU_in_remission', 'male', 'msm'),
+#                                            c('heterosexual_male', 'never_IDU', 'male', 'not_msm'),
+#                                            c('heterosexual_male', 'active_IDU', 'male', 'not_msm'),
+#                                            c('heterosexual_male', 'IDU_in_remission', 'male', 'not_msm'),
+#                                            c('female', 'never_IDU', 'female', 'not_msm'),
+#                                            c('female', 'active_IDU', 'female', 'not_msm'),
+#                                            c('female', 'IDU_in_remission', 'female', 'not_msm'))
+# )
+
+# Not sure if this would work - might give us some unwanted dimensions in the mapped result
 register.ontology.mapping('jheem.to.msm.or.not.risk',
-                          from.dimensions = c('sex', 'risk'),
+                          from.dimensions = c('sex'),
                           to.dimensions = c('sex', 'risk'),
-                          mappings = rbind(c('msm', 'never_IDU', 'male', 'msm'),
-                                           c('msm', 'active_IDU', 'male', 'msm'),
-                                           c('msm', 'IDU_in_remission', 'male', 'msm'),
-                                           c('heterosexual_male', 'never_IDU', 'male', 'not_msm'),
-                                           c('heterosexual_male', 'active_IDU', 'male', 'not_msm'),
-                                           c('heterosexual_male', 'IDU_in_remission', 'male', 'not_msm'),
-                                           c('female', 'never_IDU', 'female', 'not_msm'),
-                                           c('female', 'active_IDU', 'female', 'not_msm'),
-                                           c('female', 'IDU_in_remission', 'female', 'not_msm'))
+                          mappings = rbind(c('msm', 'male', 'msm'),
+                                           c('heterosexual_male', 'male', 'not_msm'),
+                                           c('female', 'female', 'not_msm'))
 )
 
 register.ontology.mapping('cdc.to.jheem.race',
@@ -201,3 +224,19 @@ register.ontology.mapping('nhanes.to.jheem.race',
                                            c('hispanic', 'hispanic'),
                                            c('other', 'other'),
                                            c('white, non hispanic', 'other')))
+register.ontology.mapping('stratified.census.to.jheem.race',
+                          from.dimension = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('White', 'white'),
+                                           c('Asian', 'asian'),
+                                           c('Black', 'black'),
+                                           c('American Indian and Alaska Native', 'other'),
+                                           c('Native Hawaiian and Other Pacific Islander', 'other')))
+register.ontology.mapping('stratified.census.to.census.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian and Alaska Native', 'american indian or alaska native'),
+                                           c('Asian', 'asian or pacific islander'),
+                                           c('Black', 'black'),
+                                           c('Native Hawaiian and Other Pacific Islander', 'asian or pacific islander'),
+                                           c('White', 'white')))

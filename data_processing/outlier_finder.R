@@ -2,15 +2,125 @@
 # outcome: 'diagnosed.prevalence'
 # data.manager: SURVEILLANCE.MANAGER
 # locations: 'MSAS.OF.INTEREST'
-# stratification.dimensions: something like c('risk', 'sex') -- don't include 'year' or 'location', which are implied
+# stratifications: something like list('sex', c('age', 'sex'), 'race') etc.
 # adjudication.data.frame: an optional data frame that describes values you will say keep or don't keep on. Has columns year, location, source, ontology, and another column per additional dimension in 'stratification.dimensions'. The last column should be "adjudication" and contain 'T' for keeping a row, 'F' for retaining a row, and NA for undecided rows.
 # phi: a percent change from one year to another that does not depend on how many years apart the data points are from
 # theta: a multiplier that produces a percent change based on how many years apart two samples are. The maximum allowed percent change uses phi + (1 + theta)^(year difference) - 1.
 # minimum.flagged.change: an integer that indicates what the smallest change between years that will be flagged as problematic is.
 ## ---------------------------##
 
-## ONLY USE THIS. THE REST ARE ITS HELPERS.
-find.outlier.data = function(outcome, data.manager = get.default.data.manager(), locations, stratification.dimensions=c(), adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50) {
+# outlier remover
+
+# takes in an adjudication data frame.
+# removes what should be removed
+# runs outlier finder and report back if there are any flagged points not adjudicated yet.
+
+run.outlier.process = function(outcome, stratifications=list(), data.manager = get.default.data.manager(), locations, adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50) {
+    
+    # Step 1: remove outliers as requested if we have an adjudication data frame
+    if (!is.null(adjudication.data.frame)) {
+        remove.outliers(outcome, stratifications, data.manager, adjudication.data.frame)
+    }
+    
+    # Step 2: run outlier finder on what remains
+    output.data.frame = find.outlier.data(outcome=outcome, stratifications=stratifications, data.manager=data.manager, locations=locations, adjudication.data.frame=adjudication.data.frame, phi=phi, theta=theta, minimum.flagged.change=minimum.flagged.change)
+    
+    # return the output.data.frame
+    return(output.data.frame)
+}
+
+
+
+
+#### ALL BELOW ARE HELPERS ####
+remove.outliers = function(outcome, stratifications, data.manager, adjudication.data.frame) {
+    
+    # for every point in the list, put the value NA into the data.manager
+    
+    all.sources = unique(adjudication.data.frame$source)
+    all.ontologies = unique(adjudication.data.frame$ontology)
+    
+    # remove rows with NA adjudication
+    adjudication.data.frame = subset(adjudication.data.frame, !is.na(adjudication))
+    
+    for (stratification in stratifications) {
+        
+        this.adj.data.frame = adjudication.data.frame[names(adjudication.data.frame) %in% c('year', 'location', stratification, 'source', 'ontology', 'adjudication')]
+        # pick only rows that are non-NA (except in the adjudication column, where it is okay to be NA)
+        
+        if (!is.null(this.adj.data.frame))
+            this.adj.data.frame = this.adj.data.frame[apply(
+                this.adj.data.frame,
+                1,
+                function(row) {!any(is.na(row[names(row)!='adjudication']))}
+            ),]
+        
+        stratification.name = "year__location"
+        stratification.dimensions = sort(stratification)
+        if (length(stratification.dimensions)>0)
+            stratification.name = paste0(stratification.name, "__", paste0(stratification.dimensions, collapse = "__"))
+        
+        for (source.name in all.sources) {
+            
+            ontologies.this.source = intersect(all.ontologies, names(data.manager$data[[outcome]][['estimate']][[source.name]]))
+            
+            for (ont.name in ontologies.this.source) {
+                
+                removal.points.this.source.ont = subset(this.adj.data.frame, source==source.name & ontology==ont.name & adjudication==T)
+                
+                for (i in 1:nrow(removal.points.this.source.ont)) {
+                    # Must do one put per replaced data point
+                    data.manager$put(data=as.numeric(NA),
+                                     outcome=outcome,
+                                     source=source.name,
+                                     ontology.name=ont.name,
+                                     dimension.values = c(list(year=removal.points.this.source.ont[[i,'year']],
+                                                               location=removal.points.this.source.ont[[i,'location']]),
+                                                          setNames(lapply(stratification, function(x) {removal.points.this.source.ont[[i,x]]}), stratification)),
+                                     url="removed",
+                                     details="removed",
+                                     allow.na.to.overwrite=T)
+                }
+            }
+        } 
+    }
+}
+
+find.outlier.data = function(outcome, stratifications=list(), data.manager = get.default.data.manager(), locations, adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50) {
+    # fastest way to recode this to have all stratifications in one data frame is to make this a wrapper for what I already had
+    
+    all.data.frames = lapply(stratifications, function(stratification) {
+        this.adj.data.frame = adjudication.data.frame[names(adjudication.data.frame) %in% c('year', 'location', stratification, 'source', 'ontology', 'adjudication')]
+        # pick only rows that are non-NA (except in the adjudication column, where it is okay to be NA)
+        
+        if (!is.null(this.adj.data.frame))
+            this.adj.data.frame = this.adj.data.frame[apply(
+                this.adj.data.frame,
+                1,
+                function(row) {!any(is.na(row[names(row)!='adjudication']))}
+            ),]
+        find.outlier.data.per.stratification(outcome=outcome, data.manager=data.manager, locations=locations, stratification.dimensions=stratification, adjudication.data.frame=this.adj.data.frame, phi=phi, theta=theta, minimum.flagged.change = minimum.flagged.change)
+    })
+    
+    # Combine them into one big data frame with all the dimensions
+    complete.colnames = c('year', 'location', unique(unlist(stratifications)), 'source', 'ontology', 'adjudication')
+    
+    all.expanded.data.frames = lapply(all.data.frames, function(this.data.frame) {
+        extra.cols.needed = setdiff(complete.colnames, colnames(this.data.frame))
+        if (length(extra.cols.needed)>0) {
+            extra.cols = lapply(extra.cols.needed, function(x) {rep(NA, nrow(this.data.frame))})
+            names(extra.cols)=extra.cols.needed
+            this.expanded.data.frame = cbind(this.data.frame, extra.cols)   
+        } else this.expanded.data.frame = this.data.frame
+        return(this.expanded.data.frame[complete.colnames])
+    })
+    
+    return(Reduce(rbind, all.expanded.data.frames))
+}
+
+
+### -- HELPERS -- ####
+find.outlier.data.per.stratification = function(outcome, data.manager = get.default.data.manager(), locations, stratification.dimensions=c(), adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50) {
     
     error.prefix = "Error finding outliers: "
     
@@ -40,10 +150,6 @@ find.outlier.data = function(outcome, data.manager = get.default.data.manager(),
     
 }
 
-
-
-
-### -- HELPERS -- ####
 convert.to.data.frame = function(list.of.lists, stratification.name) {
     # How long is our list of lists, flattened?
     full.length = length(unlist(list.of.lists))
@@ -114,6 +220,8 @@ do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratif
                         city.data = setNames(as.vector(array.access(data.this.stratification, location=city.name, dimension.values)), years)
                         years = years[!is.na(city.data)]
                         city.data = city.data[!is.na(city.data)]
+                        if (length(years)==0) return(NULL)
+                        if (length(city.data)==0) return(NULL)
                         result = do.find.outliers(city.data,
                                                   years = years,
                                                   get.adjudication(years=years,
@@ -146,6 +254,8 @@ do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratif
                     city.data = setNames(as.vector(array.access(data.this.stratification, location=city.name)), years)
                     years = years[!is.na(city.data)]
                     city.data = city.data[!is.na(city.data)]
+                    if (length(years)==0) return(NULL)
+                    if (length(city.data)==0) return(NULL)
                     result = do.find.outliers(city.data,
                                               years = years,
                                               get.adjudication(years=years,
@@ -188,7 +298,7 @@ generate.find.outliers.function = function(phi, theta, minimum.flagged.change) {
         # Pick 2019 or earlier, else pick first year above 2019. Must be nonzero because we divide by it to find a percent change.
         if (any(as.numeric(years)<=2019 & as.numeric(years)!=0))
             baseline.year = max(as.numeric(years)[as.numeric(years)<2020 & as.numeric(years)!=0])
-        else if (any(as.numeric(years)>2019) & as.numeric(years)!=0)
+        else if (any(as.numeric(years)>2019 & as.numeric(years)!=0))
             baseline.year = min(as.numeric(years)[as.numeric(years)!=0])
         else return(flagged.years)
         
@@ -209,7 +319,7 @@ generate.find.outliers.function = function(phi, theta, minimum.flagged.change) {
             # Flag years whose values are too different from the last acceptable year's value, updating the last acceptable year when the change is small enough
             for (y in years.to.check) {
                 abs.difference = abs(data.vector[[y]] - data.vector[[last.good.year]])
-                difference.in.years = as.numeric(y)-as.numeric(last.good.year)
+                difference.in.years = abs(as.numeric(y)-as.numeric(last.good.year))
                 tolerable.percent.difference = phi + (1 + theta) ^ difference.in.years - 1
                 if (is.na(adjudication.result[y])) {
                     if (abs.difference >= minimum.flagged.change && abs.difference / data.vector[[last.good.year]] > tolerable.percent.difference)
@@ -253,8 +363,8 @@ get.adjudication = function(years, location, source, ontology, stratum.vars, adj
     return (result)
 }
 
-city.names = c('C.47900', 'C.16980')
-jj = find.outlier.data('diagnosed.prevalence', ss, city.names, stratification.dimensions = c('age', 'sex'))
-# input.v = rep(c(T,F), nrow(jj)/2) # works if jj has even number of rows
-jj$adjudication[[1]] = T
-jj2 = find.outlier.data('diagnosed.prevalence', ss, city.names, stratification.dimensions = c('age', 'sex'), adjudication.data.frame = jj)
+# city.names = c('C.47900', 'C.16980')
+# jj = find.outlier.data('diagnosed.prevalence', stratifications = list(c(), 'age', 'sex', c('age', 'sex')), data.manager = ss, locations =  city.names)
+# # input.v = rep(c(T,F), nrow(jj)/2) # works if jj has even number of rows
+# jj$adjudication[[1]] = T
+# jj2 = find.outlier.data('diagnosed.prevalence', ss, city.names, stratification.dimensions = c('age', 'sex'), adjudication.data.frame = jj)
