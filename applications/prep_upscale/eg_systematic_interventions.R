@@ -17,23 +17,22 @@ extra.params.dist = join.distributions(
 CALIBRATION.CODE = 'init.transmission.ehe' #for now, we are going to use 'uncalibrated' (ie, manually generated) simulations
 LOCATIONS = c('C.26420','C.33100','C.16980') 
 
-# BALTIMORE - 'C.12580'
-# HOUSTON, MIAMI, CHICAGO
+# BALTIMORE, HOUSTON, MIAMI, CHICAGO
 
 PREP.UPSCALE.INTERVENTION.CODES = c('prepu10p30msm', 
                                     'prepu20p30msm', 
-                                    'prepu25p30msm', 
-                                    'prepu35p30msm', 
+                                    # 'prepu25p30msm', 
+                                    'prepu30p30msm', 
                                     'prepu40p30msm', 
                                     'prepu10p50msm', 
                                     'prepu20p50msm', 
-                                    'prepu25p50msm', 
-                                    'prepu35p50msm', 
+                                    # 'prepu25p50msm', 
+                                    'prepu30p50msm', 
                                     'prepu40p50msm', 
                                     'prepu10p80msm', 
                                     'prepu20p80msm', 
-                                    'prepu25p80msm', 
-                                    'prepu35p80msm', 
+                                    # 'prepu25p80msm', 
+                                    'prepu30p80msm', 
                                     'prepu40p80msm') #@padma - update this
 
 prep.max.intervention.code = 'prepu60p80msm'
@@ -41,17 +40,17 @@ prep.max.intervention.code = 'prepu60p80msm'
 prep.upscale.intervention.names = c(
   "10% Use 30% Persistence",
   "20% Use 30% Persistence",
-  "25% Use 30% Persistence",
+  # "25% Use 30% Persistence",
   "30% Use 30% Persistence",
   "40% Use 30% Persistence",
   "10% Use 50% Persistence",
   "20% Use 50% Persistence",
-  "25% Use 50% Persistence",
+  # "25% Use 50% Persistence",
   "30% Use 50% Persistence",
   "40% Use 50% Persistence",
   "10% Use 80% Persistence",
   "20% Use 80% Persistence",
-  "25% Use 80% Persistence",
+  # "25% Use 80% Persistence",
   "30% Use 80% Persistence",
   "40% Use 80% Persistence"
 )
@@ -201,88 +200,90 @@ for(l in LOCATIONS){
   }
 }
 
+
+
 # minimum uptake and persistance (scenario 1 - 10% use, 30% pers)
-# 
-# scene1 <- data.frame()
-# for(i in LOCATIONS){
-#   scene1 <- rbind(scene1, t(upscale_table(PREP.UPSCALE.INTERVENTION.CODES[1],prep.upscale.intervention.names[1],i)))
-# }
-# 
-# scene1 <- as.data.frame(scene1)
-# scene1[,3:10] <- sapply(scene1[,3:10], as.numeric)
-# 
-# scene1 <- scene1[,c("location","irr","irr.bl")]
-# 
-# scene1_long <- pivot_longer(scene1, 
-#                             cols = starts_with(c("irr", "irr.bl")), 
-#                             names_to = "measurement", 
-#                             values_to = "value")
-# 
-# scene1_long$measurement <- ifelse(scene1_long$measurement=="irr", 
-#                                   "IRR - with intervention",
-#                                   "IRR - no intervention")
-# 
-# scene1_long$location <- ifelse(scene1_long$location == LOCATIONS[1], "Baltimore",
-#                           ifelse(scene1_long$location == LOCATIONS[2],"Houston", 
-#                             ifelse(scene1_long$location == LOCATIONS[3], "Miami",
-#                                    "Chicago")))
-# 
-# # biggest intervention (40% use, 80% pers)
-# scene12 <- data.frame()
-# for(i in LOCATIONS){
-#   scene12 <- rbind(scene12, t(upscale_table(PREP.UPSCALE.INTERVENTION.CODES[15],
-#                                           prep.upscale.intervention.names[15],i)))
-# }
-# 
-# scene12 <- as.data.frame(scene12)
-# scene12[,3:10] <- sapply(scene12[,3:10], as.numeric)
-# 
-# scene12 <- scene12[,c("location","irr","irr.bl")]
-# 
-# scene12_long <- pivot_longer(scene12, 
-#                             cols = starts_with(c("irr", "irr.bl")), 
-#                             names_to = "measurement", 
-#                             values_to = "value")
-# 
-# scene12_long$measurement <- ifelse(scene12_long$measurement=="irr", 
-#                                   "IRR - with intervention",
-#                                   "IRR - no intervention")
-# 
-# scene12_long$location <- ifelse(scene12_long$location == LOCATIONS[1], "Baltimore",
-#                                ifelse(scene12_long$location == LOCATIONS[2],"Houston", 
-#                                       ifelse(scene12_long$location == LOCATIONS[3], "Miami",
-#                                              "Chicago")))
-# 
-# p1 <- ggplot(scene1_long, aes(x = measurement, y = value, color = location)) +
-#   geom_point() +
-#   geom_line(aes(group=location)) +
-#   labs(
-#     title = "Comparison of IRR - 10% PrEP Use, 30% Persistence",
-#     x = "Location",
-#     y = "IRR",
-#     color = "Measurement"
-#   ) + theme_minimal()
-# 
-# p1
-# 
-# p12 <- ggplot(scene12_long, aes(x = measurement, y = value, color = location)) +
-#   geom_point() +
-#   geom_line(aes(group=location)) +
-#   labs(
-#     title = "Comparison of IRR - 40% PrEP Use, 80% Persistence",
-#     x = "Location",
-#     y = "IRR",
-#     color = "Measurement"
-#   ) + theme_minimal()
-# 
-# p12
-# 
-# # figure 3 -----
-# 
-# scene1_long$int <- rep("10% Additional PrEP Use, 30% Persistence", length(scene1_long$location))
-# scene12_long$int <- rep("40% Additional PrEP Use, 80% Persistence", length(scene12_long$location))
-# 
-# combined_long <- rbind(scene1_long, scene12_long)
+
+scene1 <- data.frame()
+for(i in LOCATIONS){
+  scene1 <- rbind(scene1, t(upscale_table(PREP.UPSCALE.INTERVENTION.CODES[1],prep.upscale.intervention.names[1],i)))
+}
+
+scene1 <- as.data.frame(scene1)
+scene1[,3:10] <- sapply(scene1[,3:10], as.numeric)
+
+scene1 <- scene1[,c("location","irr","irr.bl")]
+
+scene1_long <- pivot_longer(scene1, 
+                            cols = starts_with(c("irr", "irr.bl")), 
+                            names_to = "measurement", 
+                            values_to = "value")
+
+scene1_long$measurement <- ifelse(scene1_long$measurement=="irr", 
+                                  "IRR - with intervention",
+                                  "IRR - no intervention")
+
+scene1_long$location <- ifelse(scene1_long$location == LOCATIONS[1], "Baltimore",
+                          ifelse(scene1_long$location == LOCATIONS[2],"Houston", 
+                            ifelse(scene1_long$location == LOCATIONS[3], "Miami",
+                                   "Chicago")))
+
+# biggest intervention (40% use, 80% pers)
+scene12 <- data.frame()
+for(i in LOCATIONS){
+  scene12 <- rbind(scene12, t(upscale_table(PREP.UPSCALE.INTERVENTION.CODES[15],
+                                          prep.upscale.intervention.names[15],i)))
+}
+
+scene12 <- as.data.frame(scene12)
+scene12[,3:10] <- sapply(scene12[,3:10], as.numeric)
+
+scene12 <- scene12[,c("location","irr","irr.bl")]
+
+scene12_long <- pivot_longer(scene12, 
+                            cols = starts_with(c("irr", "irr.bl")), 
+                            names_to = "measurement", 
+                            values_to = "value")
+
+scene12_long$measurement <- ifelse(scene12_long$measurement=="irr", 
+                                  "IRR - with intervention",
+                                  "IRR - no intervention")
+
+scene12_long$location <- ifelse(scene12_long$location == LOCATIONS[1], "Baltimore",
+                               ifelse(scene12_long$location == LOCATIONS[2],"Houston", 
+                                      ifelse(scene12_long$location == LOCATIONS[3], "Miami",
+                                             "Chicago")))
+
+p1 <- ggplot(scene1_long, aes(x = measurement, y = value, color = location)) +
+  geom_point() +
+  geom_line(aes(group=location)) +
+  labs(
+    title = "Comparison of IRR - 10% PrEP Use, 30% Persistence",
+    x = "Location",
+    y = "IRR",
+    color = "Measurement"
+  ) + theme_minimal()
+
+p1
+
+p12 <- ggplot(scene12_long, aes(x = measurement, y = value, color = location)) +
+  geom_point() +
+  geom_line(aes(group=location)) +
+  labs(
+    title = "Comparison of IRR - 40% PrEP Use, 80% Persistence",
+    x = "Location",
+    y = "IRR",
+    color = "Measurement"
+  ) + theme_minimal()
+
+p12
+
+# figure 3 -----
+
+scene1_long$int <- rep("10% Additional PrEP Use, 30% Persistence", length(scene1_long$location))
+scene12_long$int <- rep("40% Additional PrEP Use, 80% Persistence", length(scene12_long$location))
+
+combined_long <- rbind(scene1_long, scene12_long)
 # 
 # ggplot(combined_long, aes(x = measurement, y = value, color = location)) +
 #   geom_point() +
@@ -303,12 +304,11 @@ for(l in LOCATIONS){
 # looking at the 10 year trend of the biggest intervention
 
 # generating results till 2035 
-results.all = collection$get(outcomes = c('incidence','population', 'prep.uptake'),
+results.all = collection$get(outcomes = c('incidence','population'),
                              keep.dimensions = c('race','sex','year'))
 
-results.bl.all = collection.bl$get(
-  outcomes = c('incidence','population', 'prep.uptake'),
-  keep.dimensions = c('race','sex','year'))
+results.bl.all = collection.bl$get(outcomes = c('incidence','population', 'prep.uptake'),
+                                   keep.dimensions = c('race','sex','year','age'))
 
 
 run.prep.code <- "prepu40p80msm"
@@ -318,21 +318,21 @@ results_df <- data.frame()
 for(l in LOCATIONS){
   for (i in 1:length(run.prep.code)) {
     for(yr in as.character(start.year:end.year)){
-      # for(age in 1:5){
-      bh.ir <- (sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,,"incidence",l,run.prep.code[i]]))/
-                  sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,,"population",l,run.prep.code[i]]))) * 100000
-      other.ir <- (mean(results.all[c("other"),"msm",yr,,"incidence",l,run.prep.code[i]])/
-                     mean(results.all[c("other"),"msm",yr,,"population",l,run.prep.code[i]])) * 100000
+      for(age in 1:5){
+      bh.ir <- (sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,age,,"incidence",l,run.prep.code[i]]))/
+                  sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,age,,"population",l,run.prep.code[i]]))) * 100000
+      other.ir <- (mean(results.all[c("other"),"msm",yr,age,,"incidence",l,run.prep.code[i]])/
+                     mean(results.all[c("other"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100000
       
-      bh.bl.ir <- (sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,,"incidence",l,1]))/
-        sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,,"population",l,1]))) * 100000
-      other.bl.ir <- (mean(results.bl.all[c("other"),"msm",yr,,"incidence",l,1]))/
-        mean(results.bl.all[c("other"),"msm",yr,,"population",l,1]) * 100000
+      bh.bl.ir <- (sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,age,,"incidence",l,1]))/
+        sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,age,,"population",l,1]))) * 100000
+      other.bl.ir <- (mean(results.bl.all[c("other"),"msm",yr,age,,"incidence",l,1]))/
+        mean(results.bl.all[c("other"),"msm",yr,age,,"population",l,1]) * 100000
       
       results_inc[[length(results_inc) + 1]] <- data.frame(
         year = yr,
         loc = l,
-        # age_cat = age,
+        age_cat = age,
         intervention_code = run.prep.code[i],
         bh_ir = bh.ir,
         other_ir = other.ir,
@@ -343,20 +343,20 @@ for(l in LOCATIONS){
       )
     }
     results_df <- do.call(rbind, results_inc)
-  }
+  }}
 }
 
-results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Houston", 
-                      ifelse(results_df$loc == LOCATIONS[2],"Miami","Chicago"))
-
-library(ggplot2)
+results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
+                                                 ifelse(results_df$loc == LOCATIONS[2],"Houston", 
+                                                        ifelse(results_df$loc == LOCATIONS[3], "Miami",
+                                                               "Chicago")))
 
 ggplot(results_df) +
   geom_line(aes(x = year, y = bh_bl_ir, group = loc), color = "grey4") +
   geom_point(aes(x = year, y = bh_bl_ir, group = loc), color = 'grey4') +
   geom_line(aes(x = year, y = bh_ir, color = loc, group = loc)) +
   geom_point(aes(x = year, y = bh_ir, color = loc, group = loc)) +
-  facet_wrap(~loc, dir = "v")+
+  facet_wrap(~loc)+
   labs(
     title = "Incidence Rate among Black/Hispanic MSM by Location",
     subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
@@ -372,7 +372,7 @@ ggplot(results_df) +
   geom_point(aes(x = year, y = bl_irr, group = loc), color = 'grey4') +
   geom_line(aes(x = year, y = irr, color = loc, group = loc)) +
   geom_point(aes(x = year, y = irr, color = loc, group = loc)) +
-  facet_wrap(~loc, dir = "v")+
+  facet_wrap(~loc)+
   labs(
     title = "Incidence Rate Ratio by Location",
     subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
@@ -383,117 +383,239 @@ ggplot(results_df) +
   ) +
   theme_minimal()
 
+library(ggplot2)
+
+# 95% confidence interval using quantile ------
+
+# uncertainty range
+
+
+results_df$loc <- ifelse(results_df$loc == "Houston", LOCATIONS[1],
+                         ifelse(results_df$loc == "Miami", LOCATIONS[2],
+                                       LOCATIONS[3]))
+
+# add lower and upper bound to the results_df
+for(year in as.character(start.year:end.year)){
+  for(loc in LOCATIONS){
+    
+    bh.ir <- (colSums(results.all[c("black","hispanic"),"msm",year,,"incidence",loc,"prepu40p80msm"])/
+      colSums(results.all[c("black","hispanic"),"msm",year,,"population",loc,"prepu40p80msm"])) * 100000
+    
+    other.ir <- results.all[c("other"),"msm",year,,"incidence",loc,"prepu40p80msm"]/
+      results.all[c("other"),"msm",year,,"population",loc,"prepu40p80msm"] * 100000
+    
+    irr <- bh.ir/other.ir
+    
+    results_df$lower_bh_ir[results_df$year == year & results_df$loc == loc] <- 
+      quantile(bh.ir,0.025)
+    results_df$upper_bh_ir[results_df$year == year & results_df$loc == loc] <-
+      quantile(bh.ir,0.975)
+    
+  results_df$lower_irr[results_df$year == year & results_df$loc == loc] <-
+    quantile(irr,0.025)
+  results_df$upper_irr[results_df$year == year & results_df$loc == loc] <-
+    quantile(irr,0.975)
+  
+    }
+}
+
+results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Houston",
+                         ifelse(results_df$loc == LOCATIONS[2],"Miami", 
+                                       "Chicago"))
+
+
+ggplot(results_df) +
+  geom_line(aes(x = year, y = bh_bl_ir, group = loc, color = "Baseline")) +
+  geom_point(aes(x = year, y = bh_bl_ir, group = loc, color = 'Baseline')) +
+  geom_line(aes(x = year, y = bh_ir, color = "Max Intervention", group = loc)) +
+  geom_point(aes(x = year, y = bh_ir, color = "Max Intervention", group = loc)) +
+  facet_wrap(~loc, dir = "v")+
+  labs(
+    title = "Incidence Rate among Black/Hispanic MSM by Location",
+    subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
+    x = "Year",
+    y = "Incidence Rate (per 100,000 population)",
+    color = "Location"
+    # caption = "The black line refers to the baseline incidence rate."
+  ) +
+  scale_color_manual(values = c("Baseline" = "grey4", "Max Intervention" = "red3"),
+                     name = "Type") +
+  theme_minimal()
+
+ggplot(results_df) +
+  geom_line(aes(x = year, y = bh_bl_ir, group = loc, color = "Baseline")) +
+  geom_point(aes(x = year, y = bh_bl_ir, group = loc, color = 'Baseline')) +
+  geom_line(aes(x = year, y = bh_ir, color = "Max Intervention", group = loc)) +
+  geom_point(aes(x = year, y = bh_ir, color = "Max Intervention", group = loc)) +
+  geom_area(aes(x = year, y = upper_bh_ir, group = loc, fill = "95% Confidence Interval"), alpha = 0.2) +
+  geom_area(aes(x = year, y = lower_bh_ir, group = loc), alpha = 0.2, fill = "grey") +
+  facet_wrap(~loc, dir = "v") +
+  labs(
+    title = "Incidence Rate among Black/Hispanic MSM by Location",
+    subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
+    x = "Year",
+    y = "Incidence Rate (per 100,000 population)",
+    color = "Location"
+  ) +
+  scale_color_manual(values = c("Baseline" = "grey4", "Max Intervention" = "red3"),
+                     name = "Type") +
+  scale_fill_manual(values = c("95% Confidence Interval"="grey")) +
+  theme_minimal()
+
+
+
+
+ggplot(results_df) +
+  geom_line(aes(x = year, y = bl_irr, group = loc, color = "Baseline")) +
+  geom_point(aes(x = year, y = bl_irr, group = loc, color = "Baseline")) +
+  geom_line(aes(x = year, y = irr, color = "Max Intervention", group = loc)) +
+  geom_point(aes(x = year, y = irr, color = "Max Intervention", group = loc)) +
+  facet_wrap(~loc, dir = "v") +
+  labs(
+    title = "Incidence Rate Ratio by Location",
+    subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
+    x = "Year",
+    y = "Incidence Rate Ratio",
+    color = "Location"
+    # caption = "Black line refers to the baseline IRR."
+  ) +
+  scale_color_manual(values = c("Baseline" = "grey4", "Max Intervention" = "red3"), 
+                     name = "Type") +
+  theme_minimal()
+
+# confidence interval for IRR
+ggplot(results_df) +
+  geom_line(aes(x = year, y = bl_irr, group = loc, color = "Baseline")) +
+  geom_point(aes(x = year, y = bl_irr, group = loc, color = "Baseline")) +
+  geom_line(aes(x = year, y = irr, color = "Max Intervention", group = loc)) +
+  geom_point(aes(x = year, y = irr, color = "Max Intervention", group = loc)) +
+  geom_area(aes(x = year, y = upper_irr, group = loc, fill = "95% Confidence Interval"), alpha = 0.2) +
+  geom_area(aes(x = year, y = lower_irr, group = loc), alpha = 0.2, fill = "grey") +
+  facet_wrap(~loc, dir = "v") +
+  labs(
+    title = "Incidence Rate Ratio by Location",
+    subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
+    x = "Year",
+    y = "Incidence Rate Ratio",
+    color = "Location"
+  ) +
+  scale_color_manual(values = c("Baseline" = "grey4", "Max Intervention" = "red3"), 
+                     name = "Type") +
+  scale_fill_manual(values = c("95% Confidence Interval"="grey")) +
+  theme_minimal()
 
 # figure 5 ----- 
 # looking at actual prep.uptake
-# 
-# run.prep.code <- "prepu40p80msm"
-# results_inc <- list()
-# results_df <- data.frame()
-# 
-# for(l in LOCATIONS){
-#   for (i in 1:length(run.prep.code)) {
-#     for(yr in as.character(start.year:end.year)){
-#       # for(age in 1:5){
-#       bh.p <- (sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]]))/
-#                   sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,age,,"population",l,run.prep.code[i]]))) * 100
-#       other.p <- (mean(results.all[c("other"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]])/
-#                      mean(results.all[c("other"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
-#       
-#       bh.bl.p <- (sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,age,,"prep.uptake",l,1]))/
-#                      sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,age,,"population",l,1]))) * 100
-#       other.bl.p <- (mean(results.bl.all[c("other"),"msm",yr,age,,"prep.uptake",l,1]))/
-#         mean(results.bl.all[c("other"),"msm",yr,age,,"population",l,1]) * 100
-#       
-#       results_inc[[length(results_inc) + 1]] <- data.frame(
-#         year = yr,
-#         loc = l,
-#         # age_cat = age,
-#         intervention_code = run.prep.code[i],
-#         bh_p = bh.p,
-#         other_p = other.p,
-#         bh_bl_p = bh.bl.p,
-#         other_bl_p = other.bl.p
-#       )
-#     }
-#     results_df <- do.call(rbind, results_inc)
-#   }
-# }
-# 
-# 
-# results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
-#                          ifelse(results_df$loc == LOCATIONS[2],"Houston", 
-#                                 ifelse(results_df$loc == LOCATIONS[3], "Miami",
-#                                        "Chicago")))
-# ggplot(results_df) +
-#   geom_line(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
-#   geom_point(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
-#   geom_line(aes(x = year, y = bh_p, color = loc, group = loc)) +
-#   geom_point(aes(x = year, y = bh_p, color = loc, group = loc)) +
-#   facet_wrap(~age_cat)+
-#   labs(
-#     title = "Projected PrEP Uptake among Black/Hispanic MSM by Location",
-#     subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
-#     x = "Year",
-#     y = "PrEP Uptake (%)",
-#     color = "Location",
-#     caption = "Black line refers to the baseline PrEP Uptake."
-#   ) +
-#   theme_minimal()
-# 
-# 
-# run.prep.code <- "prepu10p30msm"
-# results_inc <- list()
-# results_df <- data.frame()
-# 
-# for(l in LOCATIONS){
-#   for (i in 1:length(run.prep.code)) {
-#     for(yr in as.character(start.year:end.year)){
-#       
-#       bh.p <- (sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,,"prep.uptake",l,run.prep.code[i]]))/
-#                  sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,,"population",l,run.prep.code[i]]))) * 100
-#       other.p <- (mean(results.all[c("other"),"msm",yr,,"prep.uptake",l,run.prep.code[i]])/
-#                     mean(results.all[c("other"),"msm",yr,,"population",l,run.prep.code[i]])) * 100
-#       
-#       bh.bl.p <- (sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,,"prep.uptake",l,1]))/
-#                     sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,,"population",l,1]))) * 100
-#       other.bl.p <- (mean(results.bl.all[c("other"),"msm",yr,,"prep.uptake",l,1]))/
-#         mean(results.bl.all[c("other"),"msm",yr,,"population",l,1]) * 100
-#       
-#       results_inc[[length(results_inc) + 1]] <- data.frame(
-#         year = yr,
-#         loc = l,
-#         intervention_code = run.prep.code[i],
-#         bh_p = bh.p,
-#         other_p = other.p,
-#         bh_bl_p = bh.bl.p,
-#         other_bl_p = other.bl.p
-#       )
-#     }
-#     results_df <- do.call(rbind, results_inc)
-#   }
-# }
-# 
-# 
-# results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
-#                          ifelse(results_df$loc == LOCATIONS[2],"Houston", 
-#                                 ifelse(results_df$loc == LOCATIONS[3], "Miami",
-#                                        "Chicago")))
-# ggplot(results_df) +
-#   geom_line(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
-#   geom_point(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
-#   geom_line(aes(x = year, y = bh_p, color = loc, group = loc)) +
-#   geom_point(aes(x = year, y = bh_p, color = loc, group = loc)) +
-#   facet_wrap(~loc)+
-#   labs(
-#     title = "Projected PrEP Uptake among Black/Hispanic MSM by Location",
-#     subtitle = "10% Additional PrEP Use, 30% PrEP Persistence",
-#     x = "Year",
-#     y = "PrEP Uptake (%)",
-#     color = "Location",
-#     caption = "Black line refers to the baseline PrEP Uptake."
-#   ) +
-#   theme_minimal()
+
+run.prep.code <- "prepu40p80msm"
+results_inc <- list()
+results_df <- data.frame()
+
+for(l in LOCATIONS){
+  for (i in 1:length(run.prep.code)) {
+    for(yr in as.character(start.year:end.year)){
+      for(age in 1:5){
+      bh.p <- (sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]]))/
+                  sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,age,,"population",l,run.prep.code[i]]))) * 100
+      other.p <- (mean(results.all[c("other"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]])/
+                     mean(results.all[c("other"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
+      
+      bh.bl.p <- (sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,age,,"prep.uptake",l,1]))/
+                     sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,age,,"population",l,1]))) * 100
+      other.bl.p <- (mean(results.bl.all[c("other"),"msm",yr,age,,"prep.uptake",l,1]))/
+        mean(results.bl.all[c("other"),"msm",yr,age,,"population",l,1]) * 100
+      
+      results_inc[[length(results_inc) + 1]] <- data.frame(
+        year = yr,
+        loc = l,
+        age_cat = age,
+        intervention_code = run.prep.code[i],
+        bh_p = bh.p,
+        other_p = other.p,
+        bh_bl_p = bh.bl.p,
+        other_bl_p = other.bl.p
+      )
+    }
+    results_df <- do.call(rbind, results_inc)
+  }}
+}
+
+
+results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
+                         ifelse(results_df$loc == LOCATIONS[2],"Houston", 
+                                ifelse(results_df$loc == LOCATIONS[3], "Miami",
+                                       "Chicago")))
+ggplot(results_df) +
+  geom_line(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
+  geom_point(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
+  geom_line(aes(x = year, y = bh_p, color = loc, group = loc)) +
+  geom_point(aes(x = year, y = bh_p, color = loc, group = loc)) +
+  facet_wrap(~age_cat)+
+  labs(
+    title = "Projected PrEP Uptake among Black/Hispanic MSM by Location",
+    subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
+    x = "Year",
+    y = "PrEP Uptake (%)",
+    color = "Location",
+    caption = "Black line refers to the baseline PrEP Uptake."
+  ) +
+  theme_minimal()
+
+
+run.prep.code <- "prepu10p30msm"
+results_inc <- list()
+results_df <- data.frame()
+
+for(l in LOCATIONS){
+  for (i in 1:length(run.prep.code)) {
+    for(yr in as.character(start.year:end.year)){
+      
+      bh.p <- (sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,,"prep.uptake",l,run.prep.code[i]]))/
+                 sum(rowMeans(results.all[c("black","hispanic"),"msm",yr,,"population",l,run.prep.code[i]]))) * 100
+      other.p <- (mean(results.all[c("other"),"msm",yr,,"prep.uptake",l,run.prep.code[i]])/
+                    mean(results.all[c("other"),"msm",yr,,"population",l,run.prep.code[i]])) * 100
+      
+      bh.bl.p <- (sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,,"prep.uptake",l,1]))/
+                    sum(rowMeans(results.bl.all[c("black","hispanic"),"msm",yr,,"population",l,1]))) * 100
+      other.bl.p <- (mean(results.bl.all[c("other"),"msm",yr,,"prep.uptake",l,1]))/
+        mean(results.bl.all[c("other"),"msm",yr,,"population",l,1]) * 100
+      
+      results_inc[[length(results_inc) + 1]] <- data.frame(
+        year = yr,
+        loc = l,
+        intervention_code = run.prep.code[i],
+        bh_p = bh.p,
+        other_p = other.p,
+        bh_bl_p = bh.bl.p,
+        other_bl_p = other.bl.p
+      )
+    }
+    results_df <- do.call(rbind, results_inc)
+  }
+}
+
+
+results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
+                         ifelse(results_df$loc == LOCATIONS[2],"Houston", 
+                                ifelse(results_df$loc == LOCATIONS[3], "Miami",
+                                       "Chicago")))
+ggplot(results_df) +
+  geom_line(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
+  geom_point(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
+  geom_line(aes(x = year, y = bh_p, color = loc, group = loc)) +
+  geom_point(aes(x = year, y = bh_p, color = loc, group = loc)) +
+  facet_wrap(~loc)+
+  labs(
+    title = "Projected PrEP Uptake among Black/Hispanic MSM by Location",
+    subtitle = "10% Additional PrEP Use, 30% PrEP Persistence",
+    x = "Year",
+    y = "PrEP Uptake (%)",
+    color = "Location",
+    caption = "Black line refers to the baseline PrEP Uptake."
+  ) +
+  theme_minimal()
+
+
 
 # ggplot(results_df, aes(x = year, y = irr, color = loc, group = loc)) +
 #   geom_line() +
@@ -664,111 +786,111 @@ ggplot(results_df) +
 # # 
 # # 
 # # 
-# 
-# run.prep.code <- "prepu40p80msm"
-# results_inc <- list()
-# results_df <- data.frame()
-# 
-# for(l in LOCATIONS){
-#   for (i in 1:length(run.prep.code)) {
-#     for(yr in as.character(start.year:end.year)){
-#       for(age in 1:5){
-#         bh.p <- (mean(results.all[c("black"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]]))/
-#                    (mean(results.all[c("black"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
-#         other.p <- (mean(results.all[c("other"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]])/
-#                       mean(results.all[c("other"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
-#         
-#         bh.bl.p <- (mean(results.bl.all[c("black"),"msm",yr,age,,"prep.uptake",l,1]))/
-#                       (mean(results.bl.all[c("black"),"msm",yr,age,,"population",l,1])) * 100
-#         other.bl.p <- (mean(results.bl.all[c("other"),"msm",yr,age,,"prep.uptake",l,1]))/
-#           mean(results.bl.all[c("other"),"msm",yr,age,,"population",l,1]) * 100
-#         
-#         results_inc[[length(results_inc) + 1]] <- data.frame(
-#           year = yr,
-#           loc = l,
-#           age_cat = age,
-#           intervention_code = run.prep.code[i],
-#           bh_p = bh.p,
-#           other_p = other.p,
-#           bh_bl_p = bh.bl.p,
-#           other_bl_p = other.bl.p
-#         )
-#       }
-#       results_df <- do.call(rbind, results_inc)
-#     }}
-# }
-# 
-# 
-# results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
-#                          ifelse(results_df$loc == LOCATIONS[2],"Houston", 
-#                                 ifelse(results_df$loc == LOCATIONS[3], "Miami",
-#                                        "Chicago")))
-# ggplot(results_df) +
-#   geom_line(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
-#   geom_point(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
-#   geom_line(aes(x = year, y = bh_p, color = loc, group = loc)) +
-#   geom_point(aes(x = year, y = bh_p, color = loc, group = loc)) +
-#   facet_wrap(~age_cat)+
-#   labs(
-#     title = "Projected PrEP Uptake among Black MSM by Location",
-#     subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
-#     x = "Year",
-#     y = "PrEP Uptake (%)",
-#     color = "Location",
-#     caption = "Black line refers to the baseline PrEP Uptake."
-#   ) +
-#   theme_minimal()
-# 
-# results_inc <- list()
-# results_df <- data.frame()
-# 
-# for(l in LOCATIONS){
-#   for (i in 1:length(run.prep.code)) {
-#     for(yr in as.character(start.year:end.year)){
-#       for(age in 1:5){
-#         bh.p <- (mean(results.all[c("hispanic"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]]))/
-#           (mean(results.all[c("hispanic"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
-#         other.p <- (mean(results.all[c("other"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]])/
-#                       mean(results.all[c("other"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
-#         
-#         bh.bl.p <- (mean(results.bl.all[c("hispanic"),"msm",yr,age,,"prep.uptake",l,1]))/
-#           (mean(results.bl.all[c("hispanic"),"msm",yr,age,,"population",l,1])) * 100
-#         other.bl.p <- (mean(results.bl.all[c("other"),"msm",yr,age,,"prep.uptake",l,1]))/
-#           mean(results.bl.all[c("other"),"msm",yr,age,,"population",l,1]) * 100
-#         
-#         results_inc[[length(results_inc) + 1]] <- data.frame(
-#           year = yr,
-#           loc = l,
-#           age_cat = age,
-#           intervention_code = run.prep.code[i],
-#           bh_p = bh.p,
-#           other_p = other.p,
-#           bh_bl_p = bh.bl.p,
-#           other_bl_p = other.bl.p
-#         )
-#       }
-#       results_df <- do.call(rbind, results_inc)
-#     }}
-# }
-# 
-# 
-# results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
-#                          ifelse(results_df$loc == LOCATIONS[2],"Houston", 
-#                                 ifelse(results_df$loc == LOCATIONS[3], "Miami",
-#                                        "Chicago")))
-# ggplot(results_df) +
-#   geom_line(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
-#   geom_point(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
-#   geom_line(aes(x = year, y = bh_p, color = loc, group = loc)) +
-#   geom_point(aes(x = year, y = bh_p, color = loc, group = loc)) +
-#   facet_wrap(~age_cat)+
-#   labs(
-#     title = "Projected PrEP Uptake among Black MSM by Location",
-#     subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
-#     x = "Year",
-#     y = "PrEP Uptake (%)",
-#     color = "Location",
-#     caption = "Black line refers to the baseline PrEP Uptake."
-#   ) +
-#   theme_minimal()
-# 
+
+run.prep.code <- "prepu40p80msm"
+results_inc <- list()
+results_df <- data.frame()
+
+for(l in LOCATIONS){
+  for (i in 1:length(run.prep.code)) {
+    for(yr in as.character(start.year:end.year)){
+      for(age in 1:5){
+        bh.p <- (mean(results.all[c("black"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]]))/
+                   (mean(results.all[c("black"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
+        other.p <- (mean(results.all[c("other"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]])/
+                      mean(results.all[c("other"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
+        
+        bh.bl.p <- (mean(results.bl.all[c("black"),"msm",yr,age,,"prep.uptake",l,1]))/
+                      (mean(results.bl.all[c("black"),"msm",yr,age,,"population",l,1])) * 100
+        other.bl.p <- (mean(results.bl.all[c("other"),"msm",yr,age,,"prep.uptake",l,1]))/
+          mean(results.bl.all[c("other"),"msm",yr,age,,"population",l,1]) * 100
+        
+        results_inc[[length(results_inc) + 1]] <- data.frame(
+          year = yr,
+          loc = l,
+          age_cat = age,
+          intervention_code = run.prep.code[i],
+          bh_p = bh.p,
+          other_p = other.p,
+          bh_bl_p = bh.bl.p,
+          other_bl_p = other.bl.p
+        )
+      }
+      results_df <- do.call(rbind, results_inc)
+    }}
+}
+
+
+results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
+                         ifelse(results_df$loc == LOCATIONS[2],"Houston", 
+                                ifelse(results_df$loc == LOCATIONS[3], "Miami",
+                                       "Chicago")))
+ggplot(results_df) +
+  geom_line(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
+  geom_point(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
+  geom_line(aes(x = year, y = bh_p, color = loc, group = loc)) +
+  geom_point(aes(x = year, y = bh_p, color = loc, group = loc)) +
+  facet_wrap(~age_cat)+
+  labs(
+    title = "Projected PrEP Uptake among Black MSM by Location",
+    subtitle = "40% Additional PrEP Use, 80% PrEP Persistence",
+    x = "Year",
+    y = "PrEP Uptake (%)",
+    color = "Location",
+    caption = "Black line refers to the baseline PrEP Uptake."
+  ) +
+  theme_minimal()
+
+results_inc <- list()
+results_df <- data.frame()
+
+for(l in LOCATIONS){
+  for (i in 1:length(run.prep.code)) {
+    for(yr in as.character(start.year:end.year)){
+      for(age in 1:5){
+        bh.p <- (mean(results.all[c("hispanic"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]]))/
+          (mean(results.all[c("hispanic"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
+        other.p <- (mean(results.all[c("other"),"msm",yr,age,,"prep.uptake",l,run.prep.code[i]])/
+                      mean(results.all[c("other"),"msm",yr,age,,"population",l,run.prep.code[i]])) * 100
+        
+        bh.bl.p <- (mean(results.bl.all[c("hispanic"),"msm",yr,age,,"prep.uptake",l,1]))/
+          (mean(results.bl.all[c("hispanic"),"msm",yr,age,,"population",l,1])) * 100
+        other.bl.p <- (mean(results.bl.all[c("other"),"msm",yr,age,,"prep.uptake",l,1]))/
+          mean(results.bl.all[c("other"),"msm",yr,age,,"population",l,1]) * 100
+        
+        results_inc[[length(results_inc) + 1]] <- data.frame(
+          year = yr,
+          loc = l,
+          age_cat = age,
+          intervention_code = run.prep.code[i],
+          bh_p = bh.p,
+          other_p = other.p,
+          bh_bl_p = bh.bl.p,
+          other_bl_p = other.bl.p
+        )
+      }
+      results_df <- do.call(rbind, results_inc)
+    }}
+}
+
+
+results_df$loc <- ifelse(results_df$loc == LOCATIONS[1], "Baltimore",
+                         ifelse(results_df$loc == LOCATIONS[2],"Houston", 
+                                ifelse(results_df$loc == LOCATIONS[3], "Miami",
+                                       "Chicago")))
+ggplot(results_df) +
+  geom_line(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
+  geom_point(aes(x = year, y = bh_bl_p, group = loc), color = 'grey4') +
+  geom_line(aes(x = year, y = bh_p, color = loc, group = loc)) +
+  geom_point(aes(x = year, y = bh_p, color = loc, group = loc)) +
+  facet_wrap(~age_cat)+
+  labs(
+    title = "Projected PrEP Uptake among Black MSM by Location",
+    subtitle = "40% Additional PrEP Uptake, 80% PrEP Persistence",
+    x = "Year",
+    y = "PrEP Uptake (%)",
+    color = "Location",
+    caption = "Black line refers to the baseline PrEP Uptake."
+  ) +
+  theme_minimal()
+

@@ -51,13 +51,20 @@ combined.plot.pi <- ggpubr::ggarrange(race.plot, sex.plot, risk.plot, age.plot,
 combined.plot.pi
 
 msm.pi.df$shape <- ifelse(msm.pi.df$dataid=="cdc", 1, 8)
+msm.pi.df$dataid <- toupper(msm.pi.df$dataid)
 
 msm.race <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','race'), mean))
 df.pts <- subset(msm.pi.df, raceid != "ALL") %>%
   dplyr::mutate(years = years + anchor.year)
 df.pts$raceid <- factor(df.pts$raceid, levels = c("black","hisp","nbnh"))
 msm.race$race <- factor(msm.race$race, levels = c("black","hispanic","other"))
+
 levels(df.pts$raceid) <- levels(msm.race$race)
+
+msm.race$race <- stringr::str_to_title(msm.race$race)
+df.pts$raceid <- stringr::str_to_title(df.pts$raceid)
+df.pts$dataid <- toupper(df.pts$dataid)
+
 msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + 
   geom_line(linewidth = 1) +
   scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a"))+
@@ -67,8 +74,9 @@ msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) +
   scale_shape_manual(values = c(1,8)) +
   ylim(0,1) + 
   scale_x_continuous(breaks = seq(anchor.year, 2030, 1)) +
-  labs(x = "Year", y = "PrEP indication", color = "Race", shape = "Data Source") +
-  theme_minimal() 
+  labs(x = "Year", y = "PrEP indication", color = "Race/Ethnicity", shape = "Data Source", title = "C") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
 msm.age <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','age'), mean))
 df.pts <- subset(msm.pi.df, ageid != "ALL") %>%
@@ -86,8 +94,12 @@ msm.age.plot <- ggplot(msm.age, aes(year, value, color = age)) +
   scale_shape_manual(values = c(1,8)) +
   ylim(0,1) + 
   scale_x_continuous(breaks = seq(anchor.year, 2030, 1)) +
-  labs(x = "Year", y = "PrEP indication", color = "Age", shape = "Data Source") +
-  theme_minimal()
+  labs(x = "Year", y = "PrEP indication", color = "Age-group", shape = "Data Source",title = "D") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  guides(shape = "none")
+
+msm_prepind <- cowplot::plot_grid(msm.race.plot, msm.age.plot, ncol=1)
 
 msm.plots.pi <- ggpubr::ggarrange(msm.race.plot, msm.age.plot,
                                   ncol=1, nrow=2, 

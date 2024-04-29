@@ -53,13 +53,21 @@ combined.plot
 
 msm.race <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','race'), mean))
 df.pts <- subset(p.msm.df.long, raceid != "ALL") |> dplyr::mutate(year = year + anchor.year)
-msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + geom_line(linewidth = 1) +
-  geom_point(aes(x=year, y = p, color=raceid), data = df.pts) +
+
+# capitalize first letter of race
+msm.race$race <- stringr::str_to_title(msm.race$race)
+df.pts$raceid <- stringr::str_to_title(df.pts$raceid)
+
+msm.race.plot <- ggplot(msm.race, aes(year, value, color = race)) + 
+  geom_line(linewidth = 1) +
+  geom_point(aes(x = year, y = p, color = raceid), data = df.pts) +
   scale_color_manual(values = c("#1f78b4", "#e41a1c", "#4daf4a")) +
-  ylim(0,1) +
+  ylim(0, 1) +
   scale_x_continuous(breaks = seq.break) +
-  ylab("PrEP use") +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
+  labs(y = "PrEP use", x = "Year", color = "Race/Ethnicity", title = "A")
+
 
 msm.age <- reshape2::melt(apply(y[,,'msm','never_IDU',], c('year','age'), mean))
 df.pts <- subset(p.msm.df.long, ageid != "ALL") |> dplyr::mutate(year = year + anchor.year)
@@ -75,8 +83,11 @@ msm.age.plot <- ggplot(msm.age, aes(year, value, color = age)) +
   geom_point(aes(x=year, y = p, color=ageid), data = df.pts) +
   ylim(0,1) +
   scale_x_continuous(breaks = seq.break) +
-  ylab("PrEP use") +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +  
+  labs(y = "PrEP use", x = "Year", color = "Age-group", title = "B")
+
+msm_prepuse <- cowplot::plot_grid(msm.race.plot, msm.age.plot, ncol = 1)
 
 # msm.risk <- reshape2::melt(apply(y[,,'msm',,], c('year','risk'), mean))
 # # df.pts <- p.idu.df.long |> dplyr::mutate(year = year + anchor.year)
