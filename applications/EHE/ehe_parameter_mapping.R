@@ -570,11 +570,11 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                    value = parameters['heterosexual.testing.covid.multiplier'],
                                                    applies.to.dimension.values=list(sex=c("female","heterosexual_male"),
                                                                                     risk = non.idu.states))
-    # this could technically be a main effect alpha because it's only apply to one stratum; but it's fine this way as well 
-    set.element.functional.form.interaction.alphas(model.settings,
+    # have to change to main effect alpha because it's only applying to one stratum
+    set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "max.covid.effect.testing.reduction",
                                                    alpha.name = "value",
-                                                   value = parameters['msm.testing.covid.multiplier'],
+                                                   values = parameters['msm.testing.covid.multiplier'],
                                                    applies.to.dimension.values=list(sex=c('msm'))) 
     set.element.functional.form.interaction.alphas(model.settings,
                                                    element.name = "max.covid.effect.testing.reduction",
