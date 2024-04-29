@@ -68,7 +68,7 @@ ggplot(data = dx.5)+
   theme()
 
 #6
-dx.6 <- all.diagnoses.two %>% filter(location == "C.16980")
+dx.6 <- all.diagnoses.two %>% filter(location == "C.12580")
 ggplot(data = dx.6)+                   
   geom_point(                             
     mapping = aes(x = year, y = Freq),    
@@ -76,7 +76,51 @@ ggplot(data = dx.6)+
   labs()+                                 
   theme()
 
+#Examples to review in meeting:
+  #Outliers are 2008, 2013, 2014 (if 2008 is an outlier is 2015 also an outlier; is this an unreal fluctuation)
+ex.1 <- all.diagnoses.two %>% filter(location == "C.12060")
+ggplot(data = ex.1)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()
 
+  #outliers are 2008 and 2009 (should it actually be 2008 and 2010?)
+ex.2 <- all.diagnoses.two %>% filter(location == "C.16980")
+ggplot(data = ex.2)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()
+
+  #outliers are 2008, 2010, 2011, 2012, 2013 (I think 2008 is clearly an outlier but the others I dont feel certain about)
+ex.3 <- all.diagnoses.two %>% filter(location == "C.47900")
+ggplot(data = ex.3)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()
+
+  #oulier is 2011, but then should 2008-2010 also be outliers? But that could be where the amendement comes in
+ex.4 <- all.diagnoses.two %>% filter(location == "C.40140")
+ggplot(data = ex.4)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()
+
+  #outlier is 2011, 2012, 2013 - how do we know what an outlier is here?
+ex.5 <- all.diagnoses.two %>% filter(location == "C.18140")
+ggplot(data = ex.5)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()
 
 # Call outlier function ---------------------------------------------------
 
