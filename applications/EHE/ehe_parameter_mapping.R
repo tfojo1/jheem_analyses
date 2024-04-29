@@ -555,7 +555,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "max.covid.effect.testing.reduction",
                                                    alpha.name = "value",
-                                                   values = parameters['age134.testing.covid.multiplier'],
+                                                   values = parameters['age34.testing.covid.multiplier'],
                                                    applies.to.dimension.values=list(age=c("35-44 years","45-54 years")))
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "max.covid.effect.testing.reduction",
