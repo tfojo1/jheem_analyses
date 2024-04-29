@@ -567,19 +567,19 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     set.element.functional.form.interaction.alphas(model.settings,
                                                    element.name = "max.covid.effect.testing.reduction",
                                                    alpha.name = "value",
-                                                   values = parameters['heterosexual.testing.covid.multiplier'],
+                                                   value = parameters['heterosexual.testing.covid.multiplier'],
                                                    applies.to.dimension.values=list(sex=c("female","heterosexual_male"),
                                                                                     risk = non.idu.states))
     # this could technically be a main effect alpha because it's only apply to one stratum; but it's fine this way as well 
     set.element.functional.form.interaction.alphas(model.settings,
                                                    element.name = "max.covid.effect.testing.reduction",
                                                    alpha.name = "value",
-                                                   values = parameters['msm.testing.covid.multiplier'],
+                                                   value = parameters['msm.testing.covid.multiplier'],
                                                    applies.to.dimension.values=list(sex=c('msm'))) 
     set.element.functional.form.interaction.alphas(model.settings,
                                                    element.name = "max.covid.effect.testing.reduction",
                                                    alpha.name = "value",
-                                                   values = parameters['idu.testing.covid.multiplier'],
+                                                   value = parameters['idu.testing.covid.multiplier'],
                                                    applies.to.dimension.values=list(sex=c("female","heterosexual_male"),
                                                                                     risk = idu.states))
     
