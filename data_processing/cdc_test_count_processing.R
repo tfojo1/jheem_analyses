@@ -129,7 +129,7 @@ data.list.positives.clean = lapply(data.list.tests, function(file){
     data$year = "2021"
   }
 
-  data$outcome = "hiv.test.positivity"
+  data$outcome = "cdc.hiv.test.positivity"
   data$value = (data$numerator)/(data$denominator)
   data$value = round(data$value, digits=3)
    
@@ -272,8 +272,8 @@ data.list.city.positivity.clean = lapply(city_tests, function(file){
   
   data$location =locations::get.cbsa.for.msa.name(data$msa)
   
-  data$outcome = "hiv.test.positivity"
-  data$outcome = "hiv.test.positivity"
+  data$outcome = "cdc.hiv.test.positivity"
+  data$outcome = "cdc.hiv.test.positivity"
   data$value = (data$`Number of persons newly diagnosed with HIV`)/(data$`Number of HIV tests conducted`)
   data$value = round(data$value, digits=3)
   

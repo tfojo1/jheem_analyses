@@ -212,7 +212,7 @@ data.manager$register.outcome(
     description = "Count of CDC Funded HIV Tests"))
 
 data.manager$register.outcome(
-  'hiv.test.positivity', #This was newly.diagnosed.positives, changing it to hiv.test.positivity put this in as a percentage not a count#
+  'cdc.hiv.test.positivity', #This was newly.diagnosed.positives, changing it to hiv.test.positivity put this in as a percentage not a count#
   metadata = create.outcome.metadata(
     scale = 'proportion',
     display.name = 'HIV Test Positivity',
