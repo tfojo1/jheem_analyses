@@ -387,7 +387,7 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'max.covid.effect.undiagnosed.testing.rr.increase',
                        scale = 'ratio',
-                       get.functional.form.function = get.undiagnosed.testing.covid.rr.functional.form) 
+                       get.value.function = get.undiagnosed.testing.covid.rrr) 
 
 # get.covid.max.testing.effect is a relative risk (e.g., 0.8 if testing is 80% of what it would be without covid)
 # testing.no.covid is time-varying, max.covid.effect.testing.reduction is (1- relative risk) (static)
