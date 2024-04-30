@@ -474,6 +474,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    dimensions = character(),
                                                    levels.of.stratification = c(0),
                                                    from.year = 2018,
+                                                   to.year = 2020,
                                                    redundant.location.threshold = 0,
                                                    
                                                    p.bias.inside.location = 0, 
