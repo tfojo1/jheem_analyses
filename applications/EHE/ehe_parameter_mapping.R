@@ -583,7 +583,16 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                    applies.to.dimension.values=list(sex=c("female","heterosexual_male"),
                                                                                     risk = idu.states))
     
-  
+    # Undiagnosed testing RR increase
+    # Even though this is named the exact same as in the specification, have to map it because using a functional form
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "max.covid.effect.undiagnosed.testing.rr.increase",
+                                                   alpha.name = "value",
+                                                   values = parameters['max.covid.effect.undiagnosed.testing.rr.increase'],
+                                                   applies.to.dimension.values="all",
+                                                   dimensions = 'all')
+    
+    
     
 }
 

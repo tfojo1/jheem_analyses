@@ -387,7 +387,7 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'max.covid.effect.undiagnosed.testing.rr.increase',
                        scale = 'ratio',
-                       get.value.function = get.undiagnosed.testing.covid.rrr) 
+                       get.functional.form.function = get.undiagnosed.testing.covid.rr.functional.form) 
 
 # get.covid.max.testing.effect is a relative risk (e.g., 0.8 if testing is 80% of what it would be without covid)
 # testing.no.covid is time-varying, max.covid.effect.testing.reduction is (1- relative risk) (static)
@@ -1756,6 +1756,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(number.of.tests.in.uninfected+new),
                          keep.dimensions = c("location","age","race","sex","risk"))
 
+# Rename to incorporate that this is CDC-funded HIV test positivity 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'hiv.test.positivity',
                          corresponding.data.outcome = 'hiv.test.positivity',
@@ -1765,7 +1766,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     axis.name = 'Proportion positive',
                                                                     units = '%',
                                                                     singular.unit = '%'),
-                         value = expression(new/total.hiv.tests),
+                         value = expression(new/total.hiv.tests), # potentially multiply this by 1.45 to account for higher positivity among CDC-funded tests 
                          denominator.outcome = 'total.hiv.tests',
                          keep.dimensions = c("location","age","race","sex","risk"))
 
