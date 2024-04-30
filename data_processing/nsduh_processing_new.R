@@ -35,6 +35,9 @@ nsduh.clean= lapply(data.list.nsduh, function(file){
   if(grepl("cocaine", filename)) {
     data$outcome = "cocaine"
   }
+  if(grepl("depression", filename)) {
+    data$outcome = "depression"
+  }
   if(grepl("02.04", filename)) {
     data$year = "2002-2004"
   }
@@ -96,6 +99,7 @@ nsduh.region.total = lapply(nsduh.clean, function(file){
   data$age = data$age_group
   #Decide on 2-27-24 to change age group ontology:
   data <- data%>%
+    filter(outcome != "depression")%>% #depression does not have age group 12+ so we are not putting a total just age stratified data
     filter(age_group == "12 or Older")
   
   data <- data %>%
@@ -233,6 +237,7 @@ nsduh.state.total = lapply(nsduh.clean, function(file){
 
   #Decide on 2-27-24 to change age group ontology:
   data <- data%>%
+    filter(outcome != "depression")%>% #depression does not have age group 12+ so we are not putting a total just age stratified data
     filter(age_group == "12 or Older")
   
   data$age = data$age_group
