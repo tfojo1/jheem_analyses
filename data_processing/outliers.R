@@ -76,7 +76,7 @@ ggplot(data = dx.6)+
   labs()+                                 
   theme()
 
-#Examples to review in meeting:
+#Examples to review in meeting: (note: these are all from source = cdc.surveillance.reports)
   #Outliers are 2008, 2013, 2014 (if 2008 is an outlier is 2015 also an outlier; is this an unreal fluctuation)
 ex.1 <- all.diagnoses.two %>% filter(location == "C.12060")
 ggplot(data = ex.1)+                   
