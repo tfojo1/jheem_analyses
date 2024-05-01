@@ -867,7 +867,7 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
 
 set.ehe.idu.from.parameters = function(model.settings,
                                        parameters,
-                                       times = c(0,2))
+                                       times = c(0,2)) # must align with idu_input_manager
 {
     specification.metadata = model.settings$specification.metadata
     races = specification.metadata$dim.names$race

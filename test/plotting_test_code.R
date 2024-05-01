@@ -3,6 +3,10 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 library(ggplot2)
 
+# Andrew can you remove the warning message with each plot? 
+# (Warning message:No shared levels found between `names(values)` of the manual scale and the data's colour values.)
+
+
 # Need to have this file locally
 # load("../jheem_analyses/prelim_results/full.with.aids.minus.prep_2024-04-20_C.12580.Rdata")
 

@@ -329,7 +329,8 @@ get.idu.relapse.rates <- function(specification.metadata)
 ##------------------------------##
 get.incident.idu.model <- function(specification.metadata,
                                    static,
-                                   knot.times=c(2000,2016))
+                                   knot.times=c("time0" = 2000,
+                                                "time2" = 2016)) # if I add a spline time, fix parameter_mapping and prior
 {
   rates = get.idu.incidence.rates(specification.metadata = specification.metadata)
   
@@ -338,7 +339,7 @@ get.incident.idu.model <- function(specification.metadata,
   else
   {
     knot.values = lapply(1:length(knot.times), function(i){rates})
-    names(knot.values) = names(knot.times) = paste0("time", (0:length(knot.values))[-length(knot.values)])
+    names(knot.values) = names(knot.times) 
     create.natural.spline.functional.form(knot.times = knot.times,
                                           knot.values = knot.values,
                                           before.time = min(knot.times)-10,
@@ -352,7 +353,8 @@ get.incident.idu.model <- function(specification.metadata,
 
 get.idu.remission.model <- function(specification.metadata,
                                     static,
-                                    knot.times=c(2000,2016))
+                                    knot.times=c("time0" = 2000,
+                                                 "time2" = 2016))
 {
   rates = get.idu.remission.rates(specification.metadata = specification.metadata)
   
@@ -361,7 +363,7 @@ get.idu.remission.model <- function(specification.metadata,
   else    
   {
     knot.values = lapply(1:length(knot.times), function(i){rates})
-    names(knot.values) = names(knot.times) = paste0("time", (0:length(knot.values))[-length(knot.values)])
+    names(knot.values) = names(knot.times) 
     create.natural.spline.functional.form(knot.times = knot.times,
                                           knot.values = knot.values,
                                           before.time = min(knot.times)-10,
@@ -375,7 +377,8 @@ get.idu.remission.model <- function(specification.metadata,
 
 get.idu.relapse.model <- function(specification.metadata,
                                   static,
-                                  knot.times=c(2000,2016))
+                                  knot.times=c("time0" = 2000,
+                                               "time2" = 2016))
 {
   rates = get.idu.relapse.rates(specification.metadata = specification.metadata)
   if (static)
@@ -383,7 +386,7 @@ get.idu.relapse.model <- function(specification.metadata,
   else
   {
     knot.values = lapply(1:length(knot.times), function(i){rates})
-    names(knot.values) = names(knot.times) = paste0("time", (0:length(knot.values))[-length(knot.values)])
+    names(knot.values) = names(knot.times) 
     create.natural.spline.functional.form(knot.times = knot.times,
                                           knot.values = knot.values,
                                           before.time = min(knot.times)-10,
