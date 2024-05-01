@@ -360,11 +360,11 @@ data.manager$register.outcome(
 data.manager$register.outcome(
   'depression',
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Major Depressive Episode in the Past Year',
     axis.name = 'Depression',
-    units = 'population',
-    description = "Major Depressive Episode in the Past Year"))
+    units =  '%',
+    description = "Major Depressive Episode in the Past Year", denominator.outcome = 'adult.population'))
 
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
