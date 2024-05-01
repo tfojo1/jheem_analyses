@@ -579,7 +579,7 @@ for (data in prop.tested.variance) {
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
-    metric = 'coefficient.of.variance',
+    metric = 'variance',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
@@ -593,7 +593,7 @@ for (data in prop.tested.variance.sex) {
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
-    metric = 'coefficient.of.variance',
+    metric = 'variance',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
@@ -607,7 +607,7 @@ for (data in prop.tested.variance.age) {
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
-    metric = 'coefficient.of.variance',
+    metric = 'variance',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
@@ -621,7 +621,7 @@ for (data in prop.tested.variance.race) {
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
-    metric = 'coefficient.of.variance',
+    metric = 'variance',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
