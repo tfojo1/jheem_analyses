@@ -4,11 +4,11 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 library(ggplot2)
 
 # Need to have this file locally
-load("../jheem_analyses/prelim_results/full.with.aids.minus.prep_2024-04-20_C.12580.Rdata")
+# load("../jheem_analyses/prelim_results/full.with.aids.minus.prep_2024-04-20_C.12580.Rdata")
 
 simplot(sim,
         facet.by = "age", split.by = "race", # likelihoood: age, sex, race; 1- and 2-way
-        outcomes = c("population"),
+        outcomes = c("population"), #style.manager = create.style.manager(color.data.by = "stratum"),
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
@@ -22,7 +22,7 @@ simplot(sim,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
-        facet.by = "risk", # race, risk, sex; 1- and 2-way 
+        facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
         outcomes = c("diagnosed.prevalence"),
         dimension.values = list(year = 2000:2030)) 
 
@@ -48,12 +48,12 @@ simplot(sim,
         dimension.values = list(year = 1980:2030)) 
 
 simplot(sim,
-        # facet.by = "age", # age, sex, race, risk; 1-way 
+        #facet.by = "race", # age, sex, race, risk; 1-way 
         outcomes = c("proportion.general.population.tested"),
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
-        outcomes = c("hiv.test.positivity"), # totals only 
+        outcomes = c("cdc.hiv.test.positivity"), # totals only 
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,

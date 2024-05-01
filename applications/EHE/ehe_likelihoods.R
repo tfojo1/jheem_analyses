@@ -462,7 +462,7 @@ two.way.proportion.tested.likelihood.instructions =
 
 #-- HIV TEST POSITIVITY --#
 hiv.test.positivity.likelihood.instructions =
-  create.nested.proportion.likelihood.instructions(outcome.for.data = "hiv.test.positivity",
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "cdc.hiv.test.positivity",
                                                    outcome.for.sim = "hiv.test.positivity",
                                                    denominator.outcome.for.data = "hiv.tests",
                                                    outcome.for.n.multipliers = 'adult.population',
