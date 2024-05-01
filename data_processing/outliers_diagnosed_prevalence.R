@@ -75,12 +75,12 @@ ggplot(data = plot.three)+
 dx.prev.ehe <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                    stratifications= list(c()), 
                                    data.manager= surveillance.manager,
-                                   phi=0.3,
-                                   theta=0.1,
+                                   phi=0.2, #default is phi=0.15 (percent change from year to year)
+                                   theta=0.08, #default is theta=0.05 (a multiplier that produces a percent change)
                                    locations= c(EHE.MSAS))
 
 #Here I adjusted the values with gives 3 total outliers- but looking at them I don't think they
-#are outliers and I think we miss the actual outliers
+#are outliers and I think we miss the actual outliers  ( iused 0.3 for phi and 0.1 for theta)
 
 plot.three <- all.dx.prev.source2 %>% filter(location == "C.16980")
 ggplot(data = plot.three)+                   
