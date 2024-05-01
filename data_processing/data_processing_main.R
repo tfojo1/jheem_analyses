@@ -364,7 +364,7 @@ data.manager$register.outcome(
     display.name = 'Major Depressive Episode in the Past Year',
     axis.name = 'Depression',
     units =  '%',
-    description = "Major Depressive Episode in the Past Year", denominator.outcome = 'adult.population'))
+    description = "Major Depressive Episode in the Past Year"), denominator.outcome = 'adult.population')
 
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
