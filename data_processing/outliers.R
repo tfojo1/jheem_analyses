@@ -1,3 +1,5 @@
+#Note from 5-1-24: We changed the phi and theta values and that resulted in fewer outliers (bc nothing coming up was extreme)
+#agreed to now look into diagnosed prevalence
 
 # Set up  -----------------------------------------------------------------
 options(error=NULL)
@@ -15,6 +17,8 @@ counties = locations::get.all.for.type("COUNTY")#do you want all counties?
 diagnoses.outliers.ehe <- run.outlier.process(outcome= 'diagnoses',
                                           stratifications= list(c()), 
                                           data.manager= surveillance.manager,
+                                          phi = 0.3,
+                                          theta = 0.1,
                                           locations= c(EHE.MSAS))
 
 #write.csv(diagnoses.outliers.ehe, file = "C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/outliers/outliers.ehe.counties/diagnoses.outliers.ehe.csv")
@@ -47,7 +51,8 @@ ggplot(data = dx.3)+
   labs()+                                 
   theme() 
 
-all.diagnoses.two = as.data.frame.table(surveillance.manager$data$diagnoses$estimate$cdc.surveillance.reports$cdc$year__location) #only for source = cdc.hiv
+all.diagnoses.two = as.data.frame.table(surveillance.manager$data$diagnosed.prevalence$estimate$cdc.surveillance.reports$cdc$year__location)
+#only for source = cdc.hiv
 
 #4
 dx.4 <- all.diagnoses.two %>% filter(location == "C.33100")
@@ -68,13 +73,14 @@ ggplot(data = dx.5)+
   theme()
 
 #6
-dx.6 <- all.diagnoses.two %>% filter(location == "C.12580")
+dx.6 <- all.diagnoses.two %>% filter(location == "C.47900")
 ggplot(data = dx.6)+                   
   geom_point(                             
     mapping = aes(x = year, y = Freq),    
     color = "turquoise4")+                       
   labs()+                                 
-  theme()
+  theme()+
+  ylim(0, NA)
 
 #Examples to review in meeting: (note: these are all from source = cdc.surveillance.reports)
   #Outliers are 2008, 2013, 2014 (if 2008 is an outlier is 2015 also an outlier; is this an unreal fluctuation)
@@ -104,23 +110,26 @@ ggplot(data = ex.3)+
   labs()+                                 
   theme()
 
-  #oulier is 2011, but then should 2008-2010 also be outliers? But that could be where the amendement comes in
+  #oulier is 2011, but then should 2008-2010 also be outliers? But that could be where the amendment comes in
 ex.4 <- all.diagnoses.two %>% filter(location == "C.40140")
 ggplot(data = ex.4)+                   
   geom_point(                             
     mapping = aes(x = year, y = Freq),    
     color = "turquoise4")+                       
   labs()+                                 
-  theme()
+  theme()+
+  ylim(0, NA)
 
   #outlier is 2011, 2012, 2013 - how do we know what an outlier is here?
+#Would not call these outliers
 ex.5 <- all.diagnoses.two %>% filter(location == "C.18140")
 ggplot(data = ex.5)+                   
   geom_point(                             
     mapping = aes(x = year, y = Freq),    
     color = "turquoise4")+                       
   labs()+                                 
-  theme()
+  theme()+
+  ylim(0, NA)
 
 # Call outlier function ---------------------------------------------------
 
