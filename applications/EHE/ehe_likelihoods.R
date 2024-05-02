@@ -525,8 +525,9 @@ pop.trans.mortality.likelihood.instructions = join.likelihood.instructions(
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions)
 
-# Base + prep 
-pop.trans.mortality.testing.prep.likelihood.instructions = join.likelihood.instructions(  
+
+#-- ALL EXCEPT TESTING-RELATED --# 
+FULL.likelihood.instructions.minus.testing =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -541,15 +542,26 @@ pop.trans.mortality.testing.prep.likelihood.instructions = join.likelihood.instr
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions,
   
-  # PROPORTION TESTED
-  proportion.tested.likelihood.instructions,
+  # AIDS DIAGNOSES LIKELIHOOD
+  aids.diagnoses.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  # proportion.tested.likelihood.instructions,
+  # hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions,
+  suppression.likelihood.instructions,
   
   # PREP LIKELIHOODS
   prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions)
+  prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions,
+  cocaine.likelihood.instructions
+)
 
-#-- ALL EXCEPT PREP, ADDED AIDS DIAGNOSES BACK --# 
-FULL.likelihood.instructions.plus.aids.diagoses.minus.prep =  join.likelihood.instructions(
+#-- ALL EXCEPT IDU-RELATED --# 
+FULL.likelihood.instructions.minus.idu =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
   immigration.likelihood.instructions, 
@@ -569,19 +581,18 @@ FULL.likelihood.instructions.plus.aids.diagoses.minus.prep =  join.likelihood.in
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
+  hiv.test.positivity.likelihood.instructions,
   awareness.likelihood.instructions,
   suppression.likelihood.instructions,
   
   # PREP LIKELIHOODS
-  # prep.uptake.likelihood.instructions,
-  # prep.indications.likelihood.instructions,
+  prep.uptake.likelihood.instructions,
+  prep.indications.likelihood.instructions
   
   # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
+  # heroin.likelihood.instructions,
+  # cocaine.likelihood.instructions
 )
-
 
 #-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 
 FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(

@@ -1,13 +1,11 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 LOCATION = 'C.12580' #BALTIMORE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.PLUS.AIDS.MINUS.PREP   # CALIBRATION.CODE.POPULATION
-                                                                      # CALIBRATION.CODE.TRANSMISSION
-                                                                      # CALIBRATION.CODE.POP.TRANS.MORT 
-
-                                                                      # CALIBRATION.CODE.BASE.PLUS.PREP 
-                                                                      # CALIBRATION.CODE.FULL.PLUS.AIDS.MINUS.PREP
-                                                                      # CALIBRATION.CODE.FULL.PLUS.AIDS
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.PLUS.AIDS   # CALIBRATION.CODE.POPULATION
+                                                            # CALIBRATION.CODE.TRANSMISSION
+                                                            # CALIBRATION.CODE.FULL.PLUS.AIDS
+                                                            # CALIBRATION.CODE.FULL.MINUS.TESTING
+                                                            # CALIBRATION.CODE.FULL.MINUS.IDU
 
 set.seed(12345)
 

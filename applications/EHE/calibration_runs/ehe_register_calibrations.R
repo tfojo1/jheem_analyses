@@ -124,35 +124,35 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT,
                           description = "Adding in likelihoods iteratively, population + transmission + mortality"
 )
 
-# pop, trans, mort + prep 
-register.calibration.info(CALIBRATION.CODE.BASE.PLUS.PREP,
-                          likelihood.instructions = pop.trans.mortality.testing.prep.likelihood.instructions,
+# full minus testing-related
+register.calibration.info(CALIBRATION.CODE.FULL.MINUS.TESTING,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.testing,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER, 
-                          thin = 200, 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "population + transmission + mortality + prep"
-)
-
-
-# full with aids without prep 
-register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS.MINUS.PREP,
-                          likelihood.instructions = FULL.likelihood.instructions.plus.aids.diagoses.minus.prep,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
+                          n.iter = N.ITER.TEST, 
                           thin = 50, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "Full with aids diagnoses except prep"
+                          description = "Full minus testing-related"
+)
+
+
+# full minus idu 
+register.calibration.info(CALIBRATION.CODE.FULL.MINUS.IDU,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.idu,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.TEST, 
+                          thin = 50, 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Full minus IDU"
 )
 
 
