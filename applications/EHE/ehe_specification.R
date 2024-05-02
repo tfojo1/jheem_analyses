@@ -518,7 +518,7 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'rate',
                        get.functional.form.function = get.incident.idu.model,
                        static=F,
-                       functional.form.from.time = 1990)
+                       functional.form.from.time = 1980)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.remission',
