@@ -32,21 +32,20 @@ round(cbind(params.mcmc[incident.idu.params],params.manual[incident.idu.params])
 
 incident.idu.params = names(params.manual[grepl("incident.idu",names(params.manual))])
 incident.idu.params.0 = names(params.manual[grepl("incident.idu.multiplier.0",names(params.manual))])
+incident.idu.params.1 = names(params.manual[grepl("incident.idu.multiplier.1",names(params.manual))])
 incident.idu.params.2 = names(params.manual[grepl("incident.idu.multiplier.2",names(params.manual))])
-# params.manual[incident.idu.params.0] = 1
-params.manual["black.incident.idu.multiplier.0"] = 2 # 1.17579
-params.manual["hispanic.incident.idu.multiplier.0"] = 1 # 19.74369
-params.manual["other.incident.idu.multiplier.0"] = 1 # 0.72062
-params.manual["msm.incident.idu.multiplier.0"] = 2 # 6.71323
 
+params.manual[incident.idu.params] = 1
 params.manual["age1.incident.idu.multiplier"] = 1 # 0.80460
-params.manual["age2.incident.idu.multiplier"] = 1 # 1.49047
-params.manual["age3.incident.idu.multiplier"] = 1 # 4.31603
-params.manual["age3.incident.idu.multiplier"] = 1 # 1.04566
-params.manual["age5.incident.idu.multiplier"] = 1 # 1.15931
+params.manual["age2.incident.idu.multiplier"] = 0.005 # 1.49047
+params.manual["age3.incident.idu.multiplier"] = 0.005 # 4.31603
+params.manual["age4.incident.idu.multiplier"] = 0.0005 # 1.04566
+params.manual["age5.incident.idu.multiplier"] = 0.005 # 1.15931
 
+params.manual[incident.idu.params.0] = 15
+params.manual[incident.idu.params.1] = 0.005
 params.manual[incident.idu.params.2] = 0.005
-# params.manual["black.incident.idu.multiplier.2"] = .005 # 0.69099
+
 sim.manual = engine$run(parameters = params.manual)
 
 # which likelihoods are WORSE now that I've made IDU better? new, diagnosed.prevalence, aids.diagnoses, awareness
@@ -72,6 +71,25 @@ simplot(sim.mcmc,
 
 simplot(sim.mcmc,
         sim.manual,
+        facet.by = "age", split.by = "race", 
+        outcomes = c("population"),
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(sim.mcmc,
+        sim.manual,
         outcomes = c("awareness"), 
         dimension.values = list(year = 2000:2030)) 
 
+# this set wasn't bad
+{
+  params.manual[incident.idu.params] = 1
+  params.manual["age1.incident.idu.multiplier"] = 1 # 0.80460
+  params.manual["age2.incident.idu.multiplier"] = 0.1 # 1.49047
+  params.manual["age3.incident.idu.multiplier"] = 0.1 # 4.31603
+  params.manual["age4.incident.idu.multiplier"] = 0.1 # 1.04566
+  params.manual["age5.incident.idu.multiplier"] = 0.1 # 1.15931
+  
+  params.manual[incident.idu.params.0] = 12
+  params.manual[incident.idu.params.1] = 0.1
+  params.manual[incident.idu.params.2] = 0.1
+}

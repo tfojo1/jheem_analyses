@@ -70,7 +70,7 @@ simplot(sim,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
-        facet.by = "age", # age; 1-way 
+        #facet.by = "age", # age; 1-way 
         outcomes = c("proportion.using.heroin",
                      "proportion.using.cocaine"), 
         dimension.values = list(year = 2000:2030)) 
