@@ -83,8 +83,9 @@ population.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                           observation.correlation.form = 'compound.symmetry', 
                                                                           
                                                                           # should always be specified; describes how precise the estimates are; 
-                                                                          # e.g., estimates can be off by 3% each year 
-                                                                          measurement.error.coefficient.of.variance = 0.03,
+                                                                          # e.g., estimates can be off by 3% each year
+                                                                          error.variance.term = 0.03,
+                                                                          error.variance.type = 'cv',
                                                                           
                                                                           # downweight because large population size; 
                                                                           # can get more specific with create.likelihood.weights 
@@ -103,8 +104,9 @@ immigration.likelihood.instructions = create.basic.likelihood.instructions(outco
                                                                            dimensions = c("age","race"), 
                                                                            levels.of.stratification = c(0,1),
                                                                            from.year = 2011, 
-                                                                           observation.correlation.form = 'compound.symmetry', 
-                                                                           measurement.error.coefficient.of.variance = 0.13, # using MOEs from data - see migration_MOE_summary
+                                                                           observation.correlation.form = 'compound.symmetry',
+                                                                           error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                                                           error.variance.type = 'cv',
                                                                            weights = 1,
                                                                            equalize.weight.by.year = T 
 )
@@ -116,7 +118,8 @@ emigration.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                           levels.of.stratification = c(0,1),
                                                                           from.year = 2011, 
                                                                           observation.correlation.form = 'compound.symmetry', 
-                                                                          measurement.error.coefficient.of.variance = 0.13, # using MOEs from data - see migration_MOE_summary
+                                                                          error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                                                          error.variance.type = 'cv',
                                                                           weights = 1,
                                                                           equalize.weight.by.year = T 
 )
@@ -130,7 +133,8 @@ race.risk.sex.two.way.new.diagnoses.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       measurement.error.coefficient.of.variance = 0.03,
+                                       error.variance.term = 0.03,
+                                       error.variance.type = 'cv',
                                        weights = list(1), 
                                        equalize.weight.by.year = T 
   )
@@ -141,7 +145,8 @@ new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(out
                                                                              levels.of.stratification = c(0,1,2), 
                                                                              from.year = 2008, 
                                                                              observation.correlation.form = 'compound.symmetry', 
-                                                                             measurement.error.coefficient.of.variance = 0.03,
+                                                                             error.variance.term = 0.03,
+                                                                             error.variance.type = 'cv',
                                                                              weights = list(1), 
                                                                              equalize.weight.by.year = T 
 )
@@ -154,8 +159,9 @@ race.risk.sex.two.way.prevalence.likelihood.instructions =
                                        dimensions = c("race","risk","sex"),
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       measurement.error.coefficient.of.variance = 0.03,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.03,
+                                       error.variance.type = 'cv',
                                        weights = list(1),
                                        equalize.weight.by.year = T 
   )
@@ -166,7 +172,8 @@ prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                           levels.of.stratification = c(0,1,2), 
                                                                           from.year = 2008, 
                                                                           observation.correlation.form = 'compound.symmetry', 
-                                                                          measurement.error.coefficient.of.variance = 0.03,
+                                                                          error.variance.term = 0.03,
+                                                                          error.variance.type = 'cv',
                                                                           weights = list(1), # upweight?
                                                                           equalize.weight.by.year = T 
 )
@@ -180,8 +187,9 @@ aids.diagnoses.likelihood.instructions =
                                                                 levels.of.stratification = c(0,1), 
                                                                 from.year = 1990,
                                                                 to.year = 2001,
-                                                                observation.correlation.form = 'compound.symmetry', 
-                                                                measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up
+                                                                observation.correlation.form = 'compound.symmetry',
+                                                                error.variance.term = 0.05, # maybe higher - look up
+                                                                error.variance.type = 'cv',
                                                                 weights = list(1), 
                                                                 equalize.weight.by.year = T,
                                                                 included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
@@ -197,8 +205,9 @@ hiv.mortality.likelihood.instructions = create.basic.likelihood.instructions(out
                                                                              dimensions = c("sex"),
                                                                              levels.of.stratification = c(0,1), 
                                                                              from.year = 2008, 
-                                                                             observation.correlation.form = 'compound.symmetry', 
-                                                                             measurement.error.coefficient.of.variance = 0.03,
+                                                                             observation.correlation.form = 'compound.symmetry',
+                                                                             error.variance.term = 0.03,
+                                                                             error.variance.type = 'cv',
                                                                              weights = list(1), 
                                                                              equalize.weight.by.year = T 
 )
@@ -210,8 +219,9 @@ general.mortality.likelihood.instructions = create.basic.likelihood.instructions
                                                                                  dimensions = character(),
                                                                                  levels.of.stratification = c(0), 
                                                                                  from.year = 2007, 
-                                                                                 observation.correlation.form = 'compound.symmetry', 
-                                                                                 measurement.error.coefficient.of.variance = 0.03, 
+                                                                                 observation.correlation.form = 'compound.symmetry',
+                                                                                 error.variance.term = 0.03,
+                                                                                 error.variance.type = 'cv',
                                                                                  weights = list(1), 
                                                                                  equalize.weight.by.year = T 
 )
@@ -262,7 +272,8 @@ aids.deaths.likelihood.instructions = create.basic.likelihood.instructions(outco
                                                                            from.year = 1981, 
                                                                            to.year = 2001,
                                                                            observation.correlation.form = 'compound.symmetry', 
-                                                                           measurement.error.coefficient.of.variance = 0.05, # maybe higher - look up 
+                                                                           error.variance.term = 0.05, # maybe higher - look up
+                                                                           error.variance.type = 'cv',
                                                                            weights = list(1), 
                                                                            equalize.weight.by.year = T 
 )
@@ -274,7 +285,8 @@ prep.uptake.likelihood.instructions = create.basic.likelihood.instructions(outco
                                                                            levels.of.stratification = c(0,1,2), 
                                                                            from.year = 2007,
                                                                            observation.correlation.form = 'compound.symmetry', 
-                                                                           measurement.error.coefficient.of.variance = 0.03, 
+                                                                           error.variance.term = 0.03,
+                                                                           error.variance.type = 'cv',
                                                                            weights = list(1), 
                                                                            equalize.weight.by.year = T 
 )
@@ -288,7 +300,8 @@ prep.indications.likelihood.instructions = create.basic.likelihood.instructions(
                                                                            from.year = 2017, 
                                                                            to.year = 2018, # they carried forwar 2018 numbers 
                                                                            observation.correlation.form = 'compound.symmetry', 
-                                                                           measurement.error.coefficient.of.variance = 0.5, # high uncertainty
+                                                                           error.variance.term = 0.5, # high uncertainty,
+                                                                           error.variance.type = 'cv',
                                                                            # ^ this means you can range from 0 to 2x the number of prep indications
                                                                            weights = list(1), 
                                                                            equalize.weight.by.year = T 
@@ -319,11 +332,8 @@ awareness.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   measurement.error.sd = .016, # .018*90 - rough estimate from HIV Atlas (for now)
-                                                   # @Andrew want two arguments here: 
-                                                   # measurement.error.term = NULL,
-                                                   # measurement.error.type = "data.cv", 
-                                                   # options: cv, sd, data.cv (pull cv off of data), data.interval (take lower/upper bounds from data)
+                                                   p.error.variance.term = 0.016, # .018*90 - rough estimate from HIV Atlas (for now)
+                                                   p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -353,8 +363,9 @@ heroin.likelihood.instructions =
                                                    within.location.p.error.correlation = 0.5,
                                                    within.location.n.error.correlation = 0.5,
                                                    
-                                                   observation.correlation.form = 'compound.symmetry', 
-                                                   measurement.error.sd = 0.54*0.005, # for now, double the NSDUH calcs and multiply by .005 from MD data
+                                                   observation.correlation.form = 'compound.symmetry',
+                                                   p.error.variance.term = 0.54*0.005, # for now, double the NSDUH calcs and multiply by .005 from MD data
+                                                   p.error.variance.type = 'sd',
                                                    # measurement.error = 0.27, # NSDUH calcs 
                                                    # measurement.error.type = "cv",
                                                    
@@ -387,7 +398,8 @@ cocaine.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry', 
-                                                   measurement.error.sd = 0.42*0.02, # for now, double the NSDUH calcs and multiply by .02 from MD data
+                                                   p.error.variance.term = 0.42*0.02, # for now, double the NSDUH calcs and multiply by .02 from MD data
+                                                   p.error.variance.type = 'sd',
                                                    # measurement.error.term = 0.21, # NSDUH calcs 
                                                    # measurement.error.type = "cv",
                                                    
@@ -420,7 +432,8 @@ proportion.tested.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   measurement.error.sd = 0.03,
+                                                   p.error.variance.term = 0.03,
+                                                   p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -451,7 +464,8 @@ two.way.proportion.tested.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   measurement.error.sd = 0.03,
+                                                   p.error.variance.term = 0.03,
+                                                   p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -486,7 +500,8 @@ hiv.test.positivity.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   measurement.error.sd = 0.03,
+                                                   p.error.variance.term = 0.03,
+                                                   p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -641,7 +656,8 @@ if(1==2){
                                                           levels.of.stratification = c(0), 
                                                           from.year = 2008, 
                                                           observation.correlation.form = 'compound.symmetry', 
-                                                          measurement.error.coefficient.of.variance = 0.03, # pick a smarter one
+                                                          error.variance.term = 0.03, # pick a smarter one
+                                                          error.variance.type = 'cv',
                                                           weights = list(1), 
                                                           equalize.weight.by.year = T,
                                                           use.lognormal.approximation = T
@@ -655,7 +671,8 @@ if(1==2){
                                                           levels.of.stratification = c(0), 
                                                           from.year = 2008, 
                                                           observation.correlation.form = 'compound.symmetry', 
-                                                          measurement.error.coefficient.of.variance = 0.03,# pick a smarter one
+                                                          error.variance.term = 0.03, # pick a smarter one
+                                                          error.variance.type = 'cv',
                                                           weights = list(1), 
                                                           equalize.weight.by.year = T 
     )
@@ -668,7 +685,8 @@ if(1==2){
                                                           levels.of.stratification = c(0), 
                                                           from.year = 2008, 
                                                           observation.correlation.form = 'compound.symmetry', 
-                                                          measurement.error.coefficient.of.variance = 0.03,# pick a smarter one
+                                                          error.variance.term = 0.03, # pick a smarter one
+                                                          error.variance.type = 'cv',
                                                           weights = list(1), 
                                                           equalize.weight.by.year = T 
     )
