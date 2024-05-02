@@ -1758,7 +1758,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
 
 # Rename to incorporate that this is CDC-funded HIV test positivity 
 track.cumulative.outcome(EHE.SPECIFICATION,
-                         name = 'hiv.test.positivity',
+                         name = 'cdc.hiv.test.positivity',
                          corresponding.data.outcome = 'cdc.hiv.test.positivity',
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Total CDC-funded HIV Tests that are Positive',
                                                                     description = "Proportion of Total CDC-funded HIV Tests that are Positive",
@@ -1766,7 +1766,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     axis.name = 'Proportion positive',
                                                                     units = '%',
                                                                     singular.unit = '%'),
-                         value = expression(new/total.hiv.tests), # potentially multiply this by 1.45 to account for higher positivity among CDC-funded tests 
+                         value = expression(2.678324*(new/total.hiv.tests)), # ratio comes from cdc_positivity_bias.R"
                          denominator.outcome = 'total.hiv.tests',
                          keep.dimensions = c("location","age","race","sex","risk"))
 
