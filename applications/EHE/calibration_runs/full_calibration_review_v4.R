@@ -39,7 +39,7 @@ params.manual[incident.idu.params] = 1
 params.manual["age1.incident.idu.multiplier"] = 1 # 0.80460
 params.manual["age2.incident.idu.multiplier"] = 0.005 # 1.49047
 params.manual["age3.incident.idu.multiplier"] = 0.005 # 4.31603
-params.manual["age4.incident.idu.multiplier"] = 0.0005 # 1.04566
+params.manual["age4.incident.idu.multiplier"] = 0.005 # 1.04566
 params.manual["age5.incident.idu.multiplier"] = 0.005 # 1.15931
 
 params.manual[incident.idu.params.0] = 15
