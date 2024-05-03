@@ -6,13 +6,12 @@ library(ggplot2)
 # Andrew can you remove the warning message with each plot? 
 # (Warning message:No shared levels found between `names(values)` of the manual scale and the data's colour values.)
 
-
 # Need to have this file locally
 # load("../jheem_analyses/prelim_results/full.with.aids.minus.prep_2024-04-20_C.12580.Rdata")
 
 simplot(sim,
         facet.by = "age", split.by = "race", # likelihoood: age, sex, race; 1- and 2-way
-        outcomes = c("population"), #style.manager = create.style.manager(color.data.by = "stratum"),
+        outcomes = c("population"), style.manager = create.style.manager(color.data.by = "stratum"),
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
@@ -22,12 +21,12 @@ simplot(sim,
 
 simplot(sim,
         facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
-        outcomes = c("new"),
+        outcomes = c("new"), style.manager = create.style.manager(color.data.by = "stratum"),
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
         facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
-        outcomes = c("diagnosed.prevalence"),
+        outcomes = c("diagnosed.prevalence"), style.manager = create.style.manager(color.data.by = "stratum"),
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
@@ -56,8 +55,10 @@ simplot(sim,
         outcomes = c("proportion.general.population.tested"),
         dimension.values = list(year = 2000:2030)) 
 
+## Andrew - sim calls this outcome "hiv.test.positivity" (old), but the data manager calls it "cdc.hiv.test.positivity" (new)
 simplot(sim,
-        outcomes = c("cdc.hiv.test.positivity"), # totals only 
+        outcomes = c("hiv.test.positivity"), # totals only 
+        plot.which = "sim.only",
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
@@ -70,7 +71,7 @@ simplot(sim,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
-        facet.by = "age", # age; 1-way 
+        #facet.by = "age", # age; 1-way 
         outcomes = c("proportion.using.heroin",
                      "proportion.using.cocaine"), 
         dimension.values = list(year = 2000:2030)) 

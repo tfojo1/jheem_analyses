@@ -354,6 +354,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     hispanic.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     other.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     
+    black.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
+    hispanic.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
+    other.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
+    
     black.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     hispanic.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     other.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
@@ -365,6 +369,7 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     age5.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
 
     msm.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
+    msm.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
     idu.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
@@ -784,15 +789,23 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     'black.incident.idu.multiplier.0',
     'hispanic.incident.idu.multiplier.0',
     'other.incident.idu.multiplier.0',
- #   'young.incident.idu.multiplier.0',
+    # 'young.incident.idu.multiplier.0',
     'msm.incident.idu.multiplier.0'
+  ),
+  
+  idu.transitions.1 = c(
+    'black.incident.idu.multiplier.1',
+    'hispanic.incident.idu.multiplier.1',
+    'other.incident.idu.multiplier.1',
+    # 'young.incident.idu.multiplier.1',
+    'msm.incident.idu.multiplier.1'
   ),
   
   idu.transitions.2 = c(
     'black.incident.idu.multiplier.2',
     'hispanic.incident.idu.multiplier.2',
     'other.incident.idu.multiplier.2',
-#    'young.incident.idu.multiplier.2',
+    # 'young.incident.idu.multiplier.2',
     'msm.incident.idu.multiplier.2'
   ),
 
