@@ -1324,6 +1324,27 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                                  sex.to=c('heterosexual_male','msm')),
                                value = expression(heterosexual.trates * male.vs.female.heterosexual.rr))
 
+# The flattened rates lets us track this as an outcome
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'flattened.sexual.transmission.rates',
+                        value = 0,
+                        scale = 'rate')
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'flattened.sexual.transmission.rates',
+                               applies.to = list(sex.to='msm'),
+                               value = 'msm.trates')
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'flattened.sexual.transmission.rates',
+                               applies.to = list(sex.to='female'),
+                               value = 'heterosexual.trates')
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'flattened.sexual.transmission.rates',
+                               applies.to = list(sex.to='heterosexual_male'),
+                               value = expression(heterosexual.trates * male.vs.female.heterosexual.rr))
+
 register.model.element(EHE.SPECIFICATION,
                        name = 'male.vs.female.heterosexual.rr',
                        value = 3.75/4.75 * 87.4/92,
@@ -1940,6 +1961,19 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          denominator.outcome = 'population',
                          value.is.numerator = F,
                          keep.dimensions = c("location","age","sex"))
+
+track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'sexual.transmission.rates',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Sexual Transmission Rates',
+                                                                    description = "Estimated rates of sexual transmission",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Rate',
+                                                                    units = '/y',
+                                                                    singular.unit = '/y'),
+                         value.to.integrate = 'flattened.sexual.transmission.rates',
+                         keep.dimensions = c('location.to','age.to','race.to','sex.to')
+)
+
 
 ##--------------------------------##
 ##--------------------------------##
