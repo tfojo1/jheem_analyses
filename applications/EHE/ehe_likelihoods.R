@@ -253,7 +253,8 @@ suppression.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry', 
-                                                   measurement.error.sd = 0.03,
+                                                   p.error.variance.term = 0.03, 
+                                                   p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
