@@ -1546,6 +1546,13 @@ census.manager = load.data.manager("../../cached/census.manager.rdata")
                             data.manager = surveillance.manager, 
                             census.manager = smaller.census.manager)
  
+ # to put adult.population for 2020-2022
+ put.msa.data.strict(locations = MSAS.OF.INTEREST, 
+                     data.manager = surveillance.manager, 
+                     census.manager = smaller.census.manager,
+                     put.stratifications = c(), 
+                     stratification.name = "year__location__age")
+ 
  #Put adult population for specific locations
  put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
                         contained.geographic.type = "county", #it will look for counties in the regions above
