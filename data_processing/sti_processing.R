@@ -41,7 +41,7 @@ outcome.mappings.sti = c('Primary and Secondary Syphilis'='ps.syphilis',
                      'Congenital Syphilis' = 'congenital.syphilis',
                      'Gonorrhea' = 'gonorrhea')
 
-age.mappings.sti = c('0-14' = '0-14 years',
+age.mappings.sti = c('0-14' = '13-14 years', #decided to make this change on 5-6-24 to align with ontology (assume no on under 13 has STI)
                  '15-19' = '15-19 years',
                  '20-24' = '20-24 years',
                  '25-29' = '25-29 years',
@@ -85,6 +85,7 @@ data.list.sti.clean = lapply(data.list.sti, function(file){
   
   if(grepl("age", filename)) {
     data$age = age.mappings.sti[data$Age.Group]
+    data = subset(data, data$age != "unknown")
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
@@ -135,6 +136,7 @@ data.list.early.syphilis = lapply(data.list.early, function(file){
   
   if(grepl("age", filename)) {
     data$age = age.mappings.sti[data$Age.Group]
+    data = subset(data, data$age != "unknown")
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
