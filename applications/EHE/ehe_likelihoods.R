@@ -480,7 +480,7 @@ two.way.proportion.tested.likelihood.instructions =
 
 #-- HIV TEST POSITIVITY --#
 hiv.test.positivity.likelihood.instructions =
-  create.nested.proportion.likelihood.instructions(outcome.for.data = "cdc.hiv.test.positivity",
+  create.nested.proportion.likelihood.instructions.with.included.multiplier(outcome.for.data = "cdc.hiv.test.positivity",
                                                    outcome.for.sim = "cdc.hiv.test.positivity",
                                                    denominator.outcome.for.data = "hiv.tests",
                                                    outcome.for.n.multipliers = 'adult.population',
@@ -504,6 +504,11 @@ hiv.test.positivity.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
+                                                   
+                                                   included.multiplier = 2.810587, # from cdc_positivity.bias.R
+                                                   included.multiplier.sd = sqrt(0.1391234), # from cdc_positivity.bias.R
+                                                   included.multiplier.correlation = 0.5,
+                                                   
                                                    p.error.variance.term = 0.03,
                                                    p.error.variance.type = 'sd',
                                                    
@@ -655,7 +660,7 @@ if(1==2){
   
   # using nested proportion or basic likelihood with a backup location? think about this - Andrew
   number.of.tests.year.on.year.change.likelihood.instructions = 
-    create.time.lagged.comparsion.likelihood.instructions(outcome.for.data = "hiv.tests",
+    create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "hiv.tests",
                                                           outcome.for.sim = "total.hiv.tests",
                                                           levels.of.stratification = c(0), 
                                                           from.year = 2008, 
@@ -668,8 +673,8 @@ if(1==2){
     )
   
   gonorrhea.year.on.year.change.likelihood.instructions = 
-    create.time.lagged.comparsion.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", # zoe working on this
-                                                          #outcome.for.sim = "sexual.transmission", # we have to define this outcome
+    create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", # zoe changing 0-14 to 13-14, throw out 'unknown'
+                                                          outcome.for.sim = "sexual.transmission.rates", 
                                                           # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
                                                           # (2020 sexual transmisson/2019 sexual transmission)
                                                           levels.of.stratification = c(0), 
@@ -682,8 +687,8 @@ if(1==2){
     )
   
   ps.syphilis.year.on.year.change.likelihood.instructions = 
-    create.time.lagged.comparsion.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # zoe working on this
-                                                          #outcome.for.sim = "sexual.transmission", # we have to define this outcome
+    create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # zoe working on this
+                                                          outcome.for.sim = "sexual.transmission.rates", # we have to define this outcome
                                                           # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
                                                           # (2020 sexual transmisson/2019 sexual transmission)
                                                           levels.of.stratification = c(0), 
