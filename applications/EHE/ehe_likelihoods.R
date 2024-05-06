@@ -334,7 +334,8 @@ awareness.likelihood.instructions =
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
                                                    p.error.variance.term = 0.016, # .018*90 - rough estimate from HIV Atlas (for now)
-                                                   p.error.variance.type = 'sd',
+                                                   p.error.variance.type = 'sd', # data.cv needs to be an option 
+                                                   # the data estimate is a coefficient of variance 
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -434,7 +435,9 @@ proportion.tested.likelihood.instructions =
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
                                                    p.error.variance.term = 0.03,
-                                                   p.error.variance.type = 'sd',
+                                                   p.error.variance.type = 'sd', # sd or data.variance 
+                                                   # this will use what is stored in the data manager instead specifying the value here
+                                                            # switch to this once the variance estimate in the data manager is corrected
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
