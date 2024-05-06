@@ -95,7 +95,7 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           likelihood.instructions = two.way.transmission.pop.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
-                          parameter.names = c(par.names.transmission),
+                          parameter.names = c(par.names.pop, par.names.transmission), # added pop params back in 5/6
                           n.iter = N.ITER,
                           thin = 50, 
                           # fixed.initial.parameter.values = params.manual[par.names.transmission], 
