@@ -1787,7 +1787,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     axis.name = 'Proportion positive',
                                                                     units = '%',
                                                                     singular.unit = '%'),
-                         value = expression(2.678324*(new/total.hiv.tests)), # ratio comes from cdc_positivity_bias.R"
+                         value = expression(2.810587*(new/total.hiv.tests)), # ratio comes from cdc_positivity_bias.R"
                          denominator.outcome = 'total.hiv.tests',
                          keep.dimensions = c("location","age","race","sex","risk"))
 
