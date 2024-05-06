@@ -1333,17 +1333,17 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='msm'),
-                               value = 'msm.trates')
+                               value = expression(global.trate*msm.trates))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='female'),
-                               value = 'heterosexual.trates')
+                               value = expression(global.trate * heterosexual.trates))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='heterosexual_male'),
-                               value = expression(heterosexual.trates * male.vs.female.heterosexual.rr))
+                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr))
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'male.vs.female.heterosexual.rr',
@@ -1966,12 +1966,14 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'sexual.transmission.rates',
                          outcome.metadata = create.outcome.metadata(display.name = 'Sexual Transmission Rates',
                                                                     description = "Estimated rates of sexual transmission",
-                                                                    scale = 'non.negative.number',
+                                                                    scale = 'rate',
                                                                     axis.name = 'Rate',
                                                                     units = '/y',
                                                                     singular.unit = '/y'),
                          value.to.integrate = 'flattened.sexual.transmission.rates',
-                         keep.dimensions = c('location.to','age.to','race.to','sex.to')
+                         denominator.outcome = 'population',
+                         dimension.alias.suffix = 'to',
+                         keep.dimensions = c('location','age','race','sex')
 )
 
 
