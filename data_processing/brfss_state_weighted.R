@@ -686,7 +686,11 @@ variance.total.state = lapply(data.list.brfss.state.totals, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = proportion_tested*(1-proportion_tested)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
     select(year, location, outcome, variance)%>%
     rename(value = variance) #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
   
@@ -702,7 +706,11 @@ variance.sex.state = lapply(data.list.brfss.state.sex, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location, sex)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
     select(year, location, outcome, variance, sex)%>%
     rename(value = variance)
   
@@ -718,7 +726,11 @@ variance.age.state = lapply(data.list.brfss.state.age, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location, age)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
     select(year, location, outcome, variance, age)%>%
     rename(value = variance)
   
@@ -735,7 +747,11 @@ variance.race.state = lapply(data.list.brfss.state.race, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location, race)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
     select(year, location, outcome, variance, race)%>%
     rename(value = variance)
   
@@ -754,7 +770,11 @@ variance.risk.state = lapply(data.list.brfss.state.risk.put, function(file){
   filename = file[[1]] 
   
   data <- data %>%
-    mutate(variance = ((value*(1- value))/n_weighted))%>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location, risk)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
     select(year, location, outcome, variance, risk)%>%
     rename(value = variance)
   
