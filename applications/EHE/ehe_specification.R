@@ -426,7 +426,8 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'suppression.of.diagnosed',
-                        value = expression( suppression.of.diagnosed.without.covid * suppression.of.diagnosed.covid.multiplier)
+                        value = expression( suppression.of.diagnosed.without.covid * suppression.of.diagnosed.covid.multiplier),
+                        scale = "proportion"
 )
 
 register.model.quantity(EHE.SPECIFICATION,
