@@ -3,6 +3,10 @@ imm.lik = immigration.likelihood.instructions$instantiate.likelihood('ehe','C.12
 em.lik = emigration.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 new.lik = new.diagnoses.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 prev.lik = prevalence.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+
+new.lik.two.way = race.risk.sex.two.way.new.diagnoses.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+prev.lik.two.way = race.risk.sex.two.way.prevalence.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+
 hiv.mort.lik = hiv.mortality.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 gen.mort.lik = general.mortality.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 aids.deaths.lik = aids.deaths.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
