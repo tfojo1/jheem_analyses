@@ -1,5 +1,4 @@
 #Run a test simulation and get results for 2 MSAs
-
 source("applications/EHE/ehe_specification.R")
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
@@ -16,8 +15,7 @@ results = collection$get(outcomes = c("incidence", "population"),
                          keep.dimensions = c("race"))
 
 
-
-
+#With actual calibrated simulations
 source("applications/EHE/ehe_specification.R")
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
