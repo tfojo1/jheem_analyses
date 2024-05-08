@@ -145,7 +145,7 @@ put.msa.data.strict.for.stratified.census = function(census.outcome.name = 'popu
                                                      locations,
                                                      contained.geographic.type = 'county', # if this is NULL, it won't get any subtype, just stay at the main geographic level
                                                      stratification.name = "year__location__age",
-                                                     put.stratifications = list(c()),
+                                                     put.stratifications = list(),
                                                      age.lower.limit = 13,
                                                      age.upper.limit = Inf,
                                                      data.manager,
