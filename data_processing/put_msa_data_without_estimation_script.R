@@ -28,9 +28,10 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                          short.name = census.manager$source.info[[source.name]]$short.name)
     
     for (ont.name in census.manager$ontology.names)
+    {
         if (ont.name %in% onts.to.ignore) next
         if (!(ont.name %in% data.manager$ontology.names))
-            data.manager$register.ontology(ont.name, census.manager$ontologies[[ont.name]])
+            data.manager$register.ontology(ont.name, census.manager$ontologies[[ont.name]])}
     
     all.data = census.manager$data[[census.outcome.name]][['estimate']]
     all.url = census.manager$url[[census.outcome.name]][['estimate']]

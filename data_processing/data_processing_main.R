@@ -583,11 +583,6 @@ data.manager$register.ontology(
 ###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')
 source('commoncode/additional_locations_of_interest.R')
-##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
-#This code also adjusts the population to be the 'adult.population' ages 13 and over
-source('data_processing/put_msa_data_without_estimation_script.R')
-#source code to sum diagnosed prevalence and new diagnoses for counties to make up MSAs
-source('data_processing/put_msa_data_as_new_source_script.R')
 ###############################################################################
 ###Source in File that reads .csvs and removes headers
 source('data_processing/fix_cdc_headers.R')
@@ -1535,9 +1530,18 @@ for (data in indications_all) {
 surveillance.manager= data.manager #Add this here so you don't have to change data.manager throughout entire code#
 
 ################################################################################
+#Decided to save a version of the surveillance manager at this point for trouble shooting in the future:
+save(surveillance.manager, file="../../cached/surveillance.manager.temp.rdata")
+
 ##Put summation of census counties to create msa populations within the surveillance manager
 smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.rdata")
 census.manager = load.data.manager("../../cached/census.manager.rdata")
+
+##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
+#This code also adjusts the population to be the 'adult.population' ages 13 and over
+source('data_processing/put_msa_data_without_estimation_script.R')
+#source code to sum diagnosed prevalence and new diagnoses for counties to make up MSAs
+source('data_processing/put_msa_data_as_new_source_script.R')
 
 #this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
 #this function currently defaults to population, when using it for mortality you need to define mortality as the outome#
