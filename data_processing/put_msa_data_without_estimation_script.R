@@ -62,7 +62,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                 if (d == 'age') ages.within.limit
                 else 1:dim(data.this.ont)[[d]]
             })
-            browser()
+            # browser()
             data.from.locs.only = do.call('[', c(list(data.this.ont), subset.by.ages.arguments, list(drop=F)))
             url.from.locs.only = do.call('[', c(list(url.this.ont), subset.by.ages.arguments, list(drop=F)))
             details.from.locs.only = do.call('[', c(list(details.this.ont), subset.by.ages.arguments, list(drop=F)))
@@ -189,7 +189,7 @@ put.msa.data.strict.for.stratified.census = function(census.outcome.name = 'popu
                 if (d == 'age') ages.within.limit
                 else 1:dim(data.this.ont)[[d]]
             })
-            browser()
+            # browser()
             data.from.locs.only = do.call('[', c(list(data.this.ont), subset.by.ages.arguments, list(drop=F)))
             url.from.locs.only = do.call('[', c(list(url.this.ont), subset.by.ages.arguments, list(drop=F)))
             details.from.locs.only = do.call('[', c(list(details.this.ont), subset.by.ages.arguments, list(drop=F)))
