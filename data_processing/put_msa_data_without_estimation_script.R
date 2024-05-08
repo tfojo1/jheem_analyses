@@ -28,9 +28,10 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                          short.name = census.manager$source.info[[source.name]]$short.name)
     
     for (ont.name in census.manager$ontology.names)
+    {
         if (ont.name %in% onts.to.ignore) next
         if (!(ont.name %in% data.manager$ontology.names))
-            data.manager$register.ontology(ont.name, census.manager$ontologies[[ont.name]])
+            data.manager$register.ontology(ont.name, census.manager$ontologies[[ont.name]])}
     
     all.data = census.manager$data[[census.outcome.name]][['estimate']]
     all.url = census.manager$url[[census.outcome.name]][['estimate']]
@@ -46,6 +47,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
         
         for (ont.name in names(data.this.source))
         {
+            if (ont.name %in% onts.to.ignore) next
             data.this.ont = data.this.source[[ont.name]][[stratification.name]]
             url.this.ont = url.this.source[[ont.name]][[stratification.name]]
             details.this.ont = details.this.source[[ont.name]][[stratification.name]]
@@ -61,7 +63,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                 if (d == 'age') ages.within.limit
                 else 1:dim(data.this.ont)[[d]]
             })
-            browser()
+            # browser()
             data.from.locs.only = do.call('[', c(list(data.this.ont), subset.by.ages.arguments, list(drop=F)))
             url.from.locs.only = do.call('[', c(list(url.this.ont), subset.by.ages.arguments, list(drop=F)))
             details.from.locs.only = do.call('[', c(list(details.this.ont), subset.by.ages.arguments, list(drop=F)))
@@ -188,7 +190,7 @@ put.msa.data.strict.for.stratified.census = function(census.outcome.name = 'popu
                 if (d == 'age') ages.within.limit
                 else 1:dim(data.this.ont)[[d]]
             })
-            browser()
+            # browser()
             data.from.locs.only = do.call('[', c(list(data.this.ont), subset.by.ages.arguments, list(drop=F)))
             url.from.locs.only = do.call('[', c(list(url.this.ont), subset.by.ages.arguments, list(drop=F)))
             details.from.locs.only = do.call('[', c(list(details.this.ont), subset.by.ages.arguments, list(drop=F)))

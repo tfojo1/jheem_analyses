@@ -65,6 +65,6 @@ DEP.PARAMETERS.PRIOR <- join.distributions(
 
 
 
-DEP.PARAMETER.SAMPLING.BLOCKS <- as.list(DEP.PARAMETERS.PRIOR@var.names) # specify the blocks later
+DEP.PARAMETER.SAMPLING.BLOCKS <- as.list(DEP.PARAMETERS.PRIOR@var.names) ## specify the blocks later ##
 
 
