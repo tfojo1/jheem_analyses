@@ -1,5 +1,4 @@
 # depression test #
-# source dep.sp
 
 source('../jheem_analyses/applications/Depression/dep_specification.R')
 
@@ -14,7 +13,7 @@ simplot(sim,"new")
 
 ## intervention: example get 90% on depression tx
 treatment90 <- create.intervention.effect(quantity.name = 'depression.proportion.tx', start.time = 2025, 
-                                        effect.values = 0.9, 
+                                        effect.values = 0.99, 
                                         times = 2030, apply.effects.as = 'value', scale = 'proportion',
                                         allow.values.less.than.otherwise = F, allow.values.greater.than.otherwise = T)
 
