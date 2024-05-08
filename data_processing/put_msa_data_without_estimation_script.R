@@ -46,6 +46,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
         
         for (ont.name in names(data.this.source))
         {
+            if (ont.name %in% onts.to.ignore) next
             data.this.ont = data.this.source[[ont.name]][[stratification.name]]
             url.this.ont = url.this.source[[ont.name]][[stratification.name]]
             details.this.ont = details.this.source[[ont.name]][[stratification.name]]
