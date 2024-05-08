@@ -23,11 +23,16 @@ print("REGISTERING CALIBRATIONS")
 par.names.pop = c("black.birth.rate.multiplier",
                   "hispanic.birth.rate.multiplier",
                   "other.birth.rate.multiplier",
+                  "black.non.idu.general.mortality.rate.multiplier", # accidentally left out before
+                  "hispanic.non.idu.general.mortality.rate.multiplier", # accidentally left out before
+                  "other.non.idu.general.mortality.rate.multiplier", # accidentally left out before
                   "age1.non.idu.general.mortality.rate.multiplier",
                   "age2.non.idu.general.mortality.rate.multiplier",
                   "age3.non.idu.general.mortality.rate.multiplier",
                   "age4.non.idu.general.mortality.rate.multiplier",
                   "age5.non.idu.general.mortality.rate.multiplier",
+                  "male.non.idu.general.mortality.rate.multiplier", # accidentally left out before
+                  "female.non.idu.general.mortality.rate.multiplier", # accidentally left out before
                   "black.age1.aging.multiplier.1",
                   "hispanic.age1.aging.multiplier.1",
                   "other.age1.aging.multiplier.1",
