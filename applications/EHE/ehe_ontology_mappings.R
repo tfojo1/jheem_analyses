@@ -246,5 +246,4 @@ register.ontology.mapping('cdc.sti.to.jheem.race',
                                            c('Hispanic/Latino', 'hispanic'),
                                            c('Multiracial', 'other'),
                                            c('Native Hawaiian/Other Pacific Islander', 'other'),
-                                           c('Unknown', 'other'), ## We don't want this category in the data
                                            c('White', 'other')))
