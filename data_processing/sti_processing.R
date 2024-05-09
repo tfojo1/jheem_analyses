@@ -89,6 +89,7 @@ data.list.sti.clean = lapply(data.list.sti, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
+    data = subset(data, data$race != "Unknown")
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -140,6 +141,7 @@ data.list.early.syphilis = lapply(data.list.early, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
+    data = subset(data, data$race != "Unknown")
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
