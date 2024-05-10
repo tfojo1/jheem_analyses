@@ -5,7 +5,7 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
-CALIBRATION.CODE.TRANSMISSION.WITHOUT.POP.PARAMS = 'init.transmission.no.pop.ehe' 
+CALIBRATION.CODE.TRANS.NO.POP.PARAMS = 'trans.no.pop' 
 CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
 CALIBRATION.CODE.FULL.MINUS.TESTING = 'full.minus.testing'
@@ -113,7 +113,7 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           preceding.calibration.codes = CALIBRATION.CODE.POPULATION
 )
 
-register.calibration.info(CALIBRATION.CODE.TRANSMISSION.WITHOUT.POP.PARAMS,
+register.calibration.info(CALIBRATION.CODE.TRANS.NO.POP.PARAMS,
                           # added proportion tested 4/23
                           likelihood.instructions = two.way.transmission.pop.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
