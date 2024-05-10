@@ -5,6 +5,7 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
+CALIBRATION.CODE.TRANSMISSION.WITHOUT.POP.PARAMS = 'init.transmission.no.pop.ehe' 
 CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
 CALIBRATION.CODE.FULL.MINUS.TESTING = 'full.minus.testing'
@@ -112,6 +113,22 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           preceding.calibration.codes = CALIBRATION.CODE.POPULATION
 )
 
+register.calibration.info(CALIBRATION.CODE.TRANSMISSION.WITHOUT.POP.PARAMS,
+                          # added proportion tested 4/23
+                          likelihood.instructions = two.way.transmission.pop.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = c(par.names.transmission), 
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          # fixed.initial.parameter.values = params.manual[par.names.transmission], 
+                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          pull.parameters.and.values.from.preceding = F,
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get transmission parameters in the general vicinity",
+                          preceding.calibration.codes = CALIBRATION.CODE.POPULATION
+)
 
 #-- REGISTER ITERATIVE CALIBRATIONS  --#
 # pop, trans, mort 
