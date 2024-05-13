@@ -1,7 +1,7 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 LOCATION = 'C.12580' #BALTIMORE.MSA 
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.PLUS.AIDS   # CALIBRATION.CODE.POPULATION
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION   # CALIBRATION.CODE.POPULATION
                                                             # CALIBRATION.CODE.TRANSMISSION
                                                             # CALIBRATION.CODE.FULL.PLUS.AIDS
                                                             # CALIBRATION.CODE.FULL.MINUS.TESTING
@@ -45,9 +45,19 @@ run.time = as.numeric(end.time) - as.numeric(start.time)
 #              " simulations (",
 #              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
 
-sim = mcmc@simulations[[length(mcmc@simulations)]]
+# Save sim 
+# sim = mcmc@simulations[[length(mcmc@simulations)]]
+# save(sim,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_",Sys.Date(),"_",LOCATION,".Rdata"))
 
-save(sim,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_",Sys.Date(),"_",LOCATION,".Rdata"))
+# Save simset
+simset = assemble.simulations.from.calibration(version = 'ehe',
+                                               location = LOCATION,
+                                               calibration.code = CALIBRATION.CODE.TO.RUN)
+
+simset = simset$burn(keep = 0.5)
+simset = simset$thin(keep = 50)
+
+save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.PROCESS,"_simset_",Sys.Date(),"_",location,".Rdata"))
 
 
 
