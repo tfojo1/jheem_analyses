@@ -5,11 +5,8 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
-CALIBRATION.CODE.TRANS.NO.POP.PARAMS = 'trans.no.pop' 
 CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
-CALIBRATION.CODE.FULL.MINUS.TESTING = 'full.minus.testing'
-CALIBRATION.CODE.FULL.MINUS.IDU = 'full.minus.idu'
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 
 N.ITER.TEST = 10000
@@ -101,23 +98,6 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           likelihood.instructions = two.way.transmission.pop.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
-                          parameter.names = c(par.names.pop, par.names.transmission), # added pop params back in 5/6
-                          n.iter = N.ITER,
-                          thin = 50, 
-                          # fixed.initial.parameter.values = params.manual[par.names.transmission], 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
-                          pull.parameters.and.values.from.preceding = F,
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POPULATION
-)
-
-register.calibration.info(CALIBRATION.CODE.TRANS.NO.POP.PARAMS,
-                          # added proportion tested 4/23
-                          likelihood.instructions = two.way.transmission.pop.likelihood.instructions,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
                           n.iter = N.ITER,
                           thin = 50, 
@@ -145,38 +125,6 @@ register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
                           description = "Adding in likelihoods iteratively, population + transmission + mortality"
 )
-
-# full minus testing-related
-register.calibration.info(CALIBRATION.CODE.FULL.MINUS.TESTING,
-                          likelihood.instructions = FULL.likelihood.instructions.minus.testing,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.TEST, 
-                          thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "Full minus testing-related"
-)
-
-
-# full minus idu 
-register.calibration.info(CALIBRATION.CODE.FULL.MINUS.IDU,
-                          likelihood.instructions = FULL.likelihood.instructions.minus.idu,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.TEST, 
-                          thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "Full minus IDU"
-)
-
 
 #-- REGISTER FULL CALIBRATION  --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
