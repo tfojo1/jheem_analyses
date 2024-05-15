@@ -111,3 +111,49 @@ for (data in census_sas_pops) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
+
+
+
+# Creating Dummy Counties -------------------------------------------------
+
+#We noticed on 5-15-24 there was an issue with missing counties in dimnames
+#This is because there are counties that were historically parts of states
+#And then were removed as counties at some point.  We noticed this for FL, MO, and VA.
+#we decided to put them here as NA so then we won't run into the dimnames
+#related error
+
+dummy.counties  <- data.frame(
+  outcome = c('population'),
+  year = c('2010'),
+  location = c('12025', '51560', '51780'), #These are the counties that have changed#
+  value = as.numeric(NA),
+  sex = c('male'),
+  race = c('white'),
+  ethnicity = c('not hispanic'),
+  age = c('< 1 year')
+  )
+
+dummy.counties.two  <- data.frame(
+  outcome = c('population'),
+  year = c('2010'),
+  location = c( '51123', '29193'), #These are the counties that have changed#
+  value = as.numeric(NA),
+  sex = c('male'),
+  race = c('white'),
+  ethnicity = c('not hispanic'),
+  age = c('< 1 year')
+)
+
+test <- list(dummy.counties, dummy.counties.two)
+
+for (data in test) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting',
+    allow.na.to.overwrite = T )
+}
