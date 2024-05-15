@@ -21,7 +21,7 @@ source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_intervent
 
 CALIBRATION.CODE= "init.transmission.ehe" # "full.with.aids" or "init.transmission.ehe"
 LOCATIONS=c("C.12580")
-#LOCATIONS=c("C.12580","C.33100") #Baltimore & Miami
+#LOCATIONS=c("C.12580","C.33100", "C.XXXXX") #Baltimore, Miami & Atlanta
 INTERVENTIONS=c("noint",
                 "testdisp")
 
