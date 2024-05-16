@@ -63,3 +63,31 @@ for (data in county_single_year_age) {
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
+
+# Creating Dummy Counties -------------------------------------------------
+
+#We noticed on 5-15-24 there was an issue with missing counties in dimnames
+#This is because there are counties that were historically parts of states
+#And then were removed as counties at some point.  We noticed this for FL, MO, and VA.
+#we decided to put them here as NA so then we won't run into the dimnames
+#related error
+
+dummy.counties  <- data.frame(
+  outcome = c('population'),
+  year = c('2018'),
+  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  value = as.numeric(NA),
+  sex = c('male'),
+  race = c('American Indian or Alaska Native'),
+  ethnicity = c('Hispanic or Latino'),
+  age = c('< 1 year')
+)
+
+census.manager$put.long.form(
+  data = dummy.counties,
+  ontology.name = 'census.cdc.wonder.population',
+  source = 'cdc_wonder',
+  dimension.values = list(),
+  url ='https://wonder.cdc.gov/',
+  details = 'CDC Wonder',
+  allow.na.to.overwrite = T )
