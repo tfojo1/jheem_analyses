@@ -125,35 +125,20 @@ for (data in census_sas_pops) {
 dummy.counties  <- data.frame(
   outcome = c('population'),
   year = c('2010'),
-  location = c('12025', '51560', '51780'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
   value = as.numeric(NA),
   sex = c('male'),
   race = c('white'),
   ethnicity = c('not hispanic'),
   age = c('< 1 year')
   )
-
-dummy.counties.two  <- data.frame(
-  outcome = c('population'),
-  year = c('2010'),
-  location = c( '51123', '29193'), #These are the counties that have changed#
-  value = as.numeric(NA),
-  sex = c('male'),
-  race = c('white'),
-  ethnicity = c('not hispanic'),
-  age = c('< 1 year')
-)
-
-test <- list(dummy.counties, dummy.counties.two)
-
-for (data in test) {
   
   census.manager$put.long.form(
-    data = data,
+    data = dummy.counties,
     ontology.name = 'census',
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting',
     allow.na.to.overwrite = T )
-}
+
