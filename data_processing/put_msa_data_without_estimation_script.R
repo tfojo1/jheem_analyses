@@ -33,6 +33,11 @@ put.msa.data.strict = function(census.outcome.name = 'population',
         if (!(ont.name %in% data.manager$ontology.names))
             data.manager$register.ontology(ont.name, census.manager$ontologies[[ont.name]])}
     
+    has.put.totals.data.for.locations = logical(length(locations))
+    has.put.stratified.data.for.locations = logical(length(locations))
+    names(has.put.totals.data.for.locations)=locations
+    names(has.put.stratified.data.for.locations)=locations
+    
     all.data = census.manager$data[[census.outcome.name]][['estimate']]
     all.url = census.manager$url[[census.outcome.name]][['estimate']]
     all.details = census.manager$details[[census.outcome.name]][['estimate']]
@@ -114,6 +119,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                  dimension.values = list(location = location),
                                  url = url,
                                  details = details)
+                has.put.totals.data.for.locations[[location]] = T
                 
                 ## -- STRATIFIED -- ##
                 for (stratification in put.stratifications) {
@@ -128,6 +134,7 @@ put.msa.data.strict = function(census.outcome.name = 'population',
                                      dimension.values = list(location=location),
                                      url = url,
                                      details = details)
+                    has.put.stratified.data.for.locations[[location]] = T
                     
                 }
                 # other.time = Sys.time()-other.time
@@ -135,6 +142,14 @@ put.msa.data.strict = function(census.outcome.name = 'population',
             }
         }
     }
+    
+    # print warning for locations we skipped for some reason
+    skipped.totals.locations = names(locations)[!has.put.totals.data.for.locations]
+    if (length(skipped.totals.locations)>0)
+        warning(paste0("putting totals data for the following location(s) failed: "), paste0(skipped.totals.locations, collapse=", "))
+    skipped.stratified.locations = names(locations)[!has.put.stratified.data.for.locations]
+    if (length(skipped.stratified.locations)>0 && length(put.stratifications)>0)
+        warning(paste0("putting totals data for the following location(s) failed: "), paste0(skipped.stratified.locations, collapse=", "))
 }
 
 # Need to source until it's in the package.
@@ -160,6 +175,11 @@ put.msa.data.strict.for.stratified.census = function(census.outcome.name = 'popu
     to.ont = ontology(year=NULL,location=NULL, incomplete.dimensions = c('year', 'location'))
     if (!(ont.name %in% data.manager$ontology.names))
         data.manager$register.ontology(ont.name, to.ont)
+    
+    has.put.totals.data.for.locations = logical(length(locations))
+    has.put.stratified.data.for.locations = logical(length(locations))
+    names(has.put.totals.data.for.locations)=locations
+    names(has.put.stratified.data.for.locations)=locations
     
     all.data = census.manager$data[[census.outcome.name]][['estimate']]
     all.url = census.manager$url[[census.outcome.name]][['estimate']]
@@ -241,6 +261,7 @@ put.msa.data.strict.for.stratified.census = function(census.outcome.name = 'popu
                                  dimension.values = list(location = location),
                                  url = url,
                                  details = details)
+                has.put.totals.data.for.locations[[location]] = T
                 
                 ## -- STRATIFIED -- ##
                 for (stratification in put.stratifications) {
@@ -255,6 +276,7 @@ put.msa.data.strict.for.stratified.census = function(census.outcome.name = 'popu
                                      dimension.values = list(location=location),
                                      url = url,
                                      details = details)
+                    has.put.stratified.data.for.locations[[location]] = T
                     
                 }
                 # other.time = Sys.time()-other.time
@@ -262,4 +284,11 @@ put.msa.data.strict.for.stratified.census = function(census.outcome.name = 'popu
             }
         }
     }
+    # print warning for locations we skipped for some reason
+    skipped.totals.locations = names(locations)[!has.put.totals.data.for.locations]
+    if (length(skipped.totals.locations)>0)
+        warning(paste0("putting totals data for the following location(s) failed: "), paste0(skipped.totals.locations, collapse=", "))
+    skipped.stratified.locations = names(locations)[!has.put.stratified.data.for.locations]
+    if (length(skipped.stratified.locations)>0 && length(put.stratifications)>0)
+        warning(paste0("putting totals data for the following location(s) failed: "), paste0(skipped.stratified.locations, collapse=", "))
 }
