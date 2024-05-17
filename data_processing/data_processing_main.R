@@ -1534,7 +1534,7 @@ surveillance.manager= data.manager #Add this here so you don't have to change da
 save(surveillance.manager, file="../../cached/surveillance.manager.temp.rdata")
 
 ##Put summation of census counties to create msa populations within the surveillance manager
-smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.rdata")
+#smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.rdata")
 census.manager = load.data.manager("../../cached/census.manager.rdata")
 
 ##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
@@ -1678,7 +1678,7 @@ get.msa.totals.from.county.simple(outcome= 'deaths',
                                   source.from = 'census.deaths', 
                                   source.to='census.deaths.aggregated',
                                   details.for.put= 'estimated from county data',
-                                  data.manager.from=smaller.census.manager,
+                                  data.manager.from=census.manager,
                                   data.manager.to= surveillance.manager)
 
 
