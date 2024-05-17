@@ -1548,12 +1548,12 @@ source('data_processing/put_msa_data_as_new_source_script.R')
 #adult.population
 put.msa.data.strict(locations = MSAS.OF.INTEREST, 
                     data.manager = surveillance.manager, 
-                    census.manager = smaller.census.manager)
+                    census.manager = census.manager)
 
 # to put adult.population for 2020-2022
 put.msa.data.strict.for.stratified.census(locations=MSAS.OF.INTEREST,
                                           data.manager = surveillance.manager,
-                                          census.manager = smaller.census.manager)
+                                          census.manager = census.manager)
 
 #Put adult population for specific locations
 put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
