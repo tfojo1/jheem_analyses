@@ -9,60 +9,60 @@
 
 # CDC Wonder --------------------------------------------------------------
 
-year_location
+#year_location
 dummy.counties.one<- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
   location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
   value = as.numeric(NA)
 )
 #year_location_age
 dummy.counties.two <- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   age = c('< 1 year')
 )
 #year_location_race
 dummy.counties.three <- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   race = c('American Indian or Alaska Native')
 )
 #year_location_ethnicity
 dummy.counties.four  <- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   ethnicity = c('Hispanic or Latino')
 )
 
 #year_location_race_ethnicity
 dummy.counties.five  <- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   race = c('American Indian or Alaska Native'),
   ethnicity = c('Hispanic or Latino')
 )
 #year_location_sex
 dummy.counties.six <- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   sex = c('male')
 )
 #year_location_age_race_ethnicity
 dummy.counties.seven  <- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   race = c('American Indian or Alaska Native'),
   ethnicity = c('Hispanic or Latino'),
@@ -70,18 +70,18 @@ dummy.counties.seven  <- data.frame(
 )
 #year_location_age_sex
 dummy.counties.eight  <- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   sex = c('male'),
   age = c('< 1 year')
 )
 #year_location_race_ethnicity_sex
 dummy.counties.nine  <- data.frame(
-  outcome = c('population'),
+  outcome = c('adult.population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   sex = c('male'),
   race = c('American Indian or Alaska Native'),
@@ -102,7 +102,7 @@ dummy.data.all = list (dummy.counties.one,
 
 for (data in dummy.data.all) {
 
-census.manager$put.long.form(
+surveillance.manager$put.long.form(
   data = data,
   ontology.name = 'census.cdc.wonder.population',
   source = 'cdc_wonder',
@@ -116,60 +116,60 @@ census.manager$put.long.form(
 # Census ------------------------------------------------------------------
 
 
-  #year_location
+  ##year_location
   dummy.counties.one<- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
     location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
     value = as.numeric(NA)
   )
   #year_location_age
   dummy.counties.two <- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('12025', '51560', '51780', '51123', '29193'), 
     value = as.numeric(NA),
     age = c('< 1 year')
   )
   #year_location_race
   dummy.counties.three <- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('12025', '51560', '51780', '51123', '29193'), 
     value = as.numeric(NA),
     race = c('white')
   )
   #year_location_ethnicity
   dummy.counties.four  <- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('12025', '51560', '51780', '51123', '29193'), 
     value = as.numeric(NA),
     ethnicity = c('not hispanic')
   )
 
   #year_location_race_ethnicity
   dummy.counties.five  <- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('12025', '51560', '51780', '51123', '29193'), 
     value = as.numeric(NA),
     race = c('white'),
     ethnicity = c('not hispanic')
   )
   #year_location_sex
   dummy.counties.six <- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('12025', '51560', '51780', '51123', '29193'), 
     value = as.numeric(NA),
     sex = c('male')
   )
   #year_location_age_race_ethnicity
   dummy.counties.seven  <- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('12025', '51560', '51780', '51123', '29193'),
     value = as.numeric(NA),
     race = c('white'),
     ethnicity = c('not hispanic'),
@@ -177,18 +177,18 @@ census.manager$put.long.form(
   )
   #year_location_age_sex
   dummy.counties.eight  <- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('12025', '51560', '51780', '51123', '29193'),
     value = as.numeric(NA),
     sex = c('male'),
     age = c('< 1 year')
   )
   #year_location_race_ethnicity_sex
   dummy.counties.nine  <- data.frame(
-    outcome = c('population'),
+    outcome = c('adult.population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('12025', '51560', '51780', '51123', '29193'), 
     value = as.numeric(NA),
     sex = c('male'),
     race = c('white'),
@@ -209,7 +209,7 @@ census.manager$put.long.form(
 
   for (data in dummy.data.all) {
 
-    census.manager$put.long.form(
+    surveillance.manager$put.long.form(
       data = data,
       ontology.name = 'census',
       source = 'census.population',
