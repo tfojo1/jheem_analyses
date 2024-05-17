@@ -1563,15 +1563,6 @@ put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.
                     census.manager = census.manager)
 
 
-# CAN REMOVE THIS SECTION AFTER THIS RUN ----------------------------------
-
-#Temporarily adding in the locations that are causing issues with the historic counties
-put.msa.data.strict(locations= c("FL", "MO", "VA", '12025', '51560', '51780', '51123', '29193'), 
-                    contained.geographic.type = "county", #it will look for counties in the regions above
-                    put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')),
-                    data.manager = surveillance.manager,
-                    census.manager = census.manager)
-
 # CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST--------
 source('data_processing/dummy.data.frames.R')
 
