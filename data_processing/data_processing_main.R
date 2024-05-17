@@ -1562,6 +1562,13 @@ put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.
                     data.manager = surveillance.manager,
                     census.manager = census.manager)
 
+#Temporarily adding in the locations that are causing issues with the historic counties
+put.msa.data.strict(locations= c("FL", "MO", "VA", '12025', '51560', '51780', '51123', '29193'), 
+                    contained.geographic.type = "county", #it will look for counties in the regions above
+                    put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')),
+                    data.manager = surveillance.manager,
+                    census.manager = census.manager)
+
 
 # Adult population for recent census data ---------------------------------
 
