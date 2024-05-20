@@ -1,3 +1,6 @@
+source('../jheem_analyses/applications/EHE/ehe_specification.R')
+source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
+
 pop.lik = population.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 imm.lik = immigration.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 em.lik = emigration.likelihood.instructions$instantiate.likelihood('ehe','C.12580')

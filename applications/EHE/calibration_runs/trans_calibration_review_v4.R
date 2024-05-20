@@ -15,28 +15,36 @@ load('../jheem_analyses/prelim_results/trans.no.pop_simset_2024-05-13_C.12580.Rd
 simset.trans.no.pop = simset
 sim.trans.no.pop = simset.trans.no.pop$burn(keep=1)
 
+load('../jheem_analyses/prelim_results/init.transmission.ehe_simset_2024-05-14_C.12580.Rdata')
+simset.trans.new = simset # this should be the same as simset.trans.no.pop (reran with original name so the caches will work)
+
 # trans with pop parameters is better on: new, prev, prop tested (but not that much better, visually)
 # trans without pop parameters is better on: pop, imm/em
 round(exp(full.lik$compute.piecewise(sim.trans) - full.lik$compute.piecewise(sim.trans.no.pop)),5)
 round(exp(full.lik$compute.piecewise(sim.trans.no.pop) - full.lik$compute.piecewise(sim.trans)),5)
 
-simplot(simset.pop,
+simplot(#simset.pop,
+  simset.trans.new,
         #sim.trans,
         sim.trans.no.pop,
+        #simset.trans,
+        #simset.trans.no.pop,
         facet.by = "age", split.by = "race", # likelihoood: age, sex, race; 1- and 2-way
         outcomes = c("population"), style.manager = create.style.manager(color.data.by = "stratum"),
         dimension.values = list(year = 2000:2030)) 
 
-simplot(sim.trans,
+simplot(#sim.trans,
         sim.trans.no.pop,
+        simset.trans.new,
         #simset.trans,
         #simset.trans.no.pop,
-        #facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
+        facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
         outcomes = c("new"), style.manager = create.style.manager(color.data.by = "stratum"),
         dimension.values = list(year = 2000:2030)) 
 
-simplot(sim.trans,
-        sim.trans.no.pop,
+simplot(#sim.trans,
+        #sim.trans.no.pop,
+        simset.trans.new,
         #simset.trans,
         #simset.trans.no.pop,
         facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
