@@ -101,8 +101,7 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           parameter.names = c(par.names.transmission), 
                           n.iter = N.ITER,
                           thin = 50, 
-                          # fixed.initial.parameter.values = params.manual[par.names.transmission], 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          #fixed.initial.parameter.values = c(global.trate=0.1), 
                           pull.parameters.and.values.from.preceding = F,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
@@ -110,21 +109,6 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           preceding.calibration.codes = CALIBRATION.CODE.POPULATION
 )
 
-#-- REGISTER ITERATIVE CALIBRATIONS  --#
-# pop, trans, mort 
-register.calibration.info(CALIBRATION.CODE.POP.TRANS.MORT,
-                          likelihood.instructions = pop.trans.mortality.likelihood.instructions,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER, 
-                          thin = 200, 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
-                          description = "Adding in likelihoods iteratively, population + transmission + mortality"
-)
 
 #-- REGISTER FULL CALIBRATION  --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
@@ -134,7 +118,6 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
                           n.iter = N.ITER.FULL, 
                           thin = 200, 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
