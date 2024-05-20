@@ -71,10 +71,10 @@ par.names.pop = c("black.birth.rate.multiplier",
 )
 
 register.calibration.info(CALIBRATION.CODE.POPULATION,
-                          likelihood.instructions = joint.pop.migration.likelihood.instructions,
+                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added total prev/new 5/20
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
-                          parameter.names = par.names.pop,
+                          parameter.names = c(par.names.pop,"global.trate"), # adding this in 5/20
                           n.iter = N.ITER,
                           thin = 50, 
                           fixed.initial.parameter.values = c(global.trate=0.1), 

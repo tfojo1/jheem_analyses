@@ -126,6 +126,19 @@ emigration.likelihood.instructions = create.basic.likelihood.instructions(outcom
 
 
 #-- NEW DIAGNOSES  --#
+total.new.diagnoses.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                       outcome.for.sim = "new",
+                                       dimensions = character(),
+                                       levels.of.stratification = c(0), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.03,
+                                       error.variance.type = 'cv',
+                                       weights = list(1), 
+                                       equalize.weight.by.year = T 
+  )
+
 race.risk.sex.two.way.new.diagnoses.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                        outcome.for.sim = "new",
@@ -153,6 +166,19 @@ new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(out
 
 
 #-- PREVALENCE  --#
+total.prevalence.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                       outcome.for.sim = "diagnosed.prevalence",
+                                       dimensions = character(),
+                                       levels.of.stratification = c(0), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.03,
+                                       error.variance.type = 'cv',
+                                       weights = list(1),
+                                       equalize.weight.by.year = T 
+  )
+
 race.risk.sex.two.way.prevalence.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                        outcome.for.sim = "diagnosed.prevalence",
@@ -523,6 +549,14 @@ hiv.test.positivity.likelihood.instructions =
 joint.pop.migration.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
                                                                            immigration.likelihood.instructions,
                                                                            emigration.likelihood.instructions)
+
+joint.pop.migration.total.trans.likelihood.instructions = join.likelihood.instructions(
+  population.likelihood.instructions,
+  immigration.likelihood.instructions,
+  emigration.likelihood.instructions,
+  total.prevalence.likelihood.instructions,
+  total.new.diagnoses.likelihood.instructions)
+
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
 two.way.transmission.pop.likelihood.instructions = 
