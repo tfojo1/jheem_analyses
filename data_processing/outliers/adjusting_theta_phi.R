@@ -85,4 +85,33 @@ gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
                                            theta = 0.1,
                                            locations= c(states))
 
+gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
+                                          stratifications= list(c('race')), 
+                                          data.manager= surveillance.manager,
+                                          phi = 0.5,
+                                          theta = 0.1,
+                                          locations= c(states))
+
+#EXAMPLE: This identifies every year but the reference year and covid as an outlier
+#which maybe that's fine?
+#but then as I correct these it's going to ripple out again
+gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
+                                          stratifications= list(c('race')), 
+                                          data.manager= surveillance.manager,
+                                          phi = 0.5,
+                                          theta = 0.1,
+                                          locations= c(states))
+
+gc.all.data = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.sti$cdc.sti$year__location__race)
+
+
+plot.one <- gc.all.data %>% filter(location == "AK")%>% filter(race == 'Multiracial')
+ggplot(data = plot.one)+                   
+  geom_point(                             
+    mapping = aes(x = year, y = Freq),    
+    color = "turquoise4")+                       
+  labs()+                                 
+  theme()+
+  ylim(0, NA)
+
 
