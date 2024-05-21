@@ -85,17 +85,10 @@ gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
                                            theta = 0.1,
                                            locations= c(states))
 
-gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
-                                          stratifications= list(c('race')), 
-                                          data.manager= surveillance.manager,
-                                          phi = 0.5,
-                                          theta = 0.1,
-                                          locations= c(states))
-
 #EXAMPLE: This identifies every year but the reference year and covid as an outlier
 #which maybe that's fine?
 #but then as I correct these it's going to ripple out again
-gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
+gonorrhea.adjusted.stratified <- run.outlier.process(outcome= 'gonorrhea',
                                           stratifications= list(c('race')), 
                                           data.manager= surveillance.manager,
                                           phi = 0.5,
