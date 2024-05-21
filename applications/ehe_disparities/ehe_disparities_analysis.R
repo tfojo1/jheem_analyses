@@ -12,7 +12,7 @@ source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_intervent
 
 CALIBRATION.CODE= "full.with.aids" #either "full.with.aids" or "init.transmission.ehe"
 LOCATIONS=c("C.12580","C.12060") #Baltimore & Atlanta
-INTERVENTIONS=c("noint", "testdisp")
+INTERVENTIONS=c("noint", "testint", "fullint")
 
 
 ### Load calibrated simset for each individual MSA

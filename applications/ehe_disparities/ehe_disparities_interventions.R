@@ -55,7 +55,7 @@ test.intervention = create.intervention(WHOLE.POPULATION,
                                           unsuppressed.multiplier=Uniform.Distribution(0.09,0.11),
                                           uninitiated.multiplier=Uniform.Distribution(0.7,0.8)
                                         ),
-                                        code="testdisp")
+                                        code="testint")
 
 #Specify criteria for checking whether the joint intervention met the EHE targets in 2030
 testing.criterion = create.intervention.criterion(outcome = 'proportion.general.population.tested',
@@ -92,4 +92,5 @@ full.intervention = create.criteria.based.intervention(base.intervention = base.
                                                                                    uninitiated.multiplier = 0.75),
                                                        #to limit computational time
                                                       max.iterations = 50,
-                                                      max.failure.rate = 0.05)
+                                                      max.failure.rate = 0.05,
+                                                      code="fullint")
