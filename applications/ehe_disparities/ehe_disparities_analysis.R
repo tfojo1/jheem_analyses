@@ -1,4 +1,45 @@
-#Transform model output into results tables
+#Project: EHE Disparities
+#Program: Run test interventions and output preliminary results.
+#Code by Todd Fojo, Melissa Schnure & Lauren Zalla
+
+#Note: this code has been run on fully calibrated simsets for 2 individual MSAs (Baltimore & Atlanta)
+
+#######
+
+### Source model specification, define interventions and parameters
+source("applications/EHE/ehe_specification.R")
+source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
+
+CALIBRATION.CODE= "full.with.aids" #either "full.with.aids" or "init.transmission.ehe"
+LOCATIONS=c("C.12580","C.12060") #Baltimore & Atlanta
+INTERVENTIONS=c("noint", "testdisp")
+
+
+### Load calibrated simset for each individual MSA
+load("../jheem_analyses/applications/ehe_disparities/simset_2024-05-16_C.12580.Rdata") # updated file 
+simset$save()
+
+load("../jheem_analyses/applications/ehe_disparities/simset_2024-05-19_C.12060.Rdata")
+simset$save()
+
+# this line takes ~5 min to run; don't need to run unless specification has changed since simset was created
+#rerun.simulations(simset) 
+
+#simplot(simset, "new", split.by="race")
+
+
+### Run interventions and select relevant results
+collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
+                                    locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=50)
+
+collection$run(2025, 2035, verbose=TRUE) # stop.for.errors = T if I want to check error messages 
+
+results = collection$get(outcomes = c("new", "population"),
+                         dimension.values = list(year=2035),
+                         keep.dimensions = c("race"))
+
+
+### Transform and output results into a table
 results
 dim(results)
 
@@ -76,6 +117,7 @@ table = cbind("IR - No Intervention (Overall)" = ir_total_meanci[, "noint"],
               "IR - Intervention (Other)" = ir_total_meanci[, "testdisp"],
               "IRD - Intervention" = ird_meanci[, "testdisp"],
               "IRR - Intervention" = irr_meanci[, "testdisp"]
-              )
+)
 table
-write.csv(table, file="../../table.csv")
+write.csv(table, file="../../code/jheem_analyses/applications/ehe_disparities/table.csv")
+

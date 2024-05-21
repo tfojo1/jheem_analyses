@@ -7,7 +7,10 @@
 START.YEAR = 2025
 IMPLEMENTED.BY.YEAR = 2030
 
-#Specify interventions on testing, viral suppression, and PrEP
+#No intervention
+noint=get.null.intervention()
+
+#Individual interventions on testing, viral suppression, and PrEP
 testing.increase = create.intervention.effect('general.population.testing', #testing rate
                                               start.time = START.YEAR,
                                               effect.values = 'testing.multiplier',
@@ -40,6 +43,19 @@ base.intervention = create.intervention(WHOLE.POPULATION,
                                         testing.increase,
                                         suppression.increase,
                                         prep.increase)
+
+
+#Suggest initial parameter distributions
+test.intervention = create.intervention(WHOLE.POPULATION,
+                                        testing.increase,
+                                        suppression.increase,
+                                        prep.increase, 
+                                        parameter.distribution = join.distributions(
+                                          testing.multiplier=Uniform.Distribution(4,6),
+                                          unsuppressed.multiplier=Uniform.Distribution(0.09,0.11),
+                                          uninitiated.multiplier=Uniform.Distribution(0.7,0.8)
+                                        ),
+                                        code="testdisp")
 
 #Specify criteria for checking whether the joint intervention met the EHE targets in 2030
 testing.criterion = create.intervention.criterion(outcome = 'proportion.general.population.tested',
@@ -77,14 +93,3 @@ full.intervention = create.criteria.based.intervention(base.intervention = base.
                                                        #to limit computational time
                                                       max.iterations = 50,
                                                       max.failure.rate = 0.05)
-
-test.intervention = create.intervention(WHOLE.POPULATION,
-                                        testing.increase,
-                                        suppression.increase,
-                                        prep.increase, 
-                                        parameter.distribution = join.distributions(
-                                          testing.multiplier=Uniform.Distribution(4,6),
-                                          unsuppressed.multiplier=Uniform.Distribution(0.09,0.11),
-                                          uninitiated.multiplier=Uniform.Distribution(0.7,0.8)
-                                          ),
-                                        code="testdisp")
