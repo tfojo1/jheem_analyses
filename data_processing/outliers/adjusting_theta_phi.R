@@ -22,7 +22,7 @@ source('commoncode/additional_locations_of_interest.R')
 national = "US"
 states = c(state.abb)
 MSAs = MSAS.OF.INTEREST
-counties = unlist(COUNTIES.OF.INTEREST) #why does this work
+counties = unlist(COUNTIES.OF.INTEREST) 
 substate.region = locations::get.all.for.type("NSDUH")
   
 # diagnoses ---------------------------------------------------------------
@@ -71,6 +71,13 @@ hiv.deaths.adjusted <- run.outlier.process(outcome= 'hiv.deaths',
                                                      theta = 0.1,
                                                      locations= c(states, MSAs))
 
+#This is another example- hiv.deaths 'sex'
+hiv.deaths.adjusted <- run.outlier.process(outcome= 'hiv.deaths',
+                                           stratifications= list(c('sex')), 
+                                           data.manager= surveillance.manager,
+                                           phi = 0.3,
+                                           theta = 0.1,
+                                           locations= c(states, MSAs))
 
 
 # Gonorrhea -----------------------------------------------------------------
