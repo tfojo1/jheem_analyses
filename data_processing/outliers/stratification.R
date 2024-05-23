@@ -6,13 +6,6 @@ source('data_processing/outlier_finder.R')
 source('commoncode/locations_of_interest.R')
 source('commoncode/additional_locations_of_interest.R')
 
-#will Need to fix these after talking to Andrew
-national = "US"
-states = c(state.abb)
-MSAs = MSAS.OF.INTEREST
-counties = unlist(COUNTIES.OF.INTEREST) 
-substate.region = locations::get.all.for.type("NSDUH")
-
 
 # Example 1: HIV Deaths ---------------------------------------------------
 ##First I adjusted the values here to get to 3 outlier for deaths:
@@ -21,7 +14,7 @@ hiv.deaths.adjusted <- run.outlier.process(outcome= 'hiv.deaths',
                                            data.manager= surveillance.manager,
                                            phi = 0.3,
                                            theta = 0.1,
-                                           locations= c(states, MSAs))
+                                           locations= c(surveillance.manager$get.locations.with.data(outcome="hiv.deaths")))
 
 #Then applied same values across strata- one example is 'sex' where there are 110 outliers
 #These are mostly within surveillance reports (the other outliers are mainly within cdc.hiv)
@@ -30,7 +23,7 @@ hiv.deaths.adjusted.stratified <- run.outlier.process(outcome= 'hiv.deaths',
                                            data.manager= surveillance.manager,
                                            phi = 0.3,
                                            theta = 0.1,
-                                           locations= c(states, MSAs))
+                                           locations= c(surveillance.manager$get.locations.with.data(outcome="hiv.deaths")))
 
 #Are these 110 sex outliers really outliers?
 #This needs to be mapped with more recent data bc otherwise it's hard to tell
@@ -66,14 +59,14 @@ gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
                                           data.manager= surveillance.manager,
                                           phi = 0.5,
                                           theta = 0.1,
-                                          locations= c(states))
+                                          locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
 
 gonorrhea.adjusted.stratified <- run.outlier.process(outcome= 'gonorrhea',
                                                      stratifications= list(c('race')), 
                                                      data.manager= surveillance.manager,
                                                      phi = 0.5,
                                                      theta = 0.1,
-                                                     locations= c(states))
+                                                     locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
 
 gc.all.data = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.sti$cdc.sti$year__location__race)
 
