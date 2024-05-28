@@ -19,6 +19,9 @@
 
 run.outlier.process = function(outcome, stratifications=list(), data.manager = get.default.data.manager(), locations, adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50, max.year = Inf, min.year = -Inf) {
     
+    # Convert adjudication data frame adjudication column to logical in case it's characters like "T"
+    if (!is.null(adjudication.data.frame)) adjudication.data.frame$adjudication = as.logical(adjudication.data.frame$adjudication)
+    
     # Step 1: remove outliers as requested if we have an adjudication data frame
     if (!is.null(adjudication.data.frame)) {
         remove.outliers(outcome, stratifications, data.manager, adjudication.data.frame)
@@ -69,6 +72,7 @@ remove.outliers = function(outcome, stratifications, data.manager, adjudication.
             for (ont.name in ontologies.this.source) {
                 
                 removal.points.this.source.ont = subset(this.adj.data.frame, source==source.name & ontology==ont.name & adjudication==T)
+                if (nrow(removal.points.this.source.ont)==0) next
                 
                 for (i in 1:nrow(removal.points.this.source.ont)) {
                     # Must do one put per replaced data point
@@ -82,6 +86,7 @@ remove.outliers = function(outcome, stratifications, data.manager, adjudication.
                                      url="removed",
                                      details="removed",
                                      allow.na.to.overwrite=T)
+                    
                 }
             }
         } 
@@ -269,6 +274,7 @@ do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratif
                                                                stratum.vars=character(0),
                                                                adj.data.frame = adj.data.frame,
                                                                adj.vector = adj.vector))
+                    
                     if (length(result)>0) return(result)
                     else return(NULL)
                     
