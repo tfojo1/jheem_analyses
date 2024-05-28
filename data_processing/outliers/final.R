@@ -25,12 +25,15 @@ diagnoses.adjusted<- run.outlier.process(outcome= 'diagnoses',
                                           max.year = 2019,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
 
-diagnoses.adjusted$adjudication <- c('T')
+diagnoses.adjusted$adjudication <- c(T)
 
 #Getting Error here- emailed Andrew 5-23-24
 run.outlier.process(outcome= 'diagnoses',
                     stratifications= list(c()),
                     data.manager= surveillance.manager,
+                    phi = 0.32, 
+                    theta = 0.06,
+                    max.year = 2019,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
                     adjudication.data.frame = diagnoses.adjusted)
 
@@ -56,9 +59,9 @@ dx.prev.adjusted<- run.outlier.process(outcome= 'diagnosed.prevalence',
 
 #Check this in meeting- the outlier.finder is identifying location = 09007 with outliers for 2008, 2009.  But i think the outliers should be
 #2010, 2011, 2012:
-# issue = as.data.frame.table(surveillance.manager$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location)
-# issue <- issue %>%
-#   filter(location == "09007")
+issue = as.data.frame.table(surveillance.manager$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location)
+issue <- issue %>%
+  filter(location == "09007")
 
 
 # Outcome = hiv.deaths ----------------------------------------------------
@@ -84,16 +87,16 @@ prep.adjusted<- run.outlier.process(outcome= 'prep',
 
 
 #Example for meeting: how low should prep numbers start? are those outliers?
-# prep.adjusted.more <- run.outlier.process(outcome= 'prep',
-#                                           stratifications= list(c()), 
-#                                           data.manager= surveillance.manager,
-#                                           phi = 0.5,
-#                                           theta = 0.05,
-#                                           max.year = 2019,
-#                                           locations= c(surveillance.manager$get.locations.with.data(outcome="prep")))
-# issue = as.data.frame.table(surveillance.manager$data$prep$estimate$aidsvu$aidsvu$year__location)
-# issue <- issue %>%
-#   filter(location == "01125")
+prep.adjusted.more <- run.outlier.process(outcome= 'prep',
+                                          stratifications= list(c()),
+                                          data.manager= surveillance.manager,
+                                          phi = 0.5,
+                                          theta = 0.05,
+                                          max.year = 2019,
+                                          locations= c(surveillance.manager$get.locations.with.data(outcome="prep")))
+issue = as.data.frame.table(surveillance.manager$data$prep$estimate$aidsvu$aidsvu$year__location)
+issue <- issue %>%
+  filter(location == "01125")
 
 
 
