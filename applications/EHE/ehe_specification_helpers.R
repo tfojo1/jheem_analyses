@@ -1002,8 +1002,12 @@ get.covid.mobility.for.location = function(location){
   covid.times = 2020 + (1.5 + 1:length(covid.mobility))/12
   names(covid.times) = names(covid.mobility)
   
+  knot.values = as.list(pmax(0, covid.mobility))
+  names(knot.values) = names(covid.mobility)
+  
   create.linear.spline.functional.form(knot.times = covid.times,
-                                       knot.values = as.list(covid.mobility))
+                                       knot.values = knot.values, 
+                                       min = 0)
 }
 
 get.covid.max.testing.effect = function(specification.metadata){
