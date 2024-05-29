@@ -2,10 +2,9 @@ source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibra
 
 LOCATION = 'C.12580' #BALTIMORE.MSA 
 CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.TRANSMISSION   # CALIBRATION.CODE.POPULATION
-                                                            # CALIBRATION.CODE.TRANSMISSION
-                                                            # CALIBRATION.CODE.FULL.PLUS.AIDS
-                                                            # CALIBRATION.CODE.FULL.MINUS.TESTING
-                                                            # CALIBRATION.CODE.FULL.MINUS.IDU
+                                                          # CALIBRATION.CODE.TRANSMISSION
+                                                          # CALIBRATION.CODE.FULL.PLUS.AIDS
+                                                          # CALIBRATION.CODE.FULL.PLUS.COVID
 
 set.seed(12345)
 
