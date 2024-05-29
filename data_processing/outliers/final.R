@@ -27,7 +27,6 @@ diagnoses.adjusted<- run.outlier.process(outcome= 'diagnoses',
 
 diagnoses.adjusted$adjudication <- c(T)
 
-#Getting Error here- emailed Andrew 5-23-24
 run.outlier.process(outcome= 'diagnoses',
                     stratifications= list(c()),
                     data.manager= surveillance.manager,
@@ -74,31 +73,6 @@ hiv.deaths.adjusted<- run.outlier.process(outcome= 'hiv.deaths',
                                          max.year = 2019,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="hiv.deaths")))
 
-# Outcome = PrEP ----------------------------------------------------------
-
-  #Total -> TBD, need to discuss in meeting
-prep.adjusted<- run.outlier.process(outcome= 'prep',
-                                          stratifications= list(c()), 
-                                          data.manager= surveillance.manager,
-                                          phi = 0.6,
-                                          theta = 0.05,
-                                          max.year = 2019,
-                                          locations= c(surveillance.manager$get.locations.with.data(outcome="prep")))
-
-
-#Example for meeting: how low should prep numbers start? are those outliers?
-prep.adjusted.more <- run.outlier.process(outcome= 'prep',
-                                          stratifications= list(c()),
-                                          data.manager= surveillance.manager,
-                                          phi = 0.5,
-                                          theta = 0.05,
-                                          max.year = 2019,
-                                          locations= c(surveillance.manager$get.locations.with.data(outcome="prep")))
-issue = as.data.frame.table(surveillance.manager$data$prep$estimate$aidsvu$aidsvu$year__location)
-issue <- issue %>%
-  filter(location == "01125")
-
-
 
 # Outcome = Suppression -------------------------------------------------------------
   #Total -> zero outliers!
@@ -143,15 +117,6 @@ engagement.adjusted <- run.outlier.process(outcome= 'engagement',
                                              #theta = 0.05,
                                              locations= c(surveillance.manager$get.locations.with.data(outcome="engagement")))
 
-# Outcome = cocaine -----------------------------------------------------
-  #Ask during meeting- what to do with year ranges?
-cocaine.adjusted <- run.outlier.process(outcome= 'cocaine',
-                                           stratifications= list(c()), 
-                                           data.manager= surveillance.manager,
-                                           #phi = 0.15,
-                                           #theta = 0.05,
-                                           locations= c(surveillance.manager$get.locations.with.data(outcome="cocaine")))
-
 # outcome = syphilis ------------------------------------------------------
   #Total -> zero outliers!
 syphilis.adjusted <- run.outlier.process(outcome= 'syphilis',
@@ -178,15 +143,7 @@ retention.adjusted <- run.outlier.process(outcome= 'retention',
                                           #theta = 0.05,
                                           #max.year = 2019,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="retention")))
-# outcome = hiv.tests ------------------------------------------------------
-  #Total- going to discuss in meeting
-hiv.tests.adjusted <- run.outlier.process(outcome= 'hiv.tests',
-                                          stratifications= list(c()), 
-                                          data.manager= surveillance.manager,
-                                          #phi = 0.15,
-                                          #theta = 0.05,
-                                          max.year = 2019,
-                                          locations= c(surveillance.manager$get.locations.with.data(outcome="hiv.tests")))
+
 # outcome = hiv.test.positivity ------------------------------------------------------
   #Total -> zero outliers
 cdc.hiv.test.positivity.adjusted <- run.outlier.process(outcome= 'cdc.hiv.test.positivity',
@@ -198,25 +155,64 @@ cdc.hiv.test.positivity.adjusted <- run.outlier.process(outcome= 'cdc.hiv.test.p
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="cdc.hiv.test.positivity")))
 
 
-# outcome = adult.immigration ---------------------------------------------------
-  #Total- this doesn't work bc this outcome is in year ranges
-adult.immigration.adjusted <- run.outlier.process(outcome= 'adult.immigration',
-                                                        stratifications= list(c()), 
-                                                        data.manager= surveillance.manager,
-                                                        #phi = 0.15,
-                                                        #theta = 0.05,
-                                                        #max.year = 2019,
-                                                        locations= c(surveillance.manager$get.locations.with.data(outcome="adult.immigration")))
-
 # outcome = aids.diagnoses ---------------------------------------------------
-#Total- this doesn't work bc this outcome is in year ranges
-aids.diagnoses.adjusted <- run.outlier.process(outcome= 'aids.diagnoses',
+#Total- 
+  #Each source here needs a different reference year (cdc.aids data is from 1981-2001; cdc.surveillance.reports are from 1993-2007)
+  #  *The case definition changed in 1993*
+
+#cdc.surveillance.reports
+aids.diagnoses.source.two<- run.outlier.process(outcome= 'aids.diagnoses',
+                                                stratifications= list(c()), 
+                                                data.manager= surveillance.manager,
+                                                phi = 0.8, 
+                                                theta = 0.2,
+                                                max.year = 2000, 
+                                                locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")))
+aids.diagnoses.source.two <- aids.diagnoses.source.two%>%
+  filter(source == "cdc.surveillance.reports")%>%
+  filter(year != "1993")#Is it ok to remove 1993?
+
+aids.diagnoses.source.two$adjudication <- c(T, T, T, T, T, T, T, F, F, F, T, T, T, T, T, T, T)
+
+run.outlier.process(outcome= 'aids.diagnoses',
+                    stratifications= list(c()),
+                    data.manager= surveillance.manager,
+                    phi = 0.8, 
+                    theta = 0.2,
+                    max.year = 2000,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")),
+                    adjudication.data.frame = aids.diagnoses.source.two)
+
+
+
+
+#cdc.aids
+aids.diagnoses.source.one <- run.outlier.process(outcome= 'aids.diagnoses',
                                                   stratifications= list(c()), 
                                                   data.manager= surveillance.manager,
-                                                  #phi = 0.15,
-                                                  #theta = 0.05,
-                                                  max.year = 1997,
+                                                  phi = 0.6,
+                                                  theta = 0.05,
+                                                  max.year = 1996,
                                                   locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")))
+aids.diagnoses.source.one <- aids.diagnoses.source.one%>%
+  filter(source == "cdc.aids")%>%
+  filter(year != "1993") #Is it ok to remove 1993?
+
+
+aids.diagnoses.source.one$adjudication <- c(T, T, T, T, T, T, T, F, F, F, T, T, T, T, T, T, T)
+
+run.outlier.process(outcome= 'aids.diagnoses',
+                    stratifications= list(c()),
+                    data.manager= surveillance.manager,
+                    phi = 0.6, 
+                    theta = 0.05,
+                    max.year = 1996,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")),
+                    adjudication.data.frame = aids.diagnoses.source.one)
 
 
 
+# #Examine aids outliers
+# issue = as.data.frame.table(surveillance.manager$data$aids.diagnoses$estimate$cdc.surveillance.reports$cdc.msa.reports$year__location)
+# issue <- issue %>%
+#   filter(location == "C.45060")
