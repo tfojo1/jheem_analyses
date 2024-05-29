@@ -118,13 +118,15 @@ engagement.adjusted <- run.outlier.process(outcome= 'engagement',
                                              locations= c(surveillance.manager$get.locations.with.data(outcome="engagement")))
 
 # outcome = syphilis ------------------------------------------------------
-  #Total -> zero outliers!
-syphilis.adjusted <- run.outlier.process(outcome= 'syphilis',
+  #Total
+
+syphilis.adjusted <- run.outlier.process(outcome= 'ps.syphilis',
                                         stratifications= list(c()), 
                                         data.manager= surveillance.manager,
-                                        #phi = 0.15,
-                                        #theta = 0.05,
-                                        locations= c(surveillance.manager$get.locations.with.data(outcome="syphilis")))
+                                        phi = 0.8,
+                                        theta = 0.05,
+                                        max.year = 2019,
+                                        locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
 # outcome = gonorrhea ------------------------------------------------------
   #Total- TBD, discuss in meeting
 gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
