@@ -544,6 +544,49 @@ hiv.test.positivity.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
+#-- YEAR-ON-YEAR TESTS CHANGE --#
+number.of.tests.year.on.year.change.likelihood.instructions = 
+  create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "hiv.tests",
+                                                        outcome.for.sim = "total.hiv.tests",
+                                                        levels.of.stratification = c(0), 
+                                                        from.year = 2008, 
+                                                        observation.correlation.form = 'compound.symmetry', 
+                                                        error.variance.term = 0.03, # pick a smarter one
+                                                        error.variance.type = 'cv',
+                                                        weights = list(1), 
+                                                        equalize.weight.by.year = T,
+                                                        use.lognormal.approximation = T
+  )
+
+#-- YEAR-ON-YEAR GONORRHEA CHANGE --#
+gonorrhea.year.on.year.change.likelihood.instructions = 
+  create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", # zoe changing 0-14 to 13-14, throw out 'unknown'
+                                                        outcome.for.sim = "sexual.transmission.rates", 
+                                                        # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
+                                                        # (2020 sexual transmisson/2019 sexual transmission)
+                                                        levels.of.stratification = c(0), 
+                                                        from.year = 2008, 
+                                                        observation.correlation.form = 'compound.symmetry', 
+                                                        error.variance.term = 0.03, # pick a smarter one
+                                                        error.variance.type = 'cv',
+                                                        weights = list(1), 
+                                                        equalize.weight.by.year = T 
+  )
+
+#-- YEAR-ON-YEAR SYPHILIS CHANGE --#
+ps.syphilis.year.on.year.change.likelihood.instructions = 
+  create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # zoe working on this
+                                                        outcome.for.sim = "sexual.transmission.rates", # we have to define this outcome
+                                                        # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
+                                                        # (2020 sexual transmisson/2019 sexual transmission)
+                                                        levels.of.stratification = c(0), 
+                                                        from.year = 2008, 
+                                                        observation.correlation.form = 'compound.symmetry', 
+                                                        error.variance.term = 0.03, # pick a smarter one
+                                                        error.variance.type = 'cv',
+                                                        weights = list(1), 
+                                                        equalize.weight.by.year = T 
+  )
 
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS  --#
 joint.pop.migration.likelihood.instructions = join.likelihood.instructions(population.likelihood.instructions,
@@ -565,92 +608,6 @@ two.way.transmission.pop.likelihood.instructions =
                                two.way.proportion.tested.likelihood.instructions, # added this in 4/23
                                population.likelihood.instructions # no aids
                                )
-
-#-- ITERATING TO TEST LIKELIHOODS --# 
-# Population, transmission, mortality
-pop.trans.mortality.likelihood.instructions = join.likelihood.instructions(  
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions)
-
-
-#-- ALL EXCEPT TESTING-RELATED --# 
-FULL.likelihood.instructions.minus.testing =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  # proportion.tested.likelihood.instructions,
-  # hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
-)
-
-#-- ALL EXCEPT IDU-RELATED --# 
-FULL.likelihood.instructions.minus.idu =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions,
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions
-  
-  # IDU LIKELIHOODS
-  # heroin.likelihood.instructions,
-  # cocaine.likelihood.instructions
-)
 
 #-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 
 FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
@@ -686,54 +643,47 @@ FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
   cocaine.likelihood.instructions
 )
 
+#-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# 
+FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # MORTALITY LIKELIHOODS
+  hiv.mortality.likelihood.instructions,
+  general.mortality.likelihood.instructions,
+  aids.deaths.likelihood.instructions,
+  
+  # AIDS DIAGNOSES LIKELIHOOD
+  aids.diagnoses.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions,
+  suppression.likelihood.instructions,
+  
+  # PREP LIKELIHOODS
+  prep.uptake.likelihood.instructions,
+  prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions,
+  cocaine.likelihood.instructions,
+  
+  # COVID LIKELIHOODS
+  number.of.tests.year.on.year.change.likelihood.instructions,
+  gonorrhea.year.on.year.change.likelihood.instructions,
+  ps.syphilis.year.on.year.change.likelihood.instructions
+  
+)
 
 
 
-#-- COVID LIKELIHOOD  --#
-if(1==2){
-  
-  # using nested proportion or basic likelihood with a backup location? think about this - Andrew
-  number.of.tests.year.on.year.change.likelihood.instructions = 
-    create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "hiv.tests",
-                                                          outcome.for.sim = "total.hiv.tests",
-                                                          levels.of.stratification = c(0), 
-                                                          from.year = 2008, 
-                                                          observation.correlation.form = 'compound.symmetry', 
-                                                          error.variance.term = 0.03, # pick a smarter one
-                                                          error.variance.type = 'cv',
-                                                          weights = list(1), 
-                                                          equalize.weight.by.year = T,
-                                                          use.lognormal.approximation = T
-    )
-  
-  gonorrhea.year.on.year.change.likelihood.instructions = 
-    create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", # zoe changing 0-14 to 13-14, throw out 'unknown'
-                                                          outcome.for.sim = "sexual.transmission.rates", 
-                                                          # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
-                                                          # (2020 sexual transmisson/2019 sexual transmission)
-                                                          levels.of.stratification = c(0), 
-                                                          from.year = 2008, 
-                                                          observation.correlation.form = 'compound.symmetry', 
-                                                          error.variance.term = 0.03, # pick a smarter one
-                                                          error.variance.type = 'cv',
-                                                          weights = list(1), 
-                                                          equalize.weight.by.year = T 
-    )
-  
-  ps.syphilis.year.on.year.change.likelihood.instructions = 
-    create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # zoe working on this
-                                                          outcome.for.sim = "sexual.transmission.rates", # we have to define this outcome
-                                                          # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
-                                                          # (2020 sexual transmisson/2019 sexual transmission)
-                                                          levels.of.stratification = c(0), 
-                                                          from.year = 2008, 
-                                                          observation.correlation.form = 'compound.symmetry', 
-                                                          error.variance.term = 0.03, # pick a smarter one
-                                                          error.variance.type = 'cv',
-                                                          weights = list(1), 
-                                                          equalize.weight.by.year = T 
-    )
-  
-}
 
 
