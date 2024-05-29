@@ -3,12 +3,17 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 library(ggplot2)
 
-# Andrew can you remove the warning message with each plot? 
-# (Warning message:No shared levels found between `names(values)` of the manual scale and the data's colour values.)
-
 # Need to have this file locally
 # load("../jheem_analyses/prelim_results/full.with.aids.minus.prep_2024-04-20_C.12580.Rdata")
 
+## --- ANDREW TO LOOK AT ---- ## 
+## @Andrew: when plotting the below by age/sex, the colors are flipped for the points vs. lines 
+simplot(sim,
+        facet.by = "age", split.by = "sex", # race, risk, sex; 1- and 2-way 
+        outcomes = c("new"), style.manager = create.style.manager(color.data.by = "stratum"),
+        dimension.values = list(year = 2000:2030)) 
+
+## --- STANDARD PLOTS ---- ## 
 simplot(sim,
         facet.by = "age", split.by = "race", # likelihoood: age, sex, race; 1- and 2-way
         outcomes = c("population"), style.manager = create.style.manager(color.data.by = "stratum"),
@@ -55,10 +60,9 @@ simplot(sim,
         outcomes = c("proportion.general.population.tested"),
         dimension.values = list(year = 2000:2030)) 
 
-## Andrew - sim calls this outcome "hiv.test.positivity" (old), but the data manager calls it "cdc.hiv.test.positivity" (new)
 simplot(sim,
-        outcomes = c("hiv.test.positivity"), # totals only 
-        plot.which = "sim.only",
+        outcomes = c("cdc.hiv.test.positivity"), # totals only 
+        # plot.which = "sim.only",
         dimension.values = list(year = 2000:2030)) 
 
 simplot(sim,
