@@ -1,8 +1,8 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = BALTIMORE.MSA
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.PLUS.COVID   # CALIBRATION.CODE.POPULATION
+LOCATION = CHICAGO.MSA
+CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.PLUS.AIDS   # CALIBRATION.CODE.POPULATION
                                                           # CALIBRATION.CODE.TRANSMISSION
                                                           # CALIBRATION.CODE.FULL.PLUS.AIDS
                                                           # CALIBRATION.CODE.FULL.PLUS.COVID
@@ -57,7 +57,7 @@ simset = assemble.simulations.from.calibration(version = 'ehe',
 simset = simset$burn(keep = 0.5)
 simset = simset$thin(keep = 50)
 
-save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.PROCESS,"_simset_",Sys.Date(),"_",location,".Rdata"))
+save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",Sys.Date(),"_",LOCATION,".Rdata"))
 
 
 
