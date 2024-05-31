@@ -564,7 +564,8 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                                         outcome.for.sim = "sexual.transmission.rates", 
                                                         # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
                                                         # (2020 sexual transmisson/2019 sexual transmission)
-                                                        levels.of.stratification = c(0), 
+                                                        levels.of.stratification = c(0,1), 
+                                                        dimensions = c("sex","race","age"),
                                                         from.year = 2008, 
                                                         observation.correlation.form = 'compound.symmetry', 
                                                         error.variance.term = 0.03, # pick a smarter one
@@ -579,7 +580,8 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                                         outcome.for.sim = "sexual.transmission.rates", # we have to define this outcome
                                                         # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
                                                         # (2020 sexual transmisson/2019 sexual transmission)
-                                                        levels.of.stratification = c(0), 
+                                                        levels.of.stratification = c(0,1), 
+                                                        dimensions = c("sex","race","age"),
                                                         from.year = 2008, 
                                                         observation.correlation.form = 'compound.symmetry', 
                                                         error.variance.term = 0.03, # pick a smarter one
