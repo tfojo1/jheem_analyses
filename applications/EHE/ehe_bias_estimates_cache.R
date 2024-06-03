@@ -58,6 +58,21 @@ heroin.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                               sub.location.type = NULL, 
                                               super.location.type = "STATE",
                                               main.location.type = "NSDUH")
+
+## NOT YET CACHED ## 
+hiv.tests.per.population.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+                                                          dimensions = character(),
+                                                          levels.of.stratification = c(0), 
+                                                          outcome.for.p = "hiv.tests.per.population",
+                                                          outcome.for.n = "adult.population",
+                                                          sub.location.type = NULL, 
+                                                          super.location.type = "STATE",
+                                                          main.location.type = "CBSA")
+
+cache.object.for.version(object = awareness.bias.estimates, 
+                         name = "heroin.bias.estimates", 
+                         version = 'ehe', overwrite=T)
+
 # ALL ALREADY CACHED
 if(1==2){
   cache.object.for.version(object = suppression.bias.estimates, 
@@ -76,11 +91,11 @@ if(1==2){
                            name = "awareness.bias.estimates", 
                            version = 'ehe', overwrite=T)
   
-  cache.object.for.version(object = awareness.bias.estimates, 
+  cache.object.for.version(object = cocaine.bias.estimates, 
                            name = "cocaine.bias.estimates", 
                            version = 'ehe', overwrite=T)
   
-  cache.object.for.version(object = awareness.bias.estimates, 
+  cache.object.for.version(object = heroin.bias.estimates, 
                            name = "heroin.bias.estimates", 
                            version = 'ehe', overwrite=T)
 }

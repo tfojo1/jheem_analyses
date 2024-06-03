@@ -1778,7 +1778,18 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(number.of.tests.in.uninfected+new),
                          keep.dimensions = c("location","age","race","sex","risk"))
 
-# Rename to incorporate that this is CDC-funded HIV test positivity 
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'total.hiv.tests.per.population',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Total Number of HIV Tests Per Population',
+                                                                    description = "Number of HIV Tests Done in the Past Year Per Population",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Tests Per Population',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = expression(total.hiv.tests/population),
+                         denominator.outcome = 'population',
+                         keep.dimensions = c("location"))
+
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'cdc.hiv.test.positivity',
                          corresponding.data.outcome = 'cdc.hiv.test.positivity',
@@ -1892,6 +1903,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       groups = 'infected',
                       exclude.tags = "emigration",
                       keep.dimensions = c("location","race","sex","risk"),
+                      subset.dimension.values = list(continuum = "diagnosed.states"), # maybe include this? 
                       from.year = 1980, 
                       to.year = 2001)
 
