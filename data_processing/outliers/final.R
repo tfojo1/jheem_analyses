@@ -117,23 +117,66 @@ engagement.adjusted <- run.outlier.process(outcome= 'engagement',
                                              #theta = 0.05,
                                              locations= c(surveillance.manager$get.locations.with.data(outcome="engagement")))
 
-# outcome = syphilis ------------------------------------------------------
+# Outcome = retention.of.engaged -----------------------------------------------------
+#Total -> zero outliers!
+retention.of.engaged.adjusted <- run.outlier.process(outcome= 'retention.of.engaged',
+                                           stratifications= list(c()), 
+                                           data.manager= surveillance.manager,
+                                           #phi = 0.15,
+                                           #theta = 0.05,
+                                           locations= c(surveillance.manager$get.locations.with.data(outcome="retention.of.engaged")))
+
+# outcome = ps.syphilis ------------------------------------------------------
   #Total
 
-syphilis.adjusted <- run.outlier.process(outcome= 'ps.syphilis',
+ps.syphilis.adjusted <- run.outlier.process(outcome= 'ps.syphilis',
                                         stratifications= list(c()), 
                                         data.manager= surveillance.manager,
-                                        phi = 0.8,
+                                        phi = 0.5,
                                         theta = 0.05,
                                         max.year = 2019,
                                         locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
+
+ps.syphilis.adjusted$adjudication <- c(T)
+
+run.outlier.process(outcome= 'ps.syphilis',
+                    stratifications= list(c()),
+                    data.manager= surveillance.manager,
+                    phi = 0.5, 
+                    theta = 0.05,
+                    max.year = 2019,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")),
+                    adjudication.data.frame = ps.syphilis.adjusted)
+
+# outcome = early.syphilis ------------------------------------------------------
+#Total
+
+early.syphilis.adjusted <- run.outlier.process(outcome= 'early.syphilis',
+                                         stratifications= list(c()), 
+                                         data.manager= surveillance.manager,
+                                         phi = 0.8,
+                                         theta = 0.05,
+                                         max.year = 2019,
+                                         locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")))
+# outcome = early.syphilis ------------------------------------------------------
+#Total
+
+congenital.syphilis.adjusted <- run.outlier.process(outcome= 'congenital.syphilis',
+                                               stratifications= list(c()), 
+                                               data.manager= surveillance.manager,
+                                               phi = 0.8,
+                                               theta = 0.05,
+                                               max.year = 2019,
+                                               locations= c(surveillance.manager$get.locations.with.data(outcome="congenital.syphilis")))
 # outcome = gonorrhea ------------------------------------------------------
   #Total- TBD, discuss in meeting
+
+#why are all of these 2018?
 gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
                                          stratifications= list(c()), 
                                          data.manager= surveillance.manager,
-                                         #phi = 0.15,
-                                         #theta = 0.05,
+                                         phi = 0.7,
+                                         theta = 0.05,
                                          max.year = 2019,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
 # outcome = retention ------------------------------------------------------
