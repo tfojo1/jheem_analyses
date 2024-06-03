@@ -827,6 +827,16 @@ gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa))))))))))))))))))))))))))
   data = subset(data, data$drop_var != "1")
   ##
   
+  #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
+  data <- data %>%
+    group_by(year, location, outcome)%>%
+    mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+    select(year, outcome, location, value.adjusted)%>%
+    rename(value = value.adjusted)
+  
+  data<- data[!duplicated(data), ] #This will take out the dup values
+  
+  
   data= as.data.frame(data)
   
   list(filename, data) 
