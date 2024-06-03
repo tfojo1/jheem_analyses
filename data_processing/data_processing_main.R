@@ -366,6 +366,15 @@ data.manager$register.outcome(
         units =  '%',
         description = "Major Depressive Episode in the Past Year"), denominator.outcome = 'adult.population')
 
+data.manager$register.outcome(
+  'hiv.tests.per.population',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'HIV Tests per Adult Population',
+    axis.name = 'HIV Tests per Adult Population',
+    units =  '%',
+    description = "HIV Tests per Adult Population"), denominator.outcome = 'adult.population')
+
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
@@ -1570,6 +1579,11 @@ source('data_processing/dummy.data.frames.R')
 
 #Source code that restructures census age groups to get adult.pop for 2020-2022
 source('data_processing/restructure.recent.census.age.groups.R')
+
+
+# Source code to create hiv.tests.per.population --------------------------
+source('data_processing/tests.per.population.R')
+
 ################################################################################
 #Create aggregated outcomes 
 #This is mainly county data being aggregated to MSA level
