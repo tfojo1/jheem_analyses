@@ -455,7 +455,7 @@ proportion.tested.likelihood.instructions =
                                                    dimensions = c("age","sex","race","risk"),
                                                    levels.of.stratification = c(0,1),
                                                    from.year = 2008,
-                                                   to.year = 2020,
+                                                   to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
                                                    
                                                    p.bias.inside.location = 0, 
                                                    p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
@@ -489,7 +489,7 @@ two.way.proportion.tested.likelihood.instructions =
                                                    dimensions = c("sex","race","risk"),
                                                    levels.of.stratification = c(0,1,2),
                                                    from.year = 2008,
-                                                   to.year = 2020,
+                                                   to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
                                                    
                                                    p.bias.inside.location = 0, 
                                                    p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
@@ -524,7 +524,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    dimensions = character(),
                                                    levels.of.stratification = c(0),
                                                    from.year = 2014,
-                                                   to.year = 2020,
+                                                   to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
                                                    redundant.location.threshold = 0,
                                                    
                                                    p.bias.inside.location = 0, 
@@ -564,7 +564,7 @@ if(1==2){
       
       levels.of.stratification = c(0),
       from.year = 2008,
-      to.year = 2020,
+      to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
       
       p.bias.inside.location = 0, 
       p.bias.outside.location = hiv.tests.per.population.bias.estimates$out.mean,
@@ -637,7 +637,7 @@ two.way.transmission.pop.likelihood.instructions =
   join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
                                race.risk.sex.two.way.prevalence.likelihood.instructions,
                                two.way.proportion.tested.likelihood.instructions, # added this in 4/23
-                               population.likelihood.instructions # no aids
+                               population.likelihood.instructions 
                                )
 
 #-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 
@@ -675,6 +675,8 @@ FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
 )
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# 
+# WHEN TESTING LAG LIKELIHOOD IS READY, REMOVE COMMENT OUT BELOW 
+
 FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 

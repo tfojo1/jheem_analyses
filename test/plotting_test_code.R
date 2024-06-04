@@ -11,6 +11,13 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum") # this i
 #load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")
 
 ## --- ANDREW TO LOOK AT ---- ## 
+# want to be able to look at the incidence by risk, sim only 
+simplot(simset,
+        facet.by = "risk", 
+        outcomes = c("incidence"), 
+        plot.which = "sim.only",
+        style.manager = location.style.manager,
+        dimension.values = list(year = 1980:2030)) 
 
 ## --- STANDARD PLOTS ---- ## 
 simplot(simset,
