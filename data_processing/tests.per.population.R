@@ -90,7 +90,9 @@ tests.per.pop <- combined %>%
   combined.cities <- combined.cities %>%
     mutate(value = (hiv.test.value/adult.population.value))%>%
     select(year, location, value)%>%
-    mutate(outcome = 'hiv.tests.per.population')
+    mutate(outcome = 'hiv.tests.per.population')%>%
+   mutate(year = as.character(year))%>%
+    mutate(location = as.character(location))
   
   #Put into data manager (but at this point surveillance manager)
   surveillance.manager$put.long.form(
