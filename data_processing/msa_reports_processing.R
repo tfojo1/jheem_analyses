@@ -518,6 +518,9 @@ data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   data$division= ifelse(grepl("Division", data$msa), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
+  #This might cause problems
+  data$msa <- gsub("MSA", "", data$msa)
+  
   #Update 2/6/24: Decided to add these old MSAs back in so that data isn't compromised
    data$msa<- gsub("Bergen-Passaic, N.J.", "New York, NY",
 gsub("Bergen-Passaic, NJ", "New York, NY",
@@ -531,6 +534,7 @@ gsub("West Palm Beach, FL", "Miami, FL",
 gsub("West Palm Beach-Boca Raton, FL", "Miami, FL",
 gsub("Nassau-Suffolk, N.Y.", "New York, NY",
 gsub("Nassau-Suffolk, NJ", "New York, NY",
+gsub("Nassau-Suffolk, NY", "New York, NY",
 gsub("Nassau/Suffolk, N.Y.", "New York, NY",
 gsub("Monmouth-Ocean City, N.J.", "New York, NY",
 gsub("Monmouth-Ocean, N.J.", "New York, NY",
@@ -540,26 +544,31 @@ gsub("Gary, IN", "Chicago, IL",
 gsub("Charlotte–Gastonia–Concord, NC–SC", "Charlotte, NC",
 gsub("Charlotte-Gast.-Rock Hill, NC-SC", "Charlotte, NC",
 gsub("Charlotte, N.C.", "Charlotte, NC",
+gsub("Charlotte-Gastonia-Concord, NC-SC", "Charlotte, NC",
 gsub("Philadelphia, PA–NJ–DE–MD", "Philadelphia, PA",
 gsub("Philadelphia, Pa.", "Philadelphia, PA",
 gsub("Philadelphia, PA-NJ", "Philadelphia, PA",
 gsub("Philadelphia, Pa–NJ–Del–Md", "Philadelphia, PA",
+gsub("Phil., PA-NJ-DE-MD", "Philadelphia, PA",
 gsub("Portland–Vancouver–Beaverton, OR–WA", "Portland, OR",
 gsub("Portland–Vancouver–Beaverton, Ore–Wash", "Portland, OR",
+gsub("Portland-Vancouver-Beaverton, OR-WA", "Portland, OR",
 gsub("Portland-Vancourver, OR-WA", "Portland, OR",
 gsub("Portland, Oreg","Portland, OR",
 gsub("Washington, DC-MD-VA-WV", "Washington, DC",
 gsub("Washington, D.C.", "Washington, DC",
 gsub("Washington, DC–VA–MD–WV", "Washington, DC",
 gsub("Washington, DC–Va–Md–WV", "Washington, DC",
+gsub("Washington, DC-VA-MD-WV ", "Washington, DC",
 gsub("Las Vegas, NV-AZ", "Las Vegas, NV",
 gsub("Wilmington, Del.", "Wilmington, DE",
 gsub("Wilmington-Newark, DE-MD", "Wilmington, DE",
 gsub("Norfolk, Va.", "Norfolk, VA",
 gsub( "Springfield, MA Necma", "Springfield, MA",
-gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa)))))))))))))))))))))))))))))))))))))))
-  
-  
+gsub("Mc Allen-Edinburg-Mission, TX", "McAllen-Edinburg-Mission",
+gsub("Detroit MI", "Detroit", 
+gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa))))))))))))))))))))))))))))))))))))))))))))))
+
   #Removing Puerto Rico
   data= subset(data, data$msa != "San Juan, P.R.")
   data= subset(data, data$msa != "San Juan–Caguas–Guaynabo, PR")
