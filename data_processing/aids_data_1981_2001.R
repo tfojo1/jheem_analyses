@@ -88,16 +88,6 @@ aids.data.clean = lapply(data.list.aids, function(file){
 
     data$location = locations::get.cbsa.for.msa.name(data$Location)
     data$outcome= "aids.diagnoses.deceased.by.2001"
-    
-    #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
-    data <- data %>%
-      group_by(location, year, outcome)%>%
-      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
-      select(year, outcome, location, value.adjusted)%>%
-      rename(value = value.adjusted)
-
-    data<- data[!duplicated(data), ] #This will take out the dup values
-    
   }
   
   if(grepl("all", filename)) {
@@ -117,30 +107,63 @@ aids.data.clean = lapply(data.list.aids, function(file){
     data$location = locations::get.cbsa.for.msa.name(data$Location)
     data$outcome= "aids.diagnoses"
     
-    #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
-    data <- data %>%
-      group_by(location, year, outcome)%>%
-      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
-      select(year, outcome, location, value.adjusted)%>%
-      rename(value = value.adjusted)
-
-    data<- data[!duplicated(data), ] #This will take out the dup values
-    
   }
 
   ##Demographic conditionals##
 
   if(grepl("sex", filename)) {
     data$sex = aids.sex.mappings[data$Sex.and.Sexual.Orientation]
+    #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
+    data <- data %>%
+      group_by(location, year, sex)%>%
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+      select(year, outcome, location, value.adjusted, sex)%>%
+      rename(value = value.adjusted)
+
+    data<- data[!duplicated(data), ] #This will take out the dup values
   }
   if(grepl("race", filename)) {
     data$race = aids.race.mappings[data$Race.or.Ethnicity]
+    #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
+    data <- data %>%
+      group_by(location, year, race)%>%
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+       select(year, outcome, location, value.adjusted, race)%>%
+       rename(value = value.adjusted)
+    
+    data<- data[!duplicated(data), ] #This will take out the dup values
   }
   if(grepl("age", filename)) {
     data$age = aids.age.mappings[data$Age.at.Diagnosis]
+    #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
+    data <- data %>%
+      group_by(location, year, age)%>%
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+      select(year, outcome, location, value.adjusted, age)%>%
+      rename(value = value.adjusted)
+
+    data<- data[!duplicated(data), ] #This will take out the dup values
   }
   if(grepl("risk", filename)) {
     data$risk = aids.risk.mappings[data$HIV.Exposure.Category]
+    #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
+    data <- data %>%
+      group_by(location, year, risk)%>%
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+      select(year, outcome, location, value.adjusted, risk)%>%
+      rename(value = value.adjusted)
+
+    data<- data[!duplicated(data), ] #This will take out the dup values
+  }
+  if(grepl("total", filename)) {
+    #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
+    data <- data %>%
+      group_by(location, year)%>%
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+       select(year, outcome, location, value.adjusted)%>%
+       rename(value = value.adjusted)
+    
+    data<- data[!duplicated(data), ] #This will take out the dup values
   }
 
   ##
@@ -225,59 +248,54 @@ aids.deaths.clean = lapply(data.list.aids.deaths, function(file){
     #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
     data <- data %>%
       group_by(location, year, sex)%>%
-      mutate(value.adjusted = sum(value))
-    # %>% #Check that this is right and then rename
-    #   select(year, outcome, location, value.adjusted, sex)%>%
-    #   rename(value = value.adjusted)
-    # 
-    # data<- data[!duplicated(data), ] #This will take out the dup values
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+      select(year, outcome, location, value.adjusted, sex)%>%
+      rename(value = value.adjusted)
+
+    data<- data[!duplicated(data), ] #This will take out the dup values
   }
   if(grepl("race", filename)) {
     data$race = aids.race.mappings[data$Race.or.Ethnicity]
     #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
     data <- data %>%
       group_by(location, year, race)%>%
-      mutate(value.adjusted = sum(value))
-    # %>% #Check that this is right and then rename
-    #   select(year, outcome, location, value.adjusted, race)%>%
-    #   rename(value = value.adjusted)
-    # 
-    # data<- data[!duplicated(data), ] #This will take out the dup values
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+      select(year, outcome, location, value.adjusted, race)%>%
+      rename(value = value.adjusted)
+
+    data<- data[!duplicated(data), ] #This will take out the dup values
   }
   if(grepl("age", filename)) {
     data$age = aids.age.mappings[data$Age.at.Diagnosis]
     #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
     data <- data %>%
       group_by(location, year, age)%>%
-      mutate(value.adjusted = sum(value))
-    # %>% #Check that this is right and then rename
-    #   select(year, outcome, location, value.adjusted, age)%>%
-    #   rename(value = value.adjusted)
-    # 
-    # data<- data[!duplicated(data), ] #This will take out the dup values
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+      select(year, outcome, location, value.adjusted, age)%>%
+      rename(value = value.adjusted)
+
+    data<- data[!duplicated(data), ] #This will take out the dup values
   }
   if(grepl("risk", filename)) {
     data$risk = aids.risk.mappings[data$HIV.Exposure.Category]
     #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
     data <- data %>%
       group_by(location, year, risk)%>%
-      mutate(value.adjusted = sum(value))
-    # %>% #Check that this is right and then rename
-    #   select(year, outcome, location, value.adjusted, risk)%>%
-    #   rename(value = value.adjusted)
-    # 
-    # data<- data[!duplicated(data), ] #This will take out the dup values
+      mutate(value.adjusted = sum(value))%>% #Check that this is right and then rename
+      select(year, outcome, location, value.adjusted, risk)%>%
+      rename(value = value.adjusted)
+
+    data<- data[!duplicated(data), ] #This will take out the dup values
   }
     if(grepl("total", filename)) {
       #6.3.24: Locations I had renamed above need to be summed together or else they are overwritten:
       data <- data %>%
-        group_by(location, year, outcome)%>%
-        mutate(value.adjusted = sum(value))
-      # %>% #Check that this is right and then rename
-      #   select(year, outcome, location, value.adjusted)%>%
-      #   rename(value = value.adjusted)
-      # 
-      # data<- data[!duplicated(data), ] #This will take out the dup values
+        group_by(location, year)%>%
+        mutate(value.adjusted = sum(value)) %>% #Check that this is right and then rename
+        select(year, outcome, location, value.adjusted)%>%
+        rename(value = value.adjusted)
+
+      data<- data[!duplicated(data), ] #This will take out the dup values
     }
 
   data$location = as.character(data$location)
