@@ -174,11 +174,9 @@ aids.data.clean = lapply(data.list.aids, function(file){
     data$risk = aids.risk.mappings[data$HIV.Exposure.Category]
   }
 
-  data <- data %>%
-    select(-Notes, - Cases, - Year.Diagnosed, -Year.Diagnosed.Code)
-
   data$location = as.character(data$location)
-
+  
+  data= as.data.frame(data)
   list(filename, data) 
 })
 
@@ -300,6 +298,7 @@ aids.deaths.clean = lapply(data.list.aids.deaths, function(file){
 
   data$location = as.character(data$location)
   
+  data= as.data.frame(data)
   list(filename, data) 
   
 })
