@@ -179,7 +179,7 @@ for (data in fixed.adult.population.census.20.22) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'census',
+    ontology.name = 'census', #the ontology here should really be stratified census but that doesn't exist at the surveillance manager level
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
