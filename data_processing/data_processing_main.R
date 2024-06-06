@@ -415,6 +415,7 @@ data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated')
 data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
+data.manager$register.source('census.aggregated.adult.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
 
 data.manager$register.ontology(
     'cdc',
@@ -1676,6 +1677,19 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
                            to.locations =  MSAS.OF.INTEREST,  
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+#This aggregates county level data to state level for the recent census years for adult.population
+#where I wrote the restructure.recent.age.groups code to estimate for adult.pop
+all.states = locations::get.all.for.type('state')
+
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'census.population',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  all.states,   
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'STATE',
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
 
