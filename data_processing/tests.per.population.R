@@ -20,15 +20,15 @@ hiv.tests.clean = subset(hiv.tests.raw, location %in% hiv.test.locations.of.inte
 
 #census (2020-2022 here are estimated)
 adult.pop.source.one = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census$year__location)) %>% rename(adult.pop.value = Freq) %>% mutate(year = as.character(year))
-adult.pop.source.one = subset(adult.pop.source.one,  location %in% hiv.test.locations.of.interest)
-adult.pop.source.one = subset(adult.pop.source.one,  year %in% hiv.tests.years.of.interest)
+adult.pop.source.one.clean = subset(adult.pop.source.one,  location %in% hiv.test.locations.of.interest)
+adult.pop.source.one.final = subset(adult.pop.source.one.clean,  year %in% hiv.tests.years.of.interest)
 
 #CDC Wonder
 adult.pop.source.two = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$cdc_wonder$census.cdc.wonder.population$year__location)) %>% rename(adult.pop.value = Freq) %>% filter(year == 2018 | year == 2019) %>% mutate(year = as.character(year))
-adult.pop.source.two  = subset(adult.pop.source.two,  location %in% hiv.test.locations.of.interest)
+adult.pop.source.two.final  = subset(adult.pop.source.two,  location %in% hiv.test.locations.of.interest)
 
 
-adult.pop.all = rbind(adult.pop.source.one ,adult.pop.source.two )
+adult.pop.all = rbind(adult.pop.source.one.final , adult.pop.source.two.final )
 
 # Combined hiv.test df with adult.pop df ----------------------------------
 
@@ -38,7 +38,8 @@ final.tests.per.pop <- all.combined%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = hiv.test.value/adult.pop.value)%>%
-  mutate(outcome = "hiv.tests.per.population")
+  mutate(outcome = "hiv.tests.per.population")%>%
+  select(year, outcome, location, value)
 
 # Put into SURVEILLANCE MANAGER (bc at this point in the code it's no longer the data manager)-------------------------------------------
 
