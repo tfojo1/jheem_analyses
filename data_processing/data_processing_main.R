@@ -1580,10 +1580,6 @@ source('data_processing/dummy.data.frames.R')
 #Source code that restructures census age groups to get adult.pop for 2020-2022
 source('data_processing/restructure.recent.census.age.groups.R')
 
-
-# Source code to create hiv.tests.per.population --------------------------
-source('data_processing/tests.per.population.R')
-
 ################################################################################
 #Create aggregated outcomes 
 #This is mainly county data being aggregated to MSA level
@@ -1690,6 +1686,7 @@ put.msa.data.as.new.source(outcome = 'adult.population',
                            geographic.type.to = 'STATE',
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
+
 put.msa.data.as.new.source(outcome = 'adult.population',
                            from.source.name = 'census.population',
                            to.source.name = 'census.aggregated.adult.population',
@@ -1698,6 +1695,9 @@ put.msa.data.as.new.source(outcome = 'adult.population',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
+
+# Source code to create hiv.tests.per.population --------------------------
+source('data_processing/tests.per.population.R')
 
 ################################################################################
 ###Source code for the STI ratio calculation/put
@@ -1722,26 +1722,12 @@ get.msa.totals.from.county.simple(outcome= 'deaths',
 ################################################################################
 #Identify Potential Outliers
 ################################################################################
-# source('data_processing/outlier_finder.R')
+#TBD
 
-##Identify outliers
-#  outlier.df <- find.outlier.data (outcome = 'diagnosed.prevalence',
-#                    data.manager = surveillance.manager,
-#                    locations = MSAS.OF.INTEREST, #need to source locations of interest code for this
-#                    stratification.dimensions = c("risk")) #do not include year or location here# #currently only works at one stratification at a time#
-#  
-# ##Create corrected vector (Below is a example)
-#  corrections = rep(T, 59)
 
-###Add in corrected vector (*MUST KEEP A RECORD OF THIS)
-# outlier.df.corrected <- find.outlier.data (outcome = 'diagnosed.prevalence',
-#                   data.manager = surveillance.manager,
-#                   locations = MSAS.OF.INTEREST,
-#                   stratification.dimensions = c("risk"),
-#                   adjudication.data.frame = outlier.df,
-#                   adjudication.vector = corrections) #do not include year or location here# #currently only works at one stratification at a time#
+# Save --------------------------------------------------------------------
 
-################################################################################
+
 ###Save surveillance manager####
 save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
 
