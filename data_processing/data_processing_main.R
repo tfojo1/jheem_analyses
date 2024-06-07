@@ -1572,7 +1572,6 @@ put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.
                     data.manager = surveillance.manager,
                     census.manager = census.manager)
 
-
 # CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST--------
 source('data_processing/dummy.data.frames.R')
 
@@ -1680,16 +1679,23 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
 
-#This aggregates county level data to state level for the recent census years for adult.population
+#This aggregates county level data to state level for the recent census years for adult.population (as well as county to MSAs of interest)
 #where I wrote the restructure.recent.age.groups code to estimate for adult.pop
 all.states = locations::get.all.for.type('state')
-
 put.msa.data.as.new.source(outcome = 'adult.population',
                            from.source.name = 'census.population',
                            to.source.name = 'census.aggregated.adult.population',
                            to.locations =  all.states,   
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'STATE',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'census.population',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  MSAS.OF.INTEREST,   
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
 
