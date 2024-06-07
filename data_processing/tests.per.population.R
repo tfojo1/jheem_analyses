@@ -1,104 +1,54 @@
-#Create new outcome = hiv.test.per.population
-  # (hiv.tests/adult.population)
 
-states = locations::get.all.for.type("state")
+# Establish boundary values -----------------------------------------------
 
-#Get hiv.test data from surveillance manager
-#Select only years we have adult.population for
-#Remove NA values
-numerator = as.data.frame.table(surveillance.manager$data$hiv.tests$estimate$cdc.testing$cdc$year__location) %>% rename(hiv.tests.value = Freq)
-  numerator.subset = subset(numerator, location %in% states)
-  final.numerator <- numerator.subset%>%
-    filter(year != "2020")%>%
-    filter(year != "2021")%>%
-    filter(hiv.tests.value != "NaN")
+hiv.test.locations.of.interest <- c("NJ", "NY", "PA" ,"FL", "CA" ,"GA" ,"TX" ,"IL" ,"IN", "WI" ,"MD", "VA", "WV" ,"DC", "DE", "AZ", "MI", "NV" ,"MA",
+                                    "NH", "NC" ,"SC", "LA", "AR" ,"MS", "TN", "WA", "KY", "OH" ,"MO", "C.12060", "C.12580", "C.16980" 
+                                    ,"C.26420", "C.31080", "C.35620", "C.37980" ,"C.41860") #states for which we have adult pop + msas for which we have hiv.tests
 
-#Get adult.population data
-#Subset so location only equals states
-#Remove years we don't have hiv.test data for 
-denominator.early.years = as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.population$census$year__location) %>% rename(adult.population.value = Freq)
-denominator.later.years = as.data.frame.table(surveillance.manager$data$adult.population$estimate$cdc_wonder$census.cdc.wonder.population$year__location) %>% rename(adult.population.value = Freq)
-                                
-  denominator.early.years = subset(denominator.early.years, location %in% states)
-  denominator.later.years = subset(denominator.later.years, location %in% states)
+hiv.tests.years.of.interest <- c("2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021") #all the years for which we have hiv.test data
 
-denominator = rbind(denominator.early.years, denominator.later.years)
 
-final.denominator <- denominator %>%
-  filter(year != "2005")%>%
-  filter(year != "2006")%>%
-  filter(year != "2007")%>%
-  filter(year != "2008")%>%
-  filter(year != "2009")%>%
-  filter(year != "2010")%>%
-  filter(adult.population.value != "NaN")
+# Get hiv.tests -----------------------------------------------------------
 
-#Figure out what states we have adult.pop for (bc it's only 30)
-#Subset hiv.test data to match
-states.we.have.pop.for = final.denominator$location
-final.numerator = subset(final.numerator, location %in% states.we.have.pop.for)
+hiv.tests.raw = as.data.frame.table(surveillance.manager$data$hiv.tests$estimate$cdc.testing$cdc$year__location)%>% rename(hiv.test.value = Freq)
 
-#Combine adult pop and hiv tests
-combined = left_join(final.numerator, final.denominator, join_by(location, year))
+hiv.tests.clean = subset(hiv.tests.raw, location %in% hiv.test.locations.of.interest) %>% filter(hiv.test.value != "NaN") #now we only have years/locations of interest.  There's a new NAs-what do we do with that?
 
-#Calculate the new outcome
-tests.per.pop <- combined %>%
-  mutate(value = hiv.tests.value/adult.population.value)%>%
-  mutate(outcome = "hiv.tests.per.population")%>%
+
+# get adult.population ----------------------------------------------------
+#Pulling adult.population from 3 sources: 20117-2017 single year age  census data, 2018-2019 single year age cdc wonder data; 2020-2021 by estimated adult.population data
+
+#census (2020-2022 here are estimated)
+adult.pop.source.one = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census$year__location)) %>% rename(adult.pop.value = Freq) %>% mutate(year = as.character(year))
+adult.pop.source.one = subset(adult.pop.source.one,  location %in% hiv.test.locations.of.interest)
+adult.pop.source.one = subset(adult.pop.source.one,  year %in% hiv.tests.years.of.interest)
+
+#CDC Wonder
+adult.pop.source.two = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$cdc_wonder$census.cdc.wonder.population$year__location)) %>% rename(adult.pop.value = Freq) %>% filter(year == 2018 | year == 2019) %>% mutate(year = as.character(year))
+adult.pop.source.two  = subset(adult.pop.source.two,  location %in% hiv.test.locations.of.interest)
+
+
+adult.pop.all = rbind(adult.pop.source.one ,adult.pop.source.two )
+
+# Combined hiv.test df with adult.pop df ----------------------------------
+
+all.combined = left_join(hiv.tests.clean, adult.pop.all,join_by(location, year))
+
+final.tests.per.pop <- all.combined%>%
   mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))
+  mutate(location = as.character(location))%>%
+  mutate(value = hiv.test.value/adult.pop.value)%>%
+  mutate(outcome = "hiv.tests.per.population")
 
-#Put into data manager (but at this point surveillance manager)
-  surveillance.manager$put.long.form(
-    data = tests.per.pop,
-    ontology.name = 'cdc',
-    source = 'cdc.testing',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/hiv/library/reports/testing/2021/index.html#:~:text=Among%20the%201%2C736%2C850%20CDC%2Dfunded,demographic%20characteristics%20and%20population%20groups.',
-    details = 'CDC Annual HIV Testing Report')
+# Put into SURVEILLANCE MANAGER (bc at this point in the code it's no longer the data manager)-------------------------------------------
 
-  
+surveillance.manager$put.long.form(
+  data = final.tests.per.pop,
+  ontology.name = 'cdc',
+  source = 'cdc.testing',
+  dimension.values = list(),
+  url = 'https://www.cdc.gov/hiv/library/reports/testing/2021/index.html#:~:text=Among%20the%201%2C736%2C850%20CDC%2Dfunded,demographic%20characteristics%20and%20population%20groups.',
+  details = 'CDC Annual HIV Testing Report')  
 
-# Adding in Cities --------------------------------------------------------
 
-  #Add cities to hiv.tests.per.population
-  
-  cities <- c("C.12060", "C.12580", "C.16980" ,"C.26420", "C.31080", "C.35620", "C.37980", "C.41860")
-  
-  #hiv.tests
-  cities.numerator = as.data.frame.table(surveillance.manager$data$hiv.tests$estimate$cdc.testing$cdc$year__location[, cities]) %>% rename(hiv.test.value = Freq)%>% filter(hiv.test.value != "NaN") #2011-2021
-  
-  
-  #Adult.pop
-  denominator.cities.1 = as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.population$census$year__location[, cities]) %>% rename(adult.population.value = Freq)
-  denominator.cities.2 = as.data.frame.table(surveillance.manager$data$adult.population$estimate$cdc_wonder$census.cdc.wonder.population$year__location[, cities]) %>% rename(adult.population.value = Freq)
-  
-  denominator = rbind(denominator.cities.1, denominator.cities.2)
-  
-  final.denominator <- denominator %>%
-    filter(year != "2005")%>%
-    filter(year != "2006")%>%
-    filter(year != "2007")%>%
-    filter(year != "2008")%>%
-    filter(year != "2009")%>%
-    filter(year != "2010")%>%
-    filter(adult.population.value != "NaN")
-  
-  #combine
-  combined.cities = left_join(cities.numerator, final.denominator, join_by(location, year))%>% filter(!is.na(adult.population.value))
-  
-  combined.cities <- combined.cities %>%
-    mutate(value = (hiv.test.value/adult.population.value))%>%
-    select(year, location, value)%>%
-    mutate(outcome = 'hiv.tests.per.population')%>%
-   mutate(year = as.character(year))%>%
-    mutate(location = as.character(location))
-  
-  #Put into data manager (but at this point surveillance manager)
-  surveillance.manager$put.long.form(
-    data = combined.cities,
-    ontology.name = 'cdc',
-    source = 'cdc.testing',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/hiv/library/reports/testing/2021/index.html#:~:text=Among%20the%201%2C736%2C850%20CDC%2Dfunded,demographic%20characteristics%20and%20population%20groups.',
-    details = 'CDC Annual HIV Testing Report')  
+
