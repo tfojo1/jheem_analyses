@@ -54,13 +54,14 @@ dx.prev.adjusted<- run.outlier.process(outcome= 'diagnosed.prevalence',
                                          phi = 0.8,
                                          theta = 0.1,
                                          max.year = 2019,
+                                         first.choice.year = 2018,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")))
 
 #Check this in meeting- the outlier.finder is identifying location = 09007 with outliers for 2008, 2009.  But i think the outliers should be
 #2010, 2011, 2012:
-issue = as.data.frame.table(surveillance.manager$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location)
-issue <- issue %>%
-  filter(location == "09007") #another example is 45085
+dx.prev.issue = as.data.frame.table(surveillance.manager$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location)
+dx.prev.issue <- dx.prev.issue %>%
+  filter(location == "45085") #another example is 09003- how do I know it's 2008, 2009 and not 2010, 2011?
 
 
 # Outcome = hiv.deaths ----------------------------------------------------
@@ -154,16 +155,17 @@ run.outlier.process(outcome= 'ps.syphilis',
 early.syphilis.adjusted <- run.outlier.process(outcome= 'early.syphilis',
                                          stratifications= list(c()), 
                                          data.manager= surveillance.manager,
-                                         phi = 0.8,
-                                         theta = 0.05,
+                                         phi = 0.9,
+                                         theta = 0.2,
                                          max.year = 2019,
+                                         first.choice.year =  2018,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")))
 
 #Review this in meeting, for DC there's a bunch of outliers here, but I think the  0,1,0 should be outliers:
 
-issue = as.data.frame.table(surveillance.manager$data$early.syphilis$estimate$cdc.sti$cdc.syphilis$year__location)
-issue <- issue %>%
-  filter(location == "11001")
+early.syph.issue = as.data.frame.table(surveillance.manager$data$early.syphilis$estimate$cdc.sti$cdc.syphilis$year__location)
+early.syph.issue <- early.syph.issue %>%
+  filter(location == "01073")
 
 # outcome = early.syphilis ------------------------------------------------------
 #Total
@@ -273,9 +275,16 @@ aids.dx.prev.adjusted <- run.outlier.process(outcome= 'aids.diagnosed.prevalence
                                          data.manager= surveillance.manager,
                                          phi = 0.4, 
                                          theta = 0.05,
+                                         first.choice.year =  2000,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnosed.prevalence")))
 
-#Look at this in meeting: What is an outlier for this time frame? Peaks around 2000-2001
- issue <- issue %>%
-   filter(location == "C.24660")
+aids.dx.prev.adjusted$adjudication <- c(T)
 
+run.outlier.process(outcome= 'aids.diagnosed.prevalence',
+                    stratifications= list(c()),
+                    data.manager= surveillance.manager,
+                    phi = 0.4, 
+                    theta = 0.05,
+                    first.choice.year =  2000,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnosed.prevalence")),
+                    adjudication.data.frame = aids.dx.prev.adjusted)
