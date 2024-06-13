@@ -429,6 +429,17 @@ data.manager$register.ontology(
     ))
 
 data.manager$register.ontology(
+  'cdc.new',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
+data.manager$register.ontology(
     'aidsvu',
     ont = ontology(
         year= NULL,
@@ -668,6 +679,13 @@ age.mappings = c('13-24' = '13-24 years',
                  '35-44' = '35-44 years',
                  '45-54' = '45-54 years',
                  '55+' = '55+ years')
+
+national.age.mappings = c('13-24' = '13-24 years',
+                         '25-34' = '25-34 years',
+                         '35-44' = '35-44 years',
+                         '45-54' = '45-54 years',
+                         '55-64' = '55-64 years',
+                         '65+' = '65+ years')
 
 #record possible values for the incomplete dimensions, year and location
 locations = c()
@@ -1035,20 +1053,12 @@ national.suppression = lapply(data.list.national.suppression , function(file){
     data$location = "US"
     
     if(grepl("age", filename)) {
-        data$age = age.mappings[data$Age.Group]
+        data$age = national.age.mappings[data$Age.Group]
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
     }
     if(grepl("sex", filename)) {
-        names(data)[names(data)=='Sex'] = 'sex'
-        data$sex = tolower(data$sex)
-    }
-    if(grepl("male", filename)) {
-        names(data)[names(data)=='Sex'] = 'sex'
-        data$sex = tolower(data$sex)
-    }
-    if(grepl("female", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
         data$sex = tolower(data$sex)
     }
@@ -1455,7 +1465,7 @@ for (data in national_suppression_all) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'cdc',
+        ontology.name = 'cdc.new',
         source = 'cdc.hiv',
         dimension.values = list(),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
