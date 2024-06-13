@@ -46,19 +46,44 @@ total.prev.adjusted<- run.outlier.process(outcome= 'total.prevalence',
                                        #max.year = 2019,
                                        locations= c(surveillance.manager$get.locations.with.data(outcome="total.prevalence")))
 
-# Outcome = diagnosed.prevalence ------------------------------------------
-  #TOTAL- TBD on this one, need to review in meeting (below)
-dx.prev.adjusted<- run.outlier.process(outcome= 'diagnosed.prevalence',
+# Outcome = diagnosed.prevalence, source = msa.surveillance.repots ------------------------------------------
+  #TOTAL- want smaller degree of variability here bc prevalence should be more consistent
+dx.prev.adjusted.one<- run.outlier.process(outcome= 'diagnosed.prevalence',
                                          stratifications= list(c()), 
                                          data.manager= surveillance.manager,
-                                         phi = 0.2,
+                                         phi = 0.4,
                                          theta = 0.05,
                                          max.year = 2019,
                                          first.choice.year = 2018,
-                                         locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")))
+                                         locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")))%>%
+  filter(source == "cdc.surveillance.reports")
 
-#Check this in meeting- the outlier.finder is identifying location = 09007 with outliers for 2008, 2009.  But i think the outliers should be
-#2010, 2011, 2012:
+dx.prev.adjusted.one$adjudication <- c(T, T, T, T, T, T, F, T)
+
+run.outlier.process(outcome= 'diagnosed.prevalence',
+                    stratifications= list(c()),
+                    data.manager= surveillance.manager,
+                    phi = 0.4,
+                    theta = 0.05,
+                    max.year = 2019,
+                    first.choice.year = 2018,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")),
+                    adjudication.data.frame = dx.prev.adjusted.one)
+
+
+
+# Outcome = diagnosed.prevalence, source = cdc.hiv ------------------------
+dx.prev.adjusted.two <- run.outlier.process(outcome= 'diagnosed.prevalence',
+                                           stratifications= list(c()), 
+                                           data.manager= surveillance.manager,
+                                           phi = 0.4,
+                                           theta = 0.05,
+                                           max.year = 2019,
+                                           first.choice.year = 2018,
+                                           locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")))%>%
+  filter(source == "cdc.hiv")
+
+
 dx.prev.issue = as.data.frame.table(surveillance.manager$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location)
 dx.prev.issue <- dx.prev.issue %>%
   filter(location == "45085") #another example is 09003- how do I know it's 2008, 2009 and not 2010, 2011?
