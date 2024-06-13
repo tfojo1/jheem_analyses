@@ -51,8 +51,8 @@ total.prev.adjusted<- run.outlier.process(outcome= 'total.prevalence',
 dx.prev.adjusted<- run.outlier.process(outcome= 'diagnosed.prevalence',
                                          stratifications= list(c()), 
                                          data.manager= surveillance.manager,
-                                         phi = 0.8,
-                                         theta = 0.1,
+                                         phi = 0.2,
+                                         theta = 0.05,
                                          max.year = 2019,
                                          first.choice.year = 2018,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")))
@@ -155,18 +155,24 @@ run.outlier.process(outcome= 'ps.syphilis',
 early.syphilis.adjusted <- run.outlier.process(outcome= 'early.syphilis',
                                          stratifications= list(c()), 
                                          data.manager= surveillance.manager,
-                                         phi = 0.9,
-                                         theta = 0.2,
+                                         phi = 0.8,
+                                         theta = 0.05,
                                          max.year = 2019,
                                          first.choice.year =  2018,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")))
 
-#Review this in meeting, for DC there's a bunch of outliers here, but I think the  0,1,0 should be outliers:
+early.syphilis.adjusted$adjudication <- c(TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE,
+TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE)
 
-early.syph.issue = as.data.frame.table(surveillance.manager$data$early.syphilis$estimate$cdc.sti$cdc.syphilis$year__location)
-early.syph.issue <- early.syph.issue %>%
-  filter(location == "01073")
-
+run.outlier.process(outcome= 'early.syphilis',
+                    stratifications= list(c()),
+                    data.manager= surveillance.manager,
+                    phi = 0.8,
+                    theta = 0.05,
+                    max.year = 2019,
+                    first.choice.year =  2018,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")),
+                    adjudication.data.frame = early.syphilis.adjusted)
 # outcome = early.syphilis ------------------------------------------------------
 #Total
 
