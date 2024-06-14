@@ -20,6 +20,12 @@ races = c('American Indian/Alaska Native' = 'American Indian/Alaska Native',
                   'White' = 'White',
                   'Multiple races' = 'Multiracial')
 
+ages = c('13-24' = '13-24 years', 
+         '25-34' = '25-34 years', 
+         '35-44' = '35-44 years', 
+         '45-54'= '45-54 years',
+         '55+' = '55+ years')
+
 # Clean -------------------------------------------------------------------
 
 template = lapply(older.suppression, function(file){
@@ -126,6 +132,8 @@ nat.suppress.age = lapply(template, function(file){
     mutate(age = category)%>%
     select(year, location, outcome, value, age)
   
+  data$age = ages[data$age]
+  
   list(filename, data) 
   
 })
@@ -221,15 +229,16 @@ for (data in nat.suppress.age.put) {
     details = 'CDC Atlas Plus data')
 }
 
-nat.suppress.risk.put = lapply(nat.suppress.risk, `[[`, 2) 
-
-for (data in nat.suppress.risk.put) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'cdc',
-    source = 'cdc.hiv',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Atlas Plus data')
-}
+#Need to fix this proportion issue#
+# nat.suppress.risk.put = lapply(nat.suppress.risk, `[[`, 2) 
+# 
+# for (data in nat.suppress.risk.put) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'cdc',
+#     source = 'cdc.hiv',
+#     dimension.values = list(),
+#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+#     details = 'CDC Atlas Plus data')
+# }
