@@ -1065,6 +1065,14 @@ national.suppression = lapply(data.list.national.suppression , function(file){
     if(grepl("risk", filename)) {
         data$risk = risk.mappings[data$Transmission.Category]
     }
+    if(grepl("male", filename)) {
+      names(data)[names(data)=='Sex'] = 'sex'
+      data$sex = tolower(data$sex)
+    }
+    if(grepl("female", filename)) {
+      names(data)[names(data)=='Sex'] = 'sex'
+      data$sex = tolower(data$sex)
+    }
     
     list(filename, data) 
     
