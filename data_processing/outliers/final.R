@@ -51,19 +51,23 @@ total.prev.adjusted<- run.outlier.process(outcome= 'total.prevalence',
 dx.prev.adjusted.one<- run.outlier.process(outcome= 'diagnosed.prevalence',
                                          stratifications= list(c()), 
                                          data.manager= surveillance.manager,
-                                         phi = 0.4,
+                                         phi = 0.2,
                                          theta = 0.05,
                                          max.year = 2019,
                                          first.choice.year = 2018,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")))%>%
   filter(source == "cdc.surveillance.reports")
 
-dx.prev.adjusted.one$adjudication <- c(T, T, T, T, T, T, F, T)
+#Need to manually remove 2018 for C.3340 and C.47900 because their 2018 value is incorrect
+dx.prev.adjusted.one$adjudication <- c(T, T, T, T, T, F, F, T, T, F, T, T, T, T, T, F)
+dx.prev.adjusted.one <- dx.prev.adjusted.one %>%
+  add_row(year = "2018", location = 'C.33340', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
+  add_row(year = "2018", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)
 
 run.outlier.process(outcome= 'diagnosed.prevalence',
                     stratifications= list(c()),
                     data.manager= surveillance.manager,
-                    phi = 0.4,
+                    phi = 0.2,
                     theta = 0.05,
                     max.year = 2019,
                     first.choice.year = 2018,
@@ -73,20 +77,44 @@ run.outlier.process(outcome= 'diagnosed.prevalence',
 
 
 # Outcome = diagnosed.prevalence, source = cdc.hiv ------------------------
+#Because there is a lot here, we decided just to straighten them out for MSAs (and states)
+
+states = locations::get.all.for.type("state") #Returns no outliers for these locations and this source
+msas = locations::get.all.for.type("CBSA")
 dx.prev.adjusted.two <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                            stratifications= list(c()), 
                                            data.manager= surveillance.manager,
-                                           phi = 0.4,
+                                           phi = 0.2,
                                            theta = 0.05,
                                            max.year = 2019,
                                            first.choice.year = 2018,
-                                           locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")))%>%
-  filter(source == "cdc.hiv")
+                                           locations= c(states, msas))%>%
+                              filter(source == "cdc.hiv")
 
+# Outcome = diagnosed.prevalence, source = cdc.aggregated.county ------------------------
 
-dx.prev.issue = as.data.frame.table(surveillance.manager$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location)
-dx.prev.issue <- dx.prev.issue %>%
-  filter(location == "45085") #another example is 09003- how do I know it's 2008, 2009 and not 2010, 2011?
+dx.prev.adjusted.three <- run.outlier.process(outcome= 'diagnosed.prevalence',
+                                              stratifications= list(c()), 
+                                              data.manager= surveillance.manager,
+                                              phi = 0.2,
+                                              theta = 0.05,
+                                              max.year = 2019,
+                                              first.choice.year = 2018,
+                                              locations= c(states, msas))%>%
+  filter(source == "cdc.aggregated.county")
+
+dx.prev.adjusted.three$adjudication <- c(T)
+
+run.outlier.process(outcome= 'diagnosed.prevalence',
+                    stratifications= list(c()),
+                    data.manager= surveillance.manager,
+                    phi = 0.2,
+                    theta = 0.05,
+                    max.year = 2019,
+                    first.choice.year = 2018,
+                    locations= c(states, msas),
+                    adjudication.data.frame = dx.prev.adjusted.three)
+
 
 
 # Outcome = hiv.deaths ----------------------------------------------------
