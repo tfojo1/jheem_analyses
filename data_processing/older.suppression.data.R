@@ -187,7 +187,6 @@ nat.suppress.risk = lapply(template, function(file){
 
 
 # Put ---------------------------------------------------------------------
-#Fix on Monday: I'm not sure this is right for the ontology, idk where this data is from
 
 nat.suppress.total.put = lapply(nat.suppress.total, `[[`, 2) 
 
@@ -196,10 +195,10 @@ for (data in nat.suppress.total.put) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc.hiv',
+    source = 'cdc.supplemental.reports',
     dimension.values = list(),
-    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Atlas Plus data')
+    url = 'https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-supplemental-report-vol-25-2.pdf',
+    details = 'HIV Surveillance Supplemental Report PDFs')
 }
 
 nat.suppress.sex.put = lapply(nat.suppress.sex, `[[`, 2) 
@@ -209,10 +208,10 @@ for (data in nat.suppress.sex.put) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc.hiv',
+    source = 'cdc.supplemental.reports',
     dimension.values = list(),
-    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Atlas Plus data')
+    url = 'https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-supplemental-report-vol-25-2.pdf',
+    details = 'HIV Surveillance Supplemental Report PDFs')
 }
 
 nat.suppress.race.put = lapply(nat.suppress.race, `[[`, 2) 
@@ -222,10 +221,10 @@ for (data in nat.suppress.race.put) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc.hiv',
+    source = 'cdc.supplemental.reports',
     dimension.values = list(),
-    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Atlas Plus data')
+    url = 'https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-supplemental-report-vol-25-2.pdf',
+    details = 'HIV Surveillance Supplemental Report PDFs')
 }
 
 nat.suppress.age.put = lapply(nat.suppress.age, `[[`, 2) 
@@ -235,10 +234,10 @@ for (data in nat.suppress.age.put) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc.hiv',
+    source = 'cdc.supplemental.reports',
     dimension.values = list(),
-    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Atlas Plus data')
+    url = 'https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-supplemental-report-vol-25-2.pdf',
+    details = 'HIV Surveillance Supplemental Report PDFs')
 }
 
 
@@ -249,8 +248,8 @@ for (data in nat.suppress.risk.put) {
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc',
-    source = 'cdc.hiv',
+    source = 'cdc.supplemental.reports',
     dimension.values = list(),
-    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Atlas Plus data')
+    url = 'https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-supplemental-report-vol-25-2.pdf',
+    details = 'HIV Surveillance Supplemental Report PDFs')
 }

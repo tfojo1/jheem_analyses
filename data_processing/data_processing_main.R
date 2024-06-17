@@ -407,6 +407,7 @@ data.manager$register.source('cdc.retention.reports', parent.source= "cdc.retent
 data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = "CDC Annual HIV Testing Report", short.name='cdc.testing')
 data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports')
 data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids')
+data.manager$register.source('cdc.supplemental.reports', parent.source= "NHSS", full.name = "HIV Surveillance Supplemental Report", short.name='cdc.supplemental.reports')
 
 
 #Creating these separately bc they have separate parent sources
@@ -656,6 +657,9 @@ source('data_processing/national_data.R')
 
 #CDC Wonder AIDS data from 1981-2001
 source('data_processing/aids_data_1981_2001.R')
+
+#Older National Level Suppression Data from Todd's PDFs
+source('data_processing/older.suppression.data.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
