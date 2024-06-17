@@ -7,15 +7,19 @@
 
 #Updated 5-24-24 to have min.year and max.year in the find outlier function- it's less/greater than or equal to
 
-# Source outlier finder ---------------------------------------------------
 
+# Source outlier finder ---------------------------------------------------
+```{r}
 #library(jheem2)
 surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 source('data_processing/outlier_finder.R')
 
 options(error=NULL)
 
+```
+
 # Outcome = diagnoses -----------------------------------------------------
+```{r}
   #TOTAL
 diagnoses.adjusted<- run.outlier.process(outcome= 'diagnoses',
                                           stratifications= list(c()), 
@@ -35,8 +39,10 @@ run.outlier.process(outcome= 'diagnoses',
                     max.year = 2019,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
                     adjudication.data.frame = diagnoses.adjusted)
+```
 
 # outcome = total.prevalence ----------------------------------------------
+```{r}
   #Total -> zero outliers!
 total.prev.adjusted<- run.outlier.process(outcome= 'total.prevalence',
                                        stratifications= list(c()), 
@@ -46,7 +52,10 @@ total.prev.adjusted<- run.outlier.process(outcome= 'total.prevalence',
                                        #max.year = 2019,
                                        locations= c(surveillance.manager$get.locations.with.data(outcome="total.prevalence")))
 
+```
+
 # Outcome = diagnosed.prevalence, source = msa.surveillance.reports ------------------------------------------
+```{r}
   #TOTAL- want smaller degree of variability here bc prevalence should be more consistent
 dx.prev.adjusted.one<- run.outlier.process(outcome= 'diagnosed.prevalence',
                                          stratifications= list(c()), 
@@ -73,10 +82,10 @@ run.outlier.process(outcome= 'diagnosed.prevalence',
                     first.choice.year = 2018,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="diagnosed.prevalence")),
                     adjudication.data.frame = dx.prev.adjusted.one)
-
-
+```
 
 # Outcome = diagnosed.prevalence, source = cdc.hiv ------------------------
+```{r}
 #Because there is a lot here, we decided just to straighten them out for MSAs (and states)
 
 states = locations::get.all.for.type("state") #Returns no outliers for these locations and this source
@@ -90,9 +99,11 @@ dx.prev.adjusted.two <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                            first.choice.year = 2018,
                                            locations= c(states, msas))%>%
                               filter(source == "cdc.hiv")
+```
+
 
 # Outcome = diagnosed.prevalence, source = cdc.aggregated.county ------------------------
-
+```{r}
 dx.prev.adjusted.three <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                               stratifications= list(c()), 
                                               data.manager= surveillance.manager,
@@ -114,10 +125,10 @@ run.outlier.process(outcome= 'diagnosed.prevalence',
                     first.choice.year = 2018,
                     locations= c(states, msas),
                     adjudication.data.frame = dx.prev.adjusted.three)
-
-
+```
 
 # Outcome = hiv.deaths ----------------------------------------------------
+```{r}
   #Total -> zero outliers!
 hiv.deaths.adjusted<- run.outlier.process(outcome= 'hiv.deaths',
                                          stratifications= list(c()), 
@@ -127,8 +138,10 @@ hiv.deaths.adjusted<- run.outlier.process(outcome= 'hiv.deaths',
                                          max.year = 2019,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="hiv.deaths")))
 
+```
 
 # Outcome = Suppression -------------------------------------------------------------
+```{r}
   #Total -> zero outliers!
 suppression.adjusted <- run.outlier.process(outcome= 'suppression',
                                     stratifications= list(c()), 
@@ -136,8 +149,10 @@ suppression.adjusted <- run.outlier.process(outcome= 'suppression',
                                     #phi = 0.15,
                                     #theta = 0.05,
                                     locations= c(surveillance.manager$get.locations.with.data(outcome="suppression")))
+```
 
 # Outcome = awareness -----------------------------------------------------
+```{r}
   #Total -> zero outliers!
 awareness.adjusted <- run.outlier.process(outcome= 'awareness',
                                             stratifications= list(c()), 
@@ -145,8 +160,10 @@ awareness.adjusted <- run.outlier.process(outcome= 'awareness',
                                             #phi = 0.15,
                                             #theta = 0.05,
                                             locations= c(surveillance.manager$get.locations.with.data(outcome="awareness")))
+```
 
 # Outcome = linkeage_1mo -----------------------------------------------------
+```{r}
   #Total -> zero outliers!
 linkeage_1mo.adjusted <- run.outlier.process(outcome= 'linkeage_1mo',
                                           stratifications= list(c()), 
@@ -154,7 +171,10 @@ linkeage_1mo.adjusted <- run.outlier.process(outcome= 'linkeage_1mo',
                                           #phi = 0.15,
                                           #theta = 0.05,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="linkeage_1mo")))
+```
+
 # Outcome = linkeage_3mo -----------------------------------------------------
+```{r}
   #Total -> zero outliers!
 linkeage_3mo.adjusted <- run.outlier.process(outcome= 'linkeage_3mo',
                                              stratifications= list(c()), 
@@ -162,7 +182,10 @@ linkeage_3mo.adjusted <- run.outlier.process(outcome= 'linkeage_3mo',
                                              #phi = 0.15,
                                              #theta = 0.05,
                                              locations= c(surveillance.manager$get.locations.with.data(outcome="linkeage_3mo")))
+```
+
 # Outcome = engagement -----------------------------------------------------
+```{r}
   #Total -> zero outliers!
 engagement.adjusted <- run.outlier.process(outcome= 'engagement',
                                              stratifications= list(c()), 
@@ -170,8 +193,10 @@ engagement.adjusted <- run.outlier.process(outcome= 'engagement',
                                              #phi = 0.15,
                                              #theta = 0.05,
                                              locations= c(surveillance.manager$get.locations.with.data(outcome="engagement")))
+```
 
 # Outcome = retention.of.engaged -----------------------------------------------------
+```{r}
 #Total -> zero outliers!
 retention.of.engaged.adjusted <- run.outlier.process(outcome= 'retention.of.engaged',
                                            stratifications= list(c()), 
@@ -179,8 +204,10 @@ retention.of.engaged.adjusted <- run.outlier.process(outcome= 'retention.of.enga
                                            #phi = 0.15,
                                            #theta = 0.05,
                                            locations= c(surveillance.manager$get.locations.with.data(outcome="retention.of.engaged")))
+```
 
 # outcome = ps.syphilis ------------------------------------------------------
+```{r}
   #Total
 
 ps.syphilis.adjusted <- run.outlier.process(outcome= 'ps.syphilis',
@@ -201,8 +228,10 @@ run.outlier.process(outcome= 'ps.syphilis',
                     max.year = 2019,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")),
                     adjudication.data.frame = ps.syphilis.adjusted)
+```
 
 # outcome = early.syphilis ------------------------------------------------------
+```{r}
 #Total
 
 early.syphilis.adjusted <- run.outlier.process(outcome= 'early.syphilis',
@@ -226,7 +255,10 @@ run.outlier.process(outcome= 'early.syphilis',
                     first.choice.year =  2018,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")),
                     adjudication.data.frame = early.syphilis.adjusted)
+```
+
 # outcome = early.syphilis ------------------------------------------------------
+```{r}
 #Total
 
 congenital.syphilis.adjusted <- run.outlier.process(outcome= 'congenital.syphilis',
@@ -236,7 +268,10 @@ congenital.syphilis.adjusted <- run.outlier.process(outcome= 'congenital.syphili
                                                theta = 0.05,
                                                max.year = 2019,
                                                locations= c(surveillance.manager$get.locations.with.data(outcome="congenital.syphilis")))
+```
+
 # outcome = gonorrhea ------------------------------------------------------
+```{r}
   #Total- TBD, discuss in meeting
 
 #why are all of these 2018?
@@ -258,9 +293,10 @@ run.outlier.process(outcome= 'gonorrhea',
                     max.year = 2019,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")),
                     adjudication.data.frame = gonorrhea.adjusted)
-
+```
 
 # outcome = retention ------------------------------------------------------
+```{r}
   #Total -> zero outliers!
 retention.adjusted <- run.outlier.process(outcome= 'retention',
                                           stratifications= list(c()), 
@@ -269,8 +305,10 @@ retention.adjusted <- run.outlier.process(outcome= 'retention',
                                           #theta = 0.05,
                                           #max.year = 2019,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="retention")))
+```
 
 # outcome = hiv.test.positivity ------------------------------------------------------
+```{r}
   #Total -> zero outliers
 cdc.hiv.test.positivity.adjusted <- run.outlier.process(outcome= 'cdc.hiv.test.positivity',
                                           stratifications= list(c()), 
@@ -280,8 +318,10 @@ cdc.hiv.test.positivity.adjusted <- run.outlier.process(outcome= 'cdc.hiv.test.p
                                           #max.year = 2019,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="cdc.hiv.test.positivity")))
 
+```
 
 # outcome = aids.diagnoses part 1---------------------------------------------------
+```{r}
 #Total- 
   #Each source here needs a different reference year (cdc.aids data is from 1981-2001; cdc.surveillance.reports are from 1993-2007)
 
@@ -305,10 +345,10 @@ run.outlier.process(outcome= 'aids.diagnoses',
                     locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")),
                     adjudication.data.frame = aids.diagnoses.source.two)
 
-
+```
 
 # outcome = aids.diagnoses part 2 -----------------------------------------
-
+```{r}
 #cdc.aids (updated 6-10 after data change)
 aids.diagnoses.source.one <- run.outlier.process(outcome= 'aids.diagnoses',
                                                   stratifications= list(c()), 
@@ -327,8 +367,11 @@ run.outlier.process(outcome= 'aids.diagnoses',
                     theta = 0.5,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")),
                     adjudication.data.frame = aids.diagnoses.source.one)
+```
+
 
 # Outcome = aids.diagnosed.prevalence -------------------------------------
+```{r}
 aids.dx.prev.adjusted <- run.outlier.process(outcome= 'aids.diagnosed.prevalence',
                                          stratifications= list(c()), 
                                          data.manager= surveillance.manager,
@@ -348,13 +391,16 @@ run.outlier.process(outcome= 'aids.diagnosed.prevalence',
                     locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnosed.prevalence")),
                     adjudication.data.frame = aids.dx.prev.adjusted)
 
+```
 
 
 # Save --------------------------------------------------------------------
-
-
+```{r}
 ###Save surveillance manager####
 save(surveillance.manager, file="../../cached/surveillance.manager.outliers.removed.rdata")
 
 #Also save to Q drive
 save(surveillance.manager, file="Q:/data_managers/surveillance.manager.outliers.removed.rdata")
+
+```
+
