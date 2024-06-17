@@ -34,7 +34,7 @@ template = lapply(older.suppression, function(file){
   filename = file[["filename"]]
   
   data <- data %>%
-    select(category, pct.suppressed)%>%
+    select(category, pct.suppressed, n, n.suppressed)%>% #use n and n.suppressed to calculate risk by group
     mutate(outcome = "suppression")%>%
     mutate(location = "US")%>%
     mutate(value = as.numeric(gsub(",", "", pct.suppressed)))%>%
@@ -139,7 +139,6 @@ nat.suppress.age = lapply(template, function(file){
 })
 
 # Risk ---------------------------------------------------------------------
-#Suppression is a proportion, I think you may have to re-calcualte this as a proportion#
 
 nat.suppress.risk = lapply(template, function(file){
   
@@ -149,25 +148,38 @@ nat.suppress.risk = lapply(template, function(file){
   data <- data %>%
     filter(category == 'msm' | category == 'idu.male' | category == 'idu.female' | category == 'idu.msm' | category == 'het.male' | category == 'het.female' | category == 'other.male' | category == 'other.female' )%>%
     rename(risk = category)%>%
-    select(year, location, outcome, value, risk)%>%
     
+    mutate(n = as.numeric(gsub(",", "", n)))%>%
+    mutate(n.suppressed = as.numeric(gsub(",", "", n.suppressed)))%>%
+    
+
+    select(year, location, outcome, risk, n.suppressed, n)%>%
+
 #Have to regroup the risk data to add filed together:
-    mutate(heterosexual.total = sum(value[risk =="het.male" | risk == 'het.female'])) %>%
-    mutate(idu.total = sum(value[risk =="idu.male" | risk == 'idu.female']))%>%
-    mutate(other.total = sum(value[risk =="other.male" | risk == 'other.female']))%>%
-    mutate(msm.total = sum(value[risk =="msm"]))%>%
-    mutate(msm.idu.total = sum(value[risk =="idu.msm"]))%>%
-    mutate(true.risk = c('msm', 'idu', 'msm_idu', 'heterosexual', 'other', NA, NA, NA))%>%
-    mutate(regrouped.value = ifelse(true.risk == 'other', other.total, ""))%>%
-    mutate(regrouped.value = ifelse(true.risk == "heterosexual", heterosexual.total, regrouped.value))%>%
-    mutate(regrouped.value = ifelse(true.risk == "idu", idu.total, regrouped.value))%>%
-    mutate(regrouped.value = ifelse(true.risk == "msm", msm.total, regrouped.value))%>% 
-    mutate(regrouped.value = ifelse(true.risk == "msm_idu", msm.idu.total, regrouped.value))%>%
-    select(year, location, outcome, true.risk, regrouped.value)%>%
-    rename(risk = true.risk)%>%
-    rename(value = regrouped.value)%>%
-    filter(!is.na(risk))
+    mutate(heterosexual.total = sum(n.suppressed[risk =="het.male" | risk == 'het.female'])) %>%
+    mutate(idu.total = sum(n.suppressed[risk =="idu.male" | risk == 'idu.female']))%>%
+    mutate(other.total = sum(n.suppressed[risk =="other.male" | risk == 'other.female']))%>%
+    mutate(msm.total = sum(n.suppressed[risk =="msm"]))%>%
+    mutate(msm.idu.total = sum(n.suppressed[risk =="idu.msm"]))%>%
+
+      mutate(heterosexual.n = sum(n[risk =="het.male" | risk == 'het.female'])) %>%
+      mutate(idu.n = sum(n[risk =="idu.male" | risk == 'idu.female']))%>%
+      mutate(other.n = sum(n[risk =="other.male" | risk == 'other.female']))%>%
+      mutate(msm.n = sum(n[risk =="msm"]))%>%
+      mutate(msm.idu.n = sum(n[risk =="idu.msm"]))%>%
   
+    mutate(true.risk = c('msm', 'idu', 'msm_idu', 'heterosexual', 'other', NA, NA, NA))%>%
+    mutate(regrouped.value = ifelse(true.risk == 'other', (other.total/other.n), ""))%>%
+    mutate(regrouped.value = ifelse(true.risk == "heterosexual", (heterosexual.total/heterosexual.n), regrouped.value))%>%
+    mutate(regrouped.value = ifelse(true.risk == "idu", (idu.total/idu.n), regrouped.value))%>%
+    mutate(regrouped.value = ifelse(true.risk == "msm", (msm.total/msm.n), regrouped.value))%>%
+    mutate(regrouped.value = ifelse(true.risk == "msm_idu", (msm.idu.total/msm.idu.n), regrouped.value))%>%
+    select(year, location, outcome, true.risk, regrouped.value)%>%
+    mutate(value = as.numeric(regrouped.value))%>%
+    rename(risk = true.risk)%>%
+    mutate(value = round(value, digits =2))%>%
+    filter(!is.na(risk))
+
   
   list(filename, data) 
   
@@ -229,16 +241,16 @@ for (data in nat.suppress.age.put) {
     details = 'CDC Atlas Plus data')
 }
 
-#Need to fix this proportion issue#
-# nat.suppress.risk.put = lapply(nat.suppress.risk, `[[`, 2) 
-# 
-# for (data in nat.suppress.risk.put) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc',
-#     source = 'cdc.hiv',
-#     dimension.values = list(),
-#     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-#     details = 'CDC Atlas Plus data')
-# }
+
+nat.suppress.risk.put = lapply(nat.suppress.risk, `[[`, 2)
+
+for (data in nat.suppress.risk.put) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc',
+    source = 'cdc.hiv',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+    details = 'CDC Atlas Plus data')
+}
