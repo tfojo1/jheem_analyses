@@ -407,6 +407,7 @@ data.manager$register.source('cdc.retention.reports', parent.source= "cdc.retent
 data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = "CDC Annual HIV Testing Report", short.name='cdc.testing')
 data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports')
 data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids')
+data.manager$register.source('cdc.supplemental.reports', parent.source= "NHSS", full.name = "HIV Surveillance Supplemental Report", short.name='cdc.supplemental.reports')
 
 
 #Creating these separately bc they have separate parent sources
@@ -415,6 +416,7 @@ data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated')
 data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
+data.manager$register.source('census.aggregated.adult.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
 
 data.manager$register.ontology(
     'cdc',
@@ -426,6 +428,17 @@ data.manager$register.ontology(
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
+
+data.manager$register.ontology(
+  'cdc.new',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
 
 data.manager$register.ontology(
     'aidsvu',
@@ -645,6 +658,9 @@ source('data_processing/national_data.R')
 #CDC Wonder AIDS data from 1981-2001
 source('data_processing/aids_data_1981_2001.R')
 
+#Older National Level Suppression Data from Todd's PDFs
+source('data_processing/older.suppression.data.R')
+
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###
 
@@ -667,6 +683,13 @@ age.mappings = c('13-24' = '13-24 years',
                  '35-44' = '35-44 years',
                  '45-54' = '45-54 years',
                  '55+' = '55+ years')
+
+national.age.mappings = c('13-24' = '13-24 years',
+                         '25-34' = '25-34 years',
+                         '35-44' = '35-44 years',
+                         '45-54' = '45-54 years',
+                         '55-64' = '55-64 years',
+                         '65+' = '65+ years')
 
 #record possible values for the incomplete dimensions, year and location
 locations = c()
@@ -1034,7 +1057,7 @@ national.suppression = lapply(data.list.national.suppression , function(file){
     data$location = "US"
     
     if(grepl("age", filename)) {
-        data$age = age.mappings[data$Age.Group]
+        data$age = national.age.mappings[data$Age.Group]
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
@@ -1043,16 +1066,16 @@ national.suppression = lapply(data.list.national.suppression , function(file){
         names(data)[names(data)=='Sex'] = 'sex'
         data$sex = tolower(data$sex)
     }
-    if(grepl("male", filename)) {
-        names(data)[names(data)=='Sex'] = 'sex'
-        data$sex = tolower(data$sex)
-    }
-    if(grepl("female", filename)) {
-        names(data)[names(data)=='Sex'] = 'sex'
-        data$sex = tolower(data$sex)
-    }
     if(grepl("risk", filename)) {
         data$risk = risk.mappings[data$Transmission.Category]
+    }
+    if(grepl("male", filename)) {
+      names(data)[names(data)=='Sex'] = 'sex'
+      data$sex = tolower(data$sex)
+    }
+    if(grepl("female", filename)) {
+      names(data)[names(data)=='Sex'] = 'sex'
+      data$sex = tolower(data$sex)
     }
     
     list(filename, data) 
@@ -1454,7 +1477,7 @@ for (data in national_suppression_all) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'cdc',
+        ontology.name = 'cdc.new',
         source = 'cdc.hiv',
         dimension.values = list(),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1559,10 +1582,6 @@ put.msa.data.strict(locations = MSAS.OF.INTEREST,
                     data.manager = surveillance.manager, 
                     census.manager = census.manager)
 
-# to put adult.population for 2020-2022
-put.msa.data.strict.for.stratified.census(locations=MSAS.OF.INTEREST,
-                                          data.manager = surveillance.manager,
-                                          census.manager = census.manager)
 
 #Put adult population for specific locations
 put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
@@ -1571,7 +1590,6 @@ put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.
                     data.manager = surveillance.manager,
                     census.manager = census.manager)
 
-
 # CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST--------
 source('data_processing/dummy.data.frames.R')
 
@@ -1579,10 +1597,6 @@ source('data_processing/dummy.data.frames.R')
 
 #Source code that restructures census age groups to get adult.pop for 2020-2022
 source('data_processing/restructure.recent.census.age.groups.R')
-
-
-# Source code to create hiv.tests.per.population --------------------------
-source('data_processing/tests.per.population.R')
 
 ################################################################################
 #Create aggregated outcomes 
@@ -1679,6 +1693,30 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
 
+#This aggregates county level data to state level for the recent census years for adult.population (as well as county to MSAs of interest)
+#where I wrote the restructure.recent.age.groups code to estimate for adult.pop
+all.states = locations::get.all.for.type('state')
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'census.population',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  all.states,   
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'STATE',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'census.population',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  MSAS.OF.INTEREST,   
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+# Source code to create hiv.tests.per.population --------------------------
+source('data_processing/tests.per.population.R')
+
 ################################################################################
 ###Source code for the STI ratio calculation/put
 ################################################################################
@@ -1699,29 +1737,13 @@ get.msa.totals.from.county.simple(outcome= 'deaths',
                                   data.manager.to= surveillance.manager)
 
 
-################################################################################
-#Identify Potential Outliers
-################################################################################
-# source('data_processing/outlier_finder.R')
 
-##Identify outliers
-#  outlier.df <- find.outlier.data (outcome = 'diagnosed.prevalence',
-#                    data.manager = surveillance.manager,
-#                    locations = MSAS.OF.INTEREST, #need to source locations of interest code for this
-#                    stratification.dimensions = c("risk")) #do not include year or location here# #currently only works at one stratification at a time#
-#  
-# ##Create corrected vector (Below is a example)
-#  corrections = rep(T, 59)
+# Remove outliers ---------------------------------------------------------
+source('data_processing/outliers/outlier.remover.R')
 
-###Add in corrected vector (*MUST KEEP A RECORD OF THIS)
-# outlier.df.corrected <- find.outlier.data (outcome = 'diagnosed.prevalence',
-#                   data.manager = surveillance.manager,
-#                   locations = MSAS.OF.INTEREST,
-#                   stratification.dimensions = c("risk"),
-#                   adjudication.data.frame = outlier.df,
-#                   adjudication.vector = corrections) #do not include year or location here# #currently only works at one stratification at a time#
+# Save --------------------------------------------------------------------
 
-################################################################################
+
 ###Save surveillance manager####
 save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
 

@@ -9,6 +9,7 @@
 # minimum.flagged.change: an integer that indicates what the smallest change between years that will be flagged as problematic is.
 # max.year: a year beyond which outliers will not be searched for
 # min.year: a year before which outliers will not be searched for
+# first.choice.year: the starting point for selection of an initial year, preference being for this year or a prior year, or the nearest year above if there is nothing below
 ## ---------------------------##
 
 # outlier remover
@@ -17,7 +18,9 @@
 # removes what should be removed
 # runs outlier finder and report back if there are any flagged points not adjudicated yet.
 
-run.outlier.process = function(outcome, stratifications=list(), data.manager = get.default.data.manager(), locations, adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50, max.year = Inf, min.year = -Inf) {
+run.outlier.process = function(outcome, stratifications=list(), data.manager = get.default.data.manager(), locations, adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50, max.year = Inf, min.year = -Inf, first.choice.year = 2019) {
+    
+    first.choice.year = as.numeric(first.choice.year)
     
     # Convert adjudication data frame adjudication column to logical in case it's characters like "T"
     if (!is.null(adjudication.data.frame)) adjudication.data.frame$adjudication = as.logical(adjudication.data.frame$adjudication)
@@ -28,7 +31,7 @@ run.outlier.process = function(outcome, stratifications=list(), data.manager = g
     }
     
     # Step 2: run outlier finder on what remains
-    output.data.frame = find.outlier.data(outcome=outcome, stratifications=stratifications, data.manager=data.manager, locations=locations, adjudication.data.frame=adjudication.data.frame, phi=phi, theta=theta, minimum.flagged.change=minimum.flagged.change, max.year = max.year, min.year = min.year)
+    output.data.frame = find.outlier.data(outcome=outcome, stratifications=stratifications, data.manager=data.manager, locations=locations, adjudication.data.frame=adjudication.data.frame, phi=phi, theta=theta, minimum.flagged.change=minimum.flagged.change, max.year = max.year, min.year = min.year, first.choice.year = first.choice.year)
     
     # return the output.data.frame
     return(output.data.frame)
@@ -93,7 +96,7 @@ remove.outliers = function(outcome, stratifications, data.manager, adjudication.
     }
 }
 
-find.outlier.data = function(outcome, stratifications=list(), data.manager = get.default.data.manager(), locations, adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50, max.year = Inf, min.year = -Inf) {
+find.outlier.data = function(outcome, stratifications=list(), data.manager = get.default.data.manager(), locations, adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50, max.year = Inf, min.year = -Inf, first.choice.year = 2019) {
     # fastest way to recode this to have all stratifications in one data frame is to make this a wrapper for what I already had
     
     all.data.frames = lapply(stratifications, function(stratification) {
@@ -106,7 +109,7 @@ find.outlier.data = function(outcome, stratifications=list(), data.manager = get
                 1,
                 function(row) {!any(is.na(row[names(row)!='adjudication']))}
             ),]
-        find.outlier.data.per.stratification(outcome=outcome, data.manager=data.manager, locations=locations, stratification.dimensions=stratification, adjudication.data.frame=this.adj.data.frame, phi=phi, theta=theta, minimum.flagged.change = minimum.flagged.change, max.year = max.year, min.year = min.year)
+        find.outlier.data.per.stratification(outcome=outcome, data.manager=data.manager, locations=locations, stratification.dimensions=stratification, adjudication.data.frame=this.adj.data.frame, phi=phi, theta=theta, minimum.flagged.change = minimum.flagged.change, max.year = max.year, min.year = min.year, first.choice.year = first.choice.year)
     })
     
     # Combine them into one big data frame with all the dimensions
@@ -127,7 +130,7 @@ find.outlier.data = function(outcome, stratifications=list(), data.manager = get
 
 
 ### -- HELPERS -- ####
-find.outlier.data.per.stratification = function(outcome, data.manager = get.default.data.manager(), locations, stratification.dimensions=c(), adjudication.data.frame=NULL, phi=0.15, theta=0.05, minimum.flagged.change=50, max.year = max.year, min.year = min.year) {
+find.outlier.data.per.stratification = function(outcome, data.manager = get.default.data.manager(), locations, stratification.dimensions, adjudication.data.frame, phi, theta, minimum.flagged.change, max.year, min.year, first.choice.year) {
     
     error.prefix = "Error finding outliers: "
     
@@ -154,7 +157,8 @@ find.outlier.data.per.stratification = function(outcome, data.manager = get.defa
                                             theta = theta,
                                             minimum.flagged.change=minimum.flagged.change,
                                             max.year = max.year,
-                                            min.year = min.year)
+                                            min.year = min.year,
+                                            first.choice.year = first.choice.year)
     return(convert.to.data.frame(flag.list, stratification.name))
     
 }
@@ -204,10 +208,10 @@ convert.to.data.frame = function(list.of.lists, stratification.name) {
     return(df)
 }
 
-do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratification.name, adj.data.frame, adj.vector, phi, theta, minimum.flagged.change, max.year, min.year) {
+do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratification.name, adj.data.frame, adj.vector, phi, theta, minimum.flagged.change, max.year, min.year, first.choice.year) {
     
     # for now, stratification can be as written, no parsing needed, like "year__location__sex"
-    do.find.outliers = generate.find.outliers.function(phi, theta, minimum.flagged.change, max.year, min.year)
+    do.find.outliers = generate.find.outliers.function(phi, theta, minimum.flagged.change, max.year, min.year, first.choice.year)
     
     source.names = names(data.manager$data[[outcome]]$estimate)
     all.flagged.list = lapply(source.names, function(source.name) {
@@ -297,7 +301,7 @@ do.get.outliers.for.outcome = function(outcome, data.manager, locations, stratif
     return(setNames(all.flagged.list, source.names[sources.which.flagged]))
 }
 
-generate.find.outliers.function = function(phi, theta, minimum.flagged.change, max.year, min.year) {
+generate.find.outliers.function = function(phi, theta, minimum.flagged.change, max.year, min.year, first.choice.year) {
     
     # NEW ALGORITHM: START AT 2019. GO FORWARDS WITH ALGORITHM AND ALSO GO BACKWARDS. IF 2019 ISN'T AVAILABLE START WITH THE NEXT EARLIER YEAR, OR IF NONE AVAILABLE BELOW 2020, PICK FIRST YEAR ABOVE 2019.
     
@@ -308,9 +312,9 @@ generate.find.outliers.function = function(phi, theta, minimum.flagged.change, m
         years = years[years <= max.year & years >= min.year]
         
         # Pick 2019 or earlier, else pick first year above 2019. Must be nonzero because we divide by it to find a percent change.
-        if (any(as.numeric(years)<=2019 & as.numeric(years)!=0))
-            baseline.year = max(as.numeric(years)[as.numeric(years)<2020 & as.numeric(years)!=0])
-        else if (any(as.numeric(years)>2019 & as.numeric(years)!=0))
+        if (any(as.numeric(years)<=first.choice.year & as.numeric(years)!=0))
+            baseline.year = max(as.numeric(years)[as.numeric(years)<=first.choice.year & as.numeric(years)!=0])
+        else if (any(as.numeric(years)>first.choice.year & as.numeric(years)!=0))
             baseline.year = min(as.numeric(years)[as.numeric(years)!=0])
         else return(flagged.years)
         

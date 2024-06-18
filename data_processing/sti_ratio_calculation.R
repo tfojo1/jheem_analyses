@@ -202,7 +202,7 @@ syph.ratio.put = lapply(syphilis.ratios, `[[`, 2)
 
 for (data in syph.ratio.put) {
   
-  data.manager$put.long.form(
+  surveillance.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
