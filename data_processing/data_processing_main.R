@@ -1737,11 +1737,9 @@ get.msa.totals.from.county.simple(outcome= 'deaths',
                                   data.manager.to= surveillance.manager)
 
 
-################################################################################
-#Identify Potential Outliers
-################################################################################
-#TBD
 
+# Remove outliers ---------------------------------------------------------
+source('data_processing/outliers/outlier.remover.R')
 
 # Save --------------------------------------------------------------------
 

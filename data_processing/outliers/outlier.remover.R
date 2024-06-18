@@ -350,11 +350,4 @@ run.outlier.process(outcome= 'aids.diagnosed.prevalence',
 
 
 
-# Save --------------------------------------------------------------------
 
-
-###Save surveillance manager####
-save(surveillance.manager, file="../../cached/surveillance.manager.outliers.removed.rdata")
-
-#Also save to Q drive
-save(surveillance.manager, file="Q:/data_managers/surveillance.manager.outliers.removed.rdata")
