@@ -115,7 +115,17 @@ par.names.transmission = c(par.names.transmission,
                            'heterosexual.testing.ramp.or',
                            'idu.testing.ramp.or',
                            'idu.remission.multiplier',
-                           'idu.relapse.multiplier')
+                           'idu.relapse.multiplier',
+                           'msm.proportion.tested.or',
+                           'msm.proportion.tested.slope.or',
+                           'heterosexual.proportion.tested.or',
+                           'heterosexual.proportion.tested.slope.or',
+                           'idu.proportion.tested.or',
+                           'idu.proportion.tested.slope.or',
+                           'msm.idu.proportion.tested.or',
+                           'msm.idu.proportion.tested.slope.or',
+                           'black.proportion.tested.or',
+                           'hispanic.proportion.tested.or')
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           # added proportion tested 4/23
