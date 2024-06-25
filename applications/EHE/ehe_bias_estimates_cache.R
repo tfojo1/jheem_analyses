@@ -67,7 +67,9 @@ hiv.tests.per.population.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANA
                                                           outcome.for.n = "adult.population",
                                                           sub.location.type = NULL, 
                                                           super.location.type = "STATE",
-                                                          main.location.type = "CBSA")
+                                                          main.location.type = "CBSA",
+                                                          main.location.type.n.source = 'census.population',
+                                                          super.location.type.n.source = 'census.population')
 
 cache.object.for.version(object = awareness.bias.estimates, 
                          name = "heroin.bias.estimates", 
@@ -85,6 +87,10 @@ if(1==2){
   
   cache.object.for.version(object = hiv.test.positivity.bias.estimates, 
                            name = "hiv.test.positivity.bias.estimates", 
+                           version = 'ehe', overwrite=T)
+  
+  cache.object.for.version(object = hiv.tests.per.population.bias.estimates, 
+                           name = "hiv.tests.per.population.bias.estimates", 
                            version = 'ehe', overwrite=T)
   
   cache.object.for.version(object = awareness.bias.estimates, 

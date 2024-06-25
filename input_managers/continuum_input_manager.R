@@ -1,6 +1,121 @@
 
 
 get.suppression.functional.form <- function(specification.metadata,
+                                                max.suppressed.proportion=0.9,
+                                                anchor.year = 2008,
+                                            include.slope = T)
+{
+    covariates = c('age','race','sex')
+    df.col.names = c('year', covariates,'risk','p','weight')
+  
+    #-- Pull Prevalence --#
+    arr.prev = SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.hiv$cdc.national$year__location__age__race__sex__risk[,'US',,,,]
+    prev.years = dimnames(arr.prev)$year
+    
+    #-- Prep data frame --#
+    
+    suppression.stratifications = names(SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.hiv$cdc)
+    suppression.stratifications = suppression.stratifications[sapply(strsplit(suppression.stratifications, "__"), length)==3]
+    
+    raw.df = NULL
+    for (stratification in suppression.stratifications)
+    {
+        if (length(strsplit(stratification, "__")[[1]])==3)
+        {
+            d = strsplit(stratification, "__")[[1]][3]
+            #suppression.arr = national.surveillance[[paste0("suppression.", d)]][,'national',]
+            suppression.arr = SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.supplemental.reports$cdc[[stratification]][,'US',]
+            suppression.years = intersect(dimnames(suppression.arr)$year[!apply(is.na(suppression.arr), 'year', all)],
+                                          prev.years)
+            suppression.arr = suppression.arr[suppression.years,,drop=F]
+        }
+        else
+        {
+            suppression.arr = SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.hiv$cdc[[stratification]][,'US',,]
+            suppression.years = intersect(dimnames(suppression.arr)$year[!apply(is.na(suppression.arr), 'year', all)],
+                                          prev.years)
+            suppression.arr = suppression.arr[suppression.years,,,drop=F]
+        }
+        
+        aggregated.prev.arr = apply(arr.prev[suppression.years,,,,,drop=F], names(dim(suppression.arr)), sum, na.rm=T)  
+        
+        mapping = get.ontology.mapping(from.ontology = dimnames(aggregated.prev.arr),
+                                       to.ontology = dimnames(suppression.arr))
+        if (is.null(mapping))
+            stop(paste0("Error get.suppression.functional.form() - cannot map prevalence to suppression for stratification '", stratification, "'"))
+        aggregated.prev.arr = mapping$apply(aggregated.prev.arr, na.rm = T)
+        
+        sub.df = reshape2::melt(suppression.arr, value.name = 'p')
+        sub.df$weight = as.numeric(aggregated.prev.arr)
+        
+        missing.columns = setdiff(df.col.names, names(sub.df))
+        for (col in missing.columns)
+            sub.df[,col] = 'all'
+        
+        sub.df = sub.df[!is.na(sub.df$p),df.col.names]
+        
+        raw.df = rbind(raw.df, sub.df)
+        
+        # mappings = get.mappings.to.align.ontologies(ontology.1 = specification.metadata$dim.names[setdiff(names(dim(arr.prev)), 'year')],
+        #                                 ontology.2 = dimnames(suppression.arr)[setdiff(names(dim(suppression.arr)), 'year')])
+    }
+    
+    raw.df = raw.df[raw.df$sex!='male' | raw.df$risk != 'all',]
+    raw.df$sex[raw.df$risk=='msm' | raw.df$risk=='msm_idu'] = 'male'
+    
+    df = restratify.data.to.specification(data = raw.df,
+                                          dim.names = specification.metadata$dim.names,
+                                          max.age = 85)
+    
+    if (any(df$p > max.suppressed.proportion))
+        stop(paste0("Error in get.suppression.functional.form() - cannot use ", max.suppressed.proportion, " as max.suppressed.proportion, because the data contain suppression up to ", max(df$p)))
+    df$p = df$p/max.suppressed.proportion
+    
+    
+    df$year = df$year - anchor.year
+    for (covariate in covariates)
+    {
+        df[,covariate] = factor(df[,covariate], levels = c('all', setdiff(unique(df[,covariate]), 'all')))
+    }
+    
+    ff = as.formula(paste0("p ~ ", paste0(covariates, "*year", collapse=' + ')))
+    fit = suppressWarnings(glm(formula = ff,
+                               data = df,
+                               family = 'binomial',
+                               weights = df$weight))
+    
+    #-- Use predict() to get the logistic intercept and slope --#
+    
+    dim.names = specification.metadata$dim.names[covariates]
+    fake.data.array = array(0, dim = sapply(dim.names, length), dimnames = dim.names)
+    intercept.data.values = reshape2::melt(fake.data.array, value.name = 'year')
+    slope.data.values = intercept.data.values
+    slope.data.values$year = 1
+    
+    intercept = suppressWarnings(predict(fit, newdata=intercept.data.values, type='link'))
+    slope = suppressWarnings(predict(fit, newdata=slope.data.values, type='link')) - intercept
+    
+    dim(intercept) = dim(slope) = sapply(dim.names, length)
+    dimnames(intercept) = dimnames(slope) = dim.names
+ 
+    if (1==2)
+    {
+        ggplot(data=df, aes(year, p)) + geom_point() + geom_smooth()
+    }
+    #-- Return --#
+    
+    if (!include.slope)
+        slope = 0
+    
+    create.logistic.linear.functional.form(intercept = intercept,
+                                           slope = slope,
+                                           anchor.year = anchor.year,
+                                           max = max.suppressed.proportion,
+                                           min = 0,
+                                           parameters.are.on.logit.scale = T)
+}
+
+OLD.get.suppression.functional.form <- function(specification.metadata,
                                             national.surveillance,
                                             max.suppressed.proportion=0.9,
                                             anchor.year=2020)

@@ -1,6 +1,6 @@
 MSM.BASE.TRATE.MEAN = 1
-HET.BASE.TRATE.MEAN = 1
-IDU.BASE.TRATE.MEAN = 1
+HET.BASE.TRATE.MEAN = .25 # from https://www.shelbytnhealth.com/DocumentCenter/View/608/Subsequent-HIV-Disease-Risk-Following-Syphilis-Diagnosis-in-a-Southern-MSM-Population-PDF?bidId=
+IDU.BASE.TRATE.MEAN = 12
 BASE.TRATE.CV = 20
 
 TRATE.RR.1.2.SPAN = 2#1.5
@@ -151,10 +151,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     # take the OR of borrowing needles from table 2 of 
     # https://pubmed.ncbi.nlm.nih.gov/9489050/
     # as an RR
-    msm.vs.heterosexual.male.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.vs.heterosexual.male.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.vs.heterosexual.male.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.vs.heterosexual.male.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
     
     #-- Age Susceptibility --#
     
@@ -301,7 +301,13 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     idu.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
     msm.idu.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
     
-    testing.ramp.up.vs.current.rr = Lognormal.Distribution(log(0.5), 0.25*log(2), upper = 1),
+    #testing.ramp.up.vs.current.rr = Lognormal.Distribution(log(0.5), 0.25*log(2), upper = 1),
+    
+    msm.testing.ramp.or = Lognormal.Distribution(0, 0.5*log(2)),
+    heterosexual.testing.ramp.or = Lognormal.Distribution(0, 0.5*log(2)),
+    idu.testing.ramp.or = Lognormal.Distribution(0, 0.5*log(2)),
+    testing.ramp.1.or = Lognormal.Distribution(0, 0.5*log(2)),
+    testing.ramp.2.or = Lognormal.Distribution(0, 0.5*log(2)),
     
     msm.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
     heterosexual.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
@@ -335,7 +341,8 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     age5.prep.or = Lognormal.Distribution(0, log(2)),
     
     prep.efficacy.z = Normal.Distribution(0, 1),
-    #oral.prep.persistence = Normal.Distribution(0.56, 0.0587, lower=0, upper=1),
+    # oral.prep.persistence = Normal.Distribution(0.56, 0.0587, lower=0, upper=1),
+    oral.prep.persistence.or = Lognormal.Distribution(0, log(1.2)/2),
     #from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6378757/
     # with Wald CI inflated 10x
     
@@ -350,9 +357,9 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     
     #-- IDU Transitions --#
     
-    black.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
-    hispanic.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
-    other.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
+    # black.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
+    # hispanic.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
+    # other.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     
     black.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     hispanic.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
@@ -368,10 +375,15 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     age4.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     age5.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
 
-    msm.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
+    # msm.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
+    black.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+    hispanic.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+    other.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+    msm.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+        
     idu.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
     idu.relapse.multiplier = Lognormal.Distribution(0, .5*log(2)),
     #idu.mortality = Lognormal.Distribution(log(0.0166), 0.1322), 
@@ -380,7 +392,7 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     
     #-- HIV-Specific Mortality --#
     hiv.mortality.0 = Lognormal.Distribution(log(9.5/6.1 * 23/1000), log(2)/2),
-    hiv.mortality.2 = Lognormal.Distribution(log(23/1000), log(2)),
+    hiv.mortality.1 = Lognormal.Distribution(log(23/1000), log(2)),
     peak.hiv.mortality = Lognormal.Distribution(log(41/6.1 * 23/1000), log(2)/2),
     #http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.688.1831&rep=rep1&type=pdf
     
@@ -390,7 +402,7 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #-- Other Sexual Mixing --#
     
     oe.female.pairings.with.msm = Lognormal.Distribution(log(0.0895), 0.5*log(2), upper = 1), #Pathela 2006 - see below
-    fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.004), 0.5*log(2), upper=1),
+    fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.0004), 0.5*log(2), upper=1),
     oe.never.idu.pairings.with.idu = Lognormal.Distribution(log(0.2), 0.5*log(2), upper=1), #see calculations below
     
     black.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
@@ -769,10 +781,10 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   female.vs.heterosexual.male.idu.susceptibility = 'female.vs.heterosexual.male.idu.susceptibility.rr',
   
   msm.idu.transmission = c(
-    'msm.vs.heterosexual.male.idu.susceptibility.rr.peak',
-    'msm.vs.heterosexual.male.idu.susceptibility.rr.0',
-    'msm.vs.heterosexual.male.idu.susceptibility.rr.1',
-    'msm.vs.heterosexual.male.idu.susceptibility.rr.2'
+    'msm.idu.susceptibility.rr.peak',
+    'msm.idu.susceptibility.rr.0',
+    'msm.idu.susceptibility.rr.1',
+    'msm.idu.susceptibility.rr.2'
   ),
   
 
@@ -785,29 +797,29 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   age5.susceptibility = 'age5.susceptibility.rr.mult',
   
-  idu.transitions.0 = c(
-    'black.incident.idu.multiplier.0',
-    'hispanic.incident.idu.multiplier.0',
-    'other.incident.idu.multiplier.0',
-    # 'young.incident.idu.multiplier.0',
-    'msm.incident.idu.multiplier.0'
-  ),
-  
-  idu.transitions.1 = c(
+  black.idu.incidence = c(
+    'black.active.idu.initial.prevalence.ratio',
+ #   'black.incident.idu.multiplier.0',
     'black.incident.idu.multiplier.1',
+    'black.incident.idu.multiplier.2'),
+
+  hispanic.idu.incidence = c(
+    'hispanic.active.idu.initial.prevalence.ratio',
+  #  'hispanic.incident.idu.multiplier.0',
     'hispanic.incident.idu.multiplier.1',
-    'other.incident.idu.multiplier.1',
-    # 'young.incident.idu.multiplier.1',
-    'msm.incident.idu.multiplier.1'
-  ),
+    'hispanic.incident.idu.multiplier.2'),
   
-  idu.transitions.2 = c(
-    'black.incident.idu.multiplier.2',
-    'hispanic.incident.idu.multiplier.2',
-    'other.incident.idu.multiplier.2',
-    # 'young.incident.idu.multiplier.2',
-    'msm.incident.idu.multiplier.2'
-  ),
+  other.idu.incidence = c(
+    'other.active.idu.initial.prevalence.ratio',
+#    'other.incident.idu.multiplier.0',
+    'other.incident.idu.multiplier.1',
+    'other.incident.idu.multiplier.2'),
+  
+  msm.idu.incidence = c(
+    'msm.active.idu.initial.prevalence.ratio',
+ #   'msm.incident.idu.multiplier.0',
+    'msm.incident.idu.multiplier.1',
+    'msm.incident.idu.multiplier.2'),
 
   age.idu.transitions = c(
     'age1.incident.idu.multiplier',
@@ -863,13 +875,20 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   old.age.testing = c('age4.proportion.tested.or',
                       'age5.proportion.tested.or'),
   
-  testing.ramp.up = 'testing.ramp.up.vs.current.rr',
+  testing.ramp.up = c(
+    'testing.ramp.1.or',
+    'testing.ramp.2.or'),
+
+  testing.ramp.by.risk = c(
+    'msm.testing.ramp.or',
+    'heterosexual.testing.ramp.or',
+    'idu.testing.ramp.or'),
   
   msm.prep = c(
     'msm.prep.intercept.or',
     'msm.prep.slope.or',
-    'msm.prep.indications.or'
-   # 'oral.prep.persistence'
+    'msm.prep.indications.or',
+    'oral.prep.persistence.or'
   ),
   
   non.msm.prep = c(
@@ -896,7 +915,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   hiv.mortality = c('peak.hiv.mortality',
                     'hiv.mortality.0',
-                    'hiv.mortality.2'),
+                    'hiv.mortality.1'),
 
   covid.sexual.transmission.race = c('black.sexual.transmission.covid.multiplier',
                                      'hispanic.sexual.transmission.covid.multiplier',

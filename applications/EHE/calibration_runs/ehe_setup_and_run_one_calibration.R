@@ -1,10 +1,10 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = CHICAGO.MSA
-CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.FULL.PLUS.AIDS   # CALIBRATION.CODE.POPULATION
-                                                          # CALIBRATION.CODE.TRANSMISSION
-                                                          # CALIBRATION.CODE.FULL.PLUS.AIDS
+LOCATION = BALTIMORE.MSA
+CALIBRATION.CODE.TO.RUN =  #CALIBRATION.CODE.POPULATION
+                            #                             CALIBRATION.CODE.TRANSMISSION
+                                                           CALIBRATION.CODE.FULL.PLUS.AIDS
                                                           # CALIBRATION.CODE.FULL.PLUS.COVID
 
 set.seed(12345)

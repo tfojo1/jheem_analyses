@@ -4,15 +4,15 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 #source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
-CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
+CALIBRATION.CODE.TRANSMISSION = 'init.trans.ehe.noaids'
 CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
 
 N.ITER.TEST = 10000
-N.ITER = 20000
-N.ITER.FULL = 40000
+N.ITER = 15000
+N.ITER.FULL = 35000
 
 # load params manual
 load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_21.Rdata") 
@@ -71,14 +71,23 @@ par.names.pop = c("black.birth.rate.multiplier",
                   "age5.migration.multiplier.time.2"
 )
 
+par.names.basic.trans = c(
+  "global.trate",
+  "peak.hiv.mortality",
+  "hiv.mortality.0",
+  "hiv.mortality.1",
+  'testing.ramp.1.or',
+  'testing.ramp.2.or'
+)
+
 register.calibration.info(CALIBRATION.CODE.POPULATION,
-                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added total prev/new 5/20
+                          likelihood.instructions = joint.pop.migration.total.trans.aids.likelihood.instructions, # added total prev/new 5/20
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
-                          parameter.names = c(par.names.pop,"global.trate"), # adding this in 5/20
+                          parameter.names = c(par.names.pop, par.names.basic.trans), # adding this in 5/20
                           n.iter = N.ITER,
                           thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.1), 
+                          fixed.initial.parameter.values = c(global.trate=0.03), 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get population parameters in the general vicinity"
@@ -86,17 +95,31 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
 
 #-- REGISTER TRANSMISSION CALIBRATION  --#
 par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('msm.vs.heterosexual.male.idu.susceptibility', 
+                                                          grepl('msm\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility', 
                                                                 EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('sexual.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('needle.sharing.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('incident.idu', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('fraction.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('female.vs.heterosexual.male.idu.susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) ]
+                                                          grepl('sexual\\.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('needle\\.sharing.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('incident\\.idu', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('idu\\.initial\\.prevalence', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('fraction\\.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('oe', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) ]
+
+par.names.transmission = c(par.names.transmission,
+                           "peak.hiv.mortality",
+                           "hiv.mortality.0",
+                           "hiv.mortality.1",
+                           'testing.ramp.1.or',
+                           'testing.ramp.2.or',
+                           'msm.testing.ramp.or',
+                           'heterosexual.testing.ramp.or',
+                           'idu.testing.ramp.or',
+                           'idu.remission.multiplier',
+                           'idu.relapse.multiplier')
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           # added proportion tested 4/23
-                          likelihood.instructions = two.way.transmission.pop.likelihood.instructions,
+                          likelihood.instructions = two.way.transmission.pop.aids.idu.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 

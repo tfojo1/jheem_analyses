@@ -33,6 +33,9 @@ read.monthly.county.mobility.data <- function(dir='../../data/raw/google_mobilit
         one.df = read.csv(file)
         
         # Keep just the counties
+        one.df$census_fips_code = as.character(one.df$census_fips_code)
+        to.pad.mask = !is.na(one.df$census_fips_code) & nchar(one.df$census_fips_code)==4
+        one.df$census_fips_code[to.pad.mask] = paste0('0', one.df$census_fips_code[to.pad.mask])
         location.type = get.location.type(one.df$census_fips_code)
         mask = !is.na(location.type) & location.type=='COUNTY'
         one.df = one.df[mask,]

@@ -55,6 +55,7 @@ if (!exists('national.surveillance'))
 # These are the real supporting files that will be in the final version
 
 # Input Managers
+source('../jheem_analyses/input_managers/input_helpers.R')
 source('../jheem_analyses/input_managers/covid_mobility_manager.R')
 source('../jheem_analyses/input_managers/covid_input_manager.R')
 source('../jheem_analyses/input_managers/idu_input_manager.R')
