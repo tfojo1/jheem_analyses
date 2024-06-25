@@ -10,7 +10,7 @@
 # Source outlier finder ---------------------------------------------------
 
 #library(jheem2)
-surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
+#surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 source('data_processing/outlier_finder.R')
 
 options(error=NULL)
@@ -25,16 +25,16 @@ diagnoses.adjusted<- run.outlier.process(outcome= 'diagnoses',
                                           max.year = 2019,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
 
-diagnoses.adjusted$adjudication <- c(T)
-
-run.outlier.process(outcome= 'diagnoses',
-                    stratifications= list(c()),
-                    data.manager= surveillance.manager,
-                    phi = 0.32, 
-                    theta = 0.06,
-                    max.year = 2019,
-                    locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
-                    adjudication.data.frame = diagnoses.adjusted)
+# diagnoses.adjusted$adjudication <- c(T)
+# 
+# run.outlier.process(outcome= 'diagnoses',
+#                     stratifications= list(c()),
+#                     data.manager= surveillance.manager,
+#                     phi = 0.32, 
+#                     theta = 0.06,
+#                     max.year = 2019,
+#                     locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
+#                     adjudication.data.frame = diagnoses.adjusted)
 
 # outcome = total.prevalence ----------------------------------------------
   #Total -> zero outliers!
