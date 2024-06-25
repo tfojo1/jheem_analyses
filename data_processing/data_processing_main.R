@@ -588,8 +588,7 @@ data.manager$register.ontology(
     ont = ontology(
         year= NULL,
         location= NULL,
-        age=c('< 1 year', '1 year', '2 years', '3 years', '4 years', '5 years', '6 years', '7 years', '8 years', '9 years', '10 years',
-              '11 years', '12 years', '13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
+        age=c('13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
               '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
               '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
               '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
@@ -601,6 +600,24 @@ data.manager$register.ontology(
         ethnicity=c('hispanic', 'not hispanic'),
         sex=c('male','female')
     ))
+data.manager$register.ontology(
+  'census.cdc.wonder.population',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
+          '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
+          '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
+          '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
+          '51 years', '52 years', '53 years', '54 years', '55 years', '56 years', '57 years', '58 years', '59 years', '60 years',
+          '61 years', '62 years', '63 years', '64 years', '65 years', '66 years', '67 years', '68 years', '69 years', '70 years',
+          '71 years', '72 years', '73 years', '74 years', '75 years', '76 years', '77 years', '78 years', '79 years', '80 years',
+          '81 years', '82 years', '83 years', '84 years', '85+ years'),
+    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White', "More than one race"),
+    ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino'), 
+    sex=c('male','female')
+  ))
+
 ################################################################################
 ###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')
@@ -1576,7 +1593,7 @@ source('data_processing/put_msa_data_without_estimation_script.R')
 source('data_processing/put_msa_data_as_new_source_script.R')
 
 #this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
-#this function currently defaults to population, when using it for mortality you need to define mortality as the outome#
+#this function currently defaults to population, when using it for mortality you need to define mortality as the outcome#
 #adult.population
 put.msa.data.strict(locations = MSAS.OF.INTEREST, 
                     data.manager = surveillance.manager, 
