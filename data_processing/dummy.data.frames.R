@@ -22,7 +22,7 @@ dummy.counties.two <- data.frame(
   year = c('2018'),
   location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
-  age = c('< 1 year')
+  age = c('20 years')
 )
 #year_location_race
 dummy.counties.three <- data.frame(
@@ -66,7 +66,7 @@ dummy.counties.seven  <- data.frame(
   value = as.numeric(NA),
   race = c('American Indian or Alaska Native'),
   ethnicity = c('Hispanic or Latino'),
-  age = c('< 1 year')
+  age = c('20 years')
 )
 #year_location_age_sex
 dummy.counties.eight  <- data.frame(
@@ -75,7 +75,7 @@ dummy.counties.eight  <- data.frame(
   location = c('12025', '51560', '51780', '51123', '29193'), 
   value = as.numeric(NA),
   sex = c('male'),
-  age = c('< 1 year')
+  age = c('20 years')
 )
 #year_location_race_ethnicity_sex
 dummy.counties.nine  <- data.frame(
@@ -129,7 +129,7 @@ surveillance.manager$put.long.form(
     year = c('2010'),
     location = c('12025', '51560', '51780', '51123', '29193'), 
     value = as.numeric(NA),
-    age = c('< 1 year')
+    age = c('20 years')
   )
   #year_location_race
   dummy.counties.three <- data.frame(
@@ -173,7 +173,7 @@ surveillance.manager$put.long.form(
     value = as.numeric(NA),
     race = c('white'),
     ethnicity = c('not hispanic'),
-    age = c('< 1 year')
+    age = c('20 years')
   )
   #year_location_age_sex
   dummy.counties.eight  <- data.frame(
@@ -182,7 +182,7 @@ surveillance.manager$put.long.form(
     location = c('12025', '51560', '51780', '51123', '29193'),
     value = as.numeric(NA),
     sex = c('male'),
-    age = c('< 1 year')
+    age = c('20 years')
   )
   #year_location_race_ethnicity_sex
   dummy.counties.nine  <- data.frame(
