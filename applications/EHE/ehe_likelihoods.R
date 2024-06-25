@@ -722,8 +722,8 @@ two.way.transmission.pop.aids.idu.likelihood.instructions =
                                race.risk.sex.two.way.prevalence.likelihood.instructions,
                                two.way.proportion.tested.likelihood.instructions, # added this in 4/23
                                population.likelihood.instructions,
-                              # aids.diagnoses.likelihood.instructions,
-                               #aids.deaths.likelihood.instructions#,
+                               aids.diagnoses.likelihood.instructions,
+                               aids.deaths.likelihood.instructions,
                                heroin.likelihood.instructions,
                                cocaine.likelihood.instructions
   )
