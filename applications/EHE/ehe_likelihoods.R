@@ -336,7 +336,7 @@ suppression.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry', 
-                                                   p.error.variance.term = 0.03, 
+                                                   p.error.variance.term = 0.06, # will update this using actual error term 
                                                    p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
@@ -716,6 +716,15 @@ two.way.transmission.pop.likelihood.instructions =
                                two.way.proportion.tested.likelihood.instructions, # added this in 4/23
                                population.likelihood.instructions 
                                )
+
+two.way.transmission.pop.idu.likelihood.instructions = 
+  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.sex.two.way.prevalence.likelihood.instructions,
+                               two.way.proportion.tested.likelihood.instructions, # added this in 4/23
+                               population.likelihood.instructions,
+                               heroin.likelihood.instructions,
+                               cocaine.likelihood.instructions
+  )
 
 two.way.transmission.pop.aids.idu.likelihood.instructions = 
   join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
