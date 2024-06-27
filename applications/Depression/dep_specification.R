@@ -111,7 +111,7 @@ register.natality(specification = DEP.SPECIFICATION,
                   child.groups = 'infected',
                   fertility.rate.value = 'immigration',
                   birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
-                  parent.child.concordant.dimensions = c('age','race','sex','risk','depression','continuum','stage'),
+                  parent.child.concordant.dimensions = c('age','race','sex','risk','depression','continuum'),
                   all.births.into.compartments = list(),
                   tag = "immigration")
 
