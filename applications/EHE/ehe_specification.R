@@ -1880,7 +1880,7 @@ track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
                                       save = F)
 
 track.cumulative.outcome(EHE.SPECIFICATION,
-                         name = 'proportion.general.population.tested',
+                         name = 'testing',
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
                                                                     description = "The Proportion of General Population who Received an HIV Test in the Past Year",
                                                                     scale = 'proportion',

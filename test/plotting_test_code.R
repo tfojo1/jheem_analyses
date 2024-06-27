@@ -91,7 +91,7 @@ simplot(simset,
 
 simplot(simset,
         #facet.by = "race", # age, sex, race, risk; 1-way 
-        outcomes = c("proportion.general.population.tested"),
+        outcomes = c("testing"),
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
 

@@ -510,7 +510,7 @@ cocaine.likelihood.instructions =
 #-- PROPORTION TESTED --#
 proportion.tested.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
-                                                   outcome.for.sim = "proportion.general.population.tested",
+                                                   outcome.for.sim = "testing",
                                                    denominator.outcome.for.data = "adult.population",
                                                    
                                                    location.types = c('STATE','CBSA'),
@@ -544,7 +544,7 @@ proportion.tested.likelihood.instructions =
 # rename
 two.way.proportion.tested.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
-                                                   outcome.for.sim = "proportion.general.population.tested",
+                                                   outcome.for.sim = "testing",
                                                    denominator.outcome.for.data = "adult.population",
                                                    
                                                    location.types = c('STATE','CBSA'),
