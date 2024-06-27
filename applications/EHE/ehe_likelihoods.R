@@ -530,8 +530,8 @@ proportion.tested.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   p.error.variance.term = 0.03,
-                                                   p.error.variance.type = 'sd', # sd or data.variance 
+                                                   p.error.variance.term = NULL,
+                                                   p.error.variance.type = 'data.variance', # sd or data.variance 
                                                    # this will use what is stored in the data manager instead specifying the value here
                                                             # switch to this once the variance estimate in the data manager is corrected
                                                    
@@ -564,8 +564,8 @@ two.way.proportion.tested.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   p.error.variance.term = 0.03,
-                                                   p.error.variance.type = 'sd',
+                                                   p.error.variance.term = NULL,
+                                                   p.error.variance.type = 'data.variance',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    

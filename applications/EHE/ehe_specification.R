@@ -397,6 +397,9 @@ TESTING.FIRST.YEAR.FRACTION.OF.RAMP = (1/RAMP.YEARLY.INCREASE)^(TESTING.RAMP1.YE
 TESTING.RAMP.UP.TIMES = TESTING.LAST.ZERO.YEAR:TESTING.RAMP1.YEAR
 TESTING.RAMP.UP.VALUES = c(0,TESTING.FIRST.YEAR.FRACTION.OF.RAMP*RAMP.YEARLY.INCREASE^(TESTING.RAMP.UP.TIMES[-1]-TESTING.RAMP.UP.TIMES[2]))
 names(TESTING.RAMP.UP.TIMES) = names(TESTING.RAMP.UP.VALUES) = as.character(TESTING.RAMP.UP.TIMES)
+
+TESTING.FUNCTIONAL.FORM.FROM.YEAR = 2010
+
 register.model.element(EHE.SPECIFICATION,
                        name = 'testing.ramp.up',
                        scale = 'proportion',
@@ -410,13 +413,15 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'testing.ramp.rr',
                        scale = 'proportion',
                        functional.form = create.linear.spline.functional.form(knot.times = c(ramp.1=TESTING.RAMP1.YEAR,
-                                                                                             ramp.2=TESTING.RAMP2.YEAR),
+                                                                                             ramp.2=TESTING.RAMP2.YEAR,
+                                                                                             ramp.stop=TESTING.FUNCTIONAL.FORM.FROM.YEAR),
                                                                               knot.values = list(ramp.1 = 0.5,
-                                                                                                 ramp.2 = 0.75),
+                                                                                                 ramp.2 = 0.75,
+                                                                                                 ramp.stop = 1),
                                                                               knot.link = 'logit',
                                                                               knots.are.on.transformed.scale = F),
                        functional.form.from.time = TESTING.RAMP1.YEAR,
-                       functional.form.to.time = TESTING.RAMP2.YEAR)
+                       functional.form.to.time = TESTING.FUNCTIONAL.FORM.FROM.YEAR)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'general.population.testing.without.covid',
@@ -424,7 +429,7 @@ register.model.element(EHE.SPECIFICATION,
                        
                        get.functional.form.function = get.testing.functional.form,
                        functional.form.scale = 'proportion',
-                       functional.form.from.time = 2010)
+                       functional.form.from.time = TESTING.FUNCTIONAL.FORM.FROM.YEAR)
                        
                        # ramp.scale = 'proportion',
                        # ramp.times = c(1982,1983,1993),
