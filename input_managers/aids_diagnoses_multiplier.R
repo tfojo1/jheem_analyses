@@ -583,8 +583,7 @@ names(sds.array) = as.character(c(1997:2007))
 
 df = data.frame(year = rep(c(as.character(c(1997:2007))), each = length(ratios.2000)),
                 state = rep(names(aids.cases.2000), 11),
-                ratio = ratios,
-                sd = sds)
+                ratio = ratios)
 
 aids.diagnoses.multipliers = apply(ratios.array,"year",mean, na.rm = T)
 aids.diagnoses.sds = sds.array
