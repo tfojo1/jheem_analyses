@@ -10,18 +10,60 @@ underlying.data <- underlying.data %>%
 
 ###########
 
-
-
 # Diagnoses- one way strata -----------------------------------------------
-
-diagnoses.stratified <- run.outlier.process(outcome= 'diagnoses',
-                                          stratifications= list('sex', 'race', 'age', 'risk'), 
-                                         #stratifications= list('sex'),
+diagnoses.stratified.sex <- run.outlier.process(outcome= 'diagnoses',
+                                         stratifications= list('sex'),
                                          data.manager= surveillance.manager,
                                          phi = 0.32, 
                                          theta = 0.06,
                                          max.year = 2019,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
+diagnoses.stratified.sex$adjudication <- c(T, T, T, T, T, T, T, T, T, F, T, T, T, T, T, T)
+run.outlier.process(outcome= 'diagnoses',
+                    stratifications= list('sex'),
+                    data.manager= surveillance.manager,
+                    phi = 0.32, 
+                    theta = 0.06,
+                    max.year = 2019,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
+                    adjudication.data.frame =diagnoses.stratified.sex)
+##
+diagnoses.stratified.age <- run.outlier.process(outcome= 'diagnoses',
+                                                stratifications= list('age'),
+                                                data.manager= surveillance.manager,
+                                                phi = 0.32, 
+                                                theta = 0.06,
+                                                max.year = 2019,
+                                                locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
+diagnoses.stratified.age$adjudication <- c(T)
+run.outlier.process(outcome= 'diagnoses',
+                    stratifications= list('age'),
+                    data.manager= surveillance.manager,
+                    phi = 0.32, 
+                    theta = 0.06,
+                    max.year = 2019,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
+                    adjudication.data.frame = diagnoses.stratified.age )
+##
+diagnoses.stratified.race <- run.outlier.process(outcome= 'diagnoses',
+                                                stratifications= list('race'),
+                                                data.manager= surveillance.manager,
+                                                phi = 0.32, 
+                                                theta = 0.06,
+                                                max.year = 2019,
+                                                locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
+##
+diagnoses.stratified.risk <- run.outlier.process(outcome= 'diagnoses',
+                                                stratifications= list('risk'),
+                                                data.manager= surveillance.manager,
+                                                phi = 0.32, 
+                                                theta = 0.06,
+                                                max.year = 2019,
+                                                locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
+#sex=16
+#age=33
+#race=32
+#risk=38
 
 # diagnosed prevalence- one way strata --------------------------------------------
 
@@ -146,16 +188,6 @@ aids.diagnoses.stratified<- run.outlier.process(outcome= 'aids.diagnoses',
                                                  theta = 0.5,
                                                  locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")))%>%
                                                 filter(source == "cdc.aids")
-
-
-# aids.diagnoses.deceased.by.2001 stratified ------------------------------
-aids.diagnoses.deceased.by.2001.stratified <- run.outlier.process(outcome= 'aids.diagnoses.deceased.by.2001',
-                                            stratifications= list('sex', 'race', 'age', 'risk'), 
-                                            data.manager= surveillance.manager,
-                                            #phi = 0.15,
-                                            #theta = 0.05,
-                                            #max.year = 2019,
-                                            locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses.deceased.by.2001")))
 
 # proportion.msm stratified -----------------------------------------------
 proportion.msm.stratified <- run.outlier.process(outcome= 'proportion.msm',
