@@ -11,13 +11,12 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum") # this i
 #load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")
 
 ## --- ANDREW TO LOOK AT ---- ## 
-# want to be able to look at the incidence by risk, sim only 
-simplot(simset,
-        facet.by = "risk", 
-        outcomes = c("incidence"), 
-        plot.which = "sim.only",
+simplot(sim.manual,
+        #facet.by = "age", # age, sex; 1-way 
+        outcomes = c("sexual.transmission.rates"), 
         style.manager = location.style.manager,
-        dimension.values = list(year = 1980:2030)) 
+        plot.year.lag.ratio = T,
+        dimension.values = list(year = 2000:2030)) 
 
 ## --- STANDARD PLOTS ---- ## 
 simplot(simset,
@@ -62,6 +61,11 @@ simplot(simset,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(simset,
+        facet.by = "age", split.by = "sex", # race, risk, sex; 1- and 2-way 
+        outcomes = c("diagnosed.prevalence"), 
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(simset,
         facet.by = "sex", # sex; 1-way 
         outcomes = c("hiv.mortality"),
         style.manager = source.style.manager,
@@ -90,7 +94,7 @@ simplot(simset,
         dimension.values = list(year = 1980:2030)) 
 
 simplot(simset,
-        #facet.by = "race", # age, sex, race, risk; 1-way 
+        facet.by = "age", # age, sex, race, risk; 1-way 
         outcomes = c("testing"),
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
@@ -106,7 +110,7 @@ simplot(simset,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(simset,
-        facet.by = "risk", # age, sex, race, risk; 1-way 
+        facet.by = "age", # age, sex, race, risk; 1-way 
         outcomes = c("suppression"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
@@ -129,6 +133,7 @@ simplot(simset,
         outcomes = c("prep.indications"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
+
 
 
 # simplot(sim,outcomes = "total.hiv.tests")
