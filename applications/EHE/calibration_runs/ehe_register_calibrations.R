@@ -129,7 +129,7 @@ par.names.transmission = c(par.names.transmission,
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           # added proportion tested 4/23
-                          likelihood.instructions = two.way.transmission.pop.idu.likelihood.instructions,
+                          likelihood.instructions = two.way.transmission.pop.idu.aware.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
