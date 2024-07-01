@@ -502,36 +502,32 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                        applies.to.dimension.values=list(race=race))
       }
       
-      # Age
+      # Age*Risk by msm or hetersexual (IDU is heterosexual * IDU multiplier)
       for(age in 1:(length(specification.metadata$dim.names$age)-1)){
-        set.element.functional.form.main.effect.alphas(model.settings,
+        age.value = specification.metadata$dim.names$age[age]
+        
+        set.element.functional.form.interaction.alphas(model.settings,
                                                        element.name = "hiv.positive.aging.rates",
                                                        alpha.name = spline.time,
-                                                       values = parameters[paste0('age',age,'.hiv.aging.multiplier.',time.suffix)],
-                                                       applies.to.dimension.values=list(age=age))
+                                                       value = parameters[paste0('age',age,'.msm.hiv.aging.multiplier.',time.suffix)],
+                                                       applies.to.dimension.values=c(age = age.value,sex='msm'))
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = "hiv.positive.aging.rates",
+                                                       alpha.name = spline.time,
+                                                       value = parameters[paste0('age',age,'.heterosexual.hiv.aging.multiplier.',time.suffix)],
+                                                       applies.to.dimension.values=c(age = age.value,
+                                                                                     sex='heterosexual_male', sex='female', non.idu.states))
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = "hiv.positive.aging.rates",
+                                                       alpha.name = spline.time,
+                                                       value = parameters[paste0('age',age,'.heterosexual.hiv.aging.multiplier.',time.suffix)]*
+                                                         parameters[paste0('idu.hiv.aging.multiplier.',time.suffix)],
+                                                       applies.to.dimension.values=c(age = age.value,
+                                                                                     sex='heterosexual_male', sex='female', idu.states))
       }
-      
-      # Sex/risk 
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "hiv.positive.aging.rates",
-                                                     alpha.name = spline.time,
-                                                     values = parameters[paste0('msm.hiv.aging.multiplier.',time.suffix)],
-                                                     applies.to.dimension.values=c(sex='msm')) 
-      
-      # when cutting across two dimensions, have to use interaction alphas 
-      set.element.functional.form.interaction.alphas(model.settings,
-                                                     element.name = "hiv.positive.aging.rates",
-                                                     alpha.name = spline.time,
-                                                     value = parameters[paste0('idu.hiv.aging.multiplier.',time.suffix)],
-                                                     applies.to.dimension.values=c(sex='heterosexual_male', sex='female', idu.states))
-      
-      set.element.functional.form.interaction.alphas(model.settings,
-                                                     element.name = "hiv.positive.aging.rates",
-                                                     alpha.name = spline.time,
-                                                     value = parameters[paste0('heterosexual.hiv.aging.multiplier.',time.suffix)],
-                                                     applies.to.dimension.values=c(sex='heterosexual_male', sex='female', non.idu.states))
-      
-    
+   
     }
     
 
