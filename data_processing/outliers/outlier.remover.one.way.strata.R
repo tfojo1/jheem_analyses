@@ -52,6 +52,20 @@ diagnoses.stratified.race <- run.outlier.process(outcome= 'diagnoses',
                                                 theta = 0.06,
                                                 max.year = 2019,
                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
+#NEED TO FIX THIS SECTION
+# diagnoses.stratified.race$adjudication <- c(T, T, T, T, T, T, T, T, T, T,
+#                                             T, T, T, T, T, T, T, T, T, T,
+#                                             T, T, T, F, T, T, T, F, F, F,
+#                                             T, T)
+# run.outlier.process(outcome= 'diagnoses',
+#                     stratifications= list('race'),
+#                     data.manager= surveillance.manager,
+#                     phi = 0.32, 
+#                     theta = 0.06,
+#                     max.year = 2019,
+#                     locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
+#                     adjudication.data.frame =  diagnoses.stratified.race)
+
 ##
 diagnoses.stratified.risk <- run.outlier.process(outcome= 'diagnoses',
                                                 stratifications= list('risk'),
@@ -60,6 +74,19 @@ diagnoses.stratified.risk <- run.outlier.process(outcome= 'diagnoses',
                                                 theta = 0.06,
                                                 max.year = 2019,
                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
+diagnoses.stratified.risk$adjudication <- c(T, T, T, T, T, T, T, T, T, T,
+                                            T, T, T, T, T, T, T, T, T, T,
+                                            T, T, T, T, F, F, F, F, F, F,
+                                            F, F, F, T, T, T, T, T)
+run.outlier.process(outcome= 'diagnoses',
+                    stratifications= list('risk'),
+                    data.manager= surveillance.manager,
+                    phi = 0.32, 
+                    theta = 0.06,
+                    max.year = 2019,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
+                    adjudication.data.frame =  diagnoses.stratified.risk)
+
 #sex=16
 #age=33
 #race=32
@@ -177,17 +204,6 @@ retention.stratified <- run.outlier.process(outcome= 'retention',
                                           #theta = 0.05,
                                           #max.year = 2019,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="retention")))
-
-
-# aids.diagnoses stratified -----------------------------------------------
-#This outcome hs two sources but only one is stratified and the other is total
-aids.diagnoses.stratified<- run.outlier.process(outcome= 'aids.diagnoses',
-                                                 stratifications= list('sex', 'race', 'age', 'risk'), 
-                                                 data.manager= surveillance.manager,
-                                                 phi = 0.9,
-                                                 theta = 0.5,
-                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="aids.diagnoses")))%>%
-                                                filter(source == "cdc.aids")
 
 # proportion.msm stratified -----------------------------------------------
 proportion.msm.stratified <- run.outlier.process(outcome= 'proportion.msm',
