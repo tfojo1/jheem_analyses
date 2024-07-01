@@ -23,11 +23,9 @@ cocaine.bias.estimates = get.cached.object.for.version(name = "cocaine.bias.esti
 
 heroin.bias.estimates = get.cached.object.for.version(name = "heroin.bias.estimates", 
                                                       version = 'ehe')  
-if(1==2){
-  # run line in ../jheem_analyses/applications/EHE/ehe_bias_estimates_cache.R to cache this when ready 
-  hiv.tests.per.population.bias.estimates = get.cached.object.for.version(name = "hiv.tests.per.population.bias.estimates", 
-                                                                          version = 'ehe')    
-}
+
+hiv.tests.per.population.bias.estimates = get.cached.object.for.version(name = "hiv.tests.per.population.bias.estimates", 
+                                                                        version = 'ehe')    
 
 
 
@@ -336,7 +334,7 @@ suppression.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry', 
-                                                   p.error.variance.term = 0.06, # will update this using actual error term 
+                                                   p.error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
                                                    p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
@@ -417,7 +415,6 @@ awareness.likelihood.instructions =
                                                    dimensions = character(), # would like to write NULL
                                                    levels.of.stratification = 0, # would like to have an auto of 0:length(d)
                                                    
-                                                   
                                                    from.year = 2008,
                                                    
                                                    p.bias.inside.location = 0, # awareness.bias.estimates$in.mean is NA
@@ -429,8 +426,8 @@ awareness.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   p.error.variance.term = 0.016, # .018*90 - rough estimate from HIV Atlas (for now)
-                                                   p.error.variance.type = 'sd', # data.cv needs to be an option 
+                                                   p.error.variance.term = NULL, # 0.016, # .018*90 - rough estimate from HIV Atlas (for now)
+                                                   p.error.variance.type = 'data.cv', # data.cv needs to be an option 
                                                    # the data estimate is a coefficient of variance 
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
@@ -615,41 +612,70 @@ hiv.test.positivity.likelihood.instructions =
   )
 
 #-- YEAR-ON-YEAR TESTS CHANGE --#
-if(1==2){
-  number.of.tests.year.on.year.change.likelihood.instructions = 
-    create.time.lagged.comparison.nested.proportion.likelihood.instructions(
-      outcome.for.data = "hiv.tests.per.population",
-      outcome.for.sim = "total.hiv.tests.per.population",
-      
-      denominator.outcome.for.data = "adult.population",
-      
-      location.types = c('STATE','CBSA'),
-      minimum.geographic.resolution.type = 'COUNTY',
-      
-      levels.of.stratification = c(0),
-      from.year = 2008,
-      to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
-      
-      p.bias.inside.location = 0, 
-      p.bias.outside.location = hiv.tests.per.population.bias.estimates$out.mean,
-      p.bias.sd.inside.location = hiv.tests.per.population.bias.estimates$out.sd,
-      p.bias.sd.outside.location = hiv.tests.per.population.bias.estimates$out.sd,
-      
-      within.location.p.error.correlation = 0.5,
-      within.location.n.error.correlation = 0.5,
-      
-      observation.correlation.form = 'compound.symmetry',
-      p.error.variance.term = 0.03,
-      p.error.variance.type = 'cv',
-      
-      partitioning.function = EHE.PARTITIONING.FUNCTION, 
-      
-      weights = list(1),
-      equalize.weight.by.year = T,
-      use.lognormal.approximation = T
-    )
-}
 
+# nested version 
+number.of.tests.year.on.year.change.nested.likelihood.instructions = 
+  create.time.lagged.comparison.nested.proportion.likelihood.instructions(
+    outcome.for.data = "hiv.tests.per.population",
+    outcome.for.sim = "total.hiv.tests.per.population",
+    
+    denominator.outcome.for.data = "adult.population",
+    
+    location.types = c('STATE','CBSA'),
+    minimum.geographic.resolution.type = 'COUNTY',
+    
+    levels.of.stratification = c(0),
+    from.year = 2008,
+    to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
+    
+    p.bias.inside.location = 0, 
+    p.bias.outside.location = hiv.tests.per.population.bias.estimates$out.mean,
+    p.bias.sd.inside.location = hiv.tests.per.population.bias.estimates$out.sd,
+    p.bias.sd.outside.location = hiv.tests.per.population.bias.estimates$out.sd,
+    
+    within.location.p.error.correlation = 0.5,
+    within.location.n.error.correlation = 0.5,
+    
+    observation.correlation.form = 'compound.symmetry',
+    p.error.variance.term = 0.03,
+    p.error.variance.type = 'cv',
+    
+    partitioning.function = EHE.PARTITIONING.FUNCTION, 
+    
+    weights = list(1),
+    equalize.weight.by.year = T,
+    use.lognormal.approximation = T
+  )
+
+# basic version 
+number.of.tests.year.on.year.change.basic.likelihood.instructions = 
+  create.time.lagged.comparison.likelihood.instructions(
+    # don't actually need this to be a per population proportion 
+    # (did this to be able to do nested likelihood), but keeping it anyway
+    outcome.for.data = "hiv.tests.per.population", 
+    outcome.for.sim = "total.hiv.tests.per.population",
+    denominator.outcome.for.sim = "population",
+    
+    levels.of.stratification = c(0),
+    from.year = 2008,
+    to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
+    
+    observation.correlation.form = 'compound.symmetry',
+    error.variance.term = 0.03,
+    error.variance.type = 'cv',
+    
+    weights = list(1),
+    equalize.weight.by.year = T,
+    use.lognormal.approximation = T
+  )
+
+# ifelse to try both versions 
+number.of.tests.year.on.year.change.likelihood.instructions = 
+  create.ifelse.likelihood.instructions(
+    number.of.tests.year.on.year.change.basic.likelihood.instructions,
+    number.of.tests.year.on.year.change.nested.likelihood.instructions
+  )
+  
 
 #-- YEAR-ON-YEAR GONORRHEA CHANGE --#
 gonorrhea.year.on.year.change.likelihood.instructions = 
@@ -710,31 +736,14 @@ joint.pop.migration.total.trans.aids.likelihood.instructions = join.likelihood.i
   total.aids.deaths.likelihood.instructions)
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
-two.way.transmission.pop.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
-                               race.risk.sex.two.way.prevalence.likelihood.instructions,
-                               two.way.proportion.tested.likelihood.instructions, # added this in 4/23
-                               population.likelihood.instructions 
-                               )
-
-two.way.transmission.pop.idu.likelihood.instructions = 
+two.way.transmission.pop.idu.aware.likelihood.instructions = 
   join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
                                race.risk.sex.two.way.prevalence.likelihood.instructions,
                                two.way.proportion.tested.likelihood.instructions, # added this in 4/23
                                population.likelihood.instructions,
                                heroin.likelihood.instructions,
-                               cocaine.likelihood.instructions
-  )
-
-two.way.transmission.pop.aids.idu.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
-                               race.risk.sex.two.way.prevalence.likelihood.instructions,
-                               two.way.proportion.tested.likelihood.instructions, # added this in 4/23
-                               population.likelihood.instructions,
-                               aids.diagnoses.likelihood.instructions,
-                               aids.deaths.likelihood.instructions,
-                               heroin.likelihood.instructions,
-                               cocaine.likelihood.instructions
+                               cocaine.likelihood.instructions,
+                               awareness.likelihood.instructions
   )
 
 
@@ -808,7 +817,7 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   cocaine.likelihood.instructions,
   
   # COVID LIKELIHOODS
-  #number.of.tests.year.on.year.change.likelihood.instructions,
+  number.of.tests.year.on.year.change.likelihood.instructions,
   gonorrhea.year.on.year.change.likelihood.instructions,
   ps.syphilis.year.on.year.change.likelihood.instructions
   
