@@ -2116,6 +2116,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
 
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'sexual.transmission.rates',
+                         corresponding.data.outcome = c('gonorrhea.ratio'), #,'ps.syphilis.ratio'),
                          outcome.metadata = create.outcome.metadata(display.name = 'Sexual Transmission Rates',
                                                                     description = "Estimated rates of sexual transmission",
                                                                     scale = 'rate',
