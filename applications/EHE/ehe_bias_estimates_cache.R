@@ -71,10 +71,6 @@ hiv.tests.per.population.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANA
                                                           main.location.type.n.source = 'census.population',
                                                           super.location.type.n.source = 'census.population')
 
-cache.object.for.version(object = awareness.bias.estimates, 
-                         name = "heroin.bias.estimates", 
-                         version = 'ehe', overwrite=T)
-
 # ALL ALREADY CACHED
 if(1==2){
   cache.object.for.version(object = suppression.bias.estimates, 
@@ -104,4 +100,8 @@ if(1==2){
   cache.object.for.version(object = heroin.bias.estimates, 
                            name = "heroin.bias.estimates", 
                            version = 'ehe', overwrite=T)
+  
+  cache.object.for.version(object = hiv.tests.per.population.bias.estimates, 
+                           name = "hiv.tests.per.population.bias.estimates", 
+                           version = 'ehe', overwrite=T)  
 }
