@@ -52,19 +52,19 @@ diagnoses.stratified.race <- run.outlier.process(outcome= 'diagnoses',
                                                 theta = 0.06,
                                                 max.year = 2019,
                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
-#NEED TO FIX THIS SECTION
-# diagnoses.stratified.race$adjudication <- c(T, T, T, T, T, T, T, T, T, T,
-#                                             T, T, T, T, T, T, T, T, T, T,
-#                                             T, T, T, F, T, T, T, F, F, F,
-#                                             T, T)
-# run.outlier.process(outcome= 'diagnoses',
-#                     stratifications= list('race'),
-#                     data.manager= surveillance.manager,
-#                     phi = 0.32, 
-#                     theta = 0.06,
-#                     max.year = 2019,
-#                     locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
-#                     adjudication.data.frame =  diagnoses.stratified.race)
+
+diagnoses.stratified.race$adjudication <- c (F, T, T, T, T, F, T, T, T, T,
+                                             T, T, T, T, T, T, T, T, T, T,
+                                             T, T, T, F, T, T, T, F, F, F,
+                                             F, T)
+run.outlier.process(outcome= 'diagnoses',
+                    stratifications= list('race'),
+                    data.manager= surveillance.manager,
+                    phi = 0.32,
+                    theta = 0.06,
+                    max.year = 2019,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
+                    adjudication.data.frame =  diagnoses.stratified.race)
 
 ##
 diagnoses.stratified.risk <- run.outlier.process(outcome= 'diagnoses',
