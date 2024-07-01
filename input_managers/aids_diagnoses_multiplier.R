@@ -1,4 +1,5 @@
-# Using data from 2000, 2002, and 2003 (2001 values seem off), 
+# https://stacks.cdc.gov/ 
+    # HIV reports, NCHHSTP, NCHHSTP_DHAP
 # calculating the ratio of AIDS diagnoses:HIV diagnoses in states that have at least 100 HIV diagnoses 
 
 # only including states with >=100 cases 
