@@ -1,12 +1,12 @@
 #####
 # CHECKING ----------------------------------------------------------------
 issue <- diagnoses.one.way %>%
-  filter(location == "IN")
+  filter(location == "C.14460")
 
 underlying.data = as.data.frame.table(surveillance.manager$data$diagnoses$estimate$cdc.hiv$cdc$year__location__sex)
 
 underlying.data <- underlying.data %>%
-  filter(location == "IN")
+  filter(location == "C.14460")
 
 ###########
 
@@ -87,10 +87,6 @@ run.outlier.process(outcome= 'diagnoses',
                     locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")),
                     adjudication.data.frame =  diagnoses.stratified.risk)
 
-#sex=16
-#age=33
-#race=32
-#risk=38
 
 # diagnosed prevalence- one way strata --------------------------------------------
 
@@ -111,10 +107,19 @@ dx.prev.stratified <- run.outlier.process(outcome= 'diagnosed.prevalence',
 hiv.deaths.stratified<- run.outlier.process(outcome= 'hiv.deaths',
                                           stratifications= list('sex', 'race', 'age', 'risk'),
                                           data.manager= surveillance.manager,
-                                          phi = 0.2,
+                                          phi = 0.3,
                                           theta = 0.05,
-                                          max.year = 2019,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="hiv.deaths")))
+hiv.deaths.stratified$adjudication <- c(T)
+
+run.outlier.process(outcome= 'hiv.deaths',
+                    stratifications= list('sex', 'race', 'age', 'risk'),
+                    data.manager= surveillance.manager,
+                    phi = 0.3,
+                    theta = 0.05,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="hiv.deaths")),
+                    adjudication.data.frame = hiv.deaths.stratified)
+
 
 # suppression - one way strata ----------------------------------------------------
 
