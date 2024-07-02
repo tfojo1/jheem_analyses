@@ -102,6 +102,17 @@ dx.prev.stratified <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                             first.choice.year = 2018,
                                             locations= c(states, msas))
 
+dx.prev.stratified$adjudication <- c(T)
+
+run.outlier.process(outcome= 'diagnosed.prevalence',
+                    stratifications= list('sex', 'race', 'age', 'risk'),
+                    data.manager= surveillance.manager,
+                    phi = 0.2,
+                    theta = 0.05,
+                    max.year = 2019,
+                    first.choice.year = 2018,
+                    locations= c(states, msas),
+                    adjudication.data.frame =  dx.prev.stratified)
 # hiv.deaths - one way strata ----------------------------------------------------
 
 hiv.deaths.stratified<- run.outlier.process(outcome= 'hiv.deaths',
