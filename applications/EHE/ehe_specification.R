@@ -1447,17 +1447,17 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='msm'),
-                               value = expression(global.trate * msm.trates * msm.peak.multiplier * sexual.susceptibility.covid.multiplier))
+                               value = expression(global.trate * msm.trates * msm.peak.multiplier))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='female'),
-                               value = expression(global.trate * heterosexual.trates * sexual.susceptibility.covid.multiplier))
+                               value = expression(global.trate * heterosexual.trates))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='heterosexual_male'),
-                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr * sexual.susceptibility.covid.multiplier))
+                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr))
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'male.vs.female.heterosexual.rr',
@@ -2125,6 +2125,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     units = '/y',
                                                                     singular.unit = '/y'),
                          value.to.integrate = 'flattened.sexual.transmission.rates',
+                         multiply.by = 'sexual.susceptibility.covid.multiplier',
                          denominator.outcome = 'population',
                          dimension.alias.suffix = 'to',
                          keep.dimensions = c('location','age','race','sex')
