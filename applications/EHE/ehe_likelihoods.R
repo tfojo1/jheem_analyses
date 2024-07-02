@@ -436,6 +436,39 @@ awareness.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
+awareness.heavy.weight.likelihood.instructions =
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "awareness",
+                                                   outcome.for.sim = "awareness",
+                                                   denominator.outcome.for.data = "total.prevalence",
+                                                   outcome.for.n.multipliers = "diagnosed.prevalence",
+                                                   
+                                                   location.types = c('STATE','CBSA','COUNTY'),
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = character(), # would like to write NULL
+                                                   levels.of.stratification = 0, # would like to have an auto of 0:length(d)
+                                                   
+                                                   from.year = 2008,
+                                                   
+                                                   p.bias.inside.location = 0, # awareness.bias.estimates$in.mean is NA
+                                                   p.bias.outside.location = awareness.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = awareness.bias.estimates$out.sd, # awareness.bias.estimates$in.sd is NA
+                                                   p.bias.sd.outside.location = awareness.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry',
+                                                   p.error.variance.term = NULL, # 0.016, # .018*90 - rough estimate from HIV Atlas (for now)
+                                                   p.error.variance.type = 'data.cv', # data.cv needs to be an option 
+                                                   # the data estimate is a coefficient of variance 
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(4),
+                                                   equalize.weight.by.year = T
+  )
+
 #-- HEROIN  --#
 heroin.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
@@ -743,7 +776,7 @@ two.way.transmission.pop.idu.aware.likelihood.instructions =
                                population.likelihood.instructions,
                                heroin.likelihood.instructions,
                                cocaine.likelihood.instructions,
-                               awareness.likelihood.instructions
+                               awareness.heavy.weight.likelihood.instructions # weight awareness more just for the transmission calibration 
   )
 
 
@@ -817,7 +850,7 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   cocaine.likelihood.instructions,
   
   # COVID LIKELIHOODS
-  number.of.tests.year.on.year.change.likelihood.instructions,
+  #number.of.tests.year.on.year.change.likelihood.instructions,
   gonorrhea.year.on.year.change.likelihood.instructions,
   ps.syphilis.year.on.year.change.likelihood.instructions
   
