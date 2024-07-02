@@ -154,7 +154,7 @@ retention.of.engaged.stratified <- run.outlier.process(outcome= 'retention.of.en
                                                      #theta = 0.05,
                                                      locations= c(surveillance.manager$get.locations.with.data(outcome="retention.of.engaged")))
 
-# engaged straitifed ------------------------------------------------------
+# engaged stratified ------------------------------------------------------
 engagement.stratified <- run.outlier.process(outcome= 'engagement',
                                              stratifications= list('sex', 'race', 'age', 'risk'), 
                                            data.manager= surveillance.manager,
@@ -168,11 +168,21 @@ engagement.stratified <- run.outlier.process(outcome= 'engagement',
 ps.syphilis.stratified <- run.outlier.process(outcome= 'ps.syphilis',
                                             stratifications= list('sex', 'race', 'age', 'risk'), 
                                             data.manager= surveillance.manager,
-                                            phi = 0.5,
+                                            phi = 0.6,
                                             theta = 0.05,
                                             max.year = 2019,
                                             locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
-
+ps.syphilis.stratified$adjudication <- c(T, T, T, T, T, T, T, T, T, F,
+                                         F, F, F, T, T, T, T, T, T, T,
+                                         T)
+run.outlier.process(outcome= 'ps.syphilis',
+                    stratifications= list('sex', 'race', 'age', 'risk'), 
+                    data.manager= surveillance.manager,
+                    phi = 0.6,
+                    theta = 0.05,
+                    max.year = 2019,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")),
+                    adjudication.data.frame = ps.syphilis.stratified)
 
 # early syphilis stratified -----------------------------------------------
 
@@ -185,6 +195,18 @@ early.syphilis.stratified <- run.outlier.process(outcome= 'early.syphilis',
                                                first.choice.year =  2018,
                                                locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")))
 
+early.syphilis.stratified$adjudication <- c(T)
+
+run.outlier.process(outcome= 'early.syphilis',
+                    stratifications= list('sex', 'race', 'age', 'risk'), 
+                    data.manager= surveillance.manager,
+                    phi = 0.8,
+                    theta = 0.05,
+                    max.year = 2019,
+                    first.choice.year =  2018,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")),
+                    adjudication.data.frame =  early.syphilis.stratified)
+
 
 # gonorrhea - stratified --------------------------------------------------
 
@@ -195,6 +217,15 @@ gonorrhea.stratified <- run.outlier.process(outcome= 'gonorrhea',
                                           theta = 0.05,
                                           max.year = 2019,
                                           locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
+gonorrhea.stratified$adjudication <- c(T)
+run.outlier.process(outcome= 'gonorrhea',
+                    stratifications= list('sex', 'race', 'age', 'risk'), 
+                    data.manager= surveillance.manager,
+                    phi = 0.6,
+                    theta = 0.05,
+                    max.year = 2019,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")),
+                    adjudication.data.frame =  gonorrhea.stratified)
 
 # retention - stratified ---------------------------------------------------------------
 retention.stratified <- run.outlier.process(outcome= 'retention',
