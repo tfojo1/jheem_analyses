@@ -1447,17 +1447,17 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='msm'),
-                               value = expression(global.trate * msm.trates * msm.peak.multiplier))
+                               value = expression(global.trate * msm.trates * msm.peak.multiplier * sexual.susceptibility.covid.multiplier))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='female'),
-                               value = expression(global.trate * heterosexual.trates))
+                               value = expression(global.trate * heterosexual.trates * sexual.susceptibility.covid.multiplier))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='heterosexual_male'),
-                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr))
+                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr * sexual.susceptibility.covid.multiplier))
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'male.vs.female.heterosexual.rr',
@@ -1919,6 +1919,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'total.hiv.tests.per.population',
+                         corresponding.data.outcome = "hiv.tests.per.population",
                          outcome.metadata = create.outcome.metadata(display.name = 'Total Number of HIV Tests Per Population',
                                                                     description = "Number of HIV Tests Done in the Past Year Per Population",
                                                                     scale = 'proportion',
