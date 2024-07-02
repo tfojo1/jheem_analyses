@@ -517,7 +517,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                        alpha.name = spline.time,
                                                        value = parameters[paste0('age',age,'.heterosexual.hiv.aging.multiplier.',time.suffix)],
                                                        applies.to.dimension.values=c(age = age.value,
-                                                                                     sex='heterosexual_male', sex='female', non.idu.states))
+                                                                                     sex=c('heterosexual_male','female'), 
+                                                                                     risk = non.idu.states))
         
         set.element.functional.form.interaction.alphas(model.settings,
                                                        element.name = "hiv.positive.aging.rates",
@@ -525,7 +526,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                        value = parameters[paste0('age',age,'.heterosexual.hiv.aging.multiplier.',time.suffix)]*
                                                          parameters[paste0('idu.hiv.aging.multiplier.',time.suffix)],
                                                        applies.to.dimension.values=c(age = age.value,
-                                                                                     sex='heterosexual_male', sex='female', idu.states))
+                                                                                     sex=c('heterosexual_male','female'), 
+                                                                                     risk = idu.states))
       }
    
     }
@@ -740,7 +742,8 @@ set.ehe.alphas.from.parameters <- function(model.settings,
             model.settings$set.element.functional.form.interaction.alphas(element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
-                                                                        applies.to.dimension.values = c(sex='msm', non.idu.states))
+                                                                        applies.to.dimension.values = c(sex='msm', 
+                                                                                                        risk = non.idu.states))
         }
         
         # Heterosexual
@@ -751,7 +754,8 @@ set.ehe.alphas.from.parameters <- function(model.settings,
             model.settings$set.element.functional.form.interaction.alphas(element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
-                                                                        applies.to.dimension.values = c(sex='heterosexual_male', sex='female', non.idu.states))
+                                                                        applies.to.dimension.values = c(sex=c('heterosexual_male','female'),
+                                                                                                        risk=non.idu.states))
         }
         
         # IDU
@@ -762,7 +766,8 @@ set.ehe.alphas.from.parameters <- function(model.settings,
             model.settings$set.element.functional.form.interaction.alphas(element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
-                                                                        applies.to.dimension.values = c(sex='heterosexual_male', sex='female', idu.states))
+                                                                        applies.to.dimension.values = c(sex=c('heterosexual_male','female'),
+                                                                                                        risk=idu.states))
         }
         
         # MSM-IDU
@@ -773,7 +778,8 @@ set.ehe.alphas.from.parameters <- function(model.settings,
             model.settings$set.element.functional.form.interaction.alphas(element.name = element.name,
                                                                         alpha.name = alpha.name,
                                                                         value = value * sex.risk.multiplier,
-                                                                        applies.to.dimension.values = c(sex='msm', idu.states))
+                                                                        applies.to.dimension.values = c(sex='msm', 
+                                                                                                        risk=idu.states))
         }
         
     }
