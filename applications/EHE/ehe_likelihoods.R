@@ -851,7 +851,7 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   
   # COVID LIKELIHOODS
   #number.of.tests.year.on.year.change.likelihood.instructions,
-  gonorrhea.year.on.year.change.likelihood.instructions,
+  #gonorrhea.year.on.year.change.likelihood.instructions,
   ps.syphilis.year.on.year.change.likelihood.instructions
   
 )
