@@ -3,8 +3,8 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 LOCATION = BALTIMORE.MSA
 CALIBRATION.CODE.TO.RUN =  #CALIBRATION.CODE.POPULATION
-                            #                             CALIBRATION.CODE.TRANSMISSION
-                                                           CALIBRATION.CODE.FULL.PLUS.AIDS
+                                                         CALIBRATION.CODE.TRANSMISSION
+                            #                               CALIBRATION.CODE.FULL.PLUS.AIDS
                                                           # CALIBRATION.CODE.FULL.PLUS.COVID
 
 set.seed(12345)
