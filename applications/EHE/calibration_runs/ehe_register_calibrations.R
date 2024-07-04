@@ -9,6 +9,7 @@ CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
+CALIBRATION.CODE.FULL.PLUS.COVID.MINUS.TEST.CHANGE = 'full.with.covid.minus.test.change' 
 
 N.ITER.TEST = 10000
 N.ITER = 15000
@@ -172,3 +173,16 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
                           description = "Full with covid likelihoods"
 )
 
+#-- REGISTER FULL CALIBRATION WITH COVID-RELATED --#
+register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID.MINUS.TEST.CHANGE,
+                          likelihood.instructions = FULL.likelihood.instructions.with.covid.minus.test.change,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Full with covid likelihoods (minus test change)"
+)
