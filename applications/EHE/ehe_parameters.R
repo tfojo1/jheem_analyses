@@ -307,11 +307,12 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     
     #testing.ramp.up.vs.current.rr = Lognormal.Distribution(log(0.5), 0.25*log(2), upper = 1),
     
-    msm.testing.ramp.or = Lognormal.Distribution(0, 0.5*log(2)),
-    heterosexual.testing.ramp.or = Lognormal.Distribution(0, 0.5*log(2)),
-    idu.testing.ramp.or = Lognormal.Distribution(0, 0.5*log(2)),
-    testing.ramp.1.or = Lognormal.Distribution(0, 0.5*log(2)),
-    testing.ramp.2.or = Lognormal.Distribution(0, 0.5*log(2)),
+    msm.testing.ramp.1.or = Lognormal.Distribution(0, 0.5*log(2)),
+    msm.testing.ramp.2.or = Lognormal.Distribution(0, 0.5*log(2)),
+    heterosexual.testing.ramp.1.or = Lognormal.Distribution(0, 0.5*log(2)),
+    heterosexual.testing.ramp.2.or = Lognormal.Distribution(0, 0.5*log(2)),
+    idu.testing.ramp.1.or = Lognormal.Distribution(0, 0.5*log(2)),
+    idu.testing.ramp.2.or = Lognormal.Distribution(0, 0.5*log(2)),
     
     msm.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
     heterosexual.undiagnosed.testing.increase.rr = Lognormal.Distribution(0, 0.5*log(2)),
@@ -886,14 +887,15 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   old.age.testing = c('age4.proportion.tested.or',
                       'age5.proportion.tested.or'),
   
-  testing.ramp.up = c(
-    'testing.ramp.1.or',
-    'testing.ramp.2.or'),
+  testing.ramp.by.risk.1 = c(
+    'msm.testing.ramp.1.or',
+    'msm.testing.ramp.2.or',
+    'heterosexual.testing.ramp.1.or',
+    'heterosexual.testing.ramp.2.or'),
 
-  testing.ramp.by.risk = c(
-    'msm.testing.ramp.or',
-    'heterosexual.testing.ramp.or',
-    'idu.testing.ramp.or'),
+  testing.ramp.by.risk.2 = c(
+    'idu.testing.ramp.1.or',
+    'idu.testing.ramp.2.or'),
   
   msm.prep = c(
     'msm.prep.intercept.or',

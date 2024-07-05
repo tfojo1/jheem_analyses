@@ -143,30 +143,23 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = 'testing.ramp.rr',
                                                        alpha.name = ramp.time,
-                                                       value = parameters['msm.testing.ramp.or'],
+                                                       value = parameters[paste0('msm.testing.',ramp.time,'.or')],
                                                        dimension = 'sex',
                                                        applies.to.dimension.values = 'msm')
         
         set.element.functional.form.interaction.alphas(model.settings,
                                                        element.name = 'testing.ramp.rr',
                                                        alpha.name = ramp.time,
-                                                       value = parameters['heterosexual.testing.ramp.or'],
+                                                       value = parameters[paste0('heterosexual.testing.',ramp.time,'.or')],
                                                        applies.to.dimension.values = list(sex=c("female","heterosexual_male"),
                                                                                           risk = non.idu.states))
         
         set.element.functional.form.interaction.alphas(model.settings,
                                                        element.name = 'testing.ramp.rr',
                                                        alpha.name = ramp.time,
-                                                       value = parameters['idu.testing.ramp.or'],
+                                                       value = parameters[paste0('idu.testing.',ramp.time,'.or')],
                                                        applies.to.dimension.values = list(sex=c("female","heterosexual_male"),
                                                                                           risk = idu.states))
-        
-        set.element.functional.form.main.effect.alphas(model.settings,
-                                                       element.name = 'testing.ramp.rr',
-                                                       alpha.name = ramp.time,
-                                                       value = parameters[paste0('testing.', ramp.time, '.or')],
-                                                       applies.to.dimension.values = 'all',
-                                                       dimension = 'all')
     }
     
     
