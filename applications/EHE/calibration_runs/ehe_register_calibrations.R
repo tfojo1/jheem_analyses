@@ -9,6 +9,7 @@ CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
+CALIBRATION.CODE.FULL.PLUS.COVID.MINUS.TEST.CHANGE = 'full.w.covid.minus.test' 
 
 N.ITER.TEST = 10000
 N.ITER = 15000
@@ -76,8 +77,12 @@ par.names.basic.trans = c(
   "peak.hiv.mortality",
   "hiv.mortality.0",
   "hiv.mortality.1",
-  'testing.ramp.1.or',
-  'testing.ramp.2.or'
+  'msm.testing.ramp.1.or',
+  'msm.testing.ramp.2.or',
+  'heterosexual.testing.ramp.1.or',
+  'heterosexual.testing.ramp.2.or',
+  'idu.testing.ramp.1.or',
+  'idu.testing.ramp.2.or'
 )
 
 register.calibration.info(CALIBRATION.CODE.POPULATION,
@@ -109,23 +114,15 @@ par.names.transmission = c(par.names.transmission,
                            "peak.hiv.mortality",
                            "hiv.mortality.0",
                            "hiv.mortality.1",
-                           'testing.ramp.1.or',
-                           'testing.ramp.2.or',
-                           'msm.testing.ramp.or',
-                           'heterosexual.testing.ramp.or',
-                           'idu.testing.ramp.or',
+                           'msm.testing.ramp.1.or',
+                           'msm.testing.ramp.2.or',
+                           'heterosexual.testing.ramp.1.or',
+                           'heterosexual.testing.ramp.2.or',
+                           'idu.testing.ramp.1.or',
+                           'idu.testing.ramp.2.or',
                            'idu.remission.multiplier',
-                           'idu.relapse.multiplier',
-                           'msm.proportion.tested.or',
-                           'msm.proportion.tested.slope.or',
-                           'heterosexual.proportion.tested.or',
-                           'heterosexual.proportion.tested.slope.or',
-                           'idu.proportion.tested.or',
-                           'idu.proportion.tested.slope.or',
-                           'msm.idu.proportion.tested.or',
-                           'msm.idu.proportion.tested.slope.or',
-                           'black.proportion.tested.or',
-                           'hispanic.proportion.tested.or')
+                           'idu.relapse.multiplier'
+                           )
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           # added proportion tested 4/23
@@ -172,3 +169,16 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
                           description = "Full with covid likelihoods"
 )
 
+#-- REGISTER FULL CALIBRATION WITH COVID-RELATED --#
+register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID.MINUS.TEST.CHANGE,
+                          likelihood.instructions = FULL.likelihood.instructions.with.covid.minus.test.change,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Full with covid likelihoods (minus test change)"
+)

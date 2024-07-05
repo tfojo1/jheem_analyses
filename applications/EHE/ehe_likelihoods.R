@@ -815,8 +815,6 @@ FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
 )
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# 
-# WHEN TESTING LAG LIKELIHOOD IS READY, REMOVE COMMENT OUT BELOW 
-
 FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
@@ -850,12 +848,50 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   cocaine.likelihood.instructions,
   
   # COVID LIKELIHOODS
-  #number.of.tests.year.on.year.change.likelihood.instructions,
-  #gonorrhea.year.on.year.change.likelihood.instructions,
+  number.of.tests.year.on.year.change.likelihood.instructions,
+  gonorrhea.year.on.year.change.likelihood.instructions,
   ps.syphilis.year.on.year.change.likelihood.instructions
   
 )
 
+FULL.likelihood.instructions.with.covid.minus.test.change =  join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # MORTALITY LIKELIHOODS
+  hiv.mortality.likelihood.instructions,
+  general.mortality.likelihood.instructions,
+  aids.deaths.likelihood.instructions,
+  
+  # AIDS DIAGNOSES LIKELIHOOD
+  aids.diagnoses.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions,
+  suppression.likelihood.instructions,
+  
+  # PREP LIKELIHOODS
+  prep.uptake.likelihood.instructions,
+  prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions,
+  cocaine.likelihood.instructions,
+  
+  # COVID LIKELIHOODS
+  #number.of.tests.year.on.year.change.likelihood.instructions,
+  gonorrhea.year.on.year.change.likelihood.instructions,
+  ps.syphilis.year.on.year.change.likelihood.instructions
+  
+)
 
 
 

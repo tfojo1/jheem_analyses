@@ -3,7 +3,9 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 LOCATION = BALTIMORE.MSA
 
-CALIBRATION.CODE.TO.PROCESS = CALIBRATION.CODE.FULL.PLUS.COVID 
+CALIBRATION.CODE.TO.PROCESS = #CALIBRATION.CODE.TRANSMISSION 
+                              #CALIBRATION.CODE.FULL.PLUS.COVID
+                              CALIBRATION.CODE.FULL.PLUS.COVID.MINUS.TEST.CHANGE
 
 # Pull just the last simulation
 # mcmc = assemble.mcmc.from.calibration(version = 'ehe',
