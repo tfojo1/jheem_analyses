@@ -659,7 +659,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     
     levels.of.stratification = c(0),
     from.year = 2008,
-    to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
+ #   to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
     
     p.bias.inside.location = 0, 
     p.bias.outside.location = hiv.tests.per.population.bias.estimates$out.mean,
@@ -691,7 +691,7 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     
     levels.of.stratification = c(0),
     from.year = 2008,
-    to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
+  #  to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
     
     observation.correlation.form = 'compound.symmetry',
     error.variance.term = 0.03,
