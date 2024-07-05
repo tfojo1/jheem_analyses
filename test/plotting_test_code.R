@@ -83,7 +83,7 @@ simplot(simset,
         dimension.values = list(year = 1981:2001)) 
 
 simplot(simset,
-        facet.by = "age", # age, sex, race, risk; 1-way 
+        #facet.by = "age", # age, sex, race, risk; 1-way 
         outcomes = c("aids.diagnoses"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 1980:2030)) 
@@ -94,7 +94,7 @@ simplot(simset,
         dimension.values = list(year = 1980:2030)) 
 
 simplot(simset,
-        facet.by = "age", # age, sex, race, risk; 1-way 
+        facet.by = "risk", # age, sex, race, risk; 1-way 
         outcomes = c("testing"),
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
@@ -137,3 +137,4 @@ simplot(simset,
 
 
 # simplot(sim,outcomes = "total.hiv.tests")
+round(apply(simset$last.sim()$diagnosed.prevalence,c("year","sex"),sum)/apply(simset$last.sim()$infected,c("year","sex"),sum)[-1,],3)
