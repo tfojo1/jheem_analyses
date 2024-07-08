@@ -163,12 +163,14 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     age4.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
     age5.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
     
-    
+    age1.msm.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.25*log(2)),
+    age2.msm.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.25*log(2)),
+        
     age1.msm.susceptibility.rr.mult.1 = Lognormal.Distribution(0, 0.25*log(2)),
     age2.msm.susceptibility.rr.mult.1 = Lognormal.Distribution(0, 0.25*log(2)),
     age4.msm.susceptibility.rr.mult.12 = Lognormal.Distribution(0, 0.25*log(2)),
     age5.msm.susceptibility.rr.mult.12 = Lognormal.Distribution(0, 0.25*log(2)),
-    
+
     age1.msm.susceptibility.rr.mult.2 = Lognormal.Distribution(0, 0.25*log(2)),
     age2.msm.susceptibility.rr.mult.2 = Lognormal.Distribution(0, 0.25*log(2)),
     
@@ -721,11 +723,13 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   # ),
   
   msm.age1.susceptibility = c(
+    'age1.msm.susceptibility.rr.mult.0',
     'age1.msm.susceptibility.rr.mult.1',
     'age1.msm.susceptibility.rr.mult.2'
   ),
   
   msm.age2.susceptibility = c(
+    'age2.msm.susceptibility.rr.mult.0',
     'age2.msm.susceptibility.rr.mult.1',
     'age2.msm.susceptibility.rr.mult.2'
   ),
