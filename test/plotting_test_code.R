@@ -11,12 +11,7 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum") # this i
 #load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")
 
 ## --- ANDREW TO LOOK AT ---- ## 
-simplot(sim.manual,
-        #facet.by = "age", # age, sex; 1-way 
-        outcomes = c("sexual.transmission.rates"), 
-        style.manager = location.style.manager,
-        plot.year.lag.ratio = T,
-        dimension.values = list(year = 2000:2030)) 
+
 
 ## --- STANDARD PLOTS ---- ## 
 simplot(simset,
@@ -51,13 +46,13 @@ simplot(simset,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(simset,
-        facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
         outcomes = c("diagnosed.prevalence"), 
+        style.manager = source.style.manager,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(simset,
+        facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
         outcomes = c("diagnosed.prevalence"), 
-        style.manager = source.style.manager,
         dimension.values = list(year = 2000:2030)) 
 
 simplot(simset,
@@ -83,7 +78,7 @@ simplot(simset,
         dimension.values = list(year = 1981:2001)) 
 
 simplot(simset,
-        #facet.by = "age", # age, sex, race, risk; 1-way 
+        facet.by = "age", # age, sex, race, risk; 1-way 
         outcomes = c("aids.diagnoses"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 1980:2030)) 
