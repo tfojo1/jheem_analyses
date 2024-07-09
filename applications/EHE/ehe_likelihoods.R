@@ -676,7 +676,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
     
     weights = list(1),
-    equalize.weight.by.year = T,
+    equalize.weight.by.year = F,
     use.lognormal.approximation = T
   )
 
@@ -698,7 +698,7 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     error.variance.type = 'cv',
     
     weights = list(1),
-    equalize.weight.by.year = T,
+    equalize.weight.by.year = F,
     use.lognormal.approximation = T
   )
 
@@ -724,7 +724,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                                         error.variance.type = 'cv',
                                                         correlation.different.years = 0.5,
                                                         weights = list(1), 
-                                                        equalize.weight.by.year = T 
+                                                        equalize.weight.by.year = F 
   )
 
 #-- YEAR-ON-YEAR SYPHILIS CHANGE --#
@@ -741,7 +741,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                                         error.variance.type = 'cv',
                                                         correlation.different.years = 0.2,
                                                         weights = list(1), 
-                                                        equalize.weight.by.year = T 
+                                                        equalize.weight.by.year = F 
   )
 
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS  --#
@@ -849,45 +849,6 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   
   # COVID LIKELIHOODS
   number.of.tests.year.on.year.change.likelihood.instructions,
-  gonorrhea.year.on.year.change.likelihood.instructions,
-  ps.syphilis.year.on.year.change.likelihood.instructions
-  
-)
-
-FULL.likelihood.instructions.with.covid.minus.test.change =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions,
-  
-  # COVID LIKELIHOODS
-  #number.of.tests.year.on.year.change.likelihood.instructions,
   gonorrhea.year.on.year.change.likelihood.instructions,
   ps.syphilis.year.on.year.change.likelihood.instructions
   
