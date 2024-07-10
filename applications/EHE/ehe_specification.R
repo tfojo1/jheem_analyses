@@ -1861,6 +1861,10 @@ register.model.element(EHE.SPECIFICATION,
                        dimension.values = list(age='all.ages'),
                        value = array(c(0.9,1,1,1,1), dim=c(age=5), dimnames=list(age=c('13-24 years','25-34 years','35-44 years','45-54 years','55+ years'))))
 
+register.model.quantity(EHE.SPECIFICATION,
+                        'general.population.testing.over.18',
+                        value = expression(general.population.testing * fraction.tests.over.18 / fraction.population.over.18))
+
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'cumulative.uninfected.over.18',
                          value = expression(cumulative.uninfected * fraction.population.over.18),
@@ -1868,30 +1872,44 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex','risk'),
                          rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
                          save = F,
-                         outcome.metadata = NULL
-)
+                         outcome.metadata = NULL)
+
+# track.point.outcome(EHE.SPECIFICATION,
+#                     name = 'general.population.testing.over.18',
+#                     scale = 'rate',
+#                     keep.dimensions = c('location','age','race','sex','risk'),
+#                     value = expression(general.population.testing * fraction.tests.over.18 / fraction.population.over.18),
+#                     save = F,
+#                     outcome.metadata = NULL,
+#                     denominator.outcome = 'uninfected')
 
 track.cumulative.proportion.from.rate(EHE.SPECIFICATION,
-                                      name = 'proportion.general.population.tested.including.under.18',
-                                      outcome.metadata = NULL,
-                                      rate.value = 'general.population.testing',
-                                      denominator.outcome = 'cumulative.uninfected',
+                                      name = 'testing',
+                                      outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
+                                                                                 description = "The Proportion of General Population who Received an HIV Test in the Past Year",
+                                                                                 scale = 'proportion',
+                                                                                 axis.name = 'Proportion Tested',
+                                                                                 units = '%'),
+                                      rate.value = 'general.population.testing.over.18',
+                                      denominator.outcome = 'cumulative.uninfected.over.18',
                                       keep.dimensions = c('location','age','race','sex','risk'),
-                                      save = F)
+                                      corresponding.data.outcome = 'proportion.tested',
+                                      rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
+                                      save = T)
 
-track.cumulative.outcome(EHE.SPECIFICATION,
-                         name = 'testing',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
-                                                                    description = "The Proportion of General Population who Received an HIV Test in the Past Year",
-                                                                    scale = 'proportion',
-                                                                    axis.name = 'Proportion Tested',
-                                                                    units = '%'),
-                         value = expression(proportion.general.population.tested.including.under.18 * fraction.tests.over.18 / fraction.population.over.18),
-                         value.is.numerator = F,
-                         denominator.outcome = 'cumulative.uninfected.over.18',
-                         rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
-                         corresponding.data.outcome = 'proportion.tested',
-                         keep.dimensions = c('location','age','race','sex','risk'))
+# track.cumulative.outcome(EHE.SPECIFICATION,
+#                          name = 'testing',
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
+#                                                                     description = "The Proportion of General Population who Received an HIV Test in the Past Year",
+#                                                                     scale = 'proportion',
+#                                                                     axis.name = 'Proportion Tested',
+#                                                                     units = '%'),
+#                          value = expression(proportion.general.population.tested.including.under.18 * fraction.tests.over.18 / fraction.population.over.18),
+#                          value.is.numerator = F,
+#                          denominator.outcome = 'cumulative.uninfected.over.18',
+#                          rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
+#                          corresponding.data.outcome = 'proportion.tested',
+#                          keep.dimensions = c('location','age','race','sex','risk'))
  
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'number.of.tests.in.uninfected',
