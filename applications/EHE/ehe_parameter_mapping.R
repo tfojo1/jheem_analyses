@@ -310,13 +310,18 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     trate.times = 0:2
     
     # MSM
-    set.ehe.trate.alphas.from.parameters(model.settings,
-                                         parameters = parameters,
-                                         category = 'msm',
-                                         age.multiplier.infix = 'msm.susceptibility.rr.mult',
-                                         times=trate.times,
-                                         do.ramp = F)
-
+    set.ehe.age.stratified.trate.alphas.from.parameters(model.settings,
+                                                        parameters = parameters,
+                                                        category = 'msm',
+                                                        age.stratifications = list(
+                                                          'age1' = ages[1],
+                                                          'age2' = ages[2],
+                                                          'age345' = ages[3:5]
+                                                        ),
+                                                        age.multiplier.infix = 'msm.susceptibility.rr.mult',
+                                                        times=trate.times,
+                                                        do.ramp = F)
+      
     # Heterosexual
     set.ehe.trate.alphas.from.parameters(model.settings,
                                          parameters = parameters,
@@ -796,6 +801,7 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                  times,
                                                  do.ramp)
 {
+    specification.metadata = model.settings$specification.metadata
     elem.name = paste0(category, '.trates')
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
@@ -861,6 +867,103 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                                 values = parameters[param.name],
                                                                 applies.to.dimension.values = 'all',
                                                                 dimension = 'all')
+}
+
+set.ehe.age.stratified.trate.alphas.from.parameters <- function(model.settings,
+                                                                parameters,
+                                                                category,
+                                                                age.stratifications,
+                                                                age.multiplier.infix,
+                                                                times,
+                                                                do.ramp)
+{
+    specification.metadata = model.settings$specification.metadata
+    elem.name = paste0(category, '.trates')
+    races = specification.metadata$dim.names$race
+    ages = specification.metadata$dim.names$age
+    
+    specification.metadata = model.settings$specification.metadata
+    for (time in times)
+    {
+        alpha.name = paste0('rate', time)
+        
+        #-- The race effects --#
+        non.age.values = parameters[paste0(races, '.', category, '.trate.', time)]
+        use.age.stratified = any(is.na(non.age.values))
+        
+        if (use.age.stratified)
+        {
+            for (race in races)
+            {
+                for (strat.index in 1:length(age.stratifications))
+                {
+                    strat.name = names(age.stratifications)[strat.index]
+                    model.settings$set.element.functional.form.interaction.alphas(element.name = elem.name,
+                                                                                  alpha.name = alpha.name,
+                                                                                  value = parameters[paste0(strat.name, '.', race, '.', category, '.trate.', time)],
+                                                                                  applies.to.dimension.values=list(race.to=race,
+                                                                                                                   age.to=age.stratifications[[strat.index]]))
+                }
+            }
+        }
+        else
+        {
+            model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                          alpha.name = alpha.name,
+                                                                          values = non.age.values,
+                                                                          dimension = 'race.to',
+                                                                          applies.to.dimension.values = races)
+        }
+        
+        #-- The age effects --#
+        for (age.index in 1:specification.metadata$n.ages)
+        {
+            # First check for one time-specific parameter for age
+            param.name = paste0('age',age.index, '.', age.multiplier.infix, '.', time)
+            param.value = parameters[param.name]
+            
+            # Next check for a time 1/2 specific parameter for age
+            if (is.na(param.value) && (time==1 || time==2))
+            {
+                param.name = paste0('age',age.index, '.', age.multiplier.infix, '.12')
+                param.value = parameters[param.name]
+            }
+            
+            # Last check for a general time-specific parameter
+            if (is.na(param.value))
+            {
+                param.name = paste0('age',age.index, '.', age.multiplier.infix)
+                param.value = parameters[param.name]
+            }
+            
+            # Set if the parameter exists
+            if (!is.na(param.value))
+            {
+                model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                              alpha.name = alpha.name,
+                                                                              values = param.value,
+                                                                              applies.to.dimension.values = ages[age.index],
+                                                                              dimension = 'age.to')
+            }
+        }
+    }
+    
+    # Ramp
+    if (do.ramp)
+    {
+        param.name = paste0(category, ".peak.trate.multiplier")
+        model.settings$set.element.ramp.values(element.name = elem.name,
+                                               values = rep(parameters[param.name], 2),
+                                               indices = c('peak.start','peak.end'))
+    }
+    
+    # After Modifier
+    param.name = paste0(category, '.fraction.trate.change.after.t2')
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                  alpha.name = 'after.modifier',
+                                                                  values = parameters[param.name],
+                                                                  applies.to.dimension.values = 'all',
+                                                                  dimension = 'all')
 }
 
 # set.ehe.aging.from.parameters <- function(model.settings,
@@ -993,3 +1096,4 @@ set.ehe.idu.from.parameters = function(model.settings,
                                                                   applies.to.dimension.values = 'all',
                                                                   dimension = 'all')
 }
+

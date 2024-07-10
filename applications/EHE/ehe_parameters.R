@@ -24,7 +24,7 @@ create.compound.symmetry.covariance.matrix = function(correlation.coefficient,
   
 }
 
-BASE.PARAMETERS.PRIOR = join.distributions(
+BASE.PARAMETERS.PRIOR = distributions::join.distributions(
     global.trate = Loguniform.Distribution(0,Inf),
     
     #-- Birth rates --#
@@ -73,24 +73,27 @@ BASE.PARAMETERS.PRIOR = join.distributions(
 
     
     #-- MSM Transmission --#
-    black.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
+    black.msm.transmission = create.age.stratified.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
                                                                     r1.log.sd=log(BASE.TRATE.CV),
                                                                     rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                     rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                    age.stratifications = c('1','2','345'),
                                                                     race='black',
                                                                     route='msm'),
     
-    hispanic.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
+    hispanic.msm.transmission = create.age.stratified.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
                                                                        r1.log.sd=log(BASE.TRATE.CV),
                                                                        rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                        rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                       age.stratifications = c('1','2','345'),
                                                                        race='hispanic',
                                                                        route='msm'),
     
-    other.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
+    other.msm.transmission = create.age.stratified.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
                                                                     r1.log.sd=log(BASE.TRATE.CV),
                                                                     rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                     rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                    age.stratifications = c('1','2','345'),
                                                                     race='other',
                                                                     route='msm'),
     
@@ -162,18 +165,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     age2.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
     age4.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
     age5.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
-    
-    age1.msm.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.25*log(2)),
-    age2.msm.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.25*log(2)),
-        
-    age1.msm.susceptibility.rr.mult.1 = Lognormal.Distribution(0, 0.25*log(2)),
-    age2.msm.susceptibility.rr.mult.1 = Lognormal.Distribution(0, 0.25*log(2)),
+
     age4.msm.susceptibility.rr.mult.12 = Lognormal.Distribution(0, 0.25*log(2)),
     age5.msm.susceptibility.rr.mult.12 = Lognormal.Distribution(0, 0.25*log(2)),
 
-    age1.msm.susceptibility.rr.mult.2 = Lognormal.Distribution(0, 0.25*log(2)),
-    age2.msm.susceptibility.rr.mult.2 = Lognormal.Distribution(0, 0.25*log(2)),
-    
     #-- Aging --#
     
     #Age1 rates from
@@ -486,7 +481,7 @@ BASE.PARAMETERS.PRIOR = join.distributions(
 )
 
 
-EHE.PARAMETERS.PRIOR = join.distributions(
+EHE.PARAMETERS.PRIOR = distributions::join.distributions(
     
     BASE.PARAMETERS.PRIOR,
     
@@ -683,22 +678,58 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   peak.msm.transmission = 'msm.peak.trate.multiplier',
   
-  black.msm.transmission = c(
+  black.age1.msm.transmission = c(
     'black.msm.trate.0',
-    'black.msm.trate.1',
-    'black.msm.trate.2'
+    'age1.black.msm.trate.1',
+    'age1.black.msm.trate.2'
+  ),
+
+  black.age2.msm.transmission = c(
+    'black.msm.trate.0',
+    'age2.black.msm.trate.1',
+    'age2.black.msm.trate.2'
+  ),
+
+  black.age345.msm.transmission = c(
+    'black.msm.trate.0',
+    'age345.black.msm.trate.1',
+    'age345.black.msm.trate.2'
   ),
   
-  hispanic.msm.transmission = c(
+  hispanic.age1.msm.transmission = c(
     'hispanic.msm.trate.0',
-    'hispanic.msm.trate.1',
-    'hispanic.msm.trate.2'
+    'age1.hispanic.msm.trate.1',
+    'age1.hispanic.msm.trate.2'
   ),
   
-  other.msm.transmission = c(
+  hispanic.age2.msm.transmission = c(
+    'hispanic.msm.trate.0',
+    'age2.hispanic.msm.trate.1',
+    'age2.hispanic.msm.trate.2'
+  ),
+  
+  hispanic.age345.msm.transmission = c(
+    'hispanic.msm.trate.0',
+    'age345.hispanic.msm.trate.1',
+    'age345.hispanic.msm.trate.2'
+  ),
+  
+  other.age1.msm.transmission = c(
     'other.msm.trate.0',
-    'other.msm.trate.1',
-    'other.msm.trate.2',
+    'age1.other.msm.trate.1',
+    'age1.other.msm.trate.2'
+  ),
+  
+  other.age2.msm.transmission = c(
+    'other.msm.trate.0',
+    'age2.other.msm.trate.1',
+    'age2.other.msm.trate.2'
+  ),
+  
+  other.age345.msm.transmission = c(
+    'other.msm.trate.0',
+    'age345.other.msm.trate.1',
+    'age345.other.msm.trate.2',
     'msm.fraction.trate.change.after.t2'
   ),
   
@@ -721,18 +752,6 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   #   'hispanic.hispanic.idu.oe',
   #   'other.other.idu.oe'
   # ),
-  
-  msm.age1.susceptibility = c(
-    'age1.msm.susceptibility.rr.mult.0',
-    'age1.msm.susceptibility.rr.mult.1',
-    'age1.msm.susceptibility.rr.mult.2'
-  ),
-  
-  msm.age2.susceptibility = c(
-    'age2.msm.susceptibility.rr.mult.0',
-    'age2.msm.susceptibility.rr.mult.1',
-    'age2.msm.susceptibility.rr.mult.2'
-  ),
   
   old.msm.age.susceptibility = c(
     'age4.msm.susceptibility.rr.mult.12',

@@ -70,6 +70,59 @@ create.transmission.prior.distribution <- function(r1.log.mean,
     )
 }
 
+create.age.stratified.transmission.prior.distribution <- function(r1.log.mean,
+                                                                  r1.log.sd,
+                                                                  rr.2.to.1.log.mean=0,
+                                                                  rr.2.to.1.log.sd,
+                                                                  rr.0.to.1.log.mean=rr.2.to.1.log.mean,
+                                                                  rr.0.to.1.log.sd=rr.2.to.1.log.sd,
+                                                                  age.stratifications,
+                                                                  race='black',
+                                                                  route=c('msm'))
+{
+    age.stratified.times = 1:2
+    n.ages = length(age.stratifications)
+  
+    mean = c(r0 = r1.log.mean-rr.0.to.1.log.mean,
+             rr.2.to.1. = rep(rr.2.to.1.log.mean,n.ages),
+             rr.0.to.1. = rep(rr.0.to.1.log.mean,n.ages))
+    
+    var.mat = diag(c(r1.log.sd^2 + rr.0.to.1.log.sd^2,
+                     rep(rr.2.to.1.log.sd^2, n.ages),
+                     rep(rr.0.to.1.log.sd^2, n.ages)))
+    
+    M = c(r0 = c(1,rep(0,2*n.ages)))
+    for (age in 1:n.ages)
+        M = rbind(M, r1. = c(1, rep(0, n.ages), as.numeric(1:n.ages==age)))
+    for (age in 1:n.ages)
+        M = rbind(M, r2. = c(1, as.numeric(1:n.ages==age), rep(0, n.ages)))
+    
+    time.names = unlist(lapply(0:2, function(time){
+      if (any(age.stratified.times==time))
+        rep(time, n.ages)
+      else
+        time
+    }))
+    
+    age.names = unlist(lapply(0:2, function(time){
+      if (any(age.stratified.times==time))
+        paste0('age', age.stratifications, ".")
+      else
+        ""
+    }))
+    
+    
+    Multivariate.Lognormal.Distribution(mu = M %*% mean,
+                                        sigma = M %*% var.mat %*% t(M),
+                                        var.names = paste0(age.names,
+                                                           race,
+                                                           '.',
+                                                           route,
+                                                           '.trate.',
+                                                           time.names)
+    )
+}
+
 create.mortality.prior.distribution <- function(mort2.log.mean = log(23/1000),
                                                 mort2.log.sd = 0.25*log(2),
                                                 mort2.to.0.log.mean = log(9.5/6.1),
