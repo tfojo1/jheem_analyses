@@ -172,20 +172,6 @@ new.diagnoses.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-downweighted.new.diagnoses.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                       outcome.for.sim = "new",
-                                       dimensions = c("age","sex","race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.03,
-                                       error.variance.type = 'cv',
-                                       weights = list(1/3), 
-                                       equalize.weight.by.year = T 
-  )
-
-
 #-- PREVALENCE  --#
 total.prevalence.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
@@ -226,18 +212,6 @@ prevalence.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-downweighted.prevalence.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                       outcome.for.sim = "diagnosed.prevalence",
-                                       dimensions = c("age","sex","race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.03,
-                                       error.variance.type = 'cv',
-                                       weights = list(1/3), 
-                                       equalize.weight.by.year = T 
-  )
 
 #-- AIDS DIAGNOSES  --#
 aids.diagnoses.likelihood.instructions =
@@ -245,7 +219,7 @@ aids.diagnoses.likelihood.instructions =
                                                                 outcome.for.sim = "aids.diagnoses",
                                                                 dimensions = c("age","sex","race","risk"),
                                                                 levels.of.stratification = c(0,1),
-                                                                from.year = 1997,
+                                                                from.year = 1990,
                                                                 to.year = 2001,
                                                                 correlation.different.years = 0.3,
                                                                 observation.correlation.form = 'compound.symmetry',
@@ -264,7 +238,7 @@ total.aids.diagnoses.likelihood.instructions =
                                                                 outcome.for.sim = "aids.diagnoses",
                                                                 dimensions = character(),
                                                                 levels.of.stratification = 0,
-                                                                from.year = 1997,
+                                                                from.year = 1990,
                                                                 to.year = 2001,
                                                                 correlation.different.years = 0.3,
                                                                 observation.correlation.form = 'compound.symmetry',
@@ -857,45 +831,3 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   ps.syphilis.year.on.year.change.likelihood.instructions
   
 )
-
-
-#-- FULL LIKELIHOOD WITH ONE COVID LIKELIHOOD, DOWNWEIGHTED PREV & NEW --# 
-FULL.likelihood.instructions.downweighted =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  downweighted.new.diagnoses.likelihood.instructions,
-  downweighted.prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions,
-  
-  # COVID LIKELIHOODS
-  number.of.tests.year.on.year.change.likelihood.instructions
-  # gonorrhea.year.on.year.change.likelihood.instructions,
-  # ps.syphilis.year.on.year.change.likelihood.instructions
-  
-)
-
