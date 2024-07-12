@@ -20,13 +20,13 @@ hiv.aging = names(params.manual[grepl("hiv.aging",names(params.manual))])
 
 cbind(params.manual[msm.age.susceptibility])
 
-params.manual["age1.msm.susceptibility.rr.mult.0"] = 5 # 1.0901636
-#params.manual["age1.msm.susceptibility.rr.mult.1"] = 2 # 0.9352303
-# params.manual["age1.msm.susceptibility.rr.mult.2"] = 2 # 1.552993
+params.manual["age1.msm.susceptibility.rr.mult.0"] = 3 # 1.0901636
+params.manual["age1.msm.susceptibility.rr.mult.1"] = 2 # 0.9352303
+params.manual["age1.msm.susceptibility.rr.mult.2"] = 2 # 1.552993
 
-params.manual["black.msm.trate.0"] = 3 # 4.037667
+#params.manual["black.msm.trate.0"] = 3 # 4.037667
 
-params.manual["other.msm.trate.0"] = .95 # 1.091424
+#params.manual["other.msm.trate.0"] = .95 # 1.091424
 #params.manual["other.msm.trate.1"] = 60 # 63.83674602
 
 sim.manual = engine$run(parameters = params.manual)

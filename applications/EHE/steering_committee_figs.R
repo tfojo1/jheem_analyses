@@ -73,3 +73,25 @@ simplot(simset,
         outcomes = c("aids.diagnoses"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 1970:2025)) 
+
+simplot(simset,
+        outcomes = c("awareness"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(simset,
+        outcomes = c("testing"),
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(simset,
+        facet.by = "risk", 
+        outcomes = c("testing"),
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(simset,
+        facet.by = "age", 
+        outcomes = c("testing"),
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) 
