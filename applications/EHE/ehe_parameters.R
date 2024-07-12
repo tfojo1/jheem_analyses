@@ -755,8 +755,8 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   # ),
   
   old.msm.age.susceptibility = c(
-    'age4.msm.susceptibility.rr.mult.12',
-    'age5.msm.susceptibility.rr.mult.12'
+    'age4.msm.susceptibility.rr.mult',
+    'age5.msm.susceptibility.rr.mult'
   ),
   
   sexual.pairing = c(
@@ -825,14 +825,16 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
 
   young.age.susceptibility = c(
-    'age1.susceptibility.rr.mult',
-    'age2.susceptibility.rr.mult'
+    'age1.non.msm.susceptibility.rr.mult',
+    'age2.non.msm.susceptibility.rr.mult'
   ),
-  
-  age4.susceptibility = 'age4.susceptibility.rr.mult',
-  
-  age5.susceptibility = 'age5.susceptibility.rr.mult',
-  
+
+  old.age.susceptibility = c(
+    'age3.non.msm.susceptibility.rr.mult',
+    'age4.non.msm.susceptibility.rr.mult',
+    'age5.non.msm.susceptibility.rr.mult'
+  ),
+
   black.idu.incidence = c(
     'black.active.idu.initial.prevalence.ratio',
  #   'black.incident.idu.multiplier.0',

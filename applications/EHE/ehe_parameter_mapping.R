@@ -326,7 +326,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     set.ehe.trate.alphas.from.parameters(model.settings,
                                          parameters = parameters,
                                          category = 'heterosexual',
-                                         age.multiplier.infix = 'susceptibility.rr.mult',
+                                         age.multiplier.infix = 'non.msm.susceptibility.rr.mult',
                                          times=trate.times,
                                          do.ramp = T)
 
@@ -334,7 +334,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     set.ehe.trate.alphas.from.parameters(model.settings,
                                          parameters = parameters,
                                          category = 'idu',
-                                         age.multiplier.infix = 'susceptibility.rr.mult',
+                                         age.multiplier.infix = 'non.msm.susceptibility.rr.mult',
                                          times=trate.times,
                                          do.ramp = F)
 
