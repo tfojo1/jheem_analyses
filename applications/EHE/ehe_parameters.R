@@ -167,8 +167,12 @@ BASE.PARAMETERS.PRIOR = distributions::join.distributions(
     age4.non.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
     age5.non.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
 
-    age4.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
-    age5.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
+    age4.msm.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.5*log(4)),
+    age4.msm.susceptibility.rr.mult.1 = Lognormal.Distribution(0, 0.5*log(4)),
+    age4.msm.susceptibility.rr.mult.2 = Lognormal.Distribution(0, 0.5*log(4)),
+    age5.msm.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.5*log(4)),
+    age5.msm.susceptibility.rr.mult.1 = Lognormal.Distribution(0, 0.5*log(4)),
+    age5.msm.susceptibility.rr.mult.2 = Lognormal.Distribution(0, 0.5*log(4)),
 
     #-- Aging --#
     
@@ -754,11 +758,16 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   #   'other.other.idu.oe'
   # ),
   
-  old.msm.age.susceptibility = c(
-    'age4.msm.susceptibility.rr.mult',
-    'age5.msm.susceptibility.rr.mult'
-  ),
+  age4.msm.age.susceptibility = c(
+    'age4.msm.susceptibility.rr.mult.0',
+    'age4.msm.susceptibility.rr.mult.1',
+    'age4.msm.susceptibility.rr.mult.2'),
   
+  age5.msm.age.susceptibility = c(
+    'age5.msm.susceptibility.rr.mult.0',
+    'age5.msm.susceptibility.rr.mult.1',
+    'age5.msm.susceptibility.rr.mult.2'),
+
   sexual.pairing = c(
     'oe.female.pairings.with.msm',
     'fraction.heterosexual.male.pairings.with.male',
