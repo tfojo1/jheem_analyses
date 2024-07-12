@@ -3,8 +3,8 @@ HET.BASE.TRATE.MEAN = .25 # from https://www.shelbytnhealth.com/DocumentCenter/V
 IDU.BASE.TRATE.MEAN = 12
 BASE.TRATE.CV = 20
 
-TRATE.RR.1.2.SPAN = 2#1.5
-TRATE.RR.0.1.SPAN = 4#2#1.5
+TRATE.RR.1.2.SPAN = 8#1.5
+TRATE.RR.0.1.SPAN = 8#2#1.5
 TRATE.RR.0.PEAK.SPAN = 8#3
 
 create.auto.regressive.covariance.matrix = function(correlation.coefficient,
@@ -154,20 +154,21 @@ BASE.PARAMETERS.PRIOR = distributions::join.distributions(
     # take the OR of borrowing needles from table 2 of 
     # https://pubmed.ncbi.nlm.nih.gov/9489050/
     # as an RR
-    msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
     
     #-- Age Susceptibility --#
     
-    age1.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
-    age2.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
-    age4.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
-    age5.susceptibility.rr.mult = Lognormal.Distribution(0, 0.25*log(2)),
+    age1.non.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
+    age2.non.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
+    age3.non.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
+    age4.non.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
+    age5.non.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
 
-    age4.msm.susceptibility.rr.mult.12 = Lognormal.Distribution(0, 0.25*log(2)),
-    age5.msm.susceptibility.rr.mult.12 = Lognormal.Distribution(0, 0.25*log(2)),
+    age4.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
+    age5.msm.susceptibility.rr.mult = Lognormal.Distribution(0, 0.5*log(4)),
 
     #-- Aging --#
     
