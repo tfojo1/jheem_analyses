@@ -1,0 +1,384 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+params: 
+    set_title: "full" # full transmission 
+    file: 'prelim_results/full.with.covid_simset_2024-07-15_C.12580.Rdata'
+    file.date: '2024-07-15'
+title: "`r paste(tools::toTitleCase(params$set_title), 'Calibration')`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r source and load files, include=FALSE}
+source('applications/EHE/ehe_specification.R')
+load(params$file)
+```
+
+
+Calibration **`r simset$calibration.code`** run on **`r params$file.date`**
+
+### Summary Plots
+
+The following plots are included below:  
+1. Population (total and by age/race)  
+2. New Diagnoses (total, by risk/race and age/sex)  
+3. Diagnosed Prevalence (total, by risk/race and age/sex)  
+4. Testing (total and by age, sex, race, and risk)  
+5. Awareness and Test Positivity (totals)  
+6. AIDS diagnoses (total and by age, sex, race, and risk)  
+7. Suppression (total and by age, sex, race, and risk)  
+8. HIV Mortality, Total Mortality, and AIDS Deaths (total)  
+9. PrEP uptake (total, age, sex) and PrEP indications (total, age, sex)  
+10.Proportion using heroin/cocaine (total and by age)  
+11. Immigration and emigration (total, age, race)  
+
+
+```{r set up plots, echo=FALSE}
+location.style.manager = create.style.manager(color.data.by = "location.type") 
+source.style.manager = create.style.manager(color.data.by = "source") 
+stratum.style.manager = create.style.manager(color.data.by = "stratum") 
+```
+
+
+### 1. Population
+Total and by age/race
+
+```{r population plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+  simplot(simset,
+        outcomes = c("population"), 
+        style.manager = source.style.manager, 
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+  simplot(simset,
+        facet.by = "age", split.by = "race", 
+        outcomes = c("population"), 
+        dimension.values = list(year = 2000:2030)) )))
+```
+
+
+
+### 2. New Diagnoses
+Total, by risk/race, and by age/sex
+
+```{r new diagnoses plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("new"), 
+        style.manager = source.style.manager, 
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "risk", split.by = "race", 
+        outcomes = c("new"), 
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", split.by = "sex", 
+        outcomes = c("new"), 
+        dimension.values = list(year = 2000:2030)) )))
+```
+
+
+
+### 3. Diagnosed Prevalence
+Total, by risk/race, and by age/sex
+
+```{r prevalence plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("diagnosed.prevalence"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "risk", split.by = "race", 
+        outcomes = c("diagnosed.prevalence"), 
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", split.by = "sex", 
+        outcomes = c("diagnosed.prevalence"), 
+        dimension.values = list(year = 2000:2030)) )))
+
+```
+
+
+
+### 4. Testing
+Total and by age, sex, race, and risk
+
+```{r testing plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("testing"),
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", 
+        outcomes = c("testing"),
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "sex", 
+        outcomes = c("testing"),
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "race", 
+        outcomes = c("testing"),
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "risk", 
+        outcomes = c("testing"),
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+```
+
+
+
+### 5. Awareness and Test Positivity 
+Totals  
+
+```{r awareness and positivity plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("awareness"), # totals only 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("cdc.hiv.test.positivity"), # totals only 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+```
+
+
+
+### 6. AIDS Diagnoses
+Total and by age, sex, race, and risk
+
+```{r aids diagnoses plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("aids.diagnoses"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 1980:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", 
+        outcomes = c("aids.diagnoses"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 1980:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "sex", 
+        outcomes = c("aids.diagnoses"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 1980:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "race", 
+        outcomes = c("aids.diagnoses"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 1980:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "risk", 
+        outcomes = c("aids.diagnoses"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 1980:2030)) )))
+```
+
+
+
+### 7. Suppression
+Total and by age, sex, race, and risk
+
+```{r suppression plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("suppression"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", 
+        outcomes = c("suppression"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "sex", 
+        outcomes = c("suppression"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "race", 
+        outcomes = c("suppression"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "risk",
+        outcomes = c("suppression"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+```
+
+
+
+### 8. HIV Mortality, Total Mortality, and AIDS Deaths
+Totals
+
+```{r mortality plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        #facet.by = "sex", # sex; 1-way 
+        outcomes = c("hiv.mortality"),
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("total.mortality"), # totals only 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+# must ask for years 1981-2001 
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("aids.deaths"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 1981:2001)) )))
+
+```
+
+
+
+### 9. PrEP
+Uptake by total, age and sex
+Indications by total, age, sex
+
+```{r prep plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("prep.uptake"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", 
+        outcomes = c("prep.uptake"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "sex", 
+        outcomes = c("prep.uptake"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("prep.indications"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", # age, sex; 1-way 
+        outcomes = c("prep.indications"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "sex", # age, sex; 1-way 
+        outcomes = c("prep.indications"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+```
+
+
+
+### 10. IDU
+Proportion using heroin/cocaine; total and by age
+
+```{r IDU plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("proportion.using.heroin",
+                     "proportion.using.cocaine"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", # age; 1-way 
+        outcomes = c("proportion.using.heroin",
+                     "proportion.using.cocaine"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+```
+
+
+
+### 11. Migration
+Immigration and emigration; total and by age and race
+
+```{r migration plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("immigration","emigration"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "age", # age, race; 1-way 
+        outcomes = c("immigration","emigration"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        facet.by = "race", # age, race; 1-way 
+        outcomes = c("immigration","emigration"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+```
