@@ -31,8 +31,8 @@ census.race.mappings = c('WA' = 'White',
                            'BA' = 'Black',
                            'IA'= 'American Indian and Alaska Native',
                            'AA' = 'Asian',
-                           'NA' = 'Native Hawaiian and Other Pacific Islander',
-                           'H' = 'Hispanic',
+                           'NA' = 'Native Hawaiian and Other Pacific Islander')
+census.eth.mappings = c(  'H' = 'Hispanic',
                            'NH' = 'Not Hispanic')
 census.age.mappings = c('1' = '0-4 years', 
                           '2' = '5-9 years', 
@@ -81,8 +81,10 @@ population.total <- county_agegr_sex %>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
   mutate(location = paste(STATE, COUNTY, sep=""))%>%
   mutate(outcome = "population")%>%
-  mutate(year = year.mappings[YEAR])%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
   select(outcome, year, location, value)
+
+population.total= as.data.frame(population.total)
 
 # SEX ---------------------------------------------------------------------
 
@@ -98,33 +100,61 @@ poulation.sex <- county_agegr_sex %>%
                values_to = "value")%>%
   mutate(outcome = "population")%>%
   mutate(sex = ifelse( sex == "MALE", 'male', 'female'))%>%
-  mutate(year = year.mappings[YEAR])%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
   select(year, location, outcome, sex, value)
 
+poulation.sex= as.data.frame(poulation.sex)
 
 # RACE --------------------------------------------------------------------
 
 population.race <- county_agegr_sex_race_eth%>%
   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
-         NA_MALE, NA_FEMALE, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
+         NA_MALE, NA_FEMALE)%>%
   filter(YEAR != "1")%>% #remove the april population estimate
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
   mutate(location = paste(STATE, COUNTY, sep=""))%>%
   filter(AGEGRP == "0")%>% #only selecting the total here
   pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
-                             "NA_MALE", "NA_FEMALE", "NH_MALE", "NH_FEMALE", "H_MALE", "H_FEMALE")), 
+                             "NA_MALE", "NA_FEMALE")), 
                names_to = c("race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
-  mutate(race = census.race.mappings[race])%>%
+  mutate(race = as.character(census.race.mappings[race]))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = year.mappings[YEAR])%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
   select(location, year, race, sex, count.by.sex)%>%
   group_by(year, location, race)%>%
   mutate(value = sum(count.by.sex))%>%
-  select(-sex, -count.by.sex)
+  select(-sex, -count.by.sex)%>%
+  mutate(outcome = "population")
 
+population.race= as.data.frame(population.race)
+
+
+# ETHNICITY ---------------------------------------------------------------
+
+population.ethnicity <- county_agegr_sex_race_eth%>%
+  select(STATE, COUNTY, YEAR, AGEGRP, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
+  filter(YEAR != "1")%>% #remove the april population estimate
+  mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
+  mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
+  mutate(location = paste(STATE, COUNTY, sep=""))%>%
+  filter(AGEGRP == "0")%>% #only selecting the total here
+  pivot_longer(cols=c(one_of( "NH_MALE", "NH_FEMALE", "H_MALE", "H_FEMALE")), 
+               names_to = c("ethnicity", "sex"),
+               names_sep = "_",
+               values_to = "count.by.sex")%>%
+  mutate(ethnicity = as.character(census.eth.mappings[ethnicity]))%>%
+  mutate(sex = tolower(sex))%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
+  select(location, year, ethnicity, sex, count.by.sex)%>%
+  group_by(year, location, ethnicity)%>%
+  mutate(value = sum(count.by.sex))%>%
+  select(-sex, -count.by.sex)%>%
+  mutate(outcome = "population")
+
+population.ethnicity= as.data.frame(population.ethnicity)
 
 # AGE (groups) ---------------------------------------------------------------------
 
@@ -144,34 +174,63 @@ poulation.age.groups <- county_agegr_sex %>%
                names_sep = "_",
                values_to = "value")%>%
   mutate(outcome = "population")%>%
-  mutate(year = year.mappings[YEAR])%>%
-  mutate(age = census.age.mappings.two[age])%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(age = as.character(census.age.mappings.two[age]))%>%
   select(year, location, outcome, age, value)
+
+poulation.age.groups= as.data.frame(poulation.age.groups)
 
 # RACE + AGE --------------------------------------------------------------
 
 population.race.age <- county_agegr_sex_race_eth%>%
   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
-         NA_MALE, NA_FEMALE, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
+         NA_MALE, NA_FEMALE)%>%
   filter(YEAR != "1")%>% #remove the april population estimate
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
   mutate(location = paste(STATE, COUNTY, sep=""))%>%
   pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
-                             "NA_MALE", "NA_FEMALE", "NH_MALE", "NH_FEMALE", "H_MALE", "H_FEMALE")), 
+                             "NA_MALE", "NA_FEMALE")), 
                names_to = c("race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
-  mutate(race = census.race.mappings[race])%>%
+  mutate(race = as.character(census.race.mappings[race]))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = year.mappings[YEAR])%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
   filter(AGEGRP != "0")%>%
-  mutate(age = census.age.mappings[AGEGRP])%>%
+  mutate(age = as.character(census.age.mappings[AGEGRP]))%>%
   select(location, year, age, race, count.by.sex)%>%
   group_by(year, location, age, race)%>%
   mutate(value = sum(count.by.sex))%>%
   mutate(outcome = 'population') %>%
   select(outcome, location, year, age, race, value)
+
+population.race.age= as.data.frame(population.race.age)
+
+
+# ETHNICITY + AGE ---------------------------------------------------------
+population.ethnicity.age <- county_agegr_sex_race_eth%>%
+  select(STATE, COUNTY, YEAR, AGEGRP, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
+  filter(YEAR != "1")%>% #remove the april population estimate
+  mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
+  mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
+  mutate(location = paste(STATE, COUNTY, sep=""))%>%
+  pivot_longer(cols=c(one_of("NH_MALE", "NH_FEMALE", "H_MALE", "H_FEMALE")), 
+               names_to = c("ethnicity", "sex"),
+               names_sep = "_",
+               values_to = "count.by.sex")%>%
+  mutate(ethnicity = as.character(census.eth.mappings[ethnicity]))%>%
+  mutate(sex = tolower(sex))%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
+  filter(AGEGRP != "0")%>%
+  mutate(age = as.character(census.age.mappings[AGEGRP]))%>%
+  select(location, year, age, ethnicity, count.by.sex)%>%
+  group_by(year, location, age, ethnicity)%>%
+  mutate(value = sum(count.by.sex))%>%
+  mutate(outcome = 'population') %>%
+  select(outcome, location, year, age, ethnicity, value)
+
+population.ethnicity.age= as.data.frame(population.ethnicity.age)
 
 
 # SEX + AGE ---------------------------------------------------------------
@@ -194,10 +253,136 @@ population.sex.age <- county_agegr_sex%>%
                names_to = c("age", "sex"),
                names_sep = "_",
                values_to = "value")%>%
-  mutate(sex = tolower(sex))%>%
-  mutate(year = year.mappings[YEAR])%>%
-  mutate(age = census.age.mappings.two[age])%>%
+  mutate(sex = ifelse( sex == "MALE", 'male', 'female'))%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(age = as.character(census.age.mappings.two[age]))%>%
   mutate(outcome = 'population') %>%
   select(outcome, location, year, age, sex, value)
 
+population.sex.age= as.data.frame(population.sex.age)
 
+# Put into CENSUS MANAGER --------------------------
+
+stratified.20.23.data = list(
+  population.total,
+  poulation.sex,
+  population.race,
+  population.ethnicity,
+  poulation.age.groups,
+  population.race.age,
+  population.ethnicity.age,
+  population.sex.age)
+
+for (data in stratified.20.23.data) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'stratified.census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+
+##############################################################################
+#ADDING A SECTION FOR SINGLE YEAR AGES TO ASSESS HOW WE WANT TO DO THINGS
+##############################################################################
+DATA.DIR.POP.20.23.AGE = "../../data_raw/new_census_data_june_2024/single_year_ages"
+
+pop.20.23.single.year.age <- Sys.glob(paste0(DATA.DIR.POP.20.23.AGE, '/*.csv'))
+
+#creating a list with sublists of filename, data#
+pop.20.23.single.year.age.data <- lapply(pop.20.23.single.year.age, function(x){
+  list(filename=x, data=read.csv(x, header=TRUE))
+})
+
+
+# AGE (SINGLE YEAR) ---------------------------------------------------------------------
+single.year.age = lapply(pop.20.23.single.year.age.data, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$STATE= str_pad(data$STATE, width=2, side="left", pad="0")
+  data$COUNTY = str_pad(data$COUNTY, width=3, side="left", pad="0")
+  data$location = paste(data$STATE, data$COUNTY, sep="")
+
+  data$year = as.character(year.mappings[data$YEAR])
+  data$value = as.numeric(data$TOT_POP)
+  data$outcome="population"
+  data$age = paste(data$AGE, "years", sep=" ")
+  data$age = ifelse(data$age == "0 years", '< 1 year', data$age)
+  data$age = ifelse(data$age == "1 years", '1 year', data$age)
+  data$age = ifelse(data$age == "85 years", '85+ years', data$age)
+  
+  data<-data %>% 
+  filter(year != "1")%>%
+  select(outcome, location, year, age, value)
+
+  data= as.data.frame(data)
+  list(filename, data)
+  
+})
+
+
+# PUT AGE (SINGLE YEAR)  -------------------------------------------------
+
+single.year.age.put  = lapply(single.year.age, `[[`, 2)
+for (data in single.year.age.put) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+
+# AGE + SEX (SINGLE YEAR) -------------------------------------------------
+single.year.age.sex = lapply(pop.20.23.single.year.age.data, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$STATE= str_pad(data$STATE, width=2, side="left", pad="0")
+  data$COUNTY = str_pad(data$COUNTY, width=3, side="left", pad="0")
+  data$location = paste(data$STATE, data$COUNTY, sep="")
+  
+  data$year = as.character(year.mappings[data$YEAR])
+
+  data$age = paste(data$AGE, "years", sep=" ")
+  data$age = ifelse(data$age == "0 years", '< 1 year', data$age)
+  data$age = ifelse(data$age == "1 years", '1 year', data$age)
+  data$age = ifelse(data$age == "85 years", '85+ years', data$age)
+  
+   data<-data %>% 
+     filter(year != "remove")%>%
+     select(location, year, age, TOT_MALE, TOT_FEMALE)%>%
+     pivot_longer(cols=c("TOT_MALE", "TOT_FEMALE"), 
+                  names_to = c("outcome", "sex"),
+                  names_sep = "_",
+                  values_to = "value")
+
+  data$outcome = 'population'
+  data$sex = tolower(data$sex)
+  
+  data= as.data.frame(data)
+  list(filename, data)
+  
+})
+# PUT AGE + SEX (SINGLE YEAR) -------------------------------------------------
+
+single.year.age.sex.put  = lapply(single.year.age.sex, `[[`, 2)
+for (data in single.year.age.sex.put) {
+
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
