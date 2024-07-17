@@ -317,7 +317,7 @@ single.year.age = lapply(pop.20.23.single.year.age.data, function(file){
   data$age = ifelse(data$age == "85 years", '85+ years', data$age)
   
   data<-data %>% 
-  filter(year != "1")%>%
+  filter(year != "remove")%>%
   select(outcome, location, year, age, value)
 
   data= as.data.frame(data)
