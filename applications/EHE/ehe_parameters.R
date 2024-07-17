@@ -307,6 +307,14 @@ BASE.PARAMETERS.PRIOR = distributions::join.distributions(
     idu.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
     msm.idu.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
     
+    black.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
+    hispanic.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
+    
+    age1.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
+    age2.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
+    age4.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
+    age5.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
+    
     #testing.ramp.up.vs.current.rr = Lognormal.Distribution(log(0.5), 0.25*log(2), upper = 1),
     
     msm.testing.ramp.1.or = Lognormal.Distribution(0, 0.5*log(2)),
@@ -913,14 +921,20 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   testing.by.race = c(
     'black.proportion.tested.or',
-    'hispanic.proportion.tested.or'
+    'black.proportion.tested.slope.or',
+    'hispanic.proportion.tested.or',
+    'hispanic.proportion.tested.slope.or'
   ),
   
   young.age.testing = c('age1.proportion.tested.or',
-                        'age2.proportion.tested.or'),
+                        'age1.proportion.tested.slope.or',
+                        'age2.proportion.tested.or',
+                        'age2.proportion.tested.slope.or'),
   
   old.age.testing = c('age4.proportion.tested.or',
-                      'age5.proportion.tested.or'),
+                      'age4.proportion.tested.slope.or',
+                      'age5.proportion.tested.or',
+                      'age5.proportion.tested.slope.or'),
   
   testing.ramp.by.risk.1 = c(
     'msm.testing.ramp.1.or',
