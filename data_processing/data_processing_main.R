@@ -1625,8 +1625,8 @@ source('data_processing/dummy.data.frames.R')
 
 # Adult population for recent census data ---------------------------------
 
-#Source code that restructures census age groups to get adult.pop for 2020-2022
-source('data_processing/restructure.recent.census.age.groups.R')
+#Source code that creates adult population for 2020-2023, stratified data
+source('data_processing/adult.population.20.23.R')
 
 ################################################################################
 #Create aggregated outcomes 
