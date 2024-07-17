@@ -269,7 +269,7 @@ stratified.20.23.data = list(
   population.ethnicity,
   #poulation.age.groups,
   population.race.age,
-  population.ethnicity.age,
+  population.ethnicity.age
   #population.sex.age
   )
 
