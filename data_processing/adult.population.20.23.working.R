@@ -45,7 +45,7 @@ adult.pop.sex.20.23 <- as.data.frame.table(adult.pop.sex.20.23)%>%
   mutate(sex = as.character(sex))%>%
   select(-Freq)
 
-#ESTIMATED DATA: adult.population 2020-2023 by age
+#ESTIMATED DATA: adult.population 2020-2023 by AGE
 population.by.age.array = census.manager$data$population$estimate$census.population$stratified.census$year__location__age
 
 restratify.age.age <- restratify.age.counts(population.by.age.array, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
@@ -117,3 +117,68 @@ for (data in estimated.adult.pop.stratified.put) {
     details = 'Census Reporting')
 }
 ##################################################################################
+
+
+# SINGLE YEAR AGE GROUP DATA ----------------------------------------------
+
+#adult.pop by SINGLE YEAR AGE (for TOTAL, SEX, and AGE)
+single.year.age = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)
+single.year.age.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age__sex)
+
+#age
+single.year.age <- single.year.age %>%
+  filter(age != "< 1 year" & age != "1 year" & age != "2 years" &  age != "3 years" &  age != "4 years" &  age != "5 years" & 
+           age != "6 years" &  age != "7 years" &  age != "8 years" &  age != "9 years" &  age != "10 years" &  age != "11 years" & 
+           age != "12 years") %>%
+  filter(year != "remove")%>%
+  mutate(age = as.character(age))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(Freq))%>%
+  select(-Freq)%>%
+  mutate(outcome = "adult.population")
+
+#total
+single.year.total <- single.year.age%>%
+  group_by(year, location)%>%
+  mutate(value.fixed = sum(value))%>%
+  select(-age, -value.fixed)
+
+#sex
+single.year.sex <- single.year.age.sex%>%
+  filter(age != "< 1 year" & age != "1 year" & age != "2 years" &  age != "3 years" &  age != "4 years" &  age != "5 years" & 
+           age != "6 years" &  age != "7 years" &  age != "8 years" &  age != "9 years" &  age != "10 years" &  age != "11 years" & 
+           age != "12 years") %>%
+  filter(year != "remove")%>%
+  mutate(age = as.character(age))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(value = as.numeric(Freq))%>%
+  select(-Freq)%>%
+  mutate(outcome = "adult.population")%>%
+  group_by(year, location, sex)%>%
+  mutate(new.value = sum(value))
+
+
+single.year.total= as.data.frame(single.year.total)
+single.year.age= as.data.frame(single.year.age)
+single.year.sex= as.data.frame(single.year.sex)
+
+#Put Single Year Age Group Data
+adult.pop.by.single.year.age = list(
+  single.year.total, #by total
+  single.year.age, #by age
+  single.year.sex #by sex
+)
+
+for (data in adult.pop.by.single.year.age) {
+  
+  surveillance.manager$put.long.form(
+    data = data,
+    ontology.name = 'census', 
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
