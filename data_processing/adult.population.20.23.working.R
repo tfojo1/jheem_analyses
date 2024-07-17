@@ -21,7 +21,7 @@ restratify.age.from.census <- restratify.age.counts(population.array.from.census
 adult.age.groups.census.20.23 = restratify.age.from.census[ , , 3:17] #subset by only adult age groups
 adult.population.census.20.23 = apply(adult.age.groups.census.20.23, MARGIN = c("year","location"), sum) #sum the adult age groups to get adult.population for 2020-2023
 
-fixed.adult.population.census.20.23 <- as.data.frame.table(adult.population.census.20.23)%>%
+adult.pop.total.20.23 <- as.data.frame.table(adult.population.census.20.23)%>%
   mutate(value = round(Freq))%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
@@ -99,7 +99,7 @@ adult.pop.ethnicity.20.23 <- as.data.frame.table(adult.pop.ethnicity.20.23)%>%
 # PUT for all stratified, estimated data ----------------------------------
 
 estimated.adult.pop.stratified.put = list(
-  fixed.adult.population.census.20.23,
+  adult.pop.total.20.23,
   adult.pop.sex.20.23,
   adult.pop.age.20.23,
   adult.pop.race.20.23,
@@ -138,11 +138,17 @@ single.year.age <- single.year.age %>%
   select(-Freq)%>%
   mutate(outcome = "adult.population")
 
+single.year.age<- single.year.age[!duplicated(single.year.age), ]
+
+
 #total
 single.year.total <- single.year.age%>%
   group_by(year, location)%>%
   mutate(value.fixed = sum(value))%>%
-  select(-age, -value.fixed)
+  select(-age, -value)%>%
+  rename(value = value.fixed)
+
+single.year.total<- single.year.total[!duplicated(single.year.total), ]
 
 #sex
 single.year.sex <- single.year.age.sex%>%
@@ -158,9 +164,13 @@ single.year.sex <- single.year.age.sex%>%
   select(-Freq)%>%
   mutate(outcome = "adult.population")%>%
   group_by(year, location, sex)%>%
-  mutate(new.value = sum(value))
+  mutate(new.value = sum(value))%>%
+  select(outcome, year, location, sex, new.value)%>%
+  rename(value = new.value)
 
+single.year.sex<- single.year.sex[!duplicated(single.year.sex), ]
 
+##
 single.year.total= as.data.frame(single.year.total)
 single.year.age= as.data.frame(single.year.age)
 single.year.sex= as.data.frame(single.year.sex)
