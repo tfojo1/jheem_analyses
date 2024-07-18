@@ -8,7 +8,7 @@
 #For ethnicity: total NH male + NH female (NH_MALE, NH_FEMALE); 
 #then Hispanic male + Hispanic female (H-MALE, H_FEMALE)
 
-DATA.DIR.POP.20.23 = "../../data_raw/new_census_data_june_2024"
+DATA.DIR.POP.20.23 = "../../data_raw/population/county_20.23"
 
 pop.20.23 <- Sys.glob(paste0(DATA.DIR.POP.20.23, '/*.csv'))
 
@@ -288,7 +288,7 @@ for (data in stratified.20.23.data) {
 ##############################################################################
 #ADDING A SECTION FOR SINGLE YEAR AGES TO ASSESS HOW WE WANT TO DO THINGS
 ##############################################################################
-DATA.DIR.POP.20.23.AGE = "../../data_raw/new_census_data_june_2024/single_year_ages"
+DATA.DIR.POP.20.23.AGE = "../../data_raw/population/county_20.23/single_year_ages"
 
 pop.20.23.single.year.age <- Sys.glob(paste0(DATA.DIR.POP.20.23.AGE, '/*.csv'))
 
