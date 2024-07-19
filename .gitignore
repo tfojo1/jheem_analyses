@@ -6,6 +6,7 @@
 # Project-specific
 cached
 prelim_results
+applications/EHE/calibration_runs/markdown_summaries/outputs
 
 
 # OS-specific
