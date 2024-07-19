@@ -6,6 +6,7 @@ params:
     set_title: "full" # full transmission 
     file: 'prelim_results/full.with.covid_simset_2024-07-15_C.12580.Rdata'
     file.date: '2024-07-15'
+    notes: 'Notes:' 
 title: "`r paste(tools::toTitleCase(params$set_title), 'Calibration')`"
 ---
 
@@ -20,7 +21,9 @@ load(params$file)
 ```
 
 
-Calibration **`r simset$calibration.code`** run on **`r params$file.date`**
+Calibration **`r simset$calibration.code`** run on **`r params$file.date`**  
+
+**Notes:** `r params$notes`
 
 ### Summary Plots
 
@@ -28,8 +31,8 @@ The following plots are included below:
 1. Population (total and by age/race)  
 2. New Diagnoses (total, by risk/race and age/sex)  
 3. Diagnosed Prevalence (total, by risk/race and age/sex)  
-4. Testing (total and by age, sex, race, and risk)  
-5. Awareness and Test Positivity (totals)  
+4. Awareness and Test Positivity (totals) 
+5. Testing (total and by age, sex, race, and risk)  
 6. AIDS diagnoses (total and by age, sex, race, and risk)  
 7. Suppression (total and by age, sex, race, and risk)  
 8. HIV Mortality, Total Mortality, and AIDS Deaths (total)  
@@ -115,7 +118,26 @@ simplot(simset,
 
 
 
-### 4. Testing
+### 4. Awareness and Test Positivity 
+Totals  
+
+```{r awareness and positivity plots, echo=FALSE}
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("awareness"), # totals only 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+
+suppressWarnings(invisible(capture.output(
+simplot(simset,
+        outcomes = c("cdc.hiv.test.positivity"), # totals only 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) )))
+```
+
+
+
+### 5. Testing
 Total and by age, sex, race, and risk
 
 ```{r testing plots, echo=FALSE}
@@ -150,25 +172,6 @@ suppressWarnings(invisible(capture.output(
 simplot(simset,
         facet.by = "risk", 
         outcomes = c("testing"),
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) )))
-```
-
-
-
-### 5. Awareness and Test Positivity 
-Totals  
-
-```{r awareness and positivity plots, echo=FALSE}
-suppressWarnings(invisible(capture.output(
-simplot(simset,
-        outcomes = c("awareness"), # totals only 
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) )))
-
-suppressWarnings(invisible(capture.output(
-simplot(simset,
-        outcomes = c("cdc.hiv.test.positivity"), # totals only 
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) )))
 ```
