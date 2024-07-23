@@ -618,19 +618,6 @@ data.manager$register.ontology(
     sex=c('male','female')
   ))
 
-data.manager$register.ontology(
-  'census.estimated.adult.population',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
-          '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
-          '75-79 years', '80-84 years', '85+ years'),
-    race=c('American Indian and Alaska Native', 'Asian', 'Black', 'White', "Native Hawaiian and Other Pacific Islander"),
-    ethnicity=c('Hispanic', 'Not Hispanic'), 
-    sex=c('male','female')
-  ))
-
 ################################################################################
 ###Source locations of interest to create MSA vector
 source('commoncode/locations_of_interest.R')
