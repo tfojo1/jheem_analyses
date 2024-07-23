@@ -1725,24 +1725,24 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
 
 #This aggregates county level data to state level for the recent census years for adult.population (as well as county to MSAs of interest)
 #where I wrote the restructure.recent.age.groups code to estimate for adult.pop
-all.states = locations::get.all.for.type('state')
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  all.states,   
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'STATE',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
-
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  MSAS.OF.INTEREST,   
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+# all.states = locations::get.all.for.type('state')
+# put.msa.data.as.new.source(outcome = 'adult.population',
+#                            from.source.name = 'census.population',
+#                            to.source.name = 'census.aggregated.adult.population',
+#                            to.locations =  all.states,   
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'STATE',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = surveillance.manager)
+# 
+# put.msa.data.as.new.source(outcome = 'adult.population',
+#                            from.source.name = 'census.population',
+#                            to.source.name = 'census.aggregated.adult.population',
+#                            to.locations =  MSAS.OF.INTEREST,   
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = surveillance.manager)
 
 # Source code to create hiv.tests.per.population --------------------------
 source('data_processing/tests.per.population.R')
