@@ -1595,13 +1595,13 @@ source('data_processing/put_msa_data_as_new_source_script.R')
 #this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
 #this function currently defaults to population, when using it for mortality you need to define mortality as the outcome#
 #adult.population
-put.msa.data.strict(locations = MSAS.OF.INTEREST, 
-                    data.manager = surveillance.manager, 
-                    census.manager = census.manager)
+# put.msa.data.strict(locations = MSAS.OF.INTEREST, 
+#                     data.manager = surveillance.manager, 
+#                     census.manager = census.manager)
 
 
 #Put adult population for specific locations
-put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
+put.msa.data.strict(locations= c(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
                     contained.geographic.type = "county", #it will look for counties in the regions above
                     put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')),
                     data.manager = surveillance.manager,
@@ -1726,6 +1726,15 @@ put.msa.data.as.new.source(outcome = 'adult.population',
                            from.source.name = 'census.population',
                            to.source.name = 'census.aggregated.adult.population',
                            to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'census.population',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
