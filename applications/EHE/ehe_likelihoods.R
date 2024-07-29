@@ -100,7 +100,37 @@ population.likelihood.instructions =
                                        # if there are more datapoints for certain years, this will normalize
                                        # e.g., if there are a few years with only the totals 
                                        # before the stratifications are available
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
+  )
+
+population.heavy.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
+                                       outcome.for.sim = "population",
+                                       dimensions = c("age","sex","race"),
+                                       levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
+                                       from.year = 2007,
+                                       correlation.different.years = 0.5, # this is the default
+                                       correlation.different.strata = 0.1, # this is the default
+                                       correlation.different.sources = 0.3, # default
+                                       correlation.same.source.different.details = 0.3, # default
+                                       
+                                       # assumes correlation between all combos of years is the same
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       
+                                       # should always be specified; describes how precise the estimates are; 
+                                       # e.g., estimates can be off by 3% each year
+                                       error.variance.term = 0.03,
+                                       error.variance.type = 'cv',
+                                       
+                                       # downweight because large population size; 
+                                       # can get more specific with create.likelihood.weights 
+                                       #(e.g., different weight for age X)
+                                       weights = 2, 
+                                       
+                                       # if there are more datapoints for certain years, this will normalize
+                                       # e.g., if there are a few years with only the totals 
+                                       # before the stratifications are available
+                                       equalize.weight.by.year = F 
   )
 
 #-- IMMIGRATION  --#
@@ -215,7 +245,7 @@ prevalence.likelihood.instructions =
 
 #-- AIDS DIAGNOSES  --#
 aids.diagnoses.likelihood.instructions =
-  create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
+  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                                                 outcome.for.sim = "aids.diagnoses",
                                                                 dimensions = c("age","sex","race","risk"),
                                                                 levels.of.stratification = c(0,1),
@@ -226,15 +256,11 @@ aids.diagnoses.likelihood.instructions =
                                                                 error.variance.term = 0.05, # maybe higher - look up
                                                                 error.variance.type = 'cv',
                                                                 weights = list(1),
-                                                                equalize.weight.by.year = T,
-                                                                included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
-                                                                included.multiplier.sd = 0.2306945, # see aids_diagnoses_multiplier.R
-                                                                included.multiplier.correlation = 0.5, 
-                                                                included.multiplier.correlation.structure = 'autoregressive.1'
+                                                                equalize.weight.by.year = F
   )
 
 total.aids.diagnoses.likelihood.instructions =
-  create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
+  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                                                 outcome.for.sim = "aids.diagnoses",
                                                                 dimensions = character(),
                                                                 levels.of.stratification = 0,
@@ -245,13 +271,83 @@ total.aids.diagnoses.likelihood.instructions =
                                                                 error.variance.term = 0.05, # maybe higher - look up
                                                                 error.variance.type = 'cv',
                                                                 weights = list(1),
-                                                                equalize.weight.by.year = T,
-                                                                included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
-                                                                included.multiplier.sd = 0.2306945, # see aids_diagnoses_multiplier.R
-                                                                included.multiplier.correlation = 0.5,
-                                                                included.multiplier.correlation.structure = 'autoregressive.1'
+                                                                equalize.weight.by.year = F
   )
 
+non.age.aids.diagnoses.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
+                                                                outcome.for.sim = "aids.diagnoses",
+                                                                dimensions = c("sex","race","risk"),
+                                                                levels.of.stratification = c(0,1),
+                                                                from.year = 1990,
+                                                                to.year = 2001,
+                                                                correlation.different.years = 0.3,
+                                                                observation.correlation.form = 'compound.symmetry',
+                                                                error.variance.term = 0.05, # maybe higher - look up
+                                                                error.variance.type = 'cv',
+                                                                weights = list(1),
+                                                                equalize.weight.by.year = F
+  )
+
+# aids.diagnoses.likelihood.instructions =
+#   create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
+#                                                                 outcome.for.sim = "aids.diagnoses",
+#                                                                 dimensions = c("age","sex","race","risk"),
+#                                                                 levels.of.stratification = c(0,1),
+#                                                                 from.year = 1990,
+#                                                                 to.year = 2001,
+#                                                                 correlation.different.years = 0.3,
+#                                                                 observation.correlation.form = 'compound.symmetry',
+#                                                                 error.variance.term = 0.05, # maybe higher - look up
+#                                                                 error.variance.type = 'cv',
+#                                                                 weights = list(1),
+#                                                                 equalize.weight.by.year = F,
+#                                                                 included.multiplier = 1, # this is now built-in to the specification, but we want to keep the uncertainty around it
+#                                                               #  included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
+#                                                                 included.multiplier.sd = 0.2306945, # see aids_diagnoses_multiplier.R
+#                                                                 included.multiplier.correlation = 0.5, 
+#                                                                 included.multiplier.correlation.structure = 'autoregressive.1'
+#   )
+# 
+# total.aids.diagnoses.likelihood.instructions =
+#   create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
+#                                                                 outcome.for.sim = "aids.diagnoses",
+#                                                                 dimensions = character(),
+#                                                                 levels.of.stratification = 0,
+#                                                                 from.year = 1990,
+#                                                                 to.year = 2001,
+#                                                                 correlation.different.years = 0.3,
+#                                                                 observation.correlation.form = 'compound.symmetry',
+#                                                                 error.variance.term = 0.05, # maybe higher - look up
+#                                                                 error.variance.type = 'cv',
+#                                                                 weights = list(1),
+#                                                                 equalize.weight.by.year = T,
+#                                                                 included.multiplier = 1,
+#                                                                # included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
+#                                                                 included.multiplier.sd = 0.2306945, # see aids_diagnoses_multiplier.R
+#                                                                 included.multiplier.correlation = 0.5,
+#                                                                 included.multiplier.correlation.structure = 'autoregressive.1'
+#   )
+# 
+# non.age.aids.diagnoses.likelihood.instructions =
+#   create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
+#                                                                 outcome.for.sim = "aids.diagnoses",
+#                                                                 dimensions = c("sex","race","risk"),
+#                                                                 levels.of.stratification = c(0,1),
+#                                                                 from.year = 1990,
+#                                                                 to.year = 2001,
+#                                                                 correlation.different.years = 0.3,
+#                                                                 observation.correlation.form = 'compound.symmetry',
+#                                                                 error.variance.term = 0.05, # maybe higher - look up
+#                                                                 error.variance.type = 'cv',
+#                                                                 weights = list(1),
+#                                                                 equalize.weight.by.year = F,
+#                                                                 included.multiplier = 1,
+#                                                                 # included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
+#                                                                 included.multiplier.sd = 0.2306945, # see aids_diagnoses_multiplier.R
+#                                                                 included.multiplier.correlation = 0.5, 
+#                                                                 included.multiplier.correlation.structure = 'autoregressive.1'
+#   )
 
 #-- HIV-MORTALITY  --#
 # all-cause mortality among pwh
@@ -636,7 +732,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     
     levels.of.stratification = c(0),
     from.year = 2008,
- #   to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
+   # to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
     
     p.bias.inside.location = 0, 
     p.bias.outside.location = hiv.tests.per.population.bias.estimates$out.mean,
@@ -668,7 +764,6 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     
     levels.of.stratification = c(0),
     from.year = 2008,
-  #  to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
     
     observation.correlation.form = 'compound.symmetry',
     error.variance.term = 0.03,
@@ -723,13 +818,13 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
 
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS  --#
 joint.pop.migration.likelihood.instructions = 
-  join.likelihood.instructions(population.likelihood.instructions,
+  join.likelihood.instructions(population.heavy.likelihood.instructions,
                                immigration.likelihood.instructions,
                                emigration.likelihood.instructions,
                                general.mortality.likelihood.instructions)
 
 joint.pop.migration.total.trans.likelihood.instructions = 
-  join.likelihood.instructions(population.likelihood.instructions,
+  join.likelihood.instructions(population.heavy.likelihood.instructions,
                                immigration.likelihood.instructions,
                                general.mortality.likelihood.instructions,
                                emigration.likelihood.instructions,
@@ -737,7 +832,7 @@ joint.pop.migration.total.trans.likelihood.instructions =
                                total.new.diagnoses.likelihood.instructions)
 
 joint.pop.migration.total.trans.aids.likelihood.instructions = 
-  join.likelihood.instructions(population.likelihood.instructions,
+  join.likelihood.instructions(population.heavy.likelihood.instructions,
                                immigration.likelihood.instructions,
                                emigration.likelihood.instructions,
                                general.mortality.likelihood.instructions,
@@ -756,6 +851,20 @@ two.way.transmission.pop.idu.aware.likelihood.instructions =
                                cocaine.likelihood.instructions,
                                awareness.heavy.weight.likelihood.instructions # weight awareness more just for the transmission calibration 
   )
+
+two.way.transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
+  join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
+                               race.risk.sex.two.way.prevalence.likelihood.instructions,
+                               two.way.proportion.tested.likelihood.instructions, # added this in 4/23
+                               population.likelihood.instructions,
+                               heroin.likelihood.instructions,
+                               cocaine.likelihood.instructions,
+                               non.age.aids.diagnoses.likelihood.instructions,
+                               aids.deaths.likelihood.instructions,
+                               two.way.proportion.tested.likelihood.instructions,
+                               awareness.likelihood.instructions
+  )
+
 
 
 #-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 

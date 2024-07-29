@@ -25,7 +25,7 @@ if (is.null(get.default.data.manager()))
 if (!exists('CENSUS.MANAGER'))
 {
     cat("Loading Census Manager (may take a minute or two)...")
-    CENSUS.MANAGER = load.data.manager.from.cache('smaller.census.manager.rdata', set.as.default=F)
+    CENSUS.MANAGER = load.data.manager.from.cache('census.manager.rdata', set.as.default=F)
     cat("Done!\n")
 }
   

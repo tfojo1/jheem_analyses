@@ -12,6 +12,250 @@
 
 library(ggplot2)
 
+hiv.cases.1993 = c(
+  Alabama = 584,
+  Arizona = 307,
+  Arkansas = 244,
+  Colorado = 485,
+ # Connecticut = 37, only pediatric cases are reported
+  Idaho = 28,
+  Indiana = 681,
+  Louisiana = 1448,
+  Michigan = 639,
+  Minnesota = 317,
+  Mississippi = 433,
+  Missouri = 662,
+  Nevada = 401,
+  "New Jersey" = 2856,
+  "North Carolina" = 1064,
+  "North Dakota" = 6,
+  Ohio = 611,
+  Oklahoma = 286,
+  "South Carolina" = 922,
+  "South Dakota" = 14,
+  Tennessee = 1015,
+  Utah = 127,
+  Virginia = 1386,
+  "West Virginia" = 65,
+  Wisconsin = 313,
+  Wyoming = 11
+)
+
+aids.cases.1993 = c(
+  Alabama = 733,
+  Arizona = 1238,
+  Arkansas = 404,
+  Colorado = 1324,
+ # Connecticut = 1758,
+  Idaho = 77,
+  Indiana = 94,
+  Louisiana = 1464,
+  Michigan = 1840,
+  Minnesota = 659,
+  Mississippi = 461,
+  Missouri = 1745,
+  Nevada = 638,
+  "New Jersey" = 5434,
+  "North Carolina" = 1368,
+  "North Dakota" = 11,
+  Ohio = 1585,
+  Oklahoma = 725,
+  "South Carolina" = 1476,
+  "South Dakota" = 29,
+  Tennessee = 1203,
+  Utah = 264,
+  Virginia = 1625,
+  "West Virginia" = 106,
+  Wisconsin = 731,
+  Wyoming = 46
+)
+
+# volume 6-2 table 21
+hiv.cases.1994 = c(
+  Alabama = 584,
+  Arizona = 409,
+  Arkansas = 295,
+  Colorado = 521,
+  # Connecticut = 40, only pediatric cases are reported
+  Idaho = 54,
+  Indiana = 487,
+  Louisiana = 1578,
+  Michigan = 1200,
+  Minnesota = 325,
+  Mississippi = 636,
+  Missouri = 625,
+  Nevada = 421,
+  "New Jersey" = 5037,
+  "North Carolina" = 1141,
+  "North Dakota" = 29,
+  Ohio = 815,
+  Oklahoma = 197,
+  "South Carolina" = 798,
+  "South Dakota" = 14,
+  Tennessee = 1026,
+  # Texas = 171, only pediatric cases reported
+  Utah = 129,
+  Virginia = 1048,
+  "West Virginia" = 140,
+  Wisconsin = 245,
+  Wyoming = 14
+)
+
+# vol 6-2 table 1
+aids.cases.1994 = c(
+  Alabama = 582,
+  Arizona = 612,
+  Arkansas = 284,
+  Colorado = 816,
+  # Connecticut = 912, only pediatric cases are reported
+  Idaho = 61,
+  Indiana = 622,
+  Louisiana = 1239,
+  Michigan = 1035,
+  Minnesota = 422,
+  Mississippi = 433,
+  Missouri = 713,
+  Nevada = 387,
+  "New Jersey" = 4993,
+  "North Carolina" = 1187,
+  "North Dakota" = 20,
+  Ohio = 1184,
+  Oklahoma = 269,
+  "South Carolina" = 1158,
+  "South Dakota" = 19,
+  Tennessee = 764,
+  # Texas = 5879, only pediatric cases reported
+  Utah = 152,
+  Virginia = 1162,
+  "West Virginia" = 96,
+  Wisconsin = 379,
+  Wyoming = 18
+)
+
+
+# volume 7-2 table 21
+hiv.cases.1995 = c(
+  Alabama = 613,
+  Arizona = 422,
+  Arkansas = 306,
+  Colorado = 405,
+  # Connecticut = 8, only pediatric cases are reported
+  Idaho = 27,
+  Indiana = 429,
+  Louisiana = 1050,
+  Michigan = 1036,
+  Minnesota = 250,
+  Mississippi = 594,
+  Missouri = 651,
+  Nevada = 396,
+  "New Jersey" = 2565,
+  "North Carolina" = 1526,
+  "North Dakota" = 1,
+  Ohio = 575,
+  Oklahoma = 193,
+  "South Carolina" = 790,
+  "South Dakota" = 25,
+  Tennessee = 1020,
+  # Texas = 54, only pediatric cases reported
+  Utah = 82,
+  Virginia = 1297,
+  "West Virginia" = 76,
+  Wisconsin = 298,
+  Wyoming = 7
+)
+
+# volume 7-2 table 1
+aids.cases.1995 = c(
+  Alabama = 642,
+  Arizona = 678,
+  Arkansas = 277,
+  Colorado = 673,
+  # Connecticut = 16528, only pediatric cases are reported
+  Idaho = 49,
+  Indiana = 529,
+  Louisiana = 1087,
+  Michigan = 1201,
+  Minnesota = 369,
+  Mississippi = 442,
+  Missouri = 791,
+  Nevada = 493,
+  "New Jersey" = 4409,
+  "North Carolina" = 164,
+  "North Dakota" = 5,
+  Ohio = 1110,
+  Oklahoma = 295,
+  "South Carolina" = 976,
+  "South Dakota" = 19,
+  Tennessee = 897,
+  # Texas = 4477, only pediatric cases reported
+  Utah = 164,
+  Virginia = 1610,
+  "West Virginia" = 127,
+  Wisconsin = 350,
+  Wyoming = 17
+)
+
+# volume 8-2 table 21
+hiv.cases.1996 = c(
+  Alabama = 535,
+  Arizona = 342,
+  Arkansas = 223,
+  Colorado = 446,
+  Idaho = 35,
+  Indiana = 409,
+  Louisiana = 1369,
+  Michigan = 789,
+  Minnesota = 246,
+  Mississippi = 555,
+  Missouri = 576,
+  Nebraska = 163,
+  Nevada = 479,
+  "New Jersey" = 2259,
+  "North Carolina" = 1039,
+  "North Dakota" = 7,
+  Ohio = 703,
+  Oklahoma = 234,
+  "South Carolina" = 777,
+  "South Dakota" = 13,
+  Tennessee = 824,
+  Utah = 117,
+  Virginia = 943,
+  "West Virginia" = 79,
+  Wisconsin = 222,
+  Wyoming = 8
+)
+
+
+# volume 8-2 table 1
+aids.cases.1996 = c(
+  Alabama = 607,
+  Arizona = 594,
+  Arkansas = 269,
+  Colorado = 522,
+  Idaho = 39,
+  Indiana = 596,
+  Louisiana = 1470,
+  Michigan = 965,
+  Minnesota = 304,
+  Mississippi = 450,
+  Missouri = 858,
+  Nebraska = 100,
+  Nevada = 427,
+  "New Jersey" = 3613,
+  "North Carolina" = 895,
+  "North Dakota" = 12,
+  Ohio = 1161,
+  Oklahoma = 272,
+  "South Carolina" = 869,
+  "South Dakota" = 14,
+  Tennessee = 826,
+  Utah = 196,
+  Virginia = 1195,
+  "West Virginia" = 121,
+  Wisconsin = 270,
+  Wyoming = 7
+)
+
 # vol 9-2, Table 27
 hiv.cases.1997 = c("Alabama" = 529,
                    "Arizona" = 343,
@@ -35,6 +279,7 @@ hiv.cases.1997 = c("Alabama" = 529,
                    "Texas" = NA,
                    "Virginia" = 930,
                    "Wisconsin" = 224)
+
 # vol 9-2, Table 1
 aids.cases.1997 = c("Alabama" = 570,
                     "Arizona" = 448,
@@ -539,67 +784,129 @@ aids.cases.2007 = c("Alabama" = 391,
                     "Virginia" = 634,
                     "Wisconsin" = 199)
 
-ratios.1997 = aids.cases.1997/hiv.cases.1997
-ratios.1998 = aids.cases.1998/hiv.cases.1998
-ratios.1999 = aids.cases.1999/hiv.cases.1999
-ratios.2000 = aids.cases.2000/hiv.cases.2000
-ratios.2001 = aids.cases.2001/hiv.cases.2001
-ratios.2002 = aids.cases.2002/hiv.cases.2002
-ratios.2003 = aids.cases.2003/hiv.cases.2003
-ratios.2004 = aids.cases.2004/hiv.cases.2004
-ratios.2005 = aids.cases.2005/hiv.cases.2005
-ratios.2006 = aids.cases.2006/hiv.cases.2006
-ratios.2007 = aids.cases.2007/hiv.cases.2007
+all.hiv = list(
+  '1993' = hiv.cases.1993,
+  '1994' = hiv.cases.1994,
+  '1995' = hiv.cases.1995,
+  '1996' = hiv.cases.1996,
+  '1997' = hiv.cases.1997,
+  '1998' = hiv.cases.1998,
+  '1999' = hiv.cases.1999,
+  '2000' = hiv.cases.2000,
+  '2001' = hiv.cases.2001,
+  '2002' = hiv.cases.2002,
+  '2003' = hiv.cases.2003,
+  '2004' = hiv.cases.2004,
+  '2005' = hiv.cases.2005,
+  '2006' = hiv.cases.2006,
+  '2007' = hiv.cases.2007)
 
-sd.1997 = sd(ratios.1997, na.rm = T)
-sd.1998 = sd(ratios.1998, na.rm = T)
-sd.1999 = sd(ratios.1999, na.rm = T)
-sd.2000 = sd(ratios.2000, na.rm = T)
-sd.2001 = sd(ratios.2001, na.rm = T)
-sd.2002 = sd(ratios.2002, na.rm = T)
-sd.2003 = sd(ratios.2003, na.rm = T)
-sd.2004 = sd(ratios.2004, na.rm = T)
-sd.2005 = sd(ratios.2005, na.rm = T)
-sd.2006 = sd(ratios.2006, na.rm = T)
-sd.2007 = sd(ratios.2007, na.rm = T)
+all.aids = list(
+  '1993' = aids.cases.1993,
+  '1994' = aids.cases.1994,
+  '1995' = aids.cases.1995,
+  '1996' = aids.cases.1996,
+  '1997' = aids.cases.1997,
+  '1998' = aids.cases.1998,
+  '1999' = aids.cases.1999,
+  '2000' = aids.cases.2000,
+  '2001' = aids.cases.2001,
+  '2002' = aids.cases.2002,
+  '2003' = aids.cases.2003,
+  '2004' = aids.cases.2004,
+  '2005' = aids.cases.2005,
+  '2006' = aids.cases.2006,
+  '2007' = aids.cases.2007)
 
-ratios = c(ratios.1997,ratios.1998,ratios.1999,
-           ratios.2000,ratios.2001,ratios.2002,
-           ratios.2003,ratios.2004,ratios.2005,
-           ratios.2006,ratios.2007)
+aids.to.hiv.df = data.frame(
+  year = unlist(lapply(names(all.hiv), function(year){
+    rep(as.numeric(year), length(all.hiv[[year]]))
+  })),
+  hiv = unlist(all.hiv),
+  aids = unlist(all.aids),
+  state = unlist(lapply(all.hiv, function(values){
+    names(values)
+  }))
+)
 
-dim.names = list(state = names(ratios.1997),
-                 year = as.character(c(1997:2007)))
+aids.to.hiv.df$ratio = aids.to.hiv.df$aids / aids.to.hiv.df$hiv
+aids.to.hiv.df$weight = sqrt(aids.to.hiv.df$hiv)
+anchor.year = 2005
+aids.to.hiv.df$year.prime = aids.to.hiv.df$year - anchor.year
+knot1.year = 1998
+aids.to.hiv.df$year.prime.sp1 = pmax(0, aids.to.hiv.df$year - knot1.year)
 
-ratios.array = array(ratios,
-                     dim = sapply(dim.names, length),
-                     dimnames = dim.names)
-                       
-sds.array = c(sd.1997,sd.1998,sd.1999,
-              sd.2000,sd.2001,sd.2002,
-              sd.2003,sd.2004,sd.2005,
-              sd.2006,sd.2007)
+fit = lm(ratio~year.prime, data=aids.to.hiv.df, weights = weight)
+fit.sp1 = lm(ratio~year.prime+year.prime.sp1, data=aids.to.hiv.df, weights = weight)
+fit.log = lm(log(ratio)~year.prime, data=aids.to.hiv.df, weights = weight)
+fit.log.sp1 = lm(log(ratio)~year.prime+year.prime.sp1, data=aids.to.hiv.df, weights = weight)
 
-names(sds.array) = as.character(c(1997:2007))
+proj.years = 1980:2007
+proj.fit.df = data.frame(
+  year = proj.years,
+  value = fit$coefficients[1] + fit$coefficients[2] * (proj.years-anchor.year)
+)
+proj.fit.sp1.df = data.frame(
+  year = proj.years,
+  value = fit.sp1$coefficients[1] + fit.sp1$coefficients[2] * (proj.years-anchor.year) + fit.sp1$coefficients[3] * pmax(0, proj.years-knot1.year)
+)
+proj.fit.log.df = data.frame(
+  year = proj.years,
+  value = exp(fit.log$coefficients[1] + fit.log$coefficients[2] * (proj.years-anchor.year))
+)
+proj.fit.log.sp1.df = data.frame(
+  year = proj.years,
+  value = exp(fit.log.sp1$coefficients[1] + fit.log.sp1$coefficients[2] * (proj.years-anchor.year) + fit.log.sp1$coefficients[3] * pmax(0, proj.years-knot1.year))
+)
 
-df = data.frame(year = rep(c(as.character(c(1997:2007))), each = length(ratios.2000)),
-                state = rep(names(aids.cases.2000), 11),
-                ratio = ratios)
+ggplot() + geom_point(data=aids.to.hiv.df, aes(x=year, y=ratio, size=weight)) + 
+  geom_smooth(data=aids.to.hiv.df, aes(x=year, y=ratio)) +
+  geom_line(data=proj.fit.df, aes(x=year, y=value), color='orange', size=2) +
+  ggtitle("Not Log")
 
-aids.diagnoses.multipliers = apply(ratios.array,"year",mean, na.rm = T)
-aids.diagnoses.sds = sds.array
+ggplot() + geom_point(data=aids.to.hiv.df, aes(x=year, y=ratio, size=weight)) + 
+  geom_smooth(data=aids.to.hiv.df, aes(x=year, y=ratio)) +
+  geom_line(data=proj.fit.sp1.df, aes(x=year, y=value), color='orange', size=2) +
+  ggtitle("Linear Spline (1 Knot)")
 
-plot.label = paste(c(1997:2007), ":", round(aids.diagnoses.multipliers,2),
-                    " (sd = ",round(aids.diagnoses.sds,2),")\n", collapse = " ")
+ggplot() + geom_point(data=aids.to.hiv.df, aes(x=year, y=ratio, size=weight)) + 
+  geom_smooth(data=aids.to.hiv.df, aes(x=year, y=ratio)) +
+  geom_line(data=proj.fit.log.df, aes(x=year, y=value), color='orange', size=2) +
+  ggtitle("Log Scale")
 
-ggplot(df, aes(x=ratio)) + 
-  geom_density(mapping = aes(x=ratio,group=year,color=year)) + 
-  annotate("label", x = 2.5, y = 2, label = plot.label)
-
-# using all years except 2001 (values seem a bit off)
-# aids.diagnoses.multiplier = mean(df$ratio[df$year!="2001"],na.rm=T)
-# aids.diagnoses.sd = sd(df$ratio[df$year!="2001"],na.rm=T)
+ggplot() + geom_point(data=aids.to.hiv.df, aes(x=year, y=ratio, size=weight)) + 
+  geom_smooth(data=aids.to.hiv.df, aes(x=year, y=ratio)) +
+  geom_line(data=proj.fit.log.sp1.df, aes(x=year, y=value), color='orange', size=2) +
+  ggtitle("Log Scale, Linear Spline")
 
 
-aids.diagnoses.multipliers
-aids.diagnoses.sds
+# get contrasts for
+desired.spline.times = c(1980, 1998, 2007)
+mat = matrix(c(rep(1,length(desired.spline.times)),
+               desired.spline.times-anchor.year,
+               pmax(0, desired.spline.times-knot1.year)),
+             nrow=length(desired.spline.times))
+
+# for log
+log.mean.to.use = mat %*% fit.log.sp1$coefficients
+log.cov.mat.to.use = mat %*% vcov(fit.log.sp1) %*% t(mat)
+
+id.mean.to.use = mat %*% fit.sp1$coefficients
+id.cov.mat.to.use = mat %*% vcov(fit.sp1) %*% t(mat)
+
+AIDS.TO.NEW.DIAGNOSES.MEAN = log.mean.to.use
+AIDS.TO.NEW.DIAGNOSES.COV.MAT = log.cov.mat.to.use
+
+AIDS.TO.NEW.DIAGNOSES.COV.MAT = sapply(1:nrow(AIDS.TO.NEW.DIAGNOSES.COV.MAT), function(i){
+    sapply(1:nrow(AIDS.TO.NEW.DIAGNOSES.COV.MAT), function(j){
+        if (i<=j)
+            AIDS.TO.NEW.DIAGNOSES.COV.MAT[i,j]
+        else
+            AIDS.TO.NEW.DIAGNOSES.COV.MAT[j,i]
+    })
+})
+
+cat("c(", paste0(AIDS.TO.NEW.DIAGNOSES.MEAN, collapse=', '), ")", sep='')
+cat("matrix(c(",
+    paste0(as.numeric(AIDS.TO.NEW.DIAGNOSES.COV.MAT), collapse=', '),
+    "), nrow=", nrow(AIDS.TO.NEW.DIAGNOSES.COV.MAT), ")", sep='')

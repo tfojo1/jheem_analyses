@@ -389,7 +389,7 @@ register.model.quantity(EHE.SPECIFICATION,
 #-- Testing --#
 #-------------#
 TESTING.RAMP1.YEAR = 1995
-TESTING.RAMP2.YEAR = 2005
+#TESTING.RAMP2.YEAR = 2005
 TESTING.LAST.ZERO.YEAR = 1982
 RAMP.YEARLY.INCREASE = 1.5
 TESTING.FIRST.YEAR.FRACTION.OF.RAMP = (1/RAMP.YEARLY.INCREASE)^(TESTING.RAMP1.YEAR-TESTING.LAST.ZERO.YEAR-1)
@@ -413,10 +413,8 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'testing.ramp.rr',
                        scale = 'proportion',
                        functional.form = create.linear.spline.functional.form(knot.times = c(ramp.1=TESTING.RAMP1.YEAR,
-                                                                                             ramp.2=TESTING.RAMP2.YEAR,
                                                                                              ramp.stop=TESTING.FUNCTIONAL.FORM.FROM.YEAR),
                                                                               knot.values = list(ramp.1 = 0.5,
-                                                                                                 ramp.2 = 0.75,
                                                                                                  ramp.stop = 1),
                                                                               knot.link = 'logit',
                                                                               knots.are.on.transformed.scale = F),
@@ -1430,13 +1428,13 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.transmission.rates',
                                applies.to = list(sex.from=c('heterosexual_male','msm'),
                                                  sex.to=c('female')),
-                               value = 'heterosexual.trates')
+                               value = expression(heterosexual.trates * heterosexual.peak.multiplier))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.transmission.rates',
                                applies.to = list(sex.from=c('female'),
                                                  sex.to=c('heterosexual_male','msm')),
-                               value = expression(heterosexual.trates * male.vs.female.heterosexual.rr))
+                               value = expression(heterosexual.trates * male.vs.female.heterosexual.rr * heterosexual.peak.multiplier))
 
 # The flattened rates lets us track this as an outcome
 register.model.quantity(EHE.SPECIFICATION,
@@ -1452,12 +1450,12 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='female'),
-                               value = expression(global.trate * heterosexual.trates))
+                               value = expression(global.trate * heterosexual.trates * heterosexual.peak.multiplier))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='heterosexual_male'),
-                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr))
+                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr * heterosexual.peak.multiplier))
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'male.vs.female.heterosexual.rr',
@@ -1465,6 +1463,24 @@ register.model.element(EHE.SPECIFICATION,
                        # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
                        # 2) ratio of condomless vaginal sex (male vs female)
                        scale = 'ratio')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'heterosexual.peak.multiplier',
+                       scale = 'ratio',
+                       functional.form = create.linear.spline.functional.form(knot.times=c(pre.peak=TIME.PRE.PEAK,
+                                                                                           peak.start=TIME.PEAK.START,
+                                                                                           peak.end=TIME.PEAK.END,
+                                                                                           post.peak=TIME.POST.PEAK),
+                                                                              knot.values = list(pre.peak=1,
+                                                                                                 peak.start=1,
+                                                                                                 peak.end=1,
+                                                                                                 post.peak=1),
+                                                                              link = 'identity',
+                                                                              knot.link = 'log'
+                       ),
+                       functional.form.from.time = TIME.PRE.PEAK,
+                       functional.form.to.time = TIME.POST.PEAK
+)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'msm.trates',
@@ -1537,11 +1553,11 @@ register.model.element(EHE.SPECIFICATION,
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'idu.contact',
                         value = expression(global.trate *
-                                               idu.trates * 
-                                               idu.peak.multiplier *
-                                               idu.contact.by.age *
-                                               idu.contact.by.race *
-                                               idu.contact.by.sex))
+                                             idu.trates * 
+                                             idu.peak.multiplier *
+                                             idu.contact.by.age *
+                                             idu.contact.by.race *
+                                             idu.contact.by.sex))
 
 
 #-- IDU Contact by Age --#
@@ -2030,10 +2046,36 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       keep.dimensions = c('location','age','race','sex'))
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'aids.to.new.diagnosis.ratio',
-                       value = 1.044985, # see aids_diagnoses_multiplier.R
+                       name = 'aids.to.new.diagnoses.ratio',
+                       functional.form = create.linear.spline.functional.form(knot.times = c(time.peak=1980,
+                                                                                             time.0 = 1998,
+                                                                                             time.1 = 2005),
+                                                                              knot.values = list(time.peak = 1.09264522805781,
+                                                                                                 time.0 = -0.022054632609793,
+                                                                                                 time.1 = -0.0811281287465434),
+                                                                              overwrite.knot.values.with.alphas = T,
+                                                                              link = 'log', 
+                                                                              knot.link = 'log',
+                                                                              knots.are.on.transformed.scale = T,
+                                                                              min = 0,
+                                                                              max = Inf),
+                       functional.form.from.time = 1980,
+                       functional.form.to.time = 2008,
                        scale = 'ratio')
 
+
+track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'cumulative.aids.to.new.diagnoses.ratio',
+                         scale = 'non.negative.number',
+               save = T,
+               outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
+                                                          description = "Number of People Emigrating from MSA in the Past Year",
+                                                          scale = 'non.negative.number',
+                                                          axis.name = 'Number Emigrating',
+                                                          units = 'individuals'),
+                # outcome.metadata = NULL,
+                         value.to.integrate = 'aids.to.new.diagnoses.ratio',
+                         keep.dimensions = c("location","age","race","sex","risk"))
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'aids.diagnoses',
@@ -2043,7 +2085,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                                                                     axis.name = 'Cases',
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
-                         value = expression(new*aids.to.new.diagnosis.ratio),
+                         value = expression(new*cumulative.aids.to.new.diagnoses.ratio),
                          corresponding.data.outcome = "aids.diagnoses",
                          keep.dimensions = c("location","age","race","sex","risk"),
                          to.year = 2005)
