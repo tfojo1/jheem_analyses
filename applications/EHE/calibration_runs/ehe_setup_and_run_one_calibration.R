@@ -4,7 +4,8 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 LOCATION = BALTIMORE.MSA
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION,
                              CALIBRATION.CODE.TRANSMISSION,
-                             CALIBRATION.CODE.FULL.PLUS.COVID)[c(1,2,3)]
+                             CALIBRATION.CODE.FULL.PLUS.COVID,
+                             CALIBRATION.CODE.FULL)[4]
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {

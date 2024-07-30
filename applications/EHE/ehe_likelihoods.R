@@ -896,7 +896,7 @@ FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
   aids.deaths.likelihood.instructions,
   
   # AIDS DIAGNOSES LIKELIHOOD
-  aids.diagnoses.likelihood.instructions,
+  non.age.aids.diagnoses.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,
@@ -930,7 +930,7 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   aids.deaths.likelihood.instructions,
   
   # AIDS DIAGNOSES LIKELIHOOD
-  aids.diagnoses.likelihood.instructions,
+  non.age.aids.diagnoses.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,

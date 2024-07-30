@@ -10,6 +10,8 @@ CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
 
+CALIBRATION.CODE.FULL = 'full'
+
 N.ITER.TEST = 10000
 N.ITER = 15000
 N.ITER.FULL = 35000
@@ -78,9 +80,17 @@ par.names.pop = c("black.birth.rate.multiplier",
                   "age1.migration.multiplier.time.1",
                   "age1.migration.multiplier.time.2",
                   "age2.migration.multiplier.time.1",
-                  "age2.migration.multiplier.time.2",
+                  
+                  # "age2.migration.multiplier.time.2",
+                  "black.age2.migration.multiplier.time.2",
+                  "hispanic.age2.migration.multiplier.time.2",
+                  "other.age2.migration.multiplier.time.2",
                   "age3.migration.multiplier.time.1",
-                  "age3.migration.multiplier.time.2",
+                  # "age3.migration.multiplier.time.2",
+                  "black.age3.migration.multiplier.time.2",
+                  "hispanic.age3.migration.multiplier.time.2",
+                  "other.age3.migration.multiplier.time.2",
+                  
                   "age4.migration.multiplier.time.1",
                   "age4.migration.multiplier.time.2",
                   "age5.migration.multiplier.time.1",
@@ -123,7 +133,12 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                                           grepl('idu\\.initial\\.prevalence', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('fraction\\.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('oe', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) ]
+                                                          grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) |
+                                            grepl('susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) |   
+                                            grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
+                                                          ]
+
+
 
 par.names.transmission = c(par.names.transmission,
                            "peak.hiv.mortality",
@@ -144,7 +159,8 @@ par.names.transmission = c(par.names.transmission,
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           # added proportion tested 4/23
-                          likelihood.instructions = two.way.transmission.pop.idu.aware.aids.testing.likelihood.instructions,
+                          #likelihood.instructions = two.way.transmission.pop.idu.aware.aids.testing.likelihood.instructions,
+                          likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
@@ -159,7 +175,7 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
 )
 
 
-#-- REGISTER FULL CALIBRATION  --#
+#-- REGISTER FULL (WITHOUT COVID) CALIBRATION  --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
                           likelihood.instructions = FULL.likelihood.instructions.with.aids,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -187,5 +203,17 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
                           description = "Full with covid likelihoods"
 )
 
-
+#-- REGISTER FULL CALIBRATION WITH EVERYTHING - straight from pop calibration --#
+register.calibration.info(CALIBRATION.CODE.FULL,
+                          likelihood.instructions = FULL.likelihood.instructions.with.covid,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.POPULATION),
+                          description = "Full with covid likelihoods"
+)
 
