@@ -1,337 +1,153 @@
+#Quantity vs element?
 
-#-- For now - source code and load data --#
-    
-    
+#'@title Register a Model Element
+# name The name of the model element. Cannot overlap with the names of model quantities
+# scale: Can be 'rate', 'ratio', 'proportion', 'time', 'number', 'non.negative.number'
+# value: A numeric value that serves as the value for this element if it is not otherwise specified. If NULL, then a value must be specified either by a get.value.function (a function which returns a value), or by a functional.form
+
+
+
 # Source supporting files
-source('../jheem_analyses/source_code.R')
- 
+# source('../jheem_analyses/source_code.R') #@Todd: relevant?
+
 
 ##--------------------##
 ##--------------------##
 ##-- INITIAL SET-UP --##
 ##--------------------##
 ##--------------------##   
-    
+#'@title Create a Model Specification for Running the JHEEM
+# should we inherit any existing model? 
+# should we start in 1970 or earlier?
 
-EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
-                                               iteration = 1,
-                                               description = "The initial JHEEM version, set up to address achieving EHE goals",
+SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield', #A single character value denoting the version
+                                                  #sub-versions=1, #A character vector indicating the names of 'sub-versions' of the model. A sub-version has the same structure but records a different set of outcomes
+                                                  iteration = 1,#A single character or numeric value denoting the iteration of the model specification for this version
+                                               description = "The initial SHIELD version, set up to model national epidemic", #A short text description of this version
                                                
-                                               start.year = 1970,
+                                               #parent.version = ??? The character version of the specification from which this new specification should inherit. Must have been registered
+                                               
+                                               start.year = 1970,#The numeric year at which simulations should start. If NULL inherits the parent specification's start year #
                                                
                                                age.endpoints=c(13,25,35,45,55,Inf),
-                                               compartments.for.infected.only = list(
-                                                   continuum = c('undiagnosed', 'undiagnosed_from_prep', 'diagnosed'),
-                                                   stage = c('acute', 'chronic')
+                                               
+                                               compartments.for.infected.only = list( #The names of the lists represent dimensions, and the values the compartments for each dimension.
+                                                 continuum = c('undiagnosed', 'diagnosed'),
+                                                 stage = c('primarySecondary', 'earlyLatent','lateLatent','tertiary')
                                                ),
                                                compartments.for.uninfected.only = list(),
                                                compartments.for.infected.and.uninfected = list(
-                                                   location = 'location',
-                                                   age = 'all.ages',
-                                                   race=c('black','hispanic','other'),
-                                                   sex= c('heterosexual_male', 'msm', 'female'),
-                                                   risk = c('never_IDU', 'active_IDU', 'IDU_in_remission')
+                                                 location = 'location',#??? How to create a national model?
+                                                 age = 'all.ages',
+                                                 race=c('black','hispanic','other'),
+                                                 sex= c('heterosexual_male', 'msm', 'heterosexual_male')
                                                ),
-
-                                               compartment.value.aliases = list(
-                                                   location = function(location){location},
-                                                   
-                                                   first.diagnosed.states='diagnosed',
-                                                   diagnosed.states='diagnosed',
-                                                   undiagnosed.states=c('undiagnosed','undiagnosed_from_prep'),
-                                                   undiagnosed.from.prep.states='undiagnosed_from_prep',
-                                                   undiagnosed.no.prep.states='undiagnosed',
-
-                                                   acute.stages = 'acute',
-                                                   chronic.stages = 'chronic',
-                                                   
-                                                   active.idu.states = 'active_IDU',
-                                                   non.active.idu.states = c('never_IDU','IDU_in_remission'),
-                                                   prior.idu.states = 'IDU_in_remission',
-                                                   never.idu.states = 'never_IDU',
-                                                   idu.states = c('active_IDU','IDU_in_remission')
+                                               
+                                               compartment.value.aliases = list( #???  named list representing substitutions to be made into compartment names (both in compartments.for.infected.only, compartments.for.uninfected.only, compartments.for.infected.and.uninfected and in subsequent references in registering model quantities)
+                                                 location = function(location){location}, #???
+                                                 
+                                                 diagnosed.states='diagnosed',
+                                                 undiagnosed.states=c('undiagnosed'),
+                                                 
+                                                 primarySecondary.stages = 'primarySecondary',
+                                                 earlyLatent.stages = 'earlyLatent',
+                                                 lateLatent.stages = 'lateLatent',
+                                                 tertiary.stages = 'tertiary',
                                                )
-                                               )
+)
 
 ##----------------------##
 ##-- Fix Strata Sizes --##
 ##----------------------##
-
-register.fixed.model.strata(EHE.SPECIFICATION,
-                            applies.before.time = 2007,
+#'@title Set Whether to Fix Strata Sizes During a Time Period
+# Set Whether to Fix Strata Sizes During a Time Period
+# Todd: what's this? 
+register.fixed.model.strata(SHIELD.SPECIFICATION, #The jheem.specification object
+                            # applies.after.time = 1970,
+                            applies.before.time = 2007, #single numeric values giving the time frame over whether this setting applies
                             fix.strata = T,
-                            dimensions.to.fix = c('location','age','race','sex'))
+                            dimensions.to.fix = c('location','age','race','sex') #A character vector denoting which dimensions should be fixed. These should be dimensions common to both infected and uninfected groups. These are only used if fix.strata==TRUE
+                            )
+
+
 
 
 ##------------------------##
 ##-- Initial Population --##
 ##------------------------##
+#'@title Set The Initial Model Population
+#'
+#'@inheritParams register.model.quantity
+#'@param specification The jheem.specification object
+#'@param group Which group ("infected" or "uninfected") this initial population is for
 
-register.initial.population(EHE.SPECIFICATION,
+
+###### Infected
+register.initial.population(SHIELD.SPECIFICATION,
                             group = 'infected',
-                            value = 'initial.population.infected')
-
-register.model.quantity(EHE.SPECIFICATION,
+                            value = 'initial.population.infected' #this quantity is defined below 
+                            )
+#starts the initial.population.infected at 0? 
+register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'initial.population.infected',
                         value = 0)
-
-register.model.quantity.subset(EHE.SPECIFICATION,
+#what is this? 
+register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'initial.population.infected',
                                applies.to = list(continuum='undiagnosed',
                                                  stage = 1),
                                value = expression(0*base.initial.population + seed.population)) #the 0* gives us the right dimensions
 
 
-
-register.initial.population(EHE.SPECIFICATION,
+###### Uninfected
+register.initial.population(SHIELD.SPECIFICATION,
                             group = 'uninfected',
                             value = 'initial.population.uninfected')
 
-register.model.quantity(EHE.SPECIFICATION,
+# define the quantity initial.population.uninfected
+register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'initial.population.uninfected',
-                        value = expression(base.initial.population - seed.population))
+                        value = expression(base.initial.population - seed.population)) #what is an expression?
 
-
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'base.initial.population.sans.risk',
+#define the quantity base.initial.population.sans.risk
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'base.initial.population.sans.risk', #sans??? 
                         value = 0)
 
-register.model.quantity.subset(EHE.SPECIFICATION,
+register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'base.initial.population.sans.risk',
                                applies.to = list(sex='female'),
                                value = 'base.initial.female.population')
 
-register.model.quantity.subset(EHE.SPECIFICATION,
+register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'base.initial.population.sans.risk',
                                applies.to = list(sex='msm'),
                                value = expression(base.initial.male.population * proportion.msm.of.male))
 
-register.model.quantity.subset(EHE.SPECIFICATION,
+register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'base.initial.population.sans.risk',
                                applies.to = list(sex='heterosexual_male'),
                                value = expression(base.initial.male.population * (1-proportion.msm.of.male)))
 
-register.model.quantity(EHE.SPECIFICATION,
+register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'base.initial.population',
                         value = 0)
 
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'base.initial.population',
-                               applies.to = list(risk='never_IDU'),
-                               value = expression(base.initial.population.sans.risk * (1-prevalence.ever.idu)))
-
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'base.initial.population',
-                               applies.to = list(risk='active_IDU'),
-                               value = expression(base.initial.population.sans.risk * prevalence.active.idu))
-
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'base.initial.population',
-                               applies.to = list(risk='IDU_in_remission'),
-                               value = expression(base.initial.population.sans.risk * (prevalence.ever.idu-prevalence.active.idu)))
-
-register.model.element(EHE.SPECIFICATION,
+register.model.element(SHIELD.SPECIFICATION,
                        name = 'base.initial.female.population',
                        get.value.function = get.base.initial.female.population,
                        scale = 'non.negative.number')
 
-register.model.element(EHE.SPECIFICATION,
+register.model.element(SHIELD.SPECIFICATION,
                        name = 'base.initial.male.population',
                        get.value.function = get.base.initial.male.population,
                        scale = 'non.negative.number')
 
-register.model.element(EHE.SPECIFICATION,
-                       name = 'active.to.never.idu.ratio',
-                       get.value.function = get.active.to.never.idu.ratio,
-                       scale = 'proportion')
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'prior.to.active.idu.ratio',
-                       get.value.function = get.prior.to.active.idu.ratio,
-                       scale = 'proportion')
-
-register.model.element(EHE.SPECIFICATION,
+register.model.element(SHIELD.SPECIFICATION,
                        name = 'seed.population',
                        get.value.function = get.seed.population,
                        scale = 'non.negative.number')
 
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'prevalence.active.idu',
-                        value = expression(1 / (1 + prior.to.active.idu.ratio + 1/active.to.never.idu.ratio)))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'prevalence.prior.idu',
-                        value = expression(prevalence.active.idu * prior.to.active.idu.ratio))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'prevalence.never.idu',
-                        value = expression(prevalence.active.idu / active.to.never.idu.ratio))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'prevalence.ever.idu',
-                        value = expression(1-prevalence.never.idu))
-
-
-
-##--------------------------------------##
-##--------------------------------------##
-##--        GENERAL QUANTITIES        --##
-##--  (for multiple core components)  --##
-##--------------------------------------##
-##--------------------------------------##
-
-
-##----------##
-##-- PrEP --##
-##----------##
-
-##-- Oral PrEP --##
-register.model.element(EHE.SPECIFICATION,
-                       name = 'oral.prep.uptake.without.covid',
-                       scale = 'proportion',
-                       get.functional.form.function = get.prep.use.functional.form,
-                       functional.form.from.time = 2014,
-                       ramp.times = 2011,
-                       ramp.values = 0)
-
-register.model.quantity(EHE.SPECIFICATION,
-                       name = 'oral.prep.uptake',
-                       scale = 'proportion',
-                       value = expression(oral.prep.uptake.without.covid*oral.prep.uptake.covid.multiplier))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'oral.prep.uptake.covid.multiplier',
-                        scale = 'proportion',
-                        value = expression((1-(1-max.covid.effect.prep.uptake.reduction) * covid.on *
-                                              (1-prep.uptake.transmission.mobility.correlation+
-                                                 (prep.uptake.transmission.mobility.correlation*covid.mobility.change))))
-)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'max.covid.effect.prep.uptake.reduction',
-                       scale = 'ratio',
-                       value=1)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'oral.prep.msm.rr',
-                       scale = 'ratio',
-                       functional.form = create.static.functional.form(value=EHE_BASE_PARAMETER_VALUES['prep.rr.msm'],
-                                                                       link='log')
-)
-
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'oral.prep.heterosexual.rr',
-                       scale = 'ratio',
-                       functional.form = create.static.functional.form(value=EHE_BASE_PARAMETER_VALUES['prep.rr.heterosexual'],
-                                                                       link='log')
-)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'oral.prep.idu.rr',
-                       scale = 'ratio',
-                       functional.form = create.static.functional.form(value=EHE_BASE_PARAMETER_VALUES['prep.rr.idu'],
-                                                                       link='log')
-)
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'oral.prep.rr',
-                        value = 'oral.prep.heterosexual.rr') 
-    # ^the background value is heterosexual.rr, which we will overwrite with the msm and idu values
-
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'oral.prep.rr',
-                               value = 'oral.prep.msm.rr',
-                               applies.to = list(sex='msm',
-                                                 risk='non.active.idu.states'))
-
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'oral.prep.rr',
-                               value = 'oral.prep.idu.rr',
-                               applies.to = list(risk='active.idu.states'))
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'oral.prep.persistence',
-                       scale = 'proportion',
-                       get.functional.form.function = get.prep.persistence.functional.form)
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'oral.prep.coverage',
-                        value = expression(oral.prep.uptake * (1 / (1-log(oral.prep.persistence)) )))
-
-##-- LAI PrEP --##
-register.model.element(EHE.SPECIFICATION, 
-                       name = 'lai.prep.uptake',
-                       scale = 'proportion',
-                       value = 0)
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'lai.prep.rr',
-                        value = expression(oral.prep.rr * lai.vs.oral.prep.hr))
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'lai.vs.oral.prep.hr',
-                       scale = 'ratio',
-                       value = 0.34)
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'lai.prep.persistence',
-                        value = expression(1 - (1-oral.prep.persistence) * lai.vs.oral.prep.discontinuation.rr))
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'lai.vs.oral.prep.discontinuation.rr',
-                       scale = 'ratio',
-                       value = 1)
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'lai.prep.coverage',
-                        value = expression(lai.prep.uptake * (1 / (1-log(lai.prep.persistence)) )))
-
-##-- Common to All PrEP / Combinations of PrEP modalities --##
-register.model.element(EHE.SPECIFICATION,
-                       name='prep.indication.without.covid',
-                       scale='proportion',
-                       get.functional.form.function = get.prep.indication.functional.form,
-                       functional.form.from.time = 2011)
-
-register.model.quantity(EHE.SPECIFICATION,
-                       name='prep.indication',
-                       scale='proportion',
-                       value = expression(prep.indication.without.covid * sexual.susceptibility.covid.multiplier))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'proportion.receiving.prep',
-                        scale = 'proportion',
-                        value = expression(
-                          prep.indication * 
-                            (oral.prep.coverage*(1-log(oral.prep.persistence)) + # oral.prep.uptake, in terms of coverage 
-                               lai.prep.coverage*(1-log(lai.prep.persistence))) # lai.prep.uptake, in terms of coverage 
-                          ))
-                            # oral.prep.uptake * (1 / (1-log(oral.prep.persistence)) ) = oral.prep.coverage 
-                            # oral.prep.uptake = oral.prep.coverage*(1-log(oral.prep.persistence))
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'prep.screening.frequency',
-                       scale = 'time',
-                       value = 0.25) #3 months
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'all.prep.coverage',
-                        value = expression(oral.prep.coverage + lai.prep.coverage),
-                        scale = 'proportion')
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'all.prep.risk',
-                        value = expression(oral.prep.coverage * oral.prep.rr + lai.prep.coverage * lai.prep.rr))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'all.prep.discontinuation',
-                        value = expression( (-log(1-oral.prep.persistence) * oral.prep.coverage +
-                                                 -log(1-lai.prep.persistence) * lai.prep.coverage) /
-                                                (oral.prep.coverage + lai.prep.coverage) ),
-                        na.replacement = 0)
 
 
 #-------------#
@@ -361,13 +177,13 @@ register.model.quantity(EHE.SPECIFICATION,
 )
 
 register.model.quantity(EHE.SPECIFICATION,
-                       name = 'undiagnosed.testing.increase',
-                       value = expression(
-                         undiagnosed.testing.increase.without.covid *
-                           (1-(1-max.covid.effect.undiagnosed.testing.rr.increase) * covid.on *
-                              (1-undiagnosed.testing.rr.mobility.correlation+
-                                 (undiagnosed.testing.rr.mobility.correlation*covid.mobility.change)))), 
-                       scale = 'non.negative.number')
+                        name = 'undiagnosed.testing.increase',
+                        value = expression(
+                          undiagnosed.testing.increase.without.covid *
+                            (1-(1-max.covid.effect.undiagnosed.testing.rr.increase) * covid.on *
+                               (1-undiagnosed.testing.rr.mobility.correlation+
+                                  (undiagnosed.testing.rr.mobility.correlation*covid.mobility.change)))), 
+                        scale = 'non.negative.number')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'undiagnosed.testing.increase.without.covid',
@@ -394,65 +210,6 @@ register.model.element(EHE.SPECIFICATION,
 # if covid.on = 0 , go back to testing.no.covid 
 
 
-##---------------------##
-##-- Needle Exchange --##
-##---------------------##
-
-register.model.element(EHE.SPECIFICATION, 
-                       name = 'needle.exchange',
-                       scale = 'proportion',
-                       value = 0)
-
-register.model.element(EHE.SPECIFICATION,
-                       name='needle.exchange.rr',
-                       scale = 'ratio',
-                       value = EHE_BASE_PARAMETER_VALUES['needle.exchange.rr'])
-
-
-
-##-----------------##
-##-- Suppression --##                            
-##-----------------##
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'suppression',
-                        value = 0)
-
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'suppression',
-                               value = 'suppression.of.diagnosed',
-                               applies.to = list(continuum='diagnosed'))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'suppression.of.diagnosed',
-                        value = expression( suppression.of.diagnosed.without.covid * suppression.of.diagnosed.covid.multiplier),
-                        scale = "proportion"
-)
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'suppression.of.diagnosed.covid.multiplier',
-                        value = expression((1-(1-max.covid.effect.suppression.of.diagnosed.reduction) * covid.on *
-                                              (1-suppression.of.diagnosed.mobility.correlation+
-                                                 (suppression.of.diagnosed.mobility.correlation*covid.mobility.change))))
-)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'max.covid.effect.suppression.of.diagnosed.reduction',
-                       scale = 'ratio',
-                       value=1)
-
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'suppression.of.diagnosed.without.covid',
-                       scale = 'proportion',
-                       
-                       get.functional.form.function = get.suppression.functional.form,
-                       national.surveillance = national.surveillance,
-                       functional.form.from.time = 2010,     
-                       
-                       ramp.times = 1996,
-                       ramp.values = 0)
-
 
 ##--------------------------------##
 ##--------------------------------##
@@ -463,79 +220,12 @@ register.model.element(EHE.SPECIFICATION,
 ##---------------------------##
 ##-- Continuum Transitions --##
 ##---------------------------##
-
-register.transition(EHE.SPECIFICATION,
-                    dimension = 'continuum',
-                    from.compartments = 'undiagnosed_from_prep',
-                    to.compartments = 'diagnosed',
-                    groups = 'infected',
-                    value = expression( 1 / prep.screening.frequency))
-
-register.transition(EHE.SPECIFICATION,
-                    dimension = 'continuum',
-                    from.compartments = 'undiagnosed_from_prep',
-                    to.compartments = 'undiagnosed',
-                    groups = 'infected',
-                    value = 'all.prep.discontinuation')
-
 register.transition(EHE.SPECIFICATION,
                     dimension = 'continuum',
                     from.compartments = 'undiagnosed',
                     to.compartments = 'diagnosed',
                     groups = 'infected',
                     value = 'testing.of.undiagnosed')
-
-
-##---------------------##
-##-- IDU Transitions --##
-##---------------------##
-
-register.transition(EHE.SPECIFICATION,
-                    dimension = 'risk',
-                    groups = c('infected', 'uninfected'),
-                    from.compartments = 'never_IDU',
-                    to.compartments = 'active_IDU',
-                    value = 'idu.incidence')
-
-register.transition(EHE.SPECIFICATION,
-                    dimension = 'risk',
-                    groups = c('infected', 'uninfected'),
-                    from.compartments = 'active_IDU',
-                    to.compartments = 'IDU_in_remission',
-                    value = expression(idu.remission * 
-                                           (1 + needle.exchange * 
-                                                (needle.exchange.remission.rate.ratio - 1))))
-
-register.transition(EHE.SPECIFICATION,
-                    dimension = 'risk',
-                    groups = c('infected', 'uninfected'),
-                    from.compartments = 'IDU_in_remission',
-                    to.compartments = 'active_IDU',
-                    value = 'idu.relapse')
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'idu.incidence',
-                       scale = 'rate',
-                       get.functional.form.function = get.incident.idu.model,
-                       static=F,
-                       functional.form.from.time = 1980)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'idu.remission',
-                       scale = 'rate',
-                       get.functional.form.function = get.idu.remission.model,
-                       static=T)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'idu.relapse',
-                       scale = 'rate',
-                       get.functional.form.function = get.idu.relapse.model,
-                       static=T)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'needle.exchange.remission.rate.ratio',
-                       scale = 'ratio',
-                       value = EHE_BASE_PARAMETER_VALUES['needle.exchange.remission.rate.ratio'])
 
 
 ##-----------------------##
@@ -545,15 +235,14 @@ register.model.element(EHE.SPECIFICATION,
 register.transition(EHE.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
-                    from.compartments = 'acute',
-                    to.compartments = 'chronic',
+                    from.compartments = 'primarySecondary',
+                    to.compartments = 'earlyLaten',
                     value = expression(1/acute.hiv.duration))
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'acute.hiv.duration',
                        scale = 'time',
                        value = EHE_BASE_PARAMETER_VALUES['acute.infection.duration'])
-
 
 ##----------------------------##
 ##----------------------------##
@@ -687,15 +376,15 @@ register.model.element(EHE.SPECIFICATION,
                        value = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
                        scale = 'rate')
 
-##------------------------##
-##------------------------##
-##--        AGING       --##
-##------------------------##
-##------------------------##
+##--------------------##
+##--------------------##
+##--        AGING   --##
+##--------------------##
+##--------------------##
 
-##----------------------##
+##--------------------##
 ##-- Uninfected Aging --##
-##----------------------##
+##--------------------##
 
 #register.transition(EHE.SPECIFICATION,
 #                    dimension = 'age',
@@ -816,13 +505,13 @@ register.transmission(EHE.SPECIFICATION,
 ##--------------------##
 
 register.model.quantity(EHE.SPECIFICATION,
-                       name = 'proportion.of.sexual.transmissions.in.prep.eligible',
-                       scale = 'proportion',
-                       value = expression(1/(1+exp(-( # expit because this will be a logit normal distribution
-                         # mean + (z score*standard dev)
-                         logit.mean.proportion.prep.eligible + 
-                           prep.fraction.sexual.transmission.avoidable.z*logit.sd.proportion.prep.eligible)  
-                         )))) 
+                        name = 'proportion.of.sexual.transmissions.in.prep.eligible',
+                        scale = 'proportion',
+                        value = expression(1/(1+exp(-( # expit because this will be a logit normal distribution
+                          # mean + (z score*standard dev)
+                          logit.mean.proportion.prep.eligible + 
+                            prep.fraction.sexual.transmission.avoidable.z*logit.sd.proportion.prep.eligible)  
+                        )))) 
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'logit.mean.proportion.prep.eligible',
@@ -849,7 +538,7 @@ register.model.quantity(EHE.SPECIFICATION,
                         value = expression((1-(1-max.covid.effect.sexual.transmission.reduction) * covid.on *
                                               (1-sexual.transmission.mobility.correlation+
                                                  (sexual.transmission.mobility.correlation*covid.mobility.change))))
-                        )
+)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'max.covid.effect.sexual.transmission.reduction',
@@ -861,8 +550,8 @@ register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.susceptibility.without.covid',
                         value = expression( base.sexual.susceptibility *
                                               (proportion.of.sexual.transmissions.in.prep.eligible*
-                                              (all.prep.risk + 1-all.prep.coverage) + 
-                                                (1-proportion.of.sexual.transmissions.in.prep.eligible)))
+                                                 (all.prep.risk + 1-all.prep.coverage) + 
+                                                 (1-proportion.of.sexual.transmissions.in.prep.eligible)))
 )
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -885,8 +574,8 @@ register.model.element(EHE.SPECIFICATION,
 register.model.quantity(EHE.SPECIFICATION,
                         name='idu.susceptibility.without.covid',
                         value = expression( base.idu.susceptibility *
-                                                (all.prep.risk + 1-all.prep.coverage) *
-                                                (1 + needle.exchange*(needle.exchange.rr-1)) )
+                                              (all.prep.risk + 1-all.prep.coverage) *
+                                              (1 + needle.exchange*(needle.exchange.rr-1)) )
 )
 
 
@@ -999,11 +688,11 @@ register.model.element(EHE.SPECIFICATION,
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.contact',
                         value = expression(global.trate *
-                                               sexual.transmission.rates * 
-                                               sexual.contact.by.age *
-                                               sexual.contact.by.race *
-                                               sexual.contact.by.sex *
-                                               sexual.contact.by.risk))
+                                             sexual.transmission.rates * 
+                                             sexual.contact.by.age *
+                                             sexual.contact.by.race *
+                                             sexual.contact.by.sex *
+                                             sexual.contact.by.risk))
 
 
 register.model.element(EHE.SPECIFICATION,
@@ -1034,8 +723,8 @@ register.model.element(EHE.SPECIFICATION,
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'fraction.male.male.that.are.with.msm',
                         value = expression(proportion.msm.of.male / 
-                                               (proportion.msm.of.male + 
-                                                    (1-proportion.msm.of.male) * fraction.heterosexual.male.pairings.with.male))
+                                             (proportion.msm.of.male + 
+                                                (1-proportion.msm.of.male) * fraction.heterosexual.male.pairings.with.male))
 )
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -1048,8 +737,8 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                applies.to=list(sex.from='heterosexual_male',
                                                sex.to='female'),
                                value = expression((1-proportion.msm.of.male)/
-                                                      (1-proportion.msm.of.male +
-                                                           proportion.msm.of.male * oe.female.pairings.with.msm))
+                                                    (1-proportion.msm.of.male +
+                                                       proportion.msm.of.male * oe.female.pairings.with.msm))
 )
 
 register.model.quantity.subset(EHE.SPECIFICATION,
@@ -1057,8 +746,8 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                applies.to=list(sex.from='msm',
                                                sex.to='female'),
                                value = expression(proportion.msm.of.male * oe.female.pairings.with.msm/
-                                                      (1-proportion.msm.of.male +
-                                                           proportion.msm.of.male * oe.female.pairings.with.msm))
+                                                    (1-proportion.msm.of.male +
+                                                       proportion.msm.of.male * oe.female.pairings.with.msm))
 )
 
 # To MSM
@@ -1073,7 +762,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                applies.to=list(sex.from='msm',
                                                sex.to='msm'),
                                value = expression((1-fraction.msm.pairings.with.female) *
-                                                      fraction.male.male.that.are.with.msm)
+                                                    fraction.male.male.that.are.with.msm)
 )
 
 register.model.quantity.subset(EHE.SPECIFICATION,
@@ -1081,7 +770,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                applies.to=list(sex.from='heterosexual_male',
                                                sex.to='msm'),
                                value = expression((1-fraction.msm.pairings.with.female) *
-                                                      (1-fraction.male.male.that.are.with.msm))
+                                                    (1-fraction.male.male.that.are.with.msm))
 )
 
 # To heterosexual male
@@ -1097,7 +786,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                applies.to=list(sex.from='msm',
                                                sex.to='heterosexual_male'),
                                value = expression(fraction.heterosexual.male.pairings.with.male *
-                                                      fraction.male.male.that.are.with.msm)
+                                                    fraction.male.male.that.are.with.msm)
 )
 
 register.model.quantity.subset(EHE.SPECIFICATION,
@@ -1105,7 +794,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                applies.to=list(sex.from='heterosexual_male',
                                                sex.to='heterosexual_male'),
                                value = expression(fraction.heterosexual.male.pairings.with.male *
-                                                      (1-fraction.male.male.that.are.with.msm))
+                                                    (1-fraction.male.male.that.are.with.msm))
 )
 
 
@@ -1209,19 +898,19 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'active.idu.counts',
                         value = expression(base.initial.population.sans.risk *
-                                               prevalence.active.idu))
+                                             prevalence.active.idu))
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'prior.idu.counts',
                         value = expression(base.initial.population.sans.risk *
-                                               prevalence.prior.idu))
+                                             prevalence.prior.idu))
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'ever.idu.counts',
                         value = expression(base.initial.population.sans.risk *
-                                               prevalence.ever.idu))
+                                             prevalence.ever.idu))
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'never.idu.counts',
                         value = expression(base.initial.population.sans.risk *
-                                               prevalence.never.idu))
+                                             prevalence.never.idu))
 
 
 
@@ -1229,66 +918,66 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='never_IDU', risk.to='never_IDU'),
                                value = expression(never.idu.counts * never.idu.sexual.oe /
-                                                      (never.idu.counts * never.idu.sexual.oe +
-                                                           ever.idu.counts * oe.never.idu.pairings.with.idu))
+                                                    (never.idu.counts * never.idu.sexual.oe +
+                                                       ever.idu.counts * oe.never.idu.pairings.with.idu))
 )
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='active_IDU', risk.to='never_IDU'),
                                value = expression(active.idu.counts * oe.never.idu.pairings.with.idu /
-                                                      (never.idu.counts * never.idu.sexual.oe +
-                                                           ever.idu.counts * oe.never.idu.pairings.with.idu))
+                                                    (never.idu.counts * never.idu.sexual.oe +
+                                                       ever.idu.counts * oe.never.idu.pairings.with.idu))
 )
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='IDU_in_remission', risk.to='never_IDU'),
                                value = expression(prior.idu.counts * oe.never.idu.pairings.with.idu /
-                                                      (never.idu.counts * never.idu.sexual.oe +
-                                                           ever.idu.counts * oe.never.idu.pairings.with.idu))
+                                                    (never.idu.counts * never.idu.sexual.oe +
+                                                       ever.idu.counts * oe.never.idu.pairings.with.idu))
 )
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='never_IDU', risk.to='active_IDU'),
                                value = expression(never.idu.counts /
-                                                      (never.idu.counts +
-                                                           ever.idu.counts * idu.sexual.oe))
+                                                    (never.idu.counts +
+                                                       ever.idu.counts * idu.sexual.oe))
 )
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='active_IDU', risk.to='active_IDU'),
                                value = expression(active.idu.counts * idu.sexual.oe /
-                                                      (never.idu.counts +
-                                                           ever.idu.counts * idu.sexual.oe))
+                                                    (never.idu.counts +
+                                                       ever.idu.counts * idu.sexual.oe))
 )
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='IDU_in_remission', risk.to='active_IDU'),
                                value = expression(prior.idu.counts * idu.sexual.oe /
-                                                      (never.idu.counts +
-                                                           ever.idu.counts * idu.sexual.oe))
+                                                    (never.idu.counts +
+                                                       ever.idu.counts * idu.sexual.oe))
 )
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='never_IDU', risk.to='IDU_in_remission'),
                                value = expression(never.idu.counts /
-                                                      (never.idu.counts +
-                                                           ever.idu.counts * idu.sexual.oe))
+                                                    (never.idu.counts +
+                                                       ever.idu.counts * idu.sexual.oe))
 )
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='active_IDU', risk.to='IDU_in_remission'),
                                value = expression(active.idu.counts * idu.sexual.oe /
-                                                      (never.idu.counts +
-                                                           ever.idu.counts * idu.sexual.oe))
+                                                    (never.idu.counts +
+                                                       ever.idu.counts * idu.sexual.oe))
 )
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.contact.by.risk',
                                applies.to = list(risk.from='IDU_in_remission', risk.to='IDU_in_remission'),
                                value = expression(prior.idu.counts * idu.sexual.oe /
-                                                      (never.idu.counts +
-                                                           ever.idu.counts * idu.sexual.oe))
+                                                    (never.idu.counts +
+                                                       ever.idu.counts * idu.sexual.oe))
 )
 
 register.model.element.values(EHE.SPECIFICATION,
@@ -1387,186 +1076,13 @@ register.model.element(EHE.SPECIFICATION,
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
                                                                                modifiers.apply.to.change = T,
-                                                                            #   after.modifier.application = 'additive.on.link.scale',
+                                                                               #   after.modifier.application = 'additive.on.link.scale',
                                                                                overwrite.modifiers.with.alphas = T
                        ),
                        functional.form.from.time = 2000,
                        ramp.times = c(1970, 1980, 1990),
                        ramp.values = c(pre.peak=1, peak.start=1, peak.end=1))
 
-
-##------------------------------------##
-##-- IV Transmission Contact Arrays --##
-##------------------------------------##
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'idu.contact',
-                        value = expression(global.trate *
-                                               idu.trates * 
-                                               extra.idu.peak.multiplier *
-                                               idu.contact.by.age *
-                                               idu.contact.by.race *
-                                               idu.contact.by.sex))
-
-
-#-- IDU Contact by Age --#
-
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'single.year.age.idu.availability',
-                       value = get.idu.availability(),
-                       dimension.values = list(age=CENSUS.AGES),
-                       resolve.dimension.values.against.model = F,
-                       scale='non.negative.number')
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'single.year.age.counts',
-                        value = expression(single.year.female.age.counts +
-                                               single.year.msm.age.counts +
-                                               single.year.heterosexual.male.age.counts))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'idu.contact.by.age',
-                        value = get.idu.age.contact.proportions)
-
-#-- IDU Contact by Race --#
-
-baseline.idu.oes = array(c(9.12,1,1,1,1.05,1,1,1,1.05),
-                            dim = c(race.to=3, race.from=3),
-                            dimnames = list(race.to=c('black','hispanic','other'),
-                                            race.from=c('black','hispanic','other')))
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'race.idu.oes',
-                       scale = 'ratio',
-                       get.functional.form.function = get.geographically.aggregated.race.oes,
-                       within.county.race.oes = baseline.idu.oes)
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'idu.contact.by.race',
-                        value = idu.oes.to.contact.proportions)
-
-#-- IDU Contact by Sex --#
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'idu.transmission.sex.oes',
-                       scale = 'ratio',
-                       value = PAIRING.INPUT.MANAGER$idu.oe.sex,
-                       dimensions = c('sex.from','sex.to'))
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'idu.contact.by.sex',
-                        value = get.idu.sex.contact.proportions)
-
-#-- IDU Transmission Rates --#
-
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'idu.trates',
-                       scale = 'rate',
-                       functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
-                                                                               knot.values = list(rate0=1,
-                                                                                                  rate1=1,
-                                                                                                  rate2=1),
-                                                                               #link = 'log',
-                                                                               link = 'identity',
-                                                                               min = 0,
-                                                                               knot.link = 'log',
-                                                                               after.time = TRATE.AFTER.TIME,
-                                                                               after.modifier = 1,
-                                                                               modifiers.apply.to.change = T,
-                                                                             #  after.modifier.application = 'multiplicative.of.change.on.value.scale',
-                                                                               overwrite.modifiers.with.alphas = T
-                       ),
-                       functional.form.from.time = 2000,
-                       ramp.times = c(1970, 1980, 1990),
-                       ramp.values = c(pre.peak=1, peak.start=1, peak.end=1))
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'extra.idu.peak.multiplier',
-                       scale = 'ratio',
-                       functional.form = create.linear.spline.functional.form(knot.times=c(pre.peak=1970,
-                                                                                           peak.start=1980,
-                                                                                           peak.end=1990,
-                                                                                           post.peak=as.numeric(TRATE.KNOT.TIMES[1])),
-                                                                              knot.values = list(pre.peak=1,
-                                                                                                 peak.start=1,
-                                                                                                 peak.end=1,
-                                                                                                 post.peak=1),
-                                                                              link = 'identity',
-                                                                              knot.link = 'log'
-                                                                           ),
-                       functional.form.from.time = 1970,
-                       functional.form.to.time = TRATE.KNOT.TIMES[1]
-)
-
-
-##-----------------------------------##
-##-----------------------------------##
-##-- FOREGROUNDS for COVID EFFECTS --##
-##-----------------------------------##
-##-----------------------------------##
-
-N.COVID.MONTHS = 24
-N.COVID.MONTHS.FULL.EFFECT = 12
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'covid.on',
-                       scale = 'proportion',
-                       functional.form = create.linear.spline.functional.form(
-                         knot.times = c(pre = (2020 + (2.5/12)), # March 15, 2020
-                                        start = (2020 + (3/12)), # March 30, 2020
-                                        end = (2020 + (3/12) + N.COVID.MONTHS.FULL.EFFECT/12), # starts tapering 
-                                        post = (2020 + (3/12) + N.COVID.MONTHS/12) # back to normal 
-                         ),
-                         knot.values = list(pre = 0,
-                                            start = 1,
-                                            end = 1,
-                                            post = 0)
-                       ),
-                       functional.form.from.time = 2020)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'covid.mobility.change',
-                       scale = 'proportion',
-                       get.functional.form.function = get.covid.mobility.for.location,
-                       functional.form.from.time = 2020)
-
-#-- Testing --#
-register.model.element(EHE.SPECIFICATION,
-                       name = 'testing.mobility.correlation',
-                       scale = 'proportion',
-                       value = 1)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'undiagnosed.testing.rr.mobility.correlation',
-                       scale = 'proportion',
-                       value = 1)
-
-#-- Sexual Transmission --#
-register.model.element(EHE.SPECIFICATION,
-                       name = 'sexual.transmission.mobility.correlation',
-                       scale = 'proportion',
-                       value = 1)
-
-
-#-- IV Transmission --#
-register.model.element(EHE.SPECIFICATION,
-                       name = 'idu.transmission.mobility.correlation',
-                       scale = 'proportion',
-                       value = 1)
-
-#-- Suppression --#
-register.model.element(EHE.SPECIFICATION,
-                       name = 'suppression.of.diagnosed.mobility.correlation',
-                       scale = 'proportion',
-                       value = 1)
-
-#-- PrEP --#
-register.model.element(EHE.SPECIFICATION,
-                       name = 'prep.uptake.transmission.mobility.correlation',
-                       scale = 'ratio',
-                       value=1)
 
 ##--------------------------##
 ##--------------------------##
@@ -1649,7 +1165,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex'),
                          corresponding.data.outcome = 'prep.indications',
                          save = T
-                         )
+)
 
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'prep.uptake',
@@ -1752,7 +1268,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
                          corresponding.data.outcome = 'proportion.tested',
                          keep.dimensions = c('location','age','race','sex','risk'))
- 
+
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'number.of.tests.in.uninfected',
                          outcome.metadata = create.outcome.metadata(display.name = 'Number of HIV Tests Among Uninfected',
@@ -1765,7 +1281,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          value.to.integrate = 'uninfected',
                          multiply.by = 'general.population.testing',
                          save = F)
- 
+
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'total.hiv.tests',
                          outcome.metadata = create.outcome.metadata(display.name = 'Total Number of HIV Tests',
@@ -1842,7 +1358,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          subset.dimension.values = list(continuum = "diagnosed.states"),
                          corresponding.data.outcome = 'diagnosed.prevalence',
                          keep.dimensions = c('location','age','race','sex','risk')
-                         )
+)
 
 
 
@@ -2007,4 +1523,3 @@ register.calibrated.parameters.for.version('ehe',
                                            sampling.blocks = EHE.PARAMETER.SAMPLING.BLOCKS,
                                            calibrate.to.year = 2025,
                                            join.with.previous.version = F)
-
