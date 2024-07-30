@@ -281,16 +281,32 @@ single.year.sex <- single.year.age.sex%>%
 
 single.year.sex<- single.year.sex[!duplicated(single.year.sex), ]
 
+#Age + Sex
+single.year.age.sex <- single.year.age.sex%>%
+  rename(value = Freq)%>%
+  filter(age != "< 1 year" & age != "1 year" & age != "2 years" &  age != "3 years" &  age != "4 years" &  age != "5 years" & 
+           age != "6 years" &  age != "7 years" &  age != "8 years" &  age != "9 years" &  age != "10 years" &  age != "11 years" & 
+           age != "12 years") %>%
+  filter(year != "remove")%>%
+  mutate(outcome = 'adult.population')%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(age = as.character(age))
+
+
 ##
 single.year.total= as.data.frame(single.year.total)
 single.year.age= as.data.frame(single.year.age)
 single.year.sex= as.data.frame(single.year.sex)
+single.year.age.sex = as.data.frame(single.year.age.sex)
 
 #Put Single Year Age Group Data
 adult.pop.by.single.year.age = list(
   single.year.total, #by total
   single.year.age, #by age
-  single.year.sex #by sex
+  single.year.sex, #by sex
+  single.year.age.sex #by age+sex
 )
 
 for (data in adult.pop.by.single.year.age) {
@@ -303,3 +319,10 @@ for (data in adult.pop.by.single.year.age) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
+
+
+# ADDING NEW STRATIFICATIONS ----------------------------------------------
+#Need: race+eth
+#   race+eth+sex
+#   age+race+eth
+
