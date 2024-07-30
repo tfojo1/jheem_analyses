@@ -32,33 +32,49 @@ par.names.pop = c("black.birth.rate.multiplier",
                   "age5.non.idu.general.mortality.rate.multiplier",
                   "male.non.idu.general.mortality.rate.multiplier", # accidentally left out before
                   "female.non.idu.general.mortality.rate.multiplier", # accidentally left out before
+                  
                   "black.age1.aging.multiplier.1",
                   "hispanic.age1.aging.multiplier.1",
                   "other.age1.aging.multiplier.1",
-                  "black.age2.aging.multiplier.1",
-                  "hispanic.age2.aging.multiplier.1",
-                  "other.age2.aging.multiplier.1",
                   "black.age1.aging.multiplier.2",
                   "hispanic.age1.aging.multiplier.2",
                   "other.age1.aging.multiplier.2",
+                  
+                  "black.age2.aging.multiplier.1",
+                  "hispanic.age2.aging.multiplier.1",
+                  "other.age2.aging.multiplier.1",
                   "black.age2.aging.multiplier.2",
                   "hispanic.age2.aging.multiplier.2",
                   "other.age2.aging.multiplier.2",
                   
-                  "black.age3.aging.multiplier",
-                  "hispanic.age3.aging.multiplier",
-                  "other.age3.aging.multiplier",
-                  "age4.aging.multiplier",
-                  "immigration.multiplier.time.1",
-                  "immigration.multiplier.time.2",
-                  "emigration.multiplier.time.1",
-                  "emigration.multiplier.time.2",
-                  "black.migration.multiplier.time.1",
-                  "black.migration.multiplier.time.2",
-                  "hispanic.migration.multiplier.time.1",
-                  "hispanic.migration.multiplier.time.2",
-                  "other.migration.multiplier.time.1",
-                  "other.migration.multiplier.time.2",
+                  "black.age3.aging.multiplier.1",
+                  "hispanic.age3.aging.multiplier.1",
+                  "other.age3.aging.multiplier.1",
+                  "black.age3.aging.multiplier.2",
+                  "hispanic.age3.aging.multiplier.2",
+                  "other.age3.aging.multiplier.2",
+                  
+                  "black.age4.aging.multiplier.1",
+                  "hispanic.age4.aging.multiplier.1",
+                  "other.age4.aging.multiplier.1",
+                  "black.age4.aging.multiplier.2",
+                  "hispanic.age4.aging.multiplier.2",
+                  "other.age4.aging.multiplier.2",
+                  
+                  "black.immigration.multiplier.time.1",
+                  "hispanic.immigration.multiplier.time.1",
+                  "other.immigration.multiplier.time.1",
+                  "black.immigration.multiplier.time.2",
+                  "hispanic.immigration.multiplier.time.2",
+                  "other.immigration.multiplier.time.2",
+                  
+                  "black.emigration.multiplier.time.1",
+                  "hispanic.emigration.multiplier.time.1",
+                  "other.emigration.multiplier.time.1",
+                  "black.emigration.multiplier.time.2",
+                  "hispanic.emigration.multiplier.time.2",
+                  "other.emigration.multiplier.time.2",
+                  
                   "age1.migration.multiplier.time.1",
                   "age1.migration.multiplier.time.2",
                   "age2.migration.multiplier.time.1",
@@ -72,20 +88,20 @@ par.names.pop = c("black.birth.rate.multiplier",
 )
 
 par.names.basic.trans = c(
-  "global.trate",
-  "peak.hiv.mortality",
-  "hiv.mortality.0",
-  "hiv.mortality.1",
-  'msm.testing.ramp.1.or',
-  'msm.testing.ramp.2.or',
-  'heterosexual.testing.ramp.1.or',
-  'heterosexual.testing.ramp.2.or',
-  'idu.testing.ramp.1.or',
-  'idu.testing.ramp.2.or'
+  "global.trate"#,
+  # "peak.hiv.mortality",
+  # "hiv.mortality.0",
+  # "hiv.mortality.1",
+  # 'msm.testing.ramp.1.or',
+  # 'msm.testing.ramp.2.or',
+  # 'heterosexual.testing.ramp.1.or',
+  # 'heterosexual.testing.ramp.2.or',
+  # 'idu.testing.ramp.1.or',
+  # 'idu.testing.ramp.2.or'
 )
 
 register.calibration.info(CALIBRATION.CODE.POPULATION,
-                          likelihood.instructions = joint.pop.migration.total.trans.aids.likelihood.instructions, # added total prev/new 5/20
+                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added total prev/new 5/20
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.pop, par.names.basic.trans), # adding this in 5/20
@@ -113,19 +129,22 @@ par.names.transmission = c(par.names.transmission,
                            "peak.hiv.mortality",
                            "hiv.mortality.0",
                            "hiv.mortality.1",
-                           'msm.testing.ramp.1.or',
-                           'msm.testing.ramp.2.or',
-                           'heterosexual.testing.ramp.1.or',
-                           'heterosexual.testing.ramp.2.or',
-                           'idu.testing.ramp.1.or',
-                           'idu.testing.ramp.2.or',
+                           # 'msm.testing.ramp.1.or',
+                           # 'msm.testing.ramp.2.or',
+                           # 'heterosexual.testing.ramp.1.or',
+                           # 'heterosexual.testing.ramp.2.or',
+                           # 'idu.testing.ramp.1.or',
+                           # 'idu.testing.ramp.2.or',
                            'idu.remission.multiplier',
-                           'idu.relapse.multiplier'
+                           'idu.relapse.multiplier',
+                           'aids.to.new.diagnoses.ratio.peak',
+                           'aids.to.new.diagnoses.ratio.0',
+                           'aids.to.new.diagnoses.ratio.1'
                            )
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           # added proportion tested 4/23
-                          likelihood.instructions = two.way.transmission.pop.idu.aware.likelihood.instructions,
+                          likelihood.instructions = two.way.transmission.pop.idu.aware.aids.testing.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
@@ -167,3 +186,6 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
                           description = "Full with covid likelihoods"
 )
+
+
+

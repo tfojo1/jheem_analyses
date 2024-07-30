@@ -1595,13 +1595,13 @@ source('data_processing/put_msa_data_as_new_source_script.R')
 #this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
 #this function currently defaults to population, when using it for mortality you need to define mortality as the outcome#
 #adult.population
-put.msa.data.strict(locations = MSAS.OF.INTEREST, 
-                    data.manager = surveillance.manager, 
-                    census.manager = census.manager)
+# put.msa.data.strict(locations = MSAS.OF.INTEREST, 
+#                     data.manager = surveillance.manager, 
+#                     census.manager = census.manager)
 
 
 #Put adult population for specific locations
-put.msa.data.strict(locations= c(STATES.CONTAINING.LOCATIONS.OF.INTEREST, NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST, COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
+put.msa.data.strict(locations= c(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
                     contained.geographic.type = "county", #it will look for counties in the regions above
                     put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')),
                     data.manager = surveillance.manager,
@@ -1612,8 +1612,8 @@ source('data_processing/dummy.data.frames.R')
 
 # Adult population for recent census data ---------------------------------
 
-#Source code that restructures census age groups to get adult.pop for 2020-2022
-source('data_processing/restructure.recent.census.age.groups.R')
+#Source code that creates adult population for 2020-2023, stratified data
+source('data_processing/adult.population.20.23.R')
 
 ################################################################################
 #Create aggregated outcomes 
@@ -1713,10 +1713,11 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
 #This aggregates county level data to state level for the recent census years for adult.population (as well as county to MSAs of interest)
 #where I wrote the restructure.recent.age.groups code to estimate for adult.pop
 all.states = locations::get.all.for.type('state')
+#Aggregates census
 put.msa.data.as.new.source(outcome = 'adult.population',
                            from.source.name = 'census.population',
                            to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  all.states,   
+                           to.locations =  all.states,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'STATE',
                            details.for.new.data = 'estimated from county data',
@@ -1725,7 +1726,44 @@ put.msa.data.as.new.source(outcome = 'adult.population',
 put.msa.data.as.new.source(outcome = 'adult.population',
                            from.source.name = 'census.population',
                            to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  MSAS.OF.INTEREST,   
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'census.population',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+#Aggregates CDC Wonder
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'cdc_wonder',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  all.states,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'STATE',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'cdc_wonder',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'cdc_wonder',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',

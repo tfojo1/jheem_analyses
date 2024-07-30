@@ -49,7 +49,7 @@ is.cached.object.out.of.date <- function(file,
 
 CACHE.FILES.TO.TRACK = c(
     'surveillance.manager.rdata',
-    'smaller.census.manager.rdata'
+    'census.manager.rdata'
 )
 
 # Requires all cached files, when loaded, to be no older than the files in this computer
