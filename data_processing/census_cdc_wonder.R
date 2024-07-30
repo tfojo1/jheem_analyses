@@ -40,7 +40,8 @@ data.list.cdc.wonder.clean = lapply(data.list.cdc.wonder  , function(file){
   data$age= data$Age
     
   data <- data %>%
-    select(outcome, year, location, age, race, ethnicity, sex, value)
+    select(outcome, year, location, age, race, ethnicity, sex, value)%>%
+    filter(year != "2020")  #Removign 2020 data now that we have census data for 2020 by single year ages
   
   data = as.data.frame(data)
   list(filename, data)  
