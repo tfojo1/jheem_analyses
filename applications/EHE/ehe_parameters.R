@@ -67,10 +67,16 @@ BASE.PARAMETERS.PRIOR = distributions::join.distributions(
     Multivariate.Lognormal.Distribution(mu=0,
                                         sigma = create.compound.symmetry.covariance.matrix(correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
                                         var.names = paste0(c("black","hispanic","other"),".emigration.multiplier.time.1")),
+    # 
+    # Multivariate.Lognormal.Distribution(mu=0,sigma = create.auto.regressive.covariance.matrix(
+    #                                       correlation.coefficient = 0.5,n=5,sd=0.5*log(2)),
+    #                                     var.names = paste0("age",c(1:5),".migration.multiplier.time.1")),
     
-    Multivariate.Lognormal.Distribution(mu=0,sigma = create.auto.regressive.covariance.matrix(
-                                          correlation.coefficient = 0.5,n=5,sd=0.5*log(2)),
-                                        var.names = paste0("age",c(1:5),".migration.multiplier.time.1")),
+    age1.migration.multiplier.time.1 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    age2.migration.multiplier.time.1 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    age3.migration.multiplier.time.1 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    age4.migration.multiplier.time.1 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    age5.migration.multiplier.time.1 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
     
     Multivariate.Lognormal.Distribution(mu=0,
                                         sigma = create.compound.symmetry.covariance.matrix(correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
@@ -80,9 +86,23 @@ BASE.PARAMETERS.PRIOR = distributions::join.distributions(
                                         sigma = create.compound.symmetry.covariance.matrix(correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
                                         var.names = paste0(c("black","hispanic","other"),".emigration.multiplier.time.2")),
 
-    Multivariate.Lognormal.Distribution(mu=0,sigma = create.auto.regressive.covariance.matrix(
-                                          correlation.coefficient = 0.5,n=5,sd=0.5*log(2)),
-                                        var.names = paste0("age",c(1:5),".migration.multiplier.time.2")),
+    # Multivariate.Lognormal.Distribution(mu=0,sigma = create.auto.regressive.covariance.matrix(
+    #                                       correlation.coefficient = 0.5,n=5,sd=0.5*log(2)),
+    #                                     var.names = paste0("age",c(1:5),".migration.multiplier.time.2")),
+    
+    
+    age1.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    
+    black.age2.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    hispanic.age2.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    other.age2.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    
+    black.age3.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    hispanic.age3.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    other.age3.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    
+    age4.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
+    age5.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
 
     
     #-- MSM Transmission --#
@@ -597,9 +617,10 @@ BASE.PARAMETERS.PRIOR = distributions::join.distributions(
     
     #-- AIDS Diagnoses --#
     aids.to.new.diagnosis.ratio = Multivariate.Lognormal.Distribution(mu = c(1.09264522805781, -0.022054632609793, -0.0811281287465434),
-                                                                      sigma = 1/135* matrix(c(0.0540150046153106, -0.00544775631061186, 0.00227929482952582, -0.00544775631061186, 0.00140533026447334, -0.000587978210286446, 0.00227929482952582, -0.000587978210286446, 0.00156311624587849), nrow=3),
+                                                                      sigma = 1/96* matrix(c(0.0540150046153106, -0.00544775631061186, 0.00227929482952582, -0.00544775631061186, 0.00140533026447334, -0.000587978210286446, 0.00227929482952582, -0.000587978210286446, 0.00156311624587849), nrow=3),
                                                                         # ^for the mean and cov mata, see aids_diagnoses_multiplier.R
-                                                                        # The 1/135 is us saying that this ratio is going to independently apply to all 135 strata
+                                                                      # The 1/135 is us saying that this ratio is going to independently apply to all 135 strata
+                                                                      # The 1/96 is us saying that this ratio is going to independently to all 135 strata, if they were correlated with a compound symmetry matrix
                                                                       var.names = paste0('aids.to.new.diagnoses.ratio.', c('peak','0','1'))) # see aids_diagnoses_multiplier.R
 )
 
@@ -747,13 +768,17 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
     age2.population.rates = c(
       'age2.non.idu.general.mortality.rate.multiplier',
       'age2.migration.multiplier.time.1',
-      'age2.migration.multiplier.time.2'
+      'black.age2.migration.multiplier.time.2',
+      'hispanic.age2.migration.multiplier.time.2',
+      'other.age2.migration.multiplier.time.2'
     ),
     
     age3.population.rates = c(
       'age3.non.idu.general.mortality.rate.multiplier',
       'age3.migration.multiplier.time.1',
-      'age3.migration.multiplier.time.2'
+      'black.age3.migration.multiplier.time.2',
+      'hispanic.age3.migration.multiplier.time.2',
+      'other.age3.migration.multiplier.time.2'
     ),
     
     age4.population.rates = c(

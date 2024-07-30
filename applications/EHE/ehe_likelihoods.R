@@ -397,6 +397,8 @@ suppression.likelihood.instructions =
                                                    levels.of.stratification = c(0,1), 
                                                    from.year = 2008, 
                                                    
+                                                   maximum.locations.per.type = 2,
+                                                   
                                                    p.bias.inside.location = suppression.bias.estimates$in.mean, 
                                                    p.bias.outside.location = suppression.bias.estimates$out.mean,
                                                    p.bias.sd.inside.location = suppression.bias.estimates$in.sd,
@@ -732,7 +734,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     
     levels.of.stratification = c(0),
     from.year = 2008,
-   # to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
+    to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
     
     p.bias.inside.location = 0, 
     p.bias.outside.location = hiv.tests.per.population.bias.estimates$out.mean,
@@ -861,10 +863,20 @@ two.way.transmission.pop.idu.aware.aids.testing.likelihood.instructions =
                                cocaine.likelihood.instructions,
                                non.age.aids.diagnoses.likelihood.instructions,
                                aids.deaths.likelihood.instructions,
-                               two.way.proportion.tested.likelihood.instructions,
                                awareness.likelihood.instructions
   )
 
+transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
+  join.likelihood.instructions(new.diagnoses.likelihood.instructions,
+                               prevalence.likelihood.instructions,
+                               proportion.tested.likelihood.instructions, # added this in 4/23
+                               population.likelihood.instructions,
+                               heroin.likelihood.instructions,
+                               cocaine.likelihood.instructions,
+                               non.age.aids.diagnoses.likelihood.instructions,
+                               aids.deaths.likelihood.instructions,
+                               awareness.likelihood.instructions
+  )
 
 
 #-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 
