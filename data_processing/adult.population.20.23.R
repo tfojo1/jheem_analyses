@@ -205,6 +205,66 @@ adult.pop.ethnicity.20.23 <- as.data.frame.table(adult.pop.ethnicity.20.23)%>%
   mutate(ethnicity = as.character(tolower(ethnicity)))%>%
   select(-Freq)
 
+#ESTIMATED DATA: adult.population 2020-2023 by RACE+ETHNICITY
+
+array.race.eth = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity
+
+restratify.race.eth <- restratify.age.counts(array.race.eth, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
+
+restrat.race.eth = restratify.race.eth[ , ,3:17, ,] #subset by only adult age groups
+fixed.race.eth = apply(restrat.race.eth, MARGIN = c("year","location", "race", 'ethnicity'), sum) #sum the adult age groups to get adult.population for 2020-2023
+
+
+fixed.race.eth <- as.data.frame.table(fixed.race.eth)%>%
+  mutate(value = round(Freq))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(outcome = "adult.population")%>%
+  mutate(race = as.character(race))%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  select(-Freq)
+
+#Update for 7-23-24: To align this race data with the current census ontology:
+fixed.race.eth$race = race.mappings.to.census[fixed.race.eth$race]
+fixed.race.eth<- fixed.race.eth %>%
+  mutate(ethnicity = tolower(ethnicity))%>%
+  group_by(year, location, race, ethnicity)%>%
+  mutate(value.new = sum(value))%>%
+  select(-value)%>%
+  rename(value = value.new)
+
+fixed.race.eth<- as.data.frame(fixed.race.eth[!duplicated(fixed.race.eth), ])
+
+#ESTIMATED DATA: adult.population 2020-2023 by RACE+ETHNICITY+AGE
+array.race.eth.age = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity
+
+restratify.race.eth.age <- restratify.age.counts(array.race.eth.age, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
+
+restrat.race.eth.age = restratify.race.eth.age[ , ,3:17, ,] #subset by only adult age groups
+fixed.race.eth.age = apply(restrat.race.eth.age, MARGIN = c("year","location", "race", 'ethnicity', 'age'), sum) #sum the adult age groups to get adult.population for 2020-2023
+
+
+fixed.race.eth.age <- as.data.frame.table(fixed.race.eth.age)%>%
+  mutate(value = round(Freq))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(outcome = "adult.population")%>%
+  mutate(race = as.character(race))%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  select(-Freq)
+
+#Update for 7-23-24: To align this race data with the current census ontology:
+fixed.race.eth.age$race = race.mappings.to.census[fixed.race.eth.age$race]
+
+fixed.race.eth.age<- fixed.race.eth.age %>%
+  mutate(ethnicity = tolower(ethnicity))%>%
+  group_by(year, location, race, ethnicity, age)%>%
+  mutate(value.new = sum(value))%>%
+  select(-value)%>%
+  rename(value = value.new)
+
+fixed.race.eth.age<- as.data.frame(fixed.race.eth.age[!duplicated(fixed.race.eth.age), ])
+
 ##################################################################################
 
 # PUT for all stratified, estimated data ----------------------------------
@@ -213,8 +273,10 @@ estimated.adult.pop.stratified.put = list(
   #adult.pop.total.20.23,
   #adult.pop.sex.20.23,
   #adult.pop.age.20.23,
-  adult.pop.race.20.23,
-  adult.pop.ethnicity.20.23)
+  adult.pop.race.20.23, #race only
+  adult.pop.ethnicity.20.23, #eth only
+  fixed.race.eth, #race+eth
+  fixed.race.eth.age) #this is race +eth+age
 
 
 for (data in estimated.adult.pop.stratified.put) {
