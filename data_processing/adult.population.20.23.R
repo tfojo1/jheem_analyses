@@ -250,6 +250,7 @@ fixed.race.eth.age <- as.data.frame.table(fixed.race.eth.age)%>%
   mutate(location = as.character(location))%>%
   mutate(outcome = "adult.population")%>%
   mutate(race = as.character(race))%>%
+  mutate(age = as.character(age))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
   select(-Freq)
 
@@ -272,7 +273,7 @@ array.race.eth.sex = census.manager$data$population$estimate$census.population$s
 restratify.race.eth.sex <- restratify.age.counts(array.race.eth.sex, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
 restrat.race.eth.sex = restratify.race.eth.sex[ , ,3:17, , ,] #subset by only adult age groups
-fixed.race.eth.sex = apply(restrat.race.eth.sex, MARGIN = c("year","location", "race", 'ethnicity', 'age', 'sex'), sum) #sum the adult age groups to get adult.population for 2020-2023
+fixed.race.eth.sex = apply(restrat.race.eth.sex, MARGIN = c("year","location", "race", 'ethnicity', 'sex'), sum) #sum the adult age groups to get adult.population for 2020-2023
 
 
 fixed.race.eth.sex <- as.data.frame.table(fixed.race.eth.sex)%>%
@@ -281,14 +282,14 @@ fixed.race.eth.sex <- as.data.frame.table(fixed.race.eth.sex)%>%
   mutate(location = as.character(location))%>%
   mutate(outcome = "adult.population")%>%
   mutate(race = as.character(race))%>%
+  mutate(sex = as.character(sex))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(ethnicity = tolower(ethnicity))%>%
   select(-Freq)
 
 #Update for 7-23-24: To align this race data with the current census ontology:
 fixed.race.eth.sex$race = race.mappings.to.census[fixed.race.eth.sex$race]
 
-fixed.race.eth.sex<- fixed.race.eth.sex %>%
-  mutate(ethnicity = tolower(ethnicity))
 
 fixed.race.eth.sex<- as.data.frame(fixed.race.eth.sex[!duplicated(fixed.race.eth.sex), ])
 
@@ -311,7 +312,7 @@ for (data in estimated.adult.pop.stratified.put) {
   
   surveillance.manager$put.long.form(
     data = data,
-    ontology.name = 'census', 
+    ontology.name = 'census.grouped.age', 
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
