@@ -356,6 +356,50 @@ population.race.eth <- population.race.eth.sex%>%
 
 population.race.eth= as.data.frame(population.race.eth)
 
+
+# Race + Ethnicity + Sex + Age --------------------------------------------
+
+population.race.eth.sex.age <- county_agegr_sex_race_eth%>%
+  select(STATE, COUNTY, YEAR, AGEGRP, NHIA_FEMALE , NHIA_MALE ,HIA_MALE , HIA_FEMALE,
+         HAA_MALE, HAA_FEMALE, NHAA_MALE, NHAA_FEMALE,
+         HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
+         HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
+         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+  filter(YEAR != "1")%>% #remove the april population estimate
+  mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
+  mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
+  mutate(location = paste(STATE, COUNTY, sep=""))%>%
+  filter(AGEGRP != "0")%>% #Removing total age
+  pivot_longer(cols=c(one_of("NHIA_FEMALE" , "NHIA_MALE" ,"HIA_MALE" , "HIA_FEMALE",
+                             "HAA_MALE", "HAA_FEMALE", "NHAA_MALE", "NHAA_FEMALE",
+                             "HBA_MALE", "HBA_FEMALE", "NHBA_MALE", "NHBA_FEMALE",
+                             "HWA_MALE", "HWA_FEMALE", "NHWA_MALE", "NHWA_FEMALE",
+                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE")), 
+               names_to = c("combined.race", "sex"),
+               names_sep = "_",
+               values_to = "count.by.sex")%>%
+  mutate(ethniticy.indcator = substring(combined.race, 1, 1))%>%
+  mutate(race = case_when(combined.race == "HAA" ~ "Asian",
+                          combined.race == "HBA" ~ "Black",
+                          combined.race == "HIA" ~ "American Indian and Alaska Native",
+                          combined.race == "HNA" ~ "Native Hawaiian and Other Pacific Islander",
+                          combined.race == "HWA" ~ "White",
+                          combined.race == "NHAA" ~ "Asian",
+                          combined.race == "NHBA" ~ "Black",
+                          combined.race == "NHIA" ~ "American Indian and Alaska Native",
+                          combined.race == "NHNA" ~ "Native Hawaiian and Other Pacific Islander",
+                          combined.race == "NHWA" ~ "White"))%>%
+  mutate(sex = tolower(sex))%>%
+  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(ethnicity = ifelse(ethniticy.indcator == "N", "Not Hispanic", 'Hispanic'))%>%
+  mutate(age = as.character(census.age.mappings[AGEGRP]))%>%
+  select(location, year, race, ethnicity, sex, age, count.by.sex)%>%
+  mutate(outcome = "population")%>%
+  mutate(value = count.by.sex)%>%
+  select(-count.by.sex)
+
+population.race.eth.sex.age= as.data.frame(population.race.eth.sex.age)
+
 # Put into CENSUS MANAGER --------------------------
 
 stratified.20.23.data = list(
@@ -368,7 +412,8 @@ stratified.20.23.data = list(
   population.ethnicity.age,
   population.race.eth,
   population.race.eth.sex,
-  population.age.race.eth
+  population.age.race.eth,
+  population.race.eth.sex.age
   #population.sex.age
   )
 
