@@ -4,13 +4,13 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 #source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
-CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
+CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe.0'
 CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
-CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
+CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid.0'
 
-CALIBRATION.CODE.FULL = 'full'
+CALIBRATION.CODE.FULL = 'full.0'
 
 N.ITER.TEST = 10000
 N.ITER = 15000
@@ -151,10 +151,10 @@ par.names.transmission = c(par.names.transmission,
                            # 'idu.testing.ramp.1.or',
                            # 'idu.testing.ramp.2.or',
                            'idu.remission.multiplier',
-                           'idu.relapse.multiplier',
-                           'aids.to.new.diagnoses.ratio.peak',
-                           'aids.to.new.diagnoses.ratio.0',
-                           'aids.to.new.diagnoses.ratio.1'
+                           'idu.relapse.multiplier'
+                           # 'aids.to.new.diagnoses.ratio.peak',
+                           # 'aids.to.new.diagnoses.ratio.0',
+                           # 'aids.to.new.diagnoses.ratio.1'
                            )
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
