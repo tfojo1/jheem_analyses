@@ -2,10 +2,17 @@ source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibra
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 LOCATION = BALTIMORE.MSA
-CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION,
-                             CALIBRATION.CODE.TRANSMISSION,
-                             CALIBRATION.CODE.FULL.PLUS.COVID,
-                             CALIBRATION.CODE.FULL)[c(3)]
+CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
+                             CALIBRATION.CODE.TRANSMISSION, # 2
+                             CALIBRATION.CODE.FULL.PLUS.COVID, # 3
+                             CALIBRATION.CODE.FULL, # 4
+                             # 8/1 debug likelihoods: 
+                             CALIBRATION.CODE.BASE.5, # 5
+                             CALIBRATION.CODE.FULL.PLUS.AIDS, # 6
+                             CALIBRATION.CODE.MINUS.POS, # 7
+                             CALIBRATION.CODE.MINUS.TST, # 8 
+                             CALIBRATION.CODE.MINUS.AIDS # 9
+                             )[c(5)]
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {
