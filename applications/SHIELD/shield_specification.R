@@ -22,7 +22,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield', #A single 
                                                   # subversion = # runs the same model but can report seperate outcomes
                                                   description = "The initial SHIELD version, set up to model national epidemic", #A short text description of this version
                                                   
-                                                  start.year = 1970,## @Todd: this is not set up to accept 1950
+                                                  start.year = 1950,## @Todd: this is not set up to accept 1950
                                                   
                                                   age.endpoints=c(0,15,20,25,30,35,40,45,50,55,65,Inf), #similar to atlas [0-15][16-20]
                                                   
@@ -32,11 +32,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield', #A single 
                                                   ),
                                                   compartments.for.uninfected.only = list(),
                                                   compartments.for.infected.and.uninfected = list(
-                                                    # Error in create.jheem.specification(version = "shield", iteration = 1,  : 
-                                                    # Cannot create jheem.specification 'shield': 'compartments.for.infected.and.uninfected' must include a 'location' dimension
-                                                                                                        location = 'location',# this is a national model
-                                                  
-                                                      age = 'all.ages',#alias for the agegroups defined above 
+                                                    age = 'all.ages',#alias for the agegroups defined above 
                                                     race=c('black','hispanic','other'),
                                                     sex= c('heterosexual_male', 'msm', 'female')
                                                   ),
