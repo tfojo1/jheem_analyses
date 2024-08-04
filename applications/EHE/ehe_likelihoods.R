@@ -170,6 +170,17 @@ new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(out
                                                                              equalize.weight.by.year = T 
 )
 
+new.diagnoses.noage.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                                                             outcome.for.sim = "new",
+                                                                             dimensions = c("sex","race","risk"),
+                                                                             levels.of.stratification = c(0,1,2), 
+                                                                             from.year = 2008, 
+                                                                             observation.correlation.form = 'compound.symmetry', 
+                                                                             error.variance.term = 0.03,
+                                                                             error.variance.type = 'cv',
+                                                                             weights = list(1), 
+                                                                             equalize.weight.by.year = T 
+)
 
 #-- PREVALENCE  --#
 total.prevalence.likelihood.instructions = 
@@ -201,6 +212,18 @@ race.risk.sex.two.way.prevalence.likelihood.instructions =
 prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                                                           outcome.for.sim = "diagnosed.prevalence",
                                                                           dimensions = c("age","sex","race","risk"),
+                                                                          levels.of.stratification = c(0,1,2), 
+                                                                          from.year = 2008, 
+                                                                          observation.correlation.form = 'compound.symmetry', 
+                                                                          error.variance.term = 0.03,
+                                                                          error.variance.type = 'cv',
+                                                                          weights = list(1), # upweight?
+                                                                          equalize.weight.by.year = T 
+)
+
+prevalence.noage.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                                                          outcome.for.sim = "diagnosed.prevalence",
+                                                                          dimensions = c("sex","race","risk"),
                                                                           levels.of.stratification = c(0,1,2), 
                                                                           from.year = 2008, 
                                                                           observation.correlation.form = 'compound.symmetry', 
@@ -501,8 +524,8 @@ proportion.tested.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   p.error.variance.term = 0.03,
-                                                   p.error.variance.type = 'sd', # sd or data.variance 
+                                                   p.error.variance.term = NULL,
+                                                   p.error.variance.type = 'data.variance', # sd or data.variance 
                                                    # this will use what is stored in the data manager instead specifying the value here
                                                             # switch to this once the variance estimate in the data manager is corrected
                                                    
@@ -882,4 +905,44 @@ FULL.likelihood.instructions.minus.aids =  join.likelihood.instructions(
   cocaine.likelihood.instructions
 )
 
+pop.prev.test.likelihood.instructions = join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  prevalence.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions
+)
+
+pop.new.test.likelihood.instructions = join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions
+)
+
+
+pop.new.prev.noage.test.likelihood.instructions = join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.noage.likelihood.instructions,
+  prevalence.noage.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions
+)
 
