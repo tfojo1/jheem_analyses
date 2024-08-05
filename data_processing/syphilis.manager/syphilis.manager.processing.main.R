@@ -67,27 +67,31 @@ data.manager$register.outcome(
 
 # Create Sources + Parent Sources -----------------------------------------
 
+##Register "Parent" Sources
+data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS")
+data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS")
+data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
+data.manager$register.parent.source('USDA', full.name = 'Economic Research Services of the United States Department of Agriculture', short.name= "USDA")
 
-# data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
-# 
-# data.manager$register.source('aidsvu', parent.source= "IQVIA", full.name = "AIDS Vu", short.name='aidsvu')
+
+##Register Data Sources ('children')
+data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
+data.manager$register.source('cdc.sdh', parent.source= "ACS", full.name = "Atlas Plus SDH Data", short.name='cdc.sdh')
+data.manager$register.source('cdc.rural', parent.source= "census", full.name = "Atlas Plus Rural Area Data", short.name='cdc.rural')
+data.manager$register.source('cdc.urban', parent.source= "USDA", full.name = "Atlas Plus Urbanization Level", short.name='cdc.urban')
 
 
 # Establish Ontologies ----------------------------------------------------
 
-
-# data.manager$register.ontology(
-#   'cdc',
-#   ont = ontology(
-#     year= NULL,
-#     location= NULL,
-#     age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-#     race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
-#     sex=c('male','female'),
-#     risk=c('msm','idu','msm_idu','heterosexual','other')
-#   ))
+data.manager$register.ontology(
+  'cdc.shd',
+  ont = ontology(
+    year= c("2018-2022"),
+    location= NULL,
+    incomplete.dimensions = c("year", "location") #Is this the right way to code the 5 year ranges?
+  ))
 
 
 # Source Data Cleaning and Processing Files -------------------------------
 
-
+source('data_processing/syphilis.manager/social.determinants.of.health.R')
