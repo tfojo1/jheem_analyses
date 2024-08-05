@@ -170,17 +170,6 @@ new.diagnoses.likelihood.instructions = create.basic.likelihood.instructions(out
                                                                              equalize.weight.by.year = T 
 )
 
-new.diagnoses.noage.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                                                             outcome.for.sim = "new",
-                                                                             dimensions = c("sex","race","risk"),
-                                                                             levels.of.stratification = c(0,1,2), 
-                                                                             from.year = 2008, 
-                                                                             observation.correlation.form = 'compound.symmetry', 
-                                                                             error.variance.term = 0.03,
-                                                                             error.variance.type = 'cv',
-                                                                             weights = list(1), 
-                                                                             equalize.weight.by.year = T 
-)
 
 #-- PREVALENCE  --#
 total.prevalence.likelihood.instructions = 
@@ -221,45 +210,16 @@ prevalence.likelihood.instructions = create.basic.likelihood.instructions(outcom
                                                                           equalize.weight.by.year = T 
 )
 
-prevalence.noage.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                                                          outcome.for.sim = "diagnosed.prevalence",
-                                                                          dimensions = c("sex","race","risk"),
-                                                                          levels.of.stratification = c(0,1,2), 
-                                                                          from.year = 2008, 
-                                                                          observation.correlation.form = 'compound.symmetry', 
-                                                                          error.variance.term = 0.03,
-                                                                          error.variance.type = 'cv',
-                                                                          weights = list(1), # upweight?
-                                                                          equalize.weight.by.year = T 
-)
-
 
 #-- AIDS DIAGNOSES  --#
-# aids.diagnoses.likelihood.instructions = 
-#   create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
-#                                                                 outcome.for.sim = "aids.diagnoses", 
-#                                                                 dimensions = c("age","sex","race","risk"), 
-#                                                                 levels.of.stratification = c(0,1), 
-#                                                                 from.year = 1990,
-#                                                                 to.year = 2001,
-#                                                                 observation.correlation.form = 'compound.symmetry',
-#                                                                 error.variance.term = 0.05, # maybe higher - look up
-#                                                                 error.variance.type = 'cv',
-#                                                                 weights = list(1), 
-#                                                                 equalize.weight.by.year = T,
-#                                                                 included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
-#                                                                 included.multiplier.sd = 0.2306945, # see aids_diagnoses_multiplier.R
-#                                                                 included.multiplier.correlation = 0.5
-#   )
-
 aids.diagnoses.likelihood.instructions = 
   create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "aids.diagnoses",
                                                                 outcome.for.sim = "aids.diagnoses", 
-                                                                dimensions = c("race","risk"), # ADD BACK AGE AND SEX LATER
+                                                                dimensions = c("age","sex","race","risk"), 
                                                                 levels.of.stratification = c(0,1), 
-                                                                from.year = as.integer(1980),
-                                                                to.year = as.integer(2001),
-                                                                observation.correlation.form = 'compound.symmetry', 
+                                                                from.year = 1990,
+                                                                to.year = 2001,
+                                                                observation.correlation.form = 'compound.symmetry',
                                                                 error.variance.term = 0.05, # maybe higher - look up
                                                                 error.variance.type = 'cv',
                                                                 weights = list(1), 
@@ -267,22 +227,6 @@ aids.diagnoses.likelihood.instructions =
                                                                 included.multiplier = 1.044985, # see aids_diagnoses_multiplier.R
                                                                 included.multiplier.sd = 0.2306945, # see aids_diagnoses_multiplier.R
                                                                 included.multiplier.correlation = 0.5
-  )
-
-
-non.age.aids.diagnoses.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                       outcome.for.sim = "aids.diagnoses",
-                                       dimensions = c("sex","race","risk"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 1990,
-                                       to.year = 2001,
-                                       correlation.different.years = 0.3,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, # maybe higher - look up
-                                       error.variance.type = 'cv',
-                                       weights = list(1),
-                                       equalize.weight.by.year = F
   )
 
 
@@ -331,8 +275,6 @@ suppression.likelihood.instructions =
                                                    #dimensions = c("sex"),
                                                    levels.of.stratification = c(0,1), 
                                                    from.year = 2008, 
-                                                   
-                                         maximum.locations.per.type = 2,
                                                    
                                                    p.bias.inside.location = suppression.bias.estimates$in.mean, 
                                                    p.bias.outside.location = suppression.bias.estimates$out.mean,
@@ -504,7 +446,7 @@ cocaine.likelihood.instructions =
 #-- PROPORTION TESTED --#
 proportion.tested.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
-                                                   outcome.for.sim = "testing",
+                                                   outcome.for.sim = "proportion.general.population.tested",
                                                    denominator.outcome.for.data = "adult.population",
                                                    
                                                    location.types = c('STATE','CBSA'),
@@ -524,8 +466,8 @@ proportion.tested.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   p.error.variance.term = NULL,
-                                                   p.error.variance.type = 'data.variance', # sd or data.variance 
+                                                   p.error.variance.term = 0.03,
+                                                   p.error.variance.type = 'sd', # sd or data.variance 
                                                    # this will use what is stored in the data manager instead specifying the value here
                                                             # switch to this once the variance estimate in the data manager is corrected
                                                    
@@ -538,7 +480,7 @@ proportion.tested.likelihood.instructions =
 # rename
 two.way.proportion.tested.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
-                                                   outcome.for.sim = "testing",
+                                                   outcome.for.sim = "proportion.general.population.tested",
                                                    denominator.outcome.for.data = "adult.population",
                                                    
                                                    location.types = c('STATE','CBSA'),
@@ -698,19 +640,6 @@ two.way.transmission.pop.likelihood.instructions =
                                population.likelihood.instructions 
                                )
 
-transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
-  join.likelihood.instructions(new.diagnoses.likelihood.instructions,
-                               prevalence.likelihood.instructions,
-                               proportion.tested.likelihood.instructions, # added this in 4/23
-                               population.likelihood.instructions,
-                               heroin.likelihood.instructions,
-                               cocaine.likelihood.instructions,
-                               non.age.aids.diagnoses.likelihood.instructions,
-                               aids.deaths.likelihood.instructions,
-                               awareness.likelihood.instructions
-  )
-
-
 #-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 
 FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
@@ -782,167 +711,12 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   
   # COVID LIKELIHOODS
   #number.of.tests.year.on.year.change.likelihood.instructions,
-  gonorrhea.year.on.year.change.likelihood.instructions
-#  ps.syphilis.year.on.year.change.likelihood.instructions
+  gonorrhea.year.on.year.change.likelihood.instructions,
+  ps.syphilis.year.on.year.change.likelihood.instructions
   
 )
 
-#-- 8/1 DEBUG LIKELIHOODS --# 
-# 1: Base 5 likelihoods 
-base5.likelihood.instructions = join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions
-)
-
-# 2: Full with aids (already joined above)
-# FULL.likelihood.instructions.with.aids
-
-# 3: Full with aids minus positivity
-FULL.likelihood.instructions.with.aids.minus.positivity =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  # hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
-)
-
-# 4: Full with aids minus all testing-related
-FULL.likelihood.instructions.with.aids.minus.all.testing =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  #proportion.tested.likelihood.instructions,
-  # hiv.test.positivity.likelihood.instructions, 
-  #awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
-)
-
-# 5: Full with aids minus aids...
-FULL.likelihood.instructions.minus.aids =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  #aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  #aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions,
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
-)
-
-pop.prev.test.likelihood.instructions = join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  prevalence.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions
-)
-
-pop.new.test.likelihood.instructions = join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions
-)
 
 
-pop.new.prev.noage.test.likelihood.instructions = join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.noage.likelihood.instructions,
-  prevalence.noage.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions
-)
+
 

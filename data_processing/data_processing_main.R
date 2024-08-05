@@ -600,6 +600,20 @@ data.manager$register.ontology(
         ethnicity=c('hispanic', 'not hispanic'),
         sex=c('male','female')
     ))
+
+data.manager$register.ontology(
+  'census.grouped.age',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+          '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
+          '75-79 years', '80-84 years', '85+ years'),
+    race=c('white', 'black', 'american indian or alaska native', 'asian or pacific islander'),
+    ethnicity=c('hispanic', 'not hispanic'),
+    sex=c('male','female')
+  ))
+
 data.manager$register.ontology(
   'census.cdc.wonder.population',
   ont = ontology(
@@ -1595,25 +1609,36 @@ source('data_processing/put_msa_data_as_new_source_script.R')
 #this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
 #this function currently defaults to population, when using it for mortality you need to define mortality as the outcome#
 #adult.population
-# put.msa.data.strict(locations = MSAS.OF.INTEREST, 
-#                     data.manager = surveillance.manager, 
-#                     census.manager = census.manager)
 
+#7-30: You need this because it puts for all the strata. But maybe youl could remove certain levels if this causes dups?
+#But is this redundant with below? Bc I should just put for counties then aggre later
+# put.msa.data.strict(locations = MSAS.OF.INTEREST,
+#                     data.manager = surveillance.manager,
+#                     census.manager = census.manager) 
 
-#Put adult population for specific locations
-put.msa.data.strict(locations= c(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
-                    contained.geographic.type = "county", #it will look for counties in the regions above
-                    put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')),
-                    data.manager = surveillance.manager,
-                    census.manager = census.manager)
-
-# CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST--------
-source('data_processing/dummy.data.frames.R')
+#7-30: I dont think you need this- i think you need to go back and add more data in for 2020-2023
+#BUT ALSO THIS WOULD NEED TO BE SOURCED IN ADULT.POP BELOW
+# # to put adult.population for 2020-2022
+# put.msa.data.strict.for.stratified.census(locations=MSAS.OF.INTEREST,
+#                                           data.manager = surveillance.manager,
+#                                           census.manager = census.manager)
 
 # Adult population for recent census data ---------------------------------
 
 #Source code that creates adult population for 2020-2023, stratified data
 source('data_processing/adult.population.20.23.R')
+
+
+#7-30: Use default settings for stratifications to get more
+#Put adult population for specific locations
+put.msa.data.strict(locations= c(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
+                    contained.geographic.type = "county", #it will look for counties in the regions above
+                    #put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')), #Use defaults
+                    data.manager = surveillance.manager,
+                    census.manager = census.manager)
+
+# CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST--------
+source('data_processing/dummy.data.frames.R')
 
 ################################################################################
 #Create aggregated outcomes 

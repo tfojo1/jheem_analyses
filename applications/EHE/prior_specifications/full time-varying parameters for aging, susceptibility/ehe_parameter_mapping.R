@@ -59,73 +59,52 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     #-- Migration rates --#
     migration.times = c("time.1","time.2")
     
-    for(time in migration.times)
-    {   
-        # Immigration - by Race 
-        set.element.functional.form.main.effect.alphas(model.settings,
-                                                       element.name = "immigration",
-                                                       alpha.name = time,
-                                                       values = parameters[paste0(races, '.immigration.multiplier.',time)],
-                                                       dimension = "race",
-                                                       applies.to.dimension.values = races) 
-  
-        
-        # Emigration - by Race 
-        set.element.functional.form.main.effect.alphas(model.settings,
-                                                       element.name = "emigration",
-                                                       alpha.name = time,
-                                                       values = parameters[paste0(races, '.emigration.multiplier.',time)],
-                                                       dimension = "race",
-                                                       applies.to.dimension.values = races) 
-        
-        # Age - immigration + emigration
-        migration.multipliers = parameters[paste0("age", age.indices, '.migration.multiplier.',time)]
-        race.interacted.ages = (1:length(age.indices))[is.na(migration.multipliers)]
-        non.interacted.ages = (1:length(age.indices))[!is.na(migration.multipliers)]
-        
-        if (length(non.interacted.ages)>0)
-        {
-            multipliers = parameters[paste0("age", non.interacted.ages, '.migration.multiplier.',time)]
-            
-            set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "immigration",
-                                                           alpha.name = time,
-                                                           values = multipliers,
-                                                           dimension = "age",
-                                                           applies.to.dimension.values = ages[non.interacted.ages]) 
-            
-            set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "emigration",
-                                                           alpha.name = time,
-                                                           values = 1/multipliers,
-                                                           dimension = "age",
-                                                           applies.to.dimension.values = ages[non.interacted.ages]) 
-        }
-        
-        if (length(race.interacted.ages)>0)
-        {
-            for (age.index in race.interacted.ages)
-            {
-                for (race in races)
-                {
-                    multiplier = parameters[paste0(race, ".age", age.index, '.migration.multiplier.',time)]
-                    
-                    set.element.functional.form.interaction.alphas(model.settings,
-                                                                   element.name = 'immigration', 
-                                                                   alpha.name = time, 
-                                                                   value = multiplier,
-                                                                   applies.to.dimension.values = list(age = ages[age.index],
-                                                                                                      race = race))
-                    
-                    set.element.functional.form.interaction.alphas(model.settings,
-                                                                   element.name = 'emigration', 
-                                                                   alpha.name = time, 
-                                                                   value = 1/multiplier,
-                                                                   applies.to.dimension.values = list(age = ages[age.index],
-                                                                                                      race = race))
-                }
-            }
-        }
+    for(time in migration.times){
+      # Immigration
+      # Total 
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "immigration",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0('immigration.multiplier.',time)],
+                                                     dimension = "all",
+                                                     applies.to.dimension.values = 'all') 
+      # Race
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "immigration",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0(races,'.migration.multiplier.',time)],
+                                                     dimension = "race",
+                                                     applies.to.dimension.values = races)  
+      # Age
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "immigration",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0("age", age.indices, '.migration.multiplier.',time)],
+                                                     dimension = "age",
+                                                     applies.to.dimension.values = ages) 
+      # Emigration
+      # Total 
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "emigration",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0('emigration.multiplier.',time)],
+                                                     dimension = "all",
+                                                     applies.to.dimension.values = 'all') 
+      # Race
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "emigration",
+                                                     alpha.name = time,
+                                                     values = 1/parameters[paste0(races,'.migration.multiplier.',time)],
+                                                     dimension = "race",
+                                                     applies.to.dimension.values = races)  
+      # Age
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "emigration",
+                                                     alpha.name = time,
+                                                     values = 1/parameters[paste0("age", age.indices, '.migration.multiplier.',time)],
+                                                     dimension = "age",
+                                                     applies.to.dimension.values = ages) 
+      
     }
 
     #-- Assortativity --#
@@ -157,35 +136,32 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                    parameter.suffixes = c(intercept='.proportion.tested.or', slope='.proportion.tested.slope.or'),
                                    idu.applies.to.in.remission = F,
                                    throw.error.if.no.parameters = F)
+
+    TESTING.RAMP.TIMES = c('ramp.1', 'ramp.2')
+    for (ramp.time in TESTING.RAMP.TIMES)
+    {
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = 'testing.ramp.rr',
+                                                       alpha.name = ramp.time,
+                                                       value = parameters[paste0('msm.testing.',ramp.time,'.or')],
+                                                       dimension = 'sex',
+                                                       applies.to.dimension.values = 'msm')
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = 'testing.ramp.rr',
+                                                       alpha.name = ramp.time,
+                                                       value = parameters[paste0('heterosexual.testing.',ramp.time,'.or')],
+                                                       applies.to.dimension.values = list(sex=c("female","heterosexual_male"),
+                                                                                          risk = non.idu.states))
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = 'testing.ramp.rr',
+                                                       alpha.name = ramp.time,
+                                                       value = parameters[paste0('idu.testing.',ramp.time,'.or')],
+                                                       applies.to.dimension.values = list(sex=c("female","heterosexual_male"),
+                                                                                          risk = idu.states))
+    }
     
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = 'testing.ramp.rr',
-                                                   alpha.name = 'ramp.1',
-                                                   value = parameters['testing.ramp.up.vs.current.rr'],
-                                                   dimension = 'all',
-                                                   applies.to.dimension.values = 'all')
-
-    # set.element.functional.form.main.effect.alphas(model.settings,
-    #                                                element.name = 'testing.ramp.rr',
-    #                                                alpha.name = 'ramp.1',
-    #                                                value = parameters['testing.ramp.up.vs.current.rr'],
-    #                                                dimension = 'sex',
-    #                                                applies.to.dimension.values = 'msm')
-    # 
-    # set.element.functional.form.interaction.alphas(model.settings,
-    #                                                element.name = 'testing.ramp.up.vs.current.rr',
-    #                                                alpha.name = 'ramp.1',
-    #                                                value = parameters['heterosexual.testing.ramp'],
-    #                                                applies.to.dimension.values = list(sex=c("female","heterosexual_male"),
-    #                                                                                   risk = non.idu.states))
-    # 
-    # set.element.functional.form.interaction.alphas(model.settings,
-    #                                                element.name = 'testing.ramp.up.vs.current.rr',
-    #                                                alpha.name = 'ramp.1',
-    #                                                value = parameters['idu.testing.ramp'],
-    #                                                applies.to.dimension.values = list(sex=c("female","heterosexual_male"),
-    #                                                                                   risk = idu.states))
-
     
     # model.settings$set.element.ramp.values(element.name = 'general.population.testing.without.covid',
     #                                      values = parameters['testing.ramp.up.vs.current.rr'] * c(TESTING.FIRST.YEAR.FRACTION.OF.RAMP,1),
@@ -334,47 +310,33 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     trate.times = 0:2
     
     # MSM
-    set.ehe.trate.alphas.from.parameters(model.settings,
-                                         parameters = parameters,
-                                         category = 'msm',
-                                         age.multiplier.infix = 'msm.susceptibility.rr.mult',
-                                         times=trate.times,
-                                         do.ramp = F)
-    
+    set.ehe.age.stratified.trate.alphas.from.parameters(model.settings,
+                                                        parameters = parameters,
+                                                        category = 'msm',
+                                                        age.stratifications = list(
+                                                          'age1' = ages[1],
+                                                          'age2' = ages[2],
+                                                          'age345' = ages[3:5]
+                                                        ),
+                                                        age.multiplier.infix = 'msm.susceptibility.rr.mult',
+                                                        times=trate.times,
+                                                        do.ramp = F)
+      
     # Heterosexual
     set.ehe.trate.alphas.from.parameters(model.settings,
                                          parameters = parameters,
                                          category = 'heterosexual',
-                                         age.multiplier.infix = 'susceptibility.rr.mult',
+                                         age.multiplier.infix = 'non.msm.susceptibility.rr.mult',
                                          times=trate.times,
-                                         do.ramp = F)
-    
+                                         do.ramp = T)
+
     # IDU
     set.ehe.trate.alphas.from.parameters(model.settings,
                                          parameters = parameters,
                                          category = 'idu',
-                                         age.multiplier.infix = 'susceptibility.rr.mult',
+                                         age.multiplier.infix = 'non.msm.susceptibility.rr.mult',
                                          times=trate.times,
                                          do.ramp = F)
-    
-    
-    # # MSM
-    # set.ehe.trate.alphas.from.parameters(model.settings,
-    #                                      parameters = parameters,
-    #                                      category = 'msm',
-    #                                      times=trate.times)
-    #   
-    # # Heterosexual
-    # set.ehe.trate.alphas.from.parameters(model.settings,
-    #                                      parameters = parameters,
-    #                                      category = 'heterosexual',
-    #                                      times=trate.times)
-    # 
-    # # IDU
-    # set.ehe.trate.alphas.from.parameters(model.settings,
-    #                                      parameters = parameters,
-    #                                      category = 'idu',
-    #                                      times=trate.times)
 
     
     # Add in the MSM-IDU susceptibility multipliers
@@ -447,42 +409,12 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                                   applies.to.dimension.values = idu.states,
                                                                   dimension = 'risk.to')
     
-    # Add in the Heterosexual Peak
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'heterosexual.peak.multiplier',
-                                                                  alpha.name = 'peak.start',
-                                                                  values = parameters['heterosexual.peak.trate.multiplier'],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'heterosexual.peak.multiplier',
-                                                                  alpha.name = 'peak.end',
-                                                                  values = parameters['heterosexual.peak.trate.multiplier'],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
-    
-    # 
-    # # Add in the Peak Multipliers for Age
-    # for (category in c('msm','heterosexual','idu'))
-    # {
-    #     model.settings$set.element.functional.form.main.effect.alphas(element.name = paste0(category, '.peak.multiplier'),
-    #                                                                   alpha.name = 'peak.start',
-    #                                                                   values = parameters[paste0('age', 1:specification.metadata$n.ages,
-    #                                                                                              '.peak.susceptibility.rr.mult')],
-    #                                                                   applies.to.dimension.values = specification.metadata$dim.names$age,
-    #                                                                   dimension = 'age.to')
-    #     model.settings$set.element.functional.form.main.effect.alphas(element.name = paste0(category, '.peak.multiplier'),
-    #                                                                   alpha.name = 'peak.end',
-    #                                                                   values = parameters[paste0('age', 1:specification.metadata$n.ages,
-    #                                                                                              '.peak.susceptibility.rr.mult')],
-    #                                                                   applies.to.dimension.values = specification.metadata$dim.names$age,
-    #                                                                   dimension = 'age.to')
-    # }
-    
     #-- Non-HIV Aging --#
     spline.times = c(2010,2020,2030,2040)
     age.indices = 1:(length(specification.metadata$dim.names$age)-1)
     
-    age.race.time.ages = c(1,2,3,4)
-    age.race.ages = numeric()
+    age.race.time.ages = c(1,2,3)
+    age.race.ages = 4
     non.interacted.ages = setdiff(age.indices, c(age.race.time.ages, age.race.ages))
     
     for(spline.i in 1:length(spline.times))
@@ -565,51 +497,143 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     #-- HIV Aging --#
     hiv.aging.spline.times = c("pre.spike","time0","time1","time2") 
     
+    race.interacted.time.suffixes = 2
+    race.interacted.age.indices = 1:2
+    race.interacted.ages = specification.metadata$dim.names$age[race.interacted.age.indices]
+    non.race.interacted.ages = specification.metadata$dim.names$age[-specification.metadata$n.ages][-race.interacted.age.indices]
+    
     for(spline.i in 1:length(hiv.aging.spline.times)){
-      
+    
       spline.time = hiv.aging.spline.times[spline.i]
       time.suffix = max(0,spline.i-2)
       
-      # Race
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "hiv.positive.aging.rates",
-                                                     alpha.name = spline.time, 
-                                                     values = parameters[paste0(races,'.hiv.aging.multiplier.',time.suffix)],
-                                                     dimension = 'race',
-                                                     applies.to.dimension.values = races)
-      
-      # Age
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "hiv.positive.aging.rates",
-                                                     alpha.name = spline.time,
-                                                     values = parameters[paste0('age',1:(specification.metadata$n.ages-1),'.hiv.aging.multiplier.',time.suffix)],
-                                                     dimension = 'age',
-                                                     applies.to.dimension.values = ages[-specification.metadata$n.ages])
-      
-      # Sex/risk 
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "hiv.positive.aging.rates",
-                                                     alpha.name = spline.time,
-                                                     values = parameters[paste0('msm.hiv.aging.multiplier.',time.suffix)],
-                                                     dimension = 'sex',
-                                                     applies.to.dimension.values = 'msm')
-      
-      # when cutting across two dimensions, have to use interaction alphas 
-      set.element.functional.form.interaction.alphas(model.settings,
-                                                     element.name = "hiv.positive.aging.rates",
-                                                     alpha.name = spline.time,
-                                                     value = parameters[paste0('idu.hiv.aging.multiplier.',time.suffix)],
-                                                     applies.to.dimension.values = list(sex=c('heterosexual_male', 'female'),
-                                                                                        risk = idu.states))
-      
-      set.element.functional.form.interaction.alphas(model.settings,
-                                                     element.name = "hiv.positive.aging.rates",
-                                                     alpha.name = spline.time,
-                                                     value = parameters[paste0('heterosexual.hiv.aging.multiplier.',time.suffix)],
-                                                     applies.to.dimension.values = list(sex=c('heterosexual_male', 'female'),
-                                                                                        risk = non.idu.states))
-      
-      
+      if (any(race.interacted.time.suffixes==time.suffix))
+      {
+          for (race in specification.metadata$dim.names$race)
+          {
+              value = parameters[paste0(race,'.hiv.aging.multiplier.',time.suffix)]
+              
+              set.element.functional.form.interaction.alphas(model.settings,
+                                                             element.name = "hiv.positive.aging.rates",
+                                                             alpha.name = spline.time,
+                                                             value = value,
+                                                             applies.to.dimension.values=list(sex = c('heterosexual_male','female'),
+                                                                                              race = race))
+
+              set.element.functional.form.interaction.alphas(model.settings,
+                                                             element.name = "hiv.positive.aging.rates",
+                                                             alpha.name = spline.time,
+                                                             value = value,
+                                                             applies.to.dimension.values=list(age = non.race.interacted.ages,
+                                                                                              sex = 'msm',
+                                                                                              race = race))
+          }
+          
+          # Age*Risk by msm or hetersexual (IDU is heterosexual * IDU multiplier)
+          # Age*race*risk for some MSM
+          for(age in 1:(length(specification.metadata$dim.names$age)-1)){
+            
+            age.value = specification.metadata$dim.names$age[age]
+            
+            
+            if (any(age==race.interacted.age.indices))
+            {
+                for (race in specification.metadata$dim.names$race)
+                {
+                    set.element.functional.form.interaction.alphas(model.settings,
+                                                                   element.name = "hiv.positive.aging.rates",
+                                                                   alpha.name = spline.time,
+                                                                   value = parameters[paste0(race, '.age',age,'.msm.hiv.aging.multiplier.',time.suffix)],
+                                                                   applies.to.dimension.values=list(age = age.value, 
+                                                                                                    sex = 'msm',
+                                                                                                    race = race))
+                }
+            }
+            else
+            {
+              tmp = parameters[paste0('age',age,'.msm.hiv.aging.multiplier.',time.suffix)]
+                set.element.functional.form.interaction.alphas(model.settings,
+                                                               element.name = "hiv.positive.aging.rates",
+                                                               alpha.name = spline.time,
+                                                               value = parameters[paste0('age',age,'.msm.hiv.aging.multiplier.',time.suffix)],
+                                                               applies.to.dimension.values = list(age = age.value,
+                                                                                                  sex = 'msm'))
+            }
+            
+            set.element.functional.form.interaction.alphas(model.settings,
+                                                           element.name = "hiv.positive.aging.rates",
+                                                           alpha.name = spline.time,
+                                                           value = parameters[paste0('age',age,'.heterosexual.hiv.aging.multiplier.',time.suffix)],
+                                                           applies.to.dimension.values = list(age = age.value,
+                                                                                              sex = c('heterosexual_male','female'), 
+                                                                                              risk = non.idu.states))
+            
+            set.element.functional.form.interaction.alphas(model.settings,
+                                                           element.name = "hiv.positive.aging.rates",
+                                                           alpha.name = spline.time,
+                                                           value = parameters[paste0('age',age,'.idu.hiv.aging.multiplier.',time.suffix)],
+                                                           applies.to.dimension.values = list(age = age.value,
+                                                                                              sex = c('heterosexual_male','female'), 
+                                                                                              risk = idu.states))
+            # set.element.functional.form.interaction.alphas(model.settings,
+            #                                                element.name = "hiv.positive.aging.rates",
+            #                                                alpha.name = spline.time,
+            #                                                value = parameters[paste0('age',age,'.heterosexual.hiv.aging.multiplier.',time.suffix)]*
+            #                                                  parameters[paste0('idu.hiv.aging.multiplier.',time.suffix)],
+            #                                                applies.to.dimension.values = list(age = age.value,
+            #                                                                                   sex = c('heterosexual_male','female'), 
+            #                                                                                   risk = idu.states))
+          }
+      }
+      else
+      {
+          # Race
+          set.element.functional.form.main.effect.alphas(model.settings,
+                                                         element.name = "hiv.positive.aging.rates",
+                                                         alpha.name = spline.time, 
+                                                         values = parameters[paste0(races,'.hiv.aging.multiplier.',time.suffix)],
+                                                         dimension = 'race',
+                                                         applies.to.dimension.values=races)
+          
+          # Age*Risk by msm or hetersexual (IDU is heterosexual * IDU multiplier)
+          # Age*race*risk for some MSM
+          for(age in 1:(length(specification.metadata$dim.names$age)-1)){
+            age.value = specification.metadata$dim.names$age[age]
+            
+            set.element.functional.form.interaction.alphas(model.settings,
+                                                           element.name = "hiv.positive.aging.rates",
+                                                           alpha.name = spline.time,
+                                                           value = parameters[paste0('age',age,'.msm.hiv.aging.multiplier.',time.suffix)],
+                                                           applies.to.dimension.values=list(age = age.value, 
+                                                                                            sex = 'msm'))
+            
+            set.element.functional.form.interaction.alphas(model.settings,
+                                                           element.name = "hiv.positive.aging.rates",
+                                                           alpha.name = spline.time,
+                                                           value = parameters[paste0('age',age,'.heterosexual.hiv.aging.multiplier.',time.suffix)],
+                                                           applies.to.dimension.values = list(age = age.value,
+                                                                                              sex = c('heterosexual_male','female'), 
+                                                                                              risk = non.idu.states))
+            
+            set.element.functional.form.interaction.alphas(model.settings,
+                                                           element.name = "hiv.positive.aging.rates",
+                                                           alpha.name = spline.time,
+                                                           value = parameters[paste0('age',age,'.idu.hiv.aging.multiplier.',time.suffix)],
+                                                           applies.to.dimension.values = list(age = age.value,
+                                                                                              sex = c('heterosexual_male','female'), 
+                                                                                              risk = idu.states))
+            # set.element.functional.form.interaction.alphas(model.settings,
+            #                                                element.name = "hiv.positive.aging.rates",
+            #                                                alpha.name = spline.time,
+            #                                                value = parameters[paste0('age',age,'.heterosexual.hiv.aging.multiplier.',time.suffix)]*
+            #                                                  parameters[paste0('idu.hiv.aging.multiplier.',time.suffix)],
+            #                                                applies.to.dimension.values = list(age = age.value,
+            #                                                                                   sex = c('heterosexual_male','female'), 
+            #                                                                                   risk = idu.states))
+          }
+      }
+
+   
     }
     
 
@@ -751,15 +775,15 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     
     # AIDS Diagnoses
-    # for (time.suffix in c('peak','0','1'))
-    # {
-    #     set.element.functional.form.main.effect.alphas(model.settings,
-    #                                                    element.name = 'aids.to.new.diagnoses.ratio',
-    #                                                    alpha.name = paste0('time.', time.suffix),
-    #                                                    values = parameters[paste0('aids.to.new.diagnoses.ratio.', time.suffix)],
-    #                                                    applies.to.dimension.values = 'all',
-    #                                                    dimension = 'all')
-    # }
+    for (time.suffix in c('peak','0','1'))
+    {
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = 'aids.to.new.diagnoses.ratio',
+                                                       alpha.name = paste0('time.', time.suffix),
+                                                       values = parameters[paste0('aids.to.new.diagnoses.ratio.', time.suffix)],
+                                                       applies.to.dimension.values = 'all',
+                                                       dimension = 'all')
+    }
 }
 
 ##---------------##
@@ -886,111 +910,65 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                  times,
                                                  do.ramp)
 {
-  elem.name = paste0(category, '.trates')
-  
-  specification.metadata = model.settings$specification.metadata
-  for (time in times)
-  {
-    alpha.name = paste0('rate', time)
-    
-    #-- The race effects --#
-    for (race in specification.metadata$dim.names$race)
-    {
-      param.name = paste0(race, '.', category, '.trate.', time)
-      model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                    alpha.name = alpha.name,
-                                                                    values = parameters[param.name],
-                                                                    applies.to.dimension.values = race,
-                                                                    dimension = 'race.to')
-    }
-    
-    
-    #-- The age effects --#
-    for (age.index in 1:specification.metadata$n.ages)
-    {
-      # First check for one time-specific parameter for age
-      param.name = paste0('age',age.index, '.', age.multiplier.infix, '.', time)
-      param.value = parameters[param.name]
-      
-      # Next check for a time 1/2 specific parameter for age
-      if (is.na(param.value) && (time==1 || time==2))
-      {
-        param.name = paste0('age',age.index, '.', age.multiplier.infix, '.12')
-        param.value = parameters[param.name]
-      }
-      
-      # Last check for a general time-specific parameter
-      if (is.na(param.value))
-      {
-        param.name = paste0('age',age.index, '.', age.multiplier.infix)
-        param.value = parameters[param.name]
-      }
-      
-      # Set if the parameter exists
-      if (!is.na(param.value))
-      {
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                      alpha.name = alpha.name,
-                                                                      values = param.value,
-                                                                      applies.to.dimension.values = specification.metadata$dim.names$age[age.index],
-                                                                      dimension = 'age.to')
-      }
-    }
-  }
-  
-  # Ramp
-  if (do.ramp)
-  {
-    param.name = paste0(category, ".peak.trate.multiplier")
-    model.settings$set.element.ramp.values(element.name = elem.name,
-                                           values = rep(parameters[param.name], 2),
-                                           indices = c('peak.start','peak.end'))
-  }
-  
-  # After Modifier
-  param.name = paste0(category, '.fraction.trate.change.after.t2')
-  model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                alpha.name = 'after.modifier',
-                                                                values = parameters[param.name],
-                                                                applies.to.dimension.values = 'all',
-                                                                dimension = 'all')
-}
-
-
-UPDATED.set.ehe.trate.alphas.from.parameters <- function(model.settings,
-                                                 parameters,
-                                                 category,
-                                                 times)
-{
     specification.metadata = model.settings$specification.metadata
     elem.name = paste0(category, '.trates')
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
     
+    specification.metadata = model.settings$specification.metadata
     for (time in times)
     {
         alpha.name = paste0('rate', time)
         
         #-- The race effects --#
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                      alpha.name = alpha.name,
-                                                                      values = parameters[paste0(races, '.', category, '.trate.', time)],
-                                                                      dimension = 'race.to',
-                                                                      applies.to.dimension.values = races)
+          model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                        alpha.name = alpha.name,
+                                                                        values = parameters[paste0(races, '.', category, '.trate.', time)],
+                                                                        dimension = 'race.to',
+                                                                        applies.to.dimension.values = races)
 
         #-- The age effects --#
-        age.multipliers = parameters[paste0('age', 1:specification.metadata$n.ages, '.susceptibility.rr.mult.', time)]
-        age.multipliers[is.na(age.multipliers)] = 1
-        
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                      alpha.name = alpha.name,
-                                                                      values = parameters[paste0('age', 1:specification.metadata$n.ages,
-                                                                                                 '.', category, '.susceptibility.rr')] *
-                                                                                age.multipliers,
-                                                                      dimension = 'age.to',
-                                                                      applies.to.dimension.values = ages)
+        for (age.index in 1:specification.metadata$n.ages)
+        {
+            # First check for one time-specific parameter for age
+            param.name = paste0('age',age.index, '.', age.multiplier.infix, '.', time)
+            param.value = parameters[param.name]
+            
+            # Next check for a time 1/2 specific parameter for age
+            if (is.na(param.value) && (time==1 || time==2))
+            {
+                param.name = paste0('age',age.index, '.', age.multiplier.infix, '.12')
+                param.value = parameters[param.name]
+            }
+                
+            # Last check for a general time-specific parameter
+            if (is.na(param.value))
+            {
+                param.name = paste0('age',age.index, '.', age.multiplier.infix)
+                param.value = parameters[param.name]
+            }
+            
+            # Set if the parameter exists
+            if (!is.na(param.value))
+            {
+                model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                              alpha.name = alpha.name,
+                                                                              values = param.value,
+                                                                              applies.to.dimension.values = ages[age.index],
+                                                                              dimension = 'age.to')
+            }
+        }
     }
 
+    # Ramp
+    if (do.ramp)
+    {
+        param.name = paste0(category, ".peak.trate.multiplier")
+        model.settings$set.element.ramp.values(element.name = elem.name,
+                                             values = rep(parameters[param.name], 2),
+                                             indices = c('peak.start','peak.end'))
+    }
+    
     # After Modifier
     param.name = paste0(category, '.fraction.trate.change.after.t2')
     model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
@@ -1000,60 +978,92 @@ UPDATED.set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                                 dimension = 'all')
 }
 
-set.ehe.age.race.stratified.trate.alphas.from.parameters <- function(model.settings,
-                                                                     parameters,
-                                                                     category,
-                                                                     stratified.age.indices,
-                                                                     times)
+set.ehe.age.stratified.trate.alphas.from.parameters <- function(model.settings,
+                                                                parameters,
+                                                                category,
+                                                                age.stratifications,
+                                                                age.multiplier.infix,
+                                                                times,
+                                                                do.ramp)
 {
     specification.metadata = model.settings$specification.metadata
     elem.name = paste0(category, '.trates')
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
-    non.stratified.age.indices = setdiff(1:specification.metadata$n.ages, stratified.age.indices)
     
+    specification.metadata = model.settings$specification.metadata
     for (time in times)
     {
         alpha.name = paste0('rate', time)
         
-        
         #-- The race effects --#
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                      alpha.name = alpha.name,
-                                                                      values = parameters[paste0(races, '.', category, '.trate.', time)],
-                                                                      dimension = 'race.to',
-                                                                      applies.to.dimension.values = races)
-        #-- The age effects --#
-        age.multipliers = parameters[paste0('age', 1:specification.metadata$n.ages, '.susceptibility.rr.mult.', time)]
-        age.multipliers[is.na(age.multipliers)] = 1
+        non.age.values = parameters[paste0(races, '.', category, '.trate.', time)]
+        use.age.stratified = any(is.na(non.age.values))
         
-        # The non-stratified age effects
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                      alpha.name = alpha.name,
-                                                                      values = parameters[paste0('age', non.stratified.age.indices,
-                                                                                                 '.', category, '.susceptibility.rr')] *
-                                                                                age.multipliers[non.stratified.age.indices],
-                                                                      dimension = 'age.to',
-                                                                      applies.to.dimension.values = ages[non.stratified.age.indices])
-        
-        # The race-stratified age effects
-        for (age.index in stratified.age.indices)
-        { 
+        if (use.age.stratified)
+        {
             for (race in races)
             {
-                if (time==2)
-                    value = parameters[paste0('age', age.index, '.', race, '.', category, '.susceptibility.rr.', time)]
-                else
-                    value = parameters[paste0('age', age.index, '.', race, '.', category, '.susceptibility.rr.01')]
-                
-                model.settings$set.element.functional.form.interaction.alphas(element.name = elem.name,
-                                                                              alpha.name = alpha.name,
-                                                                              value = value * age.multipliers[age.index],
-                                                                              applies.to.dimension.values = list(race.to = race,
-                                                                                                                 age.to = ages[age.index]))
+                for (strat.index in 1:length(age.stratifications))
+                {
+                    strat.name = names(age.stratifications)[strat.index]
+                    model.settings$set.element.functional.form.interaction.alphas(element.name = elem.name,
+                                                                                  alpha.name = alpha.name,
+                                                                                  value = parameters[paste0(strat.name, '.', race, '.', category, '.trate.', time)],
+                                                                                  applies.to.dimension.values=list(race.to=race,
+                                                                                                                   age.to=age.stratifications[[strat.index]]))
+                }
             }
         }
-
+        else
+        {
+            model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                          alpha.name = alpha.name,
+                                                                          values = non.age.values,
+                                                                          dimension = 'race.to',
+                                                                          applies.to.dimension.values = races)
+        }
+        
+        #-- The age effects --#
+        for (age.index in 1:specification.metadata$n.ages)
+        {
+            # First check for one time-specific parameter for age
+            param.name = paste0('age',age.index, '.', age.multiplier.infix, '.', time)
+            param.value = parameters[param.name]
+            
+            # Next check for a time 1/2 specific parameter for age
+            if (is.na(param.value) && (time==1 || time==2))
+            {
+                param.name = paste0('age',age.index, '.', age.multiplier.infix, '.12')
+                param.value = parameters[param.name]
+            }
+            
+            # Last check for a general time-specific parameter
+            if (is.na(param.value))
+            {
+                param.name = paste0('age',age.index, '.', age.multiplier.infix)
+                param.value = parameters[param.name]
+            }
+            
+            # Set if the parameter exists
+            if (!is.na(param.value))
+            {
+                model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                              alpha.name = alpha.name,
+                                                                              values = param.value,
+                                                                              applies.to.dimension.values = ages[age.index],
+                                                                              dimension = 'age.to')
+            }
+        }
+    }
+    
+    # Ramp
+    if (do.ramp)
+    {
+        param.name = paste0(category, ".peak.trate.multiplier")
+        model.settings$set.element.ramp.values(element.name = elem.name,
+                                               values = rep(parameters[param.name], 2),
+                                               indices = c('peak.start','peak.end'))
     }
     
     # After Modifier

@@ -4,13 +4,20 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 #source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
-CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
+CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe.0'
 CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
-CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
+CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid.0'
 
-CALIBRATION.CODE.FULL = 'full'
+# 8/1 DEBUG CALIBRATIONS
+CALIBRATION.CODE.BASE.5  = "base.5"
+# CALIBRATION.CODE.FULL.PLUS.AIDS # already defined 
+CALIBRATION.CODE.MINUS.POS = "minus.pos"
+CALIBRATION.CODE.MINUS.TST = "minus.tst"
+CALIBRATION.CODE.MINUS.AIDS = "minus.aids"
+
+CALIBRATION.CODE.FULL = 'full.0'
 
 N.ITER.TEST = 10000
 N.ITER = 15000
@@ -151,10 +158,10 @@ par.names.transmission = c(par.names.transmission,
                            # 'idu.testing.ramp.1.or',
                            # 'idu.testing.ramp.2.or',
                            'idu.remission.multiplier',
-                           'idu.relapse.multiplier',
-                           'aids.to.new.diagnoses.ratio.peak',
-                           'aids.to.new.diagnoses.ratio.0',
-                           'aids.to.new.diagnoses.ratio.1'
+                           'idu.relapse.multiplier'
+                           # 'aids.to.new.diagnoses.ratio.peak',
+                           # 'aids.to.new.diagnoses.ratio.0',
+                           # 'aids.to.new.diagnoses.ratio.1'
                            )
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
@@ -217,3 +224,63 @@ register.calibration.info(CALIBRATION.CODE.FULL,
                           description = "Full with covid likelihoods"
 )
 
+
+## DEBUG LIKELIHOODS, 8/1 ##
+# 1: Base 5 likelihoods 
+register.calibration.info(CALIBRATION.CODE.BASE.5,
+                          likelihood.instructions = base5.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "base 5"
+)
+
+# 2: Full with aids (already registered above)
+# CALIBRATION.CODE.FULL.PLUS.AIDS
+
+# 3: Full with aids minus positivity
+register.calibration.info(CALIBRATION.CODE.MINUS.POS,
+                          likelihood.instructions = FULL.likelihood.instructions.with.aids.minus.positivity,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "minus positivity"
+)
+
+# 4: Full with aids minus all testing-related
+register.calibration.info(CALIBRATION.CODE.MINUS.TST,
+                          likelihood.instructions = FULL.likelihood.instructions.with.aids.minus.all.testing,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "minus all testing-related"
+)
+
+# 5: Full with aids minus aids
+register.calibration.info(CALIBRATION.CODE.MINUS.AIDS,
+                          likelihood.instructions = FULL.likelihood.instructions.minus.aids,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "base 5"
+)

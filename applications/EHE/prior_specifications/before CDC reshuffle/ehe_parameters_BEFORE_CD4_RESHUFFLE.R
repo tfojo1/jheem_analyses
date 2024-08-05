@@ -48,27 +48,25 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     
     #-- Immigration/emigration rates --#
  
-    Multivariate.Lognormal.Distribution(mu=0,
-                                        sigma = create.compound.symmetry.covariance.matrix(correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
-                                        var.names = paste0(c("black","hispanic","other"),".immigration.multiplier.time.1")),
-    
-    Multivariate.Lognormal.Distribution(mu=0,
-                                        sigma = create.compound.symmetry.covariance.matrix(correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
-                                        var.names = paste0(c("black","hispanic","other"),".emigration.multiplier.time.1")),
+    immigration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
+    emigration.multiplier.time.1 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
+
+    Multivariate.Lognormal.Distribution(mu=0,sigma = create.compound.symmetry.covariance.matrix(
+                                          correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
+                                        var.names = paste0(c("black","hispanic","other"),".migration.multiplier.time.1")),
     
     Multivariate.Lognormal.Distribution(mu=0,sigma = create.auto.regressive.covariance.matrix(
                                           correlation.coefficient = 0.5,n=5,sd=0.5*log(2)),
                                         var.names = paste0("age",c(1:5),".migration.multiplier.time.1")),
     
     
-    Multivariate.Lognormal.Distribution(mu=0,
-                                        sigma = create.compound.symmetry.covariance.matrix(correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
-                                        var.names = paste0(c("black","hispanic","other"),".immigration.multiplier.time.2")),
+    immigration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
+    emigration.multiplier.time.2 = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
     
-    Multivariate.Lognormal.Distribution(mu=0,
-                                        sigma = create.compound.symmetry.covariance.matrix(correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
-                                        var.names = paste0(c("black","hispanic","other"),".emigration.multiplier.time.2")),
-    
+    Multivariate.Lognormal.Distribution(mu=0,sigma = create.compound.symmetry.covariance.matrix(
+                                          correlation.coefficient = 0.3,n=3,sd=0.5*log(2)),
+                                        var.names = paste0(c("black","hispanic","other"),".migration.multiplier.time.2")),
+
     Multivariate.Lognormal.Distribution(mu=0,sigma = create.auto.regressive.covariance.matrix(
                                           correlation.coefficient = 0.5,n=5,sd=0.5*log(2)),
                                         var.names = paste0("age",c(1:5),".migration.multiplier.time.2")),
@@ -153,10 +151,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     # take the OR of borrowing needles from table 2 of 
     # https://pubmed.ncbi.nlm.nih.gov/9489050/
     # as an RR
-    msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
-    msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.vs.heterosexual.male.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.vs.heterosexual.male.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.vs.heterosexual.male.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
+    msm.vs.heterosexual.male.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(2)),
     
     #-- Age Susceptibility --#
     
@@ -204,22 +202,12 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     black.age2.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
     hispanic.age2.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
     other.age2.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
+  
+    black.age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    hispanic.age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    other.age3.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     
-    black.age3.aging.multiplier.1 = Lognormal.Distribution(0, 0.5*log(2)),
-    hispanic.age3.aging.multiplier.1 = Lognormal.Distribution(0, 0.5*log(2)),
-    other.age3.aging.multiplier.1 = Lognormal.Distribution(0, 0.5*log(2)),
-    
-    black.age3.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
-    hispanic.age3.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
-    other.age3.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
-    
-    black.age4.aging.multiplier.1 = Lognormal.Distribution(0, 0.5*log(2)),
-    hispanic.age4.aging.multiplier.1 = Lognormal.Distribution(0, 0.5*log(2)),
-    other.age4.aging.multiplier.1 = Lognormal.Distribution(0, 0.5*log(2)),
-    
-    black.age4.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
-    hispanic.age4.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
-    other.age4.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
+    age4.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     
     # black.domino.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     # hispanic.domino.aging.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
@@ -303,15 +291,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     black.proportion.tested.or = Lognormal.Distribution(0, log(2)),
     hispanic.proportion.tested.or = Lognormal.Distribution(0, log(2)),
     
-    age.proportion.tested.or = Multivariate.Lognormal.Distribution(
-      mu = rep(0, 5),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(2)),
-      var.names = paste0("age",c(1:5),".proportion.tested.or")),
-    
-    # age1.proportion.tested.or = Lognormal.Distribution(0, log(2)),
-    # age2.proportion.tested.or = Lognormal.Distribution(0, log(2)),
-    # age4.proportion.tested.or = Lognormal.Distribution(0, log(2)),
-    # age5.proportion.tested.or = Lognormal.Distribution(0, log(2)),
+    age1.proportion.tested.or = Lognormal.Distribution(0, log(2)),
+    age2.proportion.tested.or = Lognormal.Distribution(0, log(2)),
+    age4.proportion.tested.or = Lognormal.Distribution(0, log(2)),
+    age5.proportion.tested.or = Lognormal.Distribution(0, log(2)),
     
     heterosexual.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
     msm.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
@@ -355,7 +338,6 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     #oral.prep.persistence = Normal.Distribution(0.56, 0.0587, lower=0, upper=1),
     #from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6378757/
     # with Wald CI inflated 10x
-    oral.prep.persistence.or = Lognormal.Distribution(0, log(1.2)/2),
     
     prep.fraction.sexual.transmission.avoidable.z = Normal.Distribution(0,1),
 
@@ -367,6 +349,10 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
     
     #-- IDU Transitions --#
+    
+    black.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
+    hispanic.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
+    other.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     
     black.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     hispanic.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
@@ -382,13 +368,9 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     age4.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     age5.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
 
+    msm.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
-    
-    black.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
-    hispanic.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
-    other.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
-    msm.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
     
     idu.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
     idu.relapse.multiplier = Lognormal.Distribution(0, .5*log(2)),
@@ -398,7 +380,7 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     
     #-- HIV-Specific Mortality --#
     hiv.mortality.0 = Lognormal.Distribution(log(9.5/6.1 * 23/1000), log(2)/2),
-    hiv.mortality.1 = Lognormal.Distribution(log(23/1000), log(2)),
+    hiv.mortality.2 = Lognormal.Distribution(log(23/1000), log(2)),
     peak.hiv.mortality = Lognormal.Distribution(log(41/6.1 * 23/1000), log(2)/2),
     #http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.688.1831&rep=rep1&type=pdf
     
@@ -527,93 +509,74 @@ EHE.PARAMETERS.PRIOR = join.distributions(
 
 BASE.PARAMETER.SAMPLING.BLOCKS = list(
 
-  #-- POPULATION PARAMETERS --#
+  immigration.multipliers = c(
+    "immigration.multiplier.time.1",
+    "immigration.multiplier.time.2"
+  ),
+  
+  emigration.multipliers = c(
+    "emigration.multiplier.time.1",
+    "emigration.multiplier.time.2"
+  ),
   
   black.age1.population.rates = c(
     'black.birth.rate.multiplier',
     'black.age1.aging.multiplier.1',
     'black.age1.aging.multiplier.2'
+#    'black.age1.domino.aging.multiplier'
   ),
   
-  black.age23.population.rates = c(
+  black.age2.population.rates = c(
     'black.age2.aging.multiplier.1',
     'black.age2.aging.multiplier.2',
-    'black.age3.aging.multiplier.1'
+    'black.age3.aging.multiplier'
+#    'black.domino.aging.multiplier'
   ),
   
-  black.age34.population.rates = c(
-    'black.age3.aging.multiplier.2',
-    'black.age4.aging.multiplier.1',
-    'black.age4.aging.multiplier.2'
-  ),
-  
-  black.immigration.multipliers = c(
-    "black.immigration.multiplier.time.1",
-    "black.immigration.multiplier.time.2"
-  ),
-  
-  black.emigration.mortality.multipliers = c(
-    "black.emigration.multiplier.time.1",
-    "black.emigration.multiplier.time.2",
-    'black.non.idu.general.mortality.rate.multiplier'
+  black.population.rates = c(
+    'black.non.idu.general.mortality.rate.multiplier',
+    'black.migration.multiplier.time.1',
+    'black.migration.multiplier.time.2'
   ),
   
   hispanic.age1.population.rates = c(
     'hispanic.birth.rate.multiplier',
     'hispanic.age1.aging.multiplier.1',
     'hispanic.age1.aging.multiplier.2'
+#    'hispanic.age1.domino.aging.multiplier'
   ),
   
-  hispanic.age23.population.rates = c(
+  hispanic.age2.population.rates = c(
     'hispanic.age2.aging.multiplier.1',
     'hispanic.age2.aging.multiplier.2',
-    'hispanic.age3.aging.multiplier.1'
+    'hispanic.age3.aging.multiplier'
+#    'hispanic.domino.aging.multiplier'
   ),
   
-  hispanic.age34.population.rates = c(
-    'hispanic.age3.aging.multiplier.2',
-    'hispanic.age4.aging.multiplier.1',
-    'hispanic.age4.aging.multiplier.2'
-  ),
-  
-  hispanic.immigration.multipliers = c(
-    "hispanic.immigration.multiplier.time.1",
-    "hispanic.immigration.multiplier.time.2"
-  ),
-  
-  hispanic.emigration.mortality.multipliers = c(
-    "hispanic.emigration.multiplier.time.1",
-    "hispanic.emigration.multiplier.time.2",
-    'hispanic.non.idu.general.mortality.rate.multiplier'
+  hispanic.population.rates = c(
+    'hispanic.non.idu.general.mortality.rate.multiplier',
+    'hispanic.migration.multiplier.time.1',
+    'hispanic.migration.multiplier.time.2'
   ),
   
   other.age1.population.rates = c(
     'other.birth.rate.multiplier',
     'other.age1.aging.multiplier.1',
     'other.age1.aging.multiplier.2'
+#    'other.age1.domino.aging.multiplier'
   ),
   
-  other.age23.population.rates = c(
+  other.age2.population.rates = c(
     'other.age2.aging.multiplier.1',
     'other.age2.aging.multiplier.2',
-    'other.age3.aging.multiplier.1'
+    'other.age3.aging.multiplier'
+#    'other.domino.aging.multiplier'
   ),
   
-  other.age34.population.rates = c(
-    'other.age3.aging.multiplier.2',
-    'other.age4.aging.multiplier.1',
-    'other.age4.aging.multiplier.2'
-  ),
-  
-  other.immigration.multipliers = c(
-    "other.immigration.multiplier.time.1",
-    "other.immigration.multiplier.time.2"
-  ),
-  
-  other.emigration.mortality.multipliers = c(
-    "other.emigration.multiplier.time.1",
-    "other.emigration.multiplier.time.2",
-    'other.non.idu.general.mortality.rate.multiplier'
+  other.population.rates = c(
+    'other.non.idu.general.mortality.rate.multiplier',
+    'other.migration.multiplier.time.1',
+    'other.migration.multiplier.time.2'
   ),
   
   age1.population.rates = c(
@@ -636,12 +599,14 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   age4.population.rates = c(
     'age4.non.idu.general.mortality.rate.multiplier',
+    'age4.aging.multiplier',
     'age4.migration.multiplier.time.1',
     'age4.migration.multiplier.time.2'
   ),
   
   age5.population.rates = c(
     'age5.non.idu.general.mortality.rate.multiplier',
+    'age4.aging.multiplier',
     'age5.migration.multiplier.time.1',
     'age5.migration.multiplier.time.2'
   ),
@@ -804,10 +769,10 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   female.vs.heterosexual.male.idu.susceptibility = 'female.vs.heterosexual.male.idu.susceptibility.rr',
   
   msm.idu.transmission = c(
-    'msm.idu.susceptibility.rr.peak',
-    'msm.idu.susceptibility.rr.0',
-    'msm.idu.susceptibility.rr.1',
-    'msm.idu.susceptibility.rr.2'
+    'msm.vs.heterosexual.male.idu.susceptibility.rr.peak',
+    'msm.vs.heterosexual.male.idu.susceptibility.rr.0',
+    'msm.vs.heterosexual.male.idu.susceptibility.rr.1',
+    'msm.vs.heterosexual.male.idu.susceptibility.rr.2'
   ),
   
 
@@ -820,26 +785,30 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   age5.susceptibility = 'age5.susceptibility.rr.mult',
   
-  black.idu.incidence = c(
-    'black.active.idu.initial.prevalence.ratio',
+  idu.transitions.0 = c(
+    'black.incident.idu.multiplier.0',
+    'hispanic.incident.idu.multiplier.0',
+    'other.incident.idu.multiplier.0',
+    # 'young.incident.idu.multiplier.0',
+    'msm.incident.idu.multiplier.0'
+  ),
+  
+  idu.transitions.1 = c(
     'black.incident.idu.multiplier.1',
-    'black.incident.idu.multiplier.2'),
-  
-  hispanic.idu.incidence = c(
-    'hispanic.active.idu.initial.prevalence.ratio',
     'hispanic.incident.idu.multiplier.1',
-    'hispanic.incident.idu.multiplier.2'),
-  
-  other.idu.incidence = c(
-    'other.active.idu.initial.prevalence.ratio',
     'other.incident.idu.multiplier.1',
-    'other.incident.idu.multiplier.2'),
+    # 'young.incident.idu.multiplier.1',
+    'msm.incident.idu.multiplier.1'
+  ),
   
-  msm.idu.incidence = c(
-    'msm.active.idu.initial.prevalence.ratio',
-    'msm.incident.idu.multiplier.1',
-    'msm.incident.idu.multiplier.2'),
-  
+  idu.transitions.2 = c(
+    'black.incident.idu.multiplier.2',
+    'hispanic.incident.idu.multiplier.2',
+    'other.incident.idu.multiplier.2',
+    # 'young.incident.idu.multiplier.2',
+    'msm.incident.idu.multiplier.2'
+  ),
+
   age.idu.transitions = c(
     'age1.incident.idu.multiplier',
     'age2.incident.idu.multiplier',
@@ -891,8 +860,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   young.age.testing = c('age1.proportion.tested.or',
                         'age2.proportion.tested.or'),
   
-  old.age.testing = c('age3.proportion.tested.or',
-                      'age4.proportion.tested.or',
+  old.age.testing = c('age4.proportion.tested.or',
                       'age5.proportion.tested.or'),
   
   testing.ramp.up = 'testing.ramp.up.vs.current.rr',
@@ -900,8 +868,8 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   msm.prep = c(
     'msm.prep.intercept.or',
     'msm.prep.slope.or',
-    'msm.prep.indications.or',
-    'oral.prep.persistence.or'
+    'msm.prep.indications.or'
+   # 'oral.prep.persistence'
   ),
   
   non.msm.prep = c(
@@ -928,7 +896,7 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   
   hiv.mortality = c('peak.hiv.mortality',
                     'hiv.mortality.0',
-                    'hiv.mortality.1'),
+                    'hiv.mortality.2'),
 
   covid.sexual.transmission.race = c('black.sexual.transmission.covid.multiplier',
                                      'hispanic.sexual.transmission.covid.multiplier',

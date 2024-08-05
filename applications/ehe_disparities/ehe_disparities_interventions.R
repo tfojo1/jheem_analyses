@@ -1,7 +1,7 @@
 ### Model EHE Intervention Effects on Racial Disparity in HIV Incidence
 
 #source('../jheem2/R/tests/ENGINE_test.R')
-#source("../jheem_analyses/applications/EHE/ehe_specification.R")
+source("../jheem_analyses/applications/EHE/ehe_specification.R")
 
 #Interventions are scaled up linearly from January 1st of START.YEAR to January 1st of IMPLEMENTED.BY.YEAR
 START.YEAR = 2025
@@ -44,53 +44,42 @@ base.intervention = create.intervention(WHOLE.POPULATION,
                                         suppression.increase,
                                         prep.increase)
 
-
-#Suggest initial parameter distributions
-test.intervention = create.intervention(WHOLE.POPULATION,
-                                        testing.increase,
-                                        suppression.increase,
-                                        prep.increase, 
-                                        parameter.distribution = join.distributions(
-                                          testing.multiplier=Uniform.Distribution(4,6),
-                                          unsuppressed.multiplier=Uniform.Distribution(0.09,0.11),
-                                          uninitiated.multiplier=Uniform.Distribution(0.7,0.8)
-                                        ),
-                                        code="testint")
-
 #Specify criteria for checking whether the joint intervention met the EHE targets in 2030
-testing.criterion = create.intervention.criterion(outcome = 'proportion.general.population.tested',
-                                                  target.value = 0.951,
-                                                  min.acceptable.value = 0.95,
-                                                  max.acceptable.value = 0.96,
-                                                  dimension.values = list(year=2030))
-suppression.criterion = create.intervention.criterion(outcome = 'suppression',
-                                                  target.value = 0.951,
-                                                  min.acceptable.value = 0.95,
-                                                  max.acceptable.value = 0.96,
-                                                  dimension.values = list(year=2030))
-prep.criterion = create.intervention.criterion(outcome = 'prep.uptake.proportion',
-                                                  target.value = 0.51,
-                                                  min.acceptable.value = 0.5,
-                                                  max.acceptable.value = 0.55,
-                                                  dimension.values = list(year=2030))
+testing.criterion = create.monotonic.criterion(parameter.name = 'testing.multiplier',
+                                               outcome = 'testing',
+                                               parameter.scale = 'ratio',
+                                               parameter.initial.value = 4,
+                                               target.value = .951, #.95
+                                               min.acceptable.value = .95,
+                                               max.acceptable.value = .96,
+                                               dimension.values=list(year='2030'))
+suppression.criterion = create.monotonic.criterion(parameter.name = 'unsuppressed.multiplier',
+                                                   outcome = 'suppression',
+                                                   parameter.scale = 'complementary.proportion',
+                                                   parameter.initial.value = .5,
+                                                   target.value = .951, #.955
+                                                   min.acceptable.value = .95,
+                                                   max.acceptable.value = .96,
+                                                   dimension.values=list(year='2030'))
+prep.criterion = create.monotonic.criterion(parameter.name = 'uninitiated.multiplier',
+                                            outcome = 'prep.uptake.proportion',
+                                            parameter.scale = 'complementary.proportion',
+                                            parameter.initial.value = .5,
+                                            target.value = .51, #.52
+                                            min.acceptable.value = .5,
+                                            max.acceptable.value = .55,
+                                            dimension.values=list(year='2030'))
 
-#Solve for parameter values that meet the criteria
-full.intervention = create.criteria.based.intervention(base.intervention = base.intervention,
-                                                       parameters.to.vary = c("testing.multiplier",
-                                                                            "unsuppressed.multiplier",
-                                                                            "uninitiated.multiplier"),
-                                                       completion.criteria = list(testing.criterion,
-                                                                                  suppression.criterion,
-                                                                                  prep.criterion), 
-                                                       parameter.scales = c(testing.multiplier = 'ratio',
-                                                                            unsuppressed.multiplier = 'proportion.staying',
-                                                                            uninitiated.multiplier = 'proportion.staying'),
-                                                      #initial.parameter.values = function(sim){
-                                                      #    2 / sim$get('testing', year='2026')},
-                                                       initial.parameter.values = c(testing.multiplier = 5,
-                                                                                   unsuppressed.multiplier = 0.1,
-                                                                                   uninitiated.multiplier = 0.75),
-                                                       #to limit computational time
-                                                      max.iterations = 50,
-                                                      max.failure.rate = 0.05,
-                                                      code="fullint")
+
+#Create full criteria-based intervention
+full.int = create.monotonic.criteria.based.intervention (base.intervention = base.intervention, #base.intervention,
+                                                         completion.criteria = list(testing.criterion,
+                                                                                    suppression.criterion,
+                                                                                    prep.criterion),
+                                                         max.iterations = 20,
+                                                         n.iterations.after.satisfying.criteria = 5,
+                                                         max.iterations.first.sim = 100,
+                                                         n.iterations.after.satisfying.criteria.first.sim = 20,
+                                                         max.failure.rate = 0,
+                                                         code=NULL, 
+                                                         name=NULL)
