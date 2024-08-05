@@ -303,10 +303,15 @@ BASE.PARAMETERS.PRIOR = join.distributions(
     black.proportion.tested.or = Lognormal.Distribution(0, log(2)),
     hispanic.proportion.tested.or = Lognormal.Distribution(0, log(2)),
     
-    age1.proportion.tested.or = Lognormal.Distribution(0, log(2)),
-    age2.proportion.tested.or = Lognormal.Distribution(0, log(2)),
-    age4.proportion.tested.or = Lognormal.Distribution(0, log(2)),
-    age5.proportion.tested.or = Lognormal.Distribution(0, log(2)),
+    age.proportion.tested.or = Multivariate.Lognormal.Distribution(
+      mu = rep(0, 5),
+      sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(2)),
+      var.names = paste0("age",c(1:5),".proportion.tested.or")),
+    
+    # age1.proportion.tested.or = Lognormal.Distribution(0, log(2)),
+    # age2.proportion.tested.or = Lognormal.Distribution(0, log(2)),
+    # age4.proportion.tested.or = Lognormal.Distribution(0, log(2)),
+    # age5.proportion.tested.or = Lognormal.Distribution(0, log(2)),
     
     heterosexual.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
     msm.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/5),
@@ -886,7 +891,8 @@ BASE.PARAMETER.SAMPLING.BLOCKS = list(
   young.age.testing = c('age1.proportion.tested.or',
                         'age2.proportion.tested.or'),
   
-  old.age.testing = c('age4.proportion.tested.or',
+  old.age.testing = c('age3.proportion.tested.or',
+                      'age4.proportion.tested.or',
                       'age5.proportion.tested.or'),
   
   testing.ramp.up = 'testing.ramp.up.vs.current.rr',
