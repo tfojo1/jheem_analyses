@@ -382,7 +382,7 @@ data.manager$register.parent.source('LHD', full.name = 'Local Health Department'
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS")
 data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS")
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
-data.manager$register.parent.source('NNHSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNHSS")
+data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNHSS")
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS")
 data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
 data.manager$register.parent.source('cdc.retention.report.pdf', full.name = 'CDC HIV Surveillance PDF Reports', short.name= "cdc.retention.report.pdf") #These are really similar
