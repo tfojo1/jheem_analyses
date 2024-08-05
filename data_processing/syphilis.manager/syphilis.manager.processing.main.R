@@ -100,8 +100,6 @@ data.manager$register.outcome(
     description = "Unknown Duration or Late Syphilis"))
 
 
-
-
 # Create Sources + Parent Sources -----------------------------------------
 
 ##Register "Parent" Sources
@@ -128,7 +126,19 @@ data.manager$register.ontology(
     incomplete.dimensions = c("year", "location") #Is this the right way to code the 5 year ranges?
   ))
 
+data.manager$register.ontology(
+  'cdc.sti',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
 
 # Source Data Cleaning and Processing Files -------------------------------
 
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
+source('data_processing/syphilis.manager/syphilis.data.R')
