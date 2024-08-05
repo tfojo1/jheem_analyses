@@ -63,6 +63,43 @@ data.manager$register.outcome(
     units = 'count',
     description = "Urbanization level: rural, suburban, urban"))
 
+data.manager$register.outcome(
+  'congenital.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Congenital Syphilis',
+    axis.name = 'Congenital Syphilis',
+    units = 'cases',
+    description = "Congenital Syphilis"))
+
+data.manager$register.outcome(
+  'early.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Early, non-primary, non-Secondary Syphilis',
+    axis.name = 'Early, non-primary, non-Secondary Syphilis',
+    units = 'cases',
+    description = "Early, non-primary, non-Secondary Syphilis"))
+
+data.manager$register.outcome(
+  'ps.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Primary and Secondary Syphilis',
+    axis.name = 'Primary and Secondary Syphilis',
+    units = 'cases',
+    description = "Primary and Secondary Syphilis"))
+
+data.manager$register.outcome(
+  'unknown.duration.or.late.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Unknown Duration or Late Syphilis',
+    axis.name = 'Unknown Duration or Late Syphilis',
+    units = 'cases',
+    description = "Unknown Duration or Late Syphilis"))
+
+
 
 
 # Create Sources + Parent Sources -----------------------------------------
