@@ -851,12 +851,6 @@ race.ps.syphilis.year.on.year.change.likelihood.instructions =
   )
 
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS  --#
-joint.pop.migration.likelihood.instructions = 
-  join.likelihood.instructions(population.heavy.likelihood.instructions,
-                               immigration.likelihood.instructions,
-                               emigration.likelihood.instructions,
-                               general.mortality.likelihood.instructions)
-
 joint.pop.migration.total.trans.likelihood.instructions = 
   join.likelihood.instructions(population.heavy.likelihood.instructions,
                                immigration.likelihood.instructions,
@@ -865,17 +859,38 @@ joint.pop.migration.total.trans.likelihood.instructions =
                                total.prevalence.likelihood.instructions,
                                total.new.diagnoses.likelihood.instructions)
 
-joint.pop.migration.total.trans.aids.likelihood.instructions = 
-  join.likelihood.instructions(population.heavy.likelihood.instructions,
-                               immigration.likelihood.instructions,
-                               emigration.likelihood.instructions,
-                               general.mortality.likelihood.instructions,
-                               total.prevalence.likelihood.instructions,
-                               total.new.diagnoses.likelihood.instructions,
-                               total.aids.diagnoses.likelihood.instructions,
-                               total.aids.deaths.likelihood.instructions)
+# joint.pop.migration.likelihood.instructions = 
+#   join.likelihood.instructions(population.heavy.likelihood.instructions,
+#                                immigration.likelihood.instructions,
+#                                emigration.likelihood.instructions,
+#                                general.mortality.likelihood.instructions)
+
+# joint.pop.migration.total.trans.aids.likelihood.instructions = 
+#   join.likelihood.instructions(population.heavy.likelihood.instructions,
+#                                immigration.likelihood.instructions,
+#                                emigration.likelihood.instructions,
+#                                general.mortality.likelihood.instructions,
+#                                total.prevalence.likelihood.instructions,
+#                                total.new.diagnoses.likelihood.instructions,
+#                                total.aids.diagnoses.likelihood.instructions,
+#                                total.aids.deaths.likelihood.instructions)
+
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
+transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
+  join.likelihood.instructions(new.diagnoses.likelihood.instructions,
+                               prevalence.likelihood.instructions,
+                               proportion.tested.likelihood.instructions, # added this in 4/23
+                               population.likelihood.instructions,
+                               heroin.likelihood.instructions,
+                               cocaine.likelihood.instructions,
+                               non.age.aids.diagnoses.likelihood.instructions,
+                               aids.deaths.likelihood.instructions,
+                               awareness.likelihood.instructions,
+                               race.ps.syphilis.year.on.year.change.likelihood.instructions,
+                               race.gonorrhea.year.on.year.change.likelihood.instructions
+  )
+
 # two.way.transmission.pop.idu.aware.likelihood.instructions = 
 #   join.likelihood.instructions(race.risk.sex.two.way.new.diagnoses.likelihood.instructions,
 #                                race.risk.sex.two.way.prevalence.likelihood.instructions,
@@ -901,19 +916,7 @@ joint.pop.migration.total.trans.aids.likelihood.instructions =
 #                                race.gonorrhea.year.on.year.change.likelihood.instructions
 #   )
 
-transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
-  join.likelihood.instructions(new.diagnoses.likelihood.instructions,
-                               prevalence.likelihood.instructions,
-                               proportion.tested.likelihood.instructions, # added this in 4/23
-                               population.likelihood.instructions,
-                               heroin.likelihood.instructions,
-                               cocaine.likelihood.instructions,
-                               non.age.aids.diagnoses.likelihood.instructions,
-                               aids.deaths.likelihood.instructions,
-                               awareness.likelihood.instructions,
-                               race.ps.syphilis.year.on.year.change.likelihood.instructions,
-                               race.gonorrhea.year.on.year.change.likelihood.instructions
-  )
+
 
 
 #-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 
