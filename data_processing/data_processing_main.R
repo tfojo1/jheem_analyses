@@ -382,7 +382,7 @@ data.manager$register.parent.source('LHD', full.name = 'Local Health Department'
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS")
 data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS")
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
-data.manager$register.parent.source('NNHSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNHSS")
+data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS")
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS")
 data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
 data.manager$register.parent.source('cdc.retention.report.pdf', full.name = 'CDC HIV Surveillance PDF Reports', short.name= "cdc.retention.report.pdf") #These are really similar
@@ -399,7 +399,7 @@ data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory U
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "US Census Bureau Death Data", short.name='census.deaths')
-data.manager$register.source('cdc.sti', parent.source= "NNHSS", full.name = "CDC STI Data", short.name='cdc.sti')
+data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "CDC STI Data", short.name='cdc.sti')
 data.manager$register.source('cdc.prep', parent.source= "IQVIA", full.name = "CDC PrEP Data", short.name='cdc.prep')
 data.manager$register.source('cdc.prep.indications', parent.source= "NHANES", full.name = "CDC PrEP Indications Data", short.name='cdc.prep.indications')
 data.manager$register.source('cdc.hiv', parent.source= "NHSS", full.name = "CDC HIV Outcomes Data", short.name='cdc.hiv')

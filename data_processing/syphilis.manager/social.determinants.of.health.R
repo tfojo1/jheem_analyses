@@ -41,11 +41,6 @@ shd.clean  = lapply(data.list.sdh, function(file){
   data$Year = as.character(data$Year)
   data$year = year.mappings[data$Year]
   
-  # data$Cases[data$Cases %in% c("Data suppressed")] = NA    
-  # data$Cases[data$Cases %in% c("Data not available")] = NA  
-  # data$value = as.numeric(gsub(",", '', data$Cases))   
-  
-  
   #Outcome conditionals#
    if(grepl("prop", filename)) {
      data = subset(data, !is.na(data$Percent)) #Need to remove Percent values that are character values
@@ -69,6 +64,8 @@ shd.clean  = lapply(data.list.sdh, function(file){
 
 
 # Put SHD Data ------------------------------------------------------------
+
+#I THINK YOU NEED 3 DIFFERENT PUTS BECAUSE YOU HAVE 3 DIFFERENT SOURCES IN THE SDH DATA##
 
 ##Update once you know how to structure the ontologoes#
 
