@@ -12,7 +12,7 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.MINUS.POS, # 7
                              CALIBRATION.CODE.MINUS.TST, # 8 
                              CALIBRATION.CODE.MINUS.AIDS # 9
-                             )[c(5)]
+                             )[c(1,2)]
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {
@@ -61,12 +61,12 @@ for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
     # save(sim,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_",Sys.Date(),"_",LOCATION,".Rdata"))
     
     # Save simset
-    # simset = assemble.simulations.from.calibration(version = 'ehe',
-    #                                                location = LOCATION,
-    #                                                calibration.code = CALIBRATION.CODE.TO.RUN)
+    simset = assemble.simulations.from.calibration(version = 'ehe',
+                                                   location = LOCATION,
+                                                   calibration.code = CALIBRATION.CODE.TO.RUN)
     # 
     # simset = simset$burn(keep = 0.5)
     # simset = simset$thin(keep = 50)
     # 
-    # save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",Sys.Date(),"_",LOCATION,".Rdata"))
+    save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",Sys.Date(),"_",LOCATION,".Rdata"))
 }

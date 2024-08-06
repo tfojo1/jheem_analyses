@@ -4,11 +4,11 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 #source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
-CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe.0'
+CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 CALIBRATION.CODE.POP.TRANS.MORT = 'pop.trans.mort'
 
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
-CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid.0'
+CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
 
 # 8/1 DEBUG CALIBRATIONS
 CALIBRATION.CODE.BASE.5  = "base.5"
@@ -17,7 +17,6 @@ CALIBRATION.CODE.MINUS.POS = "minus.pos"
 CALIBRATION.CODE.MINUS.TST = "minus.tst"
 CALIBRATION.CODE.MINUS.AIDS = "minus.aids"
 
-CALIBRATION.CODE.FULL = 'full.0'
 
 N.ITER.TEST = 10000
 N.ITER = 15000
@@ -28,100 +27,16 @@ load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_
 
 print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
-par.names.pop = c("black.birth.rate.multiplier",
-                  "hispanic.birth.rate.multiplier",
-                  "other.birth.rate.multiplier",
-                  "black.non.idu.general.mortality.rate.multiplier", # accidentally left out before
-                  "hispanic.non.idu.general.mortality.rate.multiplier", # accidentally left out before
-                  "other.non.idu.general.mortality.rate.multiplier", # accidentally left out before
-                  "age1.non.idu.general.mortality.rate.multiplier",
-                  "age2.non.idu.general.mortality.rate.multiplier",
-                  "age3.non.idu.general.mortality.rate.multiplier",
-                  "age4.non.idu.general.mortality.rate.multiplier",
-                  "age5.non.idu.general.mortality.rate.multiplier",
-                  "male.non.idu.general.mortality.rate.multiplier", # accidentally left out before
-                  "female.non.idu.general.mortality.rate.multiplier", # accidentally left out before
-                  
-                  "black.age1.aging.multiplier.1",
-                  "hispanic.age1.aging.multiplier.1",
-                  "other.age1.aging.multiplier.1",
-                  "black.age1.aging.multiplier.2",
-                  "hispanic.age1.aging.multiplier.2",
-                  "other.age1.aging.multiplier.2",
-                  
-                  "black.age2.aging.multiplier.1",
-                  "hispanic.age2.aging.multiplier.1",
-                  "other.age2.aging.multiplier.1",
-                  "black.age2.aging.multiplier.2",
-                  "hispanic.age2.aging.multiplier.2",
-                  "other.age2.aging.multiplier.2",
-                  
-                  "black.age3.aging.multiplier.1",
-                  "hispanic.age3.aging.multiplier.1",
-                  "other.age3.aging.multiplier.1",
-                  "black.age3.aging.multiplier.2",
-                  "hispanic.age3.aging.multiplier.2",
-                  "other.age3.aging.multiplier.2",
-                  
-                  "black.age4.aging.multiplier.1",
-                  "hispanic.age4.aging.multiplier.1",
-                  "other.age4.aging.multiplier.1",
-                  "black.age4.aging.multiplier.2",
-                  "hispanic.age4.aging.multiplier.2",
-                  "other.age4.aging.multiplier.2",
-                  
-                  "black.immigration.multiplier.time.1",
-                  "hispanic.immigration.multiplier.time.1",
-                  "other.immigration.multiplier.time.1",
-                  "black.immigration.multiplier.time.2",
-                  "hispanic.immigration.multiplier.time.2",
-                  "other.immigration.multiplier.time.2",
-                  
-                  "black.emigration.multiplier.time.1",
-                  "hispanic.emigration.multiplier.time.1",
-                  "other.emigration.multiplier.time.1",
-                  "black.emigration.multiplier.time.2",
-                  "hispanic.emigration.multiplier.time.2",
-                  "other.emigration.multiplier.time.2",
-                  
-                  "age1.migration.multiplier.time.1",
-                  "age1.migration.multiplier.time.2",
-                  "age2.migration.multiplier.time.1",
-                  
-                  # "age2.migration.multiplier.time.2",
-                  "black.age2.migration.multiplier.time.2",
-                  "hispanic.age2.migration.multiplier.time.2",
-                  "other.age2.migration.multiplier.time.2",
-                  "age3.migration.multiplier.time.1",
-                  # "age3.migration.multiplier.time.2",
-                  "black.age3.migration.multiplier.time.2",
-                  "hispanic.age3.migration.multiplier.time.2",
-                  "other.age3.migration.multiplier.time.2",
-                  
-                  "age4.migration.multiplier.time.1",
-                  "age4.migration.multiplier.time.2",
-                  "age5.migration.multiplier.time.1",
-                  "age5.migration.multiplier.time.2"
-)
-
-par.names.basic.trans = c(
-  "global.trate"#,
-  # "peak.hiv.mortality",
-  # "hiv.mortality.0",
-  # "hiv.mortality.1",
-  # 'msm.testing.ramp.1.or',
-  # 'msm.testing.ramp.2.or',
-  # 'heterosexual.testing.ramp.1.or',
-  # 'heterosexual.testing.ramp.2.or',
-  # 'idu.testing.ramp.1.or',
-  # 'idu.testing.ramp.2.or'
+par.names.pop = c(
+    POPULATION.PARAMETERS.PRIOR@var.names,
+    "global.trate"#,
 )
 
 register.calibration.info(CALIBRATION.CODE.POPULATION,
                           likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added total prev/new 5/20
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
-                          parameter.names = c(par.names.pop, par.names.basic.trans), # adding this in 5/20
+                          parameter.names = par.names.pop,
                           n.iter = N.ITER,
                           thin = 50, 
                           fixed.initial.parameter.values = c(global.trate=0.03), 
@@ -140,9 +55,9 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                                           grepl('idu\\.initial\\.prevalence', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('fraction\\.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('oe', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) |
-                                            grepl('susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) |   
-                                            grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
+                                                          grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) 
+                                            # grepl('susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) |   
+                                            # grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
                                                           ]
 
 
@@ -158,10 +73,10 @@ par.names.transmission = c(par.names.transmission,
                            # 'idu.testing.ramp.1.or',
                            # 'idu.testing.ramp.2.or',
                            'idu.remission.multiplier',
-                           'idu.relapse.multiplier'
-                           # 'aids.to.new.diagnoses.ratio.peak',
-                           # 'aids.to.new.diagnoses.ratio.0',
-                           # 'aids.to.new.diagnoses.ratio.1'
+                           'idu.relapse.multiplier',
+                           'aids.to.new.diagnoses.ratio.peak',
+                           'aids.to.new.diagnoses.ratio.0',
+                           'aids.to.new.diagnoses.ratio.1'
                            )
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
@@ -283,4 +198,44 @@ register.calibration.info(CALIBRATION.CODE.MINUS.AIDS,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
                           description = "base 5"
+)
+
+
+register.calibration.info('pop.prev.test',
+                          likelihood.instructions = pop.prev.test.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "population + prevalence"
+)
+
+register.calibration.info('pop.new.test',
+                          likelihood.instructions = pop.new.test.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "population + prevalence"
+)
+
+register.calibration.info('pop.new.prev.noage.test',
+                          likelihood.instructions = pop.new.prev.noage.test.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "population + prevalence"
 )
