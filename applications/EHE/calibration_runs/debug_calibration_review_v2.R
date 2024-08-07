@@ -13,7 +13,11 @@ params.manual['other.age3.migration.multiplier.time.2'] = 2.5
 sim.manual = engine$run(params.manual)
 
 # SECOND sim minus the FIRST sim
-pop.lik$compare.sims(sim.pop,sim.manual) # overall, manual is worse - knew this already 
+pop.lik$compare.sims(sim.pop,sim.manual) # NEW LIKELIHOOD WEIGTHED BY YEAR
+exp(pop.lik$compute(sim.manual, debug = T))
+exp(pop.age.weighted.lik$compute(sim.manual, debug = T))
+
+pop.heavy.lik$compare.sims(sim.pop,sim.manual) # overall, manual is worse - knew this already 
 pop.tot.lik$compare.sims(sim.pop,sim.manual) # manual total scores and looks slightly better 
 pop.age.lik$compare.sims(sim.pop,sim.manual) # manual age scores slightly WORSE but looks better
 pop.sex.lik$compare.sims(sim.pop,sim.manual) # manual sex scores and looks slightly better 
@@ -29,6 +33,7 @@ pop.race.sex.lik$compare.sims(sim.pop,sim.manual) # race * sex --> manual scores
 pop.age1.lik$compare.sims(sim.pop,sim.manual) # age 1 --> manual scores slightly better 
 pop.age2.lik$compare.sims(sim.pop,sim.manual) # age 2 --> manual scores slightly WORSE (but very close)
 pop.age3.lik$compare.sims(sim.pop,sim.manual) # age 3 --> manual scores slightly WORSE (but looks much better) **** ISSUE 
+exp(pop.age3.lik$compute(sim.manual, debug = T))
 pop.age4.lik$compare.sims(sim.pop,sim.manual) # age 4 --> manual scores slightly better
 pop.age5.lik$compare.sims(sim.pop,sim.manual) # age 5 --> manual scores slightly WORSE (but very close)
 
@@ -41,6 +46,9 @@ pop.age3.hispanic.lik$compare.sims(sim.pop,sim.manual) # age 3 * hispanic --> ma
 pop.age3.male.lik$compare.sims(sim.pop,sim.manual) # age 3 * male --> manual scores and looks better
 pop.age3.female.lik$compare.sims(sim.pop,sim.manual) # age 3 * female --> manual scores WORSE (but looks much) **** ISSUE 
 
+pop.age3.2015.lik$compare.sims(sim.pop,sim.manual)
+pop.2015.lik$compare.sims(sim.pop,sim.manual)
+
 simplot(sim.pop,
         sim.manual,
         facet.by = "age", split.by = "sex", 
@@ -48,7 +56,8 @@ simplot(sim.pop,
         dimension.values = list(year = 2000:2030)) 
 
 #####
-pop.lik = population.heavy.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+pop.lik = population.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+pop.heavy.lik = population.heavy.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 pop.tot.lik = pop.total.instructions$instantiate.likelihood('ehe','C.12580')
 pop.age.lik = pop.age.instructions$instantiate.likelihood('ehe','C.12580')
 pop.sex.lik = pop.sex.instructions$instantiate.likelihood('ehe','C.12580')
@@ -67,9 +76,42 @@ pop.age3.black.lik = pop.age3.black.instructions$instantiate.likelihood('ehe','C
 pop.age3.hispanic.lik = pop.age3.hispanic.instructions$instantiate.likelihood('ehe','C.12580')
 pop.age3.male.lik = pop.age3.male.instructions$instantiate.likelihood('ehe','C.12580')
 pop.age3.female.lik = pop.age3.female.instructions$instantiate.likelihood('ehe','C.12580')
+pop.age3.2015.lik = pop.age3.2015.instructions$instantiate.likelihood('ehe','C.12580')
+pop.2015.lik = population.heavy.2015.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
+pop.age.weighted.lik = population.age.weighted.likelihood.instructions$instantiate.likelihood('ehe','C.12580')
 
 
 #####
+population.heavy.2015.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
+                                       outcome.for.sim = "population",
+                                       dimensions = c("age","sex","race"),
+                                       levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
+                                       from.year = 2015,
+                                       correlation.different.years = 0.5, # this is the default
+                                       correlation.different.strata = 0.1, # this is the default
+                                       correlation.different.sources = 0.3, # default
+                                       correlation.same.source.different.details = 0.3, # default
+                                       
+                                       # assumes correlation between all combos of years is the same
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       
+                                       # should always be specified; describes how precise the estimates are; 
+                                       # e.g., estimates can be off by 3% each year
+                                       error.variance.term = 0.03,
+                                       error.variance.type = 'cv',
+                                       
+                                       # downweight because large population size; 
+                                       # can get more specific with create.likelihood.weights 
+                                       #(e.g., different weight for age X)
+                                       weights = 2, 
+                                       
+                                       # if there are more datapoints for certain years, this will normalize
+                                       # e.g., if there are a few years with only the totals 
+                                       # before the stratifications are available
+                                       equalize.weight.by.year = F 
+  )
+
 # TOTAL
 pop.total.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -389,6 +431,25 @@ pop.age3.female.instructions =
                                                                sex = "female"),
                                        levels.of.stratification = c(2), # 0 = totals, 1 = 1-way stratification
                                        from.year = 2007,
+                                       correlation.different.years = 0.5, # this is the default
+                                       correlation.different.strata = 0.1, # this is the default
+                                       correlation.different.sources = 0.3, # default
+                                       correlation.same.source.different.details = 0.3, # default
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.03,
+                                       error.variance.type = 'cv',
+                                       weights = 2, 
+                                       equalize.weight.by.year = F
+  )
+
+
+pop.age3.2015.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
+                                       outcome.for.sim = "population",
+                                       dimensions = c("age"),
+                                       dimension.values = list(age = "35-44 years"),
+                                       levels.of.stratification = c(1), # 0 = totals, 1 = 1-way stratification
+                                       from.year = 2015,
                                        correlation.different.years = 0.5, # this is the default
                                        correlation.different.strata = 0.1, # this is the default
                                        correlation.different.sources = 0.3, # default
