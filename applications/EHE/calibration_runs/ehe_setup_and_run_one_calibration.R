@@ -12,7 +12,7 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.MINUS.POS, # 7
                              CALIBRATION.CODE.MINUS.TST, # 8 
                              CALIBRATION.CODE.MINUS.AIDS # 9
-                             )[c(1,2)]
+                             )[c(3)]
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {

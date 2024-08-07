@@ -422,13 +422,13 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     risk.proportion.tested.or = Multivariate.Lognormal.Distribution(
         mu = rep(0, 4),
-        sigma = create.compound.symmetry.covariance.matrix(0.5, 4, log(2)),
+        sigma = create.compound.symmetry.covariance.matrix(0.5, 4, 0.5*log(2)),
         var.names = paste0(c('heterosexual','msm','idu','msm.idu'), '.proportion.tested.or')
     ),
     
     risk.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
       mu = rep(0, 4),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 4, 0.5*log(2)/5),
+      sigma = create.compound.symmetry.covariance.matrix(0.5, 4, 0.5*log(2)/10),
       var.names = paste0(c('heterosexual','msm','idu','msm.idu'), '.proportion.tested.slope.or')
     ),
     
@@ -436,20 +436,21 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     race.proportion.tested.or = Multivariate.Lognormal.Distribution(
       mu = rep(0, 2),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 2, log(2)),
+      sigma = create.compound.symmetry.covariance.matrix(0.5, 2, 0.5*log(2)),
       var.names = paste0(c('black','hispanic'), ".proportion.tested.or")
     ),
     
-    race.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
-      mu = rep(0, 2),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 2, 0.5*log(2)/5),
-      var.names = paste0(c('black','hispanic'), ".proportion.tested.slope.or")
-    ),
-    
+    # race.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
+    #   mu = rep(0, 2),
+    #   sigma = create.compound.symmetry.covariance.matrix(0.5, 2, 0.5*log(2)/10),
+    #   var.names = paste0(c('black','hispanic'), ".proportion.tested.slope.or")
+    # ),
+
     # Testing by Age
     age.proportion.tested.or = Multivariate.Lognormal.Distribution(
       mu = rep(0, 5),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(2)),
+      #sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)),
+      sigma = create.auto.regressive.covariance.matrix(0.8, 5, sd=0.5*log(1.5)),
       var.names = paste0("age", 1:5, ".proportion.tested.or")
     ),
     
@@ -1129,15 +1130,20 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'msm.idu.proportion.tested.slope.or'
     ),
     
-    black.testing = c(
+    race.testing = c(
       'black.proportion.tested.or',
-      'black.proportion.tested.slope.or'
+      'hispanic.proportion.tested.or'
     ),
 
-    hispanic.testing = c(
-      'hispanic.proportion.tested.or',
-      'hispanic.proportion.tested.slope.or'
-    ),
+    # black.testing = c(
+    #   'black.proportion.tested.or',
+    #   'black.proportion.tested.slope.or'
+    # ),
+    # 
+    # hispanic.testing = c(
+    #   'hispanic.proportion.tested.or',
+    #   'hispanic.proportion.tested.slope.or'
+    # ),
     
     young.age.testing = c('age1.proportion.tested.or',
                           'age2.proportion.tested.or'),
