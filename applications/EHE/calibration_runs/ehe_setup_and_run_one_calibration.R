@@ -4,6 +4,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 LOCATION = BALTIMORE.MSA
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANSMISSION, # 2
+<<<<<<< HEAD
                              CALIBRATION.CODE.FULL.PLUS.COVID, # 3
                              CALIBRATION.CODE.FULL, # 4
                              # 8/1 debug likelihoods: 
@@ -13,6 +14,11 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.MINUS.TST, # 8 
                              CALIBRATION.CODE.MINUS.AIDS # 9
                              )[c(3)]
+=======
+                             CALIBRATION.CODE.FULL.PLUS.AIDS, # 3
+                             CALIBRATION.CODE.FULL.PLUS.COVID # 4
+                             )[c(4)]
+>>>>>>> a5a951352deefdaf1d5c0512e74b59dd01543294
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {

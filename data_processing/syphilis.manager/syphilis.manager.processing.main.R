@@ -4,7 +4,6 @@ library(jheem2)
 library(locations)
 library(tidyverse)
 
-
 # Create Syphilis Manager -------------------------------------------------
 
 data.manager = create.data.manager('syphilis', description='syphilis data manager')
@@ -12,56 +11,92 @@ data.manager = create.data.manager('syphilis', description='syphilis data manage
 data.manager$register.outcome(
   'uninsured',
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Uninsured',
     axis.name = 'Uninsured',
+    units = '%',
+    description = "Uninsured"), denominator.outcome = 'uninsured.denominator')
+
+data.manager$register.outcome(
+  'uninsured.denominator',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Uninsured Denominator',
+    axis.name = 'Uninsured Denominator',
     units = 'count',
-    description = "Uninsured"))
+    description = "Uninsured Denominator"))
 
 data.manager$register.outcome(
   'vacant.housing',
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Vacant Housing Units',
     axis.name = 'Vacant Housing Units',
+    units = '%',
+    description = "Vacant Housing Units"), denominator.outcome = 'vacant.housing.denominator')
+
+data.manager$register.outcome(
+  'vacant.housing.denominator',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Vacant Housing Denominator',
+    axis.name = 'Vacant Housing Denominator',
     units = 'count',
-    description = "Vacant Housing Units"))
+    description = "Vacant Housing Denominator"))
 
 data.manager$register.outcome(
   'not.highschool.graduate',
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Population 25 years and older without HS diploma',
     axis.name = 'Population 25 years and older without HS diploma',
+    units = '%',
+    description = "Population 25 years and older without HS diploma"), denominator.outcome = 'not.highschool.graduate.denominator')
+
+data.manager$register.outcome(
+  'not.highschool.graduate.denominator',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Population 25 years and older without HS diploma Denominator',
+    axis.name = 'Population 25 years and older without HS diploma Denominator',
     units = 'count',
-    description = "Population 25 years and older without HS diploma"))
+    description = "Population 25 years and older without HS diploma Denominator"))
 
 data.manager$register.outcome(
   'below.fpl',
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Households living below the federal poverty level',
     axis.name = 'Households living below the federal poverty level',
+    units = '%',
+    description = "Households living below the federal poverty level"), denominator.outcome = 'below.fpl.denominator')
+
+data.manager$register.outcome(
+  'below.fpl.denominator',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Households living below the federal poverty level Denominator',
+    axis.name = 'Households living below the federal poverty level Denominator',
     units = 'count',
-    description = "Households living below the federal poverty level"))
+    description = "Households living below the federal poverty level Denominator"))
 
 data.manager$register.outcome(
   'rural.area',
   metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
+    scale = 'proportion',
     display.name = 'Population living in a rural area',
     axis.name = 'Population living in a rural area',
-    units = 'count',
-    description = "Population living in a rural area"))
+    units = '%',
+    description = "Population living in a rural area"), denominator.outcome = 'rural.area.denominator')
 
 data.manager$register.outcome(
-  'urbanization.level',
+  'rural.area.denominator',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Urbanization level: rural, suburban, urban',
-    axis.name = 'Urbanization level: rural, suburban, urban',
+    display.name = 'Population living in a rural area Denominator',
+    axis.name = 'Population living in a rural area Denominator',
     units = 'count',
-    description = "Urbanization level: rural, suburban, urban"))
+    description = "Population living in a rural area Denominator"))
 
 data.manager$register.outcome(
   'congenital.syphilis',
