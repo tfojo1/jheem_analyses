@@ -1,105 +1,89 @@
 
-# Congenital Syphilis (State 2000-2022) -----------------------------------
-DATA.DIR.CONGENITAL="../../data_raw/syphilis.manager/congenital_syphilis"
-congenital_files <- Sys.glob(paste0(DATA.DIR.CONGENITAL, '/*.csv'))
-congenital.syphilis.raw <- lapply(congenital_files, function(x){
+#  Syphilis (State 2000-2022) -----------------------------------
+DATA.DIR.SYPHILIS="../../data_raw/syphilis.manager/syphilis"
+syphilis_files <- Sys.glob(paste0(DATA.DIR.SYPHILIS, '/*.csv'))
+syphilis.data <- lapply(syphilis_files, function(x){
   skip=7
   list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 
-##
-congenital.syphilis.clean = lapply(congenital.syphilis.raw, function(file){
+# Mappings ----------------------------------------------------------------
+
+outcome.mappings.syphilis = c('Primary and Secondary Syphilis'='ps.syphilis',
+                         'Early Non-Primary, Non-Secondary Syphilis' = 'early.syphilis',
+                         'Congenital Syphilis' = 'congenital.syphilis',
+                         'Unknown Duration or Late Syphilis' = 'unknown.duration.or.late.syphilis')
+
+syphilis.mappings.age = c('0-14' = '0-14 years', 
+                     '15-19' = '15-19 years',
+                     '20-24' = '20-24 years',
+                     '25-29' = '25-29 years',
+                     '30-34' = '30-34 years',
+                     '35-39' = '35-39 years',
+                     '40-44' = '40-44 years',
+                     '45-54' = '45-54 years',
+                     '55-64' = '55-64 years',
+                     '65+' = '65+ years')
+
+# Cleaning ----------------------------------------------------------------
+
+syphilis.clean = lapply(syphilis.data, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$year = substr(data$Year, 1, 4)
-  data$Cases = (gsub(",", "", data$Cases))
-  
-  data$outcome = 'congenital.syphilis'
-  
+    data$year = substr(data$Year, 1, 4)
+    data$Cases = (gsub(",", "", data$Cases))
+   
+   data$outcome = outcome.mappings.syphilis[data$Indicator]
+
   data <- data %>%
-    mutate(value= ifelse(grepl("Data not available", Cases), NA,
-                         ifelse(grepl("Data suppressed", Cases), NA, Cases)))
+    mutate(value= ifelse(Cases == "Data not available" | Cases == "Data suppressed", NA, Cases))
+
   data$value = as.numeric(data$value)
-  
+
   if(grepl("state", filename)) {
     names(state.abb) <- state.name
     data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography])
   }
-  
-  data= as.data.frame(data)
-  
-  data<-data %>% select(outcome, year, location, value)
-  
-  list(filename, data)
-})
 
+  if(grepl("county", filename)) {
+    data$location = data$FIPS
+  }
 
+  ##Demographic conditionals##
 
-# Late or Unknown Duration Syphilis (State 2000-2022)  --------------------------------------
-
-DATA.DIR.LATE="../../data_raw/syphilis.manager/unknown_or_late_duration_syphilis"
-late_files <- Sys.glob(paste0(DATA.DIR.LATE, '/*.csv'))
-late.syphilis.raw <- lapply(late_files, function(x){
-  skip=7
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
-})
-
-late.syphilis.clean = lapply(late.syphilis.raw, function(file){
-  
-  data=file[["data"]]
-  filename = file[["filename"]]
-  
-  data$year = substr(data$Year, 1, 4)
-  data$Cases = (gsub(",", "", data$Cases))
-  
-  data$outcome = 'unknown.duration.or.late.syphilis'
-  
-  data <- data %>%
-    mutate(value= ifelse(grepl("Data not available", Cases), NA,
-                         ifelse(grepl("Data suppressed", Cases), NA, Cases)))
-  data$value = as.numeric(data$value)
-  
-  if(grepl("state", filename)) {
-    names(state.abb) <- state.name
-    data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography])
+  if(grepl("agegrp", filename)) {
+    data$age = syphilis.mappings.age[data$Age.Group]
+    data = subset(data, data$age != "unknown")
+  }
+  if(grepl("race", filename)) {
+    data$race= data$'Race.Ethnicity'
+    data = subset(data, data$race != "Unknown")
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
   }
   
   data= as.data.frame(data)
-  
-  data<-data %>% 
-    select(outcome, year, location, value)%>%
-    filter(!is.na(value)) #It seems like you can pull this data pretty far back but it's NA for most earlier years
-  
+
   list(filename, data)
 })
-
 
 # Put ---------------------------------------------------------------------
 
-late_syphilis_data = lapply(late.syphilis.clean, `[[`, 2)
+syphilis.clean.put = lapply(syphilis.clean, `[[`, 2)
 
-for (data in late_syphilis_data) {
+for (data in syphilis.clean.put) {
   
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
     dimension.values = list(),
-    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Reporting')
+    url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
+    details = 'CDC Atlas Plus')
 }
 
-cong_syphilis_data = lapply(congenital.syphilis.clean, `[[`, 2)
 
-for (data in cong_syphilis_data) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'cdc.sti',
-    source = 'cdc.sti',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
-    details = 'CDC Reporting')
-}
