@@ -1,3 +1,20 @@
+# Andrew can you make this work? 
+gonorrhea.non.ratio.year.on.year.change.likelihood.instructions = 
+  create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea", # zoe changing 0-14 to 13-14, throw out 'unknown'
+                                                        outcome.for.sim = "sexual.transmission.rates", 
+                                                        # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
+                                                        # (2020 sexual transmisson/2019 sexual transmission)
+                                                        levels.of.stratification = c(0,1), 
+                                                        dimensions = c("sex","race","age"),
+                                                        from.year = 2008, 
+                                                        observation.correlation.form = 'compound.symmetry', 
+                                                        error.variance.term = 0.03, # pick a smarter one
+                                                        error.variance.type = 'cv',
+                                                        correlation.different.years = 0.5,
+                                                        weights = list(1), 
+                                                        equalize.weight.by.year = F 
+  )
+
 
 # LIKELIHOODS INCLUDED: 
 # population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
