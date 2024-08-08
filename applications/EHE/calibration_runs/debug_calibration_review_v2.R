@@ -13,7 +13,7 @@ params.manual['other.age3.migration.multiplier.time.2'] = 2.5
 sim.manual = engine$run(params.manual)
 
 # SECOND sim minus the FIRST sim
-pop.lik$compare.sims(sim.pop,sim.manual) # NEW LIKELIHOOD WEIGTHED BY YEAR
+pop.lik$compare.sims(sim.pop,sim.manual) # NEW LIKELIHOOD WEIGHTED BY YEAR
 exp(pop.lik$compute(sim.manual, debug = T))
 exp(pop.age.weighted.lik$compute(sim.manual, debug = T))
 
