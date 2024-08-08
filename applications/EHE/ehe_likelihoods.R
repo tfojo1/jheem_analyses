@@ -1,21 +1,3 @@
-# Andrew can you make this work? 
-gonorrhea.non.ratio.year.on.year.change.likelihood.instructions = 
-  create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea", # zoe changing 0-14 to 13-14, throw out 'unknown'
-                                                        outcome.for.sim = "sexual.transmission.rates", 
-                                                        # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
-                                                        # (2020 sexual transmisson/2019 sexual transmission)
-                                                        levels.of.stratification = c(0,1), 
-                                                        dimensions = c("sex","race","age"),
-                                                        from.year = 2008, 
-                                                        observation.correlation.form = 'compound.symmetry', 
-                                                        error.variance.term = 0.03, # pick a smarter one
-                                                        error.variance.type = 'cv',
-                                                        correlation.different.years = 0.5,
-                                                        weights = list(1), 
-                                                        equalize.weight.by.year = F 
-  )
-
-
 # LIKELIHOODS INCLUDED: 
 # population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
@@ -95,26 +77,26 @@ population.likelihood.instructions =
                                        outcome.for.sim = "population",
                                        dimensions = c("age","sex","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
-                                       from.year = 2007,
+                                       from.year = 2010,
                                        correlation.different.years = 0.5, # this is the default
                                        correlation.different.strata = 0.1, # this is the default
                                        correlation.different.sources = 0.3, # default
                                        correlation.same.source.different.details = 0.3, # default
                                        
                                        # assumes correlation between all combos of years is the same
-                                       observation.correlation.form = 'compound.symmetry', 
+                                       observation.correlation.form = 'autoregressive.1', 
                                        
                                        # should always be specified; describes how precise the estimates are; 
                                        # e.g., estimates can be off by 3% each year
-                                       error.variance.term = 0.03,
+                                       error.variance.term = 0.015,
                                        error.variance.type = 'cv',
                                        
                                        # downweight because large population size; 
                                        # can get more specific with create.likelihood.weights 
                                        #(e.g., different weight for age X)
-                                       weights = list(create.likelihood.weights(
-                                         total.weight = 0.5,
-                                         dimension.values = list(year = as.character(2007:2014)))), 
+                                       # weights = list(create.likelihood.weights(
+                                       #   total.weight = 0.5,
+                                       #   dimension.values = list(year = as.character(2007:2014)))), 
                                        
                                        # if there are more datapoints for certain years, this will normalize
                                        # e.g., if there are a few years with only the totals 
