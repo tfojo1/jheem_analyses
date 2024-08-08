@@ -57,6 +57,7 @@ census.age.mappings = c('1' = '0-4 years',
 population.race <- county_agegr_sex_race_eth_10.19%>%
   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
          NA_MALE, NA_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
@@ -83,6 +84,7 @@ population.race= as.data.frame(population.race)
 # ETHNICITY ---------------------------------------------------------------
 population.ethnicity <- county_agegr_sex_race_eth_10.19%>%
   select(STATE, COUNTY, YEAR, AGEGRP, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
     filter(YEAR != "1")%>%
       filter(YEAR != "2")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
@@ -171,6 +173,7 @@ population.sex.age= as.data.frame(population.sex.age)
 population.race.age <- county_agegr_sex_race_eth_10.19%>%
   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
          NA_MALE, NA_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
@@ -198,6 +201,7 @@ population.race.age= as.data.frame(population.race.age)
 # # ETHNICITY + AGE ---------------------------------------------------------
 population.ethnicity.age <- county_agegr_sex_race_eth_10.19%>%
   select(STATE, COUNTY, YEAR, AGEGRP, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
@@ -228,6 +232,7 @@ population.race.eth.sex <- county_agegr_sex_race_eth_10.19%>%
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
          HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
@@ -271,6 +276,7 @@ population.age.race.eth <- county_agegr_sex_race_eth_10.19%>%
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
          HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
@@ -327,6 +333,7 @@ population.race.eth.sex.age <- county_agegr_sex_race_eth_10.19%>%
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
          HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
