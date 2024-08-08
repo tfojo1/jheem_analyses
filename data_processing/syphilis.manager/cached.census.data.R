@@ -33,6 +33,7 @@ population.race = as.data.frame.table(census.manager$data$population$estimate$ce
                 mutate(race = tolower(race))%>%
                 mutate(race = ifelse(race == "asian", "asian or pacific islander", race))%>%
                 mutate(race = ifelse(race == "native hawaiian and other pacific islander", "asian or pacific islander", race))%>%
+                 mutate(race = ifelse(race == "american indian and alaska native", "american indian or alaska native", race))%>%
                 group_by(year, location, race)%>%
                 mutate(new.value = sum(value))%>%
                 select(-value)%>%
@@ -45,7 +46,6 @@ population.race = as.data.frame.table(census.manager$data$population$estimate$ce
 
 population.race<- as.data.frame(population.race[!duplicated(population.race), ])
     
-
 population.data.list = list(
   population.total,
   population.age,
@@ -54,9 +54,7 @@ population.data.list = list(
 
 # Put from census into syphilis.manager -----------------------------------
 
-population.put = lapply(population.data.list, `[[`, 2)
-
-for (data in population.put) {
+for (data in population.data.list) {
 
   data.manager$put.long.form(
     data = data,
@@ -66,3 +64,9 @@ for (data in population.put) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
+
+
+
+#######THIS ONLY PUTS STRATIFIED POPULATION FOR 2020-2023- SO YOU NEED TO ADD IN
+####2005-2017, 2018-2019 BUT BECAUSE YOU MIGHT HAVE TO REDO POPULATION
+##WAIT TO SEE WHAT TODD WANTS BC THIS WILL CHANGE HOW YOU PULL THIS
