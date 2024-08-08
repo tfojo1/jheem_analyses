@@ -77,9 +77,9 @@ full.int = create.monotonic.criteria.based.intervention (base.intervention = bas
                                                                                     suppression.criterion,
                                                                                     prep.criterion),
                                                          max.iterations = 20,
-                                                         n.iterations.after.satisfying.criteria = 5,
+                                                         n.iterations.after.satisfying.criteria = 5, #can reduce
                                                          max.iterations.first.sim = 100,
                                                          n.iterations.after.satisfying.criteria.first.sim = 20,
                                                          max.failure.rate = 0,
-                                                         code=NULL, 
+                                                         code="fullint", 
                                                          name=NULL)
