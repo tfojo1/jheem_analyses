@@ -183,6 +183,11 @@ source('data_processing/births_and_deaths.R')
 #UPDATE 7-16: Temporarily commenting out 181 to source the newer stratified data
 #I'll use this to decide if we want age groups or single year
 source('data_processing/census.population.20.23.R')
+
+#Sourcing more recent census population data that is stratified but not
+#by single year age just by age group which is why we added it so much later
+source('data_processing/census.population.10.19.R')
+
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
 ################################################################################

@@ -1635,7 +1635,8 @@ put.msa.data.strict(locations= c(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, CO
                     contained.geographic.type = "county", #it will look for counties in the regions above
                     #put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')), #Use defaults
                     data.manager = surveillance.manager,
-                    census.manager = census.manager)
+                    census.manager = census.manager,
+                    onts.to.ignore = c('stratified.census', 'census.cdc.wonder.population'))   
 
 # CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST--------
 source('data_processing/dummy.data.frames.R')
@@ -1759,34 +1760,6 @@ put.msa.data.as.new.source(outcome = 'adult.population',
 
 put.msa.data.as.new.source(outcome = 'adult.population',
                            from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
-
-#Aggregates CDC Wonder
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'cdc_wonder',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  all.states,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'STATE',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
-
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'cdc_wonder',
-                           to.source.name = 'census.aggregated.adult.population',
-                           to.locations =  MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
-
-put.msa.data.as.new.source(outcome = 'adult.population',
-                           from.source.name = 'cdc_wonder',
                            to.source.name = 'census.aggregated.adult.population',
                            to.locations =  NSDUH.REGIONS.CONTAINING.LOCATIONS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',

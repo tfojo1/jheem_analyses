@@ -5,3 +5,21 @@ analysis: run and analyze the results
 steps to run JHEEM run first_time setup 
 open a chached folder > populate with data 
 test > test engine 
+
+##############################
+# Transmission vs Transission vs Remission: 
+Uninfected to Infected -> transmission 
+Infected to Infected, or Uninfected to Uninfected -> transition
+Infected to Uninfected -> remission
+
+##############################
+#DEfault definitions:
+# Groups: infected and uninfected are defined by default
+other dimensions can be defined by the user, when referring to them, we should include them in a list
+# list(sex='xx',age='xx',race='xx') or list(continuum='xx',stage='xx')
+
+##############################
+Applies.to: is used to define a subset of population that a function applies to 
+
+##############################
+rates are defined per year 
