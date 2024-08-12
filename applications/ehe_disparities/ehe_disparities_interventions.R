@@ -1,4 +1,5 @@
-### Model EHE Intervention Effects on Racial Disparity in HIV Incidence
+#EHE Intervention Effects on Racial Disparities in HIV Incidence
+#Code to specify interventions of interest.
 
 #source('../jheem2/R/tests/ENGINE_test.R')
 source("../jheem_analyses/applications/EHE/ehe_specification.R")
@@ -77,7 +78,7 @@ full.int = create.monotonic.criteria.based.intervention (base.intervention = bas
                                                                                     suppression.criterion,
                                                                                     prep.criterion),
                                                          max.iterations = 20,
-                                                         n.iterations.after.satisfying.criteria = 5, #can reduce
+                                                         n.iterations.after.satisfying.criteria = 5,
                                                          max.iterations.first.sim = 100,
                                                          n.iterations.after.satisfying.criteria.first.sim = 20,
                                                          max.failure.rate = 0,
