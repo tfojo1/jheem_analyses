@@ -142,6 +142,51 @@ data.manager$register.outcome(
     units = 'population',
     description = "Populaion Estimate"))
 
+data.manager$register.outcome(
+  'hiv.diagnoses',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'New Diagnoses',
+    axis.name = 'New Diagnoses (n)',
+    units = 'cases',
+    description = "New HIV Cases Diagnosed in a Year"))
+
+data.manager$register.outcome(
+  'hiv.diagnosed.prevalence', #Changing this from prevalence to diagnosed.prevalence bc CDC's prevalence only includes people who know their status#
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Diganosed Prevalence',
+    axis.name = 'Diganosed Prevalence (n)',
+    units = 'cases',
+    description = "Diagnosed HIV Prevalence"))
+
+data.manager$register.outcome(  #Adding this as a denominator value for awareness/knowledge of status- bc the cdc denominator is an estimated prevalence value of both known and unknown status#
+  'hiv.total.prevalence',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Total Prevalence',
+    axis.name = 'Total Prevalence',
+    units = 'cases',
+    description = "Estimated Prevalence of Known and Unknown Status"))
+
+data.manager$register.outcome(
+  'hiv.engagement', #changed from receipt to engagement
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Engagement in Care',
+    axis.name = 'Proportion of Engaged in Care',
+    units = '%',
+    description = "Engagement in  HIV medical care"), denominator.outcome = 'diagnosed.prevalence')
+
+data.manager$register.outcome(
+  'hiv.suppression', 
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Viral Suppression',
+    axis.name = 'Proportion Virally Suppressed',
+    units = '%',
+    description = "HIV Viral Suppression"), denominator.outcome = 'diagnosed.prevalence')
+
 
 # Create Sources + Parent Sources -----------------------------------------
 
@@ -149,12 +194,15 @@ data.manager$register.outcome(
 data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS")
 data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS")
 data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
+data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS")
 
 ##Register Data Sources ('children')
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
 data.manager$register.source('cdc.sdh', parent.source= "ACS", full.name = "Atlas Plus SDH Data", short.name='cdc.sdh')
 data.manager$register.source('cdc.rural', parent.source= "census", full.name = "Atlas Plus Rural Area Data", short.name='cdc.rural')
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
+data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
+
 
 # Establish Ontologies ----------------------------------------------------
 
@@ -197,11 +245,51 @@ data.manager$register.ontology(
   ))
 
 
-
 # Source Data Cleaning and Processing Files -------------------------------
 
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
 source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/cached.hiv.data.R')
 source('data_processing/syphilis.manager/cached.census.data.R')
+##Add PrEP##
+
+
+# RENAME ------------------------------------------------------------------
+
+syphilis.manager = data.manager
+
+# Aggregate Outcomes to MSA -----------------------------------------------
+
+source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
+source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
+
+source('../jheem2/R/HELPERS_array_helpers.R') 
+
+source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
+
+put.msa.data.as.new.source(outcome = 'ps.syphilis',
+                           from.source.name = 'cdc.sti',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'early.syphilis',
+                           from.source.name = 'cdc.sti',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = syphilis.manager)
+
+# SAVE SYPHILIS.MANAGER ---------------------------------------------------
+save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
+
+#Also save to Q drive
+save(syphilis.manager, file="Q:/data_managers/syphilis.manager.rdata")
+
+
 
