@@ -17,7 +17,7 @@ county_agegr_sex_race_eth_10.19 <- pop.10.19.data[[1]][[2]]
 
 # Mappings ----------------------------------------------------------------
 
-year.mappings = c("3"="2010",
+year.mappings.10.19 = c("3"="2010",
                   "4"="2011",
                   "5"="2012",
                   "6"="2013",
@@ -27,14 +27,14 @@ year.mappings = c("3"="2010",
                   "10"="2017",
                   "11"="2018",
                   "12"="2019")
-census.race.mappings = c('WA' = 'White',
+census.race.mappings.10.19 = c('WA' = 'White',
                          'BA' = 'Black',
                          'IA'= 'American Indian and Alaska Native',
                          'AA' = 'Asian',
                          'NA' = 'Native Hawaiian and Other Pacific Islander')
-census.eth.mappings = c(  'H' = 'Hispanic',
+census.eth.mappings.10.19 = c(  'H' = 'Hispanic',
                           'NH' = 'Not Hispanic')
-census.age.mappings = c('1' = '0-4 years', 
+census.age.mappings.10.19 = c('1' = '0-4 years', 
                         '2' = '5-9 years', 
                         '3' = '10-14 years', 
                         '4' = '15-19 years', 
@@ -69,9 +69,9 @@ population.race <- county_agegr_sex_race_eth_10.19%>%
                names_to = c("race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
-  mutate(race = as.character(census.race.mappings[race]))%>%
+  mutate(race = as.character(census.race.mappings.10.19[race]))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   select(location, year, race, sex, count.by.sex)%>%
   group_by(year, location, race)%>%
   mutate(value = sum(count.by.sex))%>%
@@ -95,9 +95,9 @@ population.ethnicity <- county_agegr_sex_race_eth_10.19%>%
                names_to = c("ethnicity", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
-  mutate(ethnicity = as.character(census.eth.mappings[ethnicity]))%>%
+  mutate(ethnicity = as.character(census.eth.mappings.10.19[ethnicity]))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   select(location, year, ethnicity, sex, count.by.sex)%>%
   group_by(year, location, ethnicity)%>%
   mutate(value = sum(count.by.sex))%>%
@@ -113,12 +113,12 @@ population.ethnicity= as.data.frame(population.ethnicity)
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
-  mutate(year = year.mappings[YEAR])%>%
+  mutate(year = year.mappings.10.19[YEAR])%>%
   filter(AGEGRP != "0")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
   mutate(location = paste(STATE, COUNTY, sep=""))%>%
-  mutate(age = census.age.mappings[AGEGRP])%>%
+  mutate(age = census.age.mappings.10.19[AGEGRP])%>%
   mutate(outcome = "population")%>%
   rename(value = TOT_POP)%>%
   select(year, location, outcome, age, value)
@@ -130,7 +130,7 @@ population.sex<- county_agegr_sex_race_eth_10.19 %>%
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
-  mutate(year = year.mappings[YEAR])%>%
+  mutate(year = year.mappings.10.19[YEAR])%>%
   filter(AGEGRP == "0")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
@@ -152,7 +152,7 @@ population.sex.age<- county_agegr_sex_race_eth_10.19 %>%
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
-  mutate(year = year.mappings[YEAR])%>%
+  mutate(year = year.mappings.10.19[YEAR])%>%
   filter(AGEGRP != "0")%>% 
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
@@ -163,7 +163,7 @@ population.sex.age<- county_agegr_sex_race_eth_10.19 %>%
                values_to = "value")%>%
   mutate(outcome = "population")%>%
   mutate(sex = tolower(sex))%>%
-  mutate(age = as.character(census.age.mappings[AGEGRP]))%>%
+  mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
   select(year, location, outcome, sex, age, value)
 
 population.sex.age= as.data.frame(population.sex.age)
@@ -184,11 +184,11 @@ population.race.age <- county_agegr_sex_race_eth_10.19%>%
                names_to = c("race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
-  mutate(race = as.character(census.race.mappings[race]))%>%
+  mutate(race = as.character(census.race.mappings.10.19[race]))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   filter(AGEGRP != "0")%>%
-  mutate(age = as.character(census.age.mappings[AGEGRP]))%>%
+  mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
   select(location, year, age, race, count.by.sex)%>%
   group_by(year, location, age, race)%>%
   mutate(value = sum(count.by.sex))%>%
@@ -211,11 +211,11 @@ population.ethnicity.age <- county_agegr_sex_race_eth_10.19%>%
                names_to = c("ethnicity", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
-  mutate(ethnicity = as.character(census.eth.mappings[ethnicity]))%>%
+  mutate(ethnicity = as.character(census.eth.mappings.10.19[ethnicity]))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   filter(AGEGRP != "0")%>%
-  mutate(age = as.character(census.age.mappings[AGEGRP]))%>%
+  mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
   select(location, year, age, ethnicity, count.by.sex)%>%
   group_by(year, location, age, ethnicity)%>%
   mutate(value = sum(count.by.sex))%>%
@@ -259,7 +259,7 @@ population.race.eth.sex <- county_agegr_sex_race_eth_10.19%>%
                           combined.race == "NHNA" ~ "Native Hawaiian and Other Pacific Islander",
                           combined.race == "NHWA" ~ "White"))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "Not Hispanic", 'Hispanic'))%>%
   select(location, year, race, ethnicity, sex, count.by.sex)%>%
   mutate(outcome = "population")%>%
@@ -303,9 +303,9 @@ population.age.race.eth <- county_agegr_sex_race_eth_10.19%>%
                           combined.race == "NHNA" ~ "Native Hawaiian and Other Pacific Islander",
                           combined.race == "NHWA" ~ "White"))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "Not Hispanic", 'Hispanic'))%>%
-  mutate(age = as.character(census.age.mappings[AGEGRP]))%>%
+  mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
   mutate(outcome = "population")%>%
   select(outcome, location, year, sex, race, ethnicity, age, count.by.sex)%>%
   group_by(year, location, race, ethnicity, age)%>%
@@ -360,9 +360,9 @@ population.race.eth.sex.age <- county_agegr_sex_race_eth_10.19%>%
                           combined.race == "NHNA" ~ "Native Hawaiian and Other Pacific Islander",
                           combined.race == "NHWA" ~ "White"))%>%
   mutate(sex = tolower(sex))%>%
-  mutate(year = as.character(year.mappings[YEAR]))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "Not Hispanic", 'Hispanic'))%>%
-  mutate(age = as.character(census.age.mappings[AGEGRP]))%>%
+  mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
   select(location, year, race, ethnicity, sex, age, count.by.sex)%>%
   mutate(outcome = "population")%>%
   mutate(value = count.by.sex)%>%
@@ -386,6 +386,14 @@ population.race.eth.sex.age= as.data.frame(population.race.eth.sex.age)
    population.race.eth.sex.age
 )
 
+
+# Remove Problem Locations ------------------------------------------------
+
+problem.locations = c("02063", "02066", "02261", "09001", "09003", "09005", "09007", "09009", "09011", 
+                      "09013", "09015", "09110", "09120", "09130", "09140", "09150", "09160", "09170", 
+                      "09180", "09190")
+
+stratified.10.19.data = lapply(stratified.10.19.data, function(x) filter(x, !location %in% problem.locations))
 
 # Put ---------------------------------------------------------------------
 
