@@ -1,4 +1,4 @@
-#This is stratified data, county level, census data, 2020-2023
+#This creates adult.population for 2010-2023 stratified population data from the Census
 
 #Estimate the adult.population from age grouped data
 #Then find adult.population from the single year ages
@@ -6,7 +6,6 @@
 #census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
 
 # Source Helper Code Todd Wrote -------------------------------------------
-
 
 ##This is the function that Todd wrote; More code included to run the functions that his function references
 ##This is from the HELPERS_age_year_helpers.R file (this is in JHEEM2 dev branch I think)
@@ -320,8 +319,7 @@ for (data in estimated.adult.pop.stratified.put) {
 }
 ##################################################################################
 
-
-# SINGLE YEAR AGE GROUP DATA ----------------------------------------------
+# SINGLE YEAR AGE GROUP DATA (This is for 2020-2023 where single year is available)----------------------------------------------
 
 #adult.pop by SINGLE YEAR AGE (for TOTAL, SEX, and AGE)
 single.year.age = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)
@@ -412,8 +410,89 @@ for (data in adult.pop.by.single.year.age) {
 }
 
 
-# ADDING NEW STRATIFICATIONS ----------------------------------------------
-#Need: race+eth
-#   race+eth+sex
-#   age+race+eth
+# Age Stratified Data by Group for 2010-2019 (where only grouped data is available) --------
 
+#Total 2010-2019
+total.array.10.19 = census.manager$data$population$estimate$census.population$stratified.census$year__location__age
+
+total.10.19 <- restratify.age.counts(total.array.10.19, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
+
+fixed.total.10.19 = total.10.19[ , ,3:17] #subset by only adult age groups
+fixed.total.10.19 = apply(fixed.total.10.19, MARGIN = c("year","location"), sum) 
+
+fixed.total.10.19 <- as.data.frame.table(fixed.total.10.19)%>%
+  mutate(value = round(Freq))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(outcome = "adult.population")%>%
+  select(-Freq)
+
+#Sex 2010-2019
+sex.array.10.19 = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__sex
+
+sex.10.19 <- restratify.age.counts(sex.array.10.19, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
+
+fixed.sex.10.19 = sex.10.19[ , ,3:17, ] #subset by only adult age groups
+fixed.sex.10.19 = apply(fixed.sex.10.19, MARGIN = c("year","location", "sex"), sum) 
+
+fixed.sex.10.19 <- as.data.frame.table(fixed.sex.10.19)%>%
+  mutate(value = round(Freq))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(outcome = "adult.population")%>%
+  mutate(sex = as.character(sex))%>%
+  select(-Freq)
+
+#Age 2010-2019
+age.array.10.19 = census.manager$data$population$estimate$census.population$stratified.census$year__location__age
+
+age.10.19 <- restratify.age.counts(age.array.10.19, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
+
+fixed.age.10.19 = age.10.19[ , ,3:17] #subset by only adult age groups
+fixed.age.10.19 = apply(fixed.age.10.19, MARGIN = c("year","location", "age"), sum) 
+
+fixed.age.10.19 <- as.data.frame.table(fixed.age.10.19)%>%
+  mutate(value = round(Freq))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(outcome = "adult.population")%>%
+  mutate(age = as.character(age))%>%
+  select(-Freq)
+
+#Age+Sex 2010-2019
+age.sex.array.10.19 = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__sex
+
+age.sex.10.19 <- restratify.age.counts(age.sex.array.10.19, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
+
+fixed.age.sex.10.19 = age.sex.10.19[ , ,3:17, ] #subset by only adult age groups
+fixed.age.sex.10.19 = apply(fixed.age.sex.10.19, MARGIN = c("year","location", "sex", 'age'), sum) 
+
+fixed.age.sex.10.19 <- as.data.frame.table(fixed.age.sex.10.19)%>%
+  mutate(value = round(Freq))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(outcome = "adult.population")%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(age = as.character(age))%>%
+  select(-Freq)
+
+
+# Put 2010-2019 Estimated Adult Pop for Total, sex, age, sex+age ----------
+
+est.adult.pop.10.19 = list(
+  fixed.total.10.19,
+  fixed.sex.10.19,
+  fixed.age.10.19,
+  fixed.age.sex.10.19) 
+
+
+for (data in est.adult.pop.10.19) {
+  
+  surveillance.manager$put.long.form(
+    data = data,
+    ontology.name = 'census.grouped.age', 
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
