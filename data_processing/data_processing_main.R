@@ -1605,14 +1605,14 @@ source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates c
 source('data_processing/adult.population.10.23.R') #creates adult population for 2010-2023, stratified data
 
 #7-30: Put adult population for specific locations
-put.msa.data.strict(locations= c(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
-                    contained.geographic.type = "county", #it will look for counties in the regions above
-                    #put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')), #Use defaults
-                    data.manager = surveillance.manager,
-                    census.manager = census.manager,
-                    onts.to.ignore = c('stratified.census', 'census.cdc.wonder.population'))   #August 2024, removing cdc wonder data
+# put.msa.data.strict(locations= c(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
+#                     contained.geographic.type = "county", #it will look for counties in the regions above
+#                     #put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')), #Use defaults
+#                     data.manager = surveillance.manager,
+#                     census.manager = census.manager,
+#                     onts.to.ignore = c('stratified.census', 'census.cdc.wonder.population'))   #August 2024, removing cdc wonder data
 
-source('data_processing/dummy.data.frames.R') # CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST
+#source('data_processing/dummy.data.frames.R') # CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST
 
 ################################################################################
 #Create aggregated outcomes 
