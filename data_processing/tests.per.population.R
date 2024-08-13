@@ -16,19 +16,19 @@ hiv.tests.clean = subset(hiv.tests.raw, location %in% hiv.test.locations.of.inte
 
 
 # get adult.population ----------------------------------------------------
-#Pulling adult.population from 3 sources: 20117-2017 single year age  census data, 2018-2019 single year age cdc wonder data; 2020-2021 by estimated adult.population data
 
-#census (2020-2022 here are estimated)
-adult.pop.source.one = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.population$census$year__location)) %>% rename(adult.pop.value = Freq) %>% mutate(year = as.character(year))
+#census (2011-2019 here are estimated from age groups)
+adult.pop.source.one = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census.grouped.age$year__location)) %>% rename(adult.pop.value = Freq) %>% mutate(year = as.character(year))
 adult.pop.source.one.clean = subset(adult.pop.source.one,  location %in% hiv.test.locations.of.interest)
 adult.pop.source.one.final = subset(adult.pop.source.one.clean,  year %in% hiv.tests.years.of.interest)
 
-#CDC Wonder
-adult.pop.source.two = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$cdc_wonder$census.cdc.wonder.population$year__location)) %>% rename(adult.pop.value = Freq) %>% filter(year == 2018 | year == 2019) %>% mutate(year = as.character(year))
+#Census (2020-2023 calculated from single year ages)
+adult.pop.source.two = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census$year__location)) %>% rename(adult.pop.value = Freq) %>% filter(year == 2018 | year == 2019) %>% mutate(year = as.character(year))
 adult.pop.source.two.final  = subset(adult.pop.source.two,  location %in% hiv.test.locations.of.interest)
 
 
 adult.pop.all = rbind(adult.pop.source.one.final , adult.pop.source.two.final )
+
 
 # Combined hiv.test df with adult.pop df ----------------------------------
 
