@@ -19,8 +19,9 @@ x=full.int$run(simset, start.year=2025, end.year=2030, verbose=TRUE)
 collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
                                     locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=50)
 
-collection$run(2025, 2035, verbose=TRUE, overwrite.prior=TRUE) # stop.for.errors = T to check error messages
-collection$get.parameters('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier')
+collection$run(2025, 2035, verbose=TRUE) # stop.for.errors = T to check error messages
+collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'))
+
 
 results = collection$get(outcomes = c("new", "population"),
                          dimension.values = list(year=2035),
