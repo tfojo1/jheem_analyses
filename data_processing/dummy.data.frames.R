@@ -100,17 +100,17 @@ dummy.data.all = list (dummy.counties.one,
                        dummy.counties.eight,
                        dummy.counties.nine)
 
-for (data in dummy.data.all) {
-
-surveillance.manager$put.long.form(
-  data = data,
-  ontology.name = 'census.cdc.wonder.population',
-  source = 'cdc_wonder',
-  dimension.values = list(),
-  url ='https://wonder.cdc.gov/',
-  details = 'CDC Wonder',
-  allow.na.to.overwrite = T )
-}
+# for (data in dummy.data.all) {
+# 
+# surveillance.manager$put.long.form(
+#   data = data,
+#   ontology.name = 'census.cdc.wonder.population',
+#   source = 'cdc_wonder',
+#   dimension.values = list(),
+#   url ='https://wonder.cdc.gov/',
+#   details = 'CDC Wonder',
+#   allow.na.to.overwrite = T )
+# }
 
 
 # Census ------------------------------------------------------------------
