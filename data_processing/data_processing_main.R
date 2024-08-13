@@ -1596,50 +1596,23 @@ surveillance.manager= data.manager #Add this here so you don't have to change da
 #Decided to save a version of the surveillance manager at this point for trouble shooting in the future:
 save(surveillance.manager, file="../../cached/surveillance.manager.temp.rdata")
 
-##Put summation of census counties to create msa populations within the surveillance manager
-#smaller.census.manager = load.data.manager("../../cached/smaller.census.manager.rdata")
 census.manager = load.data.manager("../../cached/census.manager.rdata")
 
-##Source code for function from Andrew to sum counties populations from census to create MSA populations for surveillance manager
-#This code also adjusts the population to be the 'adult.population' ages 13 and over
-source('data_processing/put_msa_data_without_estimation_script.R')
-#source code to sum diagnosed prevalence and new diagnoses for counties to make up MSAs
-source('data_processing/put_msa_data_as_new_source_script.R')
+source('data_processing/put_msa_data_without_estimation_script.R') #Creates adult.population for single year ages
 
-#this function allows data from the census manager to be transformed into 'adult' only outcomes, ages 13+ while maintaining the census manager data
-#this function currently defaults to population, when using it for mortality you need to define mortality as the outcome#
-#adult.population
+source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
 
-#7-30: You need this because it puts for all the strata. But maybe youl could remove certain levels if this causes dups?
-#But is this redundant with below? Bc I should just put for counties then aggre later
-# put.msa.data.strict(locations = MSAS.OF.INTEREST,
-#                     data.manager = surveillance.manager,
-#                     census.manager = census.manager) 
+source('data_processing/adult.population.10.23.R') #creates adult population for 2010-2023, stratified data
 
-#7-30: I dont think you need this- i think you need to go back and add more data in for 2020-2023
-#BUT ALSO THIS WOULD NEED TO BE SOURCED IN ADULT.POP BELOW
-# # to put adult.population for 2020-2022
-# put.msa.data.strict.for.stratified.census(locations=MSAS.OF.INTEREST,
-#                                           data.manager = surveillance.manager,
-#                                           census.manager = census.manager)
-
-# Adult population for recent census data ---------------------------------
-
-#Source code that creates adult population for 2020-2023, stratified data
-source('data_processing/adult.population.20.23.R')
-
-
-#7-30: Use default settings for stratifications to get more
-#Put adult population for specific locations
+#7-30: Put adult population for specific locations
 put.msa.data.strict(locations= c(COUNTIES.CONTAINED.IN.LOCATIONS.OF.INTEREST, COUNTIES.FOR.LIMITED.POPULATION.DATA), 
                     contained.geographic.type = "county", #it will look for counties in the regions above
                     #put.stratifications = list ('age', 'sex', 'race', 'ethnicity', c('race', 'ethnicity')), #Use defaults
                     data.manager = surveillance.manager,
                     census.manager = census.manager,
-                    onts.to.ignore = c('stratified.census', 'census.cdc.wonder.population'))   
+                    onts.to.ignore = c('stratified.census', 'census.cdc.wonder.population'))   #August 2024, removing cdc wonder data
 
-# CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST--------
-source('data_processing/dummy.data.frames.R')
+source('data_processing/dummy.data.frames.R') # CREATE NA DATA FRAMES FOR HISTORIC COUNTIES THAT NO LONGER EXIST
 
 ################################################################################
 #Create aggregated outcomes 
