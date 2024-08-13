@@ -4,8 +4,8 @@
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
 ### Load simsets
-load("../jheem_analyses/applications/ehe_disparities/simset_2024-08-08_C.12580.Rdata")
-simset$save()
+#load("../jheem_analyses/applications/ehe_disparities/simset_2024-08-08_C.12580.Rdata")
+#simset$save()
 #simplot(simset, "new", split.by="race")
 
 CALIBRATION.CODE= "full.with.covid2"
@@ -13,13 +13,14 @@ LOCATIONS=c("C.12580") #Baltimore
 INTERVENTIONS=c("noint", "fullint")
 
 #Test full intervention
-x=full.int$run(simset, start.year=2025, end.year=2030, verbose=TRUE) #419 iterations, ~8 iterations per simulation
+x=full.int$run(simset, start.year=2025, end.year=2030, verbose=TRUE)
 
 ### Run a set of interventions and select relevant results
 collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
                                     locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=50)
 
-collection$run(2025, 2035, verbose=TRUE) # stop.for.errors = T to check error messages 
+collection$run(2025, 2035, verbose=TRUE, overwrite.prior=TRUE) # stop.for.errors = T to check error messages
+collection$get.parameters('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier')
 
 results = collection$get(outcomes = c("new", "population"),
                          dimension.values = list(year=2035),
