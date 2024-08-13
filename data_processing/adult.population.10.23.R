@@ -150,7 +150,7 @@ restratify.age.counts <- function(counts,
 
 
 # ESTIMATED DATA ----------------------------------------------------------
-#ESTIMATED DATA: adult.population 2020-2023 by TOTAL
+
 desired.ages.for.census <- c('0-4 years', '5-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
                              '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
                              '75-79 years', '80-84 years', '85+ years')
@@ -162,15 +162,15 @@ race.mappings.to.census = c('White' = 'white',
                             'Native Hawaiian and Other Pacific Islander' = 'asian or pacific islander',
                             'Asian' = 'asian or pacific islander') 
 
-#ESTIMATED DATA: adult.population 2020-2023 by RACE
+#ESTIMATED DATA: adult.population 2010-2023 by RACE
 population.by.race.array = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race
 
 restratify.age.race <- restratify.age.counts(population.by.race.array, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-restratify.adult.pop.race.20.23 = restratify.age.race[ , ,3:17,] #subset by only adult age groups
-adult.pop.race.20.23 = apply(restratify.adult.pop.race.20.23, MARGIN = c("year","location", "race"), sum) #sum the adult age groups to get adult.population for 2020-2023
+restratify.adult.pop.race.10.23 = restratify.age.race[ , ,3:17,] #subset by only adult age groups
+adult.pop.race.10.23 = apply(restratify.adult.pop.race.10.23, MARGIN = c("year","location", "race"), sum) #sum the adult age groups to get adult.population for 2020-2023
 
-adult.pop.race.20.23 <- as.data.frame.table(adult.pop.race.20.23)%>%
+adult.pop.race.10.23 <- as.data.frame.table(adult.pop.race.10.23)%>%
   mutate(value = round(Freq))%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
@@ -179,24 +179,24 @@ adult.pop.race.20.23 <- as.data.frame.table(adult.pop.race.20.23)%>%
   select(-Freq)
 
 #Update for 7-23-24: To align this race data with the current census ontology:
-adult.pop.race.20.23$race = race.mappings.to.census[adult.pop.race.20.23$race]
-adult.pop.race.20.23<- adult.pop.race.20.23 %>%
+adult.pop.race.10.23$race = race.mappings.to.census[adult.pop.race.10.23$race]
+adult.pop.race.10.23<- adult.pop.race.10.23 %>%
   group_by(year, location, race)%>%
   mutate(value.new = sum(value))%>%
   select(-value)%>%
   rename(value = value.new)
-adult.pop.race.20.23<- as.data.frame(adult.pop.race.20.23[!duplicated(adult.pop.race.20.23), ])
+adult.pop.race.10.23<- as.data.frame(adult.pop.race.10.23[!duplicated(adult.pop.race.10.23), ])
 
 
-#ESTIMATED DATA: adult.population 2020-2023 by ETHNICITY
+#ESTIMATED DATA: adult.population 2010-2023 by ETHNICITY
 population.by.ethnicity.array = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity
 
 restratify.age.ethnicity <- restratify.age.counts(population.by.ethnicity.array, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-restratify.adult.pop.ethnicity.20.23 = restratify.age.ethnicity[ , , 3:17,] #subset by only adult age groups
-adult.pop.ethnicity.20.23 = apply(restratify.adult.pop.ethnicity.20.23, MARGIN = c("year","location", "ethnicity"), sum) #sum the adult age groups to get adult.population for 2020-2023
+restratify.adult.pop.ethnicity.10.23 = restratify.age.ethnicity[ , , 3:17,] #subset by only adult age groups
+adult.pop.ethnicity.10.23 = apply(restratify.adult.pop.ethnicity.10.23, MARGIN = c("year","location", "ethnicity"), sum) #sum the adult age groups to get adult.population for 2020-2023
 
-adult.pop.ethnicity.20.23 <- as.data.frame.table(adult.pop.ethnicity.20.23)%>%
+adult.pop.ethnicity.10.23 <- as.data.frame.table(adult.pop.ethnicity.10.23)%>%
   mutate(value = round(Freq))%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
@@ -204,7 +204,7 @@ adult.pop.ethnicity.20.23 <- as.data.frame.table(adult.pop.ethnicity.20.23)%>%
   mutate(ethnicity = as.character(tolower(ethnicity)))%>%
   select(-Freq)
 
-#ESTIMATED DATA: adult.population 2020-2023 by RACE+ETHNICITY
+#ESTIMATED DATA: adult.population 2010-2023 by RACE+ETHNICITY
 
 array.race.eth = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity
 
@@ -234,7 +234,7 @@ fixed.race.eth<- fixed.race.eth %>%
 
 fixed.race.eth<- as.data.frame(fixed.race.eth[!duplicated(fixed.race.eth), ])
 
-#ESTIMATED DATA: adult.population 2020-2023 by RACE+ETHNICITY+AGE
+#ESTIMATED DATA: adult.population 2010-2023 by RACE+ETHNICITY+AGE
 array.race.eth.age = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity
 
 restratify.race.eth.age <- restratify.age.counts(array.race.eth.age, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
@@ -266,7 +266,7 @@ fixed.race.eth.age<- fixed.race.eth.age %>%
 fixed.race.eth.age<- as.data.frame(fixed.race.eth.age[!duplicated(fixed.race.eth.age), ])
 
 
-# Race+Ethnicity+Sex --------------------------------------------------
+# Race+Ethnicity+Sex 2010-2023--------------------------------------------------
 array.race.eth.sex = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex
 
 restratify.race.eth.sex <- restratify.age.counts(array.race.eth.sex, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
@@ -300,8 +300,8 @@ estimated.adult.pop.stratified.put = list(
   #adult.pop.total.20.23,
   #adult.pop.sex.20.23,
   #adult.pop.age.20.23,
-  adult.pop.race.20.23, #race only
-  adult.pop.ethnicity.20.23, #eth only
+  adult.pop.race.10.23, #race only
+  adult.pop.ethnicity.10.23, #eth only
   fixed.race.eth, #race+eth
   fixed.race.eth.age, #this is race +eth+age
   fixed.race.eth.sex) #this is race+eth+sex 
@@ -408,7 +408,7 @@ for (data in adult.pop.by.single.year.age) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
-
+###############################################################################
 
 # Age Stratified Data by Group for 2010-2019 (where only grouped data is available) --------
 
