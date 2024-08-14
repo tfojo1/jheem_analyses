@@ -2,6 +2,7 @@
 library(jheem2)
 library(locations)
 library(tidyverse)
+library(readxl)
 
 # Create Syphilis Manager -------------------------------------------------
 
@@ -187,6 +188,24 @@ data.manager$register.outcome(
     units = '%',
     description = "HIV Viral Suppression"), denominator.outcome = 'diagnosed.prevalence')
 
+data.manager$register.outcome(
+  'prep', 
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Prescribed PrEP',
+    axis.name = 'Number Prescribed PrEP',
+    units = 'cases',
+    description = "Number Prescribed PrEP"))
+
+data.manager$register.outcome(
+  'prep.indications', 
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'PrEP Indications',
+    axis.name = 'Number with PrEP Indications',
+    units = 'cases',
+    description = "Estimated Number of Persons with PrEP Indications"))
+
 
 # Create Sources + Parent Sources -----------------------------------------
 
@@ -195,6 +214,9 @@ data.manager$register.parent.source('ACS', full.name = 'American Community Surve
 data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS")
 data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS")
+data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
+data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
+
 
 ##Register Data Sources ('children')
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
@@ -202,6 +224,11 @@ data.manager$register.source('cdc.sdh', parent.source= "ACS", full.name = "Atlas
 data.manager$register.source('cdc.rural', parent.source= "census", full.name = "Atlas Plus Rural Area Data", short.name='cdc.rural')
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('cdc.hiv', parent.source= "NHSS", full.name = "CDC HIV Outcomes Data", short.name='cdc.hiv')
+data.manager$register.source('aidsvu', parent.source= "IQVIA", full.name = "AIDS Vu", short.name='aidsvu')
+data.manager$register.source('cdc.prep', parent.source= "IQVIA", full.name = "CDC PrEP Data", short.name='cdc.prep')
+data.manager$register.source('cdc.prep.indications', parent.source= "NHANES", full.name = "CDC PrEP Indications Data", short.name='cdc.prep.indications')
+
 
 
 # Establish Ontologies ----------------------------------------------------
@@ -244,15 +271,45 @@ data.manager$register.ontology(
     sex=c('male','female')
   ))
 
+data.manager$register.ontology(
+  'cdc',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+data.manager$register.ontology(
+  'cdc.new',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
+data.manager$register.ontology(
+  'aidsvu',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    race=c('black', 'hispanic', 'white'),
+    sex=c('male','female')
+    
+  ))
 
 # Source Data Cleaning and Processing Files -------------------------------
 
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
 source('data_processing/syphilis.manager/syphilis.data.R')
-source('data_processing/syphilis.manager/cached.hiv.data.R')
+source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.data.R')
 source('data_processing/syphilis.manager/cached.census.data.R')
-##Add PrEP##
-
+source('data_processing/syphilis.manager/prep.data.R')
 
 # RENAME ------------------------------------------------------------------
 
@@ -284,6 +341,63 @@ put.msa.data.as.new.source(outcome = 'early.syphilis',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'hiv.diagnosed.prevalence',
+                           from.source.name = 'cdc.hiv',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'hiv.diagnoses',
+                           from.source.name = 'cdc.hiv',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'prep',
+                           from.source.name = 'cdc.prep',
+                           to.source.name = 'prep.cdc.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'prep',
+                           from.source.name = 'aidsvu',
+                           to.source.name = 'prep.aidsvu.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'prep.indications',
+                           from.source.name = 'cdc.prep.indications',
+                           to.source.name = 'prep.indications.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'hiv.suppression',
+                           from.source.name= 'cdc.hiv',
+                           to.source.name = 'cdc.aggregated.proportion',
+                           to.locations = MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager= surveillance.manager,
+                           source.for.denominator= 'cdc.hiv',
+                           ontology.for.denominator= 'cdc') 
+
 
 # SAVE SYPHILIS.MANAGER ---------------------------------------------------
 save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
