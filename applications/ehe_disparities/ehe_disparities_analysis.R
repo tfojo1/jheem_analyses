@@ -13,15 +13,14 @@ LOCATIONS=c("C.12580") #Baltimore
 INTERVENTIONS=c("noint", "fullint")
 
 #Test full intervention
-x=full.int$run(simset, start.year=2025, end.year=2030, verbose=TRUE)
+#x=full.int$run(simset, start.year=2025, end.year=2030, verbose=TRUE)
 
 ### Run a set of interventions and select relevant results
 collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
                                     locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=50)
 
-collection$run(2025, 2035, verbose=TRUE) # stop.for.errors = T to check error messages
+collection$run(2025, 2035, verbose=TRUE) # stop.for.errors = T, overwrite.prior=T
 collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'))
-
 
 results = collection$get(outcomes = c("new", "population"),
                          dimension.values = list(year=2035),
