@@ -10,17 +10,8 @@ population.total = as.data.frame.table(census.manager$data$population$estimate$c
   mutate(value = as.numeric(value))%>%
   mutate(outcome = "population")
 
-#Age 2020-2023
+#Age 2020-2023 (SINGLE YEAR)
 population.age.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)%>%
-  rename(value = Freq)%>%
-  mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))%>%
-  mutate(value = as.numeric(value))%>%
-  mutate(age = as.character(age))%>%
-  mutate(outcome = "population")
-
-#Age 2010-2019
-population.age.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age)%>%
   rename(value = Freq)%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
@@ -69,7 +60,6 @@ population.race<- as.data.frame(population.race[!duplicated(population.race), ])
 population.data.list = list(
   population.total,
   population.age.20.23,
-  population.age.10.19,
   population.sex.20.23,
   population.sex.10.19,
   population.race
@@ -88,3 +78,24 @@ for (data in population.data.list) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
+
+# Putting this separately with a different ontology -----------------------
+
+#Age 2010-2019 (AGE GROUP)
+population.age.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(outcome = "population")
+
+data.manager$put.long.form(
+  data = population.age.10.19,
+  ontology.name = 'stratified.census', 
+  source = 'census.population', 
+  dimension.values = list(),
+  url = 'www.census.gov',
+  details = 'Census Reporting')
+
+

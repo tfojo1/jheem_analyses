@@ -303,6 +303,18 @@ data.manager$register.ontology(
     
   ))
 
+data.manager$register.ontology(
+  'stratified.census',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('0-4 years', '5-9 years', '10-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+          '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
+          '75-79 years', '80-84 years', '85+ years'),
+    race=c('White', 'Black', 'Asian', 'American Indian and Alaska Native', 'Native Hawaiian and Other Pacific Islander'),
+    ethnicity=c('Hispanic', 'Not Hispanic'),
+    sex=c('male','female')
+  ))
 # Source Data Cleaning and Processing Files -------------------------------
 
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
@@ -397,6 +409,26 @@ put.msa.data.as.new.source(outcome = 'hiv.suppression',
                            data.manager= surveillance.manager,
                            source.for.denominator= 'cdc.hiv',
                            ontology.for.denominator= 'cdc') 
+
+all.states = locations::get.all.for.type('state')
+#Aggregates census
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'census.population',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  all.states,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'STATE',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'adult.population',
+                           from.source.name = 'census.population',
+                           to.source.name = 'census.aggregated.adult.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
 
 
 # SAVE SYPHILIS.MANAGER ---------------------------------------------------
