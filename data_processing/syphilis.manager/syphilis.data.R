@@ -1,5 +1,5 @@
 
-#  Syphilis (State 2000-2022) -----------------------------------
+#  Syphilis (2000-2022) -----------------------------------
 DATA.DIR.SYPHILIS="../../data_raw/syphilis.manager/syphilis"
 syphilis_files <- Sys.glob(paste0(DATA.DIR.SYPHILIS, '/*.csv'))
 syphilis.data <- lapply(syphilis_files, function(x){
