@@ -177,7 +177,7 @@ data.manager$register.outcome(
     display.name = 'Engagement in Care',
     axis.name = 'Proportion of Engaged in Care',
     units = '%',
-    description = "Engagement in  HIV medical care"), denominator.outcome = 'diagnosed.prevalence')
+    description = "Engagement in  HIV medical care"), denominator.outcome = 'hiv.diagnosed.prevalence')
 
 data.manager$register.outcome(
   'hiv.suppression', 
@@ -186,7 +186,7 @@ data.manager$register.outcome(
     display.name = 'Viral Suppression',
     axis.name = 'Proportion Virally Suppressed',
     units = '%',
-    description = "HIV Viral Suppression"), denominator.outcome = 'diagnosed.prevalence')
+    description = "HIV Viral Suppression"), denominator.outcome = 'hiv.diagnosed.prevalence')
 
 data.manager$register.outcome(
   'prep', 
@@ -228,6 +228,14 @@ data.manager$register.source('cdc.hiv', parent.source= "NHSS", full.name = "CDC 
 data.manager$register.source('aidsvu', parent.source= "IQVIA", full.name = "AIDS Vu", short.name='aidsvu')
 data.manager$register.source('cdc.prep', parent.source= "IQVIA", full.name = "CDC PrEP Data", short.name='cdc.prep')
 data.manager$register.source('cdc.prep.indications', parent.source= "NHANES", full.name = "CDC PrEP Indications Data", short.name='cdc.prep.indications')
+
+
+#Creating these separately bc they have separate parent sources
+data.manager$register.source('prep.aidsvu.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP AIDS Vu Aggregated County', short.name = 'prep aidsvu aggd county') #For aggregated prep data from AIDS Vu
+data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP CDC Aggregated County', short.name = 'prep cdc aggd county') #For aggregated prep data from Atlas Plus (CDC)
+data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
+data.manager$register.source('census.aggregated.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
 
 
 
@@ -319,7 +327,7 @@ data.manager$register.ontology(
 
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
 source('data_processing/syphilis.manager/syphilis.data.R')
-source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.data.R')
+source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/prep.data.R')
 
@@ -361,7 +369,7 @@ put.msa.data.as.new.source(outcome = 'hiv.diagnosed.prevalence',
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+                           data.manager = syphilis.manager )
 
 put.msa.data.as.new.source(outcome = 'hiv.diagnoses',
                            from.source.name = 'cdc.hiv',
@@ -370,7 +378,7 @@ put.msa.data.as.new.source(outcome = 'hiv.diagnoses',
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+                           data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prep',
                            from.source.name = 'cdc.prep',
@@ -379,7 +387,7 @@ put.msa.data.as.new.source(outcome = 'prep',
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+                           data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prep',
                            from.source.name = 'aidsvu',
@@ -388,7 +396,7 @@ put.msa.data.as.new.source(outcome = 'prep',
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+                           data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prep.indications',
                            from.source.name = 'cdc.prep.indications',
@@ -397,7 +405,7 @@ put.msa.data.as.new.source(outcome = 'prep.indications',
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+                           data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'hiv.suppression',
                            from.source.name= 'cdc.hiv',
@@ -406,29 +414,29 @@ put.msa.data.as.new.source(outcome = 'hiv.suppression',
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager= surveillance.manager,
+                           data.manager= syphilis.manager,
                            source.for.denominator= 'cdc.hiv',
                            ontology.for.denominator= 'cdc') 
 
 all.states = locations::get.all.for.type('state')
 #Aggregates census
-put.msa.data.as.new.source(outcome = 'adult.population',
+put.msa.data.as.new.source(outcome = 'population',
                            from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
+                           to.source.name = 'census.aggregated.population',
                            to.locations =  all.states,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'STATE',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+                           data.manager = syphilis.manager)
 
-put.msa.data.as.new.source(outcome = 'adult.population',
+put.msa.data.as.new.source(outcome = 'population',
                            from.source.name = 'census.population',
-                           to.source.name = 'census.aggregated.adult.population',
+                           to.source.name = 'census.aggregated.population',
                            to.locations =  MSAS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+                           data.manager = syphilis.manager)
 
 
 # SAVE SYPHILIS.MANAGER ---------------------------------------------------
