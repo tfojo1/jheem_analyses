@@ -2,7 +2,7 @@
 #Load the census manager to get population data that is clean and processed
 census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
 
-#original source=census.population; original ontology=census
+#Population total 1970-2023
 population.total = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location)%>%
   rename(value = Freq)%>%
   mutate(year = as.character(year))%>%
@@ -10,7 +10,8 @@ population.total = as.data.frame.table(census.manager$data$population$estimate$c
   mutate(value = as.numeric(value))%>%
   mutate(outcome = "population")
 
-population.age = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)%>%
+#Age 2020-2023
+population.age.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)%>%
   rename(value = Freq)%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
@@ -18,16 +19,34 @@ population.age = as.data.frame.table(census.manager$data$population$estimate$cen
   mutate(age = as.character(age))%>%
   mutate(outcome = "population")
 
-population.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__sex)%>%
+#Age 2010-2019
+population.age.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(outcome = "population")
+
+#Sex 2010-19
+population.sex.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__sex)%>%
   rename(value = Freq)%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
   mutate(sex = as.character(sex))%>%
   mutate(outcome = "population")
-  
 
-#original source=census.population; original ontology= stratified.census
+#Sex 2020-23
+population.sex.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__sex)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(outcome = "population")
+
+#Race 2010-2023
 population.race = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__race)%>%
                 rename(value = Freq)%>%
                 mutate(race = tolower(race))%>%
@@ -45,12 +64,17 @@ population.race = as.data.frame.table(census.manager$data$population$estimate$ce
   
 
 population.race<- as.data.frame(population.race[!duplicated(population.race), ])
-    
+
+#Combine
 population.data.list = list(
   population.total,
-  population.age,
-  population.sex,
-  population.race)
+  population.age.20.23,
+  population.age.10.19,
+  population.sex.20.23,
+  population.sex.10.19,
+  population.race
+  
+)
 
 # Put from census into syphilis.manager -----------------------------------
 
@@ -64,9 +88,3 @@ for (data in population.data.list) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
-
-
-
-#######THIS ONLY PUTS STRATIFIED POPULATION FOR 2020-2023- SO YOU NEED TO ADD IN
-####2005-2017, 2018-2019 BUT BECAUSE YOU MIGHT HAVE TO REDO POPULATION
-##WAIT TO SEE WHAT TODD WANTS BC THIS WILL CHANGE HOW YOU PULL THIS
