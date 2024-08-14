@@ -20,7 +20,11 @@ collection=create.simset.collection(version="ehe", calibration.code = CALIBRATIO
                                     locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=50)
 
 collection$run(2025, 2035, verbose=TRUE) # stop.for.errors = T, overwrite.prior=T
-collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'))
+
+#Examine parameter distributions
+collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'individual.simulations')
+collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'mean.and.interval')
+collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'median.and.interval')
 
 results = collection$get(outcomes = c("new", "population"),
                          dimension.values = list(year=2035),
