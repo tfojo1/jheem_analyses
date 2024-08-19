@@ -42,40 +42,34 @@ gonorrhea.ratios = lapply(gc.data.for.ratios, function(file){
       group_by(location)%>%
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
-      filter(!is.na(year.over.year))%>% #Remove rows without a year over year value (so 2018 bc it's the first year)
+      #filter(!is.na(year.over.year))%>% #Remove rows without a year over year value (so 2018 bc it's the first year)
       select(location, year, year.over.year)%>%
       rename(value = year.over.year) #Need to figure out how to handle years that have zero cases bc calculation is 10/0 which returns 'inf'
   }
   
   if(grepl("sex", filename)) {
     data<- data%>%
-      filter(!is.na(value))%>% #because this is so stratified there are certain rows where value = NA bc the 'data is not available'
       group_by(location, sex)%>%
       arrange(year, .by_group = T)%>%
-      mutate(year.over.year=value/lag(value,1)) %>%
-      filter(!is.na(year.over.year))%>% 
+      mutate(year.over.year=value/lag(value,1))%>%
       select(location, year, sex, year.over.year)%>%
       rename(value = year.over.year) #Need to figure out how to handle years that have zero cases bc calculation is 10/0 which returns 'inf'
   }
   
   if(grepl("race", filename)) { 
     data<- data %>%
-      filter(!is.na(value))%>% 
       group_by(location, race)%>%
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
-      filter(!is.na(year.over.year))%>% 
       select(location, year, race, year.over.year)%>%
       rename(value = year.over.year) 
   }
   
   if(grepl("age", filename)) { 
     data<-data %>%
-      filter(!is.na(value))%>% 
       group_by(location, age)%>%
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
-      filter(!is.na(year.over.year))%>% 
       select(location, year, age, year.over.year)%>%
       rename(value = year.over.year) 
   }
@@ -149,40 +143,33 @@ syphilis.ratios = lapply(syph.data.for.ratios, function(file){
       group_by(location)%>%
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
-      filter(!is.na(year.over.year))%>% #Remove rows without a year over year value (so 2018 bc it's the first year)
       select(location, year, year.over.year)%>%
       rename(value = year.over.year) #Need to figure out how to handle years that have zero cases bc calculation is 10/0 which returns 'inf'
   }
   
   if(grepl("sex", filename)) {
     data<- data%>%
-      filter(!is.na(value))%>% #because this is so stratified there are certain rows where value = NA bc the 'data is not available'
       group_by(location, sex)%>%
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
-      filter(!is.na(year.over.year))%>% 
       select(location, year, sex, year.over.year)%>%
       rename(value = year.over.year) #Need to figure out how to handle years that have zero cases bc calculation is 10/0 which returns 'inf'
   }
   
   if(grepl("race", filename)) { 
     data<- data %>%
-      filter(!is.na(value))%>% 
       group_by(location, race)%>%
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
-      filter(!is.na(year.over.year))%>% 
       select(location, year, race, year.over.year)%>%
       rename(value = year.over.year) 
   }
   
   if(grepl("age", filename)) { 
     data<-data %>%
-      filter(!is.na(value))%>% 
       group_by(location, age)%>%
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
-      filter(!is.na(year.over.year))%>% 
       select(location, year, age, year.over.year)%>%
       rename(value = year.over.year) 
   }
