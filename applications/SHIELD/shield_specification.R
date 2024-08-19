@@ -1,3 +1,15 @@
+# think about the statistics that we want to record
+# proportionof people aware of diagnosis 
+# proportion loving with diag and not track.integrated.outcome(prevalece of syphilis 
+#                                                              )
+# we want to take the average of two timesteps i
+# 
+# data on testing/screening
+# screening based on HIV --- 
+# break down diagnosis to screening to sphmptamatoc testing rate   
+
+#@Todd: how to remove all the warnings 
+
 # > specification.metadata=get.specification.metadata("shield","US") 
 ##############################
 # Source supporting files
@@ -30,8 +42,8 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                     # helps to define specifications for groups of compartments later on 
                                                     diagnosed.treated.states=c('diagnosed.treated'),
                                                     
-                                                    ps.states=c('ps'),
-                                                    el.states=c('el'),
+                                                    ps.stages=c('ps'),
+                                                    el.stages=c('el'),
                                                     late.stages=c('ll','ter')
                                                   )
 )
@@ -277,39 +289,124 @@ register.transition(SHIELD.SPECIFICATION,
                     value = expression(1/duration.ll))
 
 ##---------------------------##
-##-- Dynamic outputs --##
+##--         OUTPUTS.      --##
 ##---------------------------##
+# The model reports 2 categories of outcomes: 
+# 1-cumulative outcomes, reported between jan1 to dec31) 
+# 2-point estimates of compartment sizes reported in Jan 1st 
+
+# The model projects the size of infected.uninfected population by default in Jan 1st of each year
+
+# For calibration purposes, we fit these estiamtes agains CDC, but it's unclear if CDC data represents Jan 1st or another time during the year (e.g., HIV prevalence, prop suppressed)
+# Because of this, we generally calculate the average value between Jan 1st and Dec 31st of each year and report that as the annual output 
+
+# !!!for dynamic transitions that change over time (e.g., testing), the anchor points are coded at the begginign of the year (e.g., if transmission changes from 2000 to 2020, these dates represent jan 1st of those years)
+
 #Dynamic outputs: (in addition to compartment size)
 # track.dynamic.outcome: a more general definition, calculated at each step of solver (mortality birth etc)
 # track.transition: people move from one compartment to another #tracking transitions along one dimension (e.g., continuum)
 
+
+## All Diagnosis (at all stages ): has 2 components
+ ### 1st component:new diagnosis that dont receive treatment immediately (transition)
 track.transition(SHIELD.SPECIFICATION, 
-                 name = 'new.diag.untrt.ps',
+                 name = 'diag.untreated',
                  #display name on the graph
-                 outcome.metadata = create.outcome.metadata(display.name = 'New Diagnoses: Delayed Treatment',
-                                                            description = "Number of Individuals with a New Diagnosis of Primary-Secondary Syphilis that dont Start Treatment Immediately in the Past Year",
+                 outcome.metadata = create.outcome.metadata(display.name = 'Diagnoses: Delayed Treatment',
+                                                            description = "Number of Individuals with a New Diagnosis of Syphilis that dont Start Treatment Immediately in the Past Year",
                                                             scale = 'non.negative.number',
                                                             axis.name = 'Cases',
                                                             units = 'cases',
                                                             singular.unit = 'case'),
                  dimension = 'continuum',#transition along the continuum
-                 subset.dimension.values = list(stage='ps'),
                  from.compartments = 'undiagnosed',
                  to.compartments = 'diagnosed.untreated',
-                 keep.dimensions = c('age','race','sex'),
-                 corresponding.data.outcome = 'diagnoses'# a helper for simplot to add survillance data 
+                 keep.dimensions = c('location','age','race','sex','stage')
 )
-# @Todd: how to record number of diagnosis that receive treatment immediately?
-# track.dynamic.outcome(SHIELD.SPECIFICATION,
-#                       name = 'new.diag.trt.ps',
-#                       outcome.metadata = create.outcome.metadata(display.name = 'New Diagnoses: Immediate Treatment',
-#                                                                  description = "Number of Individuals with a New Diagnosis of Primary-Secondary Syphilis that Start Treatment Immediately in the Past Year",
-#                                                                  scale = 'non.negative.number',
-#                                                                  axis.name = 'Cases',
-#                                                                  units = 'cases',
-#                                                                  singular.unit = 'case'),
-#                       dynamic.quantity.name = ,
-#                       keep.dimensions = c('location','age','race','sex'))
+#2 components: new diagnosis that receive treatment immediately (remission)
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'diag.treated',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Diagnoses: Immediate Treatment',
+                                                                 description = "Number of Individuals with a New Diagnosis of Syphilis that Start Treatment Immediately in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      dynamic.quantity.name = "remission.from", #where they come from 
+                      subset.dimension.values = list(continuum='undiagnosed'), #only counting those who receive immediata trt
+                      keep.dimensions = c('location','age','race','sex','stage')
+                      )
+
+#Total diagnosis
+#We usually try to outline the outcomes here with the final outcomes we need for calibrations: so we break them by stage
+## primarySecondary
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = "diag.ps",
+                         value = expression(diag.untreated + diag.treated),
+                         subset.dimension.values = list(stage='ps.stages'),
+                         outcome.metadata = create.outcome.metadata(display.name = 'Diagnoses PS',
+                                                                    description = "Number of Individuals with a Diagnosis of Primary-Secondary Syphilis in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'ps.syphilis' #corresponding to the name in data manager
+                         )
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = "diag.el",
+                         value = expression(diag.untreated + diag.treated),
+                         subset.dimension.values = list(stage='el.stages'),
+                         outcome.metadata = create.outcome.metadata(display.name = 'Diagnoses EL',
+                                                                    description = "Number of Individuals with a Diagnosis of Early Latent Syphilis in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'el.syphilis' #corresponding to the name in data manager
+)
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = "diag.late",
+                         value = expression(diag.untreated + diag.treated),
+                         subset.dimension.values = list(stage='late.stages'),
+                         outcome.metadata = create.outcome.metadata(display.name = 'Diagnoses Late',
+                                                                    description = "Number of Individuals with a Diagnosis of Late Latent & Teritiary Syphilis in the Past Year",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis' #corresponding to the name in data manager
+)
+##########################
+# Incidence (new infections + reinfections)
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'incidence',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Incidence',
+                                                                 description = "Number of Individuals Infected with Syphilis in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      dynamic.quantity.name = 'incidence.from', # use of ".from" helps us track where individuals are coming from (differentiate new vs re-infections)
+                      keep.dimensions = c('location','age','race','sex','profile')
+)
+##########################
+# New Treatment Initiations: Immediate and Delayed
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'trt.initiation',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Treatment Initiation',
+                                                                 description = "Number of Individuals Starting Treatment in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      dynamic.quantity.name = "remission.from", #where they come from 
+                      keep.dimensions = c('location','age','race','sex','stage')
+)
+
+
 
 ##--------------------------------##
 ##--------------------------------##

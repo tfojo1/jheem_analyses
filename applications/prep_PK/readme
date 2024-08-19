@@ -3,11 +3,11 @@ analysis: run and analyze the results
 
 
 steps to run JHEEM run first_time setup 
-open a chached folder > populate with data 
+open a cached folder > populate with data 
 test > test engine 
 
 ##############################
-# Transmission vs Transission vs Remission: 
+# Transmission vs Transition vs Remission: 
 Uninfected to Infected -> transmission 
 Infected to Infected, or Uninfected to Uninfected -> transition
 Infected to Uninfected -> remission
