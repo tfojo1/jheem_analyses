@@ -420,23 +420,26 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     # Testing by Risk
     
+    proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    
     risk.proportion.tested.or = Multivariate.Lognormal.Distribution(
-        mu = rep(0, 4),
-        sigma = create.compound.symmetry.covariance.matrix(0.5, 4, 0.5*log(2)),
-        var.names = paste0(c('heterosexual','msm','idu','msm.idu'), '.proportion.tested.or')
+        mu = rep(0, 3),
+        sigma = create.compound.symmetry.covariance.matrix(0.5, 3, 0.5*log(1.5)),
+        var.names = paste0(c('heterosexual','idu','msm.idu'), '.proportion.tested.or')
     ),
     
     risk.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
-      mu = rep(0, 4),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 4, 0.5*log(2)/10),
-      var.names = paste0(c('heterosexual','msm','idu','msm.idu'), '.proportion.tested.slope.or')
+      mu = rep(0, 3),
+      sigma = create.compound.symmetry.covariance.matrix(0.5, 3, 0.5*log(1.5)/10),
+      var.names = paste0(c('heterosexual','idu','msm.idu'), '.proportion.tested.slope.or')
     ),
     
     # Testing by Race
     
     race.proportion.tested.or = Multivariate.Lognormal.Distribution(
       mu = rep(0, 2),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 2, 0.5*log(2)),
+      sigma = create.compound.symmetry.covariance.matrix(0.5, 2, 0.5*log(1.5)),
       var.names = paste0(c('black','hispanic'), ".proportion.tested.or")
     ),
     
@@ -1107,9 +1110,9 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     ),
 
 #-- TESTING --#
-    msm.testing = c(
-      'msm.proportion.tested.or',
-      'msm.proportion.tested.slope.or',
+    overall.testing = c(
+      'proportion.tested.or',
+      'proportion.tested.slope.or',
       'msm.undiagnosed.testing.increase.rr'
     ),
     

@@ -157,7 +157,20 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                    parameter.suffixes = c(intercept='.proportion.tested.or', slope='.proportion.tested.slope.or'),
                                    idu.applies.to.in.remission = F,
                                    throw.error.if.no.parameters = F)
-
+    
+    set.element.functional.form.main.effect.alphas(model.settings = model.settings,
+                                                   element.name = 'general.population.testing.without.covid',
+                                                   alpha.name = 'intercept',
+                                                   values = parameters['proportion.tested.or'],
+                                                   applies.to.dimension.values = 'all',
+                                                   dimension = 'all')
+    
+    set.element.functional.form.main.effect.alphas(model.settings = model.settings,
+                                                   element.name = 'general.population.testing.without.covid',
+                                                   alpha.name = 'slope',
+                                                   values = parameters['proportion.tested.slope.or'],
+                                                   applies.to.dimension.values = 'all',
+                                                   dimension = 'all')
 
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = 'testing.ramp.rr',
