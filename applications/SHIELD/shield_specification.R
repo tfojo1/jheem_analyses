@@ -1,12 +1,12 @@
-# think about the statistics that we want to record
-# proportionof people aware of diagnosis 
-# proportion loving with diag and not track.integrated.outcome(prevalece of syphilis 
-#                                                              )
-# we want to take the average of two timesteps i
-# 
-# data on testing/screening
-# screening based on HIV --- 
-# break down diagnosis to screening to sphmptamatoc testing rate   
+# TBD:
+  # think about the statistics that we want to record: we will record their average between Jan 1 and Dec 31
+  # proportion of people aware of diagnosis ?
+  # proportion loving with diag and not track.integrated.outcome(prevalece of syphilis)?
+ 
+# Deviding diagnosis into 2 mechanism: 
+# 1-screening: for alls tates, can be estiamted based on HIV screening
+# 2- sympthomatic testing: PS states only
+
 
 #@Todd: how to remove all the warnings 
 
