@@ -736,12 +736,22 @@ get.location.birth.rates <- function(location,
     births = apply(births, c('race','ethnicity'), sum, na.rm=T)
     
     # Pull population into an array
-    # I imagine this should be indexed [year, county, race, ethnicity] - not necessarily in that order
-    population=SURVEILLANCE.MANAGER$pull(outcome = 'adult.population', location = location, year= years, keep.dimensions = c('race', 'ethnicity'), na.rm=TRUE)[,,1]
-    
+    population = CENSUS.MANAGER$pull(outcome = 'population', 
+                                         location = counties, 
+                                         year = years, 
+                                         keep.dimensions = c('age', 'race', 'ethnicity', 'sex'), 
+                                         from.ontology.names = 'census',
+                                         na.rm=TRUE)
     if (is.null(population))
-        stop(paste0("Cannot get.location.birth.rates() - no 'adult.population' data are available in the SURVEILLANCE.MANAGER for location '", location, "' (",
+        stop(paste0("Cannot get.location.birth.rates() - no 'population' data are available in the SURVEILLANCE.MANAGER for location '", location, "' (",
                     locations::get.location.name(location), ")"))
+    
+    
+    parsed.pop.ages = parse.age.strata.names(dimnames(population)$age)
+    pop.age.mask = parsed.pop.ages$lower >= specification.metadata$age.lower.bounds[1] &
+      parsed.pop.ages$upper <= specification.metadata$age.upper.bounds[specification.metadata$n.ages]
+    population = apply(population[pop.age.mask,,,,], c('race','ethnicity'), sum)
+    
     
     # Map the ontologies
     target.dim.names = specification.metadata$dim.names[c('race')]
