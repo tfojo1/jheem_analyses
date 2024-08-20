@@ -1,3 +1,5 @@
+# PK: This is the current verion
+
 # TBD:
   # think about the statistics that we want to record: we will record their average between Jan 1 and Dec 31
   # proportion of people aware of diagnosis ?
@@ -430,3 +432,4 @@ register.model.specification(SHIELD.SPECIFICATION)
 #                                            join.with.previous.version = F)
 
 
+print("SHIELD specification sourced successfully!")
