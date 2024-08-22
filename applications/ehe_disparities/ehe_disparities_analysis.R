@@ -4,9 +4,12 @@
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
 ### Load simsets
-#load("../jheem_analyses/applications/ehe_disparities/simset_2024-08-08_C.12580.Rdata")
-#simset$save()
+load("../jheem_analyses/applications/ehe_disparities/simset_2024-08-08_C.12580.Rdata")
+simset$save()
 #simplot(simset, "new", split.by="race")
+
+#simset$get(outcomes = "awareness")
+#SURVEILLANCE.MANAGER$data$awareness$estimate$cdc.hiv$cdc$year__location[,"MD"]
 
 CALIBRATION.CODE= "full.with.covid2"
 LOCATIONS=c("C.12580") #Baltimore
@@ -19,12 +22,20 @@ INTERVENTIONS=c("noint", "fullint")
 collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
                                     locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=50)
 
-collection$run(2025, 2035, verbose=TRUE) # stop.for.errors = T, overwrite.prior=T
+collection$run(2025, 2035, verbose=TRUE, overwrite.prior=T) # stop.for.errors = T, overwrite.prior=T
 
 #Examine parameter distributions
-collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'individual.simulations')
+x <- collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'individual.simulations')
 collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'mean.and.interval')
 collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'median.and.interval')
+
+apply(x, 1, median)
+x
+dim(x)
+apply(x, c(1,4), median)
+apply(x, c(1,4), quantile, probs=0.025)
+apply(x[,,,2], 1, quantile, probs=0.025)
+apply(x[,,,2], 1, quantile, probs=0.975)
 
 results = collection$get(outcomes = c("new", "population"),
                          dimension.values = list(year=2035),

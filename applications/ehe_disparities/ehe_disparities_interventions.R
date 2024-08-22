@@ -46,34 +46,43 @@ base.intervention = create.intervention(WHOLE.POPULATION,
                                         prep.increase)
 
 #Specify criteria for checking whether the joint intervention met the EHE targets in 2030
+ # testing.criterion = create.monotonic.criterion(parameter.name = 'testing.multiplier',
+ #                                               outcome = 'testing',
+ #                                               parameter.scale = 'ratio',
+ #                                               parameter.initial.value = 4,
+ #                                               target.value = .951, #.95
+ #                                               min.acceptable.value = .95,
+ #                                               max.acceptable.value = .96,
+ #                                               dimension.values=list(year='2030'))
+
 testing.criterion = create.monotonic.criterion(parameter.name = 'testing.multiplier',
-                                               outcome = 'testing',
+                                               outcome = 'awareness', #percent aware of status
                                                parameter.scale = 'ratio',
-                                               parameter.initial.value = 4,
-                                               target.value = .951, #.95
-                                               min.acceptable.value = .95,
+                                               parameter.initial.value = 2,
+                                               target.value = .95, #.95
+                                               min.acceptable.value = .94,
                                                max.acceptable.value = .96,
                                                dimension.values=list(year='2030'))
 suppression.criterion = create.monotonic.criterion(parameter.name = 'unsuppressed.multiplier',
                                                    outcome = 'suppression',
                                                    parameter.scale = 'complementary.proportion',
                                                    parameter.initial.value = .5,
-                                                   target.value = .951, #.955
-                                                   min.acceptable.value = .95,
-                                                   max.acceptable.value = .96,
+                                                   target.value = .9025, #95% of 95%
+                                                   min.acceptable.value = .9,
+                                                   max.acceptable.value = .905,
                                                    dimension.values=list(year='2030'))
 prep.criterion = create.monotonic.criterion(parameter.name = 'uninitiated.multiplier',
-                                            outcome = 'prep.uptake.proportion',
+                                            outcome = 'prep.uptake.proportion', #percent prescribed PrEP or enrolled in a PrEP program
                                             parameter.scale = 'complementary.proportion',
                                             parameter.initial.value = .5,
-                                            target.value = .51, #.52
-                                            min.acceptable.value = .5,
-                                            max.acceptable.value = .55,
+                                            target.value = .5, #.52
+                                            min.acceptable.value = .49,
+                                            max.acceptable.value = .51,
                                             dimension.values=list(year='2030'))
 
 
 #Create full criteria-based intervention
-full.int = create.monotonic.criteria.based.intervention (base.intervention = base.intervention, #base.intervention,
+full.int = create.monotonic.criteria.based.intervention (base.intervention = base.intervention,
                                                          completion.criteria = list(testing.criterion,
                                                                                     suppression.criterion,
                                                                                     prep.criterion),
