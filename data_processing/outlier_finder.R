@@ -2,7 +2,7 @@
 # outcome: 'diagnosed.prevalence'
 # data.manager: SURVEILLANCE.MANAGER
 # locations: 'MSAS.OF.INTEREST'
-# stratifications: something like list('sex', c('age', 'sex'), 'race') etc.
+# stratifications: something like list(character(0), 'sex', c('age', 'sex'), 'race') etc.
 # adjudication.data.frame: an optional data frame that describes values you will say keep or don't keep on. Has columns year, location, source, ontology, and another column per additional dimension in 'stratification.dimensions'. The last column should be "adjudication" and contain 'T' for keeping a row, 'F' for retaining a row, and NA for undecided rows.
 # phi: a percent change from one year to another that does not depend on how many years apart the data points are from
 # theta: a multiplier that produces a percent change based on how many years apart two samples are. The maximum allowed percent change uses phi + (1 + theta)^(year difference) - 1.
@@ -38,8 +38,6 @@ run.outlier.process = function(outcome, stratifications=list(), data.manager = g
 }
 
 
-
-
 #### ALL BELOW ARE HELPERS ####
 remove.outliers = function(outcome, stratifications, data.manager, adjudication.data.frame) {
     
@@ -50,12 +48,12 @@ remove.outliers = function(outcome, stratifications, data.manager, adjudication.
     
     # remove rows with NA adjudication
     adjudication.data.frame = subset(adjudication.data.frame, !is.na(adjudication))
-    
+
     for (stratification in stratifications) {
         
         this.adj.data.frame = adjudication.data.frame[names(adjudication.data.frame) %in% c('year', 'location', stratification, 'source', 'ontology', 'adjudication')]
         # pick only rows that are non-NA (except in the adjudication column, where it is okay to be NA)
-        
+        # ?didn't we already remove rows that are NA in adjudication column?
         if (!is.null(this.adj.data.frame))
             this.adj.data.frame = this.adj.data.frame[apply(
                 this.adj.data.frame,
@@ -77,19 +75,53 @@ remove.outliers = function(outcome, stratifications, data.manager, adjudication.
                 removal.points.this.source.ont = subset(this.adj.data.frame, source==source.name & ontology==ont.name & adjudication==T)
                 if (nrow(removal.points.this.source.ont)==0) next
                 
+                this.ontology.without.year.location = data.manager$ontologies[[ont.name]]
+                this.ontology.without.year.location = this.ontology.without.year.location[!(names(this.ontology.without.year.location)%in%c('year', 'location'))]
+                
                 for (i in 1:nrow(removal.points.this.source.ont)) {
-                    # Must do one put per replaced data point
+                    this.point = removal.points.this.source.ont[i,]
+                    
+                    dimension.values.this.point = c(list(year=this.point$year,
+                                                         location=this.point$location),
+                                                    setNames(lapply(stratification, function(x) {this.point[[x]]}), stratification)
+                    )
+                    
+                    # One put to remove this data point before moving onto children
                     data.manager$put(data=as.numeric(NA),
                                      outcome=outcome,
                                      source=source.name,
                                      ontology.name=ont.name,
-                                     dimension.values = c(list(year=removal.points.this.source.ont[[i,'year']],
-                                                               location=removal.points.this.source.ont[[i,'location']]),
-                                                          setNames(lapply(stratification, function(x) {removal.points.this.source.ont[[i,x]]}), stratification)),
+                                     dimension.values = dimension.values.this.point,
                                      url="removed",
                                      details="removed",
                                      allow.na.to.overwrite=T)
                     
+                    all.data.stratifications = names(data.manager$data[[outcome]][['estimate']][[source.name]][[ont.name]])
+                    
+                    all.child.stratifications = all.data.stratifications[sapply(all.data.stratifications, function(x) {
+                        # Does this stratification have 'year', 'location', the stratification, and more?
+                        split.name = unlist(strsplit(x, "__"))
+                        return(all(stratification %in% split.name) && length(setdiff(split.name, c('year', 'location', stratification))) > 0)
+                    })]
+                    
+                    # Do a put per child stratification IF it's in the data already
+                    for (child.strat in all.child.stratifications) {
+                        
+                        # the dimension values will be the parent's dimension values as well as the part of the
+                        # ontology that includes the child's dimensions
+                        this.child.extra.dimensions = setdiff( unlist(strsplit(child.strat, "__")), c('year', 'location', stratification))
+
+                        dimension.values.this.child = c(dimension.values.this.point, this.ontology.without.year.location[this.child.extra.dimensions])
+
+                        data.manager$put(data=as.numeric(NA),
+                                         outcome=outcome,
+                                         source=source.name,
+                                         ontology.name=ont.name,
+                                         dimension.values = dimension.values.this.child,
+                                         url="removed",
+                                         details="removed",
+                                         allow.na.to.overwrite=T)
+                    }
                 }
             }
         } 

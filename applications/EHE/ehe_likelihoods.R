@@ -875,9 +875,9 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
                                cocaine.likelihood.instructions,
                                non.age.aids.diagnoses.likelihood.instructions,
                                aids.deaths.likelihood.instructions,
-                               awareness.likelihood.instructions,
-                               race.ps.syphilis.year.on.year.change.likelihood.instructions,
-                               race.gonorrhea.year.on.year.change.likelihood.instructions
+                               awareness.likelihood.instructions #,
+                               #race.ps.syphilis.year.on.year.change.likelihood.instructions,
+                               #race.gonorrhea.year.on.year.change.likelihood.instructions
   )
 
 # two.way.transmission.pop.idu.aware.likelihood.instructions = 
