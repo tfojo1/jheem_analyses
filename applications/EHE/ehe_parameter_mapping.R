@@ -974,14 +974,23 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                                       applies.to.dimension.values = races)
 
         #-- The age effects --#
-        age.multipliers = parameters[paste0('age', 1:specification.metadata$n.ages, '.susceptibility.rr.mult.', time)]
-        age.multipliers[is.na(age.multipliers)] = 1
+        age.rr.multipliers = parameters[paste0('age', 1:specification.metadata$n.ages, '.susceptibility.rr.mult.', time)]
+        age.rr.multipliers[is.na(age.rr.multipliers)] = 1
+        
+        age.rrs = parameters[paste0('age', 1:specification.metadata$n.ages, '.', category, '.susceptibility.rr')]
+        missing.rr.mask = is.na(age.rrs)
+        if (time==2)
+            age.rrs[missing.rr.mask] = parameters[paste0('age', 
+                                                         (1:specification.metadata$n.ages)[missing.rr.mask],
+                                                         '.', category, '.susceptibility.rr.2')]
+        else
+            age.rrs[missing.rr.mask] = parameters[paste0('age', 
+                                                         (1:specification.metadata$n.ages)[missing.rr.mask],
+                                                         '.', category, '.susceptibility.rr.01')]
         
         model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
                                                                       alpha.name = alpha.name,
-                                                                      values = parameters[paste0('age', 1:specification.metadata$n.ages,
-                                                                                                 '.', category, '.susceptibility.rr')] *
-                                                                                age.multipliers,
+                                                                      values = age.rrs * age.rr.multipliers,
                                                                       dimension = 'age.to',
                                                                       applies.to.dimension.values = ages)
     }
@@ -1019,15 +1028,26 @@ set.ehe.age.race.stratified.trate.alphas.from.parameters <- function(model.setti
                                                                       dimension = 'race.to',
                                                                       applies.to.dimension.values = races)
         #-- The age effects --#
-        age.multipliers = parameters[paste0('age', 1:specification.metadata$n.ages, '.susceptibility.rr.mult.', time)]
-        age.multipliers[is.na(age.multipliers)] = 1
+        age.rr.multipliers = parameters[paste0('age', 1:specification.metadata$n.ages, '.susceptibility.rr.mult.', time)]
+        age.rr.multipliers[is.na(age.rr.multipliers)] = 1
         
         # The non-stratified age effects
+        non.stratified.age.rrs = parameters[paste0('age', non.stratified.age.indices,
+                                                   '.', category, '.susceptibility.rr')]
+        missing.rr.mask = is.na(non.stratified.age.rrs)
+        if (time==2)
+          non.stratified.age.rrs[missing.rr.mask] = parameters[paste0('age', 
+                                                                      non.stratified.age.indices[missing.rr.mask],
+                                                                      '.', category, '.susceptibility.rr.2')]
+        else
+          non.stratified.age.rrs[missing.rr.mask] = parameters[paste0('age', 
+                                                                      non.stratified.age.indices[missing.rr.mask],
+                                                         '.', category, '.susceptibility.rr.01')]
+        
         model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
                                                                       alpha.name = alpha.name,
-                                                                      values = parameters[paste0('age', non.stratified.age.indices,
-                                                                                                 '.', category, '.susceptibility.rr')] *
-                                                                                age.multipliers[non.stratified.age.indices],
+                                                                      values = non.stratified.age.rrs *
+                                                                          age.rr.multipliers[non.stratified.age.indices],
                                                                       dimension = 'age.to',
                                                                       applies.to.dimension.values = ages[non.stratified.age.indices])
         
@@ -1043,7 +1063,7 @@ set.ehe.age.race.stratified.trate.alphas.from.parameters <- function(model.setti
                 
                 model.settings$set.element.functional.form.interaction.alphas(element.name = elem.name,
                                                                               alpha.name = alpha.name,
-                                                                              value = value * age.multipliers[age.index],
+                                                                              value = value * age.rr.multipliers[age.index],
                                                                               applies.to.dimension.values = list(race.to = race,
                                                                                                                  age.to = ages[age.index]))
             }
