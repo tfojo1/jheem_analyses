@@ -292,23 +292,39 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
                                                                            var.names = c('age2.other.msm.susceptibility.rr.01',
                                                                                          'age2.other.msm.susceptibility.rr.2')),
     
-    age3.msm.susceptibility.rr = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
-    age4.msm.susceptibility.rr = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
-    age5.msm.susceptibility.rr = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    age3.msm.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
+    age4.msm.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.msm.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    
+    age3.msm.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
+    age4.msm.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.msm.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
     
     # Heterosexual Susceptibility by Age
-    age1.heterosexual.susceptibility.rr = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[1]), 0.5*log(2)),
-    age2.heterosexual.susceptibility.rr = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[2]), 0.5*log(2)),
-    age3.heterosexual.susceptibility.rr = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
-    age4.heterosexual.susceptibility.rr = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
-    age5.heterosexual.susceptibility.rr = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    age1.heterosexual.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[1]), 0.5*log(2)),
+    age2.heterosexual.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[2]), 0.5*log(2)),
+    age3.heterosexual.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
+    age4.heterosexual.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.heterosexual.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    
+    age1.heterosexual.susceptibility.rr.2 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[1]), 0.5*log(2)),
+    age2.heterosexual.susceptibility.rr.2 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[2]), 0.5*log(2)),
+    age3.heterosexual.susceptibility.rr.2 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
+    age4.heterosexual.susceptibility.rr.2 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.heterosexual.susceptibility.rr.2 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
     
     # IDU Susceptibility by Age
-    age1.idu.susceptibility.rr = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[1]), 0.5*log(2)),
-    age2.idu.susceptibility.rr = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[2]), 0.5*log(2)),
-    age3.idu.susceptibility.rr = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
-    age4.idu.susceptibility.rr = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
-    age5.idu.susceptibility.rr = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    age1.idu.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[1]), 0.5*log(2)),
+    age2.idu.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[2]), 0.5*log(2)),
+    age3.idu.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
+    age4.idu.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.idu.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    
+    age1.idu.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[1]), 0.5*log(2)),
+    age2.idu.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[2]), 0.5*log(2)),
+    age3.idu.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
+    age4.idu.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.idu.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
     
     # Peak Age Susceptibility Multiplier
     
@@ -962,10 +978,16 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'age2.other.msm.susceptibility.rr.2'
     ),
 
-    old.msm.age.susceptibility = c(
-      'age3.msm.susceptibility.rr',
-      'age4.msm.susceptibility.rr',
-      'age5.msm.susceptibility.rr'
+    old.msm.age.susceptibility.01 = c(
+      'age3.msm.susceptibility.rr.01',
+      'age4.msm.susceptibility.rr.01',
+      'age5.msm.susceptibility.rr.01'
+    ),
+
+    old.msm.age.susceptibility.2 = c(
+      'age3.msm.susceptibility.rr.2',
+      'age4.msm.susceptibility.rr.2',
+      'age5.msm.susceptibility.rr.2'
     ),
 
 
@@ -1012,13 +1034,22 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     
     male.vs.female.heterosexual.rr = 'male.vs.female.heterosexual.rr',
 
-    heterosexual.age.susceptibility = c(
-      'age1.heterosexual.susceptibility.rr',
-      'age2.heterosexual.susceptibility.rr',
-      'age3.heterosexual.susceptibility.rr',
-      'age4.heterosexual.susceptibility.rr',
-      'age5.heterosexual.susceptibility.rr'
+    heterosexual.age.susceptibility.01 = c(
+      'age1.heterosexual.susceptibility.rr.01',
+      'age2.heterosexual.susceptibility.rr.01',
+      'age3.heterosexual.susceptibility.rr.01',
+      'age4.heterosexual.susceptibility.rr.01',
+      'age5.heterosexual.susceptibility.rr.01'
     ),
+
+    heterosexual.age.susceptibility.2 = c(
+      'age1.heterosexual.susceptibility.rr.2',
+      'age2.heterosexual.susceptibility.rr.2',
+      'age3.heterosexual.susceptibility.rr.2',
+      'age4.heterosexual.susceptibility.rr.2',
+      'age5.heterosexual.susceptibility.rr.2'
+    ),
+
 
 
 #-- IDU TRANSMISSION --#
@@ -1053,14 +1084,21 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'msm.idu.susceptibility.rr.2'
     ),
 
-    idu.age.susceptibility = c(
-      'age1.idu.susceptibility.rr',
-      'age2.idu.susceptibility.rr',
-      'age3.idu.susceptibility.rr',
-      'age4.idu.susceptibility.rr',
-      'age5.idu.susceptibility.rr'
+    idu.age.susceptibility.01 = c(
+      'age1.idu.susceptibility.rr.01',
+      'age2.idu.susceptibility.rr.01',
+      'age3.idu.susceptibility.rr.01',
+      'age4.idu.susceptibility.rr.01',
+      'age5.idu.susceptibility.rr.01'
     ),
 
+    idu.age.susceptibility.2 = c(
+      'age1.idu.susceptibility.rr.2',
+      'age2.idu.susceptibility.rr.2',
+      'age3.idu.susceptibility.rr.2',
+      'age4.idu.susceptibility.rr.2',
+      'age5.idu.susceptibility.rr.2'
+    ),
 
 #-- IDU INCIDENCE/REMISSION/RELAPSE --#
   
