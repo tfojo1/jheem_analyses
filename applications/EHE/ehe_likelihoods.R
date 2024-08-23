@@ -614,8 +614,7 @@ proportion.tested.likelihood.instructions =
                                                    
                                                    dimensions = c("age","sex","race","risk"),
                                                    levels.of.stratification = c(0,1),
-                                                   from.year = 2008,
-                                                   to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
+                                                   from.year = 2010,
                                                    
                                                    p.bias.inside.location = 0, 
                                                    p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
