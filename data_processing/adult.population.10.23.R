@@ -193,7 +193,7 @@ population.by.ethnicity.array = census.manager$data$population$estimate$census.p
 
 restratify.age.ethnicity <- restratify.age.counts(population.by.ethnicity.array, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-restratify.adult.pop.ethnicity.10.23 = restratify.age.ethnicity[ , , 3:17,] #subset by only adult age groups
+restratify.adult.pop.ethnicity.10.23 = restratify.age.ethnicity[ , , 3:18,] #subset by only adult age groups
 adult.pop.ethnicity.10.23 = apply(restratify.adult.pop.ethnicity.10.23, MARGIN = c("year","location", "ethnicity"), sum) #sum the adult age groups to get adult.population for 2020-2023
 
 adult.pop.ethnicity.10.23 <- as.data.frame.table(adult.pop.ethnicity.10.23)%>%
