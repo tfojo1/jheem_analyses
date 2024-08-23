@@ -167,7 +167,7 @@ population.by.race.array = census.manager$data$population$estimate$census.popula
 
 restratify.age.race <- restratify.age.counts(population.by.race.array, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-restratify.adult.pop.race.10.23 = restratify.age.race[ , ,3:17,] #subset by only adult age groups
+restratify.adult.pop.race.10.23 = restratify.age.race[ , ,3:18,] #subset by only adult age groups
 adult.pop.race.10.23 = apply(restratify.adult.pop.race.10.23, MARGIN = c("year","location", "race"), sum) #sum the adult age groups to get adult.population for 2020-2023
 
 adult.pop.race.10.23 <- as.data.frame.table(adult.pop.race.10.23)%>%
@@ -210,7 +210,7 @@ array.race.eth = census.manager$data$population$estimate$census.population$strat
 
 restratify.race.eth <- restratify.age.counts(array.race.eth, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-restrat.race.eth = restratify.race.eth[ , ,3:17, ,] #subset by only adult age groups
+restrat.race.eth = restratify.race.eth[ , ,3:18, ,] #subset by only adult age groups
 fixed.race.eth = apply(restrat.race.eth, MARGIN = c("year","location", "race", 'ethnicity'), sum) #sum the adult age groups to get adult.population for 2020-2023
 
 
@@ -239,7 +239,7 @@ array.race.eth.age = census.manager$data$population$estimate$census.population$s
 
 restratify.race.eth.age <- restratify.age.counts(array.race.eth.age, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-restrat.race.eth.age = restratify.race.eth.age[ , ,3:17, ,] #subset by only adult age groups
+restrat.race.eth.age = restratify.race.eth.age[ , ,3:18, ,] #subset by only adult age groups
 fixed.race.eth.age = apply(restrat.race.eth.age, MARGIN = c("year","location", "race", 'ethnicity', 'age'), sum) #sum the adult age groups to get adult.population for 2020-2023
 
 
@@ -271,7 +271,7 @@ array.race.eth.sex = census.manager$data$population$estimate$census.population$s
 
 restratify.race.eth.sex <- restratify.age.counts(array.race.eth.sex, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-restrat.race.eth.sex = restratify.race.eth.sex[ , ,3:17, , ,] #subset by only adult age groups
+restrat.race.eth.sex = restratify.race.eth.sex[ , ,3:18, , ,] #subset by only adult age groups
 fixed.race.eth.sex = apply(restrat.race.eth.sex, MARGIN = c("year","location", "race", 'ethnicity', 'sex'), sum) #sum the adult age groups to get adult.population for 2020-2023
 
 
@@ -417,7 +417,7 @@ total.array.10.19 = census.manager$data$population$estimate$census.population$st
 
 total.10.19 <- restratify.age.counts(total.array.10.19, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-fixed.total.10.19 = total.10.19[ , ,3:17] #subset by only adult age groups
+fixed.total.10.19 = total.10.19[ , ,3:18] #subset by only adult age groups
 fixed.total.10.19 = apply(fixed.total.10.19, MARGIN = c("year","location"), sum) 
 
 fixed.total.10.19 <- as.data.frame.table(fixed.total.10.19)%>%
@@ -432,7 +432,7 @@ sex.array.10.19 = census.manager$data$population$estimate$census.population$stra
 
 sex.10.19 <- restratify.age.counts(sex.array.10.19, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-fixed.sex.10.19 = sex.10.19[ , ,3:17, ] #subset by only adult age groups
+fixed.sex.10.19 = sex.10.19[ , ,3:18, ] #subset by only adult age groups
 fixed.sex.10.19 = apply(fixed.sex.10.19, MARGIN = c("year","location", "sex"), sum) 
 
 fixed.sex.10.19 <- as.data.frame.table(fixed.sex.10.19)%>%
@@ -448,7 +448,7 @@ age.array.10.19 = census.manager$data$population$estimate$census.population$stra
 
 age.10.19 <- restratify.age.counts(age.array.10.19, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-fixed.age.10.19 = age.10.19[ , ,3:17] #subset by only adult age groups
+fixed.age.10.19 = age.10.19[ , ,3:18] #subset by only adult age groups
 fixed.age.10.19 = apply(fixed.age.10.19, MARGIN = c("year","location", "age"), sum) 
 
 fixed.age.10.19 <- as.data.frame.table(fixed.age.10.19)%>%
@@ -464,7 +464,7 @@ age.sex.array.10.19 = census.manager$data$population$estimate$census.population$
 
 age.sex.10.19 <- restratify.age.counts(age.sex.array.10.19, desired.age.brackets= desired.ages.for.census, smooth.infinite.age.to =100)
 
-fixed.age.sex.10.19 = age.sex.10.19[ , ,3:17, ] #subset by only adult age groups
+fixed.age.sex.10.19 = age.sex.10.19[ , ,3:18, ] #subset by only adult age groups
 fixed.age.sex.10.19 = apply(fixed.age.sex.10.19, MARGIN = c("year","location", "sex", 'age'), sum) 
 
 fixed.age.sex.10.19 <- as.data.frame.table(fixed.age.sex.10.19)%>%
