@@ -1633,7 +1633,16 @@ put.msa.data.as.new.source(outcome = 'diagnosed.prevalence',
 put.msa.data.as.new.source(outcome = 'diagnoses',
                            from.source.name = 'cdc.hiv',
                            to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+                           to.locations =  MSAS.OF.INTEREST, 
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'total.prevalence',
+                           from.source.name = 'cdc.hiv',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST, 
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
