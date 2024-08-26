@@ -16,7 +16,7 @@
 ##############################
 # Source supporting files
 source('../jheem_analyses/source_code.R') # a file that contains all the necessary functions for the JHEEM
-
+source('../jheem_analyses/applications/SHIELD/shield_parameters.R') # a file that contains the SHIELD specification
 ##--------------------##
 ##-- INITIAL SET-UP --##
 ##--------------------##   
@@ -105,6 +105,17 @@ register.initial.population(SHIELD.SPECIFICATION,
 ##------------------##
 # Transmission has 4 elements: 1.susceptibility, 2.transmissibility, 3.contact, 4.new infection proportion (where does new infection go to? e.g., infected PrEP, infected not on PrEP)
 # e.g., model a flat transmission rate that applies to all groups
+#each parameter requires a prior distribution
+# 1- those that will be calibrated (calibrating dist)
+# 2- those that wont be calibrated: e.g., jitters in the future (sampling dist)
+
+# parameters are used to scale
+#Specification: parameters affect elements, quantities are calculated from elements 
+# interventions will be defined by parameters too (outside of specification)
+# element: a scalar value or a functional form 
+# constat, fix over iver time,doest ca
+# either vary by strata or changes over time (an equation that will be evaluated to create value of that parameter )
+
 register.transmission(SHIELD.SPECIFICATION,
                       contact.value = 'sexual.contact',
                       susceptibility.value = 'sexual.susceptibility',
@@ -114,10 +125,13 @@ register.transmission(SHIELD.SPECIFICATION,
                       new.infections.applies.to = list(continuum='undiagnosed',stage='ps'))
 # all.new.infections.into.compartments #@Todd what is this option ????
 
+register.model.element(SHIELD.SPECIFICATION,
+                       name="global.trate",scale = "rate",value = 1 )
+
 # rate of contact between infected and uninfected
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact',
-                        value = 1)
+                        value = expression(global.trate)) 
 
 # Susceptibility of uninfected persons
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -424,12 +438,12 @@ register.model.specification(SHIELD.SPECIFICATION)
 # source('../jheem_analyses/applications/EHE/ehe_parameters.R')
 # source('../jheem_analyses/applications/EHE/ehe_parameter_mapping.R')
 # 
-# register.calibrated.parameters.for.version('ehe',
-#                                            distribution = EHE.PARAMETERS.PRIOR,
-#                                            apply.function = EHE.APPLY.PARAMETERS.FN,
-#                                            sampling.blocks = EHE.PARAMETER.SAMPLING.BLOCKS,
-#                                            calibrate.to.year = 2025,
-#                                            join.with.previous.version = F)
+register.calibrated.parameters.for.version('shield',
+                                           distribution = SHIELD.PARAMETERS.PRIOR,
+                                           apply.function = SHIELD.APPLY.PARAMETERS.FN,
+                                           sampling.blocks = SHIELD.PARAMETER.SAMPLING.BLOCKS,
+                                           calibrate.to.year = 2025,
+                                           join.with.previous.version = F)
 
 
 print("SHIELD specification sourced successfully!")
