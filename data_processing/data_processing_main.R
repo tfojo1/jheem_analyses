@@ -377,6 +377,16 @@ data.manager$register.outcome(
     units =  '%',
     description = "HIV Tests per Adult Population"), denominator.outcome = 'adult.population')
 
+data.manager$register.outcome(
+  'unknown.duration.or.late.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Unknown Duration or Late Syphilis',
+    axis.name = 'Unknown Duration or Late Syphilis',
+    units = 'cases',
+    description = "Unknown Duration or Late Syphilis"))
+
+
 #Register "Parent" Sources
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH")
