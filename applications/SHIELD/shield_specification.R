@@ -1,10 +1,10 @@
 # PK: This is the current verion
 
 # TBD:
-  # think about the statistics that we want to record: we will record their average between Jan 1 and Dec 31
-  # proportion of people aware of diagnosis ?
-  # proportion loving with diag and not track.integrated.outcome(prevalece of syphilis)?
- 
+# think about the statistics that we want to record: we will record their average between Jan 1 and Dec 31
+# proportion of people aware of diagnosis ?
+# proportion loving with diag and not track.integrated.outcome(prevalece of syphilis)?
+
 # Deviding diagnosis into 2 mechanism: 
 # 1-screening: for alls tates, can be estiamted based on HIV screening
 # 2- sympthomatic testing: PS states only
@@ -32,6 +32,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                   ),
                                                   compartments.for.uninfected.only = list(
                                                     profile=c('susceptible','diagnosed.treated')),
+                                                  
                                                   compartments.for.infected.and.uninfected = list(
                                                     location = "US", 
                                                     age = 'all.ages',
@@ -125,14 +126,71 @@ register.transmission(SHIELD.SPECIFICATION,
                       new.infections.applies.to = list(continuum='undiagnosed',stage='ps'))
 # all.new.infections.into.compartments #@Todd what is this option ????
 
+##----------------------------------------##
+##-- Sexual Transmission Contact Arrays --##
+##----------------------------------------##
 register.model.element(SHIELD.SPECIFICATION,
                        name="global.trate",scale = "rate",value = 1 )
 
 # rate of contact between infected and uninfected
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact',
-                        value = expression(global.trate)) 
+                        value = expression(global.trate *
+                                             sexual.transmission.rates * #msm trans (depends on person getting infected-only males), and het 
+                                          sexual.contact.matrix))
 
+# a quantity has to have a scale if we want to intervene in them
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'sexual.transmission.rates',
+                        value = 0)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.transmission.rates',
+                               applies.to = list(sex.from=c('heterosexual_male','msm'),
+                                                 sex.to=c('heterosexual_male','msm')),
+                               value = 'msm.trates')
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.transmission.rates',
+                               applies.to = list(sex.from=c('heterosexual_male','msm'),
+                                                 sex.to=c('female')),
+                               value = 'heterosexual.trates')
+register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming that female to male is the same as male to female 
+                               name = 'sexual.transmission.rates',
+                               applies.to = list(sex.from=c('female'),
+                                                 sex.to=c('heterosexual_male','msm')),
+                               value = 'heterosexual.trates')
+#spline can create negative values 
+#truncate to 0
+# use the log scale: exponentiate the values
+# log scale for the knots, 
+# natural splines and put the lknows on the log scale 
+register.model.element(SHIELD.SPECIFICATION,
+                        name = 'msm.trates',
+                       functional.form = create.natural.spline.functional.form(knot.times = c(time0=2000, time1=2010, time2=2020),
+                                                                               knot.values = list(time0=0,time1=0,time2=0) ,
+                                                                               knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
+                                                                               min=0, #truncate to 0
+                                                                               # knot.values = list(time0=1,time1=1,time2=1) , knots.are.on.transformed.scale = F, #on the identity scale 
+                                                                               
+                                                                               knot.link = 'log',link='identity'), #knots on the logscale and values on the identity scale
+                       functional.form.from.time = 1960, #0 or -Inf #@TODD
+                       scale='rate') #spline with 2010/2020
+
+# msm.trate.by.race
+#add more alphas
+#if we assume the multiplier by black vs other remain the sma over time we only ned 2
+
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'heterosexual.trates',
+                       functional.form = create.linear.spline.functional.form(knot.times = c(time0=2000, time1=2010, time2=2020),knot.values = list(time0=1,time1=1,time2=1) ),
+                       functional.form.from.time = 1960, #0 or -Inf #@TODD
+                       scale='rate')
+
+#dummy contact matrix for the 99 subgroups 
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'sexual.contact.matrix',
+                        value = 1/99)
+##################################################
 # Susceptibility of uninfected persons
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.susceptibility',
@@ -238,7 +296,7 @@ register.remission(SHIELD.SPECIFICATION,
                    remission.rate.value = 'screening.immediate.treatment.rate',
                    remission.proportions.value = 'remission.prp',
                    tag = 'screening.immediate.trt'
-                   )
+)
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'remission.prp',
                         value = 1)
@@ -324,7 +382,7 @@ register.transition(SHIELD.SPECIFICATION,
 
 
 ## All Diagnosis (at all stages ): has 2 components
- ### 1st component:new diagnosis that dont receive treatment immediately (transition)
+### 1st component:new diagnosis that dont receive treatment immediately (transition)
 track.transition(SHIELD.SPECIFICATION, 
                  name = 'diag.untreated',
                  #display name on the graph
@@ -351,7 +409,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = "remission.from", #where they come from 
                       subset.dimension.values = list(continuum='undiagnosed'), #only counting those who receive immediata trt
                       keep.dimensions = c('location','age','race','sex','stage')
-                      )
+)
 
 #Total diagnosis
 #We usually try to outline the outcomes here with the final outcomes we need for calibrations: so we break them by stage
@@ -368,7 +426,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          keep.dimensions = c('location','age','race','sex'),
                          corresponding.data.outcome = 'ps.syphilis' #corresponding to the name in data manager
-                         )
+)
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = "diag.el",
                          value = expression(diag.untreated + diag.treated),

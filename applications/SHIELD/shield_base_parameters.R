@@ -1,7 +1,5 @@
 # made from SHIELD_BASE_PARAMETERS.R
 # what are the citation numbers? 
-
-
 add.parameter <- function(params, param.name,
                           value,
                           ci.lower,
