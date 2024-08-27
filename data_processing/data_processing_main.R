@@ -141,6 +141,7 @@ data.manager$register.outcome(
 
 data.manager$register.outcome(
     'gonorrhea.ratio',
+    denominator.lags.by.one.year = T,
     metadata = create.outcome.metadata(
         scale = 'non.negative.number',
         display.name = 'Gonorrhea Ratio',
@@ -159,6 +160,7 @@ data.manager$register.outcome(
 
 data.manager$register.outcome(
     'ps.syphilis.ratio',
+    denominator.lags.by.one.year = T,
     metadata = create.outcome.metadata(
         scale = 'non.negative.number',
         display.name = 'Syphilis Ratio',
@@ -1633,7 +1635,16 @@ put.msa.data.as.new.source(outcome = 'diagnosed.prevalence',
 put.msa.data.as.new.source(outcome = 'diagnoses',
                            from.source.name = 'cdc.hiv',
                            to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+                           to.locations =  MSAS.OF.INTEREST, 
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = surveillance.manager)
+
+put.msa.data.as.new.source(outcome = 'total.prevalence',
+                           from.source.name = 'cdc.hiv',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST, 
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',

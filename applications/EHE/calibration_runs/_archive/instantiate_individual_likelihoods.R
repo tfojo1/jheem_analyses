@@ -1,7 +1,7 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
-LOCATION = CHICAGO.MSA
+LOCATION = BALTIMORE.MSA
 
 pop.lik = population.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 imm.lik = immigration.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
