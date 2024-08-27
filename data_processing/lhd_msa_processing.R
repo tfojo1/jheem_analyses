@@ -351,3 +351,42 @@ for (data in lhd_san_antonio) {
     url = 'https://www.fast-trackcities.org/sites/default/files/San%20Antonio%20Transitional%20Grant%20Area%20Integrated%20HIV%20Prevention%20and%20Care%20Plan%202017-2021.pdf',
     details = 'Local Health Department Reports')
 }
+
+
+
+# Adding Update for 8.27.24 - Awareness + Prevalence for MSAs -------------
+#Did manual search for awareness and prevalence at LHD level
+#Only found data for Baltimore
+
+DATA.DIR.LHD.AWARE="../../data_raw/lhd_msa/awareness"
+
+awareness_lhd_files <- Sys.glob(paste0(DATA.DIR.LHD.AWARE, '/*.xlsx'))
+
+data.list.aware.lhd <- lapply(awareness_lhd_files, function(x){
+  list(filename=x, data=read_excel(x, col_types = c("text", "text", "text", 
+                                                    "numeric")))
+})
+
+data.list.aware.lhd.clean = lapply(data.list.aware.lhd, function(file){
+  data=file[[2]] 
+  filename = file[[1]] 
+
+  data$location = as.character(locations::get.location.code(data$location, "CBSA"))
+  
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+aware.lhd.put = lapply(data.list.aware.lhd.clean, `[[`, 2)
+
+for (data in aware.lhd.put) {
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'lhd',
+    source = 'lhd',
+    dimension.values = list(),
+    url = 'https://www.fast-trackcities.org/sites/default/files/San%20Antonio%20Transitional%20Grant%20Area%20Integrated%20HIV%20Prevention%20and%20Care%20Plan%202017-2021.pdf',
+    details = 'Local Health Department Reports')
+}
+
