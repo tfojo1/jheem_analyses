@@ -150,18 +150,6 @@ census.manager$register.ontology(
   ))
 
 ################################################################################
-                  ###Read in Census Files###
-################################################################################
-
-DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county_00.23"
-
-census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
-
-#creating a list with sublists of filename, data#
-data.list.county.pop <- lapply(census_county_files, function(x){
-  list(filename=x, data=read.csv(x, header=TRUE))
-})
-################################################################################
             ###Sourcing other files here###
 ################################################################################ 
 
@@ -187,6 +175,19 @@ source('data_processing/census.population.10.19.R')
 #UPDATE 7-16: Temporarily commenting out 181 to source the newer stratified data
 #I'll use this to decide if we want age groups or single year
 source('data_processing/census.population.20.23.R')
+
+################################################################################
+###Read in Census Files###
+################################################################################
+
+DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county_00.23"
+
+census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
+
+#creating a list with sublists of filename, data#
+data.list.county.pop <- lapply(census_county_files, function(x){
+  list(filename=x, data=read.csv(x, header=TRUE))
+})
 
 ################################################################################
           ###COUNTY POPULATION ESTIMATES 2000-2022###
@@ -318,6 +319,27 @@ data.list.county.deaths.00.23 = lapply(data.list.county, function(file){
   list(filename, data) #what to return# 
 })
 
+################################################################################
+##Update for 8-28-24: Adding US Population (summing all counties)
+################################################################################
+us.total.pop = lapply(data.list.county.pop.00.23, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+data <- data %>%
+  group_by(year)%>%
+  mutate(total = sum(value))%>%
+  select(-location, -value)%>%
+  rename(value = total)%>%
+  mutate(location = "US")
+  
+  data= as.data.frame(data)
+  
+  data<- data[!duplicated(data), ]
+  
+  list(filename, data) #what to return# 
+})
 
 ################################################################################
                 ###Put data into Census Manager###
@@ -352,6 +374,20 @@ for (data in county_deaths) {
     details = 'Census Reporting')
 }
 
+#US Totals
+
+us.total.pop.put = lapply(us.total.pop, `[[`, 2)
+
+for (data in us.total.pop.put) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
 
 ################################################################################
                   ###Save Census Manager###
