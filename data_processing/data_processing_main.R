@@ -143,11 +143,11 @@ data.manager$register.outcome(
     'gonorrhea.ratio',
     denominator.lags.by.one.year = T,
     metadata = create.outcome.metadata(
-        scale = 'non.negative.number',
+        scale = 'ratio',
         display.name = 'Gonorrhea Ratio',
         axis.name = 'Gonorrhea Ratio',
         units = 'cases',
-        description = "Year Over Year Ratio of Gonorrhea Cases"))
+        description = "Year Over Year Ratio of Gonorrhea Cases"), denominator.outcome = 'gonorrhea')
 
 data.manager$register.outcome(
     'ps.syphilis',
@@ -162,11 +162,11 @@ data.manager$register.outcome(
     'ps.syphilis.ratio',
     denominator.lags.by.one.year = T,
     metadata = create.outcome.metadata(
-        scale = 'non.negative.number',
+        scale = 'ratio',
         display.name = 'Syphilis Ratio',
         axis.name = 'Syphilis Ratio',
         units = 'cases',
-        description = "Year Over Year Ratio of Primary and Secondary Syphilis Cases"))
+        description = "Year Over Year Ratio of Primary and Secondary Syphilis Cases"), denominator.outcome = 'ps.syphilis')
 
 data.manager$register.outcome(
     'early.syphilis',
