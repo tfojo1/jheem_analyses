@@ -11,7 +11,7 @@ diagnoses.stratified.sex <- run.outlier.process(outcome= 'diagnoses',
                                          theta = 0.06,
                                          max.year = 2019,
                                          locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
-diagnoses.stratified.sex$adjudication <- c(T, T, T, T, T, T, T, T, T, F, T, T, T, T, T, T)
+diagnoses.stratified.sex$adjudication <- c(T, T, T, T, T, T, F, T, T, T, T, T)
 run.outlier.process(outcome= 'diagnoses',
                     stratifications= list('sex'),
                     data.manager= surveillance.manager,
@@ -46,10 +46,9 @@ diagnoses.stratified.race <- run.outlier.process(outcome= 'diagnoses',
                                                 max.year = 2019,
                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
 
-diagnoses.stratified.race$adjudication <- c (F, T, T, T, T, F, T, T, T, T,
+diagnoses.stratified.race$adjudication <- c (F, T, T, T, T, F, T, T, T,
                                              T, T, T, T, T, T, T, T, T, T,
-                                             T, T, T, F, T, T, T, F, F, F,
-                                             F, T)
+                                             T, T, T, F, T, T, F, T)
 run.outlier.process(outcome= 'diagnoses',
                     stratifications= list('race'),
                     data.manager= surveillance.manager,
@@ -67,9 +66,9 @@ diagnoses.stratified.risk <- run.outlier.process(outcome= 'diagnoses',
                                                 theta = 0.06,
                                                 max.year = 2019,
                                                 locations= c(surveillance.manager$get.locations.with.data(outcome="diagnoses")))
-diagnoses.stratified.risk$adjudication <- c(T, T, T, T, T, T, T, T, T, T,
-                                            T, T, T, T, T, T, T, T, T, T,
-                                            T, T, T, T, F, F, F, F, F, F,
+diagnoses.stratified.risk$adjudication <- c(T, T, T, T, T, T, T, T, T,
+                                            T, T, T, T, T, T, T, T, T,
+                                            T, T, T, T, F, F, F,
                                             F, F, F, T, T, T, T, T)
 run.outlier.process(outcome= 'diagnoses',
                     stratifications= list('risk'),
@@ -133,9 +132,8 @@ ps.syphilis.stratified <- run.outlier.process(outcome= 'ps.syphilis',
                                               theta = 0.05,
                                               max.year = 2019,
                                               locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
-ps.syphilis.stratified$adjudication <- c(T, T, T, T, T, T, T, T, T, F,
-                                         F, F, F, T, T, T, T, T, T, T,
-                                         T)
+ps.syphilis.stratified$adjudication <- c( T, T, T, T, T, F,
+                                          T, T, T, T, T, T, T)
 run.outlier.process(outcome= 'ps.syphilis',
                     stratifications= list('sex', 'race', 'age', 'risk'), 
                     data.manager= surveillance.manager,
