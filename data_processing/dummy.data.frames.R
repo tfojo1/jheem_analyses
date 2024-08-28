@@ -233,14 +233,14 @@
   dummy.counties.one<- data.frame(
     outcome = c('adult.population'),
     year = c('2020'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c( '51560', '51780', '51123'), #These are the counties that have changed#
     value = as.numeric(NA)
   )
   #year_location_age
   dummy.counties.two <- data.frame(
     outcome = c('adult.population'),
     year = c('2020'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c( '51560', '51780', '51123'),
     value = as.numeric(NA),
     age = c('20 years')
   )
@@ -249,7 +249,7 @@
   dummy.counties.three <- data.frame(
     outcome = c('adult.population'),
     year = c('2020'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c( '51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male')
   )
@@ -258,7 +258,7 @@
   dummy.counties.four  <- data.frame(
     outcome = c('adult.population'),
     year = c('2020'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c( '51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male'),
     age = c('20 years')
@@ -291,14 +291,14 @@
   dummy.counties.five<- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('51560', '51780', '51123'), #These are the counties that have changed#
     value = as.numeric(NA)
   )
   #year_location_age
   dummy.counties.six <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c( '51560', '51780', '51123'),
     value = as.numeric(NA),
     age = c('20-24 years')
   )
@@ -307,7 +307,7 @@
   dummy.counties.seven <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c( '51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male')
   )
@@ -316,7 +316,7 @@
   dummy.counties.eight  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male'),
     age = c('20-24 years')
@@ -326,7 +326,7 @@
   dummy.counties.nine <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     race = c('white')
   )
@@ -334,7 +334,7 @@
   dummy.counties.ten  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     ethnicity = c('not hispanic')
   )
@@ -343,7 +343,7 @@
   dummy.counties.eleven  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     race = c('white'),
     ethnicity = c('not hispanic')
@@ -352,7 +352,7 @@
   dummy.counties.twelve  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     race = c('white'),
     ethnicity = c('not hispanic'),
@@ -362,7 +362,7 @@
   dummy.counties.thirteen  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male'),
     race = c('white'),
@@ -400,14 +400,14 @@
   dummy.counties.fourteen<- data.frame(
     outcome = c('adult.population'),
     year = c('2020'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('51560', '51780', '51123'), #These are the counties that have changed#
     value = as.numeric(NA)
   )
   #year_location_age
   dummy.counties.fiften <- data.frame(
     outcome = c('adult.population'),
     year = c('2020'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     age = c('20 years')
   )
@@ -416,7 +416,7 @@
   dummy.counties.sixteen <- data.frame(
     outcome = c('adult.population'),
     year = c('2020'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male')
   )
@@ -425,7 +425,7 @@
   dummy.counties.seventeen  <- data.frame(
     outcome = c('adult.population'),
     year = c('2020'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c( '51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male'),
     age = c('20 years')
@@ -458,14 +458,14 @@
   dummy.counties.eighteen<- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c( '51560', '51780', '51123'), #These are the counties that have changed#
     value = as.numeric(NA)
   )
   #year_location_age
   dummy.counties.nineteen <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     age = c('20-24 years')
   )
@@ -474,7 +474,7 @@
   dummy.counties.twenty <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male')
   )
@@ -483,7 +483,7 @@
   dummy.counties.twentyone  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c( '51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male'),
     age = c('20-24 years')
@@ -493,7 +493,7 @@
   dummy.counties.twentytwo <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     race = c('white')
   )
@@ -501,7 +501,7 @@
   dummy.counties.twentythree  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     ethnicity = c('not hispanic')
   )
@@ -510,7 +510,7 @@
   dummy.counties.twentyfour  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     race = c('white'),
     ethnicity = c('not hispanic')
@@ -519,7 +519,7 @@
   dummy.counties.twentyfive  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     race = c('white'),
     ethnicity = c('not hispanic'),
@@ -529,7 +529,7 @@
   dummy.counties.twentysix  <- data.frame(
     outcome = c('adult.population'),
     year = c('2019'),
-    location = c('12025', '51560', '51780', '51123', '29193'),
+    location = c('51560', '51780', '51123'),
     value = as.numeric(NA),
     sex = c('male'),
     race = c('white'),
