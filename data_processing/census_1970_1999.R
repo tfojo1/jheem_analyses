@@ -188,6 +188,69 @@ data= as.data.frame(data)
 list(filename, data)  
 
 })
+
+################################################################################
+              ###Adding US Total for 1970-1999###
+################################################################################
+
+us.total.70.79 = lapply(county_70.79_list_clean, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  data <- data %>%
+    group_by(year)%>%
+    mutate(total = sum(value))%>%
+    select(-location, -value)%>%
+    rename(value = total)%>%
+    mutate(location = "US")
+  
+  data= as.data.frame(data)
+  
+  data<- data[!duplicated(data), ]
+  
+  list(filename, data) 
+})
+
+us.total.80.89 = lapply(data.list.80.county.clean, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  data <- data %>%
+    group_by(year)%>%
+    mutate(total = sum(value))%>%
+    select(-location, -value)%>%
+    rename(value = total)%>%
+    mutate(location = "US")
+  
+  data= as.data.frame(data)
+  
+  data<- data[!duplicated(data), ]
+  
+  list(filename, data) 
+})
+
+us.total.90.99 = lapply(data.list.county.90.clean, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  data <- data %>%
+    group_by(year)%>%
+    mutate(total = sum(value))%>%
+    select(-location, -value, -sum_population)%>%
+    rename(value = total)%>%
+    mutate(location = "US")
+  
+  data= as.data.frame(data)
+  
+  data<- data[!duplicated(data), ]
+  
+  list(filename, data) 
+})
+
+
 ################################################################################
                   ###PUT INTO CENSUS MANAGER###
 ################################################################################
@@ -223,6 +286,47 @@ for (data in county_80_pop) {
 county_70_pop = lapply(county_70.79_list_clean , `[[`, 2)
 
 for (data in county_70_pop) {  
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+
+#US Total Population values
+us.total.90.99.put = lapply(us.total.90.99 , `[[`, 2)
+
+for (data in us.total.90.99.put) {  
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+us.total.80.89.put = lapply(us.total.80.89 , `[[`, 2)
+
+for (data in us.total.80.89.put) {  
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+us.total.70.79.put = lapply(us.total.70.79 , `[[`, 2)
+
+for (data in us.total.70.79.put) {  
   
   census.manager$put.long.form(
     data = data,
