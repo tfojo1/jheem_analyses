@@ -3,26 +3,45 @@
 
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
-### Load simsets
-load("../jheem_analyses/applications/ehe_disparities/simset_2024-08-08_C.12580.Rdata")
+###################################
+### BALTIMORE ONLY ################
+
+load("../jheem_analyses/applications/ehe_disparities/simset_2024-08-08_C.12580.Rdata") #Baltimore
 simset$save()
-#simplot(simset, "new", split.by="race")
 
-#simset$get(outcomes = "awareness")
-#SURVEILLANCE.MANAGER$data$awareness$estimate$cdc.hiv$cdc$year__location[,"MD"]
-
-CALIBRATION.CODE= "full.with.covid2"
-LOCATIONS=c("C.12580") #Baltimore
+CALIBRATION.CODE= full.with.covid2
+LOCATIONS=c("C.12580")
 INTERVENTIONS=c("noint", "fullint")
-
-#Test full intervention
-#x=full.int$run(simset, start.year=2025, end.year=2030, verbose=TRUE)
 
 ### Run a set of interventions and select relevant results
 collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
                                     locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=50)
 
 collection$run(2025, 2035, verbose=TRUE, overwrite.prior=T) # stop.for.errors = T, overwrite.prior=T
+
+###################################
+### NEW SET OF SIMSETS ############
+
+### Load simsets
+load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.26420.Rdata") #Baltimore
+simset$save()
+load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.35620.Rdata") #NYC
+simset$save()
+load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.26420.Rdata") #Houston
+simset$save()
+
+CALIBRATION.CODE= "full.with.aids" #full.with.covid2
+LOCATIONS=c("C.12580", "C.35620", "C.26420")
+INTERVENTIONS=c("noint", "fullint")
+
+### Run a set of interventions and select relevant results
+collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
+                                    locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=100) #n.sim=50
+
+collection$run(2025, 2035, verbose=TRUE, overwrite.prior=T) # stop.for.errors = T, overwrite.prior=T
+
+#################################
+
 
 #Examine parameter distributions
 x <- collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'individual.simulations')

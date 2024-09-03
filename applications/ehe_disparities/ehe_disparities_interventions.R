@@ -92,4 +92,8 @@ full.int = create.monotonic.criteria.based.intervention (base.intervention = bas
                                                          n.iterations.after.satisfying.criteria.first.sim = 20,
                                                          max.failure.rate = 0,
                                                          code="fullint", 
-                                                         name=NULL)
+                                                         name=NULL,
+                                                         overwrite.existing.intervention=TRUE) #FALSE
+
+#Test full intervention
+#x=full.int$run(simset, start.year=2025, end.year=2030, verbose=TRUE)
