@@ -1,14 +1,14 @@
-source('../jheem_analyses/applications/DEP/dep_specification.R')
+source('applications/Depression/dep_specification.R')
 
 # ALL CACHED
 propdep.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
-                                                  dimensions = c("age","race","sex","risk"),
+                                                  dimensions = c("age"),
                                                   levels.of.stratification = c(0,1),
-                                                  outcome.for.p = "prop.dep", ## check names in surv manager 
+                                                  outcome.for.p = "depression", ## check name in surv manager 
                                                   outcome.for.n = "adult.population",
-                                                  sub.location.type = "COUNTY",
+                                                  sub.location.type = NULL, #"COUNTY"
                                                   super.location.type = "STATE",
-                                                  main.location.type = "CBSA")
+                                                  main.location.type = "NSDUH")
 
 
 # ALL ALREADY CACHED

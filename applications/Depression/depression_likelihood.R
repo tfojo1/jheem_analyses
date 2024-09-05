@@ -18,20 +18,12 @@ DEP.PARTITIONING.FUNCTION = function(arr, version='dep', location)
   if ("sex" %in% names(dim(arr)) &&
       all(array.access(arr, sex='msm')==array.access(arr, sex='heterosexual_male')))
   {
-    #sex.partition.dimnames = list(sex = c('heterosexual_male', 'msm'))
-    #sex.partition.arr = array(c(0.5, 0.5), dim=sapply(sex.partition.dimnames, length), sex.partition.dimnames)
-    
     specification.metadata = get.specification.metadata(version=version, location=location)
     proportion.msm = get.best.guess.msm.proportions(location,
                                                     specification.metadata = specification.metadata,
                                                     keep.age = any(names(dim(arr))=='age'),
                                                     keep.race = any(names(dim(arr))=='race'),
                                                     ages = dimnames(arr)$age)
-    # sex.partition.arr = get.best.guess.msm.proportions.by.race(location,
-    #                                                            specification.metadata = specification.metadata,
-    #                                                            years = DEFAULT.POPULATION.YEARS,
-    #                                                            min.age = specification.metadata$age.lower.bounds[1],
-    #                                                            return.proportions = T)
     
     sex.partition.arr = c(as.numeric(proportion.msm), 1-as.numeric(proportion.msm))
     sex.partition.dimnames = c(dimnames(proportion.msm), list(sex=c('msm','heterosexual_male')))
@@ -46,7 +38,7 @@ DEP.PARTITIONING.FUNCTION = function(arr, version='dep', location)
   arr
   
 }
-## difference from EHE partitioning function?
+## Similar to EHE partitioning function
 
 proportionDep_likelihood_inst <- create.nested.proportion.likelihood.instructions(outcome.for.data = 'depression', outcome.for.sim = 'proportion.depressed', 
                                         denominator.outcome.for.data = 'adult.population', 
@@ -54,9 +46,12 @@ proportionDep_likelihood_inst <- create.nested.proportion.likelihood.instruction
                                         minimum.geographic.resolution.type = 'COUNTY',
                                         dimensions = c("age"), # total, but can stratify by age, race, etc
                                         levels.of.stratification = c(0,1), # c(0,1,2) levels of stratification, 0=total, 1=one layer, etc
-                                        omit.years = c('2020'), # can omit any years we do not want included
-                                        # p.bias.inside.location = , # does the MSA value depend on county (inside)/state (outside) value? calculated automatically but can specify
-                                        # p.bias.sd.inside.location = ,
+                                        omit.years = c(2020), # can omit any years we do not want included
+                                        p.bias.inside.location = propdep.bias.estimates$in.mean, # does the MSA value depend on county (inside)/state (outside) value? calculated automatically but can specify
+                                        p.bias.sd.inside.location = propdep.bias.estimates$in.sd,
+                                        p.bias.outside.location = propdep.bias.estimates$out.mean,
+                                        p.bias.sd.outside.location = propdep.bias.estimates$out.sd,
+                                        
                                         ##-- specify these through the "get.cached.object" f() // see ehe_bias_estimates_cache.R code 
                                         
                                         # within.location.p.error.correlation = , # p, proportion // n, population -- default at 0.5
@@ -76,7 +71,7 @@ proportionDep_likelihood_inst <- create.nested.proportion.likelihood.instruction
                                         # denominator.measurement.error.cv = , # defaults to 0.05
                                         
                                         # n.multiplier.cv = , # defaults to 0.1 ## how do the denominators compare, internally done by the model
-                                        # weights = , # are there certain data-points that are more important?
+                                        weights = NULL, # are there certain data-points that are more important?
                                         # equalize.weight.by.year = , # normalises data points by year, so all years are equally important
                                         partitioning.function = DEP.PARTITIONING.FUNCTION 
                                                                    # different sources will stratify the data differently from the model, 
@@ -93,7 +88,7 @@ prev_ratio_inst <- create.basic.likelihood.instructions.with.specified.outcome(o
                                                         error.variance.type = 'sd') 
 # % PWH w dep on TX
 hiv_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'hiv_depression_tx',
-                                                        outcome.value = 0.184,
+                                                        outcome.value = 0.184, 
                                                         from.year = 2013, ## check
                                                         to.year = 2020, ## check
                                                         error.variance.term = 0.03, ## To do: calculate from data CI
