@@ -484,10 +484,10 @@ awareness.likelihood.instructions =
                                                    
                                                    from.year = 2008,
                                                    
-                                                   p.bias.inside.location = 0, # awareness.bias.estimates$in.mean is NA
+                                                   p.bias.inside.location = awareness.bias.estimates$in.mean,
                                                    p.bias.outside.location = awareness.bias.estimates$out.mean,
-                                                   p.bias.sd.inside.location = awareness.bias.estimates$out.sd, # awareness.bias.estimates$in.sd is NA
-                                                   p.bias.sd.outside.location = awareness.bias.estimates$out.sd,
+                                                   p.bias.sd.inside.location = awareness.bias.estimates$in.sd/2, # trying this out 9/5
+                                                   p.bias.sd.outside.location = awareness.bias.estimates$out.sd/2, # trying this out 9/5
                                                    
                                                    within.location.p.error.correlation = 0.5,
                                                    within.location.n.error.correlation = 0.5,
