@@ -5,7 +5,11 @@ SHIELD.PARAMETERS.PRIOR=join.distributions(
   msm.trate.multiplier1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   msm.trate.multiplier2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   msm.trate.black.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  msm.trate.hispanic.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+  msm.trate.hispanic.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  
+  #-- Sexual Mixing by Age --#
+  age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)) #to control the standard deviation of the contact matrix by age
+  # proportion.msm.of.male.mult= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
 )
 
@@ -30,13 +34,16 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){
 }
 
 #classic mcmc samples one param at a time, adaptive mcms samples multiple params
+#could add more params here (1-5 per block)
 SHIELD.PARAMETER.SAMPLING.BLOCKS = list( 
-  basic.transmission = c("global.trate",
+  global.trate=c("global.trate"),
+  age.mixing.transmission=("age.mixing.sd.mult"),
+  msm.transmission = c(
                          "msm.trate.multiplier0",
                          "msm.trate.multiplier1",
                          "msm.trate.multiplier2",
                          "msm.trate.black.multiplier",
-                         "msm.trate.hispanic.multiplier") #could add more params here (1-5 per block)
+                         "msm.trate.hispanic.multiplier") 
   
   
 )

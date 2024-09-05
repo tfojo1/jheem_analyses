@@ -1,4 +1,20 @@
-# PK: This is the current verion
+# install.packages("roxygen2")
+# installed.packages("jheem")
+# NEXT STEPS: 
+# contact matrix from JHEEM
+# Testing : symptomatic vs screening ....
+# transitions between continuum stages 
+# birth , death, migration 
+
+# Next steps: 
+# contact proportions
+# decompose the transmission 
+# vary contact by age, sex, race (modeled as independant margines)
+# sexual.transmission.rates : Next step
+# setup a dumy contact amtrix and define the transmisison rate 
+
+# fix the initial population (we have census for 2007, what are the good values to see historical sysphilis rates )
+
 
 # TBD:
 # think about the statistics that we want to record: we will record their average between Jan 1 and Dec 31
@@ -13,19 +29,26 @@
 #@Todd: how to remove all the warnings 
 
 # > specification.metadata=get.specification.metadata("shield","US") 
-##############################
-# Source supporting files
+#'@title Greet
+#'@param name Your name (must be a character value)
+greet = function(name) {
+  print(paste0("Hello, ", name, "!"))
+}
+devtools::build_manual()
+
+# Source libraries ----
 source('../jheem_analyses/source_code.R') # a file that contains all the necessary functions for the JHEEM
 source('../jheem_analyses/applications/SHIELD/shield_parameters.R') # a file that contains the SHIELD specification
-##--------------------##
-##-- INITIAL SET-UP --##
-##--------------------##   
+source('../jheem_analyses/applications/SHIELD/shield_specification_helpers.R') # a file that contains the SHIELD specification
+source('../jheem_analyses/applications/SHIELD/shield_ontology_mappings.R') # a file that contains the SHIELD specification
+
+##--------------------------------------------------------------------------------------------------------------#
+# INITIAL SET-UP ----
 SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                   iteration=1,
                                                   description = "The initial SHIELD version, set up to model national epidemic",
-                                                  start.year = 1940,
-                                                  age.endpoints=c(0,15,20,25,30,35,40,45,50,55,65,Inf), #similar to atlas [0-15][16-20]
-                                                  
+                                                  start.year = 1940, 
+                                                  age.endpoints=c(0,15,20,25,30,35,40,45,50,55,65,Inf), #11 agegroups, similar to atlas [0-15][16-20];
                                                   compartments.for.infected.only = list( 
                                                     continuum = c('undiagnosed', 'diagnosed.untreated'),
                                                     stage = c('ps', 'el','ll','ter')
@@ -39,21 +62,19 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                     race=c('black','hispanic','other'),
                                                     sex= c('heterosexual_male', 'msm', 'female')
                                                   ),
-                                                  
                                                   compartment.value.aliases = list( 
                                                     #try using aliases so that if we change the specification up here, the rest of the code doesnt break
                                                     # helps to define specifications for groups of compartments later on 
                                                     diagnosed.treated.states=c('diagnosed.treated'),
-                                                    
                                                     ps.stages=c('ps'),
                                                     el.stages=c('el'),
                                                     late.stages=c('ll','ter')
                                                   )
 )
-
+##--------------------------------------------------------------------------------------------------------------#
 ##----------------------##
-##-- Fix Strata Sizes --##
-##----------------------##
+# FIX STRATA SIZES ----
+##--------------------------------------------------------------------------------------------------------------#
 #'@title Set Whether to Fix Strata Sizes During a Time Period # a simplifying assumption to avoid modeling population demographic dynamics before year X
 # 2007 earliest year for complete census data
 register.fixed.model.strata(SHIELD.SPECIFICATION, 
@@ -64,46 +85,79 @@ register.fixed.model.strata(SHIELD.SPECIFICATION,
 )
 
 
-##------------------------##
-##-- INITIAL POPULATION --##
-##------------------------##
-# Specify the initial compartment sizes in 1940
-# e.g., model a dummy population: 900 uninfected, 100 infected 
-# we want to define a function to evaluate the population size at the end, after we know the location 
 
-#function
-get.initial.population.infected<-function(location,specification.metadata){
-  dim.names<-specification.metadata$dim.names[c('age','race','sex','continuum','stage')]
-  array(100,dim=sapply(dim.names,length),dimnames=dim.names) #dummy value for now
-}
-# add as an element
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'initial.population.infected',
-                       scale="non.negative.number",
-                       get.value.function = get.initial.population.infected)
+# INITIAL POPULATION ----
+##--------------------------------------------------------------------------------------------------------------#
+# Specify the initial compartment sizes in 1940
+
+#INFECTED 
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'initial.population.infected',
+                        value = 0 )
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'initial.population.infected',
+                               value = expression(base.initial.population* 0.005 * .5),
+                               applies.to = list(continuum='undiagnosed', stage='ps'))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'initial.population.infected',
+                               value = expression(base.initial.population* 0.005 *.5),
+                               applies.to = list(continuum='undiagnosed', stage='ter'))
+
 # define the value for initial population
 register.initial.population(SHIELD.SPECIFICATION,
                             group = 'infected',
                             value = 'initial.population.infected')
 
-##
-get.initial.population.uninfected<-function(location,specification.metadata){
-  dim.names<-specification.metadata$dim.names[c('age','race','sex','profile')]
-  array(900,dim=sapply(dim.names,length),dimnames=dim.names)
-}
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'initial.population.uninfected',
-                       scale="non.negative.number",
-                       get.value.function = get.initial.population.uninfected)
+
+
 register.initial.population(SHIELD.SPECIFICATION,
                             group = 'uninfected',
                             value = 'initial.population.uninfected')
 
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'initial.population.uninfected',
+                        value = 0)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'initial.population.uninfected',
+                               value = expression(base.initial.population * .995),
+                               applies.to = list(profile='susceptible'))
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'base.initial.population',
+                        value = 0)
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'base.initial.population',
+                               applies.to = list(sex='female'),
+                               value = 'base.initial.female.population')
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'base.initial.population',
+                               applies.to = list(sex='msm'),
+                               value = expression(base.initial.male.population * proportion.msm.of.male))
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'base.initial.population',
+                               applies.to = list(sex='heterosexual_male'),
+                               value = expression(base.initial.male.population * (1-proportion.msm.of.male)))
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'base.initial.female.population',
+                       get.value.function = get.base.initial.female.population,
+                       scale = 'non.negative.number')
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'base.initial.male.population',
+                       get.value.function = get.base.initial.male.population,
+                       scale = 'non.negative.number')
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'proportion.msm.of.male',
+                       value=0.1,
+                       scale = 'proportion')
 
 
-##------------------##
-##-- TRANSMISSION --##
-##------------------##
+# TRANSMISSION ----
+##--------------------------------------------------------------------------------------------------------------#
 # Transmission has 4 elements: 1.susceptibility, 2.transmissibility, 3.contact, 4.new infection proportion (where does new infection go to? e.g., infected PrEP, infected not on PrEP)
 # e.g., model a flat transmission rate that applies to all groups
 #each parameter requires a prior distribution
@@ -126,9 +180,9 @@ register.transmission(SHIELD.SPECIFICATION,
                       new.infections.applies.to = list(continuum='undiagnosed',stage='ps'))
 # all.new.infections.into.compartments #@Todd what is this option ????
 
-##----------------------------------------##
-##-- Sexual Transmission Contact Arrays --##
-##----------------------------------------##
+##--------------------------------------------------------------------------------------------------------------#
+## Sexual Transmission Contact Arrays ----
+##--------------------------------------------------------------------------------------------------------------#
 register.model.element(SHIELD.SPECIFICATION,
                        name="global.trate",scale = "rate",value = 1 )
 
@@ -137,7 +191,9 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact',
                         value = expression(global.trate *
                                              sexual.transmission.rates * #msm trans (depends on person getting infected-only males), and het 
-                                          sexual.contact.matrix))
+                                             sexual.contact.by.age))
+                                             # sexual.contact.by.race ))
+# sexual.contact.by.sex ))
 
 # a quantity has to have a scale if we want to intervene in them
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -147,7 +203,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.transmission.rates',
                                applies.to = list(sex.from=c('heterosexual_male','msm'),
                                                  sex.to=c('heterosexual_male','msm')),
-                               value = 'msm.trates')
+                               value = 'msm.trates') #we can add msm.peak.multiplier later if needed
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.transmission.rates',
                                applies.to = list(sex.from=c('heterosexual_male','msm'),
@@ -164,7 +220,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming th
 # log scale for the knots, 
 # natural splines and put the lknows on the log scale 
 register.model.element(SHIELD.SPECIFICATION,
-                        name = 'msm.trates',
+                       name = 'msm.trates',
                        functional.form = create.natural.spline.functional.form(knot.times = c(time0=2000, time1=2010, time2=2020),
                                                                                knot.values = list(time0=0,time1=0,time2=0) ,
                                                                                knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
@@ -186,11 +242,69 @@ register.model.element(SHIELD.SPECIFICATION,
                        functional.form.from.time = 1960, #0 or -Inf #@TODD
                        scale='rate')
 
-#dummy contact matrix for the 99 subgroups 
+
+
+##------------------------------------------------------#
+## Sexual Contact by Age ====
+##------------------------------------------------------#
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'sexual.contact.matrix',
-                        value = 1/99)
-##################################################
+                        name = 'sexual.contact.by.age',
+                        value = 0)
+# sexual contact by age from male to female
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.contact.by.age',
+                               applies.to = list(sex.to='female',
+                                                 sex.from=c('heterosexual_male','msm')),
+                               value = get.female.sexual.age.contact.proportions)
+
+# sexual contact by age from male to male
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.contact.by.age',
+                               applies.to = list(sex.to=c('heterosexual_male','msm'),
+                                                 sex.from=c('heterosexual_male','msm')),
+                               value = get.msm.sexual.age.contact.proportions)
+
+# sexual contact by age from female to male
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.contact.by.age',
+                               applies.to = list(sex.to=c('heterosexual_male','msm'),
+                                                 sex.from='female'),
+                               value = get.heterosexual.male.sexual.age.contact.proportions)
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'age.mixing.sd.mult',
+                       value = 1,
+                       scale='ratio')
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'single.year.female.age.counts',
+                       get.value.function = get.female.single.year.age.counts,
+                       dimension.values = list(age=CENSUS.AGES),
+                       resolve.dimension.values.against.model = F,
+                       scale='non.negative.number')
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'single.year.msm.age.counts',
+                       get.value.function = get.msm.single.year.age.counts,
+                       dimension.values = list(age=CENSUS.AGES),
+                       resolve.dimension.values.against.model = F,
+                       scale='non.negative.number')
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'single.year.heterosexual.male.age.counts',
+                       get.value.function = get.heterosexual.male.single.year.age.counts,
+                       dimension.values = list(age=CENSUS.AGES),
+                       resolve.dimension.values.against.model = F,
+                       scale='non.negative.number')
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'single.year.age.sexual.availability',
+                       value = get.sexual.availability(),
+                       dimension.values = list(age=CENSUS.AGES),
+                       resolve.dimension.values.against.model = F,
+                       scale='non.negative.number')
+
+
 # Susceptibility of uninfected persons
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.susceptibility',
@@ -207,9 +321,9 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         value = 1)
 
 
-##------------------##
-##--   MORTALITY  --##
-##------------------##
+##--------------------------------------------------------------------------------------------------------------#
+# MORTALITY  ----
+##--------------------------------------------------------------------------------------------------------------#
 # different sources of mortality (general, syphilis related, etc.)
 
 register.mortality(SHIELD.SPECIFICATION, 
@@ -222,9 +336,9 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         value = 0.01)
 
 
-##------------------##
-##--   NATALITY   --##
-##------------------##
+##--------------------------------------------------------------------------------------------------------------#
+# NATALITY   ----
+##--------------------------------------------------------------------------------------------------------------#
 # Fertility and birth rate 
 register.natality(specification = SHIELD.SPECIFICATION,
                   parent.groups = c('infected', 'uninfected'),
@@ -269,9 +383,9 @@ register.model.element(SHIELD.SPECIFICATION,
 )
 
 
-##---------------------------##
-##-- Continuum Transitions --##
-##---------------------------##
+##--------------------------------------------------------------------------------------------------------------#
+# CONTINUUM TRANSISION ----
+##--------------------------------------------------------------------------------------------------------------#
 # e.g., fix screening rate of 10% for all infected groups, assuming 90% get treated immediately and 10% remain untreated 
 #assuming those who are diag.untrt will seek trt after a year 
 register.model.element(SHIELD.SPECIFICATION,
@@ -322,9 +436,9 @@ register.remission(SHIELD.SPECIFICATION,
                    remission.proportions.value='remission.prp',
                    tag = 'delayed.trt' )
 
-##---------------------------##
-##-- Stage Transitions --##
-##---------------------------###
+##--------------------------------------------------------------------------------------------------------------#
+## Stage Transitions ----
+##--------------------------------------------------------------------------------------------------------------#
 # e.g., assuming a fix duration for each state: ps= 3months, earlyLatent=9months, LateLatent=10years, Teritiary=infinit
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'duration.ps',
@@ -362,9 +476,9 @@ register.transition(SHIELD.SPECIFICATION,
                     to.compartments = 'ter',
                     value = expression(1/duration.ll))
 
-##---------------------------##
-##--         OUTPUTS.      --##
-##---------------------------##
+##--------------------------------------------------------------------------------------------------------------#
+# OUTPUTS ----
+##--------------------------------------------------------------------------------------------------------------#
 # The model reports 2 categories of outcomes: 
 # 1-cumulative outcomes, reported between jan1 to dec31) 
 # 2-point estimates of compartment sizes reported in Jan 1st 
@@ -482,11 +596,12 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 
 
 
-##--------------------------------##
-##--------------------------------##
-##-- REGISTER THE SPECIFICATION --##
-##--------------------------------##
-##--------------------------------##
+##--------------------------------------------------------------------------------------------------------------#
+##--------------------------------------------------------------------------------------------------------------#
+##-- REGISTER THE SPECIFICATION ----
+##--------------------------------------------------------------------------------------------------------------#
+##--------------------------------------------------------------------------------------------------------------#
+
 
 register.model.specification(SHIELD.SPECIFICATION)
 

@@ -21,8 +21,7 @@
 # On you local computer, within the jheem_analyses directory: Create a "cached" folder. 
 # This directory is not synced to git because of file sizes
 # Use the following link to download required files:
-# https://livejohnshopkins-my.sharepoint.com/:f:/r/personal/mschnur3_jh_edu/Documents/cached_for_postdoc_assignment?csf=1&web=1&e=UBc0k5
-
+# https://www.dropbox.com/scl/fo/5vxliw7fnq91kt0odbeab/AM5SrKajDnDVQ06M7Dmsem4?rlkey=i9rqo23thi9zg9ytav4u1lyha&dl=0
 # Add the following datasets to this cached folder: 
       # surveillance.manager.rdata
       # census.manager.rdata

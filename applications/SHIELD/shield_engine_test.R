@@ -1,12 +1,3 @@
-# Next steps: 
-# contact proportions
-# decompose the transmission 
-# vary contact by age, sex, race (modeled as independant margines)
-# sexual.transmission.rates : Next step
-# setup a dumy contact amtrix and define the transmisison rate 
-
-# fix the initial population (we have census for 2007, what are the good values to see historical sysphilis rates )
-
 
 ##################
 # create the SHIELD.SPECIFICATION
@@ -14,7 +5,11 @@
 # engine.run()
 
 source('applications/SHIELD/shield_specification.R')
-engine = create.jheem.engine('shield', 'US', 2025)
+library(roxygen2)
+roxygen2::roxygenise()
+
+engine = create.jheem.engine('shield', 'C.12580', 2025) #@Todd: to update the code for ontology to work with the US location 
+#@Zoe: will add a line for US data (we dont need the county information for the US)
 params=get.medians(SHIELD.PARAMETERS.PRIOR)
 params['global.trate']=1
 params['msm.trate.multiplier1']=1000
