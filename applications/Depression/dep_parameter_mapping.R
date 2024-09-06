@@ -12,7 +12,7 @@ DEP.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                    element.name = "depression.incidence",
                                                    alpha.name = 'value',
                                                    values = parameters[paste0(races,'.depression.incidence.rr')],
-                                                   dimensions = "race", 
+                                                   dimension = "race", 
                                                    applies.to.dimension.values = races)
   
   sexes <- specification.metadata$dim.names$sex
@@ -20,7 +20,7 @@ DEP.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                  element.name = "depression.incidence",
                                                  alpha.name = 'value',
                                                  values = parameters[paste0(sexes,'.depression.incidence.rr')],
-                                                 dimensions = "sex", 
+                                                 dimension = "sex", 
                                                  applies.to.dimension.values = sexes)
   
   ages <- specification.metadata$dim.names$age
@@ -29,7 +29,7 @@ DEP.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                  element.name = "depression.incidence",
                                                  alpha.name = 'value',
                                                  values = parameters[paste0(age.labels,'.depression.incidence.rr')],
-                                                 dimensions = "age", 
+                                                 dimension = "age", 
                                                  applies.to.dimension.values = ages)
   
   risks <- c("never_IDU", "active_IDU", "IDU_in_remission")
@@ -38,7 +38,7 @@ DEP.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                  element.name = "depression.incidence",
                                                  alpha.name = 'value',
                                                  values = parameters[paste0(risk.labels,'.depression.incidence.rr')],
-                                                 dimensions = "risk", 
+                                                 dimension = "risk", 
                                                  applies.to.dimension.values = risks)
       
 ##### 
@@ -47,28 +47,28 @@ DEP.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                  element.name = "depression.proportion.tx",
                                                  alpha.name = 'value',
                                                  values = parameters[paste0(races,'.depression.proportion.tx.or')],
-                                                 dimensions = "race", 
+                                                 dimension = "race", 
                                                  applies.to.dimension.values = races)
   
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "depression.proportion.tx",
                                                  alpha.name = 'value',
                                                  values = parameters[paste0(sexes,'.depression.proportion.tx.or')],
-                                                 dimensions = "sex", 
+                                                 dimension = "sex", 
                                                  applies.to.dimension.values = sexes)
   
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "depression.proportion.tx",
                                                  alpha.name = 'value',
                                                  values = parameters[paste0(age.labels,'.depression.proportion.tx.or')],
-                                                 dimensions = "age", 
+                                                 dimension = "age", 
                                                  applies.to.dimension.values = ages)
   
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "depression.proportion.tx",
                                                  alpha.name = 'value',
                                                  values = parameters[paste0(risk.labels,'.depression.proportion.tx.or')],
-                                                 dimensions = "risk", 
+                                                 dimension = "risk", 
                                                  applies.to.dimension.values = risks)
   
   
