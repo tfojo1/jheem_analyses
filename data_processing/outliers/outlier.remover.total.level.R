@@ -186,7 +186,7 @@ retention.of.engaged.adjusted <- run.outlier.process(outcome= 'retention.of.enga
 ps.syphilis.adjusted <- run.outlier.process(outcome= 'ps.syphilis',
                                         stratifications= list(c()), 
                                         data.manager= surveillance.manager,
-                                        phi = 0.5,
+                                        phi = 0.6,
                                         theta = 0.05,
                                         max.year = 2019,
                                         locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
@@ -196,7 +196,7 @@ ps.syphilis.adjusted$adjudication <- c(T)
 run.outlier.process(outcome= 'ps.syphilis',
                     stratifications= list(c()),
                     data.manager= surveillance.manager,
-                    phi = 0.5, 
+                    phi = 0.6, 
                     theta = 0.05,
                     max.year = 2019,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")),
@@ -226,7 +226,7 @@ run.outlier.process(outcome= 'early.syphilis',
                     first.choice.year =  2018,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")),
                     adjudication.data.frame = early.syphilis.adjusted)
-# outcome = early.syphilis ------------------------------------------------------
+# outcome = congenital.syphilis ------------------------------------------------------
 #Total
 
 congenital.syphilis.adjusted <- run.outlier.process(outcome= 'congenital.syphilis',
@@ -243,9 +243,9 @@ congenital.syphilis.adjusted <- run.outlier.process(outcome= 'congenital.syphili
 #Do we want to remove these? I'm hesitant bc of rise in gc
 
 # gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
-#                                          stratifications= list(c()), 
+#                                          stratifications= list(c()),
 #                                          data.manager= surveillance.manager,
-#                                          phi = 0.6,
+#                                          phi = 0.75,
 #                                          theta = 0.05,
 #                                          max.year = 2019,
 #                                          locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
