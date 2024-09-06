@@ -1,0 +1,13 @@
+DOCUMENTATION
+generating your project as a package
+  > usethis::create_package("../myProjectFolderNameHere")
+  
+This script helps you to generate the Roxygen2 skeleton for all the functions in your code 
+  > sinew::makeOxyFile("R/shield_specification_helpers.R")
+  
+genrate Rd documentation:
+  > devtools::document()
+  
+generate pdf user manual from Rd documentation:
+  > devtools::build_manual()
+  

@@ -1,0 +1,560 @@
+# 1. Use @rdname to Group Related Functions
+# By using the @rdname tag, you can group multiple functions under the same Rd file. This allows you to control the order of documentation by deciding which function goes under which @rdname. The documentation of all functions with the same @rdname will be combined under one manual page.
+
+
+# FUNCTIONS TO GET BASE INITIAL POPULATION SIZE ----
+## get base initial populations sizes for different groups ----
+#' @title get.base.initial.female.population
+#' @description Generates the size of the 'female' population for the given years by calling
+#' \code{get.base.initial.population.for.sex} for sex-specific population data.
+#' @param location The location for which the population data is being retrieved.
+#' @param specification.metadata Metadata for specification.
+#' @param years Vector of years for which to retrieve population data. Default is `DEFAULT.POPULATION.YEARS`.
+#' @return A 2D matrix showing the number of persons broken down by race (columns) within each age group (rows).
+#' @examples 
+#' get.base.initial.female.population("C.12580", specification.metadata)
+#' where: specification.metadata=get.specification.metadata("shield", "C.12580") 
+get.base.initial.female.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
+{
+  get.base.initial.population.for.sex(location,
+                                      specification.metadata = specification.metadata,
+                                      sex = 'female',
+                                      years = years)
+}
+
+#'
+#' @title get.base.initial.male.population
+#' @description Generates the size of the 'male' population for the given years by calling
+#' \code{get.base.initial.population.for.sex} for sex-specific population data.
+#' @inheritParams get.base.initial.female.population
+#' @inherit get.base.initial.female.population return
+get.base.initial.male.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
+{
+  get.base.initial.population.for.sex(location,
+                                      specification.metadata = specification.metadata,
+                                      sex = 'male',
+                                      years = years)
+}
+
+#'
+#' @title get.base.initial.population.for.sex
+#' @description Generates the size of the population for the given years based on sex.
+#' @inheritParams get.base.initial.male.population
+#' @param sex The sex of the designated population ('male' or 'female').
+#' @return A vector of population for the given years.
+get.base.initial.population.for.sex <- function(location, specification.metadata, sex, years=DEFAULT.POPULATION.YEARS)
+{
+  if (length(specification.metadata$dim.names$location) > 1)
+    stop("We need to specify what to do with more than one location")
+  
+  if (location == 'US')
+    counties = 'US'
+  else
+    counties = locations::get.contained.locations(location, 'county')
+  
+  pop = CENSUS.MANAGER$pull(outcome = 'population', dimension.values = list(year = years, location = counties, sex = sex),
+                            keep.dimensions = c('age', 'race', 'ethnicity', 'sex'),
+                            from.ontology.names = 'census') / length(years)
+  
+  if (is.null(pop))
+    stop("We couldn't find any population data in the census manager")
+  
+  mapping = get.ontology.mapping(from.ontology = dimnames(pop),
+                                 to.ontology = specification.metadata$dim.names[c('age', 'race')])
+  
+  if (is.null(mapping))
+    stop(paste0("Cannot get.base.initial.population.for.sex('",
+                sex,
+                "') - unable to find a mapping from the census to the specification's age and race categorizations"))
+  
+  mapping$apply(pop, to.dim.names = specification.metadata$dim.names[c('age', 'race')])
+}
+
+## get msm popualtion proportion ----
+#'
+#' @title get.proportion.msm.of.male.by.race.functional.form
+#' @description Generates proportion of male who are msm by race
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @return ??? #Todd??
+get.proportion.msm.of.male.by.race.functional.form <- function(location, specification.metadata)
+{
+  best.guess.proportions = get.best.guess.msm.proportions(location = location,
+                                                          specification.metadata = specification.metadata,
+                                                          years = DEFAULT.POPULATION.YEARS,
+                                                          keep.race = T,
+                                                          keep.age = F)
+  
+  # best.guess.proportions = get.best.guess.msm.proportions.by.race(location,
+  #                                                                 specification.metadata = specification.metadata,
+  #                                                                 years = DEFAULT.POPULATION.YEARS,
+  #                                                                 min.age = specification.metadata$age.lower.bounds[1],
+  #                                                                 return.proportions = T)
+  
+  #best.guess.proportions = array(best.guess.proportions, 
+  #                               dim=c(race=length(best.guess.proportions)),
+  #                               dimnames=list(race=names(best.guess.proportions)))
+  
+  create.static.functional.form(best.guess.proportions,
+                                link = 'log',
+                                value.is.on.transformed.scale = F)
+}
+#'
+#' @title get.best.guess.msm.proportions
+#' @description generates proportion of male who are msm by race
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param years years #Todd: which years are these
+#' @param ages agegroups read from specification.metadata$dim.names$age #Todd: isn't this redundant?
+#' @param keep.age keep age #Todd: what does this mean?
+#' @param keep.race keep race #Todd: what does this mean?
+#' @param return.proportions return proportions or frequency
+#' @return a 2D matrix showing the proportion of MSM by age (rows) and race (columns)
+get.best.guess.msm.proportions <- function(location,
+                                           specification.metadata,
+                                           years = 2013,
+                                           ages = specification.metadata$dim.names$age,
+                                           keep.age = T,
+                                           keep.race = T,
+                                           return.proportions = T)
+{
+  counties = locations::get.contained.locations(location, 'county')
+  states = locations::get.overlapping.locations(location, 'state')
+  
+  # Get county-level proportions
+  proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                       dimension.values = list(location=counties,
+                                                                               sex='male'))
+  if (is.null(proportion.msm.by.county) || !setequal(counties, dimnames(proportion.msm.by.county)$location))
+    stop(paste0("Cannot get best-guess msm proportions: we don't have data on proportion msm for all counties in location '", location, "'"))
+  
+  proportion.msm.by.county = apply(proportion.msm.by.county, 'location', mean, na.rm=T)
+  if (any(is.na(proportion.msm.by.county)))
+    stop(paste0("Cannot get best-guess msm proportions: we don't have data on proportion msm for all counties in location '", location, "' (we get some NAs)"))
+  
+  # Get number male and flatten race/ethnicity
+  males = CENSUS.MANAGER$pull(outcome = 'population',
+                              keep.dimensions = c('location', 'age','race','ethnicity'),
+                              dimension.values = list(location = counties,
+                                                      year = years,
+                                                      sex = 'male'),
+                              from.ontology.names = 'census')[,,,,1]
+  
+  if (is.null(males))
+    stop("Cannot get best-guess msm proportions: we are unable to pull any census data on the number of males")
+  
+  if (is.null(ages))
+    ages = dimnames(males)$age
+  
+  
+  flat.census.reth = c(dimnames(males)$race, 'hispanic')
+  flat.census.reth.mapping = create.ontology.mapping(
+    from.dimensions = c('race','ethnicity'),
+    to.dimensions = 'race',
+    mappings = rbind(
+      cbind(dimnames(males)$race,
+            'not hispanic',
+            dimnames(males)$race),
+      cbind(dimnames(males)$race,
+            'hispanic',
+            'hispanic')
+    )
+  )
+  
+  
+  males = flat.census.reth.mapping$apply(males)
+  males[males==0] = 1
+  
+  # Estimate a proportion msm for each race
+  raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                         keep.dimensions = c('year','location','race'),
+                                                         dimension.values = list(location = states,
+                                                                                 sex = 'male'))
+  raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
+  
+  proportions.msm.by.race = c(
+    white = as.numeric(raw.proportion.msm.by.race['White']),
+    black = as.numeric(raw.proportion.msm.by.race['Black']),
+    'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['American Indian/Alaska Native']),
+    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['Asian'] + .1*raw.proportion.msm.by.race['Native Hawaiian/Other Pacific Islander']),
+    hispanic = as.numeric(raw.proportion.msm.by.race['Hispanic'])
+  )
+  proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
+  
+  if (all(is.na(proportions.msm.by.race)))
+    stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
+  
+  proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(proportions.msm.by.race[setdiff(names(proportions.msm.by.race), 'american indian or alaska native')], na.rm=T)
+  
+  # Make a guess as to the n msm
+  first.guess.n.msm = sapply(dimnames(males)$race, function(r){
+    males[,,r] * proportions.msm.by.race[r]
+  })
+  dim.names = dimnames(males)
+  dim(first.guess.n.msm) = sapply(dim.names, length)
+  dimnames(first.guess.n.msm) = dim.names
+  
+  # Scale it to hit the overall proportions in each msm
+  parsed.census.ages = parse.age.strata.names(dimnames(first.guess.n.msm)$age)
+  adult.mask = parsed.census.ages$lower >=13
+  
+  first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,]) / rowSums(males[,adult.mask,])
+  scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county
+  
+  fitted.n.msm = first.guess.n.msm * scale.factor.by.county
+  
+  # Map races
+  if (keep.race)
+  {
+    race.mapping = get.ontology.mapping(from.ontology = dimnames(males)['race'],
+                                        to.ontology = specification.metadata$dim.names['race'])
+    if (is.null(race.mapping))
+      stop("Cannot get best-guess msm proportions: we don't have a mapping from census races to the specification's races")
+    
+    fitted.n.msm = race.mapping$apply(fitted.n.msm)
+    if (return.proportions)
+      males = race.mapping$apply(males)
+  }
+  
+  # Map ages
+  age.mapping = get.ontology.mapping(from.ontology = dimnames(males)['age'],
+                                     to.ontology = list(age=ages))
+  if (is.null(age.mapping))
+    stop("Cannot get best-guess msm proportions: we don't have a mapping from census ages to the specification's age brackets")
+  
+  fitted.n.msm = age.mapping$apply(fitted.n.msm)
+  if (return.proportions)
+    males = age.mapping$apply(males)
+  
+  # Marginalize to get the probabilities
+  keep.dimensions = c('age','race')[c(keep.age, keep.race)]
+  
+  if (length(keep.dimensions)==0)
+  {
+    if (return.proportions)
+      sum(fitted.n.msm) / sum(males)
+    else
+      sum(fitted.n.msm)
+  }
+  else
+  {
+    if (return.proportions)
+      rv = apply(fitted.n.msm, keep.dimensions, sum) / apply(males, keep.dimensions, sum)
+    else
+      rv = apply(fitted.n.msm, keep.dimensions, sum)
+    
+    dim.names = dimnames(fitted.n.msm)[keep.dimensions]
+    
+    dim(rv) = sapply(dim.names, length)
+    dimnames(rv) = dim.names
+    rv
+  }
+}
+
+
+#'
+#' @title get.best.guess.msm.proportions.by.race
+#' @description assumes that within each county, relative risks of being MSM are as in MSM.PROPORTIONS
+#' and total risk of being MSM is as per read.msm.proportions
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param min.age min.age #Todd: what does this mean?
+#' @param years years #Todd: which years are these
+#' @param msm.proportions.by.race msm.proportions.by.race #Todd: what does this mean?
+#' @param return.proportions return proportions or frequency
+#' @param keep.ages keep.ages #Todd: what does this mean?
+#' @return a 2D matrix showing the proportion of MSM by age (rows) and race (columns) #Todd: true?
+get.best.guess.msm.proportions.by.race <- function(location,
+                                                   specification.metadata,
+                                                   min.age=0,
+                                                   years=DEFAULT.POPULATION.YEARS,
+                                                   msm.proportions.by.race = c(black=1-.806, hispanic=1-.854, white=1-.848, other=1-.802),
+                                                   # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4516312/
+                                                   return.proportions=T,
+                                                   keep.ages = F)
+{
+  stop("This function is deprecated - use get.best.guess.msm.proportions() instead")
+  fips = get.contained.locations(location, 'county')
+  
+  proportion.msm.by.location = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                         dimension.values = list(location=fips,
+                                                                                 sex='male'))
+  if (is.null(proportion.msm.by.location) || !setequal(fips, dimnames(proportion.msm.by.location)$location) || any(is.na(proportion.msm.by.location)))
+    stop(paste0("Cannot get best-guess msm proportions: we don't have data on proportion msm for all counties in location '", location, "'"))
+  
+  
+  proportion.msm.by.location = apply(proportion.msm.by.location, 'location', mean, na.rm=T)
+  
+  keep.dimensions = c('location', 'age','race','ethnicity')
+  males = CENSUS.MANAGER$pull(outcome = 'population',
+                              keep.dimensions = keep.dimensions,
+                              dimension.values = list(location = fips,
+                                                      year = years,
+                                                      sex = 'male'),
+                              from.ontology.names = 'census')
+  if (is.null(males))
+    stop(paste0("Cannot get best-guess msm proportions: no population data for location '", location, "' are available"))
+  
+  males = apply(males, keep.dimensions, mean, na.rm=T)
+  
+  # A hack for now while we wait for the real function
+  states = get.overlapping.locations(location, 'state')
+  raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+                                                         keep.dimensions = c('year','location','race'),
+                                                         dimension.values = list(location = states,
+                                                                                 sex = 'male'))
+  raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
+  proportion.msm.by.race = c(black = as.numeric(raw.proportion.msm.by.race['Black']),
+                             hispanic = as.numeric(raw.proportion.msm.by.race['Hispanic']),
+                             white = as.numeric(raw.proportion.msm.by.race['White']),
+                             other = mean(raw.proportion.msm.by.race[setdiff(names(raw.proportion.msm.by.race),
+                                                                             c("Black",'Hispanic','White','Native Hawaiian/Other Pacific Islander','American Indian/Alaska Native'))]))
+  
+  if (min.age > 0)
+  {
+    parsed.ages = parse.age.strata.names(dimnames(males)$age)
+    age.mask = parsed.ages$lower >= min.age
+    
+    if (names(dim(males))[2]!='age')
+      stop(paste0("Cannot get best-guess msm proportions: we assume that 'location' is the first dimension in the census data"))
+    
+    males = males[,age.mask,,]
+  }
+  
+  if (!keep.ages)
+    males = apply(males, setdiff(keep.dimensions, 'age'), sum, na.rm=T)
+  if (!setequal(fips, dimnames(males)$location) || any(is.na(males)))
+    stop(paste0("Cannot get best-guess msm proportions: we don't have census data for all counties in location '", location, "'"))
+  
+  if (names(dim(males))[1]!='location')
+    stop(paste0("Cannot get best-guess msm proportions: we assume that 'location' is the first dimension in the census data"))
+  if (all(dimnames(males)$race != 'white') || all(dimnames(males)$race != 'black'))
+    stop("Cannot get best-guess msm proportions: we assume that population data include 'black' and 'white' race categories")
+  if (all(dimnames(males)$ethnicity != 'hispanic') || all(dimnames(males)$race != 'black'))
+    stop("Cannot get best-guess msm proportions: we assume that population data include 'black' and 'white' race categories")
+  
+  msm.proportions.aligned.to.males = sapply(dimnames(males)$ethnicity, function(e){
+    if (e=='hispanic')
+      rep(as.numeric(proportion.msm.by.race['hispanic']), dim(males)['race'])
+    else
+      sapply(dimnames(males)$race, function(r){
+        rv = as.numeric(proportion.msm.by.race[r])
+        if (is.na(rv))
+          as.numeric(proportion.msm.by.race['other'])
+        else
+          rv
+      })
+  })
+  dimnames(msm.proportions.aligned.to.males) = dimnames(males)[c('race','ethnicity')]
+  msm.proportions.aligned.to.males = expand.array(msm.proportions.aligned.to.males, target.dim.names = dimnames(males))  
+  
+  numerators = proportion.msm.by.location * msm.proportions.aligned.to.males * males *
+    rowSums(males) / rowSums(males * msm.proportions.aligned.to.males) 
+  
+  race.mapping = get.ontology.mapping(from.ontology = dimnames(males)[c('race','ethnicity')],
+                                      to.ontology = specification.metadata$dim.names['race'])
+  if (is.null(race.mapping))
+    stop("Cannot get best-guess msm proportions: we cannot map from the census data's race/ethnicity to the requested races")
+  
+  target.dim.names = specification.metadata$dim.names['race']
+  if (keep.ages)
+    target.dim.names = c(dimnames(males)['age'], target.dim.names)
+  
+  numerators2 = race.mapping$apply(numerators, to.dim.names = target.dim.names)
+  
+  if (return.proportions)
+    numerators2 / race.mapping$apply(males, to.dim.names = target.dim.names)
+  else
+    numerators2 / length(years)
+}
+
+
+
+# FUNCTIONS FOR SEXUAL CONTACT BY AGE ----
+#
+#' @title get.female.sexual.age.contact.proportions
+#' @description returns a list of age contact proportions for females
+#' @param age.mixing.sd.mult multiplier of the standard deviation of the age mixing model (diff_ages_partners ~ Normal(mu,sd))
+#' used for calibration by calling \code{do.get.age.contact.proportions.for.model}
+#' @param single.year.female.age.counts number of individuals within each nominal age year for each age group
+#' @param single.year.age.sexual.availability proportion of individuals within each nominal age year available engaged in sexual activity
+#' @param specification.metadata specification.metadata
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+get.female.sexual.age.contact.proportions <- function(age.mixing.sd.mult, #multiplier of contact matrix sd
+                                                      single.year.female.age.counts,#N
+                                                      single.year.age.sexual.availability,#what proportions sexually active
+                                                      specification.metadata)
+{
+  do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
+                                           location=location,
+                                           age.mixing.sd.mult = age.mixing.sd.mult,
+                                           age.model = PAIRING.INPUT.MANAGER$sex.age.models$female,
+                                           age.counts = single.year.female.age.counts,
+                                           availability = single.year.age.sexual.availability)
+}
+
+#' @title get.msm.sexual.age.contact.proportions
+#' @description returns a list of age contact proportions for msm
+#' @inheritParams get.female.sexual.age.contact.proportions
+#' @inherit get.female.sexual.age.contact.proportions return
+get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
+                                                   single.year.msm.age.counts,
+                                                   single.year.age.sexual.availability,
+                                                   specification.metadata)
+{
+  do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
+                                           location=location,
+                                           age.mixing.sd.mult = age.mixing.sd.mult,
+                                           age.model = PAIRING.INPUT.MANAGER$sex.age.models$msm,
+                                           age.counts = single.year.msm.age.counts,
+                                           availability = single.year.age.sexual.availability)
+}
+
+#' @title get.heterosexual.male.sexual.age.contact.proportions
+#' @description returns a list of age contact proportions for het male
+#' @inheritParams get.female.sexual.age.contact.proportions
+#' @inherit get.female.sexual.age.contact.proportions return
+get.heterosexual.male.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
+                                                                 single.year.heterosexual.male.age.counts,
+                                                                 single.year.age.sexual.availability,
+                                                                 specification.metadata)
+{
+  do.get.age.contact.proportions.for.model(specification.metadata=specification.metadata,
+                                           location=location,
+                                           age.mixing.sd.mult = age.mixing.sd.mult,
+                                           age.model = PAIRING.INPUT.MANAGER$sex.age.models$heterosexual_male,
+                                           age.counts = single.year.heterosexual.male.age.counts,
+                                           availability = single.year.age.sexual.availability)
+}
+
+
+#' @title do.get.age.contact.proportions.for.model
+#' @description returns a list of age contact proportions for designated group
+#' @param location location
+#' @param age.model specific age.model used to inform new partnership probabilities
+#' @inheritParams get.female.sexual.age.contact.proportions
+#' @return OUTPUT_DESCRIPTION
+do.get.age.contact.proportions.for.model <- function(specification.metadata,
+                                                     location,
+                                                     age.mixing.sd.mult,
+                                                     age.model,
+                                                     age.counts,
+                                                     availability)
+
+{
+  #-- Call the function --#
+  age.cutoffs = specification.metadata$age.endpoints
+  age.cutoffs[length(age.cutoffs)] = min(age.cutoffs[length(age.cutoffs)],
+                                         max(as.numeric(names(age.counts))))
+  #returns contact matrix by age
+  get.age.mixing.proportions(age.delta.intercept.mean=age.model['mean.intercept'],
+                             age.delta.slope.mean=age.model['mean.slope'],
+                             age.delta.intercept.sd=age.model['sd.intercept'],
+                             age.delta.slope.sd=age.model['sd.slope'],
+                             age.cutoffs=age.cutoffs,
+                             age.labels=specification.metadata$dim.names$age,
+                             single.year.age.counts=age.counts*availability,
+                             sd.multiplier=age.mixing.sd.mult)
+}
+
+#' @title get.female.single.year.age.counts
+#' @description return counts of female in a single year
+#' @param location location
+#' @param population.years PARAM_DESCRIPTION, Default: DEFAULT.POPULATION.YEARS #Todd?
+#' @return OUTPUT_DESCRIPTION
+get.female.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
+{
+  counties = get.contained.locations(location, 'county')
+  pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=population.years, location=counties, sex='female'),
+                            keep.dimensions = c('age','race','sex','ethnicity'), from.ontology.names = 'census') / length(population.years)
+
+  array(apply(pop, 'age', sum), dim=c(age=length(CENSUS.AGES)), dimnames=list(age=CENSUS.AGES))
+}
+
+#' @title get.male.single.year.age.counts
+#' @description return counts of male in a single year
+#' @inheritParams get.female.single.year.age.counts
+#' @inherit get.female.single.year.age.counts return
+get.male.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
+{
+  counties = get.contained.locations(location, 'county')
+  pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=population.years, location=counties, sex='male'),
+                            keep.dimensions = c('age','race','sex','ethnicity'), from.ontology.names = 'census') / length(population.years)
+
+  array(apply(pop, 'age', sum), dim=c(age=length(CENSUS.AGES)), dimnames=list(age=CENSUS.AGES))
+}
+
+#' @title get.msm.single.year.age.counts
+#' @description return counts of msm in a single year
+#' @inheritParams get.female.single.year.age.counts
+#' @inherit get.female.single.year.age.counts return
+get.msm.single.year.age.counts <- function(location, specification.metadata,
+                                           population.years=DEFAULT.POPULATION.YEARS)
+{
+
+  rv = get.best.guess.msm.proportions(location,
+                                      specification.metadata = specification.metadata,
+                                      years=population.years,
+                                      keep.age = T,
+                                      keep.race = F,
+                                      return.proportions = F,
+                                      ages = NULL)
+  ages = parse.age.strata.names(dimnames(rv)$age)$lower
+  dimnames(rv)$age = as.character(ages)
+
+  rv
+}
+
+#' @title get.heterosexual.male.single.year.age.counts
+#' @description To determine the proportion of the population that falls into specific age buckets
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param population.years PARAM_DESCRIPTION, Default: DEFAULT.POPULATION.YEARS #Todd???
+#' @return OUTPUT_DESCRIPTION
+get.heterosexual.male.single.year.age.counts <- function(location, specification.metadata,
+                                                         population.years=DEFAULT.POPULATION.YEARS)
+{
+  get.male.single.year.age.counts(location = location, population.years = population.years)
+  get.msm.single.year.age.counts(location=location, specification.metadata=specification.metadata,
+                                 population.years=population.years)
+}
+
+
+#' @title 1-get.sexual.availability
+#' @description Determines the proportion of people in each age bucket that are sexually available
+#' @return 1D vector with proportion of people in each age bucket that are sexually available
+#' @details The model reflects an increase in sexual activity starting from age 13, reaching 100% at
+#'  ages 20 to 64, and gradually tapering off until age 85, the final age group.
+get.sexual.availability <- function()
+{
+  rv = rep(1, length(CENSUS.AGES))
+  names(rv) = CENSUS.AGES
+
+  # Assume no sex under 13
+  rv[as.character(0:12)] = 0
+
+  # From Abma 2017
+  availability.13.19 = c('13'=.076, #from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6547075/
+                         '14'=.108, #halfway between
+                         '15'=.13,
+                         '16'=.26,
+                         '17'=.41,
+                         '18'=.55,
+                         '19'=.68) / .75
+  rv[names(availability.13.19)] = availability.13.19
+
+  #from Tessler 2008
+  # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2426743/
+  rv[as.character(65:74)] = mean(c(67.0/83.7,39.5/61.6))
+  rv[as.character(75:as.numeric(names(rv)[length(rv)]))] = mean(c(38.5/83.7,16.7/61.6))
+
+  # Return
+  array(rv, dim=c(age=length(rv)), dimnames=list(age=names(rv)))
+}
+
+
+
+# Documentation
+# devtools::document()
+# devtools::build_manual()
