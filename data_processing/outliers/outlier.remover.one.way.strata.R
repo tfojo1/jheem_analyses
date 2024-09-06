@@ -124,50 +124,45 @@ run.outlier.process(outcome= 'hiv.deaths',
                     adjudication.data.frame = hiv.deaths.stratified)
 
 # ps.syphilis stratified --------------------------------------------------
-
-#Commenting out until we decide how to handle these 
-
-# ps.syphilis.stratified <- run.outlier.process(outcome= 'ps.syphilis',
-#                                               stratifications= list('sex', 'race', 'age', 'risk'), 
-#                                               data.manager= surveillance.manager,
-#                                               phi = 0.6,
-#                                               theta = 0.05,
-#                                               max.year = 2019,
-#                                               locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
-# ps.syphilis.stratified$adjudication <- c(T)
-# run.outlier.process(outcome= 'ps.syphilis',
-#                     stratifications= list('sex', 'race', 'age', 'risk'), 
-#                     data.manager= surveillance.manager,
-#                     phi = 0.6,
-#                     theta = 0.05,
-#                     max.year = 2019,
-#                     locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")),
-#                     adjudication.data.frame = ps.syphilis.stratified)
+ps.syphilis.stratified <- run.outlier.process(outcome= 'ps.syphilis',
+                                              stratifications= list('sex', 'race', 'age', 'risk'),
+                                              data.manager= surveillance.manager,
+                                              phi = 0.6,
+                                              theta = 0.05,
+                                              max.year = 2019,
+                                              locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
+ps.syphilis.stratified$adjudication <- c(T)
+run.outlier.process(outcome= 'ps.syphilis',
+                    stratifications= list('sex', 'race', 'age', 'risk'),
+                    data.manager= surveillance.manager,
+                    phi = 0.6,
+                    theta = 0.05,
+                    max.year = 2019,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")),
+                    adjudication.data.frame = ps.syphilis.stratified)
 
 # early syphilis stratified -----------------------------------------------
 
-#Commenting out until we decide how to handle these 
+early.syphilis.stratified <- run.outlier.process(outcome= 'early.syphilis',
+                                         stratifications= list('sex', 'race', 'age', 'risk'), 
+                                         data.manager= surveillance.manager,
+                                         phi = 0.8,
+                                         theta = 0.05,
+                                         max.year = 2019,
+                                         first.choice.year =  2018,
+                                         locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")))
 
-# early.syphilis.stratified <- run.outlier.process(outcome= 'early.syphilis',
-#                                                  stratifications= list('sex', 'race', 'age', 'risk'), 
-#                                                  data.manager= surveillance.manager,
-#                                                  phi = 0.8,
-#                                                  theta = 0.05,
-#                                                  max.year = 2019,
-#                                                  first.choice.year =  2018,
-#                                                  locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")))
-# 
-# early.syphilis.stratified$adjudication <- c(T)
-# 
-# run.outlier.process(outcome= 'early.syphilis',
-#                     stratifications= list('sex', 'race', 'age', 'risk'), 
-#                     data.manager= surveillance.manager,
-#                     phi = 0.8,
-#                     theta = 0.05,
-#                     max.year = 2019,
-#                     first.choice.year =  2018,
-#                     locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")),
-#                     adjudication.data.frame =  early.syphilis.stratified)
+early.syphilis.stratified$adjudication <- c(T)
+
+run.outlier.process(outcome= 'early.syphilis',
+                    stratifications= list('sex', 'race', 'age', 'risk'),
+                    data.manager= surveillance.manager,
+                    phi = 0.8,
+                    theta = 0.05,
+                    max.year = 2019,
+                    first.choice.year =  2018,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")),
+                    adjudication.data.frame =  early.syphilis.stratified)
 
 
 # gonorrhea - stratified --------------------------------------------------
