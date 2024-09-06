@@ -1,40 +1,20 @@
-# install.packages("roxygen2")
-# installed.packages("jheem")
+# installed.packages("jheem") @Todd: is this ready?
 # NEXT STEPS: 
-# contact matrix from JHEEM
-# Testing : symptomatic vs screening ....
-# transitions between continuum stages 
-# birth , death, migration 
-
-# Next steps: 
-# contact proportions
-# decompose the transmission 
-# vary contact by age, sex, race (modeled as independant margines)
-# sexual.transmission.rates : Next step
-# setup a dumy contact amtrix and define the transmisison rate 
+### contact matrix from JHEEM
+### Testing : symptomatic vs screening ....
+### transitions between continuum stages 
+### birth , death, migration 
 
 # fix the initial population (we have census for 2007, what are the good values to see historical sysphilis rates )
-
 
 # TBD:
 # think about the statistics that we want to record: we will record their average between Jan 1 and Dec 31
 # proportion of people aware of diagnosis ?
 # proportion loving with diag and not track.integrated.outcome(prevalece of syphilis)?
 
-# Deviding diagnosis into 2 mechanism: 
-# 1-screening: for alls tates, can be estiamted based on HIV screening
-# 2- sympthomatic testing: PS states only
-
-
 #@Todd: how to remove all the warnings 
-
 # > specification.metadata=get.specification.metadata("shield","US") 
-#'@title Greet
-#'@param name Your name (must be a character value)
-greet = function(name) {
-  print(paste0("Hello, ", name, "!"))
-}
-devtools::build_manual()
+
 
 # Source libraries ----
 source('../jheem_analyses/source_code.R') # a file that contains all the necessary functions for the JHEEM
@@ -71,7 +51,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                     late.stages=c('ll','ter')
                                                   )
 )
-##--------------------------------------------------------------------------------------------------------------#
+
 ##----------------------##
 # FIX STRATA SIZES ----
 ##--------------------------------------------------------------------------------------------------------------#
@@ -158,18 +138,12 @@ register.model.element(SHIELD.SPECIFICATION,
 
 # TRANSMISSION ----
 ##--------------------------------------------------------------------------------------------------------------#
-# Transmission has 4 elements: 1.susceptibility, 2.transmissibility, 3.contact, 4.new infection proportion (where does new infection go to? e.g., infected PrEP, infected not on PrEP)
+# Transmission has 4 elements: 1.susceptibility, 2.transmissiblity, 3.contact, 4.new infection proportion (where does new infection go to? e.g., infected PrEP, infected not on PrEP)
 # e.g., model a flat transmission rate that applies to all groups
 #each parameter requires a prior distribution
 # 1- those that will be calibrated (calibrating dist)
 # 2- those that wont be calibrated: e.g., jitters in the future (sampling dist)
 
-# parameters are used to scale
-#Specification: parameters affect elements, quantities are calculated from elements 
-# interventions will be defined by parameters too (outside of specification)
-# element: a scalar value or a functional form 
-# constat, fix over iver time,doest ca
-# either vary by strata or changes over time (an equation that will be evaluated to create value of that parameter )
 
 register.transmission(SHIELD.SPECIFICATION,
                       contact.value = 'sexual.contact',
@@ -270,12 +244,14 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(sex.to=c('heterosexual_male','msm'),
                                                  sex.from='female'),
                                value = get.heterosexual.male.sexual.age.contact.proportions)
-
+#all of the components going into a a function for a quantity have to be quantities 
+# quntitities can be equal to another quantity, or an expression or a function of other quantities 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'age.mixing.sd.mult',
                        value = 1,
                        scale='ratio')
 
+# pulls single year age counts for females based on population proportion 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'single.year.female.age.counts',
                        get.value.function = get.female.single.year.age.counts,
@@ -303,6 +279,8 @@ register.model.element(SHIELD.SPECIFICATION,
                        dimension.values = list(age=CENSUS.AGES),
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
+
+
 
 
 # Susceptibility of uninfected persons
@@ -620,3 +598,14 @@ register.calibrated.parameters.for.version('shield',
 
 
 print("SHIELD specification sourced successfully!")
+
+
+## Notes: ----
+
+
+# interventions will be defined by parameters too (outside of specification)
+# Element: a scalar value or a functional form 
+## Scalar: constant value or fix over over time 
+## Functional form: either vary by strata or changes over time (an equation that will be evaluated to create value of that parameter )
+# We generally use additional parameters to model deviations from our prior knowledge and calibrate them to data
+# Parameters affect elements, quantities are calculated from elements 
