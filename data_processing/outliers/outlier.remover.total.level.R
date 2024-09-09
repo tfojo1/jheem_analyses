@@ -226,18 +226,15 @@ congenital.syphilis.adjusted <- run.outlier.process(outcome= 'congenital.syphili
                                                max.year = 2019,
                                                locations= c(surveillance.manager$get.locations.with.data(outcome="congenital.syphilis")))
 # outcome = gonorrhea ------------------------------------------------------
-  #Total- TBD, discuss in meeting
 
-#I downloaded more gc data this month and it has resulted in more outliers
-#Do we want to remove these? I'm hesitant bc of rise in gc
-
-# gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
-#                                          stratifications= list(c()),
-#                                          data.manager= surveillance.manager,
-#                                          phi = 0.75,
-#                                          theta = 0.05,
-#                                          max.year = 2019,
-#                                          locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
+gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
+                                         stratifications= list(c()),
+                                         data.manager= surveillance.manager,
+                                         phi = 1.0,
+                                         theta = 0.5,
+                                         #first.choice.year = 2018,
+                                         locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
+#Look at location 11001- why is 2000-2013 identified as outliers but regardless of how I adjust the values, the true outliers, 2014-2016 are not identified?
 # 
 # gonorrhea.adjusted$adjudication <- c(T, F, T, T, F, F, F, F, T ,F ,T)
 # 
