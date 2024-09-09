@@ -8,7 +8,7 @@ source('../jheem_analyses/source_code.R')
 
 ##--------------------##
 ##--------------------##
-##-- INITIAL SET-UP --##
+##-- INITIAL SET-UP --## ----
 ##--------------------##
 ##--------------------##   
     
@@ -53,7 +53,7 @@ EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
                                                )
 
 ##----------------------##
-##-- Fix Strata Sizes --##
+##-- Fix Strata Sizes --## ----
 ##----------------------##
 
 register.fixed.model.strata(EHE.SPECIFICATION,
@@ -64,7 +64,7 @@ register.fixed.model.strata(EHE.SPECIFICATION,
 
 
 ##------------------------##
-##-- Initial Population --##
+##-- Initial Population --## ----
 ##------------------------##
 
 register.initial.population(EHE.SPECIFICATION,
@@ -228,14 +228,14 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 
 ##--------------------------------------##
 ##--------------------------------------##
-##--        GENERAL QUANTITIES        --##
+##--        GENERAL QUANTITIES        --## ----
 ##--  (for multiple core components)  --##
 ##--------------------------------------##
 ##--------------------------------------##
 
 
 ##----------##
-##-- PrEP --##
+##-- PrEP --## ----
 ##----------##
 
 ##-- Oral PrEP --##
@@ -386,7 +386,7 @@ register.model.quantity(EHE.SPECIFICATION,
 
 
 #-------------#
-#-- Testing --#
+#-- Testing --# ----
 #-------------#
 TESTING.RAMP1.YEAR = 1995
 #TESTING.RAMP2.YEAR = 2005
@@ -480,7 +480,7 @@ register.model.element(EHE.SPECIFICATION,
 
 
 ##---------------------##
-##-- Needle Exchange --##
+##-- Needle Exchange --## ----
 ##---------------------##
 
 register.model.element(EHE.SPECIFICATION, 
@@ -496,7 +496,7 @@ register.model.element(EHE.SPECIFICATION,
 
 
 ##-----------------##
-##-- Suppression --##                            
+##-- Suppression --##  ----                           
 ##-----------------##
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -541,13 +541,13 @@ register.model.element(EHE.SPECIFICATION,
 
 ##--------------------------------##
 ##--------------------------------##
-##--        TRANSITIONS         --##
+##--        TRANSITIONS         --## ----
 ##--------------------------------##
 ##--------------------------------##
 
 
 ##---------------------------##
-##-- Continuum Transitions --##
+##-- Continuum Transitions --## ----
 ##---------------------------##
 
 #-- From Undiagnosed/Acute --#
@@ -614,7 +614,7 @@ register.transition(EHE.SPECIFICATION,
 
 
 ##---------------------##
-##-- IDU Transitions --##
+##-- IDU Transitions --## ----
 ##---------------------##
 
 register.transition(EHE.SPECIFICATION,
@@ -667,7 +667,7 @@ register.model.element(EHE.SPECIFICATION,
 
 ##----------------------------##
 ##----------------------------##
-##--        NATALITY        --##
+##--        NATALITY        --## ----
 ##----------------------------##
 ##----------------------------##
 
@@ -689,7 +689,7 @@ register.natality(specification = EHE.SPECIFICATION,
 
 
 ##---------------##
-##-- Fertility --##                              
+##-- Fertility --## ----                              
 ##---------------##
 
 register.model.element(EHE.SPECIFICATION,
@@ -700,7 +700,7 @@ register.model.element(EHE.SPECIFICATION,
 
 
 ##-----------------------##
-##-- Birth Proportions --##
+##-- Birth Proportions --## ----
 ##-----------------------##
 
 register.model.element(EHE.SPECIFICATION,
@@ -738,12 +738,12 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 
 ##--------------------------------##
 ##--------------------------------##
-##--        MORTALITY           --##
+##--        MORTALITY           --## ----
 ##--------------------------------##
 ##--------------------------------##
 
 ##-------------------##
-##-- HIV Mortality --##
+##-- HIV Mortality --## ----
 ##-------------------##
 
 register.mortality(EHE.SPECIFICATION, 
@@ -773,7 +773,7 @@ register.model.element(EHE.SPECIFICATION,
 
 
 ##-----------------------##
-##-- General Mortality --##
+##-- General Mortality --## ----
 ##-----------------------##
 
 register.mortality(EHE.SPECIFICATION,
@@ -799,12 +799,12 @@ register.model.element(EHE.SPECIFICATION,
 
 ##------------------------##
 ##------------------------##
-##--        AGING       --##
+##--        AGING       --## ----
 ##------------------------##
 ##------------------------##
 
 ##----------------------##
-##-- Uninfected Aging --##
+##-- Uninfected Aging --## ----
 ##----------------------##
 
 #register.transition(EHE.SPECIFICATION,
@@ -825,7 +825,7 @@ register.aging(EHE.SPECIFICATION,
                aging.rate.value = 'uninfected.aging')
 
 ##--------------------##
-##-- Infected Aging --##
+##-- Infected Aging --## ----
 ##--------------------##
 
 register.aging(EHE.SPECIFICATION,
@@ -841,12 +841,12 @@ register.model.element(EHE.SPECIFICATION,
 
 ##----------------------------##
 ##----------------------------##
-##--        MIGRATION       --##
+##--        MIGRATION       --## ----
 ##----------------------------##
 ##----------------------------##
 
 ##-----------------##
-##-- Immigration --##
+##-- Immigration --## ----
 ##-----------------##
 
 register.model.element(EHE.SPECIFICATION,
@@ -878,7 +878,7 @@ register.natality(specification = EHE.SPECIFICATION,
                   tag = "immigration")
 
 ##----------------##
-##-- Emigration --##
+##-- Emigration --## ----
 ##----------------##
 
 register.model.element(EHE.SPECIFICATION,
@@ -896,7 +896,7 @@ register.mortality(EHE.SPECIFICATION,
 
 ##--------------------------------##
 ##--------------------------------##
-##--        TRANSMISSION        --##
+##--        TRANSMISSION        --## ----
 ##--------------------------------##
 ##--------------------------------##
 
@@ -920,7 +920,7 @@ register.transmission(EHE.SPECIFICATION,
 
 
 ##--------------------##
-##-- Susceptibility --##
+##-- Susceptibility --## ----
 ##--------------------##
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -1010,7 +1010,7 @@ register.model.element(EHE.SPECIFICATION,
 
 
 ##-------------------------------##
-##-- New Infection Proportions --##
+##-- New Infection Proportions --## ----
 ##-------------------------------##
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -1032,7 +1032,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 
 
 ##----------------------##
-##-- Transmissibility --##
+##-- Transmissibility --## ----
 ##----------------------##
 
 
@@ -1101,7 +1101,7 @@ register.model.element(EHE.SPECIFICATION,
 
 
 ##----------------------------------------##
-##-- Sexual Transmission Contact Arrays --##
+##-- Sexual Transmission Contact Arrays --## ----
 ##----------------------------------------##
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -1119,7 +1119,7 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'rate')
 
 #---------------------------#
-#-- Sexual Contact by Sex --#
+#-- Sexual Contact by Sex --# ----
 #---------------------------#
 
 # Set up elements
@@ -1217,7 +1217,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 
 
 #---------------------------#
-#-- Sexual Contact by Age --#
+#-- Sexual Contact by Age --# ----
 #---------------------------#
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -1280,7 +1280,7 @@ register.model.element(EHE.SPECIFICATION,
                        scale='non.negative.number')
 
 #----------------------------#
-#-- Sexual Contact by Race --#
+#-- Sexual Contact by Race --# ----
 #----------------------------#
 
 baseline.sexual.oes = array(c(3.76,1,1,1,2.19,1,1,1,1.55),
@@ -1306,7 +1306,7 @@ register.model.element(EHE.SPECIFICATION,
                        get.value.function = get.race.population.counts)
 
 #----------------------------#
-#-- Sexual Contact by Risk --#
+#-- Sexual Contact by Risk --# ----
 #----------------------------#
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -1405,7 +1405,7 @@ register.model.element.values(EHE.SPECIFICATION,
                               oe.never.idu.pairings.with.idu = EHE_BASE_PARAMETER_VALUES['oe.never.idu.pairings.with.idu'])
 
 #-------------------------------#
-#-- Sexual Transmission Rates --#
+#-- Sexual Transmission Rates --# ----
 #-------------------------------#
 
 TIME.PRE.PEAK = 1970
@@ -1547,7 +1547,7 @@ register.model.element(EHE.SPECIFICATION,
 
 
 ##------------------------------------##
-##-- IV Transmission Contact Arrays --##
+##-- IV Transmission Contact Arrays --## ----
 ##------------------------------------##
 
 register.model.quantity(EHE.SPECIFICATION,
@@ -1652,7 +1652,7 @@ register.model.element(EHE.SPECIFICATION,
 
 ##-----------------------------------##
 ##-----------------------------------##
-##-- FOREGROUNDS for COVID EFFECTS --##
+##-- FOREGROUNDS for COVID EFFECTS --## ----
 ##-----------------------------------##
 ##-----------------------------------##
 
@@ -1719,7 +1719,7 @@ register.model.element(EHE.SPECIFICATION,
 
 ##--------------------------##
 ##--------------------------##
-##-- SET TRACKED OUTCOMES --##
+##-- SET TRACKED OUTCOMES --## ----
 ##--------------------------##
 ##--------------------------##
 
@@ -2194,7 +2194,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
 
 ##--------------------------------##
 ##--------------------------------##
-##-- REGISTER THE SPECIFICATION --##
+##-- REGISTER THE SPECIFICATION --## ----
 ##--------------------------------##
 ##--------------------------------##
 
