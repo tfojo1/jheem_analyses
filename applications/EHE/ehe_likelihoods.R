@@ -71,6 +71,11 @@ EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
   
 }
 
+# redo this when we get the new data 
+pop.year.cvs = .015*seq(1,2,length=10)
+pop.year.cvs = c(pop.year.cvs,pop.year.cvs)
+names(pop.year.cvs) = 2010:2029
+
 #-- POPULATION  --#
 population.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
@@ -88,7 +93,8 @@ population.likelihood.instructions =
                                        
                                        # should always be specified; describes how precise the estimates are; 
                                        # e.g., estimates can be off by 3% each year
-                                       error.variance.term = 0.015,
+                                       error.variance.term = 0.015, 
+                                       #error.variance.term = pop.year.cvs,  
                                        error.variance.type = 'cv',
                                        
                                        # downweight because large population size; 
@@ -486,8 +492,8 @@ awareness.likelihood.instructions =
                                                    
                                                    p.bias.inside.location = awareness.bias.estimates$in.mean,
                                                    p.bias.outside.location = awareness.bias.estimates$out.mean,
-                                                   p.bias.sd.inside.location = awareness.bias.estimates$in.sd/2, # trying this out 9/5
-                                                   p.bias.sd.outside.location = awareness.bias.estimates$out.sd/2, # trying this out 9/5
+                                                   p.bias.sd.inside.location = awareness.bias.estimates$in.sd, 
+                                                   p.bias.sd.outside.location = awareness.bias.estimates$out.sd, 
                                                    
                                                    within.location.p.error.correlation = 0.5,
                                                    within.location.n.error.correlation = 0.5,
@@ -499,7 +505,7 @@ awareness.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(1),
+                                                   weights = list(32), # testing this out 9/9
                                                    equalize.weight.by.year = T
   )
 

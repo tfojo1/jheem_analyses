@@ -181,26 +181,15 @@ retention.of.engaged.adjusted <- run.outlier.process(outcome= 'retention.of.enga
                                            locations= c(surveillance.manager$get.locations.with.data(outcome="retention.of.engaged")))
 
 # outcome = ps.syphilis ------------------------------------------------------
-  #Total
-
+  #Total-no outliers.
 ps.syphilis.adjusted <- run.outlier.process(outcome= 'ps.syphilis',
                                         stratifications= list(c()), 
                                         data.manager= surveillance.manager,
-                                        phi = 0.6,
+                                        phi = 0.8,
                                         theta = 0.05,
                                         max.year = 2019,
                                         locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
 
-ps.syphilis.adjusted$adjudication <- c(T)
-
-run.outlier.process(outcome= 'ps.syphilis',
-                    stratifications= list(c()),
-                    data.manager= surveillance.manager,
-                    phi = 0.6, 
-                    theta = 0.05,
-                    max.year = 2019,
-                    locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")),
-                    adjudication.data.frame = ps.syphilis.adjusted)
 
 # outcome = early.syphilis ------------------------------------------------------
 #Total
