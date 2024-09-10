@@ -59,11 +59,7 @@ total.plus.two.way.new = y
 
 new.weight = total.plus.one.way.new/total.plus.two.way.new # 0.3214286
 
-
-## AWARENESS, FROM SURVEILLANCE MANAGER ## 
-z = 0
-# total points 
-z = z + sum(!is.nan(SURVEILLANCE.MANAGER$data$awareness$estimate$cdc.hiv$cdc$year__location[,"24510"])) # have to remove NaNs
-z = z + length(SURVEILLANCE.MANAGER$data$awareness$estimate$cdc.hiv$cdc$year__location[,"MD"])
-
-# 17 total points 
+# weight for awareness would be 18 (as if it had one-way stratifications) - numerator from above 
+# weight for new and prevalence 1/3 
+# anything that's two-way stratified should be 1/3 (new/prev; maybe prep uptake); 
+# anything that's 0-way stratified should have 18 (awareness, general mortality; test positivity; tests year-on-year)
