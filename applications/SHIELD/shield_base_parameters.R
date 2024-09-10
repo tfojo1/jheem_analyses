@@ -22,7 +22,8 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
                            citation=list(),
                            comment=character())
 
-
+# ci's are not used
+# citation numbers are oubmed ID, they're for our own records'
 
 
 ##-- TRANSMISSION --##
@@ -35,6 +36,22 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                              'fraction.heterosexual.male.pairings.with.male',
                                              0.004,0.004*.75,0.004*1.25, #Todd: I'm not sure what the CI should be here?
                                              citation='assumption')
+
+#base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
+#these are average values from 4 different studies that are included in the pairing_input_manager
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
+                                      'oe.sexual.byrace.bb',
+                                      3.76, 3.76*.75, 3.76*1.25,
+                                      citation='assumption')
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
+                                      'oe.sexual.byrace.hh',
+                                      2.19, 2.19*.75, 2.19*1.25,
+                                      citation='assumption')
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
+                                      'oe.sexual.byrace.oo',
+                                      1.55, 1.55*.75, 1.55*1.25,
+                                      citation='assumption')
+
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.sexual.transmission',
                                        4.75, 2.4, 7.1,

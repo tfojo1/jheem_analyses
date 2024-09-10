@@ -8,6 +8,8 @@
 #@rdname. The documentation of all functions with the same @rdname will be combined under one manual page.
 
 # devtools::build_vignettes("../jheem_analyses/applications/SHIELD/")
+CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
+DEFAULT.POPULATION.YEARS = 2007
 
 # BASE INITIAL POPULATION SIZE ----
 ## get base initial populations sizes for different groups ----
@@ -564,7 +566,31 @@ get.sexual.availability <- function()
   array(rv, dim=c(age=length(rv)), dimnames=list(age=names(rv)))
 }
 
+get.race.population.counts <- function(location,
+                                       specification.metadata,
+                                       years=DEFAULT.POPULATION.YEARS)
+{
+  counties = locations::get.contained.locations(location, 'county')
+  population = CENSUS.MANAGER$pull(outcome='population',
+                                   dimension.values = list(location=counties, year=years),
+                                   keep.dimensions = c('location','age','race','ethnicity', 'sex'),
+                                   from.ontology.names = 'census')
 
+  if (is.null(population))
+    stop(paste0("Cannot get.race.population.counts() - no census data were available for the counties of '", location, "'"))
+
+  parsed.ages = parse.age.strata.names(dimnames(population)$age)
+  age.mask = parsed.ages$lower >= specification.metadata$age.lower.bounds[1] &
+    parsed.ages$upper <= specification.metadata$age.upper.bounds[specification.metadata$n.ages]
+
+  race.mapping = get.ontology.mapping(from.ontology = dimnames(population)[c('race','ethnicity')],
+                                      to.ontology = specification.metadata$dim.names['race'])
+
+  if (is.null(race.mapping))
+    stop("Cannot get.race.population.counts() - don't know how to map race to the desired ontology for the specification")
+
+  race.mapping$apply(population[,age.mask,,,,], to.dim.names = specification.metadata$dim.names['race'])
+}
 
 # SEXUAL CONRACT BY RACE ----
 ##-------------##

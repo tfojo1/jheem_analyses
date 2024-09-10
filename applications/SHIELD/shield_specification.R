@@ -20,19 +20,10 @@
 # Working directory is set to the main JHEEM_Analysis folder:
 setwd("~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/")
 # setwd('../../')
-#
-source('../jheem_analyses/source_code.R') # a file that contains all the necessary functions for the JHEEM
-source('../jheem_analyses/applications/SHIELD/shield_parameters.R') # a file that contains the SHIELD specification
-source('../jheem_analyses/applications/SHIELD/shield_ontology_mappings.R') # a file that contains the SHIELD specification
-source('../jheem_analyses/applications/SHIELD/R/shield_specification_helpers.R') # a file that contains the SHIELD specification
-
-# source('../../source_code.R') # a file that contains all the necessary functions for the JHEEM
-# source('../shield_parameters.R') # a file that contains the SHIELD specification
-# source('../shield_ontology_mappings.R') # a file that contains the SHIELD specification
-# source('shield_specification_helpers.R') # a file that contains the SHIELD specification
-
+source('applications/SHIELD/shield_source_code.R')
+# source('applications/SHIELD/shield_source_code.R')
 ##--------------------------------------------------------------------------------------------------------------#
-# INITIAL SET-UP ----
+#-- INITIAL SET-UP --#----
 SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                   iteration=1,
                                                   description = "The initial SHIELD version, set up to model national epidemic",
@@ -62,7 +53,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
 )
 
 
-# FIX STRATA SIZES ----
+##---- Fix Strata Sizes----
 
 #'@title Set Whether to Fix Strata Sizes During a Time Period # a simplifying assumption to avoid modeling population demographic dynamics before year X
 # 2007 earliest year for complete census data
@@ -75,9 +66,9 @@ register.fixed.model.strata(SHIELD.SPECIFICATION,
 
 
 
-# INITIAL POPULATION ----
+#-- INITIAL POPULATION --#----
 # Specify the initial compartment sizes in year 1940
-## BASE POPULATION ----
+##---- Base Population ----
 # step1: defines a blank quantity
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'base.initial.population',
@@ -104,13 +95,13 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'base.initial.male.population',
                        get.value.function = get.base.initial.male.population,
                        scale = 'non.negative.number')
-register.model.element(SHIELD.SPECIFICATION, #Todd: to be reviewed!
+register.model.element(SHIELD.SPECIFICATION,
                        name = 'proportion.msm.of.male',
                        scale = 'proportion',
                        get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
                        functional.form.from.time=2010,
                        functional.form.to.time=2010)
-## INFECTED ----
+##---- Infected ----
 # dummy values: 0.5% are infected, and they are 50% in PS and 50% in Ter stage and all undiagnosed
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'initial.population.infected',
@@ -126,7 +117,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.initial.population(SHIELD.SPECIFICATION,
                             group = 'infected',
                             value = 'initial.population.infected')
-## UNINFECTED ----
+##---- Uninfected ----
 register.initial.population(SHIELD.SPECIFICATION,
                              group = 'uninfected',
                             value = 'initial.population.uninfected')
@@ -154,7 +145,7 @@ register.transmission(SHIELD.SPECIFICATION,
                       new.infections.applies.to = list(continuum='undiagnosed',stage='ps'))
 # all.new.infections.into.compartments #@Todd what is this option ????
 
-## Sexual Contact ----
+##---- Sexual Contact ----
 register.model.element(SHIELD.SPECIFICATION,
                        name="global.trate",
                        scale = "rate",
@@ -168,7 +159,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
                                              sexual.contact.by.age*
                                              sexual.contact.by.sex*
                                              sexual.contact.by.race ))
-## Sexual Contact: Transmission Rates ----
+##---- Sexual Contact: Transmission Rates ----
 # probability of transmission through sexual act, it depends on the recipient, person getting infected
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.transmission.rates',
@@ -201,9 +192,8 @@ register.model.element(SHIELD.SPECIFICATION,
                                                                                # this will also help with data that is skewed to right (long right tail)
                                                                                knot.values = list(time0=0,time1=0,time2=0) ,
                                                                                knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
-
                                                                                #
-                                                                               min=0, #truncate to 0 #Todd: why do we need this?
+                                                                               min=0, #even after using log for knots, value can be negative so we need to truncate
                                                                                knot.link = 'log',link='identity'), #knots on the log-scale and values on the identity scale
                        functional.form.from.time = 1960, #0 or -Inf #@TODD: what is this?
                        scale='rate') #spline with 2010/2020
@@ -213,12 +203,12 @@ register.model.element(SHIELD.SPECIFICATION,
                        functional.form = create.linear.spline.functional.form(knot.times = c(time0=2000, time1=2010, time2=2020),
                                                                               knot.values = list(time0=0,time1=0,time2=0) ,
                                                                               knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
-                                                                              min=0, #truncate to 0 #Todd: why do we need this?
+                                                                              min=0,
                                                                               knot.link = 'log',link='identity') ,
                        functional.form.from.time = 1960, #0 or -Inf #@TODD
                        scale='rate')
 
-## Sexual Contact: By AGE ----
+##---- Sexual Contact: By AGE ----
 # builds an empty sexual contact matrix and applies it to each group based on who they have sexual contact with
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact.by.age',
@@ -236,7 +226,10 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(sex.to=c('heterosexual_male','msm'),
                                                  sex.from=c('heterosexual_male','msm')),
                                value = get.msm.sexual.age.contact.proportions)
-
+#
+# x=get.msm.sexual.age.contact.proportions(specification.metadata = get.specification.metadata("shield",location = "C.12580"),
+#                                        single.year.msm.age.counts = get.msm.single.year.age.counts(location = "C.12580",specification.metadata = get.specification.metadata("shield",location = "C.12580"),population.years = 2007),
+#                                        single.year.age.sexual.availability = get.sexual.availability(),age.mixing.sd.mult = 1)
 # sexual contact by age for males who have sex with female partners
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.age',
@@ -244,6 +237,18 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                                  sex.from='female'),
                                value = get.heterosexual.male.sexual.age.contact.proportions)
 
+# from males...to females...
+# from (HIV+) to susceptible
+# age.from, sex.from, age.to, sex.to
+#
+# sex.from female. age 19 HIV+
+# sex.to hetrosexual male age.to 19
+# for each person at risk of HIV infecyon, what proportion of contact sar form diff groups
+#> females, msms, het males
+#> for female: get.heterosexual.male.sexual.age.contact.proportions
+#> msm, males: get.msm.sexual.age.contact.proportions
+#what's the number of new trans in each startutm: number of new transmision to each statum * size
+# the proportion of partners in this stratum * prev of HIV in this stratum
 #all of the components going into a a function for a quantity have to be quantities
 # we need this as an input to the get.....sexual.age.contact.proportions functions above
 register.model.element(SHIELD.SPECIFICATION,
@@ -279,16 +284,16 @@ register.model.element(SHIELD.SPECIFICATION,
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 
-## Sexual Contact: By SEX ----
+##---- Sexual Contact: By SEX ----
 # Set up elements
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'oe.female.pairings.with.msm',
-                       value = SHIELD_BASE_PARAMETER_VALUES['oe.female.pairings.with.msm'], #Todd: to review
+                       value = SHIELD_BASE_PARAMETER_VALUES['oe.female.pairings.with.msm'],
                        scale = 'ratio')
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.heterosexual.male.pairings.with.male',
-                       value = SHIELD_BASE_PARAMETER_VALUES['fraction.heterosexual.male.pairings.with.male'], #Todd: to review,
+                       value = SHIELD_BASE_PARAMETER_VALUES['fraction.heterosexual.male.pairings.with.male'],
                        scale = 'ratio')
 
 register.model.element(SHIELD.SPECIFICATION,
@@ -385,9 +390,11 @@ register.model.quantity(SHIELD.SPECIFICATION,
 
 ##--------------------------------------------------------------------------------------------------------------#
 
-## Sexual Contact: By RACE ----
-#Todd: what are these? where is this coming from? how can I move this to base parameter ? what sthe reference?
-baseline.sexual.oes = array(c(3.76,1,1,1,2.19,1,1,1,1.55),
+##---- Sexual Contact: By RACE ----
+# oes for racial mixing with the same sex are estiamted from 4 studies. we assume equally likely mixing with other groups
+baseline.sexual.oes = array(c(SHIELD_BASE_PARAMETER_VALUES['oe.sexual.byrace.bb'],1,1,
+                              1,SHIELD_BASE_PARAMETER_VALUES['oe.sexual.byrace.hh'],1,
+                              1,1,SHIELD_BASE_PARAMETER_VALUES['oe.sexual.byrace.oo']),
                             dim = c(race.to=3, race.from=3),
                             dimnames = list(race.to=c('black','hispanic','other'),
                                             race.from=c('black','hispanic','other')))
@@ -410,7 +417,7 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 
-# MORTALITY  ----
+#-- MORTALITY --# ----
 ##--------------------------------------------------------------------------------------------------------------#
 # different sources of mortality (general, syphilis related, etc.)
 
@@ -425,7 +432,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
 
 
 ##--------------------------------------------------------------------------------------------------------------#
-# NATALITY   ----
+#-- NATALITY  --# ----
 ##--------------------------------------------------------------------------------------------------------------#
 # Fertility and birth rate
 register.natality(specification = SHIELD.SPECIFICATION,
@@ -472,24 +479,51 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 ##--------------------------------------------------------------------------------------------------------------#
-# CONTINUUM TRANSISION ----
-##--------------------------------------------------------------------------------------------------------------#
-# e.g., fix screening rate of 10% for all infected groups, assuming 90% get treated immediately and 10% remain untreated
-#assuming those who are diag.untrt will seek trt after a year
+#-- CONTINUUM TRANSISION --# ----
+##---- TESTING ----
+# There are 2 components to testing: underlying screening rate (for everyone), additional sympthomatic testing rates (for ps and ter stages)
+#@PK: to add a functional form for symp.testing and screening rate
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'screening.rate',
                        scale = 'rate',
                        value = 0.1)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'sym.ps.testing.rate',
+                       scale = 'rate',
+                       value = 0.1)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'sym.ter.testing.rate',
+                       scale = 'rate',
+                       value = 0.1)
+#  the model knows that testing applies to undiagnosed group from where they end up in the following steps, so we dont have to apply to that dimension (continuum = 'undiagnosed')
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'testing.rate',
+                        scale='rate',
+                        value = 'screening.rate')
+#adding symptomatic testing to underlying screening rate for specific stages
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'testing.rate',
+                               applies.to = list(stage = 'ps'),
+                               value = 'sym.ps.testing.rate',
+                               apply.function = 'add')
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'testing.rate',
+                               applies.to = list(stage = 'ter'),
+                               value = 'sym.ter.testing.rate',
+                               apply.function = 'add')
+
+# assuming 90% get treated immediately and 10% remain untreated
+#assuming those who are diag.untrt will seek trt after a year
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'proportion.immediately.treated',
                        scale = 'proportion',
                        value = 0.9)
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'screening.immediate.treatment.rate',
-                        value = expression(screening.rate * proportion.immediately.treated))
+                        value = expression(testing.rate * proportion.immediately.treated))
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'screening.delayed.treatment.rate',
-                        value = expression(screening.rate * (1-proportion.immediately.treated)))
+                        value = expression(testing.rate * (1-proportion.immediately.treated)))
 
 #screening followed by immediate trt
 register.remission(SHIELD.SPECIFICATION,
@@ -525,7 +559,13 @@ register.remission(SHIELD.SPECIFICATION,
                    tag = 'delayed.trt' )
 
 ##--------------------------------------------------------------------------------------------------------------#
-## Stage Transitions ----
+
+#screening rate
+# testing rate.ps
+#testing rate ter
+
+
+##---- Stage Transitions ----
 ##--------------------------------------------------------------------------------------------------------------#
 # e.g., assuming a fix duration for each state: ps= 3months, earlyLatent=9months, LateLatent=10years, Teritiary=infinit
 register.model.element(SHIELD.SPECIFICATION,
@@ -565,7 +605,7 @@ register.transition(SHIELD.SPECIFICATION,
                     value = expression(1/duration.ll))
 
 ##--------------------------------------------------------------------------------------------------------------#
-# OUTPUTS ----
+#-- OUTPUTS --#----
 ##--------------------------------------------------------------------------------------------------------------#
 # The model reports 2 categories of outcomes:
 # 1-cumulative outcomes, reported between jan1 to dec31)
@@ -655,8 +695,9 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex'),
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis' #corresponding to the name in data manager
 )
-##########################
-# Incidence (new infections + reinfections)
+
+# Incidence ----
+# (new infections + reinfections)
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'incidence',
                       outcome.metadata = create.outcome.metadata(display.name = 'Incidence',
@@ -668,8 +709,9 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'incidence.from', # use of ".from" helps us track where individuals are coming from (differentiate new vs re-infections)
                       keep.dimensions = c('location','age','race','sex','profile')
 )
-##########################
-# New Treatment Initiations: Immediate and Delayed
+
+# Treatment Initiations ----
+# : Immediate and Delayed
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'trt.initiation',
                       outcome.metadata = create.outcome.metadata(display.name = 'Treatment Initiation',
@@ -681,7 +723,26 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = "remission.from", #where they come from
                       keep.dimensions = c('location','age','race','sex','stage')
 )
-
+track.point.outcome(SHIELD.SPECIFICATION,
+                    name='point.population',
+                    outcome.metadata = NULL, #we are not saving it
+                    scale='non.negative.number',
+                    save=F,
+                    value=expression(infected+uninfected),
+                    keep.dimensions = c('location','age','race','sex') #collapse on stage and continuum for infected and on profile as well
+                    )
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name='population',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                                                                    description = "Population size",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Persons',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'), #will read the scale from metadata
+                         value.to.integrate = 'point.population',
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'population' #Zoe: data should include persons under 13 (JHEEM data only includes 13+)
+                           )
 
 
 ##--------------------------------------------------------------------------------------------------------------#
@@ -693,11 +754,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 
 register.model.specification(SHIELD.SPECIFICATION)
 
-#@Melissa:
-#set this up for shield, and place the global transmission rate to play around
-# source('../jheem_analyses/applications/EHE/ehe_parameters_helpers.R')
-# source('../jheem_analyses/applications/EHE/ehe_parameters.R')
-# source('../jheem_analyses/applications/EHE/ehe_parameter_mapping.R')
+
 #
 register.calibrated.parameters.for.version('shield',
                                            distribution = SHIELD.PARAMETERS.PRIOR,
@@ -724,3 +781,17 @@ print("SHIELD specification sourced successfully!")
 # We generally use additional parameters to model deviations from our prior knowledge and calibrate them to data
 # Parameters affect elements, quantities are calculated from elements
 
+
+
+
+# linear line on the log scale will be exponetial after transportation
+# so in general we only trnasform knots in the log scale
+# when we sample those parameters )sample alpha a change), we will multiple in the knot validate.sub.version.code(and since knows tare in the log scale I can add them in thelog scale
+#                                                                                                                                                                                                                                 )
+
+
+# cumulative vs point: ndiagnosis: any diagnosis that were made during a year or n at. a single time in that year
+# infected + uninfected: these are reported at a single point in time Jan 1st of each year
+# assuming that census take place at a random time during hte year, we use the integral under population curve could be used for calibration
+# average of 2 points
+# outcomes: 1.point (like infected unifected), 2. some event count (incidence)
