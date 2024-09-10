@@ -23,7 +23,7 @@ collection$run(2025, 2035, verbose=TRUE, overwrite.prior=T) # stop.for.errors = 
 ### NEW SET OF SIMSETS ############
 
 ### Load simsets
-load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.26420.Rdata") #Baltimore
+load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.12580.Rdata") #Baltimore
 simset$save()
 load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.35620.Rdata") #NYC
 simset$save()

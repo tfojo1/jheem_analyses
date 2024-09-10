@@ -19,7 +19,9 @@ testing.increase = create.intervention.effect('general.population.testing', #tes
                                               apply.effects.as = 'multiplier', #times what testing rate would have been on 1/1/2030
                                               times = IMPLEMENTED.BY.YEAR,
                                               allow.values.less.than.otherwise = F, #do not allow testing rate to decrease vs. NC
-                                              allow.values.greater.than.otherwise = T) #allow testing rate to increase vs. NC
+                                              allow.values.greater.than.otherwise = T, #allow testing rate to increase vs. NC
+                                              min.acceptable.parameter.value = 1, #set bounds for reasonable intervention effect
+                                              max.acceptable.parameter.value = 20)
 
 suppression.increase = create.intervention.effect('suppression.of.diagnosed', #percent suppressed
                                               start.time = START.YEAR,
@@ -28,16 +30,20 @@ suppression.increase = create.intervention.effect('suppression.of.diagnosed', #p
                                               apply.effects.as = 'multiplier', #times what % unsuppressed would have been on 1/1/2030
                                               times = IMPLEMENTED.BY.YEAR,
                                               allow.values.less.than.otherwise = F, #do not allow % suppressed to decrease vs. NC
-                                              allow.values.greater.than.otherwise = T) #allow % suppressed to increase vs. NC
+                                              allow.values.greater.than.otherwise = T, #allow % suppressed to increase vs. NC
+                                              min.acceptable.parameter.value = 0.05, #set bounds for reasonable intervention effect
+                                              max.acceptable.parameter.value = 1)
 
 prep.increase = create.intervention.effect('oral.prep.uptake', #% initiated PrEP
-                                                  start.time = START.YEAR,
-                                                  effect.values = 'uninitiated.multiplier',
-                                                  scale = 'proportion.staying', #1-p
-                                                  apply.effects.as = 'multiplier', #times what % unsuppressed would have been on 1/1/2030
-                                                  times = IMPLEMENTED.BY.YEAR,
-                                                  allow.values.less.than.otherwise = F, #allow % suppressed to decrease vs. NC?
-                                                  allow.values.greater.than.otherwise = T) #allow % suppressed to increase vs. NC?
+                                              start.time = START.YEAR,
+                                              effect.values = 'uninitiated.multiplier',
+                                              scale = 'proportion.staying', #1-p
+                                              apply.effects.as = 'multiplier', #times what % uninitiated would have been on 1/1/2030
+                                              times = IMPLEMENTED.BY.YEAR,
+                                              allow.values.less.than.otherwise = F, #allow % initiated to decrease vs. NC?
+                                              allow.values.greater.than.otherwise = T, #allow % initiated to increase vs. NC?
+                                              min.acceptable.parameter.value = 0.05, #set bounds for reasonable intervention effect
+                                              max.acceptable.parameter.value = 1)
 
 #Create joint intervention and specify target population
 base.intervention = create.intervention(WHOLE.POPULATION,
