@@ -11,13 +11,6 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum") # this i
 #load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")
 
 ## --- ANDREW TO LOOK AT ---- ## 
-# When I include a facet.by, I'm getting an error: "Error in names(returned.types) = locations : attempt to set an attribute on NULL"
-simplot(simset,
-        facet.by = "age", # total; sex/race/age one-way
-        outcomes = c("sexual.transmission.rates"), 
-        style.manager = location.style.manager,
-        plot.year.lag.ratio = T,
-        dimension.values = list(year = 2000:2030)) 
 
 ## --- STANDARD PLOTS ---- ## 
 simplot(simset,
@@ -95,7 +88,7 @@ simplot(simset,
         dimension.values = list(year = 1980:2030)) 
 
 simplot(simset,
-        facet.by = "risk", # age, sex, race, risk; 1-way 
+        facet.by = "age", # age, sex, race, risk; 1-way 
         outcomes = c("testing"),
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
@@ -135,6 +128,11 @@ simplot(simset,
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
 
+simplot(simset,
+        outcomes = c("sexual.transmission.rates"), 
+        style.manager = location.style.manager,
+        plot.year.lag.ratio = T,
+        dimension.values = list(year = 2000:2030)) 
 
 
 # simplot(sim,outcomes = "total.hiv.tests")
