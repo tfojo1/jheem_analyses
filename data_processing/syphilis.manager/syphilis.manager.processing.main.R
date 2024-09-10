@@ -358,7 +358,7 @@ source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/prep.data.R')
-source('data_processing/syphilis.manager/proportion.msm.R')
+source('data_processing/syphilis.manager/cached.proportion.msm.R')
 
 # RENAME ------------------------------------------------------------------
 
