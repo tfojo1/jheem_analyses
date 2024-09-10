@@ -2,6 +2,10 @@
 #I'm going to pull this from the surveillance manager because it actually pulls from
 #BRFSS so to run it independently would be a lot of processing time
 
+
+surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
+
+
 # Source One = BRFSS -----------------------------------------------------
 brfss_sex = as.data.frame.table(surveillance.manager$data$proportion.msm$estimate$brfss$brfss$year__location__sex)%>%
   rename(value = Freq)%>%
