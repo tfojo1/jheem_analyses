@@ -349,7 +349,7 @@ population.age.race.eth.20.23<- population.age.race.eth.20.23[!duplicated(popula
 population.age.race.eth.20.23= as.data.frame(population.age.race.eth.20.23)
 
 # Race+Ethnicity ----------------------------------------------------------
-population.race.eth.20.23 <- population.race.eth.sex%>%
+population.race.eth.20.23 <- population.race.eth.sex.20.23%>%
   group_by(year, location, race, ethnicity)%>%
   mutate(value.new = sum(value))%>%
   select(-sex, -value.new)
