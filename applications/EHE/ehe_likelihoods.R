@@ -162,7 +162,7 @@ new.diagnoses.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1), 
+                                       weights = list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
   )
 
@@ -189,7 +189,7 @@ prevalence.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1), 
+                                       weights = list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
   )
 
@@ -236,7 +236,7 @@ general.mortality.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1), 
+                                       weights = list(18), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
   )
 
@@ -306,7 +306,7 @@ prep.uptake.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1), 
+                                       weights = list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
   )
 
@@ -357,7 +357,7 @@ awareness.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(18), 
+                                                   weights = list(18), # see prev_new_aware_weighting.R 
                                                    equalize.weight.by.year = T
   )
 
@@ -496,7 +496,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(1),
+                                                   weights = list(18), # see prev_new_aware_weighting.R 
                                                    equalize.weight.by.year = T
   )
 
@@ -531,7 +531,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
     
-    weights = list(1),
+    weights = list(18), # see prev_new_aware_weighting.R 
     equalize.weight.by.year = F,
     use.lognormal.approximation = T
   )
@@ -552,7 +552,7 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     error.variance.term = 0.03,
     error.variance.type = 'cv',
     
-    weights = list(1),
+    weights = list(18), # see prev_new_aware_weighting.R 
     equalize.weight.by.year = F,
     use.lognormal.approximation = T
   )
