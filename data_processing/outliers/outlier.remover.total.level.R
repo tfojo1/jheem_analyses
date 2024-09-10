@@ -181,26 +181,15 @@ retention.of.engaged.adjusted <- run.outlier.process(outcome= 'retention.of.enga
                                            locations= c(surveillance.manager$get.locations.with.data(outcome="retention.of.engaged")))
 
 # outcome = ps.syphilis ------------------------------------------------------
-  #Total
-
+  #Total-no outliers.
 ps.syphilis.adjusted <- run.outlier.process(outcome= 'ps.syphilis',
                                         stratifications= list(c()), 
                                         data.manager= surveillance.manager,
-                                        phi = 0.6,
+                                        phi = 0.8,
                                         theta = 0.05,
                                         max.year = 2019,
                                         locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")))
 
-ps.syphilis.adjusted$adjudication <- c(T)
-
-run.outlier.process(outcome= 'ps.syphilis',
-                    stratifications= list(c()),
-                    data.manager= surveillance.manager,
-                    phi = 0.6, 
-                    theta = 0.05,
-                    max.year = 2019,
-                    locations= c(surveillance.manager$get.locations.with.data(outcome="ps.syphilis")),
-                    adjudication.data.frame = ps.syphilis.adjusted)
 
 # outcome = early.syphilis ------------------------------------------------------
 #Total
@@ -226,8 +215,8 @@ run.outlier.process(outcome= 'early.syphilis',
                     first.choice.year =  2018,
                     locations= c(surveillance.manager$get.locations.with.data(outcome="early.syphilis")),
                     adjudication.data.frame = early.syphilis.adjusted)
-# outcome = congenital.syphilis ------------------------------------------------------
-#Total
+# outcome = congenital.syphilis - zero outliers ------------------------------------------------------
+
 
 congenital.syphilis.adjusted <- run.outlier.process(outcome= 'congenital.syphilis',
                                                stratifications= list(c()), 
@@ -237,18 +226,15 @@ congenital.syphilis.adjusted <- run.outlier.process(outcome= 'congenital.syphili
                                                max.year = 2019,
                                                locations= c(surveillance.manager$get.locations.with.data(outcome="congenital.syphilis")))
 # outcome = gonorrhea ------------------------------------------------------
-  #Total- TBD, discuss in meeting
-
-#I downloaded more gc data this month and it has resulted in more outliers
-#Do we want to remove these? I'm hesitant bc of rise in gc
 
 # gonorrhea.adjusted <- run.outlier.process(outcome= 'gonorrhea',
 #                                          stratifications= list(c()),
 #                                          data.manager= surveillance.manager,
-#                                          phi = 0.75,
-#                                          theta = 0.05,
-#                                          max.year = 2019,
+#                                          phi = 1.0,
+#                                          theta = 0.5,
+#                                          #first.choice.year = 2018,
 #                                          locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
+#Look at location 11001- why is 2000-2013 identified as outliers but regardless of how I adjust the values, the true outliers, 2014-2016 are not identified?
 # 
 # gonorrhea.adjusted$adjudication <- c(T, F, T, T, F, F, F, F, T ,F ,T)
 # 

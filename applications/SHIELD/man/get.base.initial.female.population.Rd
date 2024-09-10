@@ -26,5 +26,5 @@ Generates the size of the 'female' population for the given years by calling
 }
 \examples{
 get.base.initial.female.population("C.12580", specification.metadata)
-where: specification.metadata=get.specification.metadata("shield", "C.12580") 
+where: specification.metadata=get.specification.metadata("shield", "C.12580")
 }

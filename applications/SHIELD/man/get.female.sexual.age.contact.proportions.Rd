@@ -2,7 +2,7 @@
 % Please edit documentation in R/shield_specification_helpers.R
 \name{get.female.sexual.age.contact.proportions}
 \alias{get.female.sexual.age.contact.proportions}
-\title{get.female.sexual.age.contact.proportions}
+\title{1.1.get.female.sexual.age.contact.proportions}
 \usage{
 get.female.sexual.age.contact.proportions(
   age.mixing.sd.mult,
@@ -27,6 +27,6 @@ OUTPUT_DESCRIPTION
 \description{
 returns a list of age contact proportions for females
 }
-\details{
-DETAILS
+\references{
+\file{inst/docs/sexual_contacts.docx}
 }

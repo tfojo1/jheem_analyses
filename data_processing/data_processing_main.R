@@ -1786,8 +1786,9 @@ get.msa.totals.from.county.simple(outcome= 'deaths',
 
 
 # Remove outliers ---------------------------------------------------------
-source('data_processing/outliers/outlier.remover.R')
+source('data_processing/outliers/outlier.remover.total.level.R')
 source('data_processing/outliers/outlier.remover.one.way.strata.R')
+source('data_processing/outliers/outlier.remover.two.way.strata.R')
 
 # Save --------------------------------------------------------------------
 
