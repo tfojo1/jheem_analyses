@@ -95,6 +95,12 @@ data.list.county.90.clean = lapply(data.list.county.90 , function(file){
   if(grepl("1999", filename)) {
     data$year = "1999"
   }
+  
+  data <- data %>% #Fixing Dade and St Geneive Counties
+    mutate(location = ifelse(location == "12025", "12086", location))%>%
+    mutate(location = ifelse(location == "29193", "29186", location))
+  
+  
   data = as.data.frame(data)
   list(filename, data)  
 })
@@ -127,6 +133,10 @@ data.list.80.county.clean = lapply(county_80.89 , function(file){
   
   data$outcome = "population"
   data= as.data.frame(data)
+  
+  data <- data %>% #Fixing Dade and St Geneive Counties
+    mutate(location = ifelse(location == "12025", "12086", location))%>%
+    mutate(location = ifelse(location == "29193", "29186", location))
   
   list(sheet, data)  
   
@@ -184,7 +194,11 @@ data <- data %>%
 
 data$outcome = "population"
 data= as.data.frame(data)
-  
+
+data <- data %>%
+  mutate(location = ifelse(location == "12025", "12086", location))%>%
+  mutate(location = ifelse(location == "29193", "29186", location))
+
 list(filename, data)  
 
 })
@@ -249,7 +263,6 @@ us.total.90.99 = lapply(data.list.county.90.clean, function(file){
   
   list(filename, data) 
 })
-
 
 ################################################################################
                   ###PUT INTO CENSUS MANAGER###

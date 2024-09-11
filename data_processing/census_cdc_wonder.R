@@ -43,6 +43,10 @@ data.list.cdc.wonder.clean = lapply(data.list.cdc.wonder  , function(file){
     select(outcome, year, location, age, race, ethnicity, sex, value)%>%
     filter(year != "2020")  #Removign 2020 data now that we have census data for 2020 by single year ages
   
+  data <- data %>% #Fixing Dade and St Geneive Counties
+    mutate(location = ifelse(location == "12025", "12086", location))%>%
+    mutate(location = ifelse(location == "29193", "29186", location))
+  
   data = as.data.frame(data)
   list(filename, data)  
   
@@ -77,7 +81,7 @@ for (data in county_single_year_age) {
 dummy.counties.cdc.wonder  <- data.frame(
   outcome = c('population'),
   year = c('2018'),
-  location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+  location = c('51560', '51780', '51123'), #These are the counties that have changed#
   value = as.numeric(NA),
   race = c('American Indian or Alaska Native'),
   ethnicity = c('Hispanic or Latino'),

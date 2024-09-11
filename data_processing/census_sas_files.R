@@ -89,6 +89,10 @@ data.list.census.sas.clean = lapply(census_sas_data_list, function(file){
                   names_sep = "_",
                   values_to = "value")
    
+   data <- data %>% #Fixing Dade and St Geneive Counties
+     mutate(location = ifelse(location == "12025", "12086", location))%>%
+     mutate(location = ifelse(location == "29193", "29186", location))
+   
  data = as.data.frame(data)
   list(filename, data)
 
@@ -125,7 +129,7 @@ for (data in census_sas_pops) {
   dummy.counties.census <- data.frame(
     outcome = c('population'),
     year = c('2010'),
-    location = c('12025', '51560', '51780', '51123', '29193'), #These are the counties that have changed#
+    location = c('51560', '51780', '51123'), #These are the counties that have changed#
     value = as.numeric(NA),
     race = c('white'),
     ethnicity = c('not hispanic'),

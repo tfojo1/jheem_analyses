@@ -50,6 +50,10 @@ data.list.births.clean = lapply(data.list.births, function(file){
    data$location_flag = locations::is.location.valid(data$location)
    data = subset(data, data$location_flag != 'FALSE')
 
+   data <- data %>% #Fixing Dade and St Geneive Counties
+     mutate(location = ifelse(location == "12025", "12086", location))%>%
+     mutate(location = ifelse(location == "29193", "29186", location))
+   
   data <- data %>%
     select(outcome, year, location, value, race, ethnicity)
   
@@ -95,6 +99,10 @@ data.list.births.denominator = lapply(data.list.births, function(file){
   #Remove locations that are invalid
   data$location_flag = locations::is.location.valid(data$location)
   data = subset(data, data$location_flag != 'FALSE')
+  
+  data <- data %>% #Fixing Dade and St Geneive Counties
+    mutate(location = ifelse(location == "12025", "12086", location))%>%
+    mutate(location = ifelse(location == "29193", "29186", location))
   
   data <- data %>%
     select(outcome, year, location, value, race, ethnicity)
@@ -182,6 +190,10 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
    data = subset(data, data$ethnicity != "Not Stated")
    data = subset(data, data$age != "Not Stated")
   
+   data <- data %>% #Fixing Dade and St Geneive Counties
+     mutate(location = ifelse(location == "12025", "12086", location))%>%
+     mutate(location = ifelse(location == "29193", "29186", location))
+   
      data <- data %>%
       select(outcome, year, location, value, sex, age, race, ethnicity)
   
@@ -224,6 +236,10 @@ data.list.deaths.denom = lapply(data.list.deaths, function(file){
   
    data = subset(data, data$ethnicity != "Not Stated")
    data = subset(data, data$age != "Not Stated")
+   
+   data <- data %>% #Fixing Dade and St Geneive Counties
+     mutate(location = ifelse(location == "12025", "12086", location))%>%
+     mutate(location = ifelse(location == "29193", "29186", location))
 
      data <- data %>%
        select(outcome, year, location, value, sex, age, race, ethnicity)

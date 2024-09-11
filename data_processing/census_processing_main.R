@@ -106,16 +106,16 @@ census.manager$register.ontology(
     sex=c('male','female')
   ))
 
-census.manager$register.ontology(
-  'census.cdc.wonder.births.deaths',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('< 1 year', '1-4 years', '5-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65-74 years', '75-84 years', '85+ years', 'Not Stated'),
-    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White', "More than one race", 'Not Reported', "Unknown or Not Stated", "Not Available"),
-    ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino', 'Unknown or Not Stated', "Not Stated"),
-    sex=c('male','female')
-  ))
+# census.manager$register.ontology(
+#   'census.cdc.wonder.births.deaths',
+#   ont = ontology(
+#     year= NULL,
+#     location= NULL,
+#     age=c('< 1 year', '1-4 years', '5-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65-74 years', '75-84 years', '85+ years', 'Not Stated'),
+#     race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White', "More than one race", 'Not Reported', "Unknown or Not Stated", "Not Available"),
+#     ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino', 'Unknown or Not Stated', "Not Stated"),
+#     sex=c('male','female')
+#   ))
 
 census.manager$register.ontology(
   'census',
