@@ -15,6 +15,8 @@ params=get.medians(SHIELD.PARAMETERS.PRIOR)
 # params['msm.trate.multiplier1']=1000
 
 sim = engine$run(params)
+simplot(sim, 'population')
+sim$population
 # sim$parameters
 #
 # params2=c(global.trate=2)
@@ -23,8 +25,7 @@ sim = engine$run(params)
 # =generate.random.samples(SHIELD.PARAMETERS.PRIOR,10)
 
 
-simplot(sim, 'population')
-sim$population
+
 
 simplot(sim, 'incidence')
 # ,split.by = 'age',facet.by = 'race')
