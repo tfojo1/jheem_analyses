@@ -4,13 +4,22 @@
 library(locations)
 library(distributions)
 
-source('../jheem_analyses/commoncode/cache_manager.R')
-
-
 # This 'source' call is equivalent to loading the jheem2 package
 source('../jheem2/R/tests/source_jheem2_package.R')
+
+# Common code from JHEEM
+source('../jheem_analyses/commoncode/cache_manager.R')
+source('../jheem_analyses/commoncode/target_populations.R')
+source('../jheem_analyses/commoncode/age_mappings.R')
+source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
+source('../jheem_analyses/commoncode/logitnorm_helpers.R')
 source('../jheem_analyses/commoncode/file_paths.R')
+
+# Set the root directory
 set.jheem.root.directory(ROOT.DIR)
+
+# Data Loads
+load(file.path(JHEEM.CACHE.DIR, 'google_mobility_data.Rdata'))
 
 # Set up file paths
 # Load the data managers
@@ -35,22 +44,13 @@ if (!exists('CENSUS.MANAGER'))
 if (!exists('national.surveillance'))
   load(file.path(JHEEM.CACHE.DIR, 'national.surveillance.Rdata'))
 
-# SHIELD
-
+# SHIELD specific code
 source('applications/SHIELD/shield_calib_parameters.R') #
 source('applications/SHIELD/shield_base_parameters.R') #
 source('applications/SHIELD/shield_ontology_mappings.R') #
 source('applications/SHIELD/R/shield_specification_helpers.R') #
-
 # Input Managers
 source('applications/SHIELD/R/shield_inputManager_pairing.R') #inputManager to create sexual contact pairings
 source('applications/SHIELD/R/shield_inputManager_helpers.R') #
 
-# Common code from JHEEM
-source('../jheem_analyses/commoncode/target_populations.R')
-source('../jheem_analyses/commoncode/age_mappings.R')
-source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
-source('../jheem_analyses/commoncode/logitnorm_helpers.R')
 
-# Data Loads
-load(file.path(JHEEM.CACHE.DIR, 'google_mobility_data.Rdata'))

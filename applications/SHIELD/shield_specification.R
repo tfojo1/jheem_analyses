@@ -1,8 +1,4 @@
-# installed.packages("jheem") @Todd: is this ready?
 # NEXT STEPS:
-### contact matrix from JHEEM
-### Testing : symptomatic vs screening ....
-### transitions between continuum stages
 ### birth , death, migration
 
 # fix the initial population (we have census for 2007, what are the good values to see historical sysphilis rates )
@@ -12,16 +8,13 @@
 # proportion of people aware of diagnosis ?
 # proportion loving with diag and not track.integrated.outcome(prevalece of syphilis)?
 
-#@Todd: how to remove all the warnings
 # > specification.metadata=get.specification.metadata("shield","C.12580")
 # > specification.metadata=get.specification.metadata("shield","US")
 
-# Source libraries ----
 # Working directory is set to the main JHEEM_Analysis folder:
 setwd("~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/")
 # setwd('../../')
 source('applications/SHIELD/shield_source_code.R')
-# source('applications/SHIELD/shield_source_code.R')
 ##--------------------------------------------------------------------------------------------------------------#
 #-- INITIAL SET-UP --#----
 SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',

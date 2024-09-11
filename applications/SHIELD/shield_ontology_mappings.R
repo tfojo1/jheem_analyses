@@ -1,3 +1,5 @@
+#registers mapping between racial groups in the census data and the JHEEM data
+#Todd: where are we using this?
 register.ontology.mapping('census.to.jheem.race',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
