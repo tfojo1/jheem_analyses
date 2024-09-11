@@ -213,7 +213,7 @@ data.manager$register.outcome(
     display.name = 'Proportion of MSM',
     axis.name = 'Proportion of MSM',
     units = '%',
-    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population') #may need to update this
+    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population') 
 
 
 # Create Sources + Parent Sources -----------------------------------------
