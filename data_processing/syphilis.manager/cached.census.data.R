@@ -66,10 +66,6 @@ population.data.list = list(
   
 )
 
-problem.locations = c("12025", "29193")
-
-population.data.list = lapply(population.data.list, function(x) filter(x, !location %in% problem.locations))
-
 
 # Put from census into syphilis.manager -----------------------------------
 
