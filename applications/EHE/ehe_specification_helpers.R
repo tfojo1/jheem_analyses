@@ -1465,7 +1465,7 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
                                age.delta.slope.sd=age.model['sd.slope'],
                                age.cutoffs=age.cutoffs,
                                age.labels=specification.metadata$dim.names$age,
-                               single.year.age.counts=age.counts*availability,
+                               single.year.age.counts=age.counts[names(availability)]*availability,
                                sd.multiplier=age.mixing.sd.mult)
 }
 

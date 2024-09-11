@@ -460,6 +460,7 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
   age.cutoffs = specification.metadata$age.endpoints
   age.cutoffs[length(age.cutoffs)] = min(age.cutoffs[length(age.cutoffs)],
                                          max(as.numeric(names(age.counts))))
+  
   #returns contact matrix by age
   get.age.mixing.proportions(age.delta.intercept.mean=age.model['mean.intercept'],
                              age.delta.slope.mean=age.model['mean.slope'],
@@ -467,7 +468,7 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
                              age.delta.slope.sd=age.model['sd.slope'],
                              age.cutoffs=age.cutoffs,
                              age.labels=specification.metadata$dim.names$age,
-                             single.year.age.counts=age.counts*availability,
+                             single.year.age.counts=age.counts[names(availability)]*availability,
                              sd.multiplier=age.mixing.sd.mult)
 }
 
