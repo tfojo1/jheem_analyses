@@ -473,6 +473,12 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
       var.names = paste0("age", 1:5, ".proportion.tested.or")
     ),
     
+    age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
+      mu = rep(0, 5),
+      sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)/10),
+      var.names = paste0("age", 1:5, ".proportion.tested.slope.or")
+    ),
+    
     # Testing Ramp
     msm.testing.ramp = Logitnormal.Distribution(0, 0.5 * log(1.5)),
     heterosexual.testing.ramp = Logitnormal.Distribution(0, 0.5 * log(1.5)),
@@ -1187,11 +1193,16 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     # ),
     
     young.age.testing = c('age1.proportion.tested.or',
-                          'age2.proportion.tested.or'),
+                          'age1.proportion.tested.slope.or',
+                          'age2.proportion.tested.or',
+                          'age2.proportion.tested.slope.or',
+                          'age3.proportion.tested.or',
+                          'age3.proportion.tested.slope.or'),
     
-    old.age.testing = c('age3.proportion.tested.or',
-                        'age4.proportion.tested.or',
-                        'age5.proportion.tested.or'),
+    old.age.testing = c('age4.proportion.tested.or',
+                        'age4.proportion.tested.slope.or',
+                        'age5.proportion.tested.or',
+                        'age5.proportion.tested.slope.or'),
 
     testing.ramp.by.risk = c(
       'msm.testing.ramp',
