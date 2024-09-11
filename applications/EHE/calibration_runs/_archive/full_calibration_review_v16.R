@@ -10,13 +10,13 @@ load('../jheem_analyses/prelim_results/init.pop.ehe_simset_2024-08-23_C.26420.Rd
 simset.houston.pop = simset
 sim.houston.pop = simset.houston.pop$last.sim()
 
-load('../jheem_analyses/prelim_results/init.transmission.ehe_simset_2024-08-24_C.26420.Rdata')
-simset.houston.trans = simset
-sim.houston.trans = simset.houston.trans$last.sim()
-
-load('../jheem_analyses/prelim_results/full.with.aids_simset_2024-08-26_C.26420.Rdata')
-simset.houston.full = simset
-sim.houston.full = simset.houston.full$last.sim()
+# load('../jheem_analyses/prelim_results/init.transmission.ehe_simset_2024-08-24_C.26420.Rdata')
+# simset.houston.trans = simset
+# sim.houston.trans = simset.houston.trans$last.sim()
+# 
+# load('../jheem_analyses/prelim_results/full.with.aids_simset_2024-08-26_C.26420.Rdata')
+# simset.houston.full = simset
+# sim.houston.full = simset.houston.full$last.sim()
 
 full.with.covid.lik = FULL.likelihood.instructions.with.covid$instantiate.likelihood('ehe','C.26420')
 
@@ -26,21 +26,57 @@ params.manual = params.mcmc
 
 cbind(params.manual[grepl("other",names(params.manual))])
 
-# params.manual["other.birth.rate.multiplier"] = 0.9 # 0.7228271
+params.manual["other.birth.rate.multiplier"] = 0.8 # 0.7228271
+params.manual["other.age1.aging.multiplier.1"] = 1.3 # 1.2053845
+params.manual["other.age1.aging.multiplier.2"] = 1 # 0.9382194
+params.manual["other.age2.aging.multiplier.1"] = 1 # 0.9979644
+params.manual["other.age2.aging.multiplier.2"] = 1 # 0.8132484
+params.manual["other.age3.aging.multiplier.1"] = .9 # 0.8665266
+params.manual["other.age3.aging.multiplier.2"] = .9 # 0.8001982
+params.manual["other.age4.aging.multiplier.1"] = .8 # 0.7992431
+params.manual["other.age4.aging.multiplier.2"] = .9 # 0.8081439
+
+params.manual["other.non.idu.general.mortality.rate.multiplier"] = .1 # 0.75276305
 # params.manual["other.age1.migration.multiplier.time.1"] = .8 # 1.4648300
 # params.manual["other.age1.migration.multiplier.time.2"] = .8 # 1.038866
-params.manual["other.non.idu.general.mortality.rate.multiplier"] = .1 # 0.75276305
 
+#sim.houston.pop = engine$run(params.mcmc)
 sim.manual = engine$run(params.manual)
 
 # manual pop is worse?? overall race looks better but not age*race
 full.with.covid.lik$compare.sims(sim.houston.pop,sim.manual) 
 
+# with female lines
+simplot(sim.houston.pop,
+        #sim.manual,
+        facet.by = "sex", split.by = "race", # how is this sex*race plot possible? 
+        outcomes = c("population"), 
+        dimension.values = list(year = 2000:2030)) #+ 
+  geom_hline(yintercept = 2395617.9) + # this is what the sim total says it is - looks correct on the plot
+  geom_hline(yintercept = 2197600) # this is what the surveillance manager says - incorrect on the plot??
+
+# with male lines
 simplot(sim.houston.pop,
         sim.manual,
-        facet.by = "age", split.by = "race", 
+        facet.by = "sex", #split.by = "race", # how is this sex*race plot possible? 
         outcomes = c("population"), 
-        dimension.values = list(year = 2000:2030)) 
+        dimension.values = list(year = 2000:2030)) + 
+  geom_hline(yintercept = (2224922.0 + 119302.5)) +
+  geom_hline(yintercept = 2150174)
+
+# female/male other sums 
+apply(SURVEILLANCE.MANAGER$data$adult.population$estimate$census.aggregated.adult.population$census.grouped.age$year__location__race__ethnicity__sex["2010","C.26420",-3,"not hispanic",],"sex",sum)
+
+x = (SURVEILLANCE.MANAGER$data$adult.population$estimate$census.aggregated.adult.population$census.grouped.age$year__location__race__ethnicity["2019","C.26420",,])
+
+# total female/male sums 
+apply(SURVEILLANCE.MANAGER$data$adult.population$estimate$census.aggregated.adult.population$census.grouped.age$year__location__race__ethnicity__sex["2010","C.26420",,,],"sex",sum)
+
+# total female/male sums for sim 
+apply(sim.houston.pop$population["2010",,,,,,],"sex",sum)
+apply(sim.houston.pop$population["2010",,,,,,],c("sex","race"),sum)
+
+
 
 simplot(sim.houston.pop,
         sim.manual,
