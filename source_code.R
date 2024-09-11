@@ -8,6 +8,10 @@ source('../jheem_analyses/commoncode/cache_manager.R')
 
 
 # This 'source' call is equivalent to loading the jheem2 package
+
+# Make sure that the jheem2 version is up-to-date
+# library(jheem2)
+
 source('../jheem2/R/tests/source_jheem2_package.R')
 source('../jheem_analyses/commoncode/file_paths.R')
 set.jheem.root.directory(ROOT.DIR)

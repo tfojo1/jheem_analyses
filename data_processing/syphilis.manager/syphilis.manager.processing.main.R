@@ -9,15 +9,6 @@ library(readxl)
 data.manager = create.data.manager('syphilis', description='syphilis data manager')
 
 data.manager$register.outcome(
-  'uninsured',
-  metadata = create.outcome.metadata(
-    scale = 'proportion',
-    display.name = 'Uninsured',
-    axis.name = 'Uninsured',
-    units = '%',
-    description = "Uninsured"), denominator.outcome = 'uninsured.denominator')
-
-data.manager$register.outcome(
   'uninsured.denominator',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
@@ -27,13 +18,13 @@ data.manager$register.outcome(
     description = "Uninsured Denominator"))
 
 data.manager$register.outcome(
-  'vacant.housing',
+  'uninsured',
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'Vacant Housing Units',
-    axis.name = 'Vacant Housing Units',
+    display.name = 'Uninsured',
+    axis.name = 'Uninsured',
     units = '%',
-    description = "Vacant Housing Units"), denominator.outcome = 'vacant.housing.denominator')
+    description = "Uninsured"), denominator.outcome = 'uninsured.denominator')
 
 data.manager$register.outcome(
   'vacant.housing.denominator',
@@ -45,13 +36,13 @@ data.manager$register.outcome(
     description = "Vacant Housing Denominator"))
 
 data.manager$register.outcome(
-  'not.highschool.graduate',
+  'vacant.housing',
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'Population 25 years and older without HS diploma',
-    axis.name = 'Population 25 years and older without HS diploma',
+    display.name = 'Vacant Housing Units',
+    axis.name = 'Vacant Housing Units',
     units = '%',
-    description = "Population 25 years and older without HS diploma"), denominator.outcome = 'not.highschool.graduate.denominator')
+    description = "Vacant Housing Units"), denominator.outcome = 'vacant.housing.denominator')
 
 data.manager$register.outcome(
   'not.highschool.graduate.denominator',
@@ -63,13 +54,13 @@ data.manager$register.outcome(
     description = "Population 25 years and older without HS diploma Denominator"))
 
 data.manager$register.outcome(
-  'below.fpl',
+  'not.highschool.graduate',
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'Households living below the federal poverty level',
-    axis.name = 'Households living below the federal poverty level',
+    display.name = 'Population 25 years and older without HS diploma',
+    axis.name = 'Population 25 years and older without HS diploma',
     units = '%',
-    description = "Households living below the federal poverty level"), denominator.outcome = 'below.fpl.denominator')
+    description = "Population 25 years and older without HS diploma"), denominator.outcome = 'not.highschool.graduate.denominator')
 
 data.manager$register.outcome(
   'below.fpl.denominator',
@@ -81,13 +72,13 @@ data.manager$register.outcome(
     description = "Households living below the federal poverty level Denominator"))
 
 data.manager$register.outcome(
-  'rural.area',
+  'below.fpl',
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'Population living in a rural area',
-    axis.name = 'Population living in a rural area',
+    display.name = 'Households living below the federal poverty level',
+    axis.name = 'Households living below the federal poverty level',
     units = '%',
-    description = "Population living in a rural area"), denominator.outcome = 'rural.area.denominator')
+    description = "Households living below the federal poverty level"), denominator.outcome = 'below.fpl.denominator')
 
 data.manager$register.outcome(
   'rural.area.denominator',
@@ -97,6 +88,15 @@ data.manager$register.outcome(
     axis.name = 'Population living in a rural area Denominator',
     units = 'count',
     description = "Population living in a rural area Denominator"))
+
+data.manager$register.outcome(
+  'rural.area',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Population living in a rural area',
+    axis.name = 'Population living in a rural area',
+    units = '%',
+    description = "Population living in a rural area"), denominator.outcome = 'rural.area.denominator')
 
 data.manager$register.outcome(
   'congenital.syphilis',
@@ -206,6 +206,15 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Estimated Number of Persons with PrEP Indications"))
 
+data.manager$register.outcome(
+  'proportion.msm', 
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Proportion of MSM',
+    axis.name = 'Proportion of MSM',
+    units = '%',
+    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population') #may need to update this
+
 
 # Create Sources + Parent Sources -----------------------------------------
 
@@ -216,7 +225,7 @@ data.manager$register.parent.source('census', full.name = 'United States Census 
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS")
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
-
+data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS")
 
 ##Register Data Sources ('children')
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
@@ -227,7 +236,8 @@ data.manager$register.source('cdc.hiv', parent.source= "NHSS", full.name = "CDC 
 data.manager$register.source('aidsvu', parent.source= "IQVIA", full.name = "AIDS Vu", short.name='aidsvu')
 data.manager$register.source('cdc.prep', parent.source= "IQVIA", full.name = "CDC PrEP Data", short.name='cdc.prep')
 data.manager$register.source('cdc.prep.indications', parent.source= "NHANES", full.name = "CDC PrEP Indications Data", short.name='cdc.prep.indications')
-
+data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory')
+data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 
 #Creating these separately bc they have separate parent sources
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
@@ -236,8 +246,6 @@ data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
 data.manager$register.source('census.aggregated.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
-
-
 
 # Establish Ontologies ----------------------------------------------------
 
@@ -323,6 +331,26 @@ data.manager$register.ontology(
     ethnicity=c('Hispanic', 'Not Hispanic'),
     sex=c('male','female')
   ))
+
+data.manager$register.ontology(
+  'emory',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    sex=c('male', 'female') #needs to have male and female here to represent all possible outcomes
+  ))
+
+data.manager$register.ontology(
+  'brfss',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
+    race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Multiracial', 'Hispanic'),
+    sex=c('male','female'),
+    risk=c('msm', 'not_msm')
+  ))
+
 # Source Data Cleaning and Processing Files -------------------------------
 
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
@@ -330,6 +358,7 @@ source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/prep.data.R')
+source('data_processing/syphilis.manager/cached.proportion.msm.R')
 
 # RENAME ------------------------------------------------------------------
 
