@@ -1,13 +1,14 @@
+# This code uses actual data from the literature to set up the pairing matrices
+# most of these matrices are presented as "from" and "to" matrices, which are used to create the pairing matrices
+# the JHEEM focus is uninfected cases, so the matrices are estiamted such that sum of contacts to each group (columns) equals one
+# example: for person age 15-20, what proportion of contacts are coming from different age groups and what's the prevalence of HIV in each of those groups (to estimate risk of transmission)
 
-##-----------------------------##
-##-- SET-UP WITH ACTUAL DATA --##
-##-----------------------------##
 #
 #' @title create.pairing.manager
 #' @description creating pairing inputs for the model
 #' @param dir the directory where the data files are stored
 #' @return returns a list of inputs for the model
-create.pairing.manager <- function(dir='../jheem_analyses/data_files/pairing')
+create.pairing.manager <- function(dir='../jheem_analyses/applications/SHIELD/data_files/pairing')
 {
   rv = list()
 
@@ -142,22 +143,21 @@ create.pairing.manager <- function(dir='../jheem_analyses/data_files/pairing')
 }
 
 
-##-- FORWARD-FACING FUNCTIONS --## ----
-#TODD: whats this?
-#
+##-- HELPER FUNCTIONS --## ----
+# get.age.mixing.proportions ----
 #' @title get.age.mixing.proportions
-#' @description takes the model and calculates mixing proportions Delta age= B0+B1a , sd=L0+L1 a
-#' @param age.delta.intercept.mean
-#' @param age.delta.slope.mean ??
-#' @param age.delta.intercept.sd ??
-#' @param age.delta.slope.sd ??
-#' @param age.cutoffs age brackets that we want (the end can't be infinity- need to be an age 85) c(0,15,20,25,30,35,40,45,50,55,65,85)
+#' @description takes the model and calculates mixing proportions
+#' Delta(ages)= N(mu=B0+B1 a , sd=L0+L1 a) where a is the age of person the contact is made to
+#' @param age.delta.intercept.mean B0
+#' @param age.delta.slope.mean B1
+#' @param age.delta.intercept.sd L0
+#' @param age.delta.slope.sd L1
+#' @param age.cutoffs age brackets, the end can't be infinity (e.g., c(0,15,20,25,30,35,40,45,50,55,65,85))
 #' @param age.labels how do you want to label the age brackets "lower_upper years"
 #' @param single.year.age.counts the count of people in each year of age
-#' @param sd.multiplier calibration parameter
+#' @param sd.multiplier calibration parameter used to scale sd
 #' @return n by n matrix of contact proportions (age.to columns summing to 1) - all of mixing matrixes care about who is RECEIVING the contact
 #' @examples
-#'
 # x= get.specification.metadata('shield','US')
 # x$dim.names$age
 get.age.mixing.proportions <- function(age.delta.intercept.mean,
@@ -209,12 +209,33 @@ get.age.mixing.proportions <- function(age.delta.intercept.mean,
   rv
 }
 
+# calculate.oe.ratios -----
+#' @title calculate.oe.ratios
+#' @description generates the oe ratios from observed pairing counts of partnerships
+#' @param pairing.counts observed pairing counts (n by n matrix of reported partnerships between each group)
+#' @return A n by n matrix of oes
+#' @examples
+#' pairing.counts = matrix(c(72, 33, 176, 56, 130, 562, 120, 301, 2023), nrow=3, byrow=TRUE,dimnames = list(from=c("black", "hispanic", "other"), to=c("black", "hispanic", "other")))
+#' calculate.oe.ratios(pairing.counts) returns the observed/expected ratio of partnerships between each pair
+calculate.oe.ratios <- function(pairing.counts)
+{
+  marginals = rowSums(pairing.counts) / sum(pairing.counts) #marginal distribution of the contacts from each group
+  col.counts = colSums(pairing.counts) #total number of available contacts by race
+  expected = outer(marginals, col.counts) # if there is no preferetial mixing, this is the expected number of contacts between each pair
+  pairing.counts / expected #observed/expected ratio of contacts between each pair
+}
+
+# get.pairing.proportions ----
 #' @title get.pairing.proportions
 #' @description using the oes and marginal.counts (population size), it computes the proportion of contacts
 #' @param oe.ratios observed/expected ratios
 #' @param marginal.counts popualtion count in each group
 #' @return n by n matrix where columns (to) sum to 1
 #' @examples
+#' pairing.counts = matrix(c(72, 33, 176, 56, 130, 562, 120, 301, 2023), nrow=3, byrow=TRUE,dimnames = list(from=c("black", "hispanic", "other"), to=c("black", "hispanic", "other")))
+#' oes = calculate.oe.ratios(pairing.counts) returns the observed/expected ratio of partnerships between each pair
+#' marginal.counts = c(100, 200, 300)
+#' get.pairing.proportions(oes, marginal.counts) returns the proportion of contacts between each pair
 get.pairing.proportions <- function(oe.ratios, marginal.counts)
 {
   if (dim(oe.ratios)[1] != dim(oe.ratios)[2])
@@ -229,29 +250,15 @@ get.pairing.proportions <- function(oe.ratios, marginal.counts)
   rv
 }
 
-#' @title calculate.oe.ratios
-#' @description generates the oe ratios from observed pairing counts of partnerships
-#' @param pairing.counts observed pairing counts (n by n matrix of reported partnerships between each group)
-#' @return A n by n matrix of oes
-#' @examples
-# pairing.counts = matrix(c(72, 33, 176, 56, 130, 562, 120, 301, 2023), nrow=3, byrow=TRUE,dimnames = list(from=c("black", "hispanic", "other"), to=c("black", "hispanic", "other")))
-# calculate.oe.ratios(pairing.counts) returns the observed/expected ratio of partnerships between each pair
-calculate.oe.ratios <- function(pairing.counts)
-{
-  marginals = rowSums(pairing.counts) / sum(pairing.counts) #marginal distribution of the contacts from each group
-  col.counts = colSums(pairing.counts) #total number of available contacts by race
-  expected = outer(marginals, col.counts) # if there is no preferetial mixing, this is the expected number of contacts between each pair
-  pairing.counts / expected #observed/expected ratio of contacts between each pair
-}
 
-
+# matrix.to.scatter ----
 #' @title matrix.to.scatter
 #' @description Used in fitting the data (to fit 2 B's and L's) to data on ages of people and their partners-the papers only published aggregated data in the matrix forma and we had to decompose this back to individual data to fit the model. this function randomly samples ages from that age range and construct a list
-#' @param mat ??
-#' @param age.cutoffs ??
-#' @return ??
+#' @param mat summary matrix of contacts
+#' @param age.cutoffs age cut offs to sample from
+#' @return list of ages for contact pairs
 #' @examples
-#' age1-ages n partnerships: loop over n: sample age1 and age2 from that range
+#' n partnerships are reported between a person of age=[30-40] with a person of age=[60-70] (age1-age2). we sample n values from each age bracket and report the pairs
 matrix.to.scatter <- function(mat,
                               age.cutoffs)
 {
@@ -271,13 +278,12 @@ matrix.to.scatter <- function(mat,
   rv
 }
 
+# fit.age.model ----
 #' @title fit.age.model
-#' @description ????
-#' @param age.of.reference ??
-#' @param age.of.partner ??
-#' @return ??
-#' @examples
-#'
+#' @description fits the age model to list of data points (Delta(ages)= N(mu=B0+B1 a , sd=L0+L1 a) where a is the age of person the contact is made to)
+#' @param age.of.reference age1
+#' @param age.of.partner age2
+#' @return returning the B0, B1, L0, L1 values
 fit.age.model <- function(age.of.reference, age.of.partner)
 {
   diffs = age.of.partner - age.of.reference
@@ -303,3 +309,4 @@ fit.age.model <- function(age.of.reference, age.of.partner)
 
 ##-- CREATE and STORE --## ----
 PAIRING.INPUT.MANAGER = create.pairing.manager()
+print("PAIRING.INPUT.MANAGER created!")

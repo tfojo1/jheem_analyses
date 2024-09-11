@@ -36,6 +36,7 @@ if (!exists('national.surveillance'))
   load(file.path(JHEEM.CACHE.DIR, 'national.surveillance.Rdata'))
 
 # SHIELD
+
 source('applications/SHIELD/shield_calib_parameters.R') #
 source('applications/SHIELD/shield_base_parameters.R') #
 source('applications/SHIELD/shield_ontology_mappings.R') #
@@ -43,6 +44,7 @@ source('applications/SHIELD/R/shield_specification_helpers.R') #
 
 # Input Managers
 source('applications/SHIELD/R/shield_inputManager_pairing.R') #inputManager to create sexual contact pairings
+source('applications/SHIELD/R/shield_inputManager_helpers.R') #
 
 # Common code from JHEEM
 source('../jheem_analyses/commoncode/target_populations.R')

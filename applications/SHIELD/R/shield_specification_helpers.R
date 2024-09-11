@@ -7,7 +7,6 @@
 #This allows you to control the order of documentation by deciding which function goes under which
 #@rdname. The documentation of all functions with the same @rdname will be combined under one manual page.
 
-# devtools::build_vignettes("../jheem_analyses/applications/SHIELD/")
 CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
 DEFAULT.POPULATION.YEARS = 2007
 
