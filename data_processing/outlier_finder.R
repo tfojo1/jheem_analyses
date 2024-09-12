@@ -370,9 +370,9 @@ generate.find.outliers.function = function(phi, theta, phi.and.theta.on.additive
             for (y in years.to.check) {
                 
                 difference.in.years = abs(as.numeric(y)-as.numeric(last.good.year))
+                abs.difference = abs(data.vector[[y]] - data.vector[[last.good.year]])
                 
                 if (phi.and.theta.on.additive.scale) {
-                    abs.difference = abs(data.vector[[y]] - data.vector[[last.good.year]])
                     tolerable.percent.difference = phi + (1 + theta) ^ difference.in.years - 1
                 } else {
                     ratio = data.vector[[y]] / data.vector[[last.good.year]]
@@ -380,13 +380,16 @@ generate.find.outliers.function = function(phi, theta, phi.and.theta.on.additive
                 }
                 
                 if (is.na(adjudication.result[y])) {
-                    if (phi.and.theta.on.additive.scale) {
+                    if (abs.difference==0)
+                        last.good.year = y
+                    else if (phi.and.theta.on.additive.scale) {
                         if (abs.difference >= minimum.flagged.change && abs.difference / data.vector[[last.good.year]] > tolerable.percent.difference)
                             flagged.years = c(flagged.years, y)
                         else
                             last.good.year = y
                     } else {
-                        if (ratio > tolerable.ratio.invertible || ratio < 1/tolerable.ratio.invertible)
+                        if (abs.difference >= minimum.flagged.change && 
+                            (ratio > tolerable.ratio.invertible || ratio < 1/tolerable.ratio.invertible))
                             flagged.years = c(flagged.years, y)
                         else
                             last.good.year = y
