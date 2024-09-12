@@ -289,6 +289,12 @@ fixed.race.eth.sex <- as.data.frame.table(fixed.race.eth.sex)%>%
 #Update for 7-23-24: To align this race data with the current census ontology:
 fixed.race.eth.sex$race = race.mappings.to.census[fixed.race.eth.sex$race]
 
+fixed.race.eth.sex<- fixed.race.eth.sex %>%
+  group_by(year, location, race, ethnicity, sex)%>%
+  mutate(value.new = sum(value))%>%
+  select(-value)%>%
+  rename(value = value.new)
+
 
 fixed.race.eth.sex<- as.data.frame(fixed.race.eth.sex[!duplicated(fixed.race.eth.sex), ])
 
