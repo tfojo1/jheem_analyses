@@ -690,26 +690,30 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     set.ehe.idu.from.parameters(model.settings,
                                 parameters = parameters)
     
+    #-- Increased General Mortality among all HIV --#
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'hiv.general.mortality.multiplier',
+                                                                  alpha.name = 'value',
+                                                                  values = parameters[paste0('age',1:specification.metadata$n.ages,'.hiv.general.mortality.multiplier')],
+                                                                  applies.to.dimension.values = specification.metadata$dim.names$age,
+                                                                  dimension = 'age')
 
-    #-- HIV Mortality --#
-    
+    #-- HIV Mortality (increased mortality specifically among unsuppressed) --#
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
                                                                 alpha.name = 'rate0',
-                                                                values = parameters['hiv.mortality.0'],
+                                                                values = parameters['unsuppressed.hiv.mortality.0'],
                                                                 applies.to.dimension.values = 'all',
                                                                 dimension = 'all')
     
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
                                                                 alpha.name = 'rate1',
-                                                                values = parameters['hiv.mortality.1'],
+                                                                values = parameters['unsuppressed.hiv.mortality.1'],
                                                                 applies.to.dimension.values = 'all',
                                                                 dimension = 'all')
     
     model.settings$set.element.ramp.values(element.name = 'unsuppressed.hiv.mortality.rate',
-                                         values = c(parameters['hiv.mortality.0'], rep(parameters['peak.hiv.mortality'], 2)),
+                                         values = c(parameters['unsuppressed.hiv.mortality.0'], rep(parameters['unsuppressed.peak.hiv.mortality'], 2)),
                                          indices = c('pre.peak', 'peak.start', 'peak.end'))
 
-        
     #-- Diagnosed Transmissibility --#
     
     model.settings$set.element.value(element.name = 'diagnosed.needle.sharing.rr',

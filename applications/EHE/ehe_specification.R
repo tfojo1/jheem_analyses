@@ -778,8 +778,13 @@ register.model.element(EHE.SPECIFICATION,
 
 register.mortality(EHE.SPECIFICATION,
                    tag = 'non.idu.general.mortality',
-                   groups = c('uninfected','infected'),
+                   groups = c('uninfected'),
                    mortality.rate.value = 'non.idu.general.mortality')
+
+register.mortality(EHE.SPECIFICATION,
+                   tag = 'non.idu.general.mortality',
+                   groups = c('infected'),
+                   mortality.rate.value = expression(non.idu.general.mortality*hiv.general.mortality.multiplier))
 
 register.mortality(EHE.SPECIFICATION,
                    tag = 'idu.mortality',
@@ -791,6 +796,14 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'non.idu.general.mortality',
                        get.functional.form.function = get.location.mortality.rates.functional.form,
                        scale = 'rate')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'hiv.general.mortality.multiplier',
+                       functional.form = create.static.functional.form(value = 1, 
+                                                                       link="log",
+                                                                       min=1,
+                                                                       value.is.on.transformed.scale = F),
+                       scale = 'ratio')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.mortality.rate',
