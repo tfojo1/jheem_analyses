@@ -47,8 +47,8 @@ proportionDep_likelihood_inst <- create.nested.proportion.likelihood.instruction
                                         dimensions = c("age"), # total, but can stratify by age, race, etc
                                         levels.of.stratification = c(0,1), # c(0,1,2) levels of stratification, 0=total, 1=one layer, etc
                                         omit.years = c(2020), # can omit any years we do not want included
-                                        p.bias.inside.location = propdep.bias.estimates$in.mean, # does the MSA value depend on county (inside)/state (outside) value? calculated automatically but can specify
-                                        p.bias.sd.inside.location = propdep.bias.estimates$in.sd,
+                                        p.bias.inside.location = 0,# propdep.bias.estimates$in.mean, # does the MSA value depend on county (inside)/state (outside) value? calculated automatically but can specify
+                                        p.bias.sd.inside.location = propdep.bias.estimates$out.sd, # $in.sd
                                         p.bias.outside.location = propdep.bias.estimates$out.mean,
                                         p.bias.sd.outside.location = propdep.bias.estimates$out.sd,
                                         
