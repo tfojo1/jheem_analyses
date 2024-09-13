@@ -53,9 +53,9 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
 
 
 par.names.transmission = c(par.names.transmission,
-                           "peak.hiv.mortality",
-                           "hiv.mortality.0",
-                           "hiv.mortality.1",
+                           "unsuppressed.peak.hiv.mortality",
+                           "unsuppressed.hiv.mortality.0",
+                           "unsuppressed.hiv.mortality.1",
                            # 'msm.testing.ramp.1.or',
                            # 'msm.testing.ramp.2.or',
                            # 'heterosexual.testing.ramp.1.or',
