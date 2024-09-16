@@ -215,6 +215,23 @@ data.manager$register.outcome(
     units = '%',
     description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population') 
 
+data.manager$register.outcome(
+  'female.population', 
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Female Population',
+    axis.name = 'Female Population',
+    units = 'cases',
+    description = "Female Population Age 15-44"))
+
+data.manager$register.outcome(
+  'fertility.rate', 
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Fertility Rate',
+    axis.name = 'Fertility Rate',
+    units = '%',
+    description = "Fertility Rate"), denominator.outcome = 'female.population') 
 
 # Create Sources + Parent Sources -----------------------------------------
 
@@ -359,6 +376,7 @@ source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/prep.data.R')
 source('data_processing/syphilis.manager/cached.proportion.msm.R')
+source('data_processing/syphilis.manager/fertility.rate.R')
 
 # RENAME ------------------------------------------------------------------
 
