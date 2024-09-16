@@ -14,13 +14,13 @@ data.list.county.90 <- lapply(ninties_files, function(x) {
 })
 
 #1980-1989 County data
-sheets <- excel_sheets("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls")
+sheets <- excel_sheets("../../data_raw/population/county_70.89/county_80.89.xls")
 county_80.89 <- lapply(sheets, function(x) {
-  list(sheet=x, data=read_excel("~/JHEEM/data_raw/population/county_70.89/county_80.89.xls", sheet = x, skip=5))
+  list(sheet=x, data=read_excel("../../data_raw/population/county_70.89/county_80.89.xls", sheet = x, skip=5))
 })
 
 #1970-1979 County Data
-county_70.79 <- read.csv("~/JHEEM/data_raw/population/county_70.89/county_70.79.csv", header=FALSE, colClasses=c(V2="character"))
+county_70.79 <- read.csv("../../data_raw/population/county_70.89/county_70.79.csv", header=FALSE, colClasses=c(V2="character"))
 
 ################################################################################
                   ###Create Mappings###
