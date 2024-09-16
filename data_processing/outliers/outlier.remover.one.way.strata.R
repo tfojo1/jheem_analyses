@@ -158,25 +158,39 @@ run.outlier.process(outcome= 'early.syphilis',
 
 # gonorrhea - stratified --------------------------------------------------
 
-#Commenting out until we decide how to handle these 
+gonorrhea.stratified <- run.outlier.process(outcome= 'gonorrhea',
+                                            stratifications= list('sex', 'race', 'age', 'risk'),
+                                            data.manager= surveillance.manager,
+                                            phi = 3.0,
+                                            theta = 0.5,
+                                            phi.and.theta.on.additive.scale = F,
+                                            minimum.flagged.change = 49,
+                                            locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
 
-# gonorrhea.stratified <- run.outlier.process(outcome= 'gonorrhea',
-#                                             stratifications= list('sex', 'race', 'age', 'risk'), 
-#                                             data.manager= surveillance.manager,
-#                                             phi = 0.6,
-#                                             theta = 0.05,
-#                                             max.year = 2019,
-#                                             locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
-# gonorrhea.stratified$adjudication <- c(T)
-# run.outlier.process(outcome= 'gonorrhea',
-#                     stratifications= list('sex', 'race', 'age', 'risk'), 
-#                     data.manager= surveillance.manager,
-#                     phi = 0.6,
-#                     theta = 0.05,
-#                     max.year = 2019,
-#                     locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")),
-#                     adjudication.data.frame =  gonorrhea.stratified)
-
+ gonorrhea.stratified$adjudication <- c (TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 
+   TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 
+   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE,
+   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+   TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE,
+   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,TRUE,
+   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+   TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE,
+   FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, 
+   TRUE, TRUE, TRUE, TRUE, TRUE)
+ 
+run.outlier.process(outcome= 'gonorrhea',
+                    stratifications= list('sex', 'race', 'age', 'risk'),
+                    data.manager= surveillance.manager,
+                    phi = 3.0,
+                    theta = 0.5,
+                    phi.and.theta.on.additive.scale = F,
+                    minimum.flagged.change = 49,
+                    locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")),
+                    adjudication.data.frame =  gonorrhea.stratified)
 
 
 # The next outcomes do not have any outliers ------------------------------
