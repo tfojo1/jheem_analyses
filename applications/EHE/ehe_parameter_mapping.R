@@ -704,11 +704,11 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                                 applies.to.dimension.values = 'all',
                                                                 dimension = 'all')
     
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
-                                                                  alpha.name = 'rate0',
-                                                                  values = parameters[paste0('age',1:specification.metadata$n.ages,'.unsuppressed.hiv.mortality.multiplier')],
-                                                                  applies.to.dimension.values = specification.metadata$dim.names$age,
-                                                                  dimension = 'age')
+    # model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
+    #                                                               alpha.name = 'rate0',
+    #                                                               values = parameters[paste0('age',1:specification.metadata$n.ages,'.unsuppressed.hiv.mortality.multiplier')],
+    #                                                               applies.to.dimension.values = specification.metadata$dim.names$age,
+    #                                                               dimension = 'age')
     
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
                                                                 alpha.name = 'rate1',
@@ -716,11 +716,11 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                                 applies.to.dimension.values = 'all',
                                                                 dimension = 'all')
     
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
-                                                                  alpha.name = 'rate1',
-                                                                  values = parameters[paste0('age',1:specification.metadata$n.ages,'.unsuppressed.hiv.mortality.multiplier')],
-                                                                  applies.to.dimension.values = specification.metadata$dim.names$age,
-                                                                  dimension = 'age')
+    # model.settings$set.element.functional.form.main.effect.alphas(element.name = 'unsuppressed.hiv.mortality.rate',
+    #                                                               alpha.name = 'rate1',
+    #                                                               values = parameters[paste0('age',1:specification.metadata$n.ages,'.unsuppressed.hiv.mortality.multiplier')],
+    #                                                               applies.to.dimension.values = specification.metadata$dim.names$age,
+    #                                                               dimension = 'age')
     
     model.settings$set.element.ramp.values(element.name = 'unsuppressed.hiv.mortality.rate',
                                          values = c(parameters['unsuppressed.hiv.mortality.0'], rep(parameters['unsuppressed.peak.hiv.mortality'], 2)),

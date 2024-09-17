@@ -584,11 +584,11 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     unsuppressed.peak.hiv.mortality = Lognormal.Distribution(log(41/6.1 * 23/1000), log(2)/2),
     #http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.688.1831&rep=rep1&type=pdf
     
-    age1.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
-    age2.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
-    age3.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
-    age4.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
-    age5.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
+    # age1.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
+    # age2.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
+    # age3.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
+    # age4.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
+    # age5.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
     
     #-- Sexual Mixing by Age --#
     age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)),
@@ -1265,18 +1265,24 @@ BASE.HIV.SAMPLING.BLOCKS = list(
                                    'unsuppressed.hiv.mortality.0',
                                    'unsuppressed.hiv.mortality.1'),
 
-    young.hiv.mortality = c('age1.unsuppressed.hiv.mortality.multiplier',
-                            'age1.hiv.general.mortality.multiplier',
-                            'age2.unsuppressed.hiv.mortality.multiplier',
-                            'age2.hiv.general.mortality.multiplier'),
-    
-    medium.hiv.mortality = c('age3.unsuppressed.hiv.mortality.multiplier',
-                             'age3.hiv.general.mortality.multiplier',
-                             'age4.unsuppressed.hiv.mortality.multiplier',
-                             'age4.hiv.general.mortality.multiplier'),
-    
-    old.hiv.mortality = c('age5.unsuppressed.hiv.mortality.multiplier',
-                          'age5.hiv.general.mortality.multiplier'),
+    hiv.general.mortality.multipliers = c('age1.hiv.general.mortality.multiplier',
+                                          'age2.hiv.general.mortality.multiplier',
+                                          'age3.hiv.general.mortality.multiplier',
+                                          'age4.hiv.general.mortality.multiplier',
+                                          'age5.hiv.general.mortality.multiplier'),
+
+    # young.hiv.mortality = c('age1.unsuppressed.hiv.mortality.multiplier',
+    #                         'age1.hiv.general.mortality.multiplier',
+    #                         'age2.unsuppressed.hiv.mortality.multiplier',
+    #                         'age2.hiv.general.mortality.multiplier'),
+    # 
+    # medium.hiv.mortality = c('age3.unsuppressed.hiv.mortality.multiplier',
+    #                          'age3.hiv.general.mortality.multiplier',
+    #                          'age4.unsuppressed.hiv.mortality.multiplier',
+    #                          'age4.hiv.general.mortality.multiplier'),
+    # 
+    # old.hiv.mortality = c('age5.unsuppressed.hiv.mortality.multiplier',
+    #                       'age5.hiv.general.mortality.multiplier'),
 
 
 #-- COVID --#
