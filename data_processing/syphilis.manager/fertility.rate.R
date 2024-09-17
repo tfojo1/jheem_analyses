@@ -1,9 +1,12 @@
+
+options(error=NULL)
+
 DATA.DIR.FERTILITY="../../data_raw/syphilis.manager/fertility"
 
-fertility.files <- Sys.glob(paste0(DATA.DIR.FERTILITY, '/*.csv'))
-data.list.fertility <- lapply(fertility.files, function(x){
-  skip=8
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+fertility.files <- list.files(DATA.DIR.FERTILITY, pattern = ".txt", full.names = "TRUE")
+data.list.fertility <- lapply(fertility.files, function(x) {
+  list(filename=x, data=read.delim2(x, colClasses = c('County.Code' = 'character')))
+ 
 })
 
 
@@ -17,49 +20,49 @@ fertility.clean = lapply(data.list.fertility, function(file){
   #Universal Cleaning#
   data$outcome = 'fertility.rate'
   data$year = as.character(data$Year)
+  data$value = as.numeric(data$'Fertility.Rate') #Is this the right format?#
   
-  data$value = data$'Fertility Rate per 1,000' #CHECK HOW THIS SHOULD BE PUT- DIVIDE BY 1000?#
+  data <- data %>%
+    select(-Notes, -Year.Code)
   
-  #Figure out location and demographics#
-  
-  # #Location conditionals#
-  # if(grepl("state", filename)) {
-  #   names(state.abb) <- state.name 
-  #   data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
-  #   names(data)[names(data)=='Geography'] = 'state'
-  #   data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state]) 
-  # }
-  # 
-  # if(grepl("county", filename)) {
-  #   data$location = as.character(data$FIPS)
-  # }
-  # 
-  # ##Demographic conditionals##
-  # 
-  # if(grepl("age", filename)) {
-  #   data$age = age.mappings[data$Age.Group]
-  # }
-  # if(grepl("race", filename)) {
-  #   names(data)[names(data)=='Race.Ethnicity'] = 'race'
-  # }
+  #Location conditionals#
+  if(grepl("county", filename)) {
+    data$location = data$'County.Code'
+  }
+  if(grepl("national", filename)) {
+      data$location = "US"
+  }
+   
+   #Demographic conditionals#
+   if(grepl("age", filename)) {
+      data$age = data$'Age.of.Mother.9'
+   }
+  if(grepl("single.race", filename)) {
+     data$race = data$'Mother.s.Single.Race'
+  }
+  if(grepl("bridged.race", filename)) {
+     data$race = data$'Mother.s.Bridged.Race'
+  }
+  if(grepl("hispanic", filename)) {
+    data$ethnicity = data$'Mother.s.Hispanic.Origin'
+  }
   
   list(filename, data) 
   
 })
-
-
 # Put female.population as denominator for fertility. ---------------------
 
-female.population.clean = lapply(data.list.fertility, function(file){
+female.population.clean = lapply(fertility.clean, function(file){
   
-  data=file[["data"]]
-  filename = file[["filename"]]
+  data=file[[2]]
+  filename = file[[1]]
   
-  #Universal Cleaning#
+  data <- data %>%
+    select(-outcome, -value)
+  
   data$outcome = 'female.population'
-  data$year = as.character(data$Year)
   
-  data$value = data$'Female Population' #Remove commas?
+  data$value = data$'Female.Population' 
   
   list(filename, data) 
   
@@ -67,5 +70,5 @@ female.population.clean = lapply(data.list.fertility, function(file){
 
 
 # Put into Syphilis Data Manager ------------------------------------------
-
-
+#I think you need to add a source or a parent source and an ontology#
+#You need to remove races that are not part of the ontology#

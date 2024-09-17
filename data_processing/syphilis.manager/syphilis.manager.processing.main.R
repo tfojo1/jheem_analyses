@@ -368,6 +368,17 @@ data.manager$register.ontology(
     risk=c('msm', 'not_msm')
   ))
 
+
+data.manager$register.ontology(
+  'cdc.fertility',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('15-19 years', '20-24 years', '25-29 years', '30-34 years','35-39 years', '40-44 years'),
+    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American',   'White', 'More than one race'),
+    ethnicity = c('Hispanic or Latino', 'Not Hispanic or Latino')
+  ))
+
 # Source Data Cleaning and Processing Files -------------------------------
 
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
