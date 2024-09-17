@@ -801,7 +801,6 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'hiv.general.mortality.multiplier',
                        functional.form = create.static.functional.form(value = 1, 
                                                                        link="log",
-                                                                       min=1,
                                                                        value.is.on.transformed.scale = F),
                        scale = 'ratio')
 
