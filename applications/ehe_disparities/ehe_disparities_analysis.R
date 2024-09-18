@@ -3,25 +3,6 @@
 
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
-###################################
-### BALTIMORE ONLY ################
-
-load("../jheem_analyses/applications/ehe_disparities/simset_2024-08-08_C.12580.Rdata") #Baltimore
-simset$save()
-
-CALIBRATION.CODE= full.with.covid2
-LOCATIONS=c("C.12580")
-INTERVENTIONS=c("noint", "fullint")
-
-### Run a set of interventions and select relevant results
-collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
-                                    locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=50)
-
-collection$run(2025, 2035, verbose=TRUE, overwrite.prior=T) # stop.for.errors = T, overwrite.prior=T
-
-###################################
-### NEW SET OF SIMSETS ############
-
 ### Load simsets
 load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.12580.Rdata") #Baltimore
 simset$save()
@@ -31,30 +12,36 @@ load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.26420.R
 simset$save()
 
 CALIBRATION.CODE= "full.with.aids" #full.with.covid2
-LOCATIONS=c("C.12580", "C.35620", "C.26420")
+LOCATIONS=c("C.12580", "C.26420")
+LOCATIONS=c("C.35620")
 INTERVENTIONS=c("noint", "fullint")
 
 ### Run a set of interventions and select relevant results
 collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
-                                    locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=100) #n.sim=50
+                                    locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=100)
 
-collection$run(2025, 2035, verbose=TRUE, overwrite.prior=T) # stop.for.errors = T, overwrite.prior=T
+collection$run(2025, 2035, verbose=TRUE, stop.for.errors=T) # stop.for.errors = T, overwrite.prior=T
 
 #################################
 
-
 #Examine parameter distributions
 x <- collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'individual.simulations')
-collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'mean.and.interval')
-collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'median.and.interval')
+#collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'mean.and.interval')
+#collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'median.and.interval')
 
-apply(x, 1, median)
-x
-dim(x)
-apply(x, c(1,4), median)
-apply(x, c(1,4), quantile, probs=0.025)
+#dim(x)
+
+#Overall
 apply(x[,,,2], 1, quantile, probs=0.025)
 apply(x[,,,2], 1, quantile, probs=0.975)
+
+#Baltimore
+apply(x[,,1,2], 1, quantile, probs=0.025)
+apply(x[,,1,2], 1, quantile, probs=0.975)
+
+#Houston
+apply(x[,,2,2], 1, quantile, probs=0.025)
+apply(x[,,2,2], 1, quantile, probs=0.975)
 
 results = collection$get(outcomes = c("new", "population"),
                          dimension.values = list(year=2035),

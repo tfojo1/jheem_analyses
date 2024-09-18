@@ -19,9 +19,8 @@ testing.increase = create.intervention.effect('general.population.testing', #tes
                                               apply.effects.as = 'multiplier', #times what testing rate would have been on 1/1/2030
                                               times = IMPLEMENTED.BY.YEAR,
                                               allow.values.less.than.otherwise = F, #do not allow testing rate to decrease vs. NC
-                                              allow.values.greater.than.otherwise = T, #allow testing rate to increase vs. NC
-                                              min.acceptable.parameter.value = 1, #set bounds for reasonable intervention effect
-                                              max.acceptable.parameter.value = 20)
+                                              allow.values.greater.than.otherwise = T #allow testing rate to increase vs. NC
+                                              )
 
 suppression.increase = create.intervention.effect('suppression.of.diagnosed', #percent suppressed
                                               start.time = START.YEAR,
@@ -30,9 +29,8 @@ suppression.increase = create.intervention.effect('suppression.of.diagnosed', #p
                                               apply.effects.as = 'multiplier', #times what % unsuppressed would have been on 1/1/2030
                                               times = IMPLEMENTED.BY.YEAR,
                                               allow.values.less.than.otherwise = F, #do not allow % suppressed to decrease vs. NC
-                                              allow.values.greater.than.otherwise = T, #allow % suppressed to increase vs. NC
-                                              min.acceptable.parameter.value = 0.05, #set bounds for reasonable intervention effect
-                                              max.acceptable.parameter.value = 1)
+                                              allow.values.greater.than.otherwise = T #allow % suppressed to increase vs. NC
+                                              )
 
 prep.increase = create.intervention.effect('oral.prep.uptake', #% initiated PrEP
                                               start.time = START.YEAR,
@@ -41,9 +39,8 @@ prep.increase = create.intervention.effect('oral.prep.uptake', #% initiated PrEP
                                               apply.effects.as = 'multiplier', #times what % uninitiated would have been on 1/1/2030
                                               times = IMPLEMENTED.BY.YEAR,
                                               allow.values.less.than.otherwise = F, #allow % initiated to decrease vs. NC?
-                                              allow.values.greater.than.otherwise = T, #allow % initiated to increase vs. NC?
-                                              min.acceptable.parameter.value = 0.05, #set bounds for reasonable intervention effect
-                                              max.acceptable.parameter.value = 1)
+                                              allow.values.greater.than.otherwise = T #allow % initiated to increase vs. NC?
+                                              )
 
 #Create joint intervention and specify target population
 base.intervention = create.intervention(WHOLE.POPULATION,
@@ -51,32 +48,26 @@ base.intervention = create.intervention(WHOLE.POPULATION,
                                         suppression.increase,
                                         prep.increase)
 
-#Specify criteria for checking whether the joint intervention met the EHE targets in 2030
- # testing.criterion = create.monotonic.criterion(parameter.name = 'testing.multiplier',
- #                                               outcome = 'testing',
- #                                               parameter.scale = 'ratio',
- #                                               parameter.initial.value = 4,
- #                                               target.value = .951, #.95
- #                                               min.acceptable.value = .95,
- #                                               max.acceptable.value = .96,
- #                                               dimension.values=list(year='2030'))
-
 testing.criterion = create.monotonic.criterion(parameter.name = 'testing.multiplier',
-                                               outcome = 'awareness', #percent aware of status
+                                               outcome = 'awareness', #percent aware of status #(used to be 'testing')
                                                parameter.scale = 'ratio',
                                                parameter.initial.value = 2,
                                                target.value = .95, #.95
                                                min.acceptable.value = .94,
                                                max.acceptable.value = .96,
-                                               dimension.values=list(year='2030'))
+                                               dimension.values=list(year='2030'),
+                                               min.acceptable.parameter.value = 0.5,
+                                               max.acceptable.parameter.value = 10)
 suppression.criterion = create.monotonic.criterion(parameter.name = 'unsuppressed.multiplier',
-                                                   outcome = 'suppression',
+                                                   outcome = 'suppression', #percent suppressed
                                                    parameter.scale = 'complementary.proportion',
                                                    parameter.initial.value = .5,
                                                    target.value = .9025, #95% of 95%
                                                    min.acceptable.value = .9,
                                                    max.acceptable.value = .905,
-                                                   dimension.values=list(year='2030'))
+                                                   dimension.values=list(year='2030'),
+                                                   min.acceptable.parameter.value = 0.05,
+                                                   max.acceptable.parameter.value = 1)
 prep.criterion = create.monotonic.criterion(parameter.name = 'uninitiated.multiplier',
                                             outcome = 'prep.uptake.proportion', #percent prescribed PrEP or enrolled in a PrEP program
                                             parameter.scale = 'complementary.proportion',
@@ -84,7 +75,9 @@ prep.criterion = create.monotonic.criterion(parameter.name = 'uninitiated.multip
                                             target.value = .5, #.52
                                             min.acceptable.value = .49,
                                             max.acceptable.value = .51,
-                                            dimension.values=list(year='2030'))
+                                            dimension.values=list(year='2030'),
+                                            min.acceptable.parameter.value = 0.05,
+                                            max.acceptable.parameter.value = 1)
 
 
 #Create full criteria-based intervention
