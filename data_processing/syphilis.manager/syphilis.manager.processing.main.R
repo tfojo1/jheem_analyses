@@ -243,6 +243,7 @@ data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillan
 data.manager$register.parent.source('IQVIA', full.name = 'IQVIA', short.name= "IQVIA")
 data.manager$register.parent.source('NHANES', full.name = 'National Health and Nutrition Examination Survey', short.name= "NHANES")
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS")
+data.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
 
 ##Register Data Sources ('children')
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
@@ -255,6 +256,7 @@ data.manager$register.source('cdc.prep', parent.source= "IQVIA", full.name = "CD
 data.manager$register.source('cdc.prep.indications', parent.source= "NHANES", full.name = "CDC PrEP Indications Data", short.name='cdc.prep.indications')
 data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory')
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
+data.manager$register.source('cdc.wonder.natality', parent.source= "NVSS", full.name = "CDC Wonder Natality Data", short.name='cdc.wonder.natality')
 
 #Creating these separately bc they have separate parent sources
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
