@@ -107,7 +107,9 @@ female.population.clean = lapply(fertility.clean, function(file){
   
   data$outcome = 'female.population'
   
-  data$value = data$'Female.Population' 
+  data$value = data$'Female.Population'
+  
+  data = as.data.frame(data)
   
   list(filename, data) 
   
@@ -131,16 +133,16 @@ for (data in fertility.put) {
     url = 'https://wonder.cdc.gov/natality.html',
     details = 'CDC Wonder Natality Data')
 }
-# 
-# female.population.put = lapply(female.population.clean, `[[`, 2)  
-# 
-# for (data in female.population.put) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'cdc.fertility',
-#     source = 'cdc.wonder.natality',
-#     dimension.values = list(),
-#     url = 'https://wonder.cdc.gov/natality.html',
-#     details = 'CDC Wonder Natality Data')
-# }
+
+female.population.put = lapply(female.population.clean, `[[`, 2)
+
+for (data in female.population.put) {
+
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.fertility',
+    source = 'cdc.wonder.natality',
+    dimension.values = list(),
+    url = 'https://wonder.cdc.gov/natality.html',
+    details = 'CDC Wonder Natality Data')
+}
