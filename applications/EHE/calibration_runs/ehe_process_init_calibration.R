@@ -3,9 +3,12 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 LOCATION = BALTIMORE.MSA
 
-CALIBRATION.CODE.TO.PROCESS = #CALIBRATION.CODE.TRANSMISSION 
-                              #CALIBRATION.CODE.FULL.PLUS.COVID
-                              CALIBRATION.CODE.FULL.PLUS.COVID.MINUS.TEST.CHANGE
+CALIBRATION.CODE.TO.PROCESS = c(CALIBRATION.CODE.POPULATION, # 1
+                                CALIBRATION.CODE.TRANSMISSION, # 2
+                                CALIBRATION.CODE.FULL.PLUS.AIDS, # 3
+                                CALIBRATION.CODE.FULL.PLUS.COVID # 4
+                                )[c(4)]
+
 
 # Pull just the last simulation
 # mcmc = assemble.mcmc.from.calibration(version = 'ehe',
@@ -22,8 +25,8 @@ simset = assemble.simulations.from.calibration(version = 'ehe',
                                                calibration.code = CALIBRATION.CODE.TO.PROCESS,
                                                allow.incomplete = T)
 
-simset = simset$burn(keep = 0.5)
-simset = simset$thin(keep = 50)
+# simset = simset$burn(keep = 0.5)
+# simset = simset$thin(keep = 50)
 
 save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.PROCESS,"_simset_",Sys.Date(),"_",LOCATION,".Rdata"))
 
