@@ -453,7 +453,6 @@ proportion.tested.likelihood.instructions =
                                                    observation.correlation.form = 'compound.symmetry',
                                                    p.error.variance.term = NULL,
                                                    p.error.variance.type = 'data.variance', # sd or data.variance 
-                                                   correlation.different.strata = 0.8, 
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
