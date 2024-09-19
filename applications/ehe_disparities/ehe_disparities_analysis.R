@@ -4,23 +4,23 @@
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
 ### Load simsets
-load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.12580.Rdata") #Baltimore
+load("../jheem_analyses/applications/ehe_disparities/simset_2024_09-19_C.12580.Rdata") #Baltimore
 simset$save()
-load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.35620.Rdata") #NYC
-simset$save()
-load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.26420.Rdata") #Houston
-simset$save()
+#load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.35620.Rdata") #NYC
+#simset$save()
+#load("../jheem_analyses/applications/ehe_disparities/simset_2024_08-26_C.26420.Rdata") #Houston
+#simset$save()
 
-CALIBRATION.CODE= "full.with.aids" #full.with.covid2
-LOCATIONS=c("C.12580", "C.26420")
-LOCATIONS=c("C.35620")
+CALIBRATION.CODE="full.with.covid2" #full.with.aids
+LOCATIONS=c("C.12580")
+#LOCATIONS=c("C.26420","C.35620")
 INTERVENTIONS=c("noint", "fullint")
 
 ### Run a set of interventions and select relevant results
 collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
                                     locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=100)
 
-collection$run(2025, 2035, verbose=TRUE, stop.for.errors=T) # stop.for.errors = T, overwrite.prior=T
+collection$run(2025, 2035, verbose=TRUE, stop.for.errors=T, overwrite.prior=T) # stop.for.errors = T, overwrite.prior=T
 
 #################################
 
