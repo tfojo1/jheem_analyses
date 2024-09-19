@@ -691,10 +691,30 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                 parameters = parameters)
     
     #-- Increased General Mortality among all HIV --#
+    time.static.ages = 1:4
+    time.varying.ages = 5
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'hiv.general.mortality.multiplier',
-                                                                  alpha.name = 'value',
-                                                                  values = parameters[paste0('age',1:specification.metadata$n.ages,'.hiv.general.mortality.multiplier')],
-                                                                  applies.to.dimension.values = specification.metadata$dim.names$age,
+                                                                  alpha.name = 'time0',
+                                                                  values = parameters[paste0('age',time.static.ages,'.hiv.general.mortality.multiplier')],
+                                                                  applies.to.dimension.values = specification.metadata$dim.names$age[time.static.ages],
+                                                                  dimension = 'age')
+    
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'hiv.general.mortality.multiplier',
+                                                                  alpha.name = 'time2',
+                                                                  values = parameters[paste0('age',time.static.ages,'.hiv.general.mortality.multiplier')],
+                                                                  applies.to.dimension.values = specification.metadata$dim.names$age[time.static.ages],
+                                                                  dimension = 'age')
+    
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'hiv.general.mortality.multiplier',
+                                                                  alpha.name = 'time0',
+                                                                  values = parameters[paste0('age',time.varying.ages,'.hiv.general.mortality.multiplier.0')],
+                                                                  applies.to.dimension.values = specification.metadata$dim.names$age[time.varying.ages],
+                                                                  dimension = 'age')
+    
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'hiv.general.mortality.multiplier',
+                                                                  alpha.name = 'time2',
+                                                                  values = parameters[paste0('age',time.varying.ages,'.hiv.general.mortality.multiplier.2')],
+                                                                  applies.to.dimension.values = specification.metadata$dim.names$age[time.varying.ages],
                                                                   dimension = 'age')
 
     #-- HIV Mortality (increased mortality specifically among unsuppressed) --#

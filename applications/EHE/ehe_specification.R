@@ -799,9 +799,14 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'hiv.general.mortality.multiplier',
-                       functional.form = create.static.functional.form(value = 1, 
-                                                                       link="log",
-                                                                       value.is.on.transformed.scale = F),
+                       functional.form = create.natural.spline.functional.form(knot.times = c(time0 = 2000,
+                                                                                              time2 = 2020),
+                                                                               knot.values = list(time0 = 1,
+                                                                                                  time2 = 1),
+                                                                               link = "identity",
+                                                                               min = 1,
+                                                                               knot.link = "log"),
+                       functional.form.from.time = 2000,
                        scale = 'ratio')
 
 register.model.element(EHE.SPECIFICATION,
@@ -2000,7 +2005,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(diagnosed.prevalence/cumulative.infected),
                          corresponding.data.outcome = 'awareness',
                          denominator.outcome = 'cumulative.infected',
-                         keep.dimensions = c("location"))
+                         keep.dimensions = c("location","age"))
 
 track.dynamic.outcome(EHE.SPECIFICATION,
                       name = 'hiv.mortality',

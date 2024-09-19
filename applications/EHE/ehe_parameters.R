@@ -466,11 +466,13 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     # ),
 
     # Testing by Age
+    age1.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(1.5)), # separating age 1 out of the correlation 
+    
     age.proportion.tested.or = Multivariate.Lognormal.Distribution(
-      mu = rep(0, 5),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)),
+      mu = rep(0, 4),
+      sigma = create.compound.symmetry.covariance.matrix(0.5, 4, 0.5*log(1.5)),
       #sigma = create.auto.regressive.covariance.matrix(0.8, 5, sd=0.5*log(1.5)),
-      var.names = paste0("age", 1:5, ".proportion.tested.or")
+      var.names = paste0("age", 2:5, ".proportion.tested.or")
     ),
     
     age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
@@ -576,7 +578,8 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     age2.hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
     age3.hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
     age4.hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
-    age5.hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
+    age5.hiv.general.mortality.multiplier.0 = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
+    age5.hiv.general.mortality.multiplier.2 = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
     
     #-- HIV-Specific Mortality (unsuppressed) --#
     unsuppressed.hiv.mortality.0 = Lognormal.Distribution(log(9.5/6.1 * 23/1000), log(2)/2),
@@ -1265,11 +1268,12 @@ BASE.HIV.SAMPLING.BLOCKS = list(
                                    'unsuppressed.hiv.mortality.0',
                                    'unsuppressed.hiv.mortality.1'),
 
-    hiv.general.mortality.multipliers = c('age1.hiv.general.mortality.multiplier',
-                                          'age2.hiv.general.mortality.multiplier',
-                                          'age3.hiv.general.mortality.multiplier',
-                                          'age4.hiv.general.mortality.multiplier',
-                                          'age5.hiv.general.mortality.multiplier'),
+    young.hiv.general.mortality.multipliers = c('age1.hiv.general.mortality.multiplier',
+                                                'age2.hiv.general.mortality.multiplier',
+                                                'age3.hiv.general.mortality.multiplier'),
+    old.hiv.general.mortality.multipliers = c('age4.hiv.general.mortality.multiplier',
+                                              'age5.hiv.general.mortality.multiplier.0',
+                                              'age5.hiv.general.mortality.multiplier.2'),
 
     # young.hiv.mortality = c('age1.unsuppressed.hiv.mortality.multiplier',
     #                         'age1.hiv.general.mortality.multiplier',
