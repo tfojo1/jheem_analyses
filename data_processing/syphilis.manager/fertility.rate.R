@@ -83,12 +83,11 @@ fertility.clean = lapply(data.list.fertility, function(file){
   
   data = as.data.frame(data)
   
-  #CHECK ON THIS- need decision from group#
-  data$value = (data$value/1000) #whats the right format
-  data = subset(data, data$value < 1.0)
   
+  data$value = (data$value/1000) #changing format of rate
+  data = subset(data, data$value < 1.0) 
   data <- data %>%
-    mutate(location.check = locations::is.location.valid(location))%>%
+    mutate(location.check = locations::is.location.valid(location))%>% #Removing counties coded as 'unidentified'
     filter(location.check == T)
   
   list(filename, data) 
@@ -117,9 +116,6 @@ female.population.clean = lapply(fertility.clean, function(file){
 
 
 # Put into Syphilis Data Manager ------------------------------------------
-#I think you need to add a source or a parent source and an ontology#
-#You need to remove races that are not part of the ontology#
-
 
 fertility.put = lapply(fertility.clean, `[[`, 2)
 

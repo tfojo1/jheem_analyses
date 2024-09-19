@@ -227,7 +227,7 @@ data.manager$register.outcome(
 data.manager$register.outcome(
   'fertility.rate', 
   metadata = create.outcome.metadata(
-    scale = 'proportion',
+    scale = 'rate',
     display.name = 'Fertility Rate',
     axis.name = 'Fertility Rate',
     units = '%',
