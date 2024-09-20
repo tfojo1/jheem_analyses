@@ -7,7 +7,7 @@ source.style.manager = create.style.manager(color.data.by = "source")
 stratum.style.manager = create.style.manager(color.data.by = "stratum") # this is the default right now 
 
 # Need to have this file locally
-load('../jheem_analyses/prelim_results/full.with.covid_simset_2024-08-08_C.12580.Rdata')
+load('../jheem_analyses/prelim_results/full.with.covid2_simset_2024-09-19_C.12580.Rdata')
 
 simplot(simset,
         simset$last.sim(),
