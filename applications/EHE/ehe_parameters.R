@@ -292,13 +292,13 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
                                                                            var.names = c('age2.other.msm.susceptibility.rr.01',
                                                                                          'age2.other.msm.susceptibility.rr.2')),
     
-    age3.msm.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
-    age4.msm.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
-    age5.msm.susceptibility.rr.01 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    age3.msm.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
+    age4.msm.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.msm.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
     
-    age3.msm.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
-    age4.msm.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
-    age5.msm.susceptibility.rr.2 = Lognormal.Distribution(log(IDU.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    age3.msm.susceptibility.rr.2 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[3]), 0.5*log(2)),
+    age4.msm.susceptibility.rr.2 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.msm.susceptibility.rr.2 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
     
     # Heterosexual Susceptibility by Age
     age1.heterosexual.susceptibility.rr.01 = Lognormal.Distribution(log(SEXUAL.SUSCEPTIBILITY.BY.AGE[1]), 0.5*log(2)),
@@ -466,18 +466,16 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     # ),
 
     # Testing by Age
-    age1.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(1.5)), # separating age 1 out of the correlation 
-    
     age.proportion.tested.or = Multivariate.Lognormal.Distribution(
-      mu = rep(0, 4),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 4, 0.5*log(1.5)),
-      #sigma = create.auto.regressive.covariance.matrix(0.8, 5, sd=0.5*log(1.5)),
-      var.names = paste0("age", 2:5, ".proportion.tested.or")
+      mu = rep(0, 5),
+      #sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)),
+      sigma = create.auto.regressive.covariance.matrix(0.8, 5, sd=0.5*log(1.5)),
+      var.names = paste0("age", 1:5, ".proportion.tested.or")
     ),
     
     age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
       mu = rep(0, 5),
-      sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)/10),
+      sigma = create.auto.regressive.covariance.matrix(0.8, 5, 0.5*log(1.5)/10),
       var.names = paste0("age", 1:5, ".proportion.tested.slope.or")
     ),
     
@@ -574,13 +572,8 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
           # idu.adjustment = 2.41/3.01
           # non.aids.mortality.adjustment = 2.43
           # non.aids.mortality.adjustment*idu.adjustment # 1.945615
-    age1.hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
-    age2.hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
-    age3.hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
-    age4.hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
-    age5.hiv.general.mortality.multiplier.0 = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
-    age5.hiv.general.mortality.multiplier.2 = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
-    
+    hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
+
     #-- HIV-Specific Mortality (unsuppressed) --#
     unsuppressed.hiv.mortality.0 = Lognormal.Distribution(log(9.5/6.1 * 23/1000), log(2)/2),
     unsuppressed.hiv.mortality.1 = Lognormal.Distribution(log(23/1000), log(2)),
@@ -1266,28 +1259,8 @@ BASE.HIV.SAMPLING.BLOCKS = list(
 
     unsuppressed.hiv.mortality = c('unsuppressed.peak.hiv.mortality',
                                    'unsuppressed.hiv.mortality.0',
-                                   'unsuppressed.hiv.mortality.1'),
-
-    young.hiv.general.mortality.multipliers = c('age1.hiv.general.mortality.multiplier',
-                                                'age2.hiv.general.mortality.multiplier',
-                                                'age3.hiv.general.mortality.multiplier'),
-    old.hiv.general.mortality.multipliers = c('age4.hiv.general.mortality.multiplier',
-                                              'age5.hiv.general.mortality.multiplier.0',
-                                              'age5.hiv.general.mortality.multiplier.2'),
-
-    # young.hiv.mortality = c('age1.unsuppressed.hiv.mortality.multiplier',
-    #                         'age1.hiv.general.mortality.multiplier',
-    #                         'age2.unsuppressed.hiv.mortality.multiplier',
-    #                         'age2.hiv.general.mortality.multiplier'),
-    # 
-    # medium.hiv.mortality = c('age3.unsuppressed.hiv.mortality.multiplier',
-    #                          'age3.hiv.general.mortality.multiplier',
-    #                          'age4.unsuppressed.hiv.mortality.multiplier',
-    #                          'age4.hiv.general.mortality.multiplier'),
-    # 
-    # old.hiv.mortality = c('age5.unsuppressed.hiv.mortality.multiplier',
-    #                       'age5.hiv.general.mortality.multiplier'),
-
+                                   'unsuppressed.hiv.mortality.1',
+                                   'hiv.general.mortality.multiplier'),
 
 #-- COVID --#
 

@@ -799,14 +799,9 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'hiv.general.mortality.multiplier',
-                       functional.form = create.natural.spline.functional.form(knot.times = c(time0 = 2000,
-                                                                                              time2 = 2020),
-                                                                               knot.values = list(time0 = 1,
-                                                                                                  time2 = 1),
-                                                                               link = "identity",
-                                                                               min = 1,
-                                                                               knot.link = "log"),
-                       functional.form.from.time = 2000,
+                       functional.form = create.static.functional.form(value = 1, 
+                                                                       link="log",
+                                                                       value.is.on.transformed.scale = F),
                        scale = 'ratio')
 
 register.model.element(EHE.SPECIFICATION,
