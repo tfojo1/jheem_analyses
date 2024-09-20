@@ -53,6 +53,7 @@ generate_documentation <- function(..., path.to.documentation.folder, recursive=
         for (file.path in files.to.copy) {
             
             # Hash file path and add a number to the end if needed
+            # Note that Roxygen2 does not want the file names to have "." except for the extension and not to begin with an underscore.
             hashed.file.name = gsub("\\.R", "", file.path)
             hashed.file.name = gsub("\\.", "", hashed.file.name)
             hashed.file.name = gsub("/", "_", hashed.file.name)
