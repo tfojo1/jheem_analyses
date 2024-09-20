@@ -18,7 +18,7 @@ set.jheem.root.directory(ROOT.DIR)
 
 # Set up file paths
 # Load the data managers
-if (is.null(get.default.data.manager()))
+if (!exists('SURVEILLANCE.MANAGER'))
 {
     cat("Loading Surveillance Manager (may take a minute or two)...")
     SURVEILLANCE.MANAGER = load.data.manager.from.cache('surveillance.manager.rdata', set.as.default=T)
