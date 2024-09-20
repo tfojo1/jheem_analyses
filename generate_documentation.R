@@ -46,13 +46,25 @@ generate_documentation <- function(..., path.to.documentation.folder, recursive=
                             open = F)
     
     # Copy files over to its /R directory.
-    # It does not matter what the file names are, so give each one a number so that there are never any identical file names.
-    this.file.number = 1
+    # Hash the file names in a way that avoids clashes but is still legible since Roxygen2's errors will refer to them
+    used.file.names = character(0)
     for (directory in directories) {
         files.to.copy = list.files(path=directory, recursive = recursive, full.names=T)
         for (file.path in files.to.copy) {
-            file.copy(from = file.path, to = paste0(project.documentation.path, "/R/", as.character(this.file.number), ".R"))
-            this.file.number = this.file.number + 1
+            
+            # Hash file path and add a number to the end if needed
+            hashed.file.name = gsub("\\.R", "", file.path)
+            hashed.file.name = gsub("\\.", "", hashed.file.name)
+            hashed.file.name = gsub("/", "_", hashed.file.name)
+            hashed.file.name = paste0("filepath_", hashed.file.name)
+            copy.number = 0
+            while (hashed.file.name %in% used.file.names) {
+                copy.number = copy.number + 1
+                hashed.file.name = paste0(hashed.file.name, "_", copy.number, ".R")
+            }
+            used.file.names = union(used.file.names, hashed.file.name)
+            
+            file.copy(from = file.path, to = paste0(project.documentation.path, "/R/", hashed.file.name, ".R"))
         }
     }
     
