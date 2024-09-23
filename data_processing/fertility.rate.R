@@ -121,7 +121,7 @@ fertility.put = lapply(fertility.clean, `[[`, 2)
 
 for (data in fertility.put) {
 
-  data.manager$put.long.form(
+  census.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.fertility',
     source = 'cdc.wonder.natality',
@@ -134,7 +134,7 @@ female.population.put = lapply(female.population.clean, `[[`, 2)
 
 for (data in female.population.put) {
 
-  data.manager$put.long.form(
+  census.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.fertility',
     source = 'cdc.wonder.natality',
