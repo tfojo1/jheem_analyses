@@ -68,11 +68,15 @@ census.manager$register.outcome(
 #Register "Parent" Sources
 census.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
 census.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
+census.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
+
 
 #Register Data Sources ('children')
 census.manager$register.source('census.population', parent.source= "census", full.name = "Census Population Data", short.name='census.population')
 census.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
 census.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
+census.manager$register.source('cdc.wonder.natality', parent.source= "NVSS", full.name = "CDC Wonder Natality Data", short.name='cdc.wonder.natality')
+
 
 census.manager$register.ontology(
   'census.cdc.wonder.population',
@@ -149,6 +153,34 @@ census.manager$register.ontology(
     sex=c('male','female')
   ))
 
+census.manager$register.ontology(
+  'cdc.fertility',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('15-19 years', '20-24 years', '25-29 years', '30-34 years','35-39 years', '40-44 years'),
+    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American',   'White', 'More than one race'),
+    ethnicity = c('Hispanic or Latino', 'Not Hispanic or Latino')
+  ))
+
+census.manager$register.outcome(
+  'female.population', 
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Female Population',
+    axis.name = 'Female Population',
+    units = 'cases',
+    description = "Female Population Age 15-44"))
+
+census.manager$register.outcome(
+  'fertility.rate', 
+  metadata = create.outcome.metadata(
+    scale = 'rate',
+    display.name = 'Fertility Rate',
+    axis.name = 'Fertility Rate',
+    units = '%',
+    description = "Fertility Rate"), denominator.outcome = 'female.population') 
+
 ################################################################################
             ###Sourcing other files here###
 ################################################################################ 
@@ -175,6 +207,9 @@ source('data_processing/census.population.10.19.R')
 #UPDATE 7-16: Temporarily commenting out 181 to source the newer stratified data
 #I'll use this to decide if we want age groups or single year
 source('data_processing/census.population.20.23.R')
+
+#Fertility rates and female.population
+source('data_processing/fertility.rate.R')
 
 ################################################################################
 ###Read in Census Files###
