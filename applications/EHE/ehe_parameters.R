@@ -469,13 +469,13 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     age.proportion.tested.or = Multivariate.Lognormal.Distribution(
       mu = rep(0, 5),
       #sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)),
-      sigma = create.auto.regressive.covariance.matrix(0.8, 5, sd=0.5*log(1.5)),
+      sigma = create.auto.regressive.covariance.matrix(0.7, 5, sd=0.5*log(1.5)),
       var.names = paste0("age", 1:5, ".proportion.tested.or")
     ),
     
     age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
       mu = rep(0, 5),
-      sigma = create.auto.regressive.covariance.matrix(0.8, 5, 0.5*log(1.5)/10),
+      sigma = create.auto.regressive.covariance.matrix(0.7, 5, 0.5*log(1.5)/10),
       var.names = paste0("age", 1:5, ".proportion.tested.slope.or")
     ),
     
