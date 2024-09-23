@@ -65,6 +65,24 @@ census.manager$register.outcome(
     units = 'deaths',
     description = "Metro Deaths Denominator"))
 
+census.manager$register.outcome(
+  'female.population', 
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Female Population',
+    axis.name = 'Female Population',
+    units = 'cases',
+    description = "Female Population Age 15-44"))
+
+census.manager$register.outcome(
+  'fertility.rate', 
+  metadata = create.outcome.metadata(
+    scale = 'rate',
+    display.name = 'Fertility Rate',
+    axis.name = 'Fertility Rate',
+    units = '%',
+    description = "Fertility Rate"), denominator.outcome = 'female.population') 
+
 #Register "Parent" Sources
 census.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
 census.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
@@ -163,23 +181,6 @@ census.manager$register.ontology(
     ethnicity = c('Hispanic or Latino', 'Not Hispanic or Latino')
   ))
 
-census.manager$register.outcome(
-  'female.population', 
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'Female Population',
-    axis.name = 'Female Population',
-    units = 'cases',
-    description = "Female Population Age 15-44"))
-
-census.manager$register.outcome(
-  'fertility.rate', 
-  metadata = create.outcome.metadata(
-    scale = 'rate',
-    display.name = 'Fertility Rate',
-    axis.name = 'Fertility Rate',
-    units = '%',
-    description = "Fertility Rate"), denominator.outcome = 'female.population') 
 
 ################################################################################
             ###Sourcing other files here###
