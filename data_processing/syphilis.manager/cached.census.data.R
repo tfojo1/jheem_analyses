@@ -2,6 +2,8 @@
 #Load the census manager to get population data that is clean and processed
 census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
 
+# THESE ARE ONTOLOGY = CENSUS.DATA ----------------------------------------
+
 #Population total 1970-2023
 population.total = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location)%>%
   rename(value = Freq)%>%
@@ -52,9 +54,18 @@ population.race = as.data.frame.table(census.manager$data$population$estimate$ce
                 mutate(location = as.character(location))%>%
                 mutate(value = as.numeric(value))%>%
                 mutate(outcome = "population")
-  
 
 population.race<- as.data.frame(population.race[!duplicated(population.race), ])
+
+#Age+Sex 20-23-ontology census data bc its single age 
+age.sex.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age__sex)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(outcome = "population")
 
 #Combine
 population.data.list = list(
@@ -62,10 +73,10 @@ population.data.list = list(
   population.age.20.23,
   population.sex.20.23,
   population.sex.10.19,
-  population.race
+  population.race,
+  age.sex.20.23
   
 )
-
 
 # Put from census into syphilis.manager -----------------------------------
 
@@ -73,14 +84,14 @@ for (data in population.data.list) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'census.data', #need to change the racial groups
+    ontology.name = 'census', #need to change the racial groups
     source = 'census.population', 
     dimension.values = list(),
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
 
-# Putting this separately with a different ontology -----------------------
+# THESE ARE ONTOLOGY = STRATIFIED.CENSUS -----------------------
 
 #Age 2010-2019 (AGE GROUP)
 population.age.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age)%>%
@@ -91,6 +102,91 @@ population.age.10.19 = as.data.frame.table(census.manager$data$population$estima
   mutate(age = as.character(age))%>%
   mutate(outcome = "population")
 
+#Ethnicity 2010-2023
+population.ethnicity = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__ethnicity)%>%
+  rename(value = Freq)%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(outcome = "population")
+
+# Race+Ethnicity+Sex 2010-2023
+population.race.eth.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity__sex)%>%
+  rename(value = Freq)%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(race = as.character(race))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(outcome = "population")
+
+#Race+Ethnicity 2010-2023
+population.race.eth= as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity)%>%
+  rename(value = Freq)%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(race = as.character(race))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(outcome = "population")
+
+#Age+Sex 2010-2019 (ontology= stratifed.census because this is age group data)
+age.sex.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__sex)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(outcome = "population")
+
+#Age+Race+Ethnicity 2010-2023
+population.race.eth.age = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity)%>%
+  rename(value = Freq)%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(race = as.character(race))%>%
+  mutate(age = as.character(age))%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(outcome = "population")
+
+#Age+Race 2010-2023
+age.race = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(race = as.character(race))%>%
+  mutate(outcome = "population")
+
+#Age+Ethnicity 2010-2023
+age.eth = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(outcome = "population")
+
+
+# Put for ontology = stratified census ------------------------------------
+#Combine
+population.stratified.census = list(
+  population.age.10.19,
+  population.ethnicity,
+  population.race.eth,
+  age.race,
+  age.eth,
+  age.sex.10.19,
+  population.race.eth.age,
+  population.race.eth.sex
+)
+
 data.manager$put.long.form(
   data = population.age.10.19,
   ontology.name = 'stratified.census', 
@@ -98,5 +194,3 @@ data.manager$put.long.form(
   dimension.values = list(),
   url = 'www.census.gov',
   details = 'Census Reporting')
-
-

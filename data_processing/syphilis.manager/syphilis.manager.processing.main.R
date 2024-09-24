@@ -288,7 +288,7 @@ data.manager$register.ontology(
   ))
 
 data.manager$register.ontology(
-  'census.data',
+  'census',
   ont = ontology(
     year= NULL,
     location= NULL,
