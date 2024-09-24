@@ -3,9 +3,9 @@
 library(locations)
 library(distributions)
 
-JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
-SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD/"
-setwd(JHEEM.DIR)
+# JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
+# SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD/"
+# setwd(JHEEM.DIR)
 
 # This 'source' call is equivalent to loading the jheem2 package
 source('../jheem2/R/tests/source_jheem2_package.R')

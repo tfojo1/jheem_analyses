@@ -15,10 +15,10 @@
 # > specification.metadata=get.specification.metadata("shield","US")
 
 # Working directory is set to the main JHEEM_Analysis folder:
-JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
-SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD/"
-setwd(JHEEM.DIR)
-# setwd('../../')
+# JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
+# SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD/"
+# setwd(JHEEM.DIR)
+setwd('../../')
 source('applications/SHIELD/shield_source_code.R')
 ##--------------------------------------------------------------------------------------------------------------#
 #-- INITIAL SET-UP --#----

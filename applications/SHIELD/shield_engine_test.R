@@ -17,9 +17,15 @@ params=get.medians(SHIELD.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
 #plotting:
+
+# before 2020 the census gave single age brackets after they only give age-groups
+# census.data: age-groups for 2020-2023
+# stratified.census: single ages before 2020
+
 #population data for Baltimore MSA
 SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census.data$year__location[, "C.12580"]
-simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER) #still doesnt plot the data
+simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER,facet.by='age') #still doesnt plot the data
+sim$location
 
 SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[, "C.12580"]
 simplot(sim,"diag.ps",data.manager = SURVEILLANCE.MANAGER)
