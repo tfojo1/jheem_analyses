@@ -5,10 +5,10 @@
 
 #
 #' @title create.pairing.manager
-#' @description creating pairing inputs for the model
+#' @description creating pairing inputs for the model; data is in .../data_files/pairing"
 #' @param dir the directory where the data files are stored
 #' @return returns a list of inputs for the model
-create.pairing.manager <- function(dir='../jheem_analyses/applications/SHIELD/data_files/pairing')
+create.pairing.manager <- function(dir)
 {
   rv = list()
 
@@ -307,6 +307,3 @@ fit.age.model <- function(age.of.reference, age.of.partner)
 }
 
 
-##-- CREATE and STORE --## ----
-PAIRING.INPUT.MANAGER = create.pairing.manager()
-print("PAIRING.INPUT.MANAGER created!")

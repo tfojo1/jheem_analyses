@@ -7,8 +7,7 @@
 #This allows you to control the order of documentation by deciding which function goes under which
 #@rdname. The documentation of all functions with the same @rdname will be combined under one manual page.
 
-CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
-DEFAULT.POPULATION.YEARS = 2007
+
 
 # BASE INITIAL POPULATION SIZE ----
 ## get base initial populations sizes for different groups ----
@@ -459,7 +458,7 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
   age.cutoffs = specification.metadata$age.endpoints
   age.cutoffs[length(age.cutoffs)] = min(age.cutoffs[length(age.cutoffs)],
                                          max(as.numeric(names(age.counts))))
-  
+
   #returns contact matrix by age
   get.age.mixing.proportions(age.delta.intercept.mean=age.model['mean.intercept'],
                              age.delta.slope.mean=age.model['mean.slope'],
@@ -691,4 +690,45 @@ oes.to.proportions <- function(oes, population)
 {
   raw = oes * rep(population[ dimnames(oes)[[1]] ], each=length(population))
   raw / rowSums(raw)
+}
+
+
+# FERTILITY ----
+#' @title get.fertility.rates.functional.form
+#' @description generating a functional form for fertility rates based on census data
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param population.years population.years
+#' @return a functional form for fertility rates to be used in the specification
+get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+  # pull fertility rates
+  rates = get.fertility.rates.from.census(location=location,specification.metadata = specification.metadata)
+  #define a static functional form
+  create.static.functional.form(value = rates,
+                                link = "log", #use log to add multipliers as alpha main effects for calibration
+                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+}
+
+#' @title get.fertility.rates.from.census
+#' @description reading the fertility rates from the census manager
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param population.years population.years
+#' @return returning the fertility rates in the correct dimension
+get.fertility.rates.from.census<-function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
+  #pull fertility rates
+  counties=locations::get.contained.locations(location, 'county') #extract the counties for the location MSA
+#@PK: to double check with the new dataset
+  #   fertility = CENSUS.MANAGER$pull(outcome='fertility.rate',
+  #                                 location = counties,
+  #                                 year= population.years,
+  #                                 keep.dimensions = c('race', 'ethnicity', 'location'),
+  #                                 na.rm=TRUE)[,,,1] #keep all race, all ethnicities, first source#
+  fertility = 2/30 #it knows the dimensions
+
+    if (is.null(fertility))
+    stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
+                locations::get.location.name(location), ")"))
+  #@Todd: can we just return these rates or how do we make sure that they have the correct dimension?
+  return(fertility)
 }

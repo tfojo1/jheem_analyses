@@ -26,7 +26,7 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
 # citation numbers are oubmed ID, they're for our own records'
 
 
-##-- TRANSMISSION --##
+## TRANSMISSION ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                              'oe.female.pairings.with.msm', #observed to estimated ratio of contacts for females with male who are msm
                                              0.0895,0.0895*.75,0.0895*1.25, #Todd: I'm not sure what the CI should be here?
@@ -37,6 +37,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                              0.004,0.004*.75,0.004*1.25, #Todd: I'm not sure what the CI should be here?
                                              citation='assumption')
 
+## SEXUAL CONTACT BY RACE ----
 #base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
 #these are average values from 4 different studies that are included in the pairing_input_manager
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
@@ -51,8 +52,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'oe.sexual.byrace.oo',
                                       1.55, 1.55*.75, 1.55*1.25,
                                       citation='assumption')
-
-
+## SEXUAL TRANSMISSION RATES ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.sexual.transmission',
                                        4.75, 2.4, 7.1,
                                        citation=26362321)
@@ -68,6 +68,11 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.male.sexua
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.msm.sex.with.female',
                                        0.18, 0.18*5, 0.18*2,
                                        citation=9525438)
+
+# NEW BIRTHS ----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.birth.ratio',
+                                      1.05, 1.05*5, 1.05*2,
+                                      citation=00000)
 ##-- STATE DURATIONS --##
 # SHIELD_BASE_PARAMETERS = add.parameter(SHIELD_BASE_PARAMETERS, 'primarySecondary.infection.duration',
 #                                        3/12, 1/12, 6/12,

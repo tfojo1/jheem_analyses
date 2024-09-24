@@ -1,3 +1,6 @@
+# CENSUS.MANAGER$data$births$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity
+# add the age/race of moms
+
 # NEXT STEPS:
 ### birth , death, migration
 
@@ -12,7 +15,9 @@
 # > specification.metadata=get.specification.metadata("shield","US")
 
 # Working directory is set to the main JHEEM_Analysis folder:
-setwd("~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/")
+JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
+SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD/"
+setwd(JHEEM.DIR)
 # setwd('../../')
 source('applications/SHIELD/shield_source_code.R')
 ##--------------------------------------------------------------------------------------------------------------#
@@ -47,7 +52,6 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
 
 
 ##---- Fix Strata Sizes----
-
 #'@title Set Whether to Fix Strata Sizes During a Time Period # a simplifying assumption to avoid modeling population demographic dynamics before year X
 # 2007 earliest year for complete census data
 register.fixed.model.strata(SHIELD.SPECIFICATION,
@@ -88,12 +92,12 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'base.initial.male.population',
                        get.value.function = get.base.initial.male.population,
                        scale = 'non.negative.number')
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'proportion.msm.of.male',
-                       scale = 'proportion',
-                       get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
-                       functional.form.from.time=2010,
-                       functional.form.to.time=2010)
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'proportion.msm.of.male',
+#                        scale = 'proportion',
+#                        get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
+#                        functional.form.from.time=2010,
+#                        functional.form.to.time=2010)
 ##---- Infected ----
 # dummy values: 0.5% are infected, and they are 50% in PS and 50% in Ter stage and all undiagnosed
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -112,7 +116,7 @@ register.initial.population(SHIELD.SPECIFICATION,
                             value = 'initial.population.infected')
 ##---- Uninfected ----
 register.initial.population(SHIELD.SPECIFICATION,
-                             group = 'uninfected',
+                            group = 'uninfected',
                             value = 'initial.population.uninfected')
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'initial.population.uninfected',
@@ -410,9 +414,61 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 
+#-- NATALITY --# ----
+# we model births based on women's fertility rates
+register.natality(specification = SHIELD.SPECIFICATION,
+                  parent.groups = c('infected', 'uninfected'),
+                  applies.to = list(sex='female'), #only women give birth
+                  child.groups = 'uninfected',
+                  fertility.rate.value = 'fertility.rate',
+                  birth.proportions.value = 'birth.proportions', # when they are born, where do they go? (e.g., what age, what race, what sex will they have)
+                  parent.child.concordant.dimensions = c('race'),# the race of the cild will be the same
+                  all.births.into.compartments = list(profile='susceptible',age= 1),
+                  tag = 'births')
+##---- FERTILITY ----
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'fertility.rate',
+                       get.functional.form.function = get.fertility.rates.functional.form,
+                       functional.form.from.time = DEFAULT.POPULATION.YEARS,
+                       scale = 'rate')
+
+##---- BIRTH PROPORTIONS ----
+# to determine where newborns should go
+# currently set as a fix ratio
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'fraction.male.births',
+                       scale = 'proportion',
+                       value = SHIELD_BASE_PARAMETER_VALUES['male.to.female.birth.ratio'] / (1+SHIELD_BASE_PARAMETER_VALUES['male.to.female.birth.ratio']))
+
+#data is available from the year 2010
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'proportion.msm.of.male',
+                       scale = 'proportion',
+                       get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
+                       functional.form.from.time=2010,
+                       functional.form.to.time=2010)
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'birth.proportions',
+                        value =0)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               applies.to = list(sex.to='msm'),
+                               name = 'birth.proportions',
+                               value = expression( fraction.male.births*proportion.msm.of.male ))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               applies.to = list(sex.to='heterosexual_male'),
+                               name = 'birth.proportions',
+                               value = expression( fraction.male.births*(1-proportion.msm.of.male)  ))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               applies.to = list(sex.to='female'),
+                               name = 'birth.proportions',
+                               value = expression( 1-fraction.male.births ))
+
+##--------------------------------------------------------------------------------------------------------------#
 #-- MORTALITY --# ----
 ##--------------------------------------------------------------------------------------------------------------#
 # different sources of mortality (general, syphilis related, etc.)
+## Syphilis related mortality
 
 register.mortality(SHIELD.SPECIFICATION,
                    tag = 'general.mortality',
@@ -425,53 +481,12 @@ register.model.quantity(SHIELD.SPECIFICATION,
 
 
 ##--------------------------------------------------------------------------------------------------------------#
-#-- NATALITY  --# ----
-##--------------------------------------------------------------------------------------------------------------#
-# Fertility and birth rate
-register.natality(specification = SHIELD.SPECIFICATION,
-                  parent.groups = c('infected', 'uninfected'),
-                  applies.to = list(sex='female'), #only women give birth
-                  child.groups = 'uninfected',
-                  fertility.rate.value = 'general.fertility.rate',
-                  birth.proportions.value = 'general.birth.proportions', # when they are born, where do they go? (e.g., what age, what race, what sex will they have)
-                  parent.child.concordant.dimensions = c('race'),# the race of the cild will be the same
-                  all.births.into.compartments = list(profile='susceptible',age= 1),
-                  tag = 'births')
-
-# e.g., assuming 50% of births are female and 10% of male are msm
-# required elements to decide where new births should go
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'proportion.births.female',
-                       scale = 'proportion',
-                       value = 0.5)
-
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'proportion.male.msm',
-                       scale = 'proportion',
-                       value = 0.1)
-
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'general.birth.proportions',
-                        value = 'proportion.births.female')# this will apply to all unless we define the subsets below:
-
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(sex.to='heterosexual_male'), # there is a sex.from option as well that is used to differntiate proportions based on who the parent is
-                               name = 'general.birth.proportions',
-                               value = expression( (1- proportion.births.female)*(1-proportion.male.msm) ))
-
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(sex.to='msm'),
-                               name = 'general.birth.proportions',
-                               value = expression( (1- proportion.births.female)*(proportion.male.msm) ))
-
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'general.fertility.rate',
-                       scale = 'rate',
-                       value = 0.024 #this will come from census data by race for women in each county
-)
+# -- MIGRATION --# ----
+# immigration/emigration doesnt depent on disease state- it's used to fit the population size but doesnt change the prevalence of the disease
+# the prior comes from census reports (prp getting in and leaving MSAs) - these didnt represent immigrations from other countries but more movements between MSAs
+# oneway stratification only for one timepoint  (2011-2015) (2016-2020) breakdown by age, by race, by sex only for 2020
 
 
-##--------------------------------------------------------------------------------------------------------------#
 #-- CONTINUUM TRANSISION --# ----
 ##---- TESTING ----
 # There are 2 components to testing: underlying screening rate (for everyone), additional sympthomatic testing rates (for ps and ter stages)
@@ -723,7 +738,7 @@ track.point.outcome(SHIELD.SPECIFICATION,
                     save=F,
                     value=expression(infected+uninfected),
                     keep.dimensions = c('location','age','race','sex') #collapse on stage and continuum for infected and on profile as well
-                    )
+)
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name='population',
                          outcome.metadata = create.outcome.metadata(display.name = 'Population',
@@ -735,7 +750,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          value.to.integrate = 'point.population',
                          keep.dimensions = c('location','age','race','sex'),
                          corresponding.data.outcome = 'population' #Zoe: data should include persons under 13 (JHEEM data only includes 13+)
-                           )
+)
 
 
 ##--------------------------------------------------------------------------------------------------------------#

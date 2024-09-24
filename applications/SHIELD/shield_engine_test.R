@@ -5,18 +5,33 @@
 # engine.run()
 
 source('applications/SHIELD/shield_specification.R')
-# library(roxygen2)
-# roxygen2::roxygenise()
 
-engine = create.jheem.engine('shield', 'C.12580', 2025) #@Todd: to update the code for ontology to work with the US location
-#@Zoe: will add a line for US data (we dont need the county information for the US)
+# Baltimore MSA : C.12580
+engine = create.jheem.engine('shield', 'C.12580', 2025)
+# engine = create.jheem.engine('shield', 'US', 2025)
+
 params=get.medians(SHIELD.PARAMETERS.PRIOR)
 # params['global.trate']=1
 # params['msm.trate.multiplier1']=1000
 
 sim = engine$run(params)
-simplot(sim, 'population')
-sim$population
+
+#plotting:
+#population data for Baltimore MSA
+SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census.data$year__location[, "C.12580"]
+simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER) #still doesnt plot the data
+
+SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[, "C.12580"]
+simplot(sim,"diag.ps",data.manager = SURVEILLANCE.MANAGER)
+SURVEILLANCE.MANAGER$outcomes
+
+SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[, "C.12580"]
+
+SURVEILLANCE.MANAGER$source.info
+
+
+# simplot(sim, 'population')
+# sim$population
 # sim$parameters
 #
 # params2=c(global.trate=2)
@@ -27,13 +42,13 @@ sim$population
 
 
 
-simplot(sim, 'incidence')
-# ,split.by = 'age',facet.by = 'race')
-# ,dimension.values =  list(age='0-14 years'))
-        # dimension.values = list(year = 2000:2020))
-simplot(sim, 'trt.initiation')
-
-sim$params
+# simplot(sim, 'incidence')
+# # ,split.by = 'age',facet.by = 'race')
+# # ,dimension.values =  list(age='0-14 years'))
+#         # dimension.values = list(year = 2000:2020))
+# simplot(sim, 'trt.initiation')
+#
+# sim$params
 
 
 

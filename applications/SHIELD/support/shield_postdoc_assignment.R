@@ -1,11 +1,11 @@
 # DELIVERABLES:
 # Part 1:#
-#   Provide a Word document containing the two generated plots.
+# Provide a Word document containing the two generated plots.
 # Include a description of how well the simulated data fits the CDC targets.
-# Parts 2 & 3:#
-#   Include the R code you developed for each question, save the R script, and share it with us.
+# Parts 2 to 4:#
+# Include the R code you developed for each question, save the R script with your initial (e.g., PK.R), and share it with us.
 # For each question, include your rationale for the new code and your interpretation of the results as comments throughout the script and at the end of each question.
-
+# Please email your response to pkasaie@jhu.edu
 
 ##---------------------------------------------------------------##
 ##-- PART 1: Code Setup and Implementation                     --##
@@ -81,7 +81,6 @@ simplot(sim, outcomes = "diagnosed.prevalence", dimension.values = list(year = 2
 # hint: you can use the simplot function to plot outputs from several simulations on the same plot:
 # simplot(sim1, sim2, outcomes = "new", dimension.values = list(year = 2007:2025))
 
-
 ##-------------------------------------------------------------------##
 ##-- Part 3: Model Calibration                                     --##
 ##-------------------------------------------------------------------##
@@ -96,9 +95,8 @@ diagnosed.prevalence.target= SURVEILLANCE.MANAGER$pull(outcome="diagnosed.preval
 new.diagnoses.sim=sim$get("new",year=c(2008:2021))
 diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 
-
 # Write a code to find the global.trate that provides the best fit to new.diagnosis.target and diagnosed.prevalence.target over time
-# you can use alternative measures of goodness of fit that you deem approperiate
+# you can use alternative measures of goodness of fit that you deem appropriate
 # please provide comments throughout your code to describe your rationale and include a summary at the end to describe the results
 
 ##-------------------------------------------------------------------------------------------------------------##
@@ -110,11 +108,11 @@ diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 # Task 1: Extract the Number of New Diagnoses
 # First, we need to extract the number of new diagnoses from the sim object created in Part 1.
 # you can call this object new.diagnoses
-# If you don’t have access to the sim object, you would load it from the onedrive folder.
+# If you don’t have access to the sim object, you can load a copy from the onedrive folder.
 
-## Describe the dimensions and names of the dimensions of the Extracted Objects
+##Task2: Describe the dimensions and names of the dimensions of the Extracted Objects
 
-## Filter Objects for Specific Subgroups
+##Task3: Filter Objects for Specific Subgroups
 # a. Filter the new.diagnoses to focus on the subgroup: 13-24 years old, Black, MSM, and never IDU.
 # b. Plot the filtered data over time
 # c. interpret the trend in new diagnoses for this subgroup
@@ -124,7 +122,7 @@ diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 #                     drop = FALSE]
 
 
-## Draw a histogram of the age distribution for new HIV diagnoses in the year 2020
+##Task4: Draw a histogram of the age distribution for new HIV diagnoses in the year 2020
 ## what proportion of new diagnosis in year 2020 occured among 12-24 years old?
 # hint: you can aggregate the new.diagnoses across all groups in year 2020 and plot the age distribution using ggplot2
 
