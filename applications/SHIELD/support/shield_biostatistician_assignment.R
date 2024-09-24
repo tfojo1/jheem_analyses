@@ -1,10 +1,10 @@
 # DELIVERABLES:
-# Part 1:#
-#   Provide a Word document containing the two generated plots.
-# Include a description of how well the simulated data fits the CDC targets.
-# Parts 2 & 3:#
-#   Include the R code you developed for each question, save the R script, and share it with us.
-# For each question, include your rationale for the new code and your interpretation of the results as comments throughout the script and at the end of each question.
+# Part 1-4:
+# Provide a Word document containing the plots and interpreations.
+# Parts 2 & 3 :
+# Include the R code you developed for each question, save the R script with your initial (e.g., xx.R), and share it with us.
+# For each question, include your rationale for the new code and your interpretation of the results as comments throughout the script
+# and at the end of each question.
 
 
 ##---------------------------------------------------------------##
@@ -68,26 +68,6 @@ simplot(sim, outcomes = "diagnosed.prevalence", dimension.values = list(year = 2
 ## Tasks:
 # Set the R seed to 1234
 # Instead of fixing the global transmission rate, you will investigate how changes in this rate affect the model's predictions.
-# Sample three different values of global.trate from a uniform distribution bounded between 0 and 0.05.
-# For each sampled value, update the params object and rerun the simulation.
-# Run the simulations for the three different global.trate values you sampled.
-# Visualize the outcomes of these simulations, focusing on the "new HIV diagnoses" and # "prevalence of diagnosed HIV" from 2007 to 2025.
-# Compare the results from the three simulations with each other and against CDC-reported data.
-# Analyze which of the three simulations provides the best fit to the observed data.
-
-# Note: You will need to develop the code to sample the parameters, run the simulations, and create the visualizations
-# Please include your interpretation of the results and any insights you gained from this analysis at the end of your code
-
-# hint: you can use the simplot function to plot outputs from several simulations on the same plot:
-# simplot(sim1, sim2, outcomes = "new", dimension.values = list(year = 2007:2025))
-
-
-##-------------------------------------------------------------------##
-##-- Part 3: Model Calibration                                     --##
-##-------------------------------------------------------------------##
-# In Part 2, you set the global transmission rate (global.trate) to some random values and observed the impact on the two calibration outcomes
-# Now, we will explore a machanism for optimizing the fit to these outcomes
-
 # Extract the calibration targets for number of new diagnosis (new.diagnosis) and prevalence of diagnosed HIV (diagnosed.prevalence) as follow:
 new.diagnosis.target=SURVEILLANCE.MANAGER$pull(outcome="diagnoses", location="C.12580",source="cdc.aggregated.county")
 diagnosed.prevalence.target= SURVEILLANCE.MANAGER$pull(outcome="diagnosed.prevalence", location="C.12580",source="cdc.aggregated.county")
@@ -96,13 +76,20 @@ diagnosed.prevalence.target= SURVEILLANCE.MANAGER$pull(outcome="diagnosed.preval
 new.diagnoses.sim=sim$get("new",year=c(2008:2021))
 diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 
-
 # Write a code to find the global.trate that provides the best fit to new.diagnosis.target and diagnosed.prevalence.target over time
-# you can use alternative measures of goodness of fit that you deem approperiate
+# you can use alternative measures of goodness of fit that you deem appropriate
+# Visualize the outcomes of these simulations, focusing on the "new HIV diagnoses" and # "prevalence of diagnosed HIV" from 2007 to 2025.
 # please provide comments throughout your code to describe your rationale and include a summary at the end to describe the results
 
+# hint:
+# Sample  different values of global.trate from a uniform distribution bounded between 0 and 0.1.
+# For each sampled value, update the params object, run the simulation, and compute goodness of fit
+# You can use the simplot function to plot outputs from several simulations on the same plot:
+# simplot(sim1, sim2, outcomes = "new", dimension.values = list(year = 2007:2025))
+
+
 ##-------------------------------------------------------------------------------------------------------------##
-##-- Part 4: Data Extraction and Analysis                                                                    --##
+##-- Part 3: Data Extraction and Analysis                                                                    --##
 ##-------------------------------------------------------------------------------------------------------------##
 # In this section, you'll explore and analyze simulation results related to new HIV diagnoses.
 # You will need to extract, filter, and aggregate data from a simulation object and visualize your findings.
@@ -130,7 +117,7 @@ diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 
 
 ##----------------------------------------------------##
-##-- Part 5: Paper Review                           --##
+##-- Part 4: Paper Review                           --##
 ##----------------------------------------------------##
 # Please review the following paper and answer the below questions:
 # "What Will It Take to End HIV in the United States? A Comprehensive, Local-Level Modeling Study"
