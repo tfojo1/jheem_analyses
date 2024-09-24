@@ -154,22 +154,3 @@ diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 # 6.	Model calibration focuses on 10 calibration target including new diagnoses, prevalence,etc. Let's assume that we have more certainty
 #     in some targets than others. How can we reflect this in the likeloohood function used for calibration?
 
-
-
-## EXAMPLE ANSWERS - REMOVE BEFORE DISTRIBUTING ##
-# 2.	What is the benefit of running 1000 simulations for each MSA?
-    # a. Answer: Represent uncertainty; sensitivity analyses
-# 3.	The authors note that their modeled scenarios of improved viral suppression represent the combined efficacy of interventions to enhance engagement and retention in care and improved adherence to antiretrovirals. List two potential real-world interventions that could result in improved viral suppression.
-    # a. Example answers: (Many acceptable answers for this question)
-# 4.	The authors assumed that, without any additional intervention, PrEP coverage would continue its trajectory into the future. Consider a scenario where PrEP coverage actually dropped in the future (e.g., during COVID). How might that change the impact of the modeled PrEP intervention?
-    # a. Answer: Intervention would have a greater impact because baseline is lower
-# 5.	The authors chose to scale up the interventions linearly. How might this differ in a real-world scenario?
-    # a. Example answer: Early adopters scale-up quickly; marginalized populations scale up more slowly as they are harder to reach
-# 6.	Provide an interpretation of Figure 3, panel D.
-    # a. Example answer: Reported cases trending downwards in both the simulation and data from 2010-2018; intervention implemented in 2020 leads to a short-term increase in reported cases (due to increased testing/identification of cases; not increased transmission) then a sustained decline in cases
-# 7.	Scenario 6 reduced new infections in the Seattle-Tacoma-Bellevue MSA by 17% compared to 51% in the Miami-Fort Lauderdale-Pompano Beach MSA (Figure 4). What is your interpretation of this result and what are some possible explanations for this difference?
-    # a. Example answer: Seattle has a small population of Black and Hispanic MSM <35y or their population of YBHMSM already has high testing/PrEP/suppression rates
-# 8.	The sensitivity analysis found that HIV transmission among Black heterosexuals was the parameter most strongly associated with the estimated reduction in HV incidence. If this transmission rate were lower than expected, how would you expect that to impact the projected reduction in HIV incidence?
-    # a. Answer: A lower transmission rate would lead to a lower reduction in incidence (they should be able to pull this directly from the Baton Rouge example given).
-# 9.	Give 1-2 examples of research questions you could examine with this model.
-    # a. Example answers: (Many acceptable answers for this question)
