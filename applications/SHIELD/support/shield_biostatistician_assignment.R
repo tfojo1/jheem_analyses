@@ -132,40 +132,44 @@ diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 ##----------------------------------------------------##
 ##-- Part 5: Paper Review                           --##
 ##----------------------------------------------------##
-# Please review the following paper and answer the below questions: 
+# Please review the following paper and answer the below questions:
 # "What Will It Take to End HIV in the United States? A Comprehensive, Local-Level Modeling Study"
-# https://www.acpjournals.org/doi/10.7326/M21-1501 
+# https://www.acpjournals.org/doi/10.7326/M21-1501
+# you can also find a saved copy under the cashed folder: https://www.dropbox.com/scl/fo/5vxliw7fnq91kt0odbeab/AM5SrKajDnDVQ06M7Dmsem4?rlkey=i9rqo23thi9zg9ytav4u1lyha&dl=0
+# unde fojo-et-al-2021-what-will-it-take-to-end-hiv-in-the-united-states.pdf
 
-# 1.	The authors chose to represent local epidemics at the level of metropolitan statistical area (MSA). How else might you represent these epidemics geographically, and under what assumptions would you choose these other representations? (Give 1-2 examples). 
-# 2.	What is the benefit of running 1000 simulations for each MSA? 
-# 3.	The authors note that their modeled scenarios of improved viral suppression represent the combined efficacy of interventions to enhance engagement and retention in care and improved adherence to antiretrovirals. List two potential real-world interventions that could result in improved viral suppression. 
-# 4.	The authors assumed that, without any additional intervention, PrEP coverage would continue its trajectory into the future. Consider a scenario where PrEP coverage actually dropped in the future (e.g., during COVID). How might that change the impact of the modeled PrEP intervention? 
-# 5.	The authors chose to scale up the interventions linearly. How might this differ in a real-world scenario? 
-# 6.	Provide an interpretation of Figure 3, panel D. 
-# 7.	Scenario 6 reduced new infections in the Seattle-Tacoma-Bellevue MSA by 17% compared to 51% in the Miami-Fort Lauderdale-Pompano Beach MSA (Figure 4). What is your interpretation of this result and what are some possible explanations for this difference? 
-# 8.	The sensitivity analysis found that HIV transmission among Black heterosexuals was the parameter most strongly associated with the estimated reduction in HV incidence. If this transmission rate were lower than expected, how would you expect that to impact the projected reduction in HIV incidence? 
-# 9.	Give 1-2 examples of research questions you could examine with this model. 
+# 1.	What is the benefit of running 1000 simulations for each MSA? how would you determine if 1000 simulation is approperiate or if you need less/more?
+
+# 2.	The authors assumed that, without any additional intervention, PrEP coverage would continue its trajectory into the future.
+#     Consider a scenario where baseline PrEP coverage remains fix at 2023's level.
+#     How might that change the impact of the modeled PrEP intervention to 2030?
+
+# 3.	The authors chose to scale up the interventions linearly. How might this differ in a real-world scenario?
+
+# 4.	Provide an interpretation of Figure 3, panel D.
+
+# 5.  The compartmental model is deterministic by nature. What are the soures of uncertainty in the current JHEEM model
+#     that contribute to shaded areas in Figure 3
+
+# 6.	Model calibration focuses on 10 calibration target including new diagnoses, prevalence,etc. Let's assume that we have more certainty
+#     in some targets than others. How can we reflect this in the likeloohood function used for calibration?
+
 
 
 ## EXAMPLE ANSWERS - REMOVE BEFORE DISTRIBUTING ##
-# 1.	The authors chose to represent local epidemics at the level of metropolitan statistical area (MSA). How else might you represent these epidemics geographically, and under what assumptions would you choose these other representations? (Give 1-2 examples). 
-    # a.	Example answers: 
-      # i.	Model at the county level; assume no mixing between counties 
-      # ii.	Model urban vs rural; assume urban more likely to mix with urban and rural more likely to mix with rural 
-      # iii.	Model at the state level; assume homogenous mixing within state 
-# 2.	What is the benefit of running 1000 simulations for each MSA? 
-    # a. Answer: Represent uncertainty; sensitivity analyses 
-# 3.	The authors note that their modeled scenarios of improved viral suppression represent the combined efficacy of interventions to enhance engagement and retention in care and improved adherence to antiretrovirals. List two potential real-world interventions that could result in improved viral suppression. 
-    # a. Example answers: (Many acceptable answers for this question) 
-# 4.	The authors assumed that, without any additional intervention, PrEP coverage would continue its trajectory into the future. Consider a scenario where PrEP coverage actually dropped in the future (e.g., during COVID). How might that change the impact of the modeled PrEP intervention? 
-    # a. Answer: Intervention would have a greater impact because baseline is lower 
-# 5.	The authors chose to scale up the interventions linearly. How might this differ in a real-world scenario? 
-    # a. Example answer: Early adopters scale-up quickly; marginalized populations scale up more slowly as they are harder to reach 
-# 6.	Provide an interpretation of Figure 3, panel D. 
-    # a. Example answer: Reported cases trending downwards in both the simulation and data from 2010-2018; intervention implemented in 2020 leads to a short-term increase in reported cases (due to increased testing/identification of cases; not increased transmission) then a sustained decline in cases 
-# 7.	Scenario 6 reduced new infections in the Seattle-Tacoma-Bellevue MSA by 17% compared to 51% in the Miami-Fort Lauderdale-Pompano Beach MSA (Figure 4). What is your interpretation of this result and what are some possible explanations for this difference? 
-    # a. Example answer: Seattle has a small population of Black and Hispanic MSM <35y or their population of YBHMSM already has high testing/PrEP/suppression rates 
-# 8.	The sensitivity analysis found that HIV transmission among Black heterosexuals was the parameter most strongly associated with the estimated reduction in HV incidence. If this transmission rate were lower than expected, how would you expect that to impact the projected reduction in HIV incidence? 
-    # a. Answer: A lower transmission rate would lead to a lower reduction in incidence (they should be able to pull this directly from the Baton Rouge example given). 
-# 9.	Give 1-2 examples of research questions you could examine with this model. 
-    # a. Example answers: (Many acceptable answers for this question) 
+# 2.	What is the benefit of running 1000 simulations for each MSA?
+    # a. Answer: Represent uncertainty; sensitivity analyses
+# 3.	The authors note that their modeled scenarios of improved viral suppression represent the combined efficacy of interventions to enhance engagement and retention in care and improved adherence to antiretrovirals. List two potential real-world interventions that could result in improved viral suppression.
+    # a. Example answers: (Many acceptable answers for this question)
+# 4.	The authors assumed that, without any additional intervention, PrEP coverage would continue its trajectory into the future. Consider a scenario where PrEP coverage actually dropped in the future (e.g., during COVID). How might that change the impact of the modeled PrEP intervention?
+    # a. Answer: Intervention would have a greater impact because baseline is lower
+# 5.	The authors chose to scale up the interventions linearly. How might this differ in a real-world scenario?
+    # a. Example answer: Early adopters scale-up quickly; marginalized populations scale up more slowly as they are harder to reach
+# 6.	Provide an interpretation of Figure 3, panel D.
+    # a. Example answer: Reported cases trending downwards in both the simulation and data from 2010-2018; intervention implemented in 2020 leads to a short-term increase in reported cases (due to increased testing/identification of cases; not increased transmission) then a sustained decline in cases
+# 7.	Scenario 6 reduced new infections in the Seattle-Tacoma-Bellevue MSA by 17% compared to 51% in the Miami-Fort Lauderdale-Pompano Beach MSA (Figure 4). What is your interpretation of this result and what are some possible explanations for this difference?
+    # a. Example answer: Seattle has a small population of Black and Hispanic MSM <35y or their population of YBHMSM already has high testing/PrEP/suppression rates
+# 8.	The sensitivity analysis found that HIV transmission among Black heterosexuals was the parameter most strongly associated with the estimated reduction in HV incidence. If this transmission rate were lower than expected, how would you expect that to impact the projected reduction in HIV incidence?
+    # a. Answer: A lower transmission rate would lead to a lower reduction in incidence (they should be able to pull this directly from the Baton Rouge example given).
+# 9.	Give 1-2 examples of research questions you could examine with this model.
+    # a. Example answers: (Many acceptable answers for this question)
