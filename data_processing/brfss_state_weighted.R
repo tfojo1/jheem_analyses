@@ -280,9 +280,12 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   data$tested = ifelse(data$ever.tested == "7", 0, data$tested) #If they don't know they haven't been tested in the past year
   data$tested = ifelse(data$ever.tested == "2", 0, data$tested) #If they have never been tested they havent tested in the past year
   data$tested = ifelse(data$ever.tested == "1" & data$HIVTSTD3 == "777777", 0, data$tested)#If they have received a test at some point but don't know the date they havent been tested*
-  data$tested = ifelse(data$ever.tested == "1" & data$HIVTSTD3 == "999999", 0, data$tested)
+  #data$tested = ifelse(data$ever.tested == "1" & data$HIVTSTD3 == "999999", 0, data$tested) #Is this right? should this be in denominator?
   
   data$flag = ifelse(data$ever.tested == "1" & is.na(data$HIVTSTD3), "remove" , "keep")
+  data$flag = ifelse(data$ever.tested == "1" & is.na(data$HIVTSTD3=="999999"), "remove" , data$flag)
+  
+  
   data = subset(data, data$flag != "remove")
   
   list(filename, data) 
