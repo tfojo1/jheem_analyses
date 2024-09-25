@@ -124,6 +124,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`  
     data$risk = NA #No sexual orientation data for 2013#
+    data$ever.tested = data$HIVTST6
   }
   if(grepl("2014", filename)) {
     data$year = as.numeric("2014")
@@ -134,6 +135,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
       mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
                               SEX== "1" & SXORIENT == "3" ~ "msm",
                               TRUE ~ NA ))
+    data$ever.tested = data$HIVTST6
   }
   if(grepl("2015", filename)) {
     data$year = as.numeric("2015")
@@ -144,6 +146,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
       mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
                               SEX== "1" & SXORIENT == "3" ~ "msm",
                               TRUE ~ NA ))
+    data$ever.tested = data$HIVTST6
   }
   if(grepl("2016", filename)) {
     data$year = as.numeric("2016")
@@ -155,6 +158,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
                               SEX== "1" & SXORIENT == "3" ~ "msm",
                               TRUE ~ NA )) %>%
       mutate(at_risk = if_else(HIVRISK4 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
+    data$ever.tested = data$HIVTST6
   }
   if(grepl("2017", filename)) {
     data$year = as.numeric("2017")
@@ -166,6 +170,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
                               SEX== "1" & SXORIENT == "3" ~ "msm",
                               TRUE ~ NA )) %>%
       mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
+    data$ever.tested = data$HIVTST6
   }
   if(grepl("2018", filename)) {
     data$year = as.numeric("2018")
@@ -175,6 +180,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
     data <- data %>%
       mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
+    data$ever.tested = data$HIVTST6
   }
   if(grepl("2019", filename)) {
     data$year = as.numeric("2019")
@@ -184,6 +190,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
     data <- data %>%
       mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
+    data$ever.tested = data$HIVTST7
   }
   if(grepl("2020", filename)) {
     data$year = as.numeric("2020")
@@ -193,6 +200,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
     data <- data %>%
       mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
+    data$ever.tested = data$HIVTST7
   }
   if(grepl("2021", filename)) {
     data$year = as.numeric("2021")
@@ -200,6 +208,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
     data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
+    data$ever.tested = data$HIVTST7
   }
   if(grepl("2022", filename)) {
     data$year = as.numeric("2022")
@@ -209,6 +218,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
     data <- data %>%
       mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
+    data$ever.tested = data$HIVTST7
   }
   
   #Create location#
@@ -218,8 +228,8 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   data$outcome = "proportion.tested"  
   
   #Removing missing values for HIVTSTD3  
-  data= subset(data, data$HIVTSTD3 != "777777")
-  data= subset(data, data$HIVTSTD3 != "999999")
+  # data= subset(data, data$HIVTSTD3 != "777777")
+  # data= subset(data, data$HIVTSTD3 != "999999")
   
   #Do calculation to determine if test was in fact in the past year:
   data$test_year = as.numeric(str_sub(data$HIVTSTD3, -4))
@@ -234,31 +244,46 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   data$tested[mask] = data$test_month[mask] / 12
   
   #Correct any dates that are years in the future
-  data$today = Sys.Date()
-  data$current_year = substr(data$today, 1, 4)
-  data$tested = if_else(data$test_year > data$current_year, NA, data$tested) #mark as NA for those with future test years
+  data$current_year = "2024" #YOU WILL NEED TO UPDATE THIS WHEN YOU GET NEW DATA but for now tested date should not be beynd BRFSS year
+  data$tested = if_else(data$test_year > data$current_year, 0, data$tested) #mark as NA for those with future test years - assuming all these folks were not tested in past year so they = 0
+  data$tested = if_else(data$HIVTSTD3 == "777777", 0, data$tested) #Remove unknowns
+  data$tested = if_else(data$HIVTSTD3 == "999999", 0, data$tested) #Remove unknowns
+  data$tested = if_else(is.na(data$HIVTSTD3), 0, data$tested) #Remove unknowns
   
-  data=subset(data, !is.na(data$tested)) #Remove people who were not tested or had incorrect data##
+  
+  #data=subset(data, !is.na(data$tested)) #Remove people who were not tested or had incorrect data##
   
   data$sex = brfss.sex.mappings[data$sex]
   data$age = brfss.age.mappings[data$age]
   data$race = brfss.race.mappings[data$race]
   
   #Remove values that are NA
-  data= subset(data, !is.na(data$sex))
-  data= subset(data, !is.na(data$age))
-  data= subset(data, !is.na(data$race))
-  
-  #Remove unknown race and age
-  data= subset(data, data$age != 'Unknown')
-  data= subset(data, data$race != 'Unknown')
-  
+  # data= subset(data, !is.na(data$sex))
+  # data= subset(data, !is.na(data$age))
+  # data= subset(data, !is.na(data$race))
+  # 
+  # #Remove unknown race and age
+  # data= subset(data, data$age != 'Unknown')
+  # data= subset(data, data$race != 'Unknown')
+  # 
   #\\\\\\To show only individuals at risk of HIV in the denominator///////#
   #Un-comment line 259-262
   # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
   # data <- data %>%
   #    rename(any_of(brfss_risk_var))
   # data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
+  
+  #Update for 9-25-24: If ever.tested (HIVTST7) is yes, no, don't know (1,2,7) include in denominator.  Code a 7 as a 0 for not tested.
+  #If ever.tested is refused or missing (9, NA) then exclude from denominator
+  data= subset(data, !is.na(data$ever.tested)) #Removing blanks
+  data= subset(data, data$ever.tested != "9") #Removing unknowns
+  data$tested = ifelse(data$ever.tested == "7", 0, data$tested) #If they don't know they haven't been tested in the past year
+  data$tested = ifelse(data$ever.tested == "2", 0, data$tested) #If they have never been tested they havent tested in the past year
+  data$tested = ifelse(data$ever.tested == "1" & data$HIVTSTD3 == "777777", 0, data$tested)#If they have received a test at some point but don't know the date they havent been tested*
+  data$tested = ifelse(data$ever.tested == "1" & data$HIVTSTD3 == "999999", 0, data$tested)
+  
+  data$flag = ifelse(data$ever.tested == "1" & is.na(data$HIVTSTD3), "remove" , "keep")
+  data = subset(data, data$flag != "remove")
   
   list(filename, data) 
 })
