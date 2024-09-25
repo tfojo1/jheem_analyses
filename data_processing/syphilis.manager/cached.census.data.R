@@ -187,10 +187,13 @@ population.stratified.census = list(
   population.race.eth.sex
 )
 
+for (data in population.stratified.census) {
+  
 data.manager$put.long.form(
-  data = population.age.10.19,
+  data = data,
   ontology.name = 'stratified.census', 
   source = 'census.population', 
   dimension.values = list(),
   url = 'www.census.gov',
   details = 'Census Reporting')
+}
