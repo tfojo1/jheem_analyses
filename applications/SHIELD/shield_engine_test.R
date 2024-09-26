@@ -3,11 +3,17 @@
 # create the SHIELD.SPECIFICATION
 # create an engine object
 # engine.run()
-
+# setwd('../../')
+# JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
+# SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD"
+# setwd(JHEEM.DIR)
+# setwd(SHIELD.DIR)
+setwd('../../')
 source('applications/SHIELD/shield_specification.R')
 
 # Baltimore MSA : C.12580
 engine = create.jheem.engine('shield', 'C.12580', 2025)
+
 # engine = create.jheem.engine('shield', 'US', 2025)
 
 params=get.medians(SHIELD.PARAMETERS.PRIOR)

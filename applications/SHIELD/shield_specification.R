@@ -18,7 +18,7 @@
 # JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
 # SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD/"
 # setwd(JHEEM.DIR)
-setwd('../../')
+# setwd('../../')
 source('applications/SHIELD/shield_source_code.R')
 ##--------------------------------------------------------------------------------------------------------------#
 #-- INITIAL SET-UP --#----
