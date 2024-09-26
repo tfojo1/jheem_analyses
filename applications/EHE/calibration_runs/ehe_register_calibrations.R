@@ -8,6 +8,12 @@ CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid2'
 
+
+CALIBRATION.CODE.POP.PROB = 'pop.problem.msas'
+CALIBRATION.CODE.TRANS.PROB = 'trans.problem.msas'
+CALIBRATION.CODE.FULL.PLUS.AIDS.PROB = 'full.with.aids.prob'
+CALIBRATION.CODE.FULL.PLUS.COVID.PROB = 'full.with.covid2.prob'
+
 N.ITER.TEST = 10000
 N.ITER = 15000
 N.ITER.FULL = 35000
@@ -24,6 +30,19 @@ par.names.pop = c(
 
 register.calibration.info(CALIBRATION.CODE.POPULATION,
                           likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added total prev/new 5/20
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = par.names.pop,
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          fixed.initial.parameter.values = c(global.trate=0.03), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get population parameters in the general vicinity"
+)
+
+register.calibration.info(CALIBRATION.CODE.POP.PROB,
+                          likelihood.instructions = joint.pop.problem.msas.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = par.names.pop,
@@ -86,6 +105,20 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           preceding.calibration.codes = CALIBRATION.CODE.POPULATION
 )
 
+register.calibration.info(CALIBRATION.CODE.TRANS.PROB,
+                          likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = c(par.names.transmission), 
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          pull.parameters.and.values.from.preceding = F,
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get transmission parameters in the general vicinity",
+                          preceding.calibration.codes = CALIBRATION.CODE.POP.PROB
+)
+
 
 #-- REGISTER FULL (WITHOUT COVID) CALIBRATION  --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
@@ -101,6 +134,20 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS,
                           description = "Full with aids diagnoses"
 )
 
+register.calibration.info(CALIBRATION.CODE.FULL.PLUS.AIDS.PROB,
+                          likelihood.instructions = FULL.likelihood.instructions.with.aids,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.PROB),
+                          description = "Full with aids diagnoses"
+)
+
+
 #-- REGISTER FULL CALIBRATION WITH COVID-RELATED --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
                           likelihood.instructions = FULL.likelihood.instructions.with.covid,
@@ -112,5 +159,18 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Full with covid likelihoods"
+)
+
+register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID.PROB,
+                          likelihood.instructions = FULL.likelihood.instructions.with.covid,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.PROB),
                           description = "Full with covid likelihoods"
 )
