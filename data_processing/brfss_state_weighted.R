@@ -233,7 +233,7 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   #HIVTSTD3 = date of last test
   #HIVTST7 (renamed 'ever.tested') = ever tested for HIV
   
-#data = subset(data, data$HIVTSTD3 != "999999") #Remove date of last HIV is refused- *this is the issue*
+  data = subset(data, is.na(data$HIVTSTD3) | data$HIVTSTD3 != 999999) #Remove date of last HIV is refused
   
 # Create 'tested' variable (used to determine if test is in past year)------------------------------------------------
 
