@@ -22,21 +22,20 @@ load(file.path(JHEEM.CACHE.DIR, 'google_mobility_data.Rdata'))
 
 # CENSUS.MANAGE ----
 # it's a big file with a lot of information that is only needed for generating the initial population
-# if (!exists('CENSUS.MANAGER'))
-# {
+if (!exists('CENSUS.MANAGER')){
   # cat("Loading Census Manager (may take a minute or two)...")
   CENSUS.MANAGER = load.data.manager.from.cache('census.manager.rdata', set.as.default=F)
   # print("Census manager read")
-# }
+}
 
 
 # Syphilis SURVEILLANCE.MANAGER ----
 # includes all the data used for calibration and plotting
 # county-, MSA- and US- level aggregation
-# if (is.null(get.default.data.manager())){ #if it's in memory, it wont reload it
+if (is.null(get.default.data.manager())){ #if it's in memory, it wont reload it
 SURVEILLANCE.MANAGER = load.data.manager('cached/syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
 # print("Syphilis survillance manager read")
-# }
+}
 
 # JHEEM survillance manager:
 # Load the data managers
