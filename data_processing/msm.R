@@ -11,6 +11,8 @@ data.list.brfss.state.sex.for.msm = lapply(data.list.brfss.state.clean, function
   data=file[[2]] 
   filename = file[[1]] 
   
+  data= subset(data, !is.na(data$sex)) #Need to remove sex is NA
+  
   data<- data %>%
     group_by(location, sex) %>%
     mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
@@ -56,12 +58,12 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex.for.msm, function(f
   data <- data %>%
     select(outcome, year, location, msm, msm_total, n_weighted)%>% #n_weighted here is the sum of the weights by sex#
     filter(!is.na(msm_total))%>%
-    mutate(value = (msm_total/n_weighted))
+     mutate(value = (msm_total/n_weighted))
 
   data$value = round(data$value, digits=2)
 
   data<- data[!duplicated(data), ]
-  
+
   #Need to add sex column in for put statment dimensions
   data$sex = "male"
 
