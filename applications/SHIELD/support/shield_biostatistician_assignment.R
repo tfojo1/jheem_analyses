@@ -105,14 +105,14 @@ diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 # a. Filter the new.diagnoses to focus on the subgroup: 13-24 years old, Black, MSM, and never IDU.
 # b. Plot the filtered data over time
 # c. interpret the trend in new diagnoses for this subgroup
-# hint: you can filter data by accessing specific indexes in eahc dimension
+# hint: you can filter data by accessing specific indexes in each dimension
 # new_filtered <- new[location_index, year_index, age_index, race_index, sex_index, risk_index,
 #                     ,    # All simulations (if you want to keep all simulations, leave empty or specify indices)
 #                     drop = FALSE]
 
 
 ## Draw a histogram of the age distribution for new HIV diagnoses in the year 2020
-## what proportion of new diagnosis in year 2020 occured among 12-24 years old?
+## what proportion of new diagnosis in year 2020 occurred among 12-24 years old?
 # hint: you can aggregate the new.diagnoses across all groups in year 2020 and plot the age distribution using ggplot2
 
 
@@ -123,21 +123,21 @@ diagnosed.prevalence.sim=sim$get("diagnosed.prevalence",year=c(2008:2021))
 # "What Will It Take to End HIV in the United States? A Comprehensive, Local-Level Modeling Study"
 # https://www.acpjournals.org/doi/10.7326/M21-1501
 # you can also find a saved copy under the cashed folder: https://www.dropbox.com/scl/fo/5vxliw7fnq91kt0odbeab/AM5SrKajDnDVQ06M7Dmsem4?rlkey=i9rqo23thi9zg9ytav4u1lyha&dl=0
-# unde fojo-et-al-2021-what-will-it-take-to-end-hiv-in-the-united-states.pdf
+# under fojo-et-al-2021-what-will-it-take-to-end-hiv-in-the-united-states.pdf
 
-# 1.	What is the benefit of running 1000 simulations for each MSA? how would you determine if 1000 simulation is approperiate or if you need less/more?
+# 1.	What is the benefit of running 1000 simulations for each MSA? how would you determine if 1000 simulation is appropriate or if you need less/more?
 
 # 2.	The authors assumed that, without any additional intervention, PrEP coverage would continue its trajectory into the future.
-#     Consider a scenario where baseline PrEP coverage remains fix at 2023's level.
+#     Consider a scenario where baseline PrEP coverage remains fixed at 2023's level.
 #     How might that change the impact of the modeled PrEP intervention to 2030?
 
 # 3.	The authors chose to scale up the interventions linearly. How might this differ in a real-world scenario?
 
 # 4.	Provide an interpretation of Figure 3, panel D.
 
-# 5.  The compartmental model is deterministic by nature. What are the soures of uncertainty in the current JHEEM model
-#     that contribute to shaded areas in Figure 3
+# 5.  The compartmental model is deterministic by nature. What are the sources of uncertainty in the current JHEEM model
+#     that contribute to shaded areas in Figure 3?
 
-# 6.	Model calibration focuses on 10 calibration target including new diagnoses, prevalence,etc. Let's assume that we have more certainty
-#     in some targets than others. How can we reflect this in the likeloohood function used for calibration?
+# 6.	The model calibration focuses on 10 calibration target including new diagnoses, prevalence,etc. Let's assume that we have more certainty
+#     in some targets than others. How can we reflect this in the likelihood function used for calibration?
 

@@ -142,9 +142,17 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   #Create outcome#
   data$outcome = "proportion.tested"  
   
-  # #Removing missing values for HIVTSTD3  
-  # data= subset(data, data$HIVTSTD3 != "777777")
-  # data= subset(data, data$HIVTSTD3 != "999999")
+  data$sex = brfss.sex.mappings[data$sex]
+  data$age = brfss.age.mappings[data$age]
+  data$race = brfss.race.mappings[data$race]
+  
+  # Estimate Who Was Tested in the Past Year ------------------------------------
+  #HIVTSTD3 = date of last test
+  #HIVTST7 (renamed 'ever.tested') = ever tested for HIV
+  
+  data = subset(data, is.na(data$HIVTSTD3) | data$HIVTSTD3 != 999999) #Remove date of last HIV is refused- *this is the issue*
+  
+  # Create 'tested' variable (used to determine if test is in past year)------------------------------------------------
   
   #Do calculation to determine if test was in fact in the past year:
   data$test_year = as.numeric(str_sub(data$HIVTSTD3, -4))
@@ -152,30 +160,30 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   
   #Copying from Todd's code#
   data$test_month = if_else((!is.na(data$test_month) & data$test_month==77), 6, data$test_month) #If month is missing but we have year- assuming june bc 50/50 prob#
-  data$test_month = if_else(is.na(data$test_year), NA, data$test_month) #If year is missing, then it's NA altogether
   
   data$tested = as.numeric(!is.na(data$test_year) & data$test_year >= data$year) #create probabilities of testing in past year
   mask = !is.na(data$test_year) & data$test_year==(data$year-1)
   data$tested[mask] = data$test_month[mask] / 12
   
   #Correct any dates that are years in the future
-  # data$today = Sys.Date()
-  # data$current_year = substr(data$today, 1, 4)
-  data$flag.year = 2023 #Because the data stops at 2021- there shouldn't be obs beyond this year THIS WILL NEED TO BE CORRECTED WITH ADDITION OF FURTURE DATA
-  data$tested = if_else(data$test_year > data$flag.year, NA, data$tested) #mark as NA for those with future test years
+  data$current_year = "2024" #YOU WILL NEED TO UPDATE THIS WHEN YOU GET NEW DATA but for now tested date should not be beyond BRFSS year
+  data$tested = if_else(data$test_year > data$current_year, 0, data$tested) #If they reported a test date in the future, keep in the denominator
   
-  data$sex = brfss.sex.mappings[data$sex]
-  data$age = brfss.age.mappings[data$age]
-  data$race = brfss.race.mappings[data$race]
   
-  #Remove values that are NA
-  # data= subset(data, !is.na(data$sex))
-  # data= subset(data, !is.na(data$age))
-  # data= subset(data, !is.na(data$race))
-  # 
-  # #Remove unknown race and age
-  # data= subset(data, data$age != 'Unknown')
-  # data= subset(data, data$race != 'Unknown')
+  # This is to address NAs in the 'tested' variable -----------------------------------------------------
+  data$HIVTSTD3 = as.character(data$HIVTSTD3)
+  data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '1', "0", data$tested)
+  data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '2', "0", data$tested)
+  data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '7', "0", data$tested)
+  
+  data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '9', "drop", data$tested)
+  data$tested = ifelse(is.na(data$HIVTSTD3) & is.na(data$ever.tested), "drop", data$tested)
+  
+  data <- data %>%
+    filter(tested != "drop")
+  
+  data$tested = as.numeric(data$tested)
+  
   
   #\\\\\\To show only individuals at risk of HIV in the denominator///////#
   #Un-comment line 175-178
@@ -184,20 +192,6 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   #   rename(any_of(brfss_risk_var))
   # data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
   
-  #Update for 9-25-24: If ever.tested (HIVTST7) is yes, no, don't know (1,2,7) include in denominator.  Code a 7 as a 0 for not tested.
-  #If ever.tested is refused or missing (9, NA) then exclude from denominator
-  data= subset(data, !is.na(data$ever.tested)) #Removing blanks
-  data= subset(data, data$ever.tested != "9") #Removing unknowns
-  data$tested = ifelse(data$ever.tested == "7", 0, data$tested) #If they don't know they haven't been tested in the past year
-  data$tested = ifelse(data$ever.tested == "2", 0, data$tested) #If they have never been tested they havent tested in the past year
-  data$tested = ifelse(data$ever.tested == "1" & data$HIVTSTD3 == "777777", 0, data$tested)#If they have received a test at some point but don't know the date they havent been tested*
-  #data$tested = ifelse(data$ever.tested == "1" & data$HIVTSTD3 == "999999", 0, data$tested) #Is this right? should this be in denominator?
-  
-  data$flag = ifelse(data$ever.tested == "1" & is.na(data$HIVTSTD3), "remove" , "keep")
-  data$flag = ifelse(data$ever.tested == "1" & is.na(data$HIVTSTD3=="999999"), "remove" , data$flag)
-  
-  
-  data = subset(data, data$flag != "remove")
   
   list(filename, data) 
 })
@@ -243,6 +237,8 @@ data.list.brfss.msa.sex = lapply(data.list.brfss.msa.clean, function(file){
   data=file[[2]] 
   filename = file[[1]] 
   
+  data= subset(data, !is.na(data$sex)) #Remove sex is NA
+  
   data<- data %>%
     group_by(location, sex) %>%
     mutate(n_weighted = sum(`_MMSAWT`)) %>% #denominator should be the sum of weights#
@@ -274,6 +270,9 @@ data.list.brfss.msa.age = lapply(data.list.brfss.msa.clean, function(file){
   data=file[[2]] 
   filename = file[[1]] 
   
+  data= subset(data, !is.na(data$age)) #Remove missing age
+  data= subset(data, data$age != 'Unknown')
+  
   data<- data %>%
     group_by(location, age) %>%
     mutate(n_weighted = sum(`_MMSAWT`)) %>% #denominator should be the sum of weights#
@@ -304,6 +303,9 @@ data.list.brfss.msa.race = lapply(data.list.brfss.msa.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
+  
+  data= subset(data, !is.na(data$race)) #Remove unknown race
+  data= subset(data, data$race != 'Unknown')
   
   data<- data %>%
     group_by(location, race) %>%
