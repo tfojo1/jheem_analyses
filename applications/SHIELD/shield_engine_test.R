@@ -8,7 +8,7 @@
 # SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD"
 # setwd(JHEEM.DIR)
 # setwd(SHIELD.DIR)
-setwd('../../')
+# setwd('../../')
 source('applications/SHIELD/shield_specification.R')
 
 # Baltimore MSA : C.12580
@@ -30,7 +30,7 @@ sim = engine$run(params)
 
 #population data for Baltimore MSA
 SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census.data$year__location[, "C.12580"]
-simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER,facet.by='age') #still doesnt plot the data
+simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER ) #still doesnt plot the data
 sim$location
 
 SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[, "C.12580"]
