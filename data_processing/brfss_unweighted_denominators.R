@@ -261,6 +261,8 @@ data.list.brfss.msa.sex.n_unweighted = lapply(data.list.brfss.msa.clean, functio
   data=file[[2]] 
   filename = file[[1]] 
   
+  data = subset(data, !is.na(data$sex))
+  
   data<- data %>%
     add_count(location, sex) %>%     #Create population variable-count of BRFSS responses by state#
     group_by(location, sex)
@@ -285,6 +287,9 @@ data.list.brfss.msa.age.n_unweighted = lapply(data.list.brfss.msa.clean, functio
   
   data=file[[2]] 
   filename = file[[1]] 
+  
+  data = subset(data, !is.na(data$age))
+  data = subset(data, (data$age != 'Unknown'))
   
   data<- data %>%
     add_count(location, age) %>%     #Create population variable-count of BRFSS responses by state#
@@ -311,6 +316,9 @@ data.list.brfss.msa.race.n_unweighted = lapply(data.list.brfss.msa.clean, functi
   
   data=file[[2]] 
   filename = file[[1]] 
+  
+  data = subset(data, !is.na(data$race))
+  data = subset(data, (data$race != 'Unknown'))
   
   data<- data %>%
     add_count(location, race) %>%     #Create population variable-count of BRFSS responses by state#
