@@ -39,6 +39,8 @@ get.high.risk.testing.ratios = function(version, location){
   df$age = age.map[df$orig.age]
   df = df[!is.na(df$age),]
   
+  df = df[!is.na(df$race),]
+  
   # Set reference levels
   reference.age.index = ceiling(specification.metadata$n.ages/2)
   age.levels = c(specification.metadata$dim.names$age[reference.age.index],
@@ -116,6 +118,8 @@ get.high.risk.testing.ratios.during.covid = function(version, location){
   df$orig.age = df$age
   df$age = age.map[df$orig.age]
   df = df[!is.na(df$age),]
+  
+  df = df[!is.na(df$race),]
   
   # Set reference levels
   reference.age.index = ceiling(specification.metadata$n.ages/2)

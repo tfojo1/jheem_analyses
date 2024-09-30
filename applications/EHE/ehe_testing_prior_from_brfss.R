@@ -34,6 +34,8 @@ get.testing.intercepts.and.slopes = function(version, location,
   df$age = age.map[df$orig.age]
   df = df[!is.na(df$age),]
   
+  df = df[!is.na(df$race),]
+  
   # Set reference levels
   reference.age.index = ceiling(specification.metadata$n.ages/2)
   age.levels = c(specification.metadata$dim.names$age[reference.age.index],
