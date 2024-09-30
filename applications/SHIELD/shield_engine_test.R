@@ -13,6 +13,10 @@
 # setwd('../../')
 source('applications/SHIELD/shield_specification.R')
 
+#US level data for fertility rate:
+# SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity[,'US',,,]
+
+
 # Baltimore MSA : C.12580
 engine = create.jheem.engine('shield', 'C.12580', 2025)
 
