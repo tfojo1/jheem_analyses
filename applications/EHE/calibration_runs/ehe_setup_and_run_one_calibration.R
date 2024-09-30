@@ -11,8 +11,8 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.POP.PROB, # 5
                              CALIBRATION.CODE.TRANS.PROB, # 6
                              CALIBRATION.CODE.FULL.PLUS.AIDS.PROB, # 7
-                             CALIBRATION.CODE.FULL.PLUS.COVID.PROB # 7
-                             )[c(4)]
+                             CALIBRATION.CODE.FULL.PLUS.COVID.PROB # 8
+                             )[c(2,4)]
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {

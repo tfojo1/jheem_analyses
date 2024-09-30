@@ -1,13 +1,13 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = BALTIMORE.MSA
+LOCATION = CHICAGO.MSA
 
 CALIBRATION.CODE.TO.PROCESS = c(CALIBRATION.CODE.POPULATION, # 1
                                 CALIBRATION.CODE.TRANSMISSION, # 2
                                 CALIBRATION.CODE.FULL.PLUS.AIDS, # 3
                                 CALIBRATION.CODE.FULL.PLUS.COVID # 4
-                                )[c(4)]
+                                )[c(3)]
 
 
 # Pull just the last simulation
