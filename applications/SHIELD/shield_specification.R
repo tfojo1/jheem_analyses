@@ -67,12 +67,20 @@ register.fixed.model.strata(SHIELD.SPECIFICATION,
 
 
 #-- INITIAL POPULATION --#----
-# Specify the initial compartment sizes in year 1940
+# Specify the initial compartment sizes  
 ##---- Base Population ----
 # step1: defines a blank quantity
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'base.initial.population',
                         value = 0)
+#data is available from the year 2010
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'proportion.msm.of.male',
+                       scale = 'proportion',
+                       get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
+                       functional.form.from.time=2010,
+                       functional.form.to.time=2010)
+
 # step2: assigns values to specific population subgroups where the values are read from an upcoming element below
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'base.initial.population',
@@ -95,38 +103,33 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'base.initial.male.population',
                        get.value.function = get.base.initial.male.population,
                        scale = 'non.negative.number')
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'proportion.msm.of.male',
-#                        scale = 'proportion',
-#                        get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
-#                        functional.form.from.time=2010,
-#                        functional.form.to.time=2010)
+ 
 ##---- Infected ----
 # dummy values: 0.5% are infected, and they are 50% in PS and 50% in Ter stage and all undiagnosed
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'initial.population.infected',
-                        value = 0 )
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'initial.population.infected',
-                               value = expression(base.initial.population* 0.005 * .5),
-                               applies.to = list(continuum='undiagnosed', stage='ps'))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'initial.population.infected',
-                               value = expression(base.initial.population* 0.005 *.5),
-                               applies.to = list(continuum='undiagnosed', stage='ter'))
-register.initial.population(SHIELD.SPECIFICATION,
-                            group = 'infected',
-                            value = 'initial.population.infected')
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = 'initial.population.infected',
+#                         value = 0 )
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'initial.population.infected',
+#                                value = expression(base.initial.population* 0.005 * .5),
+#                                applies.to = list(continuum='undiagnosed', stage='ps'))
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'initial.population.infected',
+#                                value = expression(base.initial.population* 0.005 *.5),
+#                                applies.to = list(continuum='undiagnosed', stage='ter'))
+# register.initial.population(SHIELD.SPECIFICATION,
+#                             group = 'infected',
+#                             value = 'initial.population.infected')
 ##---- Uninfected ----
 register.initial.population(SHIELD.SPECIFICATION,
                             group = 'uninfected',
                             value = 'initial.population.uninfected')
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'initial.population.uninfected',
-                        value = 0)
+                        value = 1)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'initial.population.uninfected',
-                               value = expression(base.initial.population * .995),
+                               value = expression(base.initial.population * 1),
                                applies.to = list(profile='susceptible'))
 
 
@@ -142,29 +145,20 @@ register.natality(specification = SHIELD.SPECIFICATION,
                   parent.child.concordant.dimensions = c('race'),# the race of the cild will be the same
                   all.births.into.compartments = list(profile='susceptible',age= 1),
                   tag = 'births')
-##---- FERTILITY ----
+##---- Fertility ----
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fertility.rate',
                        get.functional.form.function = get.fertility.rates.functional.form,
                        functional.form.from.time = DEFAULT.POPULATION.YEARS,
                        scale = 'rate')
 
-##---- BIRTH PROPORTIONS ----
+##---- Birth Proportions ----
 # to determine where newborns should go
 # currently set as a fix ratio
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.male.births',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['male.to.female.birth.ratio'] / (1+SHIELD_BASE_PARAMETER_VALUES['male.to.female.birth.ratio']))
-
-#data is available from the year 2010
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'proportion.msm.of.male',
-                       scale = 'proportion',
-                       get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
-                       functional.form.from.time=2010,
-                       functional.form.to.time=2010)
-
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'birth.proportions',
                         value =0)
@@ -184,29 +178,17 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 ##--------------------------------------------------------------------------------------------------------------#
 
 #-- MORTALITY --# ----
-##--------------------------------------------------------------------------------------------------------------#
-# different sources of mortality (general, syphilis related, etc.)
-## Syphilis related mortality
-
+##---- General Mortality ----
 register.mortality(SHIELD.SPECIFICATION,
                    tag = 'general.mortality',
-                   groups = c('uninfected'),
+                   groups = c('infected','uninfected'),
                    mortality.rate.value = 'general.mortality.rate')
-
-register.mortality(SHIELD.SPECIFICATION,
-                   tag = 'general.mortality',
-                   groups = c('infected'),
-                   mortality.rate.value = expression(general.mortality.rate * syphilis.general.mortality.multiplier))
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'general.mortality.rate',
                        get.functional.form.function = get.location.mortality.rates.functional.form,
                        scale = 'rate')
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'syphilis.general.mortality.multiplier',
-                       value = 1,
-                       scale = 'rate')
-##--------------------------------------------------------------------------------------------------------------#
-# -- MIGRATION --# ----
+
+#-- TBD/ MIGRATION --# ----
 # immigration/emigration doesnt depent on disease state- it's used to fit the population size but doesnt change the prevalence of the disease
 # the prior comes from census reports (prp getting in and leaving MSAs) - these didnt represent immigrations from other countries but more movements between MSAs
 # oneway stratification only for one timepoint  (2011-2015) (2016-2020) breakdown by age, by race, by sex only for 2020
@@ -501,7 +483,7 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 
-#-- CONTINUUM TRANSISION --# ----
+#-- TBD/ CONTINUUM TRANSISION --# ----
 ##---- TESTING ----
 # There are 2 components to testing: underlying screening rate (for everyone), additional sympthomatic testing rates (for ps and ter stages)
 #@PK: to add a functional form for symp.testing and screening rate
