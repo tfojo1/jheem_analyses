@@ -719,7 +719,7 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
   counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
   
   #@Todd: I get why we need this for the MSA models, but do we need for the US model? 
-  # CENSUS.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity
+  # CENSUS.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity[,counties,,,]
   fertility = CENSUS.MANAGER$pull(outcome='fertility.rate',
                                   location = counties,
                                   year= population.years,
