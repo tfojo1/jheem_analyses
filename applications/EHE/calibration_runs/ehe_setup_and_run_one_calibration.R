@@ -5,13 +5,7 @@ LOCATION = BALTIMORE.MSA
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANSMISSION, # 2
                              CALIBRATION.CODE.FULL.PLUS.AIDS, # 3
-                             CALIBRATION.CODE.FULL.PLUS.COVID, # 4
-                             
-                             # special calibration stream for "problematic" MSAs 
-                             CALIBRATION.CODE.POP.PROB, # 5
-                             CALIBRATION.CODE.TRANS.PROB, # 6
-                             CALIBRATION.CODE.FULL.PLUS.AIDS.PROB, # 7
-                             CALIBRATION.CODE.FULL.PLUS.COVID.PROB # 8
+                             CALIBRATION.CODE.FULL.PLUS.COVID # 4
                              )[c(2,4)]
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
