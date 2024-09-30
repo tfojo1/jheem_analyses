@@ -738,8 +738,9 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
 
 #-- POPULATION PARAMETERS --#
 
-    black.birth.and.immigration = c(
-      'black.birth.rate.multiplier',
+    black.birth.rate = c('black.birth.rate.multiplier'),
+  
+    black.immigration = c(
       "black.immigration.multiplier.time.1",
       "black.immigration.multiplier.time.2"
     ),
@@ -783,9 +784,9 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
       'black.age5.migration.multiplier.time.2'
     ),
     
+    hispanic.birth.rate = c('hispanic.birth.rate.multiplier'),
     
-    hispanic.birth.and.immigration = c(
-      'hispanic.birth.rate.multiplier',
+    hispanic.immigration = c(
       "hispanic.immigration.multiplier.time.1",
       "hispanic.immigration.multiplier.time.2"
     ),
@@ -829,9 +830,9 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
       'hispanic.age5.migration.multiplier.time.2'
     ),
   
+    other.birth.rate = c('other.birth.rate.multiplier'),
   
-    other.birth.and.immigration = c(
-      'other.birth.rate.multiplier',
+    other.immigration = c(
       "other.immigration.multiplier.time.1",
       "other.immigration.multiplier.time.2"
     ),
