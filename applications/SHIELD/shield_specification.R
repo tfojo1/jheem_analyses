@@ -130,6 +130,89 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(profile='susceptible'))
 
 
+
+#-- NATALITY --# ----
+# we model births based on women's fertility rates
+register.natality(specification = SHIELD.SPECIFICATION,
+                  parent.groups = c('infected', 'uninfected'),
+                  applies.to = list(sex='female'), #only women give birth
+                  child.groups = 'uninfected',
+                  fertility.rate.value = 'fertility.rate',
+                  birth.proportions.value = 'birth.proportions', # when they are born, where do they go? (e.g., what age, what race, what sex will they have)
+                  parent.child.concordant.dimensions = c('race'),# the race of the cild will be the same
+                  all.births.into.compartments = list(profile='susceptible',age= 1),
+                  tag = 'births')
+##---- FERTILITY ----
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'fertility.rate',
+                       get.functional.form.function = get.fertility.rates.functional.form,
+                       functional.form.from.time = DEFAULT.POPULATION.YEARS,
+                       scale = 'rate')
+
+##---- BIRTH PROPORTIONS ----
+# to determine where newborns should go
+# currently set as a fix ratio
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'fraction.male.births',
+                       scale = 'proportion',
+                       value = SHIELD_BASE_PARAMETER_VALUES['male.to.female.birth.ratio'] / (1+SHIELD_BASE_PARAMETER_VALUES['male.to.female.birth.ratio']))
+
+#data is available from the year 2010
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'proportion.msm.of.male',
+                       scale = 'proportion',
+                       get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
+                       functional.form.from.time=2010,
+                       functional.form.to.time=2010)
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'birth.proportions',
+                        value =0)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               applies.to = list(sex.to='msm'),
+                               name = 'birth.proportions',
+                               value = expression( fraction.male.births*proportion.msm.of.male ))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               applies.to = list(sex.to='heterosexual_male'),
+                               name = 'birth.proportions',
+                               value = expression( fraction.male.births*(1-proportion.msm.of.male)  ))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               applies.to = list(sex.to='female'),
+                               name = 'birth.proportions',
+                               value = expression( 1-fraction.male.births ))
+
+##--------------------------------------------------------------------------------------------------------------#
+
+#-- MORTALITY --# ----
+##--------------------------------------------------------------------------------------------------------------#
+# different sources of mortality (general, syphilis related, etc.)
+## Syphilis related mortality
+
+register.mortality(SHIELD.SPECIFICATION,
+                   tag = 'general.mortality',
+                   groups = c('uninfected'),
+                   mortality.rate.value = 'general.mortality.rate')
+
+register.mortality(SHIELD.SPECIFICATION,
+                   tag = 'general.mortality',
+                   groups = c('infected'),
+                   mortality.rate.value = expression(general.mortality.rate * syphilis.general.mortality.multiplier))
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'general.mortality.rate',
+                       get.functional.form.function = get.location.mortality.rates.functional.form,
+                       scale = 'rate')
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'syphilis.general.mortality.multiplier',
+                       value = 1,
+                       scale = 'rate')
+##--------------------------------------------------------------------------------------------------------------#
+# -- MIGRATION --# ----
+# immigration/emigration doesnt depent on disease state- it's used to fit the population size but doesnt change the prevalence of the disease
+# the prior comes from census reports (prp getting in and leaving MSAs) - these didnt represent immigrations from other countries but more movements between MSAs
+# oneway stratification only for one timepoint  (2011-2015) (2016-2020) breakdown by age, by race, by sex only for 2020
+# 2010-2020
+
+
 #-- TRANSMISSION --# ----
 # Transmission has 4 elements: 1.susceptibility, 2.transmissibility, 3.contact, 4.new infection proportion (where does new infection go to? e.g., infected PrEP, infected not on PrEP)
 # e.g., model a flat transmission rate that applies to all groups
@@ -417,78 +500,6 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 
-#-- NATALITY --# ----
-# we model births based on women's fertility rates
-register.natality(specification = SHIELD.SPECIFICATION,
-                  parent.groups = c('infected', 'uninfected'),
-                  applies.to = list(sex='female'), #only women give birth
-                  child.groups = 'uninfected',
-                  fertility.rate.value = 'fertility.rate',
-                  birth.proportions.value = 'birth.proportions', # when they are born, where do they go? (e.g., what age, what race, what sex will they have)
-                  parent.child.concordant.dimensions = c('race'),# the race of the cild will be the same
-                  all.births.into.compartments = list(profile='susceptible',age= 1),
-                  tag = 'births')
-##---- FERTILITY ----
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'fertility.rate',
-                       get.functional.form.function = get.fertility.rates.functional.form,
-                       functional.form.from.time = DEFAULT.POPULATION.YEARS,
-                       scale = 'rate')
-
-##---- BIRTH PROPORTIONS ----
-# to determine where newborns should go
-# currently set as a fix ratio
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'fraction.male.births',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['male.to.female.birth.ratio'] / (1+SHIELD_BASE_PARAMETER_VALUES['male.to.female.birth.ratio']))
-
-#data is available from the year 2010
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'proportion.msm.of.male',
-                       scale = 'proportion',
-                       get.functional.form.function = get.proportion.msm.of.male.by.race.functional.form,
-                       functional.form.from.time=2010,
-                       functional.form.to.time=2010)
-
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'birth.proportions',
-                        value =0)
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(sex.to='msm'),
-                               name = 'birth.proportions',
-                               value = expression( fraction.male.births*proportion.msm.of.male ))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(sex.to='heterosexual_male'),
-                               name = 'birth.proportions',
-                               value = expression( fraction.male.births*(1-proportion.msm.of.male)  ))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(sex.to='female'),
-                               name = 'birth.proportions',
-                               value = expression( 1-fraction.male.births ))
-
-##--------------------------------------------------------------------------------------------------------------#
-#-- MORTALITY --# ----
-##--------------------------------------------------------------------------------------------------------------#
-# different sources of mortality (general, syphilis related, etc.)
-## Syphilis related mortality
-
-register.mortality(SHIELD.SPECIFICATION,
-                   tag = 'general.mortality',
-                   groups = c('infected','uninfected'),
-                   mortality.rate.value = 'general.mortality.rate')
-
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'general.mortality.rate',
-                        value = 0.01)
-
-
-##--------------------------------------------------------------------------------------------------------------#
-# -- MIGRATION --# ----
-# immigration/emigration doesnt depent on disease state- it's used to fit the population size but doesnt change the prevalence of the disease
-# the prior comes from census reports (prp getting in and leaving MSAs) - these didnt represent immigrations from other countries but more movements between MSAs
-# oneway stratification only for one timepoint  (2011-2015) (2016-2020) breakdown by age, by race, by sex only for 2020
-
 
 #-- CONTINUUM TRANSISION --# ----
 ##---- TESTING ----
@@ -616,6 +627,7 @@ register.transition(SHIELD.SPECIFICATION,
                     value = expression(1/duration.ll))
 
 ##--------------------------------------------------------------------------------------------------------------#
+
 #-- OUTPUTS --#----
 ##--------------------------------------------------------------------------------------------------------------#
 # The model reports 2 categories of outcomes:
@@ -707,7 +719,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis' #corresponding to the name in data manager
 )
 
-# Incidence ----
+## Incidence ----
 # (new infections + reinfections)
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'incidence',
@@ -721,7 +733,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       keep.dimensions = c('location','age','race','sex','profile')
 )
 
-# Treatment Initiations ----
+## Treatment Initiations ----
 # : Immediate and Delayed
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'trt.initiation',
@@ -734,6 +746,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = "remission.from", #where they come from
                       keep.dimensions = c('location','age','race','sex','stage')
 )
+## Population ----
 track.point.outcome(SHIELD.SPECIFICATION,
                     name='point.population',
                     outcome.metadata = NULL, #we are not saving it

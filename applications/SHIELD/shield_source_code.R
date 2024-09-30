@@ -67,6 +67,8 @@ print("PAIRING.INPUT.MANAGER created")
 
 # Global variables used in the code:
 CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
-DEFAULT.POPULATION.YEARS = 2007
+cat("CENSUS.AGES set to ",CENSUS.AGES,"\n")
 
+DEFAULT.POPULATION.YEARS = 2007
+cat("DEFAULT.POPULATION.YEARS set to ",DEFAULT.POPULATION.YEARS,"\n")
 

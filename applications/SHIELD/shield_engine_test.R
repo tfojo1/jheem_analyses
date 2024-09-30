@@ -19,12 +19,21 @@ engine = create.jheem.engine('shield', 'C.12580', 2025)
 # engine = create.jheem.engine('shield', 'US', 2025)
 
 params=get.medians(SHIELD.PARAMETERS.PRIOR)
+
 # params['global.trate']=1
 # params['msm.trate.multiplier1']=1000
 
 sim = engine$run(params)
 
 #plotting:
+#population data for Baltimore MSA
+# SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[, "C.12580"]
+simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER ) #still doesnt plot the data
+sim$location
+
+
+
+
 
 # before 2020 the census gave single age brackets after they only give age-groups
 # census.data: age-groups for 2020-2023
@@ -35,14 +44,14 @@ SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$censu
 simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER ) #still doesnt plot the data
 sim$location
 
-SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[, "C.12580"]
-simplot(sim,"diag.ps",data.manager = SURVEILLANCE.MANAGER)
-SURVEILLANCE.MANAGER$outcomes
-
-SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[, "C.12580"]
-
-SURVEILLANCE.MANAGER$source.info
-
+# SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[, "C.12580"]
+# simplot(sim,"diag.ps",data.manager = SURVEILLANCE.MANAGER)
+# SURVEILLANCE.MANAGER$outcomes
+# 
+# SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[, "C.12580"]
+# 
+# SURVEILLANCE.MANAGER$source.info
+# 
 
 # simplot(sim, 'population')
 # sim$population

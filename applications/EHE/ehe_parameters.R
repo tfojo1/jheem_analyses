@@ -45,7 +45,7 @@ create.compound.symmetry.covariance.matrix = function(correlation.coefficient,
 ##-- MAKE THE DISTRIBUTION --##
 ##---------------------------##
 ##---------------------------##
-
+# POPULATION.PARAMETERS.PRIOR ----
 POPULATION.PARAMETERS.PRIOR = distributions::join.distributions(
   
     #-- Birth rates --#
@@ -159,7 +159,7 @@ POPULATION.PARAMETERS.PRIOR = distributions::join.distributions(
     hispanic.age4.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2)),
     other.age4.aging.multiplier.2 = Lognormal.Distribution(0, 0.5*log(2))
 )
-
+# BASE.HIV.PARAMETERS.PRIOR ----
 BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     global.trate = Loguniform.Distribution(0,Inf),
     
@@ -678,7 +678,7 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
                                                                       var.names = paste0('aids.to.new.diagnoses.ratio.', c('peak','0','1'))) # see aids_diagnoses_multiplier.R
 )
 
-
+# EHE.SUPPRESSION.PRIOR ----
 EHE.SUPPRESSION.PRIOR = distributions::join.distributions(
 
     #-- Suppression --#
@@ -720,7 +720,7 @@ EHE.SUPPRESSION.PRIOR = distributions::join.distributions(
                                                           5)
 )
 
-
+# EHE.PARAMETERS.PRIOR ----
 EHE.PARAMETERS.PRIOR = distributions::join.distributions(
   POPULATION.PARAMETERS.PRIOR,
   BASE.HIV.PARAMETERS.PRIOR,
@@ -730,10 +730,10 @@ EHE.PARAMETERS.PRIOR = distributions::join.distributions(
 
 ##---------------------##
 ##---------------------##
-##-- SAMPLING BLOCKS --##
+##-- SAMPLING BLOCKS --## ----
 ##---------------------##
 ##---------------------##
-
+# EHE.POPULATION.SAMPLING.BLOCKS ----
 EHE.POPULATION.SAMPLING.BLOCKS = list(
 
 #-- POPULATION PARAMETERS --#
@@ -889,7 +889,7 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
       'female.non.idu.general.mortality.rate.multiplier'
     )
 )
-
+# BASE.HIV.SAMPLING.BLOCKS ----
 BASE.HIV.SAMPLING.BLOCKS = list(
     
     proportion.msm.of.male = 'proportion.msm.of.male.mult',
@@ -1302,7 +1302,7 @@ BASE.HIV.SAMPLING.BLOCKS = list(
 )
 
 #-- SUPPRESSION --#
-
+# EHE.SUPPRESSION.SAMPLING.BLOCKS ----
 EHE.SUPPRESSION.SAMPLING.BLOCKS = list(
   msm.suppression = c(
     'msm.suppressed.or',
@@ -1341,11 +1341,12 @@ EHE.SUPPRESSION.SAMPLING.BLOCKS = list(
     'age5.suppressed.slope.or'
   )
 )
-
+# EHE.NON.POPULATION.SAMPLING.BLOCKS ----
 EHE.NON.POPULATION.SAMPLING.BLOCKS = c(BASE.HIV.SAMPLING.BLOCKS,
                                        EHE.SUPPRESSION.SAMPLING.BLOCKS)
 
 # Population parameters are sampled 1/3 as much
+# EHE.PARAMETER.SAMPLING.BLOCKS ----
 EHE.PARAMETER.SAMPLING.BLOCKS = 
   c(EHE.POPULATION.SAMPLING.BLOCKS,
     EHE.NON.POPULATION.SAMPLING.BLOCKS,
