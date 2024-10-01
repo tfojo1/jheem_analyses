@@ -72,3 +72,5 @@ cat("CENSUS.AGES set to ",CENSUS.AGES,"\n")
 DEFAULT.POPULATION.YEARS = 2007
 cat("DEFAULT.POPULATION.YEARS set to ",DEFAULT.POPULATION.YEARS,"\n")
 
+FERTILE.AGES=c('15-19 years','20-24 years','25-29 years','30-34 years','35-39 years','40-44 years')
+cat("FERTILE.AGES set to ",FERTILE.AGES,"\n")

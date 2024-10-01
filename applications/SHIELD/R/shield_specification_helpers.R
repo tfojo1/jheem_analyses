@@ -716,20 +716,48 @@ get.fertility.rates.functional.form<-function(location, specification.metadata, 
 #' @param population.years population.years
 #' @return returning the fertility rates in the correct dimension
 get.fertility.rates.from.census<-function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
-  counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
+  #need to map race/ethnicity #make robust to age
   
-  #@Todd: I get why we need this for the MSA models, but do we need for the US model? 
-  # CENSUS.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity[,counties,,,]
+  if (location=='US'){
+    counties='US'
+  }else{
+    counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
+    allCounties=(dimnames(CENSUS.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)$location)
+    #remove counties that are missing
+    counties=intersect(counties,allCounties)
+  }
+  if(length(counties)==0)
+    stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
+                locations::get.location.name(location), ")"))
+  
   fertility = CENSUS.MANAGER$pull(outcome='fertility.rate',
                                   location = counties,
                                   year= population.years,
-                                  # keep.dimensions = c('race', 'ethnicity', 'location'),
-                                  na.rm=TRUE)[,,,1] #keep all race, all ethnicity, first source#
+                                  keep.dimensions = c('location','age','race', 'ethnicity'), #@Todd,Andrew: it should work without the location but it fails
+                                  na.rm=TRUE)
   
   if (is.null(fertility))
     stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
                 locations::get.location.name(location), ")"))
-  return(fertility)
+  ####
+  female.population = CENSUS.MANAGER$pull(outcome='female.population',
+                                          location = counties,
+                                          year= population.years,
+                                          keep.dimensions = c('location','age','race', 'ethnicity'), #@Todd,Andrew: it should work without the location but it fails
+                                          na.rm=TRUE)
+    # mapping  fertility rate to correct dimensions in the simulation 
+  births=fertility*female.population
+  female.population[is.na(births)]=NA #remove the cases where births are NAs
+  #
+  target.dimnames=specification.metadata$dim.names[c('age','race')]
+  target.dimnames$age=FERTILE.AGES
+  
+  mapped.births=map.value.ontology(births, target.dim.names = target.dimnames,na.rm = TRUE)
+  mapped.female.population=map.value.ontology(female.population, target.dim.names = target.dimnames,na.rm = TRUE)
+  #
+  mapped.fertility.rate=mapped.births/mapped.female.population
+  
+  return(mapped.fertility.rate)
 }
 
 # MORTALITY ----
@@ -758,10 +786,14 @@ get.location.mortality.rates <- function(location,
                                          specification.metadata,
                                          year.ranges = c('2001-2010','2011-2020'))
 {
-  counties = locations::get.contained.locations(location, 'county')
+   
+# we didnt have county-level mortality data that was fully stratified , but state level data are stratified 
+  # we also have metro areas
+  #some MSAs have counties from multiple states (e.g., DC)
+    counties = locations::get.contained.locations(location, 'county')
   states = unique(locations::get.containing.locations(counties, 'state'))
   
-  #@Todd: why are we pulling by states?   
+  
   # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
   deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', 
                                location = states, 

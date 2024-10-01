@@ -1,55 +1,59 @@
-#Defines the 'other' risk category into 'heterosexual' risk for JHEEM
-register.ontology.mapping('lump.other.risk.and.heterosexual',
-                          from.dimensions = 'risk',
-                          to.dimensions = 'risk',
-                          mappings = rbind(c('msm', 'msm'),
-                                           c('idu', 'idu'),
-                                           c('msm_idu', 'msm_idu'),
-                                           c('heterosexual', 'heterosexual'),
-                                           c('other', 'heterosexual'))
-)
 
-#This maps JHEEM data on risk to CDC data on risk (JHEEM categories on left)
-register.ontology.mapping('idu.to.active.prior',
-                          from.dimensions = 'risk',
-                          to.dimensions = 'risk',
-                          mappings = rbind(c('never_IDU', 'non.idu'),
-                                           c('active_IDU', 'idu'),
-                                           c('IDU_in_remission', 'idu')))
-
-#This maps JHEEM data on risk to CDC data on risk (JHEEM categories on left)
-register.ontology.mapping('non.idu.to.never.prior',
-                          from.dimensions = 'risk',
-                          to.dimensions = 'risk',
-                          mappings = rbind(c('never_IDU', 'non.active.idu'),
-                                           c('active_IDU', 'active.idu'),
-                                           c('IDU_in_remission', 'non.active.idu')))
-
-#Maps JHEEM sex+risk categories into those found in CDC data for sex+risk categories
-register.ontology.mapping('jheem.to.cdc.sex.risk',
-                          from.dimensions = c('sex', 'risk'),
-                          to.dimensions = c('sex', 'risk'),
-                          mappings = rbind(c('msm', 'never_IDU', 'male', 'msm'),
-                                           c('msm', 'active_IDU', 'male', 'msm_idu'),
-                                           c('msm', 'IDU_in_remission', 'male', 'msm_idu'),
-                                           c('heterosexual_male', 'never_IDU', 'male', 'heterosexual'),
-                                           c('heterosexual_male', 'active_IDU', 'male', 'idu'),
-                                           c('heterosexual_male', 'IDU_in_remission', 'male', 'idu'),
-                                           c('female', 'never_IDU', 'female', 'heterosexual'),
-                                           c('female', 'active_IDU', 'female', 'idu'),
-                                           c('female', 'IDU_in_remission', 'female', 'idu'))
-)
-
-#This maps JHEEM to BRFSS data (because the BRFSS data only has male and MSM as risk+sex)
-register.ontology.mapping('jheem.to.msm.or.not.risk',
+# BRFSS & SHIELD ----
+#This maps SHILED to BRFSS data (because the BRFSS data only has male and MSM as risk+sex)
+register.ontology.mapping('shiled.to.brfss.sex.risk',
                           from.dimensions = c('sex'),
                           to.dimensions = c('sex', 'risk'),
                           mappings = rbind(c('msm', 'male', 'msm'),
                                            c('heterosexual_male', 'male', 'not_msm'),
                                            c('female', 'female', 'not_msm'))
 )
-#Maps racial categories from CDC data to the races we use in JHEEM
-register.ontology.mapping('cdc.to.jheem.race',
+#This maps data from BRFSS to Census population data
+#We have both BRFSS data and Census population in SHIELD and this helps the pull function understand how to conceptualize those data sources together
+register.ontology.mapping('brfss.prop.tested.to.shield',
+                          from.dimensions = c('race', 'ethnicity'),
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian or Alaska Native', 'Hispanic or Latino', 'Hispanic'),
+                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'American Indian/Alaska Native'),
+                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'Hispanic'),
+                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'Asian/Pacific Islander'),
+                                           c('Black or African American', 'Hispanic or Latino', 'Hispanic'),
+                                           c('Black or African American', 'Not Hispanic or Latino', 'Black'),
+                                           c('More than one race', 'Hispanic or Latino', 'Hispanic'),
+                                           c('More than one race', 'Not Hispanic or Latino', 'Multiracial'),
+                                           c('White','Hispanic or Latino','Hispanic'),
+                                           c('White','Not Hispanic or Latino','White'),
+                                           c(NA, NA, 'other')))
+
+#This maps data from BRFSS to census population data
+register.ontology.mapping('brfss.prop.tested.to.shield.2',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian/Alaska Native', 'American Indian/Alaska Native'),
+                                           c('Asian', 'Asian/Pacific Islander'),
+                                           c('Black', 'Black'),
+                                           c('Hispanic', 'Hispanic'),
+                                           c('Multiracial', 'Multiracial'),
+                                           c('Native Hawaiian/Other Pacific Islander', 'Asian/Pacific Islander'),
+                                           c('Other race', 'other'),
+                                           c('White', 'White')))
+
+#Maps BRFSS racial groups (this is where proportion tested data is from) to SHIELD racial groups
+register.ontology.mapping('brfss.prop.tested.to.shield.race',
+                          from.dimension = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black', 'black'),
+                                           c('Hispanic', 'hispanic'),
+                                           c('Multiracial', 'other'),
+                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
+                                           c('Other race', 'other'),
+                                           c('White', 'other')))
+
+# CDC & SHIELD ----
+#Maps racial categories from CDC data to the races we use in SHILED
+register.ontology.mapping('cdc.to.shiled.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
                           mappings = rbind(c('American Indian/Alaska Native', 'other'),
@@ -60,9 +64,8 @@ register.ontology.mapping('cdc.to.jheem.race',
                                            c('Native Hawaiian/Other Pacific Islander', 'other'),
                                            c('White', 'other'))
 )
-
-#Maps racial categories from CDC MSA Surveillance Reports to races we use for JHEEM
-register.ontology.mapping('cdc.msa.reports.to.jheem.race',
+#Maps racial categories from CDC MSA Surveillance Reports to races we use for SHILED
+register.ontology.mapping('cdc.msa.reports.to.shield.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
                           mappings = rbind(c('American Indian/Alaska Native', 'other'),
@@ -70,9 +73,46 @@ register.ontology.mapping('cdc.msa.reports.to.jheem.race',
                                            c('Black/African American', 'black'),
                                            c('Hispanic/Latino', 'hispanic'),
                                            c('White', 'other')))
+# CENSUS & SHIELD ----
+
+#Maps racial grouped used in the Census Immigration data to the racial groups used in SHIELD
+register.ontology.mapping('census.immigration.to.SHIELD.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
+                                           c('White, Non-Hispanic', 'white'),
+                                           c('Black', 'black'),
+                                           c('Other', 'other'))) # needed?
+# converting sex groups in SHIELD to sexes reported in CENSUS
+register.ontology.mapping('shield.to.census.sex',
+                          from.dimensions=c('sex'),
+                          to.dimensions = c('sex'),
+                          mappings = rbind(c('female', 'female'),
+                                           c('msm','male'),
+                                           c('heterosexual_male','male')))
 
 
-#I removed a lot of these CDC Wonder Mappings that were in JHEEM- these are mainly relevant for when we pulled adult.population data from CDC Wonder
+#Maps Census racial groups (specifically race+ethnicity) to what we use in SHIELD 
+register.ontology.mapping('census.to.shield.race',
+                          from.dimensions = c('race', 'ethnicity'),
+                          to.dimensions = 'race',
+                          mappings = rbind(c('white', 'hispanic', 'hispanic'),
+                                           c('white', 'not hispanic', 'other'),
+                                           c('black', 'hispanic', 'hispanic'),
+                                           c('black', 'not hispanic', 'black'),
+                                           c('american indian or alaska native', 'hispanic', 'hispanic'),
+                                           c('american indian or alaska native', 'not hispanic', 'other'),
+                                           c('asian or pacific islander', 'hispanic', 'hispanic'),
+                                           c('asian or pacific islander', 'not hispanic', 'other')))
+
+#Maps Census racial groups  (ethnicity only) to what we use in SHIELD 
+register.ontology.mapping('census.to.shield.ethnicity.only',
+                          from.dimensions = c('race'),
+                          to.dimensions = 'race',
+                          mappings = rbind(c('hispanic', 'hispanic'),
+                                           c('not hispanic', 'other')))
+
+# WONDER to CDC/CENSUS ----
 #I'm keeping a few for SHIELD because we are using CDC Wonder for fertility rates
 register.ontology.mapping('wonder.to.census.race.2',
                           from.dimensions = 'race',
@@ -95,29 +135,11 @@ register.ontology.mapping('wonder.to.census.ethnicity.2',
                           mappings = rbind(c('Hispanic or Latino', 'hispanic'),
                                            c('Not Hispanic or Latino', 'not hispanic')))
 
-#Maps Census racial groups (specifically race+ethnicity) to what we use in JHEEM 
-register.ontology.mapping('census.to.jheem.race',
-                          from.dimensions = c('race', 'ethnicity'),
-                          to.dimensions = 'race',
-                          mappings = rbind(c('white', 'hispanic', 'hispanic'),
-                                           c('white', 'not hispanic', 'other'),
-                                           c('black', 'hispanic', 'hispanic'),
-                                           c('black', 'not hispanic', 'black'),
-                                           c('american indian or alaska native', 'hispanic', 'hispanic'),
-                                           c('american indian or alaska native', 'not hispanic', 'other'),
-                                           c('asian or pacific islander', 'hispanic', 'hispanic'),
-                                           c('asian or pacific islander', 'not hispanic', 'other')))
-
-#Maps Census racial groups  (ethnicity only) to what we use in JHEEM 
-register.ontology.mapping('census.to.jheem.ethnicity.only',
-                          from.dimensions = c('race'),
-                          to.dimensions = 'race',
-                          mappings = rbind(c('hispanic', 'hispanic'),
-                                           c('not hispanic', 'other')))
 
 
-#Mapping CDC Wonder racial groups to JHEEM (for SHIELD this is for fertility)
-register.ontology.mapping('wonder.to.jheem.race.2',
+# WONDER & SHIELD ----
+#Mapping CDC Wonder racial groups to SHIELD (for SHIELD this is for fertility)
+register.ontology.mapping('wonder.to.SHIELD.race.2',
                           from.dimensions = c('race'),
                           to.dimensions = 'race',
                           mappings = rbind(c('American Indian or Alaska Native', 'other'),
@@ -126,72 +148,16 @@ register.ontology.mapping('wonder.to.jheem.race.2',
                                            c('White', 'other'),
                                            c('More than one race', 'other')))
 
-#This is a mapping from JHEEM to CDC- because of the additional categories that exist they need to be classified into two 2 categories CDC has
-register.ontology.mapping('jheem.to.cdc.sex',
-                          from.dimensions = 'sex',
-                          to.dimensions = 'sex',
-                          mappings = rbind(c('heterosexual_male', 'male'),
-                                           c('msm', 'male'),
-                                           c('female', 'female')))
-
-#Maps racial grouped used in the Census Immigration data to the racial groups used in JHEEM
-register.ontology.mapping('census.immigration.to.jheem.race',
-                          from.dimensions = 'race',
-                          to.dimensions = 'race',
-                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
-                                           c('White, Non-Hispanic', 'white'),
-                                           c('Black', 'black'),
-                                           c('Other', 'other'))) # needed?
-
+# EMORY & SHIELD ----
 #Maps Emory's sex groups to CDC (Emory has an estimate of MSM and so the Emory data is only relevant to men)
 register.ontology.mapping('emory.sex.to.cdc.sex.temporary',
                           from.dimensions = 'sex',
                           to.dimensions = 'sex',
                           mappings = rbind(c('male', 'male'),
                                            c(NA, 'female')))
-#This maps data from BRFSS to Census population data
-#We have both BRFSS data and Census population in SHIELD and this helps the pull function understand how to conceptualize those data sources together
-register.ontology.mapping('proportion.tested.to.adult.population',
-                          from.dimensions = c('race', 'ethnicity'),
-                          to.dimensions = 'race',
-                          mappings = rbind(c('American Indian or Alaska Native', 'Hispanic or Latino', 'Hispanic'),
-                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'American Indian/Alaska Native'),
-                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'Hispanic'),
-                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'Asian/Pacific Islander'),
-                                           c('Black or African American', 'Hispanic or Latino', 'Hispanic'),
-                                           c('Black or African American', 'Not Hispanic or Latino', 'Black'),
-                                           c('More than one race', 'Hispanic or Latino', 'Hispanic'),
-                                           c('More than one race', 'Not Hispanic or Latino', 'Multiracial'),
-                                           c('White','Hispanic or Latino','Hispanic'),
-                                           c('White','Not Hispanic or Latino','White'),
-                                           c(NA, NA, 'other')))
 
-#This maps data from BRFSS to census population data
-register.ontology.mapping('proportion.tested.to.adult.population.2',
-                          from.dimensions = 'race',
-                          to.dimensions = 'race',
-                          mappings = rbind(c('American Indian/Alaska Native', 'American Indian/Alaska Native'),
-                                           c('Asian', 'Asian/Pacific Islander'),
-                                           c('Black', 'Black'),
-                                           c('Hispanic', 'Hispanic'),
-                                           c('Multiracial', 'Multiracial'),
-                                           c('Native Hawaiian/Other Pacific Islander', 'Asian/Pacific Islander'),
-                                           c('Other race', 'other'),
-                                           c('White', 'White')))
 
-#Maps BRFSS racial groups (this is where proportion tested data is from) to JHEEM racial groups
-register.ontology.mapping('proportion.tested.to.jheem.race',
-                          from.dimension = 'race',
-                          to.dimensions = 'race',
-                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
-                                           c('Asian', 'other'),
-                                           c('Black', 'black'),
-                                           c('Hispanic', 'hispanic'),
-                                           c('Multiracial', 'other'),
-                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
-                                           c('Other race', 'other'),
-                                           c('White', 'other')))
-
+# CENSUS & BRFSS ----
 #This maps data from Census to BRFSS- this is also to help the pull function make sense of the data
 register.ontology.mapping('census.to.brfss.race.ethnicity',
                           from.dimensions = c('race', 'ethnicity'),
@@ -207,15 +173,16 @@ register.ontology.mapping('census.to.brfss.race.ethnicity',
                                            c(NA, NA, 'Multiracial'),
                                            c(NA, NA, 'other')))
 
-#Maps NHANES racial groups to those used in JHEEM
-register.ontology.mapping('nhanes.to.jheem.race',
+# NHANES & SHIELD ----
+#Maps NHANES racial groups to those used in SHIELD
+register.ontology.mapping('nhanes.to.SHIELD.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
                           mappings = rbind(c('black, non hispanic', 'black'),
                                            c('hispanic', 'hispanic'),
                                            c('other', 'other'),
                                            c('white, non hispanic', 'other')))
-
+# CENSUS TO CENSUS ----
 #Maps the racial groups from stratified Census data to the other racial groups in the Census data
 register.ontology.mapping('stratified.census.to.census.race',
                           from.dimensions = c('race', 'ethnicity'),

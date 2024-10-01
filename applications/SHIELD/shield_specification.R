@@ -135,10 +135,11 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
 
 #-- NATALITY --# ----
+
 # we model births based on women's fertility rates
 register.natality(specification = SHIELD.SPECIFICATION,
                   parent.groups = c('infected', 'uninfected'),
-                  applies.to = list(sex='female'), #only women give birth
+                  applies.to = list(sex='female',age=FERTILE.AGES), #only women 15-44 give birth
                   child.groups = 'uninfected',
                   fertility.rate.value = 'fertility.rate',
                   birth.proportions.value = 'birth.proportions', # when they are born, where do they go? (e.g., what age, what race, what sex will they have)
@@ -763,7 +764,7 @@ register.model.specification(SHIELD.SPECIFICATION)
 
 #
 register.calibrated.parameters.for.version('shield',
-                                           distribution = SHIELD.PARAMETERS.PRIOR,
+                                           distribution = SHIELD.FULL.PARAMETERS.PRIOR,
                                            apply.function = SHIELD.APPLY.PARAMETERS.FN,
                                            sampling.blocks = SHIELD.PARAMETER.SAMPLING.BLOCKS,
                                            calibrate.to.year = 2025,

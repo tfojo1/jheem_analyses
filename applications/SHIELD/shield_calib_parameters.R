@@ -92,3 +92,5 @@ msm.transmission = c(
 
 age.mixing.transmission=("age.mixing.sd.mult")
 )
+SHIELD.PARAMETER.SAMPLING.BLOCKS=c(SHIELD.POPULATION.SAMPLING.BLOCKS,
+                                   SHIELD.TRANSMISSION.SAMPLING.BLOCKS)
