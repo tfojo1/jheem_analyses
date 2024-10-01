@@ -197,3 +197,22 @@ data.manager$put.long.form(
   url = 'www.census.gov',
   details = 'Census Reporting')
 }
+
+
+# Census Deaths -----------------------------------------------------------
+deaths.total = as.data.frame.table(census.manager$data$deaths$estimate$census.deaths$census$year__location)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(outcome = "deaths")
+
+# Put for Census Deaths ---------------------------------------------------
+  data.manager$put.long.form(
+    data = deaths.total,
+    ontology.name = 'census',
+    source = 'census.deaths',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+
