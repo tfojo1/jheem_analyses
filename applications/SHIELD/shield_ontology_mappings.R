@@ -134,7 +134,17 @@ register.ontology.mapping('wonder.to.census.ethnicity.2',
                           to.dimensions = 'ethnicity',
                           mappings = rbind(c('Hispanic or Latino', 'hispanic'),
                                            c('Not Hispanic or Latino', 'not hispanic')))
-
+register.ontology.mapping('wonder.to.census.race.3',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
+                                           c('Asian or Pacific Islander', 'asian or pacific islander'),
+                                           c('Black or African American', 'black'),
+                                           c('White', 'white'),
+                                           c('More than one race', NA),
+                                           c('Not Reported', NA),
+                                           c('Unknown or Not Stated', NA),
+                                           c('Not Available', NA)))
 
 
 # WONDER & SHIELD ----
@@ -147,6 +157,20 @@ register.ontology.mapping('wonder.to.SHIELD.race.2',
                                            c('Black or African American', 'black'),
                                            c('White', 'other'),
                                            c('More than one race', 'other')))
+
+register.ontology.mapping('wonder.to.SHIELD.race.ethnicity',
+                          from.dimensions = c('race', 'ethnicity'),
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian or Alaska Native', 'Hispanic or Latino', 'hispanic'),
+                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'other'),
+                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'hispanic'),
+                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'other'),
+                                           c('Black or African American', 'Hispanic or Latino', 'hispanic'),
+                                           c('Black or African American', 'Not Hispanic or Latino', 'black'),
+                                           c('More than one race', 'Hispanic or Latino', 'hispanic'),
+                                           c('More than one race', 'Not Hispanic or Latino', 'other'),
+                                           c('White','Hispanic or Latino','hispanic'),
+                                           c('White','Not Hispanic or Latino','other')))
 
 # EMORY & SHIELD ----
 #Maps Emory's sex groups to CDC (Emory has an estimate of MSM and so the Emory data is only relevant to men)
