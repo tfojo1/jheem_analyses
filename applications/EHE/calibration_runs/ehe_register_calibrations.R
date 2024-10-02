@@ -10,7 +10,7 @@ CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid2'
 
 N.ITER.TEST = 10000
 N.ITER = 15000
-N.ITER.FULL = 35000
+N.ITER.FULL = 50000
 
 # load params manual
 load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_21.Rdata") 
