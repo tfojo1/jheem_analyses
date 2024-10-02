@@ -10,9 +10,9 @@ HET.BASE.TRATE.MEAN = .25 # from https://www.shelbytnhealth.com/DocumentCenter/V
 IDU.BASE.TRATE.MEAN = 12
 BASE.TRATE.CV = 20
 
-TRATE.RR.1.2.SPAN = 8#1.5
-TRATE.RR.0.1.SPAN = 8#2#1.5
-TRATE.RR.0.PEAK.SPAN = 8#3
+TRATE.RR.1.2.SPAN = 2#1.5
+TRATE.RR.0.1.SPAN = 2#2#1.5
+TRATE.RR.0.PEAK.SPAN = 4#3
 
 # The next three functions defined in ehe_parameters_helpers.R
 SEXUAL.SUSCEPTIBILITY.BY.AGE = get.sexual.susceptibility.by.age(c('13-24 years', '25-34 years', '35-44 years', '45-54 years', '55+ years'))
@@ -466,18 +466,31 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     # ),
 
     # Testing by Age
-    age.proportion.tested.or = Multivariate.Lognormal.Distribution(
-      mu = rep(0, 5),
-      #sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)),
-      sigma = create.auto.regressive.covariance.matrix(0.7, 5, sd=0.5*log(1.5)),
-      var.names = paste0("age", 1:5, ".proportion.tested.or")
-    ),
+    age1.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    age2.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    age3.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    age4.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    age5.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
     
-    age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
-      mu = rep(0, 5),
-      sigma = create.auto.regressive.covariance.matrix(0.7, 5, 0.5*log(1.5)/10),
-      var.names = paste0("age", 1:5, ".proportion.tested.slope.or")
-    ),
+    age1.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    age2.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    age3.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    age4.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    age5.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    
+    # age.proportion.tested.or = Multivariate.Lognormal.Distribution(
+    #   mu = rep(0, 5),
+    #   #sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)),
+    #   sigma = create.auto.regressive.covariance.matrix(0.7, 5, sd=0.5*log(1.5)),
+    #   var.names = paste0("age", 1:5, ".proportion.tested.or")
+    # ),
+    # 
+    # age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
+    #   mu = rep(0, 5),
+    #   sigma = create.auto.regressive.covariance.matrix(0.7, 5, 0.5*log(1.5)/10),
+    #   var.names = paste0("age", 1:5, ".proportion.tested.slope.or")
+    # ),
+    # 
     
     # Testing Ramp
     msm.testing.ramp = Logitnormal.Distribution(0, 0.5 * log(1.5)),
@@ -751,31 +764,43 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
       'black.non.idu.general.mortality.rate.multiplier'
     ),
   
-    black.age1.aging.and.migration = c(
+    black.age1.aging.and.migration.1 = c(
       'black.age1.aging.multiplier.1',
+      'black.age1.migration.multiplier.time.1'
+    ),
+    
+    black.age1.aging.and.migration.2 = c(
       'black.age1.aging.multiplier.2',
-      'black.age1.migration.multiplier.time.1',
       'black.age1.migration.multiplier.time.2'
     ),
     
-    black.age2.aging.and.migration = c(
+    black.age2.aging.and.migration.1 = c(
       'black.age2.aging.multiplier.1',
+      'black.age2.migration.multiplier.time.1'
+    ),
+    
+    black.age2.aging.and.migration.2 = c(
       'black.age2.aging.multiplier.2',
-      'black.age2.migration.multiplier.time.1',
       'black.age2.migration.multiplier.time.2'
     ),
     
-    black.age3.aging.and.migration = c(
+    black.age3.aging.and.migration.1 = c(
       'black.age3.aging.multiplier.1',
+      'black.age3.migration.multiplier.time.1'
+    ),
+    
+    black.age3.aging.and.migration.2 = c(
       'black.age3.aging.multiplier.2',
-      'black.age3.migration.multiplier.time.1',
       'black.age3.migration.multiplier.time.2'
     ),
     
-    black.age4.aging.and.migration = c(
+    black.age4.aging.and.migration.1 = c(
       'black.age4.aging.multiplier.1',
+      'black.age4.migration.multiplier.time.1'
+    ),
+    
+    black.age4.aging.and.migration.2 = c(
       'black.age4.aging.multiplier.2',
-      'black.age4.migration.multiplier.time.1',
       'black.age4.migration.multiplier.time.2'
     ),
     
@@ -797,35 +822,47 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
       'hispanic.non.idu.general.mortality.rate.multiplier'
     ),
     
-    hispanic.age1.aging.and.migration = c(
+    hispanic.age1.aging.and.migration.1 = c(
       'hispanic.age1.aging.multiplier.1',
+      'hispanic.age1.migration.multiplier.time.1'
+    ),
+    
+    hispanic.age1.aging.and.migration.2 = c(
       'hispanic.age1.aging.multiplier.2',
-      'hispanic.age1.migration.multiplier.time.1',
       'hispanic.age1.migration.multiplier.time.2'
     ),
     
-    hispanic.age2.aging.and.migration = c(
+    hispanic.age2.aging.and.migration.1 = c(
       'hispanic.age2.aging.multiplier.1',
+      'hispanic.age2.migration.multiplier.time.1'
+    ),
+    
+    hispanic.age2.aging.and.migration.2 = c(
       'hispanic.age2.aging.multiplier.2',
-      'hispanic.age2.migration.multiplier.time.1',
       'hispanic.age2.migration.multiplier.time.2'
     ),
     
-    hispanic.age3.aging.and.migration = c(
+    hispanic.age3.aging.and.migration.1 = c(
       'hispanic.age3.aging.multiplier.1',
+      'hispanic.age3.migration.multiplier.time.1'
+    ),
+    
+    hispanic.age3.aging.and.migration.2 = c(
       'hispanic.age3.aging.multiplier.2',
-      'hispanic.age3.migration.multiplier.time.1',
       'hispanic.age3.migration.multiplier.time.2'
     ),
     
-    hispanic.age4.aging.and.migration = c(
+    hispanic.age4.aging.and.migration.1 = c(
       'hispanic.age4.aging.multiplier.1',
+      'hispanic.age4.migration.multiplier.time.1'
+    ),
+    
+    hispanic.age4.aging.and.migration.2 = c(
       'hispanic.age4.aging.multiplier.2',
-      'hispanic.age4.migration.multiplier.time.1',
       'hispanic.age4.migration.multiplier.time.2'
     ),
     
-    hispanic.age5.migration = c(
+    hispanic.age5migration = c(
       'hispanic.age5.migration.multiplier.time.1',
       'hispanic.age5.migration.multiplier.time.2'
     ),
@@ -843,40 +880,51 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
       'other.non.idu.general.mortality.rate.multiplier'
     ),
     
-    other.age1.aging.and.migration = c(
+    other.age1.aging.and.migration.1 = c(
       'other.age1.aging.multiplier.1',
+      'other.age1.migration.multiplier.time.1'
+    ),
+    
+    other.age1.aging.and.migration.2 = c(
       'other.age1.aging.multiplier.2',
-      'other.age1.migration.multiplier.time.1',
       'other.age1.migration.multiplier.time.2'
     ),
     
-    other.age2.aging.and.migration = c(
+    other.age2.aging.and.migration.1 = c(
       'other.age2.aging.multiplier.1',
+      'other.age2.migration.multiplier.time.1'
+    ),
+    
+    other.age2.aging.and.migration.2 = c(
       'other.age2.aging.multiplier.2',
-      'other.age2.migration.multiplier.time.1',
       'other.age2.migration.multiplier.time.2'
     ),
     
-    other.age3.aging.and.migration = c(
+    other.age3.aging.and.migration.1 = c(
       'other.age3.aging.multiplier.1',
+      'other.age3.migration.multiplier.time.1'
+    ),
+    
+    other.age3.aging.and.migration.2 = c(
       'other.age3.aging.multiplier.2',
-      'other.age3.migration.multiplier.time.1',
       'other.age3.migration.multiplier.time.2'
     ),
     
-    other.age4.aging.and.migration = c(
+    other.age4.aging.and.migration.1 = c(
       'other.age4.aging.multiplier.1',
+      'other.age4.migration.multiplier.time.1'
+    ),
+    
+    other.age4.aging.and.migration.2 = c(
       'other.age4.aging.multiplier.2',
-      'other.age4.migration.multiplier.time.1',
       'other.age4.migration.multiplier.time.2'
     ),
     
-    other.age5.migration = c(
+    other.age5migration = c(
       'other.age5.migration.multiplier.time.1',
       'other.age5.migration.multiplier.time.2'
     ),
 
-    
     age.specific.mortality = c(
       'age1.non.idu.general.mortality.rate.multiplier',
       'age2.non.idu.general.mortality.rate.multiplier',
