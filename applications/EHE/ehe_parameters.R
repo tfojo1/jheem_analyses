@@ -11,8 +11,8 @@ IDU.BASE.TRATE.MEAN = 12
 BASE.TRATE.CV = 20
 
 TRATE.RR.1.2.SPAN = 2#1.5
-TRATE.RR.0.1.SPAN = 2#2#1.5
-TRATE.RR.0.PEAK.SPAN = 4#3
+TRATE.RR.0.1.SPAN = 4#2#1.5
+TRATE.RR.0.PEAK.SPAN = 8#3
 
 # The next three functions defined in ehe_parameters_helpers.R
 SEXUAL.SUSCEPTIBILITY.BY.AGE = get.sexual.susceptibility.by.age(c('13-24 years', '25-34 years', '35-44 years', '45-54 years', '55+ years'))
