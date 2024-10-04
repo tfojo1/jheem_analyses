@@ -59,7 +59,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
 # 2007 earliest year for complete census data
 register.fixed.model.strata(SHIELD.SPECIFICATION,
                             applies.after.time = -Inf,
-                            applies.before.time = 2007,
+                            applies.before.time = 1970,
                             fix.strata = T,
                             dimensions.to.fix = c('location','age','race','sex')
 )
@@ -132,10 +132,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value = expression(base.initial.population * 1),
                                applies.to = list(profile='susceptible'))
 
-
-
 #-- NATALITY --# ----
-
 # we model births based on women's fertility rates
 register.natality(specification = SHIELD.SPECIFICATION,
                   parent.groups = c('infected', 'uninfected'),
@@ -175,8 +172,6 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(sex.to='female'),
                                name = 'birth.proportions',
                                value = expression( 1-fraction.male.births ))
-
-##--------------------------------------------------------------------------------------------------------------#
 
 #-- MORTALITY --# ----
 ##---- General Mortality ----
@@ -702,6 +697,31 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis' #corresponding to the name in data manager
 )
 
+## Population ----
+track.point.outcome(SHIELD.SPECIFICATION,
+                    name='point.population',
+                    outcome.metadata = NULL, #we are not saving it
+                    scale='non.negative.number',
+                    save=F,
+                    value=expression(infected+uninfected),
+                    keep.dimensions = c('location','age','race','sex') #collapse on stage and continuum for infected and on profile as well
+)
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name='population',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                                                                    description = "Population size",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Persons',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'), #will read the scale from metadata
+                         value.to.integrate = 'point.population',
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'population' #Zoe: data should include persons under 13 (JHEEM data only includes 13+)
+)
+
+
+##--------------------------------------------------------------------------------------------------------------#
+##--------------------------------------------------------------------------------------------------------------#
 ## Incidence ----
 # (new infections + reinfections)
 track.dynamic.outcome(SHIELD.SPECIFICATION,
@@ -729,31 +749,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = "remission.from", #where they come from
                       keep.dimensions = c('location','age','race','sex','stage')
 )
-## Population ----
-track.point.outcome(SHIELD.SPECIFICATION,
-                    name='point.population',
-                    outcome.metadata = NULL, #we are not saving it
-                    scale='non.negative.number',
-                    save=F,
-                    value=expression(infected+uninfected),
-                    keep.dimensions = c('location','age','race','sex') #collapse on stage and continuum for infected and on profile as well
-)
-track.integrated.outcome(SHIELD.SPECIFICATION,
-                         name='population',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
-                                                                    description = "Population size",
-                                                                    scale = 'non.negative.number',
-                                                                    axis.name = 'Persons',
-                                                                    units = 'persons',
-                                                                    singular.unit = 'person'), #will read the scale from metadata
-                         value.to.integrate = 'point.population',
-                         keep.dimensions = c('location','age','race','sex'),
-                         corresponding.data.outcome = 'population' #Zoe: data should include persons under 13 (JHEEM data only includes 13+)
-)
 
-
-##--------------------------------------------------------------------------------------------------------------#
-##--------------------------------------------------------------------------------------------------------------#
 ##-- REGISTER THE SPECIFICATION ----
 ##--------------------------------------------------------------------------------------------------------------#
 ##--------------------------------------------------------------------------------------------------------------#

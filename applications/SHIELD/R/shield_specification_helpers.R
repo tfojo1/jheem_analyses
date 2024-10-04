@@ -777,23 +777,30 @@ get.location.mortality.rates.functional.form = function(location, specification.
                                 value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
 }
 #' @title get.location.mortality.rates
-#' @description reading the mortality rates from the census manager
+#' @description reading the mortality rates from the census manager (approximating them off state-level data)
 #' @param location location
 #' @param specification.metadata specification.metadata
 #' @param year.ranges year.ranges #Todd: ???
-#' @return returning the mortality rates in the correct dimension
+#' @return returning the mortality rates for each MSA (location) in the correct dimension
 get.location.mortality.rates <- function(location,
                                          specification.metadata,
-                                         year.ranges = c('2001-2010','2011-2020'))
-{
-   
-# we didnt have county-level mortality data that was fully stratified , but state level data are stratified 
-  # we also have metro areas
-  #some MSAs have counties from multiple states (e.g., DC)
-    counties = locations::get.contained.locations(location, 'county')
-  states = unique(locations::get.containing.locations(counties, 'state'))
-  
-  
+                                         year.ranges = c('2001-2010','2011-2020')){
+  # Todd's code is designed for modeling MSAs, where each MSA consists of a collection of counties.
+  # County-level mortality data is not fully stratified, but state-level data is available with stratification.
+  # Note: Some MSAs span over multiple states (e.g., Washington DC  ).
+  # To estimate the MSA-level mortality rate, we extract the counties within each MSA, map these counties to their corresponding states,
+  # and then take a weighted average of the state-level rates to approximate the MSA-level mortality rate.
+  if (location=='US'){
+    counties='US'
+    #' @Todd: we should be able to just pull this directly from the census.manager, correct?
+    # mortality.rate = CENSUS.MANAGER$pull(outcome = 'mortality.rate', 
+                                 # location = states, 
+                                 # year= year.ranges, 
+                                 # keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+    
+  }else{
+    counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
+    states = unique(locations::get.containing.locations(counties, 'state')) # construct the states: 
   # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
   deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', 
                                location = states, 
@@ -808,10 +815,8 @@ get.location.mortality.rates <- function(location,
                                    location = states, 
                                    year= year.ranges, 
                                    keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
-  
   if (is.null(population))
     stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
-  
   population[is.na(deaths)] = NA
   
   # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
@@ -846,6 +851,7 @@ get.location.mortality.rates <- function(location,
     })
     
     apply(state.weights * rates.by.state, c('age','race','sex'), sum)
-  }
+  }}
+  #' @todd; whats returned from this function?
 }
 
