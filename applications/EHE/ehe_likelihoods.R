@@ -245,7 +245,6 @@ suppression.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
                                                    outcome.for.sim = "suppression",
                                                    denominator.outcome.for.data = 'diagnosed.prevalence',
-                                                   denominator.outcome.for.sim = 'diagnosed.prevalence',
                                                    
                                                    # want to be able to specify max # for each location type;
                                                    # have to decide how to order (probably by denominator)
@@ -366,7 +365,6 @@ heroin.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
                                                    outcome.for.sim = "proportion.using.heroin",
                                                    denominator.outcome.for.data = 'adult.population',
-                                                   denominator.outcome.for.sim = 'population',
                                                    
                                                    location.types = c('STATE','NSDUH'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
@@ -400,7 +398,6 @@ cocaine.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "cocaine",
                                                    outcome.for.sim = "proportion.using.cocaine",
                                                    denominator.outcome.for.data = 'adult.population',
-                                                   denominator.outcome.for.sim = 'population',
                                                    
                                                    location.types = c('STATE','NSDUH'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
@@ -543,7 +540,6 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     # (did this to be able to do nested likelihood), but keeping it anyway
     outcome.for.data = "hiv.tests.per.population", 
     outcome.for.sim = "total.hiv.tests.per.population",
-    denominator.outcome.for.sim = "population",
     
     levels.of.stratification = c(0),
     from.year = 2008,
