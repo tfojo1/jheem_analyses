@@ -59,7 +59,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
 # 2007 earliest year for complete census data
 register.fixed.model.strata(SHIELD.SPECIFICATION,
                             applies.after.time = -Inf,
-                            applies.before.time = 1970,
+                            applies.before.time = 2007,
                             fix.strata = T,
                             dimensions.to.fix = c('location','age','race','sex')
 )
