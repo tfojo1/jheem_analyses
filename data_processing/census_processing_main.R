@@ -381,6 +381,28 @@ data <- data %>%
 })
 
 ################################################################################
+##Update for 10-7-24: Adding US Deaths Total (summing all counties)
+################################################################################
+us.total.deaths = lapply(data.list.county.deaths.00.23, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  data <- data %>%
+    group_by(year)%>%
+    mutate(total = sum(value))%>%
+    select(-location, -value)%>%
+    rename(value = total)%>%
+    mutate(location = "US")
+  
+  data= as.data.frame(data)
+  
+  data<- data[!duplicated(data), ]
+  
+  list(filename, data) #what to return# 
+})
+
+################################################################################
                 ###Put data into Census Manager###
 ################################################################################  
 
@@ -413,11 +435,25 @@ for (data in county_deaths) {
     details = 'Census Reporting')
 }
 
-#US Totals
-
+#US Totals- population
 us.total.pop.put = lapply(us.total.pop, `[[`, 2)
 
 for (data in us.total.pop.put) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+
+#US Totals- deaths
+us.total.deaths.put = lapply(us.total.deaths, `[[`, 2)
+
+for (data in us.total.deaths.put) {
   
   census.manager$put.long.form(
     data = data,
