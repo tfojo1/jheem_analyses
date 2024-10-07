@@ -1,21 +1,12 @@
 #CASHED FOLDER:
 # https://livejohnshopkins-my.sharepoint.com/personal/tfojo1_jh_edu/_layouts/15/onedrive.aspx?e=5%3A940bf48ba6e0498495fea5596e3dc8e7&sharingv2=true&fromShare=true&at=9&CID=425e54af%2De78b%2D4d53%2D8df4%2D6abb10af6339&id=%2Fpersonal%2Ftfojo1%5Fjh%5Fedu%2FDocuments%2FJHEEM2&FolderCTID=0x012000E74D427C3A55BC45A1C18C850CDA2DB4&view=0
-
-# CENSUS.MANAGER$data$births$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity
-# add the age/race of moms
-
-# NEXT STEPS:
-### birth , death, migration
-
-# fix the initial population (we have census for 2007, what are the good values to see historical sysphilis rates )
-
-# TBD:
-# think about the statistics that we want to record: we will record their average between Jan 1 and Dec 31
-# proportion of people aware of diagnosis ?
-# proportion loving with diag and not track.integrated.outcome(prevalece of syphilis)?
-
 # > specification.metadata=get.specification.metadata("shield","C.12580")
 # > specification.metadata=get.specification.metadata("shield","US")
+
+
+# NEXT STEPS:
+# Develop a functional form for fertility 
+# likelihoods 
 
 # Working directory is set to the main JHEEM_Analysis folder:
 # JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
