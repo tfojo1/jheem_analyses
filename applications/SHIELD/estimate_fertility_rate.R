@@ -52,25 +52,94 @@ df%>%filter(race=='black') %>%
   theme_minimal()
 
 
-# GLM: main effects and interactions
+# GLM: main effects and interactions ----
 ##@TODD:is it corretc to use binomial family here?
-fit.models= function( model="glm.one.way"){
-  if(model=="glm.one.way"){
+fit.models<- function( type="glm.one.way",family='quasibinomial' ){
+  if(type=="glm.one.way"){
     fit=glm(fertility.rate ~ age + race + year, 
-            data = df, family = 'binomial')
-  } else if(model=="glm.two.way"){
+            data = df, family =family )
+  } else if(type=="glm.two.way"){
     fit=glm(fertility.rate ~ age * race + year, 
-            data = df, family = 'binomial')
-  } else if(model=="glm.three.way1"){
+            data = df, family =family )
+  } else if(type=="glm.three.way1"){
     fit=glm(fertility.rate ~ age * race + year + year:age , 
-            data = df, family = 'binomial')
-  } else if(model=="glm.three.way2"){
+            data = df, family =family )
+  } else if(type=="glm.three.way2"){
     fit=glm(fertility.rate ~ age * race + year +  year:race, 
-            data = df, family = 'binomial')
-  }else if(model=="glm.three.way3"){
+            data = df, family =family )
+  }else if(type=="glm.three.way3"){
     fit=glm(fertility.rate ~ age * race + year + year:age + year:race, 
-            data = df, family = 'binomial')
+            data = df, family =family )
   }
+  return(fit)
+}
+# PLOTTING FUNCTION ----
+plot.fit<-function(df.fitted){
+  df=df.fitted
+  # BY AGE
+  df_mean <- df %>%
+    group_by(age,year) %>%
+    summarize(mean_fertility = mean(fertility.rate, na.rm = TRUE),  
+              mean_predicted_fertility = mean(predicted_fertility, na.rm = TRUE), 
+              .groups = 'drop')
+  b1<-ggplot(df_mean, aes(x = year, y = mean_fertility, group = 1)) +
+    geom_line(aes(color = "Actual"), size = 1) +                             # Actual values
+    geom_line(aes(y = mean_predicted_fertility, color = "Fitted"), size = 1, linetype = "dashed") +  # Fitted values
+    facet_wrap(~ age) +                                                      # Facet by age groups
+    theme_minimal() +
+    labs(title = "Fertility Rate: Actual vs. Fitted Over Time",
+         x = "Year", y = "Fertility Rate",
+         color = "Line Type") +
+    scale_color_manual(values = c("Actual" = "blue", "Fitted" = "red")) +    # Set custom colors
+    theme(legend.position = "bottom")
+  ####
+  # BY RACE
+  df_mean <- df %>%
+    group_by(race,year) %>%
+    summarize(mean_fertility = mean(fertility.rate, na.rm = TRUE),  
+              mean_predicted_fertility = mean(predicted_fertility, na.rm = TRUE), 
+              .groups = 'drop')
+  b2<-ggplot(df_mean, aes(x = year, y = mean_fertility, group = 1)) +
+    geom_line(aes(color = "Actual"), size = 1) +                             # Actual values
+    geom_line(aes(y = mean_predicted_fertility, color = "Fitted"), size = 1, linetype = "dashed") +  # Fitted values
+    facet_wrap(~ race) +                                                      # Facet by age groups
+    theme_minimal() +
+    labs(title = "Fertility Rate: Actual vs. Fitted Over Time",
+         x = "Year", y = "Fertility Rate",
+         color = "Line Type") +
+    scale_color_manual(values = c("Actual" = "blue", "Fitted" = "red")) +    # Set custom colors
+    theme(legend.position = "bottom")
+  ####
+  # BY AGE
+  b3<-ggplot(df, aes(x = year, y = fertility.rate, group = 1)) +
+    geom_line(aes(color = "Actual"), size = 1) +                             # Actual values
+    geom_line(aes(y = predicted_fertility, color = "Fitted"), size = 1, linetype = "dashed") +  # Fitted values
+    facet_wrap(~ age*race) +                                                      # Facet by age groups
+    theme_minimal() +
+    labs(title = "Fertility Rate: Actual vs. Fitted Over Time",
+         x = "Year", y = "Fertility Rate",
+         color = "Line Type") +
+    scale_color_manual(values = c("Actual" = "blue", "Fitted" = "red")) +    # Set custom colors
+    theme(legend.position = "bottom")
+  
+  return(list(b1,b2,b3))
+}
+
+# EXAMPLE: ----
+# quasibinomial is used when the dependent variable is a proportion (0 < fertility.rate < 1).
+# It assumes that the variance is proportional to the mean but does not require the data to follow the strict binomial variance assumption.
+fit=fit.models(type="glm.one.way",family="quasibinomial");fit
+fit=fit.models(type="glm.two.way",family="quasibinomial");fit
+fit=fit.models(type="glm.three.way2",family="quasibinomial");fit
+fit=fit.models(type="glm.three.way1",family="quasibinomial");fit
+fit=fit.models(type="glm.three.way3",family="quasibinomial");fit
+predicted_values <- predict(fit, type = "response")  # type = "response" gives the predictions on the scale of the response variable (proportion)
+df.fitted=df;df.fitted$predicted_fertility <- predicted_values
+b=plot.fit(df.fitted)
+print(b[[3]]);
+
+##############################################################################
+return_intercept_slope<-function(fit){
   # Unpack the intercepts and slopes into arrays indexed ['age','race'] to build ocrresponding functional form
   # Intercept
   # The intercept represents the expected value of the response variable (in this case, fertility rate) when all predictor variables are at their reference levels.
@@ -105,10 +174,11 @@ fit.models= function( model="glm.one.way"){
 plot.fit=function(type="glm.one.way"){
   
   # 1- fit the models
-  model = fit.models(type )
+  fit = fit.models(type )
+  model.specification= return_intercept_slope(fit)
   #evaluate functional forms
-  fertility.functional.form = create.logistic.linear.functional.form(intercept = model$intercepts,
-                                                            slope = model$slopes,
+  fertility.functional.form = create.logistic.linear.functional.form(intercept = model.specification$intercepts,
+                                                            slope = model.specification$slopes,
                                                             anchor.year = YEARS[1],#2007 
                                                             parameters.are.on.logit.scale=T) 
   
@@ -117,7 +187,6 @@ plot.fit=function(type="glm.one.way"){
   values = array(unlist(values), 
                  dim = c(sapply(dim.names, length),length(YEARS.PROJECT)),
                  dimnames = c(dim.names, list(year=YEARS.PROJECT)))
-  
   
   # PLOT BY AGE
   varnames = c("age", "year")
@@ -147,6 +216,7 @@ plot.fit=function(type="glm.one.way"){
     facet_wrap(~age)+
     theme(plot.title = element_text(hjust = 0.5,size = 25))
   b3
+ 
   return(list(b1,b2,b3))
 }  
 
