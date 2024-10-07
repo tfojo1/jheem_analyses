@@ -242,15 +242,6 @@ data.manager$register.outcome(
     units = 'deaths',
     description = "Deaths"))
 
-data.manager$register.outcome(
-  'mortality.rate', 
-  metadata = create.outcome.metadata(
-    scale = 'rate',
-    display.name = 'Mortality Rate',
-    axis.name = 'Mortality Rate',
-    units = '%',
-    description = "Mortality Rate"), denominator.outcome = 'population') 
-
 # Create Sources + Parent Sources -----------------------------------------
 
 ##Register "Parent" Sources
@@ -277,7 +268,6 @@ data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory U
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 data.manager$register.source('cdc.wonder.natality', parent.source= "NVSS", full.name = "CDC Wonder Natality Data", short.name='cdc.wonder.natality')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
-data.manager$register.source('cdc.wonder.mortality', parent.source= "NVSS", full.name = "CDC Wonder Mortality Data", short.name='cdc.wonder.mortality')
 
 #Creating these separately bc they have separate parent sources
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
@@ -398,16 +388,6 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('15-19 years', '20-24 years', '25-29 years', '30-34 years','35-39 years', '40-44 years'),
-    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American',   'White', 'More than one race'),
-    ethnicity = c('Hispanic or Latino', 'Not Hispanic or Latino')
-  ))
-
-data.manager$register.ontology(
-  'cdc.deaths',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('< 1 year', '1-4 years', '5-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65-74 years', '75-84 years', '85+ years'),
     race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American',   'White', 'More than one race'),
     ethnicity = c('Hispanic or Latino', 'Not Hispanic or Latino')
   ))
