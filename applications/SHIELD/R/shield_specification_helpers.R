@@ -63,7 +63,7 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
                             keep.dimensions = c('age', 'race', 'ethnicity', 'sex'),
                             from.ontology.names = 'census') / length(years)
   
-  if (is.null(pop))
+  if (length(pop)==0)
     stop("We couldn't find any population data in the census manager")
   
   mapping = get.ontology.mapping(from.ontology = dimnames(pop),
@@ -854,4 +854,7 @@ get.location.mortality.rates <- function(location,
   }}
   #' @todd; whats returned from this function?
 }
+
+
+
 

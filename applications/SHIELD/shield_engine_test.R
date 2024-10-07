@@ -1,6 +1,7 @@
 #CASHED FOLDER:
 # https://livejohnshopkins-my.sharepoint.com/personal/tfojo1_jh_edu/_layouts/15/onedrive.aspx?e=5%3A940bf48ba6e0498495fea5596e3dc8e7&sharingv2=true&fromShare=true&at=9&CID=425e54af%2De78b%2D4d53%2D8df4%2D6abb10af6339&id=%2Fpersonal%2Ftfojo1%5Fjh%5Fedu%2FDocuments%2FJHEEM2&FolderCTID=0x012000E74D427C3A55BC45A1C18C850CDA2DB4&view=0
 
+# https://jheem.shinyapps.io/EndingHIV/
 
 ##################
 # create the SHIELD.SPECIFICATION
@@ -20,24 +21,16 @@ source('applications/SHIELD/shield_specification.R')
 
 # Baltimore MSA : C.12580
 engine = create.jheem.engine('shield', 'C.12580', 2025)
-
 # engine = create.jheem.engine('shield', 'US', 2025)
-
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
-
-sim = engine$run(params)
+params['black.fertility.rate.multiplier']=.5
+sim1 = engine$run(params)
 
 #plotting:
 #population data for Baltimore MSA
 # SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[, "C.12580"]
-simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER ) #still doesnt plot the data
-sim$location
+simplot(c(sim,sim1),"population",data.manager = SURVEILLANCE.MANAGER,facet.by = c('age'),split.by = c('race'),dimension.values = list('age'='0-14 years',year = 2000:2030) ) #still doesnt plot the data
 
-# before 2020 the census gave single age brackets after they only give age-groups
-# census.data: age-groups for 2020-2023
-# stratified.census: single ages before 2020
-
-#population data for Baltimore MSA
-# SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census.data$year__location[, "C.12580"]
-simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER ) #still doesnt plot the data
-sim$location 
+simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER,facet.by = c('sex') )
+simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER,facet.by = c('age') )
+simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER,facet.by = c('age'),split.by = c('race') )
