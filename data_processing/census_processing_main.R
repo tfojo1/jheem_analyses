@@ -212,6 +212,9 @@ source('data_processing/census.population.20.23.R')
 #Fertility rates and female.population
 source('data_processing/fertility.rate.R')
 
+#National Level 'metro' deaths
+source('data_processing/mortality.cdc.wonder.R')
+
 ################################################################################
 ###Read in Census Files###
 ################################################################################

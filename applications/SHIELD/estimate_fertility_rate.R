@@ -1,19 +1,17 @@
 # MAPPING FERTILITY RATE DATA AS A FUNCTION OF TIME AND OTHER COVARIATES 
 library(splines)
+
 # DATA PREPRATION ----
 # Loading census manager
-if (!exists('CENSUS.MANAGER')){
-  # cat("Loading Census Manager (may take a minute or two)...")
-  CENSUS.MANAGER = load.data.manager.from.cache('census.manager.rdata', set.as.default=F)
-  # print("Census manager read")
-}
+source('applications/SHIELD/shield_source_code.R')
 # CENSUS.MANAGER$outcomes
 # CENSUS.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity
 
 # years for which fertility data is reported:
 YEARS=2007:2023
-YEARS.PROJECT=2007:2035
+YEARS.PROJECT=2007:2040
 location='US'
+
 # extracting the data
 fertility.rate = CENSUS.MANAGER$pull(outcome='fertility.rate',
                                      location = 'US',
@@ -22,10 +20,11 @@ fertility.rate = CENSUS.MANAGER$pull(outcome='fertility.rate',
                                      na.rm=TRUE)
 dimnames(fertility.rate)
 # extracting dimensions 
-specification.metadata=get.specification.metadata('shield','US')
+# specification.metadata=get.specification.metadata('shield','US')
 # specification.metadata$dim.names
-# target.dimnames=specification.metadata$dim.names[c('age','race')] #Todd: this doesnt have year
+# target.dimnames=c(list( year = as.character(YEARS)), specification.metadata$dim.names[c('age','race')])  
 
+# target.dimnames: we set this manually to include female of childbearing ages and correct years
 target.dimnames=target.dimnames <- list(
   age = c(  "15-19 years", "20-24 years", "25-29 years", "30-34 years",
             "35-39 years", "40-44 years"  ),
@@ -36,8 +35,8 @@ target.dimnames=target.dimnames <- list(
 mapped.fertility.rate=map.value.ontology(fertility.rate, 
                                          target.dim.names = target.dimnames,
                                          na.rm = TRUE)
-
-# FITTING MODELS ----
+print("data is ready")
+# Explanatory analysis ----
 # To convert a multi-dimensional object to dataframe
 library(reshape2)
 df= melt(mapped.fertility.rate, varnames = c("age", "race", "year"), value.name = "fertility.rate")
@@ -46,36 +45,44 @@ ggplot(df, aes(x=fertility.rate)) + geom_density()+facet_wrap(~age) # bi-modal d
 ggplot(df, aes(x=fertility.rate)) + geom_density()+facet_wrap(~race) # bi-modal dists
 ggplot(df, aes(x=fertility.rate)) + geom_density()+facet_wrap(~race*age) # bi-modal dists> there is a year component too
 
-df%>%filter(race=='black') %>%
-  ggplot( aes(x = fertility.rate)) + 
-  geom_density() + 
-  facet_grid(rows = vars(year)) + 
-  theme_minimal()
+# df%>%filter(race=='black') %>%
+#   ggplot( aes(x = fertility.rate)) + 
+#   geom_density() + 
+#   facet_grid(rows = vars(year)) + 
+#   theme_minimal()
 
-
-# GLM: main effects and interactions ----
-##@TODD:is it corretc to use binomial family here?
-fit.models<- function( type="glm.one.way",family='quasibinomial' ,spline.df=1){
+### FITTING MODELS ### ----
+# GLM: main effects and interactions 
+# quasibinomial is used when the dependent variable is a proportion (0 < fertility.rate < 1).
+# It assumes that the variance is proportional to the mean but does not require the data to follow the strict binomial variance assumption.
+# GLM.quasibinomial uses a logit link funciton to map the data
+# GLM.gaussian uses identity link
+# fit.models----
+fit.models<- function( type="glm.one.way",family='quasibinomial'  ){
   if(type=="glm.one.way"){
-    fit=glm(fertility.rate ~ age + race + ns(year, df = spline.df), 
+    fit=glm(fertility.rate ~ age + race + year, 
             data = df, family =family )
-  } else if(type=="glm.two.way"){
-    fit=glm(fertility.rate ~ age * race + ns(year, df = spline.df), 
+  } else if(type=="glm.two.way1"){
+    fit=glm(fertility.rate ~ age * race + year, 
             data = df, family =family )
-  } else if(type=="glm.three.way1"){
-    fit=glm(fertility.rate ~ age * race + ns(year, df = spline.df) + year:age , 
+  } else if(type=="glm.two.way2"){
+    fit=glm(fertility.rate ~ age * race + year + year:age , 
             data = df, family =family )
-  } else if(type=="glm.three.way2"){
-    fit=glm(fertility.rate ~ age * race + ns(year, df = spline.df) +  year:race, 
+  } else if(type=="glm.two.way3"){
+    fit=glm(fertility.rate ~ age * race + year +  year:race, 
             data = df, family =family )
-  }else if(type=="glm.three.way3"){
-    fit=glm(fertility.rate ~ age * race + ns(year, df = spline.df) + year:age + year:race, 
+  }else if(type=="glm.two.way4"){
+    fit=glm(fertility.rate ~ age * race + year + year:age + year:race, 
             data = df, family =family )
-  }
+  }else if(type=="glm.three.way"){
+    fit=glm(fertility.rate ~ age * race*year, 
+            data = df, family =family )
+  } 
+
   return(fit)
 }
-# PLOTTING FUNCTION ----
-plot.fit<-function(df.fitted){
+# plot.fitted.values ----
+plot.fitted.values<-function(df.fitted){
   df=df.fitted
   # BY YEAR
   df_mean <- df %>%
@@ -140,33 +147,7 @@ plot.fit<-function(df.fitted){
   
   return(list(b0,b1,b2,b3))
 }
-
-# EXAMPLE: ----
-# quasibinomial is used when the dependent variable is a proportion (0 < fertility.rate < 1).
-# It assumes that the variance is proportional to the mean but does not require the data to follow the strict binomial variance assumption.
-
-fit=fit.models(type="glm.one.way",family="gaussian");fit
-fit=fit.models(type="glm.one.way",family="quasibinomial");fit
-
-
-fit=fit.models(type="glm.two.way",family="quasibinomial");fit
-fit=fit.models(type="glm.three.way2",family="quasibinomial");fit
-fit=fit.models(type="glm.three.way1",family="quasibinomial");fit
- 
-fit=fit.models(type="glm.three.way3",family="gaussian");fit
-fit=fit.models(type="glm.three.way3",family="quasibinomial");fit
- ####
-predicted_values <- predict(fit, type = "response")  # type = "response" gives the predictions on the scale of the response variable (proportion)
-df.fitted=df;df.fitted$predicted_fertility <- predicted_values
-b=plot.fit(df.fitted)
-print(b[[1]]);
-print(b[[2]]);
-print(b[[3]]);
-print(b[[4]]);
-
-
-
-##############################################################################
+# return_intercept_slope ----
 return_intercept_slope<-function(fit){
   # Unpack the intercepts and slopes into arrays indexed ['age','race'] to build ocrresponding functional form
   # Intercept
@@ -184,11 +165,9 @@ return_intercept_slope<-function(fit){
   year0.data = cbind(iterated.values, year=0) #gives you the intercepts for each stratum (combination of age and race) since the year terms are effectively removed or set to zero.
   year1.data = cbind(iterated.values, year=1) #The difference between these two predictions (slopes) provides the effect of moving from year 0 to year 1, which represents the slope or change in predicted values associated with the increase in year.
   
-  #@TODD: is there another way to extract these for more complicated models?
   # fit$coefficients
-  # this will work, even with interaction terms as long as you use a standard linear year term (not squared, splined, etc.), 
   #@TODD: what is the 'link' here?
-  intercepts = predict(fit, year0.data, type="link") 
+  intercepts = predict(fit, year0.data, type="link") #makes the prediction in the "link" scale in which case logit
   slopes = predict(fit, year1.data, type="link") - intercepts
   
   dim(intercepts) = dim(slopes) = sapply(dim.names, length)
@@ -199,56 +178,112 @@ return_intercept_slope<-function(fit){
   rv
 }
 
-plot.fit=function(type="glm.one.way"){
+# plot.projected.values ----
+plot.projected.values<-function(type='glm.three.way',family='gaussian'){
+  # fit the model
+  fit=fit.models(type=type,family=family);
+  # extract slope and intercept
+  rv=return_intercept_slope(fit)
+  ff<-NULL
+  if (family=="gaussian"){   
+    ff=create.linear.functional.form(intercept = rv$intercepts,
+                                     slope = rv$slopes,
+                                     anchor.year = 0)
+  }else{ 
+    ff=create.logistic.linear.functional.form(intercept = rv$intercepts,
+                                              slope = rv$slopes,
+                                              anchor.year = 0,
+                                              parameters.are.on.logit.scale=T)
+  }
+  YEARS.PROJECT=2007:2040
+  sim=ff$project(YEARS.PROJECT)
+  sim.target.dimnames=c(target.dimnames[1:2],list(year=YEARS.PROJECT))
+  sim=array(unlist(sim),
+            dim = sapply(sim.target.dimnames,length),
+            dimnames =sim.target.dimnames)
+  # PLOT BY YEAR
+  varnames = c( "year")
+  mean_sim <- apply(sim, varnames, mean)
+  mean_sim <- as.data.frame(cbind(year=as.numeric(names(mean_sim)), fertility.rate=as.numeric(mean_sim)))
+  mean_data <- apply(mapped.fertility.rate, varnames, mean)
+  mean_data <- as.data.frame(cbind(year=as.numeric(names(mean_data)), fertility.rate=as.numeric(mean_data)))
   
-  # 1- fit the models
-  fit = fit.models(type )
-  model.specification= return_intercept_slope(fit)
-  #evaluate functional forms
-  fertility.functional.form = create.logistic.linear.functional.form(intercept = model.specification$intercepts,
-                                                            slope = model.specification$slopes,
-                                                            anchor.year = YEARS[1],#2007 
-                                                            parameters.are.on.logit.scale=T) 
-  
-  #project values from this fucnitonal form
-  values = fertility.functional.form$project(YEARS.PROJECT) 
-  values = array(unlist(values), 
-                 dim = c(sapply(dim.names, length),length(YEARS.PROJECT)),
-                 dimnames = c(dim.names, list(year=YEARS.PROJECT)))
+  b0=ggplot() + 
+    geom_line(data=mean_sim, aes(x=year, y=fertility.rate)) +
+    geom_point(data=mean_data, aes(x=year, y=fertility.rate)) + 
+    theme(plot.title = element_text(hjust = 0.5,size = 25))
   
   # PLOT BY AGE
   varnames = c("age", "year")
-  sim=melt(apply(values, varnames,mean), varnames = varnames, value.name = "fertility.rate")
-  data=melt(apply(mapped.fertility.rate, varnames,mean),varnames = varnames, value.name = "fertility.rate")
+  mean_sim=melt(apply(sim, varnames,mean), varnames = varnames, value.name = "fertility.rate")
+  mean_data=melt(apply(mapped.fertility.rate, varnames,mean),varnames = varnames, value.name = "fertility.rate")
   b1=ggplot() + 
-    geom_line(data=sim, aes(x=year, y=fertility.rate, color=age)) +
-    geom_point(data=data, aes(x=year, y=fertility.rate, color=age)) + 
+    geom_line(data=mean_sim, aes(x=year, y=fertility.rate, color=age)) +
+    geom_point(data=mean_data, aes(x=year, y=fertility.rate, color=age)) + 
     theme(plot.title = element_text(hjust = 0.5,size = 25))
-  b1
+  
   # PLOT BY RACE
   varnames = c("race", "year")
-  sim=melt(apply(values, varnames,mean), varnames = varnames, value.name = "fertility.rate")
-  data=melt(apply(mapped.fertility.rate, varnames,mean),varnames = varnames, value.name = "fertility.rate")
+  mean_sim=melt(apply(sim, varnames,mean), varnames = varnames, value.name = "fertility.rate")
+  mean_data=melt(apply(mapped.fertility.rate, varnames,mean),varnames = varnames, value.name = "fertility.rate")
   b2=ggplot() + 
-    geom_line(data=sim, aes(x=year, y=fertility.rate, color=race)) +
-    geom_point(data=data, aes(x=year, y=fertility.rate, color=race)) + 
+    geom_line(data=mean_sim, aes(x=year, y=fertility.rate, color=race)) +
+    geom_point(data=mean_data, aes(x=year, y=fertility.rate, color=race)) + 
     theme(plot.title = element_text(hjust = 0.5,size = 25))
-  b2
+  
   # PLOT BY AGE RACE 
   varnames = c("age", "race", "year")
-  sim=melt(apply(values, varnames,mean), varnames = varnames, value.name = "fertility.rate")
-  data=melt(apply(mapped.fertility.rate, varnames,mean),varnames = varnames, value.name = "fertility.rate")
+  mean_sim=melt(apply(sim, varnames,mean), varnames = varnames, value.name = "fertility.rate")
+  mean_data=melt(apply(mapped.fertility.rate, varnames,mean),varnames = varnames, value.name = "fertility.rate")
   b3=ggplot() + 
-    geom_line(data=sim, aes(x=year, y=fertility.rate, color=race)) + 
-    geom_point(data=data, aes(x=year, y=fertility.rate, color=race)) + 
+    geom_line(data=mean_sim, aes(x=year, y=fertility.rate, color=race)) + 
+    geom_point(data=mean_data, aes(x=year, y=fertility.rate, color=race)) + 
     facet_wrap(~age)+
     theme(plot.title = element_text(hjust = 0.5,size = 25))
-  b3
- 
-  return(list(b1,b2,b3))
-}  
+  
+  
+  return(list(b0,b1,b2,b3))
+}
 
-plot.fit( "glm.two.way")[3]
-plot.fit( "glm.three.way1")[1]
-plot.fit("glm.three.way2")[3]
-plot.fit( "glm.three.way3")[3]
+## ----
+plot.projected.values(type='glm.three.way',family='gaussian')[4]
+plot.projected.values(type='glm.three.way',family='quasibinomial')[4]
+ 
+
+# Manual EXAMPLE: ----
+fit=fit.models(type="glm.three.way",family="quasibinomial");fit
+
+
+# approach1:
+predicted_values <- predict(fit, type = "response")  # type = "response" gives the predictions on the scale of the response variable (proportion)
+df.fitted=df;df.fitted$predicted_fertility <- predicted_values
+b=plot.fitted.values(df.fitted)
+print(b[[4]]);
+
+# approach2:
+# how to estimate the fit for 15-19 black in 2007 manually:
+expit<-function(x){1/(1+exp(-x))} 
+v=expit(fit$coefficients[1]+ #intercept
+          fit$coefficients[9]*2007 #year
+        )
+# compare v against df.fitted[1,'predicted_fertility'] should be the same
+df.fitted[1,'predicted_fertility']
+
+# approach3:
+# we can also extract the intercept and slope and use them for prediction
+rv=return_intercept_slope(fit)
+vv=expit(rv$intercepts[1]+rv$slopes[1]*2007)
+
+## defining a spline function ----
+# spline function here with 2 knots create a linear function 
+knot1=apply(mapped.fertility.rate[,,as.character(2008:2012)],c('age','race'),mean)
+knot2=apply(mapped.fertility.rate[,,as.character(2018:2022)],c('age','race'),mean)
+ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
+                                         knot.values = list(time1=knot1,time2=knot2))
+qplot(2007:2040,sapply(ff$project(2007:2040),function(x){x[[12]]}))
+
+ 
+
+
+
+
