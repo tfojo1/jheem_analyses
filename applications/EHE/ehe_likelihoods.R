@@ -241,6 +241,42 @@ general.mortality.likelihood.instructions =
   )
 
 #-- SUPPRESSION  --#
+TOTAL.suppression.likelihood.instructions = 
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
+                                                   outcome.for.sim = "suppression",
+                                                   denominator.outcome.for.data = 'diagnosed.prevalence',
+                                                   
+                                                   # want to be able to specify max # for each location type;
+                                                   # have to decide how to order (probably by denominator)
+                                                   location.types = c('COUNTY','STATE','CBSA'), 
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   # limit.to.n.location
+                                                   
+                                                   dimensions = c("age","sex","race","risk"),
+                                                   #dimensions = c("sex"),
+                                                   levels.of.stratification = c(0), 
+                                                   from.year = 2008, 
+                                                   
+                                                   maximum.locations.per.type = 2,
+                                                   
+                                                   p.bias.inside.location = suppression.bias.estimates$in.mean, 
+                                                   p.bias.outside.location = suppression.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = suppression.bias.estimates$in.sd,
+                                                   p.bias.sd.outside.location = suppression.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry', 
+                                                   p.error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
+                                                   p.error.variance.type = 'sd',
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = list(1), 
+                                                   equalize.weight.by.year = T 
+  )
+
 suppression.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
                                                    outcome.for.sim = "suppression",
@@ -560,31 +596,47 @@ number.of.tests.year.on.year.change.likelihood.instructions =
     number.of.tests.year.on.year.change.nested.likelihood.instructions
   )
   
+gonorrhea.year.on.year.change.likelihood.instructions.test = 
+  create.basic.ratio.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", 
+                                             outcome.for.sim = "sexual.transmission.rates", 
+                                             # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
+                                             # (2020 sexual transmisson/2019 sexual transmission)
+                                             levels.of.stratification = c(0,1), 
+                                             dimensions = c("sex","race","age"),
+                                             from.year = 2018, 
+                                             observation.correlation.form = 'compound.symmetry', 
+                                             error.variance.term = 0.03, # pick a smarter one
+                                             error.variance.type = 'cv',
+                                             correlation.different.years = 0.5,
+                                             
+                                             weights = list(1), 
+                                             equalize.weight.by.year = F 
+  )
 
 #-- YEAR-ON-YEAR GONORRHEA CHANGE --#
-gonorrhea.year.on.year.change.likelihood.instructions = 
-  create.time.lagged.comparison.likelihood.instructions.with.included.multiplier(outcome.for.data = "gonorrhea.ratio", 
-                                                                                 outcome.for.sim = "sexual.transmission.rates", 
-                                                                                 # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
-                                                                                 # (2020 sexual transmisson/2019 sexual transmission)
-                                                                                 levels.of.stratification = c(0,1), 
-                                                                                 dimensions = c("sex","race","age"),
-                                                                                 from.year = 2018, 
-                                                                                 observation.correlation.form = 'compound.symmetry', 
-                                                                                 error.variance.term = 0.03, # pick a smarter one
-                                                                                 error.variance.type = 'cv',
-                                                                                 correlation.different.years = 0.5,
-                                                                                 
-                                                                                 # ratio of HIV transmission (year-on-year) is proportional 
-                                                                                 # to ratio of gonorrhea transmission (year-on-year) 
-                                                                                 # with best estimate of 1 but can be off by X%
-                                                                                 included.multiplier = 1,
-                                                                                 included.multiplier.sd = 0.1232992, # see applications/EHE/ehe_sti_included_multiplier.R
-                                                                                 included.multiplier.correlation = 0.5,
-                                                                                 
-                                                                                 weights = list(1), 
-                                                                                 equalize.weight.by.year = F 
-  )
+# gonorrhea.year.on.year.change.likelihood.instructions = 
+#   create.time.lagged.comparison.likelihood.instructions.with.included.multiplier(outcome.for.data = "gonorrhea.ratio", 
+#                                                                                  outcome.for.sim = "sexual.transmission.rates", 
+#                                                                                  # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
+#                                                                                  # (2020 sexual transmisson/2019 sexual transmission)
+#                                                                                  levels.of.stratification = c(0,1), 
+#                                                                                  dimensions = c("sex","race","age"),
+#                                                                                  from.year = 2018, 
+#                                                                                  observation.correlation.form = 'compound.symmetry', 
+#                                                                                  error.variance.term = 0.03, # pick a smarter one
+#                                                                                  error.variance.type = 'cv',
+#                                                                                  correlation.different.years = 0.5,
+#                                                                                  
+#                                                                                  # ratio of HIV transmission (year-on-year) is proportional 
+#                                                                                  # to ratio of gonorrhea transmission (year-on-year) 
+#                                                                                  # with best estimate of 1 but can be off by X%
+#                                                                                  included.multiplier = 1,
+#                                                                                  included.multiplier.sd = 0.1232992, # see applications/EHE/ehe_sti_included_multiplier.R
+#                                                                                  included.multiplier.correlation = 0.5,
+#                                                                                  
+#                                                                                  weights = list(1), 
+#                                                                                  equalize.weight.by.year = F 
+#   )
 
 TEST.gonorrhea.year.on.year.change.likelihood.instructions =
   create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea.ratio",
