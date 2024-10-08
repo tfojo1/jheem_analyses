@@ -596,7 +596,7 @@ number.of.tests.year.on.year.change.likelihood.instructions =
     number.of.tests.year.on.year.change.nested.likelihood.instructions
   )
   
-gonorrhea.year.on.year.change.likelihood.instructions.test = 
+gonorrhea.year.on.year.change.likelihood.instructions = 
   create.basic.ratio.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", 
                                              outcome.for.sim = "sexual.transmission.rates", 
                                              # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
@@ -638,22 +638,6 @@ gonorrhea.year.on.year.change.likelihood.instructions.test =
 #                                                                                  equalize.weight.by.year = F 
 #   )
 
-TEST.gonorrhea.year.on.year.change.likelihood.instructions =
-  create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea.ratio",
-                                                        outcome.for.sim = "sexual.transmission.rates",
-                                                        # (2020 gon diagnoses / 2019 gon diagnoses) proportional to
-                                                        # (2020 sexual transmisson/2019 sexual transmission)
-                                                        levels.of.stratification = c(0,1),
-                                                        dimensions = c("sex","race","age"),
-                                                        from.year = 2018,
-                                                        observation.correlation.form = 'compound.symmetry',
-                                                        error.variance.term = 0.03, # pick a smarter one
-                                                        error.variance.type = 'cv',
-                                                        correlation.different.years = 0.5,
-                                                        weights = list(1),
-                                                        equalize.weight.by.year = F
-  )
-
 # race.gonorrhea.year.on.year.change.likelihood.instructions = 
 #   create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", # zoe changing 0-14 to 13-14, throw out 'unknown'
 #                                                         outcome.for.sim = "sexual.transmission.rates", 
@@ -672,28 +656,45 @@ TEST.gonorrhea.year.on.year.change.likelihood.instructions =
 
 #-- YEAR-ON-YEAR SYPHILIS CHANGE --#
 ps.syphilis.year.on.year.change.likelihood.instructions = 
-  create.time.lagged.comparison.likelihood.instructions.with.included.multiplier(outcome.for.data = "ps.syphilis.ratio", 
-                                                                                 outcome.for.sim = "sexual.transmission.rates", 
-                                                                                 # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
-                                                                                 # (2020 sexual transmisson/2019 sexual transmission)
-                                                                                 levels.of.stratification = c(0,1), 
-                                                                                 dimensions = c("sex","race","age"),
-                                                                                 from.year = 2018, 
-                                                                                 observation.correlation.form = 'compound.symmetry', 
-                                                                                 error.variance.term = 0.03, # pick a smarter one
-                                                                                 error.variance.type = 'cv',
-                                                                                 correlation.different.years = 0.5,
-                                                                                 
-                                                                                 # ratio of HIV transmission (year-on-year) is proportional 
-                                                                                 # to ratio of ps transmission (year-on-year) 
-                                                                                 # with best estimate of 1 but can be off by X%
-                                                                                 included.multiplier = 1,
-                                                                                 included.multiplier.sd = 0.1232992, # see applications/EHE/ehe_sti_included_multiplier.R
-                                                                                 included.multiplier.correlation = 0.5,
-                                                                                 
-                                                                                 weights = list(1), 
-                                                                                 equalize.weight.by.year = F 
+  create.basic.ratio.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", 
+                                             outcome.for.sim = "sexual.transmission.rates", 
+                                             # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
+                                             # (2020 sexual transmisson/2019 sexual transmission)
+                                             levels.of.stratification = c(0,1), 
+                                             dimensions = c("sex","race","age"),
+                                             from.year = 2018, 
+                                             observation.correlation.form = 'compound.symmetry', 
+                                             error.variance.term = 0.03, # pick a smarter one
+                                             error.variance.type = 'cv',
+                                             correlation.different.years = 0.5,
+                                             
+                                             weights = list(1), 
+                                             equalize.weight.by.year = F 
   )
+
+# ps.syphilis.year.on.year.change.likelihood.instructions = 
+#   create.time.lagged.comparison.likelihood.instructions.with.included.multiplier(outcome.for.data = "ps.syphilis.ratio", 
+#                                                                                  outcome.for.sim = "sexual.transmission.rates", 
+#                                                                                  # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
+#                                                                                  # (2020 sexual transmisson/2019 sexual transmission)
+#                                                                                  levels.of.stratification = c(0,1), 
+#                                                                                  dimensions = c("sex","race","age"),
+#                                                                                  from.year = 2018, 
+#                                                                                  observation.correlation.form = 'compound.symmetry', 
+#                                                                                  error.variance.term = 0.03, # pick a smarter one
+#                                                                                  error.variance.type = 'cv',
+#                                                                                  correlation.different.years = 0.5,
+#                                                                                  
+#                                                                                  # ratio of HIV transmission (year-on-year) is proportional 
+#                                                                                  # to ratio of ps transmission (year-on-year) 
+#                                                                                  # with best estimate of 1 but can be off by X%
+#                                                                                  included.multiplier = 1,
+#                                                                                  included.multiplier.sd = 0.1232992, # see applications/EHE/ehe_sti_included_multiplier.R
+#                                                                                  included.multiplier.correlation = 0.5,
+#                                                                                  
+#                                                                                  weights = list(1), 
+#                                                                                  equalize.weight.by.year = F 
+#   )
 
 # race.ps.syphilis.year.on.year.change.likelihood.instructions = 
 #   create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # zoe working on this
