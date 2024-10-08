@@ -32,17 +32,13 @@ data.list.births.clean = lapply(data.list.births, function(file){
   data$location_flag = locations::is.location.valid(data$location)
   data = subset(data, data$location_flag != 'FALSE')
   
-  data <- data %>% #Fixing Dade and St Geneive Counties
-    mutate(location = ifelse(location == "12025", "12086", location))%>%
-    mutate(location = ifelse(location == "29193", "29186", location))
-  
   ##Removing births = suppressed or Missing County##
   ##'Missing County' appears when county data is not available for a certain year. 
   #This occurs because the county did not meet minimum population standards and thus the data for the county was recoded to the "Unidentified Counties"
   data = subset(data, data$Births != "Suppressed") 
   data = subset(data, data$Births != "Missing County")
   data$value = as.numeric(data$Births)
-  data$Births = as.numeric(data$Births)
+  
 
    if(grepl("bridged.race", filename)) {
   data$race = data$`Mother.s.Bridged.Race`
@@ -55,20 +51,20 @@ data.list.births.clean = lapply(data.list.births, function(file){
        data$race = if_else(data$race == "Native Hawaiian or Other Pacific Islander" | data$race == "Asian", "Asian or Pacific Islander", data$race)
      }
      
-     data <- data %>%
-       select(outcome, year, location, value, race, ethnicity, Births)
+      data <- data %>%
+        select(outcome, year, location, value, race, ethnicity)
      
      if(grepl("single.race", filename)) {
        
        #Now re-calculate the rate for the combined asian + native hawaiian pacific islander group
        data <- data %>%
          group_by(year, location, ethnicity, race)%>%
-         mutate(combined.asian.births = sum(Births))%>%
+         mutate(combined.asian.births = sum(value))%>%
          select(-value)%>%
          rename(value = combined.asian.births)%>%
          ungroup()
      }
-
+     
   data = as.data.frame(data)
   list(filename, data)  
   
@@ -92,10 +88,6 @@ data.list.births.denominator = lapply(data.list.births, function(file){
   #Remove locations that are invalid
   data$location_flag = locations::is.location.valid(data$location)
   data = subset(data, data$location_flag != 'FALSE')
-  
-  data <- data %>% #Fixing Dade and St Geneive Counties
-    mutate(location = ifelse(location == "12025", "12086", location))%>%
-    mutate(location = ifelse(location == "29193", "29186", location))
   
   ##Removing births = suppressed or Missing County##
   ##'Missing County' appears when county data is not available for a certain year. 
@@ -216,10 +208,6 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
   
    data = subset(data, data$ethnicity != "Not Stated")
    data = subset(data, data$age != "Not Stated")
-  
-   data <- data %>% #Fixing Dade and St Geneive Counties
-     mutate(location = ifelse(location == "12025", "12086", location))%>%
-     mutate(location = ifelse(location == "29193", "29186", location))
    
      data <- data %>%
       select(outcome, year, location, value, sex, age, race, ethnicity)
@@ -263,10 +251,6 @@ data.list.deaths.denom = lapply(data.list.deaths, function(file){
   
    data = subset(data, data$ethnicity != "Not Stated")
    data = subset(data, data$age != "Not Stated")
-   
-   data <- data %>% #Fixing Dade and St Geneive Counties
-     mutate(location = ifelse(location == "12025", "12086", location))%>%
-     mutate(location = ifelse(location == "29193", "29186", location))
 
      data <- data %>%
        select(outcome, year, location, value, sex, age, race, ethnicity)
