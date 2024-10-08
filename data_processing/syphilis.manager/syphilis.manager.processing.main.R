@@ -277,6 +277,7 @@ data.manager$register.source('prep.indications.aggregated.county', parent.source
 data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
 data.manager$register.source('census.aggregated.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
 
+
 # Establish Ontologies ----------------------------------------------------
 
 data.manager$register.ontology(
@@ -489,6 +490,15 @@ put.msa.data.as.new.source(outcome = 'hiv.suppression',
                            data.manager= syphilis.manager,
                            source.for.denominator= 'cdc.hiv',
                            ontology.for.denominator= 'cdc') 
+
+put.msa.data.as.new.source(outcome = 'deaths',
+                           from.source.name= 'census.deaths',
+                           to.source.name = 'census.aggregated.population', 
+                           to.locations = MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager= syphilis.manager) 
 
 all.states = locations::get.all.for.type('state')
 #Aggregates census

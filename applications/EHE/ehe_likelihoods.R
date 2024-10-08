@@ -4,7 +4,7 @@
 # heroin, cocaine
 
 
-#-- BIAS ESTIMATES FOR NESTED PROPORTIONS  --#
+#-- BIAS ESTIMATES FOR NESTED PROPORTIONS  ----
 suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
                                                            version = 'ehe')
 
@@ -76,7 +76,7 @@ pop.year.cvs = .015*seq(1,2,length=10)
 pop.year.cvs = c(pop.year.cvs,pop.year.cvs)
 names(pop.year.cvs) = 2010:2029
 
-#-- POPULATION  --#
+#-- POPULATION  ----
 population.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
                                        outcome.for.sim = "population",
@@ -110,7 +110,7 @@ population.likelihood.instructions =
                                        equalize.weight.by.year = F
   )
 
-#-- IMMIGRATION  --#
+#-- IMMIGRATION  ----
 immigration.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
                                        outcome.for.sim = "immigration",
@@ -124,7 +124,7 @@ immigration.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-#-- EMIGRATION  --#
+#-- EMIGRATION  ----
 emigration.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
                                        outcome.for.sim = "emigration",
@@ -139,7 +139,7 @@ emigration.likelihood.instructions =
   )
 
 
-#-- NEW DIAGNOSES  --#
+#-- NEW DIAGNOSES  ----
 total.new.diagnoses.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                        outcome.for.sim = "new",
@@ -166,7 +166,7 @@ new.diagnoses.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-#-- PREVALENCE  --#
+#-- PREVALENCE  ----
 total.prevalence.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                        outcome.for.sim = "diagnosed.prevalence",
@@ -194,7 +194,7 @@ prevalence.likelihood.instructions =
   )
 
 
-#-- AIDS DIAGNOSES  --#
+#-- AIDS DIAGNOSES  ----
 non.age.aids.diagnoses.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                                                 outcome.for.sim = "aids.diagnoses",
@@ -210,7 +210,7 @@ non.age.aids.diagnoses.likelihood.instructions =
                                                                 equalize.weight.by.year = F
   )
 
-#-- HIV-MORTALITY  --#
+#-- HIV-MORTALITY  ----
 # all-cause mortality among pwh
 hiv.mortality.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
@@ -225,7 +225,7 @@ hiv.mortality.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-#-- GENERAL MORTALITY  --#
+#-- GENERAL MORTALITY  ----
 # everyone in the population, regardless of HIV 
 general.mortality.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "deaths",
@@ -240,43 +240,7 @@ general.mortality.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-#-- SUPPRESSION  --#
-TOTAL.suppression.likelihood.instructions = 
-  create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
-                                                   outcome.for.sim = "suppression",
-                                                   denominator.outcome.for.data = 'diagnosed.prevalence',
-                                                   
-                                                   # want to be able to specify max # for each location type;
-                                                   # have to decide how to order (probably by denominator)
-                                                   location.types = c('COUNTY','STATE','CBSA'), 
-                                                   minimum.geographic.resolution.type = 'COUNTY',
-                                                   # limit.to.n.location
-                                                   
-                                                   dimensions = c("age","sex","race","risk"),
-                                                   #dimensions = c("sex"),
-                                                   levels.of.stratification = c(0), 
-                                                   from.year = 2008, 
-                                                   
-                                                   maximum.locations.per.type = 2,
-                                                   
-                                                   p.bias.inside.location = suppression.bias.estimates$in.mean, 
-                                                   p.bias.outside.location = suppression.bias.estimates$out.mean,
-                                                   p.bias.sd.inside.location = suppression.bias.estimates$in.sd,
-                                                   p.bias.sd.outside.location = suppression.bias.estimates$out.sd,
-                                                   
-                                                   within.location.p.error.correlation = 0.5,
-                                                   within.location.n.error.correlation = 0.5,
-                                                   
-                                                   observation.correlation.form = 'compound.symmetry', 
-                                                   p.error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
-                                                   p.error.variance.type = 'sd',
-                                                   
-                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
-                                                   
-                                                   weights = list(1), 
-                                                   equalize.weight.by.year = T 
-  )
-
+#-- SUPPRESSION  ----
 suppression.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
                                                    outcome.for.sim = "suppression",
@@ -313,7 +277,7 @@ suppression.likelihood.instructions =
                                                    equalize.weight.by.year = T 
   )
 
-#-- AIDS DEATHS  --#
+#-- AIDS DEATHS  ----
 # in the data, this is the cumulative estimate of aids.diagnoses.deceased.by.2001 from 1980-2001 
 # e.g., 1995 aids.diagnoses.deceased.by.2001 gives everyone diagnosed in 1995 who is deceased by 2001 (NOT that they died in 1995)
 # so cumulative total will be helpful to get totals by sex/race/risk
@@ -331,7 +295,7 @@ aids.deaths.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-#-- PREP UPTAKE  --#
+#-- PREP UPTAKE  ----
 prep.uptake.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "prep",
                                        outcome.for.sim = "prep.uptake", 
@@ -345,7 +309,7 @@ prep.uptake.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-#-- PREP INDICATIONS  --#
+#-- PREP INDICATIONS  ----
 # this is an absolute count, not a proportion 
 prep.indications.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "prep.indications",
@@ -362,7 +326,7 @@ prep.indications.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
-#-- AWARENESS --#
+#-- AWARENESS ----
 awareness.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "awareness",
                                                    outcome.for.sim = "awareness",
@@ -396,7 +360,7 @@ awareness.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
-#-- HEROIN  --#
+#-- HEROIN  ----
 heroin.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
                                                    outcome.for.sim = "proportion.using.heroin",
@@ -429,7 +393,7 @@ heroin.likelihood.instructions =
                                                    equalize.weight.by.year = T 
   )
 
-#-- COCAINE  --#
+#-- COCAINE  ----
 cocaine.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "cocaine",
                                                    outcome.for.sim = "proportion.using.cocaine",
@@ -462,7 +426,7 @@ cocaine.likelihood.instructions =
                                                    equalize.weight.by.year = T 
   )
 
-#-- PROPORTION TESTED --#
+#-- PROPORTION TESTED ----
 proportion.tested.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
                                                    outcome.for.sim = "testing",
@@ -493,7 +457,7 @@ proportion.tested.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
-#-- HIV TEST POSITIVITY --#
+#-- HIV TEST POSITIVITY ----
 hiv.test.positivity.likelihood.instructions =
   create.nested.proportion.likelihood.instructions.with.included.multiplier(outcome.for.data = "cdc.hiv.test.positivity",
                                                    outcome.for.sim = "cdc.hiv.test.positivity",
@@ -533,7 +497,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
-#-- YEAR-ON-YEAR TESTS CHANGE --#
+#-- YEAR-ON-YEAR TESTS CHANGE ----
 
 # nested version 
 number.of.tests.year.on.year.change.nested.likelihood.instructions = 
@@ -595,7 +559,8 @@ number.of.tests.year.on.year.change.likelihood.instructions =
     number.of.tests.year.on.year.change.basic.likelihood.instructions,
     number.of.tests.year.on.year.change.nested.likelihood.instructions
   )
-  
+
+#-- YEAR-ON-YEAR GONORRHEA CHANGE ----
 gonorrhea.year.on.year.change.likelihood.instructions = 
   create.basic.ratio.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", 
                                              outcome.for.sim = "sexual.transmission.rates", 
@@ -613,7 +578,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              equalize.weight.by.year = F 
   )
 
-#-- YEAR-ON-YEAR GONORRHEA CHANGE --#
+
 # gonorrhea.year.on.year.change.likelihood.instructions = 
 #   create.time.lagged.comparison.likelihood.instructions.with.included.multiplier(outcome.for.data = "gonorrhea.ratio", 
 #                                                                                  outcome.for.sim = "sexual.transmission.rates", 
@@ -654,7 +619,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
 #                                                         equalize.weight.by.year = F 
 #   )
 
-#-- YEAR-ON-YEAR SYPHILIS CHANGE --#
+#-- YEAR-ON-YEAR SYPHILIS CHANGE ----
 ps.syphilis.year.on.year.change.likelihood.instructions = 
   create.basic.ratio.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", 
                                              outcome.for.sim = "sexual.transmission.rates", 
@@ -712,7 +677,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
 #                                                         equalize.weight.by.year = F 
 #   )
 
-#-- JOIN THE POPULATION-RELATED LIKELIHOODS  --#
+#-- JOIN THE POPULATION-RELATED LIKELIHOODS --#  ----
 joint.pop.migration.total.trans.likelihood.instructions = 
   join.likelihood.instructions(population.likelihood.instructions,
                                immigration.likelihood.instructions,
@@ -721,7 +686,7 @@ joint.pop.migration.total.trans.likelihood.instructions =
                                total.prevalence.likelihood.instructions,
                                total.new.diagnoses.likelihood.instructions)
 
-#-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS  --#
+#-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
 transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
   join.likelihood.instructions(new.diagnoses.likelihood.instructions,
                                prevalence.likelihood.instructions,
@@ -737,7 +702,7 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
   )
 
 
-#-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# 
+#-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# ---- 
 FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
@@ -771,7 +736,7 @@ FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
   cocaine.likelihood.instructions
 )
 
-#-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# 
+#-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
 FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions, 
