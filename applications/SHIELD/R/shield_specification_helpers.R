@@ -695,18 +695,52 @@ oes.to.proportions <- function(oes, population)
 
 # FERTILITY ----
 #' @title get.fertility.rates.functional.form
-#' @description generating a functional form for fertility rates based on census data
+#' @description generating a functional form for fertility rates based on census data (see inputs/estimate_fertility_rate.R)
 #' @param location location
 #' @param specification.metadata specification.metadata
-#' @param population.years population.years
-#' @return a functional form for fertility rates to be used in the specification
-get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
-  # pull fertility rates
-  rates = get.fertility.rates.from.census(location=location,specification.metadata = specification.metadata)
-  #define a static functional form
-  create.static.functional.form(value = rates,
-                                link = "log", #use log to add multipliers as alpha main effects for calibration
-                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+#' @param population.years years for which data is available
+#' @return a spline functional form for fertility rates by age, race, year 
+get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=2007:2023){
+  # pull fertility rates for location
+  mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years)
+  df= melt(mapped.fertility.rates, varnames = c("age", "race", "year"), value.name = "fertility.rate")
+  
+  # fit the guassian estimate knot1/2
+  fit.fertility.rate<-function(df,time ){
+    #fit a 3 way model of age race year:
+    fit=glm(fertility.rate ~ age * race*year, data = df, family ='gaussian' )
+    # predict it for the given time point
+    predicted.values <- predict(fit, type = "response",newdata=df[df$year==time,])
+    # mapp the dimensions
+    target.dims=dim(mapped.fertility.rate)[1:2]
+    target.dimnames=dimnames(mapped.fertility.rate)[1:2]
+    predicted.values =array(predicted.values,dim =target.dims,dimnames =  target.dimnames) 
+    return(predicted.values)
+  } 
+  
+  knot1=fit.fertility.rate(df,2010)
+  knot2=fit.fertility.rate(df,2020)
+  ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
+                                           knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above
+                                           #how to project forward:
+                                        #since linear projections are too extereme, we multiply future prediction by a modifier set at 0.5
+                                           after.time = 2030,
+                                           after.modifier = 0.5,#modifier.min and .max could sample
+                                           modifiers.apply.to.change = T, # if True, modifier is multiplied into diff between knot1 and knot2 values; if False, modifier is multiplied into knot2 value
+                                           min = 0 # this is to prevent values from falling below 0
+                                        #@TODD: how does this modify the behavior
+  )
+  # we can run this to see the example plot:
+  #ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
+  # knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above
+  # #how to project forward:
+  # #since linear projections are too extereme, we multiply future prediction by a modifier set at 0.5
+  # after.time = 2030,
+  # after.modifier = 0.5,#modifier.min and .max could sample
+  # modifiers.apply.to.change = T, # if True, modifier is multiplied into diff between knot1 and knot2 values; if False, modifier is multiplied into knot2 value
+  # min = 0 # this is to prevent values from falling below 0
+  # )
+# qplot(2007:2040,sapply(ff$project(2007:2040),function(x){x[[12]]}))
 }
 
 #' @title get.fertility.rates.from.census
@@ -715,9 +749,8 @@ get.fertility.rates.functional.form<-function(location, specification.metadata, 
 #' @param specification.metadata specification.metadata
 #' @param population.years population.years
 #' @return returning the fertility rates in the correct dimension
-get.fertility.rates.from.census<-function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
-  #need to map race/ethnicity #make robust to age
-  
+get.fertility.rates.from.census<-function(location, specification.metadata, population.years=2007:2023){
+  #1- extract data from the census manager
   if (location=='US'){
     counties='US'
   }else{
@@ -729,34 +762,31 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
   if(length(counties)==0)
     stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
                 locations::get.location.name(location), ")"))
-  
-  fertility = CENSUS.MANAGER$pull(outcome='fertility.rate',
-                                  location = counties,
-                                  year= population.years,
-                                  keep.dimensions = c('location','age','race', 'ethnicity'), #@Todd,Andrew: it should work without the location but it fails
-                                  na.rm=TRUE)
-  
-  if (is.null(fertility))
+
+  fertility.rate = CENSUS.MANAGER$pull(outcome='fertility.rate',
+                                       location = counties,
+                                       year= population.years,
+                                       keep.dimensions = c('location','age','race', 'ethnicity','year'),  
+                                       na.rm=TRUE)
+  if (is.null(fertility.rate))
     stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
                 locations::get.location.name(location), ")"))
-  ####
-  female.population = CENSUS.MANAGER$pull(outcome='female.population',
-                                          location = counties,
-                                          year= population.years,
-                                          keep.dimensions = c('location','age','race', 'ethnicity'), #@Todd,Andrew: it should work without the location but it fails
-                                          na.rm=TRUE)
-    # mapping  fertility rate to correct dimensions in the simulation 
-  births=fertility*female.population
-  female.population[is.na(births)]=NA #remove the cases where births are NAs
-  #
-  target.dimnames=specification.metadata$dim.names[c('age','race')]
-  target.dimnames$age=FERTILE.AGES
   
-  mapped.births=map.value.ontology(births, target.dim.names = target.dimnames,na.rm = TRUE)
-  mapped.female.population=map.value.ontology(female.population, target.dim.names = target.dimnames,na.rm = TRUE)
-  #
-  mapped.fertility.rate=mapped.births/mapped.female.population
+  #2-map the dimensions to the target dimensions
+  # target.dimnames: we set this manually to include female of childbearing ages and correct years
+  #@PK: I need to make this more generalizable 
+  target.dimnames=target.dimnames <- list(
+    age = c(  "15-19 years", "20-24 years", "25-29 years", "30-34 years",
+              "35-39 years", "40-44 years"  ),
+    race = c("black", "hispanic", "other"),
+    year = as.character(population.years)
+  )
   
+  mapped.fertility.rate=map.value.ontology(fertility.rate, 
+                                           target.dim.names = target.dimnames,
+                                           na.rm = TRUE)
+  
+ 
   return(mapped.fertility.rate)
 }
 

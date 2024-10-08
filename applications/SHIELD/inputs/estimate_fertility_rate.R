@@ -250,6 +250,28 @@ plot.projected.values(type='glm.three.way',family='gaussian')[4]
 plot.projected.values(type='glm.three.way',family='quasibinomial')[4]
  
 
+
+
+## defining a spline function ----
+# spline function here with 2 knots create a linear function 
+
+# we can use projections from the linear model for the spline knots 
+knot1=apply(mapped.fertility.rate[,,as.character(2008:2012)],c('age','race'),mean)
+knot2=apply(mapped.fertility.rate[,,as.character(2018:2022)],c('age','race'),mean)
+ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020, time3=2030),
+                                         knot.values = list(time1=knot1,
+                                                            time2=knot2, 
+                                                            time3=knot2+0.5*(knot2-knot1)))
+qplot(2007:2040,sapply(ff$project(2007:2040),function(x){x[[12]]}))
+
+#there is acode for sampling knot3 coef as a function of knot2
+#logistic tail
+
+
+
+
+
+
 # Manual EXAMPLE: ----
 fit=fit.models(type="glm.three.way",family="quasibinomial");fit
 
@@ -274,15 +296,6 @@ df.fitted[1,'predicted_fertility']
 rv=return_intercept_slope(fit)
 vv=expit(rv$intercepts[1]+rv$slopes[1]*2007)
 
-## defining a spline function ----
-# spline function here with 2 knots create a linear function 
-knot1=apply(mapped.fertility.rate[,,as.character(2008:2012)],c('age','race'),mean)
-knot2=apply(mapped.fertility.rate[,,as.character(2018:2022)],c('age','race'),mean)
-ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
-                                         knot.values = list(time1=knot1,time2=knot2))
-qplot(2007:2040,sapply(ff$project(2007:2040),function(x){x[[12]]}))
-
- 
 
 
 

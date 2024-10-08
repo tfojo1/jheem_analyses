@@ -1,51 +1,18 @@
 # LIKELIHOODS INCLUDED: 
-# population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
-# AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
-# heroin, cocaine
-
-#' @title shield.partitioning.function
-#' @description  ????
-#' @param arr ???
-#' @param version version
-#' @param location location
-#' @return ????
-SHIELD.PARTITIONING.FUNCTION = function(arr, version='shield', location){
-  if ("sex" %in% names(dim(arr)) &&
-      all(array.access(arr, sex='msm')==array.access(arr, sex='heterosexual_male')))
-  {
-    specification.metadata = get.specification.metadata(version=version, location=location)
-    proportion.msm = get.best.guess.msm.proportions(location,
-                                                    specification.metadata = specification.metadata,
-                                                    keep.age = any(names(dim(arr))=='age'),
-                                                    keep.race = any(names(dim(arr))=='race'),
-                                                    ages = dimnames(arr)$age)
-
-    
-    sex.partition.arr = c(as.numeric(proportion.msm), 1-as.numeric(proportion.msm))
-    sex.partition.dimnames = c(dimnames(proportion.msm), list(sex=c('msm','heterosexual_male')))
-    dim(sex.partition.arr) = sapply(sex.partition.dimnames, length)
-    dimnames(sex.partition.arr) = sex.partition.dimnames
-    
-    sex.modified = array.access(arr, sex.partition.dimnames)
-    sex.modified = sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
-    
-    array.access(arr, dimnames(sex.modified)) = sex.modified
-  }
-  arr
-}
-
-# redo this when we get the new data 
-# pop.year.cvs = .015*seq(1,2,length=10)
-# pop.year.cvs = c(pop.year.cvs,pop.year.cvs)
-# names(pop.year.cvs) = 2010:2029
-
+# population,
+ # BIRTHS? By trata? 
+# DEATHS? By strata?
+ 
 #-- POPULATION----
+# Basic likelihood: where we have data at the location level desired# sometimes we dont have the calibration data for the location of interest. so for example we need to calibrate prop aware in Baltimiore to data from MD and building some uncertainty to account for similarities between those locations
 population.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "population", 
                                        outcome.for.sim = "population",
                                        dimensions = c("age","sex","race"),
-                                       levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
-                                       from.year = 2010, #@TODD: why 2010? 
+                                       levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g., age race)
+                                       from.year = 2010, #the year calibration starts (popualtion size and demographics are fix to 2007)
+                                       
+                                       #measurement error: if census data is off in one year, how much is it off the next year or different strata?
                                        correlation.different.years = 0.5, # this is the default
                                        correlation.different.strata = 0.1, # this is the default
                                        correlation.different.sources = 0.3, # default

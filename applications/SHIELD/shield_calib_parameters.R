@@ -2,12 +2,25 @@
 # Defining the calibration parameters and prior distributions
 
 #1- PARAMETER PRIORS:----
+races=model.settings$specification.metadata$dim.names$race
+fertile.ages=model.settings$specification.metadata$dim.names$age[2:7]
+fertile.age.ranges= c("15.19","20.24","25.29","30.34","35.39","40.44") 
+
 ##--- Population param priors ----
 POPULATION.PARAMETERS.PRIOR=join.distributions( 
-  ## Fertility rates by race
+  ## Fertility rates 
+  # (6 agegroups, 3 race, 2 knots)-> max 36 params
+  # we start with 6 age, and 3 race, parameters applied to both knots -> 9 total
   black.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   hispanic.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   other.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  
+  age15.19.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  age20.24.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  age25.29.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  age30.34.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  age35.39.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  age40.44.fertility.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
   # Mortality rates by race:
   black.general.mortality.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -62,15 +75,34 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){
                                                    applies.to.dimension.values = c("black","hispanic"))
   }
   
-  ## Fertility rates by race----
-  #applies the 3 race multipliers to the fertility
-  races=model.settings$specification.metadata$dim.names$race
+  ## Fertility rates by race/age to time1/time2 knots----
+  #when we have a function with knots, we use alpha.name = time (taking one at a time)
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "fertility.rate",
-                                                 alpha.name = 'value',
+                                                 alpha.name = "time1",
                                                  values = parameters[paste0(races,".fertility.rate.multiplier")],
                                                  dimension = "race",
                                                  applies.to.dimension.values = races)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "fertility.rate",
+                                                 alpha.name = "time2",
+                                                 values = parameters[paste0(races,".fertility.rate.multiplier")],
+                                                 dimension = "race",
+                                                 applies.to.dimension.values = races)
+  
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "fertility.rate",
+                                                 alpha.name = 'time1',
+                                                 values = parameters[paste0("age",fertile.age.ranges,".fertility.rate.multiplier")],
+                                                 dimension = "age",
+                                                 applies.to.dimension.values = fertile.ages)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "fertility.rate",
+                                                 alpha.name = 'time2',
+                                                 values = parameters[paste0("age",fertile.age.ranges,".fertility.rate.multiplier")],
+                                                 dimension = "age",
+                                                 applies.to.dimension.values = fertile.ages)
+  
   
   ## Mortality rates by race----
   races=model.settings$specification.metadata$dim.names$race
@@ -102,9 +134,16 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){
 #could add more params here (1-5 per block)
 ##---- Population sampling block ----
 SHIELD.POPULATION.SAMPLING.BLOCKS = list(
-  fertility.rates=c("black.fertility.rate.multiplier",
+  fertility.rates.race=c("black.fertility.rate.multiplier",
                     "hispanic.fertility.rate.multiplier",
                     "other.fertility.rate.multiplier"),
+  
+  fertility.rates.age=c("age15.19.fertility.rate.multiplier",
+                    "age20.24.fertility.rate.multiplier",
+                    "age25.29.fertility.rate.multiplier",
+                    "age30.34.fertility.rate.multiplier",
+                    "age35.39.fertility.rate.multiplier",
+                    "age40.44.fertility.rate.multiplier"),
   
   mortality.rates.by.race=c("black.general.mortality.rate.multiplier",
                             "hispanic.general.mortality.rate.multiplier",
