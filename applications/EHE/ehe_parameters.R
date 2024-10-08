@@ -10,7 +10,7 @@ HET.BASE.TRATE.MEAN = .25 # from https://www.shelbytnhealth.com/DocumentCenter/V
 IDU.BASE.TRATE.MEAN = 12
 BASE.TRATE.CV = 20
 
-TRATE.RR.1.2.SPAN = 2#1.5
+TRATE.RR.1.2.SPAN = 4#1.5
 TRATE.RR.0.1.SPAN = 4#2#1.5
 TRATE.RR.0.PEAK.SPAN = 8#3
 
