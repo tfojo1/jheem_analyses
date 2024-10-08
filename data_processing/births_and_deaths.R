@@ -24,39 +24,51 @@ data.list.births.clean = lapply(data.list.births, function(file){
   data$year = as.character(data$Year)
   data$outcome= "births"
   data$ethnicity = data$`Mother.s.Hispanic.Origin`
+  
+  #Fix Location Codes
+  data$location= str_pad(data$`County.Code`, width=5, side="left", pad="0")
+  data$location = as.character(data$location)
+  #Remove locations that are invalid
+  data$location_flag = locations::is.location.valid(data$location)
+  data = subset(data, data$location_flag != 'FALSE')
+  
+  data <- data %>% #Fixing Dade and St Geneive Counties
+    mutate(location = ifelse(location == "12025", "12086", location))%>%
+    mutate(location = ifelse(location == "29193", "29186", location))
+  
+  ##Removing births = suppressed or Missing County##
+  ##'Missing County' appears when county data is not available for a certain year. 
+  #This occurs because the county did not meet minimum population standards and thus the data for the county was recoded to the "Unidentified Counties"
+  data = subset(data, data$Births != "Suppressed") 
+  data = subset(data, data$Births != "Missing County")
+  data$value = as.numeric(data$Births)
+  data$Births = as.numeric(data$Births)
 
-   if(grepl("07.19", filename)) {
+   if(grepl("bridged.race", filename)) {
   data$race = data$`Mother.s.Bridged.Race`
    }
-   if(grepl("20.22", filename)) {
-  data$race = data$`Mother.s.Single.Race`
-   }
-
-  #Combining racial groups from bridged and single
-  #Todd said for now to leave in Not reported, not available, and unknown and add to the ontology
-  data$race = if_else(data$race == "Native Hawaiian or Other Pacific Islander" | data$race == "Asian", "Asian or Pacific Islander", data$race)
-
-##Removing births = suppressed or Missing County##
-##'Missing County' appears when county data is not available for a certain year. 
-#This occurs because the county did not meet minimum population standards and thus the data for the county was recoded to the "Unidentified Counties"
-   data = subset(data, data$Births != "Suppressed") 
-   data = subset(data, data$Births != "Missing County")
-   data$value = as.numeric(data$Births)
-   
-   #Fix Location Codes
-   data$location= str_pad(data$`County.Code`, width=5, side="left", pad="0")
-   data$location = as.character(data$location)
-   #Remove locations that are invalid
-   data$location_flag = locations::is.location.valid(data$location)
-   data = subset(data, data$location_flag != 'FALSE')
-
-   data <- data %>% #Fixing Dade and St Geneive Counties
-     mutate(location = ifelse(location == "12025", "12086", location))%>%
-     mutate(location = ifelse(location == "29193", "29186", location))
-   
-  data <- data %>%
-    select(outcome, year, location, value, race, ethnicity)
   
+   if(grepl("single.race", filename)) {
+       data$race = data$`Mother.s.Single.Race`
+       #Combining racial groups from bridged and single
+       #Todd said for now to leave in Not reported, not available, and unknown and add to the ontology
+       data$race = if_else(data$race == "Native Hawaiian or Other Pacific Islander" | data$race == "Asian", "Asian or Pacific Islander", data$race)
+     }
+     
+     data <- data %>%
+       select(outcome, year, location, value, race, ethnicity, Births)
+     
+     if(grepl("single.race", filename)) {
+       
+       #Now re-calculate the rate for the combined asian + native hawaiian pacific islander group
+       data <- data %>%
+         group_by(year, location, ethnicity, race)%>%
+         mutate(combined.asian.births = sum(Births))%>%
+         select(-value)%>%
+         rename(value = combined.asian.births)%>%
+         ungroup()
+     }
+
   data = as.data.frame(data)
   list(filename, data)  
   
@@ -74,25 +86,6 @@ data.list.births.denominator = lapply(data.list.births, function(file){
   data$outcome= "births.denominator"
   data$ethnicity = data$`Mother.s.Hispanic.Origin`
   
-  if(grepl("07.19", filename)) {
-    data$race = data$`Mother.s.Bridged.Race`
-  }
-  if(grepl("20.22", filename)) {
-    data$race = data$`Mother.s.Single.Race`
-  }
-  
-  #Combining racial groups from bridged and single
-  #Todd said for now to leave in Not reported, not available, and unknown and add to the ontology
-  data$race = if_else(data$race == "Native Hawaiian or Other Pacific Islander" | data$race == "Asian", "Asian or Pacific Islander", data$race)
-  
-  ##Removing births = suppressed or Missing County##
-  ##'Missing County' appears when county data is not available for a certain year. 
-  #This occurs because the county did not meet minimum population standards and thus the data for the county was recoded to the "Unidentified Counties"
-  data = subset(data, data$`Total.Population` != "Suppressed") 
-  data = subset(data, data$`Total.Population` != "Missing County")
-  data = subset(data, data$`Total.Population` != "Not Available")
-  data$value = as.numeric(data$`Total.Population`)
-  
   #Fix Location Codes
   data$location= str_pad(data$`County.Code`, width=5, side="left", pad="0")
   data$location = as.character(data$location)
@@ -103,6 +96,40 @@ data.list.births.denominator = lapply(data.list.births, function(file){
   data <- data %>% #Fixing Dade and St Geneive Counties
     mutate(location = ifelse(location == "12025", "12086", location))%>%
     mutate(location = ifelse(location == "29193", "29186", location))
+  
+  ##Removing births = suppressed or Missing County##
+  ##'Missing County' appears when county data is not available for a certain year. 
+  #This occurs because the county did not meet minimum population standards and thus the data for the county was recoded to the "Unidentified Counties"
+  data = subset(data, data$`Total.Population` != "Suppressed") 
+  data = subset(data, data$`Total.Population` != "Missing County")
+  data = subset(data, data$`Total.Population` != "Not Available")
+  data$value = as.numeric(data$`Total.Population`)
+  data$`Total.Population` = as.numeric(data$`Total.Population`)
+  
+  if(grepl("bridged.race", filename)) {
+    data$race = data$`Mother.s.Bridged.Race`
+  }
+  
+  if(grepl("single.race", filename)) {
+    data$race = data$`Mother.s.Single.Race`
+    #Combining racial groups from bridged and single
+    #Todd said for now to leave in Not reported, not available, and unknown and add to the ontology
+    data$race = if_else(data$race == "Native Hawaiian or Other Pacific Islander" | data$race == "Asian", "Asian or Pacific Islander", data$race)
+  }
+  
+  data <- data %>%
+    select(outcome, year, location, value, race, ethnicity, Total.Population)
+  
+  if(grepl("single.race", filename)) {
+    
+    #Now re-calculate the rate for the combined asian + native hawaiian pacific islander group
+    data <- data %>%
+      group_by(year, location, ethnicity, race)%>%
+      mutate(combined.asian.population = sum(Total.Population))%>%
+      select(-value)%>%
+      rename(value = combined.asian.population)%>%
+      ungroup()
+  }
   
   data <- data %>%
     select(outcome, year, location, value, race, ethnicity)
