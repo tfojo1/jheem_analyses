@@ -9,37 +9,40 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 LOCATION = NYC.MSA
 
 if(LOCATION==BALTIMORE.MSA){
-  load(paste0("../jheem_analyses/prelim_results/full.with.covid2_simset_2024-09-27_",LOCATION,".Rdata"))
+  load(paste0("../jheem_analyses/prelim_results/full.with.covid2_simset_2024-10-03_",LOCATION,".Rdata"))
   simset.old = simset
   
-  load(paste0("../jheem_analyses/prelim_results/full.with.covid2_simset_2024-10-02_",LOCATION,".Rdata"))
+  load(paste0("../jheem_analyses/prelim_results/full.with.covid2_simset_2024-10-07_",LOCATION,".Rdata"))
   simset.new = simset
   
 } else {
-  load(paste0("../jheem_analyses/prelim_results/full.with.aids_simset_2024-09-27_",LOCATION,".Rdata"))
+  load(paste0("../jheem_analyses/prelim_results/full.with.aids_simset_2024-10-03_",LOCATION,".Rdata"))
   simset.old = simset
   
-  load(paste0("../jheem_analyses/prelim_results/full.with.aids_simset_2024-10-01_",LOCATION,".Rdata"))
+  load(paste0("../jheem_analyses/prelim_results/full.with.aids_simset_2024-10-05_",LOCATION,".Rdata"))
   simset.new = simset  
 }
 
-balt.lik = FULL.likelihood.instructions.with.covid$instantiate.likelihood('ehe','C.12580')
-nyc.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.35620')
-houston.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.26420')
-chicago.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.16980')
-atl.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.12060')
+#nyc.sti.test.lik = gonorrhea.year.on.year.change.likelihood.instructions.test$instantiate.likelihood('ehe','C.35620')
 
-#atl.pop.lik$compare.sims(simset.old$last.sim(),simset.new$last.sim()) 
+# balt.lik = FULL.likelihood.instructions.with.covid$instantiate.likelihood('ehe','C.12580')
+nyc.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.35620')
+# houston.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.26420')
+#chicago.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.16980')
+# atl.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.12060')
+
+chicago.lik$compare.sims(simset.old$last.sim(),simset.new$last.sim()) 
 #exp(atl.pop.lik$compute(simset.new$last.sim()) - atl.pop.lik$compute(simset.old$last.sim()))
 
 simplot(simset.old$last.sim(),
+        #simset.new,
         simset.new$last.sim(),
         facet.by = "age", split.by = "race", # age, sex, race; 1- and 2-way
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
 
-simplot(#simset.old$last.sim(),
-        simset.new,
+simplot(simset.old$last.sim(),
+        #simset.new,
         simset.new$last.sim(),
         outcomes = c("diagnosed.prevalence"), 
         style.manager = source.style.manager,
@@ -117,5 +120,12 @@ simplot(simset.old$last.sim(),
 simplot(simset.old$last.sim(),
         simset.new$last.sim(),
         outcomes = c("total.mortality"), # totals only 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(simset.old$last.sim(),
+        simset.new$last.sim(),
+        facet.by = "risk", # age, sex, race, risk; 1-way 
+        outcomes = c("suppression"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
