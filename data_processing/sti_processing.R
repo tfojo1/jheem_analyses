@@ -59,7 +59,7 @@ syphilis.clean = lapply(syphilis.data, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
-    data = subset(data, data$race != "Unknown")
+    #data = subset(data, data$race != "Unknown")
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -76,12 +76,12 @@ syphilis.clean = lapply(syphilis.data, function(file){
 syphilis.clean.put = lapply(syphilis.clean, `[[`, 2)
 
 for (data in syphilis.clean.put) {
-  
+
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown')), 
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -128,7 +128,7 @@ gonorrhea.clean = lapply(gonorrhea.data, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
-    data = subset(data, data$race != "Unknown")
+    #data = subset(data, data$race != "Unknown")
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -149,7 +149,7 @@ for (data in gonorrhea.clean.put) {
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown')), 
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }

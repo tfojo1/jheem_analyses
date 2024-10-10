@@ -436,7 +436,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -447,7 +447,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -482,22 +482,23 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('13-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
 
 #Create a separate ontology for early syphilis
-data.manager$register.ontology(
-    'cdc.syphilis',
-    ont = ontology(
-        year= NULL,
-        location= NULL,
-        age=c('13-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years'), 
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
-        sex=c('male','female'),
-        risk=c('msm','idu','msm_idu','heterosexual','other')
-    ))
+#I think this can be removed; temporarily commenting out to see if issues arive (10-10)
+# data.manager$register.ontology(
+#     'cdc.syphilis',
+#     ont = ontology(
+#         year= NULL,
+#         location= NULL,
+#         age=c('13-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years'), 
+#         race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+#         sex=c('male','female'),
+#         risk=c('msm','idu','msm_idu','heterosexual','other')
+#     ))
 
 data.manager$register.ontology(
     'nsduh',
@@ -578,7 +579,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White', 'Unknown'),
+        race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -589,7 +590,7 @@ data.manager$register.ontology(
         year= ("1981-2001"),
         location= NULL,
         age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White', 'Unknown'),
+        race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other'),
         incomplete.dimensions = c("year", "location")
@@ -1451,7 +1452,7 @@ for (data in diagnoses_all) {
         data = data,
         ontology.name = 'cdc',
         source = 'cdc.hiv',
-        dimension.values = list(),
+        dimension.values.to.distribute = list(race=c('Multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'CDC Atlas Plus data')
 }
@@ -1465,7 +1466,7 @@ for (data in prevalence_all) {
         data = data,
         ontology.name = 'cdc',
         source = 'cdc.hiv',
-        dimension.values = list(),
+        dimension.values.to.distribute = list(race=c('Multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'CDC Atlas Plus data')
 }
@@ -1479,7 +1480,7 @@ for (data in deaths_all) {
         data = data,
         ontology.name = 'cdc',
         source = 'cdc.hiv',
-        dimension.values = list(),
+        dimension.values.to.distribute = list(race=c('Multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'CDC Atlas Plus data')
 }
@@ -1493,7 +1494,7 @@ for (data in deaths_notes) {
         data = data,
         ontology.name = 'cdc',
         source = 'cdc.hiv',
-        dimension.values = list(),
+        dimension.values.to.distribute = list(race=c('Multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'Jurisdiction with incomplete reporting of deaths for most recent year.')
 }
@@ -1522,7 +1523,7 @@ for (data in national_suppression_all) {
         data = data,
         ontology.name = 'cdc.new',
         source = 'cdc.hiv',
-        dimension.values = list(),
+        dimension.values.to.distribute = list(race=c('Multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'CDC Atlas Plus data')
 }

@@ -192,7 +192,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
      data = data,
      ontology.name = 'cdc.aids', 
      source = 'cdc.aids',
-     dimension.values = list(),
+     dimension.values.to.distribute = list(race=c('Unknown')),
      url = 'https://wonder.cdc.gov/AIDSPublic.html',
      details = 'CDC Wonder AIDS Public Information Data')  
  }
@@ -315,7 +315,7 @@ for (data in aids.deaths.put) {
     data = data,
     ontology.name = 'cdc.aids.deaths',
     source = 'cdc.aids',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Unknown')),
     url = 'https://wonder.cdc.gov/AIDSPublic.html',
     details = 'CDC Wonder AIDS Public Information Data')
 }
