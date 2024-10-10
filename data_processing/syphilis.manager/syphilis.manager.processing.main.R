@@ -299,6 +299,18 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
 
+#Create a separate ontology for early syphilis
+data.manager$register.ontology(
+  'cdc.syphilis',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
 data.manager$register.ontology(
   'census',
   ont = ontology(
