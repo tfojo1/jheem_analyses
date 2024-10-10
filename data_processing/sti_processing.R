@@ -23,7 +23,8 @@ syphilis.mappings.age = c('0-14' = '13-14 years',  #decided to make this change 
                           '40-44' = '40-44 years',
                           '45-54' = '45-54 years',
                           '55-64' = '55-64 years',
-                          '65+' = '65+ years')
+                          '65+' = '65+ years',
+                          'Unknown' = 'Unknown')
 
 # Cleaning ----------------------------------------------------------------
 
@@ -55,11 +56,9 @@ syphilis.clean = lapply(syphilis.data, function(file){
   
   if(grepl("agegrp", filename)) {
     data$age = syphilis.mappings.age[data$Age.Group]
-    data = subset(data, data$age != "unknown")
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
-    #data = subset(data, data$race != "Unknown")
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -81,7 +80,7 @@ for (data in syphilis.clean.put) {
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown')), 
+    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'), 
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -124,11 +123,9 @@ gonorrhea.clean = lapply(gonorrhea.data, function(file){
   
   if(grepl("age", filename)) {
     data$age = syphilis.mappings.age[data$Age.Group]
-    data = subset(data, data$age != "unknown")
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
-    #data = subset(data, data$race != "Unknown")
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -149,7 +146,7 @@ for (data in gonorrhea.clean.put) {
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown')), 
+    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'),  
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
