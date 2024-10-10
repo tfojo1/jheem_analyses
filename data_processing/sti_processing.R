@@ -86,6 +86,88 @@ for (data in syphilis.clean.put) {
 }
 
 
+
+# Clean + Put Early Syphilis because age categories are different ---------
+
+DATA.DIR.SYPHILIS.EARLY="../../data_raw/syphilis.manager/syphilis/early.syphilis"
+syphilis_files_early <- Sys.glob(paste0(DATA.DIR.SYPHILIS.EARLY, '/*.csv'))
+syphilis.data.early <- lapply(syphilis_files_early, function(x){
+  skip=7
+  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+})
+
+early.syphilis.age = c('0-14' = '13-14 years',  #decided to make this change on 5-6-24 to align with ontology (assume no on under 13 has STI)
+                       '15-24' = '15-24 years',
+                       '25-34' = '25-34 years',
+                       '35-44' = '35-44 years',
+                       '45-54' = '45-54 years',
+                       '55-64' = '55-64 years',
+                       '65+' = '65+ years',
+                       'Unknown' = 'Unknown')
+
+
+
+# Early Spyhilis Cleaning ----------------------------------------------------------------
+
+syphilis.clean.early = lapply(syphilis.data.early, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$year = substr(data$Year, 1, 4)
+  data$Cases = (gsub(",", "", data$Cases))
+  
+  data$outcome = outcome.mappings.syphilis[data$Indicator]
+  
+  data <- data %>%
+    mutate(value= ifelse(Cases == "Data not available" | Cases == "Data suppressed", NA, Cases))
+  
+  data$value = as.numeric(data$value)
+  
+  if(grepl("state", filename)) {
+    names(state.abb) <- state.name
+    data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography])
+  }
+  
+  if(grepl("county", filename)) {
+    data$location = data$FIPS
+  }
+  
+  ##Demographic conditionals##
+  
+  if(grepl("agegrp", filename)) {
+    data$age = early.syphilis.age[data$Age.Group]
+  }
+  if(grepl("race", filename)) {
+    data$race= data$'Race.Ethnicity'
+  }
+  if(grepl("sex", filename)) {
+    names(data)[names(data)=='Sex'] = 'sex'
+    data$sex = tolower(data$sex)
+  }
+  
+  data= as.data.frame(data)
+  
+  list(filename, data)
+})
+
+
+# Early Syphilis Put ------------------------------------------------------
+
+early.syphilis.put = lapply(syphilis.clean.early, `[[`, 2)
+
+for (data in early.syphilis.put) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.syphilis',
+    source = 'cdc.sti',
+    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'), 
+    url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
+    details = 'CDC Atlas Plus')
+}
+
+
 # Gonorrhea Data ----------------------------------------------------------
 
 DATA.DIR.GC="../../data_raw/gonorrhea"
