@@ -714,7 +714,7 @@ FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
   prevalence.likelihood.instructions,
   
   # MORTALITY LIKELIHOODS
-  #hiv.mortality.likelihood.instructions,
+  hiv.mortality.likelihood.instructions,
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions,
   
@@ -748,7 +748,7 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   prevalence.likelihood.instructions,
   
   # MORTALITY LIKELIHOODS
-  #hiv.mortality.likelihood.instructions,
+  hiv.mortality.likelihood.instructions,
   general.mortality.likelihood.instructions,
   aids.deaths.likelihood.instructions,
   
