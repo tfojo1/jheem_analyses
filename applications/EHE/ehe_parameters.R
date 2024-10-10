@@ -1006,24 +1006,34 @@ BASE.HIV.SAMPLING.BLOCKS = list(
 
     peak.msm.transmission = 'msm.peak.trate.multiplier',
     
-    black.msm.transmission = c(
-      'black.msm.trate.0',
+    black.msm.transmission.0 = c(
+      'black.msm.trate.0'
+    ),
+
+    black.msm.transmission.1.2 = c(
       'black.msm.trate.1',
       'black.msm.trate.2'
     ),
+
+    hispanic.msm.transmission.0 = c(
+      'hispanic.msm.trate.0'
+    ),
     
-    hispanic.msm.transmission = c(
-      'hispanic.msm.trate.0',
+    hispanic.msm.transmission.1.2 = c(
       'hispanic.msm.trate.1',
       'hispanic.msm.trate.2'
     ),
     
-    other.msm.transmission = c(
-      'other.msm.trate.0',
-      'other.msm.trate.1',
-      'other.msm.trate.2',
-      'msm.fraction.trate.change.after.t2'
+    other.msm.transmission.0 = c(
+      'other.msm.trate.0'
     ),
+    
+    other.msm.transmission.1.2 = c(
+      'other.msm.trate.1',
+      'other.msm.trate.2'
+    ),
+
+    msm.fraction.trate.change.after.t2 = c('msm.fraction.trate.change.after.t2'),
 
     young.black.msm.age.susceptibility = c(
       'age1.black.msm.susceptibility.rr.01',
