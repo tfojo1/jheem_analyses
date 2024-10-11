@@ -2198,7 +2198,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = '/y'),
                          value.to.integrate = 'flattened.sexual.transmission.rates',
                          multiply.by = 'sexual.susceptibility.covid.multiplier',
-                         denominator.outcome = 'population',
+                         denominator.outcome = 'prep.indications',
                          dimension.alias.suffix = 'to',
                          keep.dimensions = c('location','age','race','sex')
 )
