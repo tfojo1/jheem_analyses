@@ -1796,7 +1796,7 @@ get.msa.totals.from.county.simple(outcome= 'deaths',
                                   data.manager.from=census.manager,
                                   data.manager.to= surveillance.manager)
 
-
+save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
 
 # Remove outliers ---------------------------------------------------------
 source('data_processing/outliers/outlier.remover.total.level.R')

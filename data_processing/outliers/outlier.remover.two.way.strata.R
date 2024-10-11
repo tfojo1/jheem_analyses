@@ -141,7 +141,7 @@ run.outlier.process(outcome= 'diagnosed.prevalence',
 
 # Diagnoses (6) ---------------------------------------------------------------
 
-#13 outliers
+#14 outliers
 diagnoses.one <- run.outlier.process(outcome= 'diagnoses',
                                      stratifications= list(c('age', 'race')),
                                      data.manager= surveillance.manager,
@@ -152,7 +152,7 @@ diagnoses.one <- run.outlier.process(outcome= 'diagnoses',
 
 
 
-diagnoses.one$adjudication <- c(T, T, T, T, T, T, T, F, F, F, T, T, T)
+diagnoses.one$adjudication <- c(T, T, T, T, T, T, T, T, F, F, F, T, T, T)
 
 diagnoses.one <- diagnoses.one %>%
   add_row(year = "2019", location = 'C.33100', age = '25-34 years', race = 'Black/African American', source ='cdc.aggregated.county', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
