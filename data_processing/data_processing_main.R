@@ -459,7 +459,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White', "Multiracial"),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -1519,7 +1519,7 @@ for (data in sle_all) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'cdc',
+        ontology.name = 'cdc.proportion',
         source = 'cdc.hiv',
         dimension.values = list(),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1535,7 +1535,7 @@ for (data in national_suppression_all) {
         data = data,
         ontology.name = 'cdc.new',
         source = 'cdc.hiv',
-        dimension.values.to.distribute = list(race=c('Multiracial')),
+        dimension.values = list(),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'CDC Atlas Plus data')
 }
