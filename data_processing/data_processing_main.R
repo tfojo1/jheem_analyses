@@ -441,6 +441,18 @@ data.manager$register.ontology(
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
 
+#This is for suppression data that includes multiracial- this has been distributed for other outcomes but suppression is a proportion
+data.manager$register.ontology(
+  'cdc.proportion',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White', 'Multiracial'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
 data.manager$register.ontology(
   'cdc.new',
   ont = ontology(
@@ -487,7 +499,7 @@ data.manager$register.ontology(
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
 
-#Create a separate ontology for early syphilis
+#Create a separate ontology for early syphilis and for late duration or unknown
 
 data.manager$register.ontology(
     'cdc.syphilis',

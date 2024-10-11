@@ -220,7 +220,7 @@ for (data in nat.suppress.race.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc',
+    ontology.name = 'cdc.proportion',
     source = 'cdc.supplemental.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-supplemental-report-vol-25-2.pdf',
