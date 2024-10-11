@@ -26,6 +26,7 @@ heroin.bias.estimates = get.cached.object.for.version(name = "heroin.bias.estima
 hiv.tests.per.population.bias.estimates = get.cached.object.for.version(name = "hiv.tests.per.population.bias.estimates", 
                                                                         version = 'ehe')    
 
+TOTAL.WEIGHT = 0.5 # universally downweighting 10/11 to try to allow more mixing
 
 
 EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
@@ -97,13 +98,8 @@ population.likelihood.instructions =
                                        #error.variance.term = pop.year.cvs,  
                                        error.variance.type = 'cv',
                                        
-                                       # downweight because large population size; 
-                                       # can get more specific with create.likelihood.weights 
-                                       #(e.g., different weight for age X)
-                                       # weights = list(create.likelihood.weights(
-                                       #   total.weight = 0.5,
-                                       #   dimension.values = list(year = as.character(2007:2014)))), 
-                                       
+                                       weights = (1*TOTAL.WEIGHT),
+
                                        # if there are more datapoints for certain years, this will normalize
                                        # e.g., if there are a few years with only the totals 
                                        # before the stratifications are available
@@ -120,7 +116,7 @@ immigration.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                        error.variance.type = 'cv',
-                                       weights = 1,
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
   )
 
@@ -134,7 +130,7 @@ emigration.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                        error.variance.type = 'cv',
-                                       weights = 1,
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
   )
 
@@ -149,7 +145,7 @@ total.new.diagnoses.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1), 
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
   )
 
@@ -162,7 +158,7 @@ new.diagnoses.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1), #list(0.3), # see prev_new_aware_weighting.R 
+                                       weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
   )
 
@@ -176,7 +172,7 @@ total.prevalence.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1),
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
   )
 
@@ -189,7 +185,7 @@ prevalence.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1), #list(0.3), # see prev_new_aware_weighting.R 
+                                       weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
   )
 
@@ -197,17 +193,17 @@ prevalence.likelihood.instructions =
 #-- AIDS DIAGNOSES  ----
 non.age.aids.diagnoses.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                                                outcome.for.sim = "aids.diagnoses",
-                                                                dimensions = c("sex","race","risk"),
-                                                                levels.of.stratification = c(0,1),
-                                                                from.year = 1990,
-                                                                to.year = 2001,
-                                                                correlation.different.years = 0.3,
-                                                                observation.correlation.form = 'compound.symmetry',
-                                                                error.variance.term = 0.05, # maybe higher - look up
-                                                                error.variance.type = 'cv',
-                                                                weights = list(1),
-                                                                equalize.weight.by.year = F
+                                       outcome.for.sim = "aids.diagnoses",
+                                       dimensions = c("sex","race","risk"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 1990,
+                                       to.year = 2001,
+                                       correlation.different.years = 0.3,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, # maybe higher - look up
+                                       error.variance.type = 'cv',
+                                       weights = (1*TOTAL.WEIGHT),
+                                       equalize.weight.by.year = F
   )
 
 #-- HIV-MORTALITY  ----
@@ -221,7 +217,7 @@ hiv.mortality.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(1), 
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
   )
 
@@ -236,7 +232,7 @@ general.mortality.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(18), # see prev_new_aware_weighting.R 
+                                       weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
   )
 
@@ -273,7 +269,7 @@ suppression.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(1), 
+                                                   weights = (1*TOTAL.WEIGHT),
                                                    equalize.weight.by.year = T 
   )
 
@@ -291,7 +287,7 @@ aids.deaths.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.05, # maybe higher - look up
                                        error.variance.type = 'cv',
-                                       weights = list(1), 
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
   )
 
@@ -305,7 +301,7 @@ prep.uptake.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.03,
                                        error.variance.type = 'cv',
-                                       weights = list(0.3), # see prev_new_aware_weighting.R 
+                                       weights = (0.3*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
   )
 
@@ -322,7 +318,7 @@ prep.indications.likelihood.instructions =
                                        error.variance.term = 0.5, # high uncertainty,
                                        error.variance.type = 'cv',
                                        # ^ this means you can range from 0 to 2x the number of prep indications
-                                       weights = list(1), 
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
   )
 
@@ -356,7 +352,7 @@ awareness.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(18), # see prev_new_aware_weighting.R 
+                                                   weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
                                                    equalize.weight.by.year = T
   )
 
@@ -389,7 +385,7 @@ heroin.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(1), 
+                                                   weights = (1*TOTAL.WEIGHT),
                                                    equalize.weight.by.year = T 
   )
 
@@ -422,7 +418,7 @@ cocaine.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(1), 
+                                                   weights = (1*TOTAL.WEIGHT),
                                                    equalize.weight.by.year = T 
   )
 
@@ -453,7 +449,7 @@ proportion.tested.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(1),
+                                                   weights = (1*TOTAL.WEIGHT),
                                                    equalize.weight.by.year = T
   )
 
@@ -493,7 +489,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = list(18), # see prev_new_aware_weighting.R 
+                                                   weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
                                                    equalize.weight.by.year = T
   )
 
@@ -528,7 +524,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
     
-    weights = list(18), # see prev_new_aware_weighting.R 
+    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
     equalize.weight.by.year = F,
     use.lognormal.approximation = T
   )
@@ -548,7 +544,7 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     error.variance.term = 0.03,
     error.variance.type = 'cv',
     
-    weights = list(18), # see prev_new_aware_weighting.R 
+    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
     equalize.weight.by.year = F,
     use.lognormal.approximation = T
   )
@@ -574,7 +570,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
                                              
-                                             weights = list(1), 
+                                             weights = (1*TOTAL.WEIGHT),
                                              equalize.weight.by.year = F 
   )
 
@@ -633,7 +629,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
                                              
-                                             weights = list(1), 
+                                             weights = (1*TOTAL.WEIGHT),
                                              equalize.weight.by.year = F 
   )
 
