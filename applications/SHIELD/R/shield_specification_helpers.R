@@ -1,5 +1,5 @@
 DEFAULT.POPULATION.YEARS=2007 #used for generating the initial population and sexual contact oes (observed/estimated race estimates)
-DEFAULT.MORTALITY.RATE.YEARS=c('2001-2010','2011-2020')
+DEFAULT.MORTALITY.RATE.YEARS=c('2001-2010','2011-2020') #2001:2020
 DEFAULT.FERTILITY.RATE.YEARS=c(2007:2023)
 
 # Documentation
@@ -518,6 +518,7 @@ get.location.mortality.rates <- function(location,
   browser()
   if (location=='US'){
     counties='US'
+    #use the deaths instead 
     mortality.rate = CENSUS.MANAGER$pull(outcome = 'metro.deaths',
                                          location = counties,
                                          year= year.ranges,

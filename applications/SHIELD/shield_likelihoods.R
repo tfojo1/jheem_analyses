@@ -11,12 +11,11 @@ population.likelihood.instructions =
                                        dimensions = c("age","sex","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g., age race)
                                        from.year = 2010, #the year calibration starts (popualtion size and demographics are fix to 2007)
-                                       
-                                       #measurement error: if census data is off in one year, how much is it off the next year or different strata?
+                                                                              #measurement error: if census data is off in one year, how much is it off the next year or different strata?
                                        correlation.different.years = 0.5, # this is the default
                                        correlation.different.strata = 0.1, # this is the default
-                                       correlation.different.sources = 0.3, # default
-                                       correlation.same.source.different.details = 0.3, # default
+                                       # correlation.different.sources = 0, # default from one source
+                                       correlation.same.source.different.details = 0.3, # default: 
                                        
                                        # assumes correlation between all combos of years is the same
                                        observation.correlation.form = 'autoregressive.1', 
@@ -40,7 +39,9 @@ population.likelihood.instructions =
                                        equalize.weight.by.year = F
   )
 
-
+#deaths
+#births 
+# if we work on proportions that it'll be different 
 #-- IMMIGRATION----
 # immigration.likelihood.instructions = 
 #   create.basic.likelihood.instructions(outcome.for.data = "immigration", 
