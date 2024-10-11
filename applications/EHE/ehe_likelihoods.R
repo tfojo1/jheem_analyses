@@ -89,7 +89,6 @@ population.likelihood.instructions =
                                        correlation.different.sources = 0.3, # default
                                        correlation.same.source.different.details = 0.3, # default
                                        
-                                       # assumes correlation between all combos of years is the same
                                        observation.correlation.form = 'autoregressive.1', 
                                        
                                        # should always be specified; describes how precise the estimates are; 
