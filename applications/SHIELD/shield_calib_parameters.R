@@ -2,9 +2,6 @@
 # Defining the calibration parameters and prior distributions
 
 #1- PARAMETER PRIORS:----
-races=model.settings$specification.metadata$dim.names$race
-fertile.ages=model.settings$specification.metadata$dim.names$age[2:7]
-fertile.age.ranges= c("15.19","20.24","25.29","30.34","35.39","40.44") 
 
 ##--- Population param priors ----
 POPULATION.PARAMETERS.PRIOR=join.distributions( 
@@ -58,6 +55,10 @@ SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
 
 #2- LINKING PARAMETERS TO FUNCTIONAL FORMS....  -----
 SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){ 
+  races=model.settings$specification.metadata$dim.names$race
+  fertile.ages=model.settings$specification.metadata$dim.names$age[2:7]
+  fertile.age.ranges= c("15.19","20.24","25.29","30.34","35.39","40.44") 
+  
   #alphas are main effects  (corresponds to our margines)
   ## Transmission ----
   for(time in 0:2){

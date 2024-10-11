@@ -789,3 +789,7 @@ print("SHIELD specification sourced successfully!")
 # assuming that census take place at a random time during hte year, we use the integral under population curve could be used for calibration
 # average of 2 points
 # outcomes: 1.point (like infected unifected), 2. some event count (incidence)
+
+
+
+

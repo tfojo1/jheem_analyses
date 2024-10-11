@@ -1,3 +1,7 @@
+DEFAULT.POPULATION.YEARS=2007 #used for generating the initial population and sexual contact oes (observed/estimated race estimates)
+DEFAULT.MORTALITY.RATE.YEARS=c('2001-2010','2011-2020')
+DEFAULT.FERTILITY.RATE.YEARS=c(2007:2023)
+
 # Documentation
 # devtools::document("../jheem_analyses/applications/SHIELD/")
 # devtools::build_manual("../jheem_analyses/applications/SHIELD/")
@@ -6,7 +10,6 @@
 # By using the @rdname tag, you can group multiple functions under the same Rd file.
 #This allows you to control the order of documentation by deciding which function goes under which
 #@rdname. The documentation of all functions with the same @rdname will be combined under one manual page.
-
 
 
 # BASE INITIAL POPULATION SIZE ----
@@ -377,6 +380,210 @@ get.best.guess.msm.proportions.by.race <- function(location,
 
 
 
+
+# FERTILITY ----
+#' @title get.fertility.rates.functional.form
+#' @description generating a functional form for fertility rates based on census data (see inputs/estimate_fertility_rate.R)
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param population.years years for which data is available
+#' @return a spline functional form for fertility rates by age, race, year 
+get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=DEFAULT.FERTILITY.RATE.YEARS){ 
+  # pull fertility rates for location
+  mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years) #TODD: would you do all the calculations here?
+  if (length(mapped.fertility.rates)==0)
+    stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
+                locations::get.location.name(location), ")"))
+  #fit a gausian model to the data; we will use this model to estimate fertility.rate at the knots 
+  #alternatively, we could use an average of 5 years around each knot
+  # reshape into a datafram
+  df= reshape2::melt(mapped.fertility.rates, varnames = c("age", "race", "year"), value.name = "fertility.rate")
+  #fit a 3 way model of age race year:
+  fit=glm(fertility.rate ~ age * race*year, data = df, family ='gaussian' )
+  target.dims=dim(mapped.fertility.rates)[1:2]
+  target.dimnames=dimnames(mapped.fertility.rates)[1:2]
+  
+  # function to predict the fertility rate in a given year
+  predict.fertility.rate<-function(fit,time,target.dims,target.dimnames){
+    # predict it for the given time point
+    predicted.values <- predict(fit, type = "response",newdata=df[df$year==time,])
+    # mapp the dimensions
+    predicted.values =array(predicted.values,dim =target.dims,dimnames =  target.dimnames) 
+  } 
+  # predict values for each knot:
+  knot1=predict.fertility.rate(fit,2010,target.dims,target.dimnames)
+  knot2=predict.fertility.rate(fit,2020,target.dims,target.dimnames)
+  
+  #define a spline function with 2 knots, and use a modifier to project forward
+  ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
+                                           knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above
+                                           #how to project forward:
+                                           #since linear projections are too extereme, we multiply future prediction by a modifier set at 0.5
+                                           after.time = 2030,
+                                           after.modifier = 0.5,#modifier.min and .max could sample
+                                           modifiers.apply.to.change = T, # if True, modifier is multiplied into diff between knot1 and knot2 values; if False, modifier is multiplied into knot2 value
+                                           min = 0 # this is to prevent values from falling below 0
+                                           #@TODD: how does this modify the behavior
+  )
+  # we can run this to see the example plot:
+  #ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
+  # knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above
+  # #how to project forward:
+  # #since linear projections are too extereme, we multiply future prediction by a modifier set at 0.5
+  # after.time = 2030,
+  # after.modifier = 0.5,#modifier.min and .max could sample
+  # modifiers.apply.to.change = T, # if True, modifier is multiplied into diff between knot1 and knot2 values; if False, modifier is multiplied into knot2 value
+  # min = 0 # this is to prevent values from falling below 0
+  # )
+  # qplot(2007:2040,sapply(ff$project(2007:2040),function(x){x[[12]]}))
+}
+
+#' @title get.fertility.rates.from.census
+#' @description reading the fertility rates from the census manager
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param population.years population.years
+#' @return returning the fertility rates in the correct dimension
+get.fertility.rates.from.census<-function(location, specification.metadata, population.years=DEFAULT.FERTILITY.RATE.YEARS){
+  #1- extract data from the census manager
+  if (location=='US'){
+    counties='US'
+  }else{
+    counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
+    allCounties=(dimnames(CENSUS.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)$location)
+    #remove counties that are missing
+    counties=intersect(counties,allCounties)
+  }
+  if(length(counties)==0)
+    stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
+                locations::get.location.name(location), ")"))
+  
+  fertility.rate = CENSUS.MANAGER$pull(outcome='fertility.rate',
+                                       location = counties,
+                                       year= population.years,
+                                       keep.dimensions = c('location','age','race', 'ethnicity','year'),  
+                                       na.rm=TRUE)
+  if (is.null(fertility.rate))
+    stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
+                locations::get.location.name(location), ")"))
+  
+  #2-map the dimensions to the target dimensions
+  # target.dimnames: we set this manually to include female of childbearing ages and correct years
+  #@PK: I need to make this more generalizable 
+  target.dimnames=target.dimnames <- list(
+    age = c(  "15-19 years", "20-24 years", "25-29 years", "30-34 years",
+              "35-39 years", "40-44 years"  ),
+    race = c("black", "hispanic", "other"),
+    year = as.character(population.years)
+  )
+  
+  mapped.fertility.rate=map.value.ontology(fertility.rate, 
+                                           target.dim.names = target.dimnames,
+                                           na.rm = TRUE)
+  
+  
+  return(mapped.fertility.rate)
+}
+
+# MORTALITY ----
+#' @title get.location.mortality.rates.functional.form
+#' @description generating a functional form for mortality rates based on census data
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param population.years population.years
+#' @return a functional form for mortality rates to be used in the specification
+get.location.mortality.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.MORTALITY.RATE.YEARS)
+{
+  rates = get.location.mortality.rates(location=location,
+                                       specification.metadata = specification.metadata) 
+  
+  create.static.functional.form(value = rates,
+                                link = "log",
+                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+}
+#' @title get.location.mortality.rates
+#' @description reading the mortality rates from the census manager (approximating them off state-level data)
+#' @param location location
+#' @param specification.metadata specification.metadata
+#' @param year.ranges year.ranges #Todd: ???
+#' @return returning the mortality rates for each MSA (location) in the correct dimension
+get.location.mortality.rates <- function(location,
+                                         specification.metadata,
+                                         year.ranges = DEFAULT.MORTALITY.RATE.YEARS){
+  # Todd's code is designed for modeling MSAs, where each MSA consists of a collection of counties.
+  # County-level mortality data is not fully stratified, but state-level data is available with stratification.
+  # Note: Some MSAs span over multiple states (e.g., Washington DC  ).
+  # To estimate the MSA-level mortality rate, we extract the counties within each MSA, map these counties to their corresponding states,
+  # and then take a weighted average of the state-level rates to approximate the MSA-level mortality rate.
+  browser()
+  if (location=='US'){
+    counties='US'
+    mortality.rate = CENSUS.MANAGER$pull(outcome = 'metro.deaths',
+                                         location = counties,
+                                         year= year.ranges,
+                                         keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+    
+  }else{
+    counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
+    states = unique(locations::get.containing.locations(counties, 'state')) # construct the states: 
+    # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
+    deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', 
+                                 location = states, 
+                                 year= year.ranges, 
+                                 keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+    
+    if (is.null(deaths))
+      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
+    
+    # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
+    population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', 
+                                     location = states, 
+                                     year= year.ranges, 
+                                     keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+    if (is.null(population))
+      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
+    population[is.na(deaths)] = NA
+    
+    # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
+    # then divide the two
+    target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
+    rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
+      map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
+    
+    if (any(is.na(rates.by.state)))
+      stop("getting NA values in rates.by.state in get.location.mortality.rates()")
+    
+    if (length(states)==1)
+      rates.by.state[1,,,]
+    else
+    {
+      county.populations = CENSUS.MANAGER$pull(outcome = 'population',
+                                               dimension.values = list(location=counties,
+                                                                       year=year.ranges),
+                                               from.ontology.names = 'census')
+      
+      if (is.null(county.populations))
+        stop("Error in get.location.mortality.rates(): cannot get populations for the component counties")
+      county.populations = apply(county.populations,
+                                 'location', mean, na.rm=T)
+      total.population = sum(county.populations, na.rm=T)
+      
+      state.weights = sapply(states, function(st){
+        counties.in.state.and.loc = intersect(counties,
+                                              locations::get.contained.locations(st, 'county'))
+        
+        sum(county.populations[counties.in.state.and.loc], na.rm=T)/total.population
+      })
+      
+      apply(state.weights * rates.by.state, c('age','race','sex'), sum)
+    }}
+}
+
+
+
+
+
+
 # SEXUAL CONTACT BY AGE ----
 #' @title functions.sexual.contact.model
 #' @description sexual contacts are charactrized via 4 components: 1)transmission probability, 2)age mixing, 3)sex mixing, and 4)race mixing
@@ -691,200 +898,4 @@ oes.to.proportions <- function(oes, population)
   raw = oes * rep(population[ dimnames(oes)[[1]] ], each=length(population))
   raw / rowSums(raw)
 }
-
-
-# FERTILITY ----
-#' @title get.fertility.rates.functional.form
-#' @description generating a functional form for fertility rates based on census data (see inputs/estimate_fertility_rate.R)
-#' @param location location
-#' @param specification.metadata specification.metadata
-#' @param population.years years for which data is available
-#' @return a spline functional form for fertility rates by age, race, year 
-get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=2007:2023){
-  # pull fertility rates for location
-  mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years)
-  df= melt(mapped.fertility.rates, varnames = c("age", "race", "year"), value.name = "fertility.rate")
-  
-  # fit the guassian estimate knot1/2
-  fit.fertility.rate<-function(df,time ){
-    #fit a 3 way model of age race year:
-    fit=glm(fertility.rate ~ age * race*year, data = df, family ='gaussian' )
-    # predict it for the given time point
-    predicted.values <- predict(fit, type = "response",newdata=df[df$year==time,])
-    # mapp the dimensions
-    target.dims=dim(mapped.fertility.rate)[1:2]
-    target.dimnames=dimnames(mapped.fertility.rate)[1:2]
-    predicted.values =array(predicted.values,dim =target.dims,dimnames =  target.dimnames) 
-    return(predicted.values)
-  } 
-  
-  knot1=fit.fertility.rate(df,2010)
-  knot2=fit.fertility.rate(df,2020)
-  ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
-                                           knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above
-                                           #how to project forward:
-                                        #since linear projections are too extereme, we multiply future prediction by a modifier set at 0.5
-                                           after.time = 2030,
-                                           after.modifier = 0.5,#modifier.min and .max could sample
-                                           modifiers.apply.to.change = T, # if True, modifier is multiplied into diff between knot1 and knot2 values; if False, modifier is multiplied into knot2 value
-                                           min = 0 # this is to prevent values from falling below 0
-                                        #@TODD: how does this modify the behavior
-  )
-  # we can run this to see the example plot:
-  #ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
-  # knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above
-  # #how to project forward:
-  # #since linear projections are too extereme, we multiply future prediction by a modifier set at 0.5
-  # after.time = 2030,
-  # after.modifier = 0.5,#modifier.min and .max could sample
-  # modifiers.apply.to.change = T, # if True, modifier is multiplied into diff between knot1 and knot2 values; if False, modifier is multiplied into knot2 value
-  # min = 0 # this is to prevent values from falling below 0
-  # )
-# qplot(2007:2040,sapply(ff$project(2007:2040),function(x){x[[12]]}))
-}
-
-#' @title get.fertility.rates.from.census
-#' @description reading the fertility rates from the census manager
-#' @param location location
-#' @param specification.metadata specification.metadata
-#' @param population.years population.years
-#' @return returning the fertility rates in the correct dimension
-get.fertility.rates.from.census<-function(location, specification.metadata, population.years=2007:2023){
-  #1- extract data from the census manager
-  if (location=='US'){
-    counties='US'
-  }else{
-    counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
-    allCounties=(dimnames(CENSUS.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)$location)
-    #remove counties that are missing
-    counties=intersect(counties,allCounties)
-  }
-  if(length(counties)==0)
-    stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
-                locations::get.location.name(location), ")"))
-
-  fertility.rate = CENSUS.MANAGER$pull(outcome='fertility.rate',
-                                       location = counties,
-                                       year= population.years,
-                                       keep.dimensions = c('location','age','race', 'ethnicity','year'),  
-                                       na.rm=TRUE)
-  if (is.null(fertility.rate))
-    stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
-                locations::get.location.name(location), ")"))
-  
-  #2-map the dimensions to the target dimensions
-  # target.dimnames: we set this manually to include female of childbearing ages and correct years
-  #@PK: I need to make this more generalizable 
-  target.dimnames=target.dimnames <- list(
-    age = c(  "15-19 years", "20-24 years", "25-29 years", "30-34 years",
-              "35-39 years", "40-44 years"  ),
-    race = c("black", "hispanic", "other"),
-    year = as.character(population.years)
-  )
-  
-  mapped.fertility.rate=map.value.ontology(fertility.rate, 
-                                           target.dim.names = target.dimnames,
-                                           na.rm = TRUE)
-  
- 
-  return(mapped.fertility.rate)
-}
-
-# MORTALITY ----
-#' @title get.location.mortality.rates.functional.form
-#' @description generating a functional form for mortality rates based on census data
-#' @param location location
-#' @param specification.metadata specification.metadata
-#' @param population.years population.years
-#' @return a functional form for mortality rates to be used in the specification
-get.location.mortality.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS)
-{
-  rates = get.location.mortality.rates(location=location,
-                                       specification.metadata = specification.metadata) 
-  
-  create.static.functional.form(value = rates,
-                                link = "log",
-                                value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
-}
-#' @title get.location.mortality.rates
-#' @description reading the mortality rates from the census manager (approximating them off state-level data)
-#' @param location location
-#' @param specification.metadata specification.metadata
-#' @param year.ranges year.ranges #Todd: ???
-#' @return returning the mortality rates for each MSA (location) in the correct dimension
-get.location.mortality.rates <- function(location,
-                                         specification.metadata,
-                                         year.ranges = c('2001-2010','2011-2020')){
-  # Todd's code is designed for modeling MSAs, where each MSA consists of a collection of counties.
-  # County-level mortality data is not fully stratified, but state-level data is available with stratification.
-  # Note: Some MSAs span over multiple states (e.g., Washington DC  ).
-  # To estimate the MSA-level mortality rate, we extract the counties within each MSA, map these counties to their corresponding states,
-  # and then take a weighted average of the state-level rates to approximate the MSA-level mortality rate.
-  if (location=='US'){
-    counties='US'
-    #' @Todd: we should be able to just pull this directly from the census.manager, correct?
-    # mortality.rate = CENSUS.MANAGER$pull(outcome = 'mortality.rate', 
-                                 # location = states, 
-                                 # year= year.ranges, 
-                                 # keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
-    
-  }else{
-    counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
-    states = unique(locations::get.containing.locations(counties, 'state')) # construct the states: 
-  # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
-  deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', 
-                               location = states, 
-                               year= year.ranges, 
-                               keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
-  
-  if (is.null(deaths))
-    stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
-  
-  # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
-  population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', 
-                                   location = states, 
-                                   year= year.ranges, 
-                                   keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
-  if (is.null(population))
-    stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
-  population[is.na(deaths)] = NA
-  
-  # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
-  # then divide the two
-  target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
-  rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
-    map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
-  
-  if (any(is.na(rates.by.state)))
-    stop("getting NA values in rates.by.state in get.location.mortality.rates()")
-  
-  if (length(states)==1)
-    rates.by.state[1,,,]
-  else
-  {
-    county.populations = CENSUS.MANAGER$pull(outcome = 'population',
-                                             dimension.values = list(location=counties,
-                                                                     year=year.ranges),
-                                             from.ontology.names = 'census')
-    
-    if (is.null(county.populations))
-      stop("Error in get.location.mortality.rates(): cannot get populations for the component counties")
-    county.populations = apply(county.populations,
-                               'location', mean, na.rm=T)
-    total.population = sum(county.populations, na.rm=T)
-    
-    state.weights = sapply(states, function(st){
-      counties.in.state.and.loc = intersect(counties,
-                                            locations::get.contained.locations(st, 'county'))
-      
-      sum(county.populations[counties.in.state.and.loc], na.rm=T)/total.population
-    })
-    
-    apply(state.weights * rates.by.state, c('age','race','sex'), sum)
-  }}
-  #' @todd; whats returned from this function?
-}
-
-
-
 
