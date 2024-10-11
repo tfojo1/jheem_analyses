@@ -167,20 +167,14 @@ gonorrhea.stratified <- run.outlier.process(outcome= 'gonorrhea',
                                             minimum.flagged.change = 49,
                                             locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
 
- gonorrhea.stratified$adjudication <- c (TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 
-   TRUE, TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, 
-   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, TRUE,
-   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-   TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE,
-   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,TRUE,
-   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-   TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
-   TRUE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, FALSE,
-   FALSE, TRUE, TRUE, FALSE, TRUE, TRUE, FALSE, FALSE, TRUE, TRUE, 
-   TRUE, TRUE, TRUE, TRUE, TRUE)
+ gonorrhea.stratified$adjudication <- c (
+   T, T, F, T, T, T, T, T, T, T, 
+   T, T, F, T, T, T, T, T, T, T, 
+   T, T, T, T, T, T, T, T, T, F,
+   T, T, T, T, T, T, T, T, T, T,
+   F, T, T, T, F, F, T, T, F, F,
+   T, T, T, T, T, F, F, T, T, T,
+   T, T, T, T) 
  
 run.outlier.process(outcome= 'gonorrhea',
                     stratifications= list('sex', 'race', 'age', 'risk'),
