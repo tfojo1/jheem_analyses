@@ -71,19 +71,6 @@ register.ontology.mapping('cdc.to.jheem.race',
                                            c('White', 'other'))
 )
 
-register.ontology.mapping('cdc.to.jheem.race.proportion',
-                          from.dimensions = 'race',
-                          to.dimensions = 'race',
-                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
-                                           c('Asian', 'other'),
-                                           c('Black/African American', 'black'),
-                                           c('Hispanic/Latino', 'hispanic'),
-                                           c('Multiracial', 'other'),
-                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
-                                           c('White', 'other'))
-)
-
-
 register.ontology.mapping('cdc.msa.reports.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
