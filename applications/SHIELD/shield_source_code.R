@@ -1,6 +1,6 @@
+cat("*** Running Shiled_source_code.R ***\n")
 NEW.SOURCE=F
-cat("new.sources is set to",NEW.SOURCE, "....\n")
-
+ 
 # The file to source to load all necessary packages, cached data, code
 library(reshape2)
 library(locations)
@@ -70,3 +70,6 @@ cat("DEFAULT.POPULATION.YEARS set to ",DEFAULT.POPULATION.YEARS,"\n")
 
 FERTILE.AGES=c('15-19 years','20-24 years','25-29 years','30-34 years','35-39 years','40-44 years')
 cat("FERTILE.AGES set to ",FERTILE.AGES,"\n")
+
+
+cat("*** Shiled_source_code.R completed! ***\n")

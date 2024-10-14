@@ -11,12 +11,11 @@ population.likelihood.instructions =
                                        dimensions = c("age","sex","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g., age race)
                                        from.year = 2010, #the year calibration starts (popualtion size and demographics are fix to 2007)
-                                       
-                                       #measurement error: if census data is off in one year, how much is it off the next year or different strata?
+                                                                              #measurement error: if census data is off in one year, how much is it off the next year or different strata?
                                        correlation.different.years = 0.5, # this is the default
                                        correlation.different.strata = 0.1, # this is the default
-                                       correlation.different.sources = 0.3, # default
-                                       correlation.same.source.different.details = 0.3, # default
+                                       # correlation.different.sources = 0, # default from one source
+                                       correlation.same.source.different.details = 0.3, # default: 
                                        
                                        # assumes correlation between all combos of years is the same
                                        observation.correlation.form = 'autoregressive.1', 
@@ -25,7 +24,7 @@ population.likelihood.instructions =
                                        # e.g., estimates can be off by 3% each year
                                        error.variance.term = 0.015, 
                                        #error.variance.term = pop.year.cvs,  
-                                       error.variance.type = 'cv',
+                                       error.variance.type = 'cv'
                                        
                                        # downweight because large population size; 
                                        # can get more specific with create.likelihood.weights 
@@ -34,13 +33,15 @@ population.likelihood.instructions =
                                        #   total.weight = 0.5,
                                        #   dimension.values = list(year = as.character(2007:2014)))), 
                                        
-                                       # if there are more datapoints for certain years, this will normalize
+                                       # if there are more data points for certain years, this will normalize
                                        # e.g., if there are a few years with only the totals 
-                                       # before the stratifications are available
-                                       equalize.weight.by.year = F
+                                       # before the stratification are available
+                                       # equalize.weight.by.year = F Default is TRUE
   )
 
-
+#deaths
+#births 
+# if we work on proportions that it'll be different 
 #-- IMMIGRATION----
 # immigration.likelihood.instructions = 
 #   create.basic.likelihood.instructions(outcome.for.data = "immigration", 
@@ -70,9 +71,11 @@ population.likelihood.instructions =
 #   )
 
 #-- FULL LIKELIHOODS --# ----
-FULL.likelihood.instructions =  join.likelihood.instructions(
+POPULATION.likelihood.instructions =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions 
+  #births
+  #daeth
   # immigration.likelihood.instructions, 
   # emigration.likelihood.instructions
 )
