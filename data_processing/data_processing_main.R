@@ -441,25 +441,13 @@ data.manager$register.ontology(
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
 
-#This is for suppression data that includes multiracial- this has been distributed for other outcomes but suppression is a proportion
-data.manager$register.ontology(
-  'cdc.proportion',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White', 'Multiracial'),
-    sex=c('male','female'),
-    risk=c('msm','idu','msm_idu','heterosexual','other')
-  ))
-
 data.manager$register.ontology(
   'cdc.new',
   ont = ontology(
     year= NULL,
     location= NULL,
     age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White', "Multiracial"),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -537,7 +525,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
-        race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Multiracial', 'Hispanic'),
+        race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Hispanic'),
         sex=c('male','female'),
         risk=c('msm', 'not_msm')
     ))
@@ -580,7 +568,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('13-19 years', '20-24 years', '25-34 years', '35-44 years', '45-54 years','55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80-84 years','85+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -639,23 +627,24 @@ data.manager$register.ontology(
     sex=c('male','female')
   ))
 
-data.manager$register.ontology(
-  'census.cdc.wonder.population',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
-          '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
-          '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
-          '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
-          '51 years', '52 years', '53 years', '54 years', '55 years', '56 years', '57 years', '58 years', '59 years', '60 years',
-          '61 years', '62 years', '63 years', '64 years', '65 years', '66 years', '67 years', '68 years', '69 years', '70 years',
-          '71 years', '72 years', '73 years', '74 years', '75 years', '76 years', '77 years', '78 years', '79 years', '80 years',
-          '81 years', '82 years', '83 years', '84 years', '85+ years'),
-    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White', "More than one race"),
-    ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino'), 
-    sex=c('male','female')
-  ))
+#Can this be removed?
+# data.manager$register.ontology( 
+#   'census.cdc.wonder.population',
+#   ont = ontology(
+#     year= NULL,
+#     location= NULL,
+#     age=c('13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
+#           '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
+#           '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
+#           '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
+#           '51 years', '52 years', '53 years', '54 years', '55 years', '56 years', '57 years', '58 years', '59 years', '60 years',
+#           '61 years', '62 years', '63 years', '64 years', '65 years', '66 years', '67 years', '68 years', '69 years', '70 years',
+#           '71 years', '72 years', '73 years', '74 years', '75 years', '76 years', '77 years', '78 years', '79 years', '80 years',
+#           '81 years', '82 years', '83 years', '84 years', '85+ years'),
+#     race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White'),
+#     ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino'), 
+#     sex=c('male','female')
+#   ))
 
 ################################################################################
 ###Source locations of interest to create MSA vector
@@ -675,7 +664,7 @@ source('data_processing/cdc_test_count_processing.R')
 source('data_processing/lhd_msa_processing.R')
 
 ###Source in STI data
-source('data_processing/sti_processing.R')
+#source('data_processing/sti_processing.R')
 
 ###Source in NSDUH substance data
 source('data_processing/nsduh_processing_new.R')
@@ -1134,6 +1123,8 @@ national.suppression = lapply(data.list.national.suppression , function(file){
       data$sex = tolower(data$sex)
     }
     
+    data = subset(data, data$race != "Multiracial")  #removing multiracial 10-14-24
+                  
     list(filename, data) 
     
 })
@@ -1519,7 +1510,7 @@ for (data in sle_all) {
     
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'cdc.proportion',
+        ontology.name = 'cdc',
         source = 'cdc.hiv',
         dimension.values = list(),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -1725,23 +1716,23 @@ put.msa.data.as.new.source(outcome = 'suppression',
                            ontology.for.denominator= 'cdc') 
 
 #Aggregating STI data
-put.msa.data.as.new.source(outcome = 'gonorrhea',
-                           from.source.name = 'cdc.sti',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
-
-put.msa.data.as.new.source(outcome = 'ps.syphilis',
-                           from.source.name = 'cdc.sti',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = surveillance.manager)
+# put.msa.data.as.new.source(outcome = 'gonorrhea',
+#                            from.source.name = 'cdc.sti',
+#                            to.source.name = 'cdc.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,  
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = surveillance.manager)
+# 
+# put.msa.data.as.new.source(outcome = 'ps.syphilis',
+#                            from.source.name = 'cdc.sti',
+#                            to.source.name = 'cdc.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,  
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = surveillance.manager)
 
 #This aggregates county level data to state level for the recent census years for adult.population (as well as county to MSAs of interest)
 #where I wrote the restructure.recent.age.groups code to estimate for adult.pop
