@@ -1,12 +1,12 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = BALTIMORE.MSA
+LOCATION = NYC.MSA
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANSMISSION, # 2
                              CALIBRATION.CODE.FULL.PLUS.AIDS, # 3
                              CALIBRATION.CODE.FULL.PLUS.COVID # 4
-                             )[c(2,4)]
+                             )[c(1:3)]
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {
