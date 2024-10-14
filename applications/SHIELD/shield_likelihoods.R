@@ -24,7 +24,7 @@ population.likelihood.instructions =
                                        # e.g., estimates can be off by 3% each year
                                        error.variance.term = 0.015, 
                                        #error.variance.term = pop.year.cvs,  
-                                       error.variance.type = 'cv',
+                                       error.variance.type = 'cv'
                                        
                                        # downweight because large population size; 
                                        # can get more specific with create.likelihood.weights 
@@ -33,10 +33,10 @@ population.likelihood.instructions =
                                        #   total.weight = 0.5,
                                        #   dimension.values = list(year = as.character(2007:2014)))), 
                                        
-                                       # if there are more datapoints for certain years, this will normalize
+                                       # if there are more data points for certain years, this will normalize
                                        # e.g., if there are a few years with only the totals 
-                                       # before the stratifications are available
-                                       equalize.weight.by.year = F
+                                       # before the stratification are available
+                                       # equalize.weight.by.year = F Default is TRUE
   )
 
 #deaths
@@ -71,9 +71,11 @@ population.likelihood.instructions =
 #   )
 
 #-- FULL LIKELIHOODS --# ----
-FULL.likelihood.instructions =  join.likelihood.instructions(
+POPULATION.likelihood.instructions =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions 
+  #births
+  #daeth
   # immigration.likelihood.instructions, 
   # emigration.likelihood.instructions
 )
