@@ -55,6 +55,7 @@ national.clean = lapply(data.list.national, function(file){
 
   if(grepl("race", filename)) {
     names(data)[names(data)=='Race.Ethnicity'] = 'race'
+    data = subset(data, data$race != 'Multiracial') #Removing multiracial 10-14-24
   }
   if(grepl("male", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'

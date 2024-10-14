@@ -33,6 +33,8 @@ template = lapply(older.suppression, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
+  data = subset(data, data$category != 'Multiple Races') #Removing multiracial on 10-14-24
+  
   data <- data %>%
     select(category, pct.suppressed, n, n.suppressed)%>% #use n and n.suppressed to calculate risk by group
     mutate(outcome = "suppression")%>%
@@ -110,7 +112,7 @@ nat.suppress.race = lapply(template, function(file){
   filename = file[[1]]
   
   data <- data %>%
-    filter(category == 'American Indian/Alaska Native' | category == 'Asian' | category == 'Black/African American' | category == 'Hispanic/Latino'| category == 'Native Hawaiian/Other Pacific Islander' | category == 'White' | category == 'Multiple races')%>%
+    filter(category == 'American Indian/Alaska Native' | category == 'Asian' | category == 'Black/African American' | category == 'Hispanic/Latino'| category == 'Native Hawaiian/Other Pacific Islander' | category == 'White')%>%
     rename(race = category)%>%
     select(year, location, outcome, value, race)
   
@@ -220,7 +222,7 @@ for (data in nat.suppress.race.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc.proportion',
+    ontology.name = 'cdc',
     source = 'cdc.supplemental.reports',
     dimension.values = list(),
     url = 'https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-supplemental-report-vol-25-2.pdf',
