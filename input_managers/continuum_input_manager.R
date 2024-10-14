@@ -14,7 +14,7 @@ get.suppression.functional.form <- function(specification.metadata,
     
     #-- Prep data frame --#
     
-    suppression.stratifications = names(SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.hiv$cdc.proportion)
+    suppression.stratifications = names(SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.hiv$cdc)
     suppression.stratifications = suppression.stratifications[sapply(strsplit(suppression.stratifications, "__"), length)==3]
     
     raw.df = NULL
@@ -25,14 +25,14 @@ get.suppression.functional.form <- function(specification.metadata,
         {
             d = strsplit(stratification, "__")[[1]][3]
             #suppression.arr = national.surveillance[[paste0("suppression.", d)]][,'national',]
-            suppression.arr = SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.supplemental.reports$cdc.proportion[[stratification]][,'US',]
+            suppression.arr = SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.supplemental.reports$cdc[[stratification]][,'US',]
             suppression.years = intersect(dimnames(suppression.arr)$year[!apply(is.na(suppression.arr), 'year', all)],
                                           prev.years)
             suppression.arr = suppression.arr[suppression.years,,drop=F]
         }
         else
         {
-            suppression.arr = SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.hiv$cdc.proportion[[stratification]][,'US',,]
+            suppression.arr = SURVEILLANCE.MANAGER$data$suppression$estimate$cdc.hiv$cdc[[stratification]][,'US',,]
             suppression.years = intersect(dimnames(suppression.arr)$year[!apply(is.na(suppression.arr), 'year', all)],
                                           prev.years)
             suppression.arr = suppression.arr[suppression.years,,,drop=F]
