@@ -20,7 +20,7 @@ national.metro.deaths = lapply(metro.deaths.national.raw, function(file){
   data$location = "US" 
   data$year = as.character(data$Year)
   data$value = as.numeric(data$Deaths)
-  data$outcome= "metro.deaths"
+  data$outcome= "deaths" #Decided to change this from metro deaths to deaths on 10-12-24 (because this is really just deaths)
   
   data$sex = tolower(data$Gender)
   data$race = data$Race
@@ -48,7 +48,7 @@ national.metro.deaths.denominator  = lapply(metro.deaths.national.raw, function(
   data$year = as.character(data$Year)
   data = subset(data, data$Population != "Not Applicable") #removing suppressed values
   data$value = as.numeric(data$Population)
-  data$outcome= "metro.deaths.denominator"
+  data$outcome= "deaths.denominator"
   
   data$sex = tolower(data$Gender)
   data$race = data$Race
