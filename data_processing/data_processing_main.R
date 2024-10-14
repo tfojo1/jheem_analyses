@@ -1058,6 +1058,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data = subset(data, data$race != "Multiracial")
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
