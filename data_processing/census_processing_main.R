@@ -65,6 +65,16 @@ census.manager$register.outcome(
     units = 'deaths',
     description = "Metro Deaths Denominator"))
 
+#I'm not sure if we need this- this is the denominator value for the national level deaths from CDC Wonder (corresponds to outcoem = deaths, source= cdc wonder)
+census.manager$register.outcome(
+  'deaths.denominator',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Deaths Denominator',
+    axis.name = 'Deaths Denominator',
+    units = 'deaths',
+    description = "Deaths Denominator"))
+
 census.manager$register.outcome(
   'female.population', 
   metadata = create.outcome.metadata(
