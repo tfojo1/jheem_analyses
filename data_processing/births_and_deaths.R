@@ -270,7 +270,7 @@ for (data in deaths_race_eth ) {
   
   census.manager$put.long.form(
     data = data,
-    ontology.name = 'census.cdc.wonder.births.deaths',
+    ontology.name = 'metro.deaths',
     source = 'cdc_wonder',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/',
@@ -283,7 +283,7 @@ for (data in deaths_denom ) {
   
   census.manager$put.long.form(
     data = data,
-    ontology.name = 'census.cdc.wonder.births.deaths',
+    ontology.name = 'metro.deaths',
     source = 'cdc_wonder',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/',
