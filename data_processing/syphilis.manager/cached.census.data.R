@@ -1,3 +1,4 @@
+#Note: This is data being pulled from the Census Manager (not exclusively data from the Census)
 
 #Load the census manager to get population data that is clean and processed
 census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
@@ -216,3 +217,43 @@ deaths.total = as.data.frame.table(census.manager$data$deaths$estimate$census.de
     url = 'www.census.gov',
     details = 'Census Reporting')
 
+
+
+# National Level Births and the Denominator -------------------------------
+
+national.births = as.data.frame.table(census.manager$data$births$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity)%>%
+  filter(location == "US")%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(race = as.character(race))%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(outcome = "births")
+
+national.births.denominator = as.data.frame.table(census.manager$data$births.denominator$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity)%>%
+  filter(location == "US")%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(race = as.character(race))%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(outcome = "births.denominator")
+
+national.birth.data.combined = list(
+  national.births,
+  national.births.denominator
+)
+
+
+for (data in national.birth.data.combined ) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census.cdc.wonder.births.deaths',
+    source = 'cdc.wonder.natality',
+    dimension.values = list(),
+    url = 'https://wonder.cdc.gov/',
+    details = 'CDC Wonder')
+}

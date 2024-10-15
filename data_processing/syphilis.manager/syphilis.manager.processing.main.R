@@ -405,6 +405,20 @@ data.manager$register.ontology(
     ethnicity = c('Hispanic or Latino', 'Not Hispanic or Latino')
   ))
 
+#This is for the births+births denominator data pulled from Census
+census.manager$register.ontology(
+  'census.cdc.wonder.births.deaths',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c("< 1 year", "1-4 years", "10-14 years", "15-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years",
+          "45-49 years", "5-9 years", "50-54 years", "55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80-84 years", 
+          "85-89 years", "90-94 years", "95-99 years", "100+ years"),
+    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White', "More than one race", 'Not Reported', "Unknown or Not Stated", "Not Available"),
+    ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino', 'Unknown or Not Stated', "Not Stated"),
+    sex=c('male','female')
+  ))
+
 
 # Source Data Cleaning and Processing Files -------------------------------
 
