@@ -3,6 +3,7 @@
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
 # heroin, cocaine
 
+TOTAL.WEIGHT = 1 # 0.5 universally downweighting to try to allow more mixing - NOT YET, TRYING WITH NEW CVs first 
 
 #-- BIAS ESTIMATES FOR NESTED PROPORTIONS  ----
 suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
@@ -25,8 +26,6 @@ heroin.bias.estimates = get.cached.object.for.version(name = "heroin.bias.estima
 
 hiv.tests.per.population.bias.estimates = get.cached.object.for.version(name = "hiv.tests.per.population.bias.estimates", 
                                                                         version = 'ehe')    
-
-TOTAL.WEIGHT = 0.5 # universally downweighting 10/11 to try to allow more mixing
 
 
 EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
@@ -71,11 +70,6 @@ EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
   arr
   
 }
-
-# redo this when we get the new data 
-pop.year.cvs = .015*seq(1,2,length=10)
-pop.year.cvs = c(pop.year.cvs,pop.year.cvs)
-names(pop.year.cvs) = 2010:2029
 
 #-- POPULATION  ----
 population.likelihood.instructions = 
@@ -142,7 +136,7 @@ total.new.diagnoses.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.03,
+                                       error.variance.term = 0.07425679, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
@@ -155,7 +149,7 @@ new.diagnoses.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.03,
+                                       error.variance.term = 0.07425679, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
@@ -169,7 +163,7 @@ total.prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.03,
+                                       error.variance.term = 0.0923375, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
@@ -182,7 +176,7 @@ prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.03,
+                                       error.variance.term = 0.0923375, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
@@ -199,7 +193,7 @@ non.age.aids.diagnoses.likelihood.instructions =
                                        to.year = 2001,
                                        correlation.different.years = 0.3,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, # maybe higher - look up
+                                       error.variance.term = 0.2550623, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = F
@@ -214,7 +208,7 @@ hiv.mortality.likelihood.instructions =
                                        levels.of.stratification = c(0,1), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.03,
+                                       error.variance.term = 0.0923375, # using prevalence value from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
@@ -229,7 +223,7 @@ general.mortality.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2007, 
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.03,
+                                       error.variance.term = 0.03, # look into source and see if they have estimate 
                                        error.variance.type = 'cv',
                                        weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
@@ -284,7 +278,7 @@ aids.deaths.likelihood.instructions =
                                        from.year = 1981, 
                                        to.year = 2001,
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.05, # maybe higher - look up
+                                       error.variance.term = 0.2550623, # using aids diagnoses estimate from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T 
@@ -298,7 +292,7 @@ prep.uptake.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2007,
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.03,
+                                       error.variance.term = 0.03546968, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (0.3*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T 
@@ -312,7 +306,7 @@ prep.indications.likelihood.instructions =
                                        dimensions = c("age","sex"),
                                        levels.of.stratification = c(0,1), 
                                        from.year = 2017, 
-                                       to.year = 2018, # they carried forwar 2018 numbers 
+                                       to.year = 2018, # they carried forward 2018 numbers 
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.5, # high uncertainty,
                                        error.variance.type = 'cv',
@@ -345,8 +339,8 @@ awareness.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   p.error.variance.term = NULL, # 0.016, # .018*90 - rough estimate from HIV Atlas (for now)
-                                                   p.error.variance.type = 'data.cv', # data.cv needs to be an option 
+                                                   p.error.variance.term = NULL, 
+                                                   p.error.variance.type = 'data.cv', 
                                                    # the data estimate is a coefficient of variance 
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
@@ -377,10 +371,8 @@ heroin.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry',
-                                                   p.error.variance.term = 0.54*0.005, # for now, double the NSDUH calcs and multiply by .005 from MD data
-                                                   p.error.variance.type = 'sd',
-                                                   # measurement.error = 0.27, # NSDUH calcs 
-                                                   # measurement.error.type = "cv",
+                                                   p.error.variance.term = 0.54, # NSDUH calcs; doubled value (0.27); see NSDUH IDU Data_updated.xlsx in input_managers
+                                                   p.error.variance.type = "cv",
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -410,10 +402,8 @@ cocaine.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry', 
-                                                   p.error.variance.term = 0.42*0.02, # for now, double the NSDUH calcs and multiply by .02 from MD data
-                                                   p.error.variance.type = 'sd',
-                                                   # measurement.error.term = 0.21, # NSDUH calcs 
-                                                   # measurement.error.type = "cv",
+                                                   p.error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
+                                                   p.error.variance.type = "cv",
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -483,8 +473,8 @@ hiv.test.positivity.likelihood.instructions =
                                                    included.multiplier.sd = sqrt(0.1391234), # from cdc_positivity.bias.R
                                                    included.multiplier.correlation = 0.5,
                                                    
-                                                   p.error.variance.term = 0.03,
-                                                   p.error.variance.type = 'sd',
+                                                   p.error.variance.term = 0.5, # can be off by two fold; guessing this 
+                                                   p.error.variance.type = 'cv',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -518,7 +508,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     within.location.n.error.correlation = 0.5,
     
     observation.correlation.form = 'compound.symmetry',
-    p.error.variance.term = 0.03,
+    p.error.variance.term = 0.03, # guessed this
     p.error.variance.type = 'cv',
     
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
@@ -540,7 +530,7 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     from.year = 2008,
     
     observation.correlation.form = 'compound.symmetry',
-    error.variance.term = 0.03,
+    error.variance.term = 0.03, # guessed this
     error.variance.type = 'cv',
     
     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
@@ -565,7 +555,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              dimensions = c("sex","race","age"),
                                              from.year = 2018, 
                                              observation.correlation.form = 'compound.symmetry', 
-                                             error.variance.term = 0.03, # pick a smarter one
+                                             error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
                                              
@@ -624,7 +614,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                              dimensions = c("sex","race","age"),
                                              from.year = 2018, 
                                              observation.correlation.form = 'compound.symmetry', 
-                                             error.variance.term = 0.03, # pick a smarter one
+                                             error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
                                              
