@@ -386,7 +386,8 @@ for (data in adult.imm.em.list) {
     data = data,
     ontology.name = 'census.immigration.adults',
     source = 'census.population',
-    dimension.values = list(),
+    #dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Other')),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
     details = 'Census Metro Area to Metro Area Migration Flows')
 }
@@ -448,7 +449,7 @@ updated.adult.movement = lapply(adult.movement.data.unstratified.years, `[[`, 2)
 
 for (data in updated.adult.movement) {
   
-  data.manager$put.long.form(
+  data.manager$put.long.form( #Not redistributing race bc none of these have race
     data = data,
     ontology.name = 'census.immigration.adults',
     source = 'census.population',
