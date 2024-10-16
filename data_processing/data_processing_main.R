@@ -545,7 +545,7 @@ data.manager$register.ontology(
         location= NULL,
         age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                 "65-69 years", "70-74 years", "75+ years"),
-        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black"),
+        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black", 'Other'),
         sex=c('male','female'),
         incomplete.dimensions = c("year", "location")
     ))
@@ -557,7 +557,7 @@ data.manager$register.ontology(
         location= NULL,
         age = c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                 "65-69 years", "70-74 years", "75+ years"),
-        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black"),
+        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black", 'Other'),
         sex=c('male','female'),
         incomplete.dimensions = c("year", "location")
     ))
