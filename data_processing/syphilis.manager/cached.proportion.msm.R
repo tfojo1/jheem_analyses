@@ -2,6 +2,7 @@
 #I'm going to pull this from the surveillance manager because it actually pulls from
 #BRFSS so to run it independently would be a lot of processing time
 
+#At first this code is just pulling for county data but at the bottom I add national
 
 surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 
@@ -73,4 +74,64 @@ for (data in prop.msm.brfss) {
     dimension.values = list(sex = "male"),
     url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
     details = 'Emory University MSM Research from American Community Survey')
+  
+
+# Adding Proportion MSM at National Level (For Emory and BRFSS) -----------
+
+
+# Emory National ----------------------------------------------------------
+  DATA.DIR.MSM="../../data_raw/emory"
+  emory_files <- Sys.glob(paste0(DATA.DIR.MSM, '/*.csv'))
+  data.list.emory.msm <- lapply(emory_files, function(x){
+    list(filename=x, data=read.csv(x, header=TRUE, colClasses=c(COUNTYFP="character", STATEFP= "character")))
+  })
+  
+  emory.msm.national = lapply(data.list.emory.msm, function(file){
+    
+    data=file[["data"]]
+    filename = file[["filename"]]
+    
+    data$year = "2013"
+    data$outcome= "proportion.msm"
+    data$location = "US"
+    
+    #Group by location to sum across states
+    data <- data %>%
+      group_by(location)%>%
+      mutate(sum_msm = sum(MSM5YEAR))%>%
+      mutate(sum_adult_men = sum(ADULTMEN))
+    
+    data$value = as.numeric(data$sum_msm/data$sum_adult_men)
+    data$value = round(data$value, digits=2)
+    
+    #Need to add sex column in for put statement dimensions
+    data$sex = "male"
+    
+    data <- data %>%
+      select(year, location, outcome, sex, value)
+    
+    data<- data[!duplicated(data), ]
+    
+    data= as.data.frame(data)
+    
+    list(filename, data)
+  })  
+  
+  national.emory.msm.put = lapply(emory.msm.national, `[[`, 2)
+  
+  for (data in national.emory.msm.put ) {
+    
+    data.manager$put.long.form(
+      data = data,
+      ontology.name = 'emory',
+      source = 'emory',
+      dimension.values = list(sex = "male"),
+      url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
+      details = 'Emory University MSM Research from American Community Survey')
+  }
+  
+
+# BRFSS National ----------------------------------------------------------
+
+  #I'm going to write a separate code for this.
 
