@@ -3,6 +3,7 @@ library(jheem2)
 library(locations)
 library(tidyverse)
 library(readxl)
+library(haven)
 
 # Create Syphilis Manager -------------------------------------------------
 
