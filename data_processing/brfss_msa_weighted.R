@@ -146,8 +146,7 @@ data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   data$age = brfss.age.mappings[data$age]
   data$race = brfss.race.mappings[data$race]
   
-  data = subset(data, data$race != 'Multiracial') #Removing multiracial, other race, unknown 1-14-24
-  data = subset(data, data$race != 'Other race')
+  data = subset(data, data$race != 'Multiracial') #Removing multiracial, unknown 1-14-24
   data = subset(data, data$race != 'Unknown')
   
   # Estimate Who Was Tested in the Past Year ------------------------------------
