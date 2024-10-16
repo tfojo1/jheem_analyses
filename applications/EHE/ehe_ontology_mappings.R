@@ -220,7 +220,7 @@ register.ontology.mapping('proportion.tested.to.jheem.race',
                                            c('Asian', 'other'),
                                            c('Black', 'black'),
                                            c('Hispanic', 'hispanic'),
-                                           c('Multiracial', 'other'),
+                                           #c('Multiracial', 'other'),
                                            c('Native Hawaiian/Other Pacific Islander', 'other'),
                                            c('Other race', 'other'),
                                            c('White', 'other')))
