@@ -217,8 +217,6 @@ deaths.total = as.data.frame.table(census.manager$data$deaths$estimate$census.de
     url = 'www.census.gov',
     details = 'Census Reporting')
 
-
-
 # National Level Births and the Denominator -------------------------------
 
 national.births = as.data.frame.table(census.manager$data$births$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity)%>%
@@ -256,4 +254,50 @@ for (data in national.birth.data.combined ) {
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
+}
+
+
+# National Population Data by Age, Sex, Age+Sex ---------------------------
+
+nat.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__sex)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(outcome = "population")
+
+nat.age = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(outcome = "population")
+
+nat.age.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__sex)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(outcome = "population")
+
+nat.age.sex.combined = list(
+  nat.sex,
+  nat.age,
+  nat.age.sex)
+
+#national.sex.put = lapply(national.sex, `[[`, 2)
+
+for (data in nat.age.sex.combined) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'stratified.census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
 }
