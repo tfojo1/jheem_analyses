@@ -80,7 +80,7 @@ for (data in syphilis.clean.put) {
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'), 
+    dimension.values = list(),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -162,73 +162,73 @@ for (data in early.syphilis.put) {
     data = data,
     ontology.name = 'cdc.syphilis',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'), 
+    dimension.values = list(),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
 
-
+#Removing gc data because it hasn't been requested.
 # Gonorrhea Data ----------------------------------------------------------
 
-DATA.DIR.GC="../../data_raw/gonorrhea"
-gonorrhea_files <- Sys.glob(paste0(DATA.DIR.GC, '/*.csv'))
-gonorrhea.data <- lapply(gonorrhea_files, function(x){
-  skip=7
-  list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
-})
-
-gonorrhea.clean = lapply(gonorrhea.data, function(file){
-  
-  data=file[["data"]]
-  filename = file[["filename"]]
-  
-  data$year = substr(data$Year, 1, 4)
-  data$Cases = (gsub(",", "", data$Cases))
-  
-  data$outcome = "gonorrhea"
-  
-  data <- data %>%
-    mutate(value= ifelse(Cases == "Data not available" | Cases == "Data suppressed", NA, Cases))
-  
-  data$value = as.numeric(data$value)
-  
-  if(grepl("state", filename)) {
-    names(state.abb) <- state.name
-    data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography])
-  }
-  
-  if(grepl("county", filename)) {
-    data$location = data$FIPS
-  }
-  
-  ##Demographic conditionals##
-  
-  if(grepl("age", filename)) {
-    data$age = syphilis.mappings.age[data$Age.Group]
-  }
-  if(grepl("race", filename)) {
-    data$race= data$'Race.Ethnicity'
-  }
-  if(grepl("sex", filename)) {
-    names(data)[names(data)=='Sex'] = 'sex'
-    data$sex = tolower(data$sex)
-  }
-  
-  data= as.data.frame(data)
-  
-  list(filename, data)
-})
-
-# Put Gonorrhea -----------------------------------------------------------
-gonorrhea.clean.put = lapply(gonorrhea.clean, `[[`, 2)
-
-for (data in gonorrhea.clean.put) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'cdc.sti',
-    source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'),  
-    url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
-    details = 'CDC Atlas Plus')
-}
+# DATA.DIR.GC="../../data_raw/gonorrhea"
+# gonorrhea_files <- Sys.glob(paste0(DATA.DIR.GC, '/*.csv'))
+# gonorrhea.data <- lapply(gonorrhea_files, function(x){
+#   skip=7
+#   list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+# })
+# 
+# gonorrhea.clean = lapply(gonorrhea.data, function(file){
+#   
+#   data=file[["data"]]
+#   filename = file[["filename"]]
+#   
+#   data$year = substr(data$Year, 1, 4)
+#   data$Cases = (gsub(",", "", data$Cases))
+#   
+#   data$outcome = "gonorrhea"
+#   
+#   data <- data %>%
+#     mutate(value= ifelse(Cases == "Data not available" | Cases == "Data suppressed", NA, Cases))
+#   
+#   data$value = as.numeric(data$value)
+#   
+#   if(grepl("state", filename)) {
+#     names(state.abb) <- state.name
+#     data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography])
+#   }
+#   
+#   if(grepl("county", filename)) {
+#     data$location = data$FIPS
+#   }
+#   
+#   ##Demographic conditionals##
+#   
+#   if(grepl("age", filename)) {
+#     data$age = syphilis.mappings.age[data$Age.Group]
+#   }
+#   if(grepl("race", filename)) {
+#     data$race= data$'Race.Ethnicity'
+#   }
+#   if(grepl("sex", filename)) {
+#     names(data)[names(data)=='Sex'] = 'sex'
+#     data$sex = tolower(data$sex)
+#   }
+#   
+#   data= as.data.frame(data)
+#   
+#   list(filename, data)
+# })
+# 
+# # Put Gonorrhea -----------------------------------------------------------
+# gonorrhea.clean.put = lapply(gonorrhea.clean, `[[`, 2)
+# 
+# for (data in gonorrhea.clean.put) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'cdc.sti',
+#     source = 'cdc.sti',
+#     dimension.values = list(),    
+#     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
+#     details = 'CDC Atlas Plus')
+# }
