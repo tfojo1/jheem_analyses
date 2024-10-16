@@ -1805,6 +1805,16 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          save = F)
 
 track.integrated.outcome(EHE.SPECIFICATION,
+                         name = 'prep.indications.with.risk',
+                         value.to.integrate = 'uninfected',
+                         multiply.by = 'prep.indication', 
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         save = F
+)
+
+track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'prep.indications',
                          outcome.metadata = create.outcome.metadata(display.name = 'PrEP Indications',
                                                                     description = "The Number of People with an Indication for PrEP",
@@ -1812,8 +1822,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     axis.name = 'Number indicated for PrEP',
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
-                         value.to.integrate = 'uninfected',
-                         multiply.by = 'prep.indication', 
+                         value = 'prep.indications.with.risk',
                          keep.dimensions = c('location','age','race','sex'),
                          corresponding.data.outcome = 'prep.indications',
                          save = T
@@ -2198,7 +2207,7 @@ track.integrated.outcome(EHE.SPECIFICATION,
                                                                     singular.unit = '/y'),
                          value.to.integrate = 'flattened.sexual.transmission.rates',
                          multiply.by = 'sexual.susceptibility.covid.multiplier',
-                         denominator.outcome = 'prep.indications',
+                         denominator.outcome = 'prep.indications.with.risk',
                          dimension.alias.suffix = 'to',
                          keep.dimensions = c('location','age','race','sex')
 )
