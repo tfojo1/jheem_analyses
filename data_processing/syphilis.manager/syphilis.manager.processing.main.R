@@ -309,6 +309,13 @@ data.manager$register.ontology(
   ))
 
 data.manager$register.ontology(
+  'cdc.rural.area',
+  ont = ontology(
+    year= NULL,
+    location= NULL
+  ))
+
+data.manager$register.ontology(
   'cdc.sti',
   ont = ontology(
     year= NULL,

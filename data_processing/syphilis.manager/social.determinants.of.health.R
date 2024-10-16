@@ -164,7 +164,7 @@ for (data in sdh.clean.put) {
 
     data.manager$put.long.form(
       data = data,
-      ontology.name = 'cdc.sdh',
+      ontology.name = 'cdc.rural.area',
       source = 'cdc.rural',
       dimension.values = list(),
       url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
