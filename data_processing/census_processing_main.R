@@ -211,36 +211,36 @@ census.manager$register.ontology(
 ################################################################################ 
 
 #This pulls population from 1970-1999#
-source('data_processing/census_1970_1999.R')
+source('data_processing/census.manager/census_1970_1999.R')
 
 #This pulls single year age groups and demographic data from 2018-2020#
-source('data_processing/census_cdc_wonder.R')
+source('data_processing/census.manager/census_cdc_wonder.R')
 
 #This pulls single year age groups and demographic data from 2005-2017#
-source('data_processing/census_sas_files.R')
+source('data_processing/census.manager/census_sas_files.R')
 
 #This pulls birth and death data from CDC Wonder#
-source('data_processing/births_and_deaths.R')
+source('data_processing/census.manager/births_and_deaths.R')
 
 #This pulls the stratified census data by county for 2020-2022
-#source('data_processing/stratified_census.R')
+#source('data_processing/census.manager/stratified_census.R')
 
 #Sourcing more recent census population data that is stratified but not
 #by single year age just by age group which is why we added it so much later
-source('data_processing/census.population.10.19.R')
+source('data_processing/census.manager/census.population.10.19.R')
 
 #UPDATE 7-16: Temporarily commenting out 181 to source the newer stratified data
 #I'll use this to decide if we want age groups or single year
-source('data_processing/census.population.20.23.R')
+source('data_processing/census.manager/census.population.20.23.R')
 
 #Fertility rates and female.population
-source('data_processing/fertility.rate.R')
+source('data_processing/census.manager/fertility.rate.R')
 
 #National Level 'metro' deaths
-source('data_processing/mortality.cdc.wonder.R')
+source('data_processing/census.manager/mortality.cdc.wonder.R')
 
 #National Population data by age, sex, Age_sex (for SHIELD)
-source('data_processing/national.population.data.R')
+source('data_processing/census.manager/national.population.data.R')
 
 ################################################################################
 ###Read in Census Files###
