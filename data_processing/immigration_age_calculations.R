@@ -386,8 +386,7 @@ for (data in adult.imm.em.list) {
     data = data,
     ontology.name = 'census.immigration.adults',
     source = 'census.population',
-    #dimension.values = list(),
-    dimension.values.to.distribute = list(race=c('Other')),
+    dimension.values = list(),
     url = 'https://www.census.gov/data/tables/2015/demo/geographic-mobility/metro-to-metro-migration.html',
     details = 'Census Metro Area to Metro Area Migration Flows')
 }
