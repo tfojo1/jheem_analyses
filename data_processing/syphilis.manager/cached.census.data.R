@@ -301,3 +301,50 @@ for (data in nat.age.sex.combined) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
+
+
+# National Level Death Data -----------------------------------------------
+
+#from census
+national.deaths.total <- as.data.frame.table(census.manager$data$deaths$estimate$census.population$census$year__location)%>%
+  filter(location == "US")%>%
+  mutate(outcome = "deaths")%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(Freq))
+  
+  #From cdc wonder
+  national.deaths.stratified <- as.data.frame.table(census.manager$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)%>%
+  filter(location == "US")%>%
+  mutate(outcome = "deaths")%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+    mutate(value = as.numeric(Freq))%>%
+  mutate(age = as.character(age))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(race = as.character(race))%>%
+  mutate(ethnicity = as.character(ethnicity))
+
+#Need separate puts bc these are separate sources
+  
+  #census national death total data
+  data.manager$put.long.form(
+    data = national.deaths.total,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+  
+  
+    #cdc wonder national stratified death data
+    data.manager$put.long.form(
+      data = national.deaths.stratified,
+      ontology.name = 'census.cdc.wonder.births.deaths',
+      source = 'cdc_wonder',
+      dimension.values = list(),
+      url = 'https://wonder.cdc.gov/',
+      details = 'CDC Wonder')
+
+
+  

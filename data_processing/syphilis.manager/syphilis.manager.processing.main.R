@@ -306,6 +306,7 @@ data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behav
 data.manager$register.source('cdc.wonder.natality', parent.source= "NVSS", full.name = "CDC Wonder Natality Data", short.name='cdc.wonder.natality')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
 data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory')
+data.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
 
 
 #Creating these separately bc they have separate parent sources
