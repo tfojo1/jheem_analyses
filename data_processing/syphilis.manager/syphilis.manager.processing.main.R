@@ -301,16 +301,16 @@ data.manager$register.source('census.aggregated.population', parent.source= "cen
 
 # Establish Ontologies ----------------------------------------------------
 
-data.manager$register.ontology(
+data.manager$register.ontology( #This is for the county level SDH data (excluding rural.area)
   'cdc.sdh',
   ont = ontology(
     year= c("2018-2022"),
     location= NULL,
-    incomplete.dimensions = c("year", "location") #Is this the right way to code the 5 year ranges?
+    incomplete.dimensions = c("year", "location") 
   ))
 
-data.manager$register.ontology(
-  'cdc.rural.area',
+data.manager$register.ontology( #This is for the county level rural area data; and the national level SDH data
+  'cdc.sdh.two',
   ont = ontology(
     year= NULL,
     location= NULL

@@ -1,5 +1,8 @@
 options(error=NULL)
 
+#Note: County level SDH data is by year range. Except for Rural area which is for 2010 and 2020.
+#National level SDH data is by single year.And Rural area is 2010 and 2020.
+
 # Read in SDH Data --------------------------------------------------------
 
 DATA.DIR.SDH="../../data_raw/syphilis.manager/sdh"
@@ -184,4 +187,111 @@ for (data in sdh.clean.put) {
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus data')
   }
+  
+
+# National Level SDH Data -------------------------------------------------
+  
+  DATA.DIR.SDH.NATIONAL="../../data_raw/syphilis.manager/sdh/national"
+  national_sdh_files <- Sys.glob(paste0(DATA.DIR.SDH.NATIONAL, '/*.csv'))
+  national.sdh.data <- lapply(national_sdh_files, function(x){
+    skip=7
+    list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
+  })
+  
+
+# clean national data -----------------------------------------------------
+  national.sdh.clean  = lapply(national.sdh.data, function(file){
+    
+    data=file[["data"]]
+    filename = file[["filename"]]
+    
+    data$outcome = shd.mappings[data$Indicator]
+    data = data[!is.na(data$outcome),]
+    data$location = "US"
+    data$Year = as.character(data$Year)
+    data$year = ifelse(data$Year == "2020 (COVID-19 Pandemic)", "2020", data$Year)
+    
+    if(grepl("sdh", filename)) {
+      data = subset(data, !is.na(data$Percent)) #Need to remove Percent values that are character values
+      data = subset(data, data$Percent != "Data not available")
+      data$formatted.percent = as.numeric(data$Percent)
+      data$value = (data$formatted.percent/100)
+    }
+    
+    if(grepl("rural.area", filename)) {
+      data = subset(data, !is.na(data$Percent)) #Need to remove Percent values that are character values
+      data = subset(data, data$Percent != "Data not available")
+      data$formatted.percent = as.numeric(data$Percent)
+      data$value = (data$formatted.percent/100)
+    }
+    
+    data <- data %>%
+      select(outcome, year, location, value, Denominator)
+    data= as.data.frame(data)
+    list(filename, data) 
+    
+  })
+
+# National Denominators ---------------------------------------------------
+  national.sdh.denominators = lapply(national.sdh.clean, function(file){
+    
+    data=file[[2]]
+    filename = file[[1]]
+    
+    data <- data %>%
+      select(-value)%>%
+      mutate(value = as.numeric(gsub(',', '', Denominator)))%>%
+      mutate(outcome = paste( outcome, 'denominator', sep = '.'))%>%
+      select(outcome, year, location, value)
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+    
+  })
+
+# Put National Level Data ---------------------------------------------------
+  
+  all.others.national = national.sdh.denominators[[2]][[2]]
+  all.others.national.denom = national.sdh.clean[[2]][[2]]
+  
+  all.sdh.national = list(
+    all.others.national,
+    all.others.national.denom
+  )
+  
+  #put for all others
+  
+  for (data in all.sdh.national) {
+    
+    data.manager$put.long.form(
+      data = data,
+      ontology.name = 'cdc.sdh.two',
+      source = 'cdc.sdh',
+      dimension.values = list(),
+      url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
+      details = 'CDC Atlas Plus data')
+  }
+  
+  
+  
+  #Put for rural
+  national.rural.data = national.sdh.clean[[1]][[2]]
+  national.rural.data.denominators = national.sdh.denominators[[1]][[2]]
+  
+  national.rural = list(national.rural.data,
+                        national.rural.data.denominators )
+  
+  for (data in national.rural) {
+    
+    data.manager$put.long.form(
+      data = data,
+      ontology.name = 'cdc.sdh.two',
+      source = 'cdc.rural',
+      dimension.values = list(),
+      url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
+      details = 'CDC Atlas Plus data')
+  }
+
+  
   
