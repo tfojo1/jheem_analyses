@@ -261,6 +261,24 @@ data.manager$register.outcome(
     units = '%',
     description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
 
+data.manager$register.outcome(
+  'births',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Births',
+    axis.name = 'Births',
+    units = 'births',
+    description = "Births"))
+
+data.manager$register.outcome(
+  'births.denominator',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Births Denominator',
+    axis.name = 'Births Denominator',
+    units = 'births',
+    description = "Births Denominator"))
+
 # Create Sources + Parent Sources -----------------------------------------
 
 ##Register "Parent" Sources

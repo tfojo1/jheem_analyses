@@ -247,7 +247,7 @@ national.birth.data.combined = list(
 
 for (data in national.birth.data.combined ) {
   
-  census.manager$put.long.form(
+  data.manager$put.long.form(
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc.wonder.natality',
