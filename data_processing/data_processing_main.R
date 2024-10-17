@@ -545,7 +545,7 @@ data.manager$register.ontology(
         location= NULL,
         age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                 "65-69 years", "70-74 years", "75+ years"),
-        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black"),
+        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black", 'Other'),
         sex=c('male','female'),
         incomplete.dimensions = c("year", "location")
     ))
@@ -557,7 +557,7 @@ data.manager$register.ontology(
         location= NULL,
         age = c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                 "65-69 years", "70-74 years", "75+ years"),
-        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black"),
+        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black", 'Other'),
         sex=c('male','female'),
         incomplete.dimensions = c("year", "location")
     ))
@@ -626,25 +626,6 @@ data.manager$register.ontology(
     ethnicity=c('hispanic', 'not hispanic'),
     sex=c('male','female')
   ))
-
-#Can this be removed?
-# data.manager$register.ontology( 
-#   'census.cdc.wonder.population',
-#   ont = ontology(
-#     year= NULL,
-#     location= NULL,
-#     age=c('13 years', '14 years', '15 years', '16 years', '17 years', '18 years', '19 years', '20 years',
-#           '21 years', '22 years', '23 years', '24 years', '25 years', '26 years', '27 years', '28 years', '29 years', '30 years',
-#           '31 years', '32 years', '33 years', '34 years', '35 years', '36 years', '37 years', '38 years', '39 years', '40 years',
-#           '41 years', '42 years', '43 years', '44 years', '45 years', '46 years', '47 years', '48 years', '49 years', '50 years',
-#           '51 years', '52 years', '53 years', '54 years', '55 years', '56 years', '57 years', '58 years', '59 years', '60 years',
-#           '61 years', '62 years', '63 years', '64 years', '65 years', '66 years', '67 years', '68 years', '69 years', '70 years',
-#           '71 years', '72 years', '73 years', '74 years', '75 years', '76 years', '77 years', '78 years', '79 years', '80 years',
-#           '81 years', '82 years', '83 years', '84 years', '85+ years'),
-#     race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White'),
-#     ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino'), 
-#     sex=c('male','female')
-#   ))
 
 ################################################################################
 ###Source locations of interest to create MSA vector

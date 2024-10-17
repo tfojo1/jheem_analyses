@@ -449,7 +449,7 @@ updated.adult.movement = lapply(adult.movement.data.unstratified.years, `[[`, 2)
 
 for (data in updated.adult.movement) {
   
-  data.manager$put.long.form( #Not redistributing race bc none of these have race
+  data.manager$put.long.form( 
     data = data,
     ontology.name = 'census.immigration.adults',
     source = 'census.population',

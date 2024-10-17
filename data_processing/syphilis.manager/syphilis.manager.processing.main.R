@@ -3,6 +3,7 @@ library(jheem2)
 library(locations)
 library(tidyverse)
 library(readxl)
+library(haven)
 
 # Create Syphilis Manager -------------------------------------------------
 
@@ -242,6 +243,24 @@ data.manager$register.outcome(
     units = 'deaths',
     description = "Deaths"))
 
+data.manager$register.outcome(
+  'proportion.tested.n',       
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Denominator value for proportion tested in past year',
+    axis.name = 'Denominator value for proportion tested in past year',
+    units = '%',
+    description = "Denominator value for proportion tested in past year"))
+
+data.manager$register.outcome(
+  'proportion.tested', 
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Proportion Tested in Past Year',
+    axis.name = 'Proportion Tested in Past Year',
+    units = '%',
+    description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
+
 # Create Sources + Parent Sources -----------------------------------------
 
 ##Register "Parent" Sources
@@ -268,6 +287,8 @@ data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory U
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 data.manager$register.source('cdc.wonder.natality', parent.source= "NVSS", full.name = "CDC Wonder Natality Data", short.name='cdc.wonder.natality')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
+data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory')
+
 
 #Creating these separately bc they have separate parent sources
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
@@ -280,12 +301,19 @@ data.manager$register.source('census.aggregated.population', parent.source= "cen
 
 # Establish Ontologies ----------------------------------------------------
 
-data.manager$register.ontology(
+data.manager$register.ontology( #This is for the county level SDH data (excluding rural.area)
   'cdc.sdh',
   ont = ontology(
     year= c("2018-2022"),
     location= NULL,
-    incomplete.dimensions = c("year", "location") #Is this the right way to code the 5 year ranges?
+    incomplete.dimensions = c("year", "location") 
+  ))
+
+data.manager$register.ontology( #This is for the county level rural area data; and the national level SDH data
+  'cdc.sdh.two',
+  ont = ontology(
+    year= NULL,
+    location= NULL
   ))
 
 data.manager$register.ontology(
@@ -293,8 +321,8 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    age=c('13-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years', "Unknown"),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Multiracial', 'Native Hawaiian/Other Pacific Islander', 'White', 'Unknown'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -305,8 +333,8 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('13-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years'),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    age=c('13-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years', "Unknown"),
+    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White', "Unknown", "Multiracial"),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -389,7 +417,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
-    race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Multiracial', 'Hispanic'),
+    race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Hispanic'),
     sex=c('male','female'),
     risk=c('msm', 'not_msm')
   ))
@@ -406,7 +434,7 @@ data.manager$register.ontology(
   ))
 
 #This is for the births+births denominator data pulled from Census
-census.manager$register.ontology(
+data.manager$register.ontology(
   'census.cdc.wonder.births.deaths',
   ont = ontology(
     year= NULL,
@@ -419,6 +447,13 @@ census.manager$register.ontology(
     sex=c('male','female')
   ))
 
+data.manager$register.ontology(
+  'emory',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    sex=c('male', 'female') #needs to have male and female here to represent all possible outcomes
+  ))
 
 # Source Data Cleaning and Processing Files -------------------------------
 
@@ -429,6 +464,8 @@ source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/prep.data.R')
 source('data_processing/syphilis.manager/cached.proportion.msm.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
+source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested
+source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
 
 # RENAME ------------------------------------------------------------------
 

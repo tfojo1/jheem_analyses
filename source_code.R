@@ -41,8 +41,8 @@ if (!exists('CENSUS.MANAGER'))
 #    load(file.path(JHEEM.CACHE.DIR, 'DEFAULT.LOCALE.MAPPING.Rdata'))
 #if (!exists('msa.surveillance'))
 #    load(file.path(JHEEM.CACHE.DIR, 'msa.surveillance.Rdata'))
-if (!exists('national.surveillance'))
-  load(file.path(JHEEM.CACHE.DIR, 'national.surveillance.Rdata'))
+#if (!exists('national.surveillance'))
+#  load(file.path(JHEEM.CACHE.DIR, 'national.surveillance.Rdata'))
 
 
 # These supporting files are hold-overs from the previous version, and will eventually need to be replaced

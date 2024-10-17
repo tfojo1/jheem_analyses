@@ -371,6 +371,14 @@ track.cumulative.outcome(DEP.SPECIFICATION,
                          keep.dimensions = c("location"), 
                          save = T)
 
+track.cumulative.outcome(DEP.SPECIFICATION,
+                         name = 'cumulative.uninfected.over.18',
+                         value = expression(cumulative.uninfected * fraction.population.over.18),
+                         scale = 'non.negative.number',
+                         keep.dimensions = c('location','age','race','sex','risk','depression'),
+                         rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
+                         save = F,
+                         outcome.metadata = NULL)
 
 ##--------------##
 ##-- FINALIZE --##
