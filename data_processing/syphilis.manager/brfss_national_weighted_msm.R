@@ -3,7 +3,7 @@
 #Note this pulls a dataset created within the brfss_national_weighted_tested file
 ################################################################################
 ##Create a version of the brfss.state.sex data list to use below##
-data.list.brfss.national.sex.for.msm = lapply(data.list.brfss.state.clean, function(file){
+data.list.brfss.national.sex.for.msm = lapply(data.list.brfss.national.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
