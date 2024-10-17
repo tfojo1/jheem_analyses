@@ -5,24 +5,24 @@ calculate.error.terms(data.type = "suppression",
                       data.source.1 = "cdc.aggregated.proportion",
                       data.source.2 = "lhd",
                       is.cv = F)
-# DIAGNOSES: 0.07425679
+# DIAGNOSES: 0.04621778
 calculate.error.terms(data.type = "diagnoses",
                       data.source.1 = "cdc.surveillance.reports",
                       data.source.2 = "cdc.aggregated.county",
                       is.cv = T)
-# PREVAELNCE: 0.0923375
+# PREVALENCE: 0.04711922
 calculate.error.terms(data.type = "diagnosed.prevalence",
                       data.source.1 = "cdc.surveillance.reports",
                       data.source.2 = "cdc.aggregated.county",
                       is.cv = T)
 
-# AIDS DIAGNOSES: 0.2550623 - from 1993-1997 only; one source only has totals so no stratifications anyway 
+# AIDS DIAGNOSES: 0.2277531 - from 1993-1997 only; one source only has totals so no stratifications anyway 
 calculate.error.terms(data.type = "aids.diagnoses",
                       data.source.1 = "cdc.surveillance.reports",
                       data.source.2 = "cdc.aids",
                       years = c(1993:1997),
                       is.cv = T)
-# PREP UPTAKE: 0.03546968
+# PREP UPTAKE: 0.01239159
 calculate.error.terms(data.type = "prep",
                       data.source.1 = "aidsvu",
                       data.source.2 = "cdc.prep",
@@ -64,43 +64,43 @@ calculate.error.terms = function(data.type,
   locations.in.both.age = intersect(dimnames(data1$year__location__age)$location,
                                     dimnames(data2$year__location__age)$location)
   ages.in.both = intersect(dimnames(data1$year__location__age)$age,
-                           dimnames(data2$year__location__age)$age) 
-  
+                           dimnames(data2$year__location__age)$age)
+
   values1 = data1$year__location__age[years.in.both.age, locations.in.both.age,ages.in.both]
   values2 = data2$year__location__age[years.in.both.age, locations.in.both.age,ages.in.both]
-  
+
   all.values1 = c(all.values1, values1)
   all.values2 = c(all.values2, values2)
-  
-  
+
+
   # RISK
   years.in.both.risk = intersect(dimnames(data1$year__location__risk)$year,
                                  dimnames(data2$year__location__risk)$year)
   locations.in.both.risk = intersect(dimnames(data1$year__location__risk)$location,
                                      dimnames(data2$year__location__risk)$location)
   risks.in.both = intersect(dimnames(data1$year__location__risk)$risk,
-                            dimnames(data2$year__location__risk)$risk) 
-  
+                            dimnames(data2$year__location__risk)$risk)
+
   values1 = data1$year__location__risk[years.in.both.risk, locations.in.both.risk,risks.in.both]
   values2 = data2$year__location__risk[years.in.both.risk, locations.in.both.risk,risks.in.both]
-  
+
   all.values1 = c(all.values1, values1)
   all.values2 = c(all.values2, values2)
-  
+
   # SEX
   years.in.both.sex = intersect(dimnames(data1$year__location__sex)$year,
                                 dimnames(data2$year__location__sex)$year)
   locations.in.both.sex = intersect(dimnames(data1$year__location__sex)$location,
                                     dimnames(data2$year__location__sex)$location)
   sexes.in.both = intersect(dimnames(data1$year__location__sex)$sex,
-                            dimnames(data2$year__location__sex)$sex) 
-  
+                            dimnames(data2$year__location__sex)$sex)
+
   values1 = data1$year__location__sex[years.in.both.sex, locations.in.both.sex,sexes.in.both]
   values2 = data2$year__location__sex[years.in.both.sex, locations.in.both.sex,sexes.in.both]
-  
+
   all.values1 = c(all.values1, values1)
   all.values2 = c(all.values2, values2)
-  
+
   
   # RACE
   # years.in.both.race = intersect(dimnames(data1$year__location__race)$year,
@@ -118,12 +118,19 @@ calculate.error.terms = function(data.type,
   
   if(is.cv){
     # Calculate it
-    errors.1 = (all.values1 - all.values2)/all.values1 
-    errors.2 = (all.values1 - all.values2)/all.values2
-    errors = c(errors.1,errors.2)
-    errors[is.nan(errors)] = 0
-    errors = errors[!is.infinite(errors)]
-    rv = sqrt(sum(errors^2, na.rm=T)/sum(!is.na(errors))) 
+    cvs.1 = (all.values1 - all.values2)/all.values1 
+    cvs.2 = (all.values1 - all.values2)/all.values2
+    
+    cvs = c(cvs.1,cvs.2)
+    cvs[is.nan(cvs)] = 0
+    cvs = cvs[!is.na(cvs) & !is.infinite(cvs)]
+    
+    # check for outliers
+    mean.cv = mean(cvs)
+    sd.cv = sd(cvs)
+    outliers.mask = cvs<(mean.cv - (3*sd.cv)) | cvs>(mean.cv + (3*sd.cv))
+    cvs = cvs[!outliers.mask]
+    rv = sqrt(sum(cvs^2, na.rm=T)/sum(!is.na(cvs))) 
     
   } else {
     
