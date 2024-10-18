@@ -39,8 +39,34 @@ population.likelihood.instructions =
                                        # equalize.weight.by.year = F Default is TRUE
   )
 
-#deaths
-#births 
+#-- GENERAL MORTALITY  ----
+# everyone in the population 
+# general.mortality.likelihood.instructions = 
+#   create.basic.likelihood.instructions(outcome.for.data = "deaths",
+#                                        outcome.for.sim = "total.mortality", 
+#                                        dimensions = character(),#census only reports total deaths by location and year (those two are implicit)
+#                                        levels.of.stratification = c(0), 
+#                                        from.year = 2007, 
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.03, # look into source and see if they have estimate 
+#                                        error.variance.type = 'cv'
+#                                        # weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+#                                        # equalize.weight.by.year = T 
+#   )
+# #-- BIRTHS  ----
+# births.likelihood.instructions = 
+#   create.basic.likelihood.instructions(outcome.for.data = "births",
+#                                        outcome.for.sim = "births", 
+#                                        dimensions = character('age','race'),
+#                                        levels.of.stratification = c(0,1,2), 
+#                                        # from.year = 2007, #???
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.03, #???
+#                                        error.variance.type = 'cv'
+#                                        # weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+#                                        # equalize.weight.by.year = T 
+#   )
+
 # if we work on proportions that it'll be different 
 #-- IMMIGRATION----
 # immigration.likelihood.instructions = 

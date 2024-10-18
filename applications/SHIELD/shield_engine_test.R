@@ -1,6 +1,7 @@
 #CASHED FOLDER:
 # https://livejohnshopkins-my.sharepoint.com/personal/tfojo1_jh_edu/_layouts/15/onedrive.aspx?e=5%3A940bf48ba6e0498495fea5596e3dc8e7&sharingv2=true&fromShare=true&at=9&CID=425e54af%2De78b%2D4d53%2D8df4%2D6abb10af6339&id=%2Fpersonal%2Ftfojo1%5Fjh%5Fedu%2FDocuments%2FJHEEM2&FolderCTID=0x012000E74D427C3A55BC45A1C18C850CDA2DB4&view=0
-
+# Excel Sheet:
+# https://livejohnshopkins-my.sharepoint.com/:x:/g/personal/zdansky1_jh_edu/EVrQ-OpGqlVIpBi_KE0P6v4B2rTpIvYcyUtLz9e1NH_oig?e=kd8bjH&wdLOR=c06087FCD-0041-804E-BB9F-F582185054BC
 # https://jheem.shinyapps.io/EndingHIV/
 
 ##################
@@ -15,28 +16,33 @@
 # setwd('../../')
 source('applications/SHIELD/shield_specification.R')
 
-#metro.deaths:
-# grep('US',dimnames(CENSUS.MANAGER$data$metro.deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)[2]) # TRUE
-# grep('US',dimnames(SURVEILLANCE.MANAGER$outcomes)[2]) # TRUE
-# #population:
-# grep('US',dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location)[2])  #TRUE
-# grep('US',dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location__age)[2])# FALSE
-# grep('US',dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location__sex)[2])# FALSE
-# grep('US',dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location__race)[2])# FALSE
-# grep('US',dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location__age__sex)[2])# FALSE
-# #fertility rate:
+# CENSUS.MANAGER$outcomes
+# #metro.deaths:
+# grep('US',dimnames(CENSUS.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)[2]) # TRUE
+# # #population:
+# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age)[2])# TRUE
+# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__sex)[2])# TRUE
+# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race)[2])  #FALSE
+# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__ethnicity)[2])# FALSE
+# 
+# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__sex)[2])# FALSE
+# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race)[2])# FALSE
+# 
+# # #fertility rate:
 # grep('US',dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)[2]) # TRUE
+
 #US level data for fertility rate:
 # SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity[,'US',,,]
 
 
 # Baltimore MSA : C.12580
 engine = create.jheem.engine('shield', 'C.12580', 2025) #fails at reading mortality
+ # engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size 
 
-engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size 
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 # params['black.fertility.rate.multiplier']=.5
 sim1 = engine$run(params)
+sim1$births
 
 #plotting:
 #population data for Baltimore MSA

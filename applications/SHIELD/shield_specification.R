@@ -182,6 +182,7 @@ register.model.element(SHIELD.SPECIFICATION,
 # oneway stratification only for one timepoint  (2011-2015) (2016-2020) breakdown by age, by race, by sex only for 2020
 # 2010-2020
 
+# when we add immigration, we need to make sure that we dont count immigrants in Births and emmigrants as Deaths!!
 
 #-- TRANSMISSION --# ----
 # Transmission has 4 elements: 1.susceptibility, 2.transmissibility, 3.contact, 4.new infection proportion (where does new infection go to? e.g., infected PrEP, infected not on PrEP)
@@ -712,6 +713,22 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
 )
 
 
+## Births ----
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                    name='births',
+                    outcome.metadata = create.outcome.metadata(display.name = 'Births',
+                                                               description = "Births",
+                                                               scale = 'non.negative.number',
+                                                               axis.name = 'Persons',
+                                                               units = 'persons',
+                                                               singular.unit = 'person'), #will read the scale from metadata
+                    scale='non.negative.number',
+                    save=T,
+                    dynamic.quantity.name = 'births.from', #model has an internal definition for births  #births from is conditional on parent's characteristics
+                    keep.dimensions = c('location','age','race') #collapse on stage and continuum for infected and on profile as well
+)
+
+
 ##--------------------------------------------------------------------------------------------------------------#
 ##--------------------------------------------------------------------------------------------------------------#
 ## Incidence ----
@@ -785,13 +802,26 @@ print("SHIELD specification sourced successfully!")
 #                                                                                                                                                                                                                                 )
 
 
-# cumulative vs point: ndiagnosis: any diagnosis that were made during a year or n at. a single time in that year
+# OUTPUTS: ----
+# There are two ways to capture outputs: via 1) compartments (e.g., population size of a compartment), or 2) transitions (e/g., number of people moving from one compartment to another)
+#1::
+## track.point.outcome(): a static outcome at a certain point in time 
+### track.integrated.outcome(): integrates a point outcome over time
+# cumulative vs point: any diagnosis that were made during a year or n at. a single time in that year
 # infected + uninfected: these are reported at a single point in time Jan 1st of each year
 # assuming that census take place at a random time during hte year, we use the integral under population curve could be used for calibration
 # average of 2 points
 # outcomes: 1.point (like infected unifected), 2. some event count (incidence)
 
+# 2::  
+## track.transition(): a dynamic outcome that starts and end from compartments (it has both a from- and to-)
+## track.dynamic.outcome(): doesnt have a from or to compartment (e.g., count people as they enter the model)
+### track.cumulative.outcome(): can add multiple dynamic outcomes together  
+
+
+
 
 
 
 cat("*** Shiled_specification.R completed! ***\n")
+
