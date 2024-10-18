@@ -824,4 +824,17 @@ print("SHIELD specification sourced successfully!")
 
 
 cat("*** Shiled_specification.R completed! ***\n")
-
+# years=c('2000'=2000,'2005'=2005,'2010'=2010,'2020'=2020,'2030'=2030,'2040'=2040)
+# aging.rates<-do.get.empiric.aging.rates(location,
+#                                         specification.metadata,  
+#                                         years,
+#                                         force.match.age.brackets.to.before.smoothing = NULL)
+# aging.rates
+# new_aging_rates <- array(0, dim = c(length(years), dim(aging.rates[[1]]) ) )
+# dimnames(new_aging_rates)=c(year=list(as.character(years)),
+#                             dimnames(aging.rates[[1]]))
+# for (i in 1:length(years)) {
+#   year_name <- years[i]
+#   new_aging_rates[i, , , ] <- aging.rates[[i]]
+# }
+# new_aging_rates

@@ -658,44 +658,46 @@ do.get.empiric.aging.rates <- function(location,
   }
   # Compute aging rates:
   aging.rates = lapply(years, function(year){
-    year = as.character(min(max(year,min.year),max.year))
+    year = as.character(min(max(year,min.year),max.year)) #!onces the census data end, it applies the last year of data and projects that forward  (e.g., for 2030, it uses data in 2017)
     raw.rates = sapply(1:(specification.metadata$n.ages-1), function(age.index){
       age.upper.bound = specification.metadata$age.upper.bounds[age.index] - 1
       age.lower.bound = specification.metadata$age.lower.bounds[age.index]
-      age.bracket.ages = age.lower.bound:age.upper.bound
-      # if (age.bracket.ages[1]==0) age.bracket.ages[1]<-"< 1"
+      age.bracket.ages = paste0(age.lower.bound:age.upper.bound, ' years')
+      
       #@Todd:we have an issue here with <1 year and 1 year agegroups. and also 85+ years
-      #
+      if (age.bracket.ages[1]=="0 years") age.bracket.ages[1]<-"< 1 year"
+      if (age.bracket.ages[2]=="1 years") age.bracket.ages[2]<-"1 year"
+      #@Todd: what about those over 64 years?
+      
+      
+      # aging rate for the last agegroup in each braket
       pop[year, paste0(age.upper.bound, ' years'),,] /
-        colSums(pop[year, paste0(age.bracket.ages, ' years'),,], dims=1)
+        colSums(pop[year,age.bracket.ages,,], dims=1)
     })
     dim.names = c(dimnames(pop)[c('race','sex')], list(age=specification.metadata$dim.names$age[-1]))
     dim(raw.rates) = sapply(dim.names, length)
     dimnames(raw.rates) = dim.names
-    desired.dim.names = specification.metadata$dim.names[c('age','race','sex','risk')]
-    desired.dim.names$age = desired.dim.names$age[-length(desired.dim.names$age)]
-    #
+    
+    # reconfiguring the dimensions:
+    desired.dim.names = specification.metadata$dim.names[c('age','race','sex')]
+    desired.dim.names$age = desired.dim.names$age[-length(desired.dim.names$age)] #TODD: why are we excluding the last agegroup here?
+    
+    # mapping to our sex groups
     sex.mapping = c(msm='male', heterosexual_male='male', female='female')
     rates.by.sex = sapply(desired.dim.names$sex, function(sex){
           sex.from = sex.mapping[sex]
       if (is.na(sex.from))
         stop("'get.empiric.aging.rates' in the ehe_specification_helpers is hard-coded for sex = [msm, heterosexual_male, female]. You will need to modify this function to accomodate additional sex categories")
-      
       raw.rates[,sex.from,]
     })
-    
     dim.names = desired.dim.names[c('race','age','sex')]
     dim(rates.by.sex) = sapply(dim.names, length)
     dimnames(rates.by.sex) = dim.names
-    
+    #
     rv = expand.array(rates.by.sex, target.dim.names = desired.dim.names)
-    
-    rv[1,,,specification.metadata$compartment.aliases$active.idu.states] = active.idu.proportion.youngest.stratum.aging.up
-    rv[1,,,specification.metadata$compartment.aliases$prior.idu.states] = prior.idu.proportion.youngest.stratum.aging.up
-    
+    dim(rv)
     rv
   })
-  
   names(aging.rates) = names(years)
   aging.rates
 }
