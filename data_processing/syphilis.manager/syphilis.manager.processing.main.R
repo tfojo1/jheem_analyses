@@ -316,7 +316,7 @@ data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('cdc.aggregated.proportion', parent.source= "NHSS", full.name = 'CDC Aggregated Proportion', short.name = 'cdc agg prop')
 data.manager$register.source('census.aggregated.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
-
+data.manager$register.source('cdc.wonder.aggregated.births', parent.source= "NVSS", full.name = 'CD Wonder Aggregated Births', short.name = 'cdc.wndr.agg.births')
 
 # Establish Ontologies ----------------------------------------------------
 
@@ -581,6 +581,16 @@ put.msa.data.as.new.source(outcome = 'deaths',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
                            data.manager= syphilis.manager) 
+
+put.msa.data.as.new.source(outcome = 'births',
+                           from.source.name= 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.births', 
+                           to.locations = MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager= syphilis.manager) 
+
 
 all.states = locations::get.all.for.type('state')
 #Aggregates census
