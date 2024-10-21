@@ -22,8 +22,19 @@ par.names.pop = c(
     "global.trate"#,
 )
 
+par.names.pop = c(par.names.pop,
+                  EHE.PARAMETERS.PRIOR@var.names[grepl('msm\\.trate', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                   grepl('heterosexual\\.trate', EHE.PARAMETERS.PRIOR@var.names) |
+                                                   grepl('idu\\.trate', EHE.PARAMETERS.PRIOR@var.names) |
+                                                   grepl('incident\\.idu', EHE.PARAMETERS.PRIOR@var.names) |
+                                                   grepl('black\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) |
+                                                   grepl('hispanic\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) |
+                                                   grepl('other\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) ]
+                    )
+ 
+
 register.calibration.info(CALIBRATION.CODE.POPULATION,
-                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added total prev/new 5/20
+                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added race/risk transmission targets 10/21
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = par.names.pop,
