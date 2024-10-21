@@ -41,54 +41,54 @@ simplot(simset.old$last.sim(),
         dimension.values = list(year = 2000:2030)) 
 
 simplot(#simset.old$first.sim(),
-        simset.old$last.sim(),
-        #simset.new$first.sim(),
-        simset.new$last.sim(),
-        simset.new,
-        outcomes = c("diagnosed.prevalence"), 
-        style.manager = source.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+  simset.old$last.sim(),
+  #simset.new$first.sim(),
+  simset.new$last.sim(),
+  simset.new,
+  outcomes = c("diagnosed.prevalence"), 
+  style.manager = source.style.manager,
+  dimension.values = list(year = 2000:2030)) 
 
 simplot(#simset.old$first.sim(),
-        simset.old$last.sim(),
-        #simset.new$first.sim(),
-        simset.new$last.sim(),
-        #simset.new,
-        facet.by = "risk", split.by = "race",
-        outcomes = c("diagnosed.prevalence"), 
-        dimension.values = list(year = 2000:2030)) 
+  simset.old$last.sim(),
+  #simset.new$first.sim(),
+  simset.new$last.sim(),
+  #simset.new,
+  facet.by = "risk", split.by = "race",
+  outcomes = c("diagnosed.prevalence"), 
+  dimension.values = list(year = 2000:2030)) 
 
 simplot(#simset.old$first.sim(),
-        simset.old$last.sim(),
-        #simset.new$first.sim(),
-        simset.new$last.sim(),
-        #simset.new,
-        facet.by = "age", split.by = "sex", 
-        outcomes = c("diagnosed.prevalence"), 
-        dimension.values = list(year = 2000:2030)) 
+  simset.old$last.sim(),
+  #simset.new$first.sim(),
+  simset.new$last.sim(),
+  #simset.new,
+  facet.by = "age", split.by = "sex", 
+  outcomes = c("diagnosed.prevalence"), 
+  dimension.values = list(year = 2000:2030)) 
 
 simplot(#simset.old$last.sim(),
-        simset.new,      
-        simset.new$last.sim(),
-        outcomes = c("new"), 
-        style.manager = source.style.manager, 
-        dimension.values = list(year = 2000:2030)) 
+  simset.new,      
+  simset.new$last.sim(),
+  outcomes = c("new"), 
+  style.manager = source.style.manager, 
+  dimension.values = list(year = 2000:2030)) 
 
 simplot(#simset.old$last.sim(),
-        simset.new$last.sim(),
-        facet.by = "risk", split.by = "race", 
-        outcomes = c("new"), 
-        dimension.values = list(year = 2000:2030)) 
+  simset.new$last.sim(),
+  facet.by = "risk", split.by = "race", 
+  outcomes = c("new"), 
+  dimension.values = list(year = 2000:2030)) 
 
 simplot(#simset.old$last.sim(),
-        simset.new$last.sim(),
-        facet.by = "age", split.by = "sex", 
-        outcomes = c("new"), 
-        dimension.values = list(year = 2000:2030)) 
+  simset.new$last.sim(),
+  facet.by = "age", split.by = "sex", 
+  outcomes = c("new"), 
+  dimension.values = list(year = 2000:2030)) 
 
 simplot(simset.old$last.sim(),
         simset.new$last.sim(),
-       # facet.by = "age", 
+        # facet.by = "age", 
         outcomes = c("testing"),
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
