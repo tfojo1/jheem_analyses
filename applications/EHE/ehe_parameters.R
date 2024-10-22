@@ -164,78 +164,96 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     global.trate = Loguniform.Distribution(0,Inf),
     
     #-- MSM Transmission --#
-    black.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
+    black.msm.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
                                                                     r1.log.sd=log(BASE.TRATE.CV),
                                                                     rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                     rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                    rr.peak.to.0.log.mean = log(3.1),
+                                                                    rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                     race='black',
                                                                     route='msm'),
     
-    hispanic.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
+    hispanic.msm.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
                                                                        r1.log.sd=log(BASE.TRATE.CV),
                                                                        rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                        rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                       rr.peak.to.0.log.mean = log(3.1),
+                                                                       rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                        race='hispanic',
                                                                        route='msm'),
     
-    other.msm.transmission = create.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
+    other.msm.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(MSM.BASE.TRATE.MEAN),
                                                                     r1.log.sd=log(BASE.TRATE.CV),
                                                                     rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                     rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                    rr.peak.to.0.log.mean = log(3.1),
+                                                                    rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                     race='other',
                                                                     route='msm'),
     
-    msm.peak.trate.multiplier =  Lognormal.Distribution(log(3.1), 0.5*log(TRATE.RR.0.PEAK.SPAN)),
+#    msm.peak.trate.multiplier =  Lognormal.Distribution(log(3.1), 0.5*log(TRATE.RR.0.PEAK.SPAN)),
     
     
     #-- Heterosexual Transmission --#
-    black.heterosexual.transmission = create.transmission.prior.distribution(r1.log.mean=log(HET.BASE.TRATE.MEAN),
+    black.heterosexual.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(HET.BASE.TRATE.MEAN),
                                                                              r1.log.sd=log(BASE.TRATE.CV),
                                                                              rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                              rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                             rr.peak.to.0.log.mean = log(2.2),
+                                                                             rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                              race='black',
                                                                              route='heterosexual'),
     
-    hispanic.heterosexual.transmission = create.transmission.prior.distribution(r1.log.mean=log(HET.BASE.TRATE.MEAN),
+    hispanic.heterosexual.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(HET.BASE.TRATE.MEAN),
                                                                                 r1.log.sd=log(BASE.TRATE.CV),
                                                                                 rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                                 rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                                rr.peak.to.0.log.mean = log(2.2),
+                                                                                rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                                 race='hispanic',
                                                                                 route='heterosexual'),
     
-    other.heterosexual.transmission = create.transmission.prior.distribution(r1.log.mean=log(HET.BASE.TRATE.MEAN),
+    other.heterosexual.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(HET.BASE.TRATE.MEAN),
                                                                              r1.log.sd=log(BASE.TRATE.CV),
                                                                              rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                              rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                             rr.peak.to.0.log.mean = log(2.2),
+                                                                             rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                              race='other',
                                                                              route='heterosexual'),
     
-    heterosexual.peak.trate.multiplier =  Lognormal.Distribution(log(2.2), 0.5*log(TRATE.RR.0.PEAK.SPAN)),
+#    heterosexual.peak.trate.multiplier =  Lognormal.Distribution(log(2.2), 0.5*log(TRATE.RR.0.PEAK.SPAN)),
     
     
     #-- IDU Transmission --#
-    black.idu.transmission = create.transmission.prior.distribution(r1.log.mean=log(IDU.BASE.TRATE.MEAN),
+    black.idu.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(IDU.BASE.TRATE.MEAN),
                                                                     r1.log.sd=log(BASE.TRATE.CV),
                                                                     rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                     rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                    rr.peak.to.0.log.mean = log(4.7),
+                                                                    rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                     race='black',
                                                                     route='idu'),
     
-    hispanic.idu.transmission = create.transmission.prior.distribution(r1.log.mean=log(IDU.BASE.TRATE.MEAN),
+    hispanic.idu.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(IDU.BASE.TRATE.MEAN),
                                                                        r1.log.sd=log(BASE.TRATE.CV),
                                                                        rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                        rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                       rr.peak.to.0.log.mean = log(4.7),
+                                                                       rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                        race='hispanic',
                                                                        route='idu'),
     
-    other.idu.transmission = create.transmission.prior.distribution(r1.log.mean=log(IDU.BASE.TRATE.MEAN),
+    other.idu.transmission = create.four.knot.transmission.prior.distribution(r1.log.mean=log(IDU.BASE.TRATE.MEAN),
                                                                     r1.log.sd=log(BASE.TRATE.CV),
                                                                     rr.2.to.1.log.sd=0.5*log(TRATE.RR.1.2.SPAN),
                                                                     rr.0.to.1.log.sd=0.5*log(TRATE.RR.0.1.SPAN),
+                                                                    rr.peak.to.0.log.mean = log(4.7),
+                                                                    rr.peak.to.0.log.sd = 0.5*log(TRATE.RR.0.PEAK.SPAN),
                                                                     race='other',
                                                                     route='idu'),
     
-    idu.peak.trate.multiplier =  Lognormal.Distribution(log(4.7), 0.5*log(TRATE.RR.0.PEAK.SPAN)),
+#    idu.peak.trate.multiplier =  Lognormal.Distribution(log(4.7), 0.5*log(TRATE.RR.0.PEAK.SPAN)),
     
     #-- MSM-IDU Transmission --#
     
@@ -328,11 +346,11 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     # Peak Age Susceptibility Multiplier
     
-    age1.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.5*log(2)),
-    age2.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.5*log(2)),
-    age3.susceptibility.rr.mult.0 = Lognormal.Distribution(0, 0.5*log(2)),
-    age4.susceptibility.rr.mult.0 = Lognormal.Distribution(log(AIDS.RELATIVE.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
-    age5.susceptibility.rr.mult.0 = Lognormal.Distribution(log(AIDS.RELATIVE.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    age1.susceptibility.rr.peak = Lognormal.Distribution(0, 0.5*log(2)),
+    age2.susceptibility.rr.peak = Lognormal.Distribution(0, 0.5*log(2)),
+    age3.susceptibility.rr.peak = Lognormal.Distribution(0, 0.5*log(2)),
+    age4.susceptibility.rr.peak = Lognormal.Distribution(log(AIDS.RELATIVE.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.susceptibility.rr.peak = Lognormal.Distribution(log(AIDS.RELATIVE.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
     
    
     
@@ -1004,9 +1022,10 @@ BASE.HIV.SAMPLING.BLOCKS = list(
   
 #-- MSM TRANSMISSION --#
 
-    peak.msm.transmission = 'msm.peak.trate.multiplier',
+ #   peak.msm.transmission = 'msm.peak.trate.multiplier',
     
-    black.msm.transmission.0 = c(
+    black.msm.transmission.0.peak = c(
+      'black.msm.trate.peak',
       'black.msm.trate.0'
     ),
 
@@ -1016,6 +1035,7 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     ),
 
     hispanic.msm.transmission.0 = c(
+      'hispanic.msm.trate.peak',
       'hispanic.msm.trate.0'
     ),
     
@@ -1025,6 +1045,7 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     ),
     
     other.msm.transmission.0 = c(
+      'other.msm.trate.peak',
       'other.msm.trate.0'
     ),
     
@@ -1089,26 +1110,35 @@ BASE.HIV.SAMPLING.BLOCKS = list(
   
 #-- HETEROSEXUAL TRANSMISSION --#
 
-    peak.heterosexual.transmission = 'heterosexual.peak.trate.multiplier',
+ #   peak.heterosexual.transmission = 'heterosexual.peak.trate.multiplier',
+
+    black.heterosexual.transmission.0.peak = c(
+      'black.heterosexual.trate.peak',
+      'black.heterosexual.trate.0'),
     
-    black.heterosexual.transmission = c(
-      'black.heterosexual.trate.0',
+    black.heterosexual.transmission.1.2 = c(
       'black.heterosexual.trate.1',
       'black.heterosexual.trate.2'
     ),
-    
-    hispanic.heterosexual.transmission = c(
-      'hispanic.heterosexual.trate.0',
+
+    hispanic.heterosexual.transmission.0.peak = c(
+      'hispanic.heterosexual.trate.peak',
+      'hispanic.heterosexual.trate.0'),
+
+    hispanic.heterosexual.transmission.1.2 = c(
       'hispanic.heterosexual.trate.1',
       'hispanic.heterosexual.trate.2'
     ),
     
-    other.heterosexual.transmission = c(
-      'other.heterosexual.trate.0',
+    other.heterosexual.transmission.0.peak = c(
+      'other.heterosexual.trate.peak',
+      'other.heterosexual.trate.0'),
+
+    other.heterosexual.transmission.1.2 = c(
       'other.heterosexual.trate.1',
-      'other.heterosexual.trate.2',
-      'heterosexual.fraction.trate.change.after.t2'
-    ),
+      'other.heterosexual.trate.2'),
+
+    heterosexual.fraction.trate.change.after.t2 = 'heterosexual.fraction.trate.change.after.t2',
     
     male.vs.female.heterosexual.rr = 'male.vs.female.heterosexual.rr',
 
@@ -1132,26 +1162,35 @@ BASE.HIV.SAMPLING.BLOCKS = list(
 
 #-- IDU TRANSMISSION --#
   
-    peak.idu.transmission = 'idu.peak.trate.multiplier',
+#    peak.idu.transmission = 'idu.peak.trate.multiplier',
     
-    black.idu.transmission = c(
-      'black.idu.trate.0',
+    black.idu.transmission.0.peak = c(
+      'black.idu.trate.peak',
+      'black.idu.trate.0'),
+      
+    black.idu.transmission.1.2 = c(
       'black.idu.trate.1',
       'black.idu.trate.2'
     ),
     
-    hispanic.idu.transmission = c(
-      'hispanic.idu.trate.0',
+    hispanic.idu.transmission.0.peak = c(
+      'hispanic.idu.trate.peak',
+      'hispanic.idu.trate.0'),
+    
+    hispanic.idu.transmission.1.2 = c(
       'hispanic.idu.trate.1',
       'hispanic.idu.trate.2'
     ),
     
-    other.idu.transmission = c(
-      'other.idu.trate.0',
+    other.idu.transmission.0.peak = c(
+      'other.idu.trate.peak',
+      'other.idu.trate.0'),
+    
+    other.idu.transmission.1.2 = c(
       'other.idu.trate.1',
-      'other.idu.trate.2',
-      'idu.fraction.trate.change.after.t2'
-    ),
+      'other.idu.trate.2'),
+    
+    idu.fraction.trate.change.after.t2 = 'idu.fraction.trate.change.after.t2',
     
     female.vs.heterosexual.male.idu.susceptibility = 'female.vs.heterosexual.male.idu.susceptibility.rr',
     
@@ -1218,11 +1257,11 @@ BASE.HIV.SAMPLING.BLOCKS = list(
                                'global.trate'),
   
     age.peak.multiplier = c(
-      'age1.susceptibility.rr.mult.0',
-      'age2.susceptibility.rr.mult.0',
-      'age3.susceptibility.rr.mult.0',
-      'age4.susceptibility.rr.mult.0',
-      'age5.susceptibility.rr.mult.0'
+      'age1.susceptibility.rr.peak',
+      'age2.susceptibility.rr.peak',
+      'age3.susceptibility.rr.peak',
+      'age4.susceptibility.rr.peak',
+      'age5.susceptibility.rr.peak'
     ),
 
 #-- TESTING --#

@@ -338,127 +338,65 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
 
     #-- Transmission Rates --#
     
-    trate.times = 0:2
+    trate.alpha.times = c('pre.peak', 'peak.start', 'peak.end', '0', '1', '2')
+    trate.parameter.times = c('0', 'peak','peak', '0', '1', '2')
+    age.rr.parameter.times = c('01', 'peak', 'peak', '01', '01', '2')
+    age.rr.is.category.specific = c(T, F, F, T, T, T)
     
     # MSM
-    set.ehe.age.race.stratified.trate.alphas.from.parameters(model.settings,
-                                                        parameters = parameters,
-                                                        category = 'msm',
-                                                        stratified.age.indices = 1:2,
-                                                        times=trate.times)
+    set.ehe.trate.alphas.from.parameters(model.settings,
+                                         parameters = parameters,
+                                         category = 'msm',
+                                         alpha.times = trate.alpha.times,
+                                         trate.parameter.times = trate.parameter.times,
+                                         age.rr.parameter.times = age.rr.parameter.times,
+                                         age.rr.is.category.specific = age.rr.is.category.specific,
+                                         race.stratified.age.indices = 1:2,
+                                         age.rr.is.race.stratified = c(T,F,F,T,T,T))
       
     # Heterosexual
     set.ehe.trate.alphas.from.parameters(model.settings,
                                          parameters = parameters,
                                          category = 'heterosexual',
-                                         times=trate.times)
+                                         alpha.times = trate.alpha.times,
+                                         trate.parameter.times = trate.parameter.times,
+                                         age.rr.parameter.times = age.rr.parameter.times,
+                                         age.rr.is.category.specific = age.rr.is.category.specific)
 
     # IDU
     set.ehe.trate.alphas.from.parameters(model.settings,
                                          parameters = parameters,
                                          category = 'idu',
-                                         times=trate.times)
+                                         alpha.times = trate.alpha.times,
+                                         trate.parameter.times = trate.parameter.times,
+                                         age.rr.parameter.times = age.rr.parameter.times,
+                                         age.rr.is.category.specific = age.rr.is.category.specific)
 
     
     # Add in the MSM-IDU susceptibility multipliers
     # And female-IDU susceptibility multipliers
     
-    for (time in trate.times)
+    for (i in 1:length(trate.alpha.times))
     {
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
-                                                                      alpha.name = paste0('rate', time),
-                                                                      values = parameters[paste0('msm.idu.susceptibility.rr.', time)],
+                                                                      alpha.name = paste0('rate.', trate.alpha.times[i]),
+                                                                      values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
                                                                       applies.to.dimension.values = 'msm',
                                                                       dimension = 'sex.to')
       
-      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.trates',
-                                                                    alpha.name = paste0('rate', time),
-                                                                    values = parameters[paste0('msm.idu.susceptibility.rr.', time)],
-                                                                    applies.to.dimension.values = idu.states,
-                                                                    dimension = 'risk.to')
-      
-      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
-                                                                    alpha.name = paste0('rate', time),
-                                                                    values = parameters['female.vs.heterosexual.male.idu.susceptibility.rr'],
-                                                                    applies.to.dimension.values = 'female',
-                                                                    dimension = 'sex.to')
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.trates',
+                                                                      alpha.name = paste0('rate.', trate.alpha.times[i]),
+                                                                      values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
+                                                                      applies.to.dimension.values = idu.states,
+                                                                      dimension = 'risk.to')
+        
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
+                                                                      alpha.name = paste0('rate.', trate.alpha.times[i]),
+                                                                      values = parameters['female.vs.heterosexual.male.idu.susceptibility.rr'],
+                                                                      applies.to.dimension.values = 'female',
+                                                                      dimension = 'sex.to')
     }
-    
-    # Add in the IDU Peak
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.peak.multiplier',
-                                                                  alpha.name = 'peak.start',
-                                                                  values = parameters['idu.peak.trate.multiplier'],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.peak.multiplier',
-                                                                  alpha.name = 'peak.end',
-                                                                  values = parameters['idu.peak.trate.multiplier'],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
-    
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.peak.multiplier',
-                                                                  alpha.name = 'peak.start',
-                                                                  values = parameters['msm.idu.susceptibility.rr.peak'],
-                                                                  applies.to.dimension.values = 'msm',
-                                                                  dimension = 'sex.to')
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.peak.multiplier',
-                                                                  alpha.name = 'peak.end',
-                                                                  values = parameters['msm.idu.susceptibility.rr.peak'],
-                                                                  applies.to.dimension.values = 'msm',
-                                                                  dimension = 'sex.to')
-    
-    # Add in the MSM Peak
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.peak.multiplier',
-                                                                  alpha.name = 'peak.start',
-                                                                  values = parameters['msm.peak.trate.multiplier'],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.peak.multiplier',
-                                                                  alpha.name = 'peak.end',
-                                                                  values = parameters['msm.peak.trate.multiplier'],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
-    
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.peak.multiplier',
-                                                                  alpha.name = 'peak.start',
-                                                                  values = parameters['msm.idu.susceptibility.rr.peak'],
-                                                                  applies.to.dimension.values = idu.states,
-                                                                  dimension = 'risk.to')
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.peak.multiplier',
-                                                                  alpha.name = 'peak.end',
-                                                                  values = parameters['msm.idu.susceptibility.rr.peak'],
-                                                                  applies.to.dimension.values = idu.states,
-                                                                  dimension = 'risk.to')
-    
-    # Add in the Heterosexual Peak
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'heterosexual.peak.multiplier',
-                                                                  alpha.name = 'peak.start',
-                                                                  values = parameters['heterosexual.peak.trate.multiplier'],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'heterosexual.peak.multiplier',
-                                                                  alpha.name = 'peak.end',
-                                                                  values = parameters['heterosexual.peak.trate.multiplier'],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
-    
-    # 
-    # # Add in the Peak Multipliers for Age
-    # for (category in c('msm','heterosexual','idu'))
-    # {
-    #     model.settings$set.element.functional.form.main.effect.alphas(element.name = paste0(category, '.peak.multiplier'),
-    #                                                                   alpha.name = 'peak.start',
-    #                                                                   values = parameters[paste0('age', 1:specification.metadata$n.ages,
-    #                                                                                              '.peak.susceptibility.rr.mult')],
-    #                                                                   applies.to.dimension.values = specification.metadata$dim.names$age,
-    #                                                                   dimension = 'age.to')
-    #     model.settings$set.element.functional.form.main.effect.alphas(element.name = paste0(category, '.peak.multiplier'),
-    #                                                                   alpha.name = 'peak.end',
-    #                                                                   values = parameters[paste0('age', 1:specification.metadata$n.ages,
-    #                                                                                              '.peak.susceptibility.rr.mult')],
-    #                                                                   applies.to.dimension.values = specification.metadata$dim.names$age,
-    #                                                                   dimension = 'age.to')
-    # }
+
     
     #-- Non-HIV Aging --#
     spline.times = c(2010,2020,2030,2040)
@@ -971,44 +909,72 @@ set.ehe.alphas.from.parameters <- function(model.settings,
 set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                  parameters,
                                                  category,
-                                                 times)
+                                                 alpha.times,
+                                                 trate.parameter.times,
+                                                 age.rr.parameter.times,
+                                                 age.rr.is.category.specific,
+                                                 race.stratified.age.indices = integer(),
+                                                 age.rr.is.race.stratified = rep(F, length(alpha.times)))
 {
     specification.metadata = model.settings$specification.metadata
     elem.name = paste0(category, '.trates')
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
+    non.race.stratified.age.indices = setdiff(1:specification.metadata$n.ages, race.stratified.age.indices)
+    all.age.indices = 1:length(ages)
     
-    for (time in times)
+    for (i in 1:length(alpha.times))
     {
-        alpha.name = paste0('rate', time)
+        alpha.time = alpha.times[i]
+        trate.param.time = trate.parameter.times[i]
+        age.rr.param.time = age.rr.parameter.times[i]
+        alpha.name = paste0('rate.', alpha.time)
         
         #-- The race effects --#
         model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
                                                                       alpha.name = alpha.name,
-                                                                      values = parameters[paste0(races, '.', category, '.trate.', time)],
+                                                                      values = parameters[paste0(races, '.', category, '.trate.', trate.param.time)],
                                                                       dimension = 'race.to',
                                                                       applies.to.dimension.values = races)
 
-        #-- The age effects --#
-        age.rr.multipliers = parameters[paste0('age', 1:specification.metadata$n.ages, '.susceptibility.rr.mult.', time)]
-        age.rr.multipliers[is.na(age.rr.multipliers)] = 1
+        #-- The non-race-stratified age effects --#
         
-        age.rrs = parameters[paste0('age', 1:specification.metadata$n.ages, '.', category, '.susceptibility.rr')]
-        missing.rr.mask = is.na(age.rrs)
-        if (time==2)
-            age.rrs[missing.rr.mask] = parameters[paste0('age', 
-                                                         (1:specification.metadata$n.ages)[missing.rr.mask],
-                                                         '.', category, '.susceptibility.rr.2')]
+        if (age.rr.is.race.stratified[i])
+            age.indices = non.race.stratified.age.indices
         else
-            age.rrs[missing.rr.mask] = parameters[paste0('age', 
-                                                         (1:specification.metadata$n.ages)[missing.rr.mask],
-                                                         '.', category, '.susceptibility.rr.01')]
+            age.indices = all.age.indices
         
+        if (age.rr.is.category.specific[i])
+            age.rrs = paste0('age', age.indices, '.', category, '.susceptibility.rr.', age.rr.param.time)
+        else
+            age.rrs = paste0('age', age.indices, '.susceptibility.rr.', age.rr.param.time)
+    
         model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
                                                                       alpha.name = alpha.name,
-                                                                      values = age.rrs * age.rr.multipliers,
+                                                                      values = parameters[age.rrs],
                                                                       dimension = 'age.to',
-                                                                      applies.to.dimension.values = ages)
+                                                                      applies.to.dimension.values = ages[age.indices])
+        
+        # The race-stratified age effects
+        if (age.rr.is.race.stratified[i])
+        {
+            for (age.index in race.stratified.age.indices)
+            { 
+                for (race in races)
+                {
+                    if (age.rr.is.category.specific[i])
+                        age.rr = paste0('age', age.index, '.', race, '.', category, '.susceptibility.rr.', age.rr.param.time)
+                    else
+                        age.rr = paste0('age', age.index, '.', race, '.susceptibility.rr.', age.rr.param.time)
+                        
+                    model.settings$set.element.functional.form.interaction.alphas(element.name = elem.name,
+                                                                                  alpha.name = alpha.name,
+                                                                                  value = parameters[age.rr],
+                                                                                  applies.to.dimension.values = list(race.to = race,
+                                                                                                                     age.to = ages[age.index]))
+                }
+            }
+        }
     }
 
     # After Modifier
@@ -1018,82 +984,6 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                                 values = parameters[param.name],
                                                                 applies.to.dimension.values = 'all',
                                                                 dimension = 'all')
-}
-
-set.ehe.age.race.stratified.trate.alphas.from.parameters <- function(model.settings,
-                                                                     parameters,
-                                                                     category,
-                                                                     stratified.age.indices,
-                                                                     times)
-{
-    specification.metadata = model.settings$specification.metadata
-    elem.name = paste0(category, '.trates')
-    races = specification.metadata$dim.names$race
-    ages = specification.metadata$dim.names$age
-    non.stratified.age.indices = setdiff(1:specification.metadata$n.ages, stratified.age.indices)
-    
-    for (time in times)
-    {
-        alpha.name = paste0('rate', time)
-        
-        
-        #-- The race effects --#
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                      alpha.name = alpha.name,
-                                                                      values = parameters[paste0(races, '.', category, '.trate.', time)],
-                                                                      dimension = 'race.to',
-                                                                      applies.to.dimension.values = races)
-        #-- The age effects --#
-        age.rr.multipliers = parameters[paste0('age', 1:specification.metadata$n.ages, '.susceptibility.rr.mult.', time)]
-        age.rr.multipliers[is.na(age.rr.multipliers)] = 1
-        
-        # The non-stratified age effects
-        non.stratified.age.rrs = parameters[paste0('age', non.stratified.age.indices,
-                                                   '.', category, '.susceptibility.rr')]
-        missing.rr.mask = is.na(non.stratified.age.rrs)
-        if (time==2)
-          non.stratified.age.rrs[missing.rr.mask] = parameters[paste0('age', 
-                                                                      non.stratified.age.indices[missing.rr.mask],
-                                                                      '.', category, '.susceptibility.rr.2')]
-        else
-          non.stratified.age.rrs[missing.rr.mask] = parameters[paste0('age', 
-                                                                      non.stratified.age.indices[missing.rr.mask],
-                                                         '.', category, '.susceptibility.rr.01')]
-        
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                      alpha.name = alpha.name,
-                                                                      values = non.stratified.age.rrs *
-                                                                          age.rr.multipliers[non.stratified.age.indices],
-                                                                      dimension = 'age.to',
-                                                                      applies.to.dimension.values = ages[non.stratified.age.indices])
-        
-        # The race-stratified age effects
-        for (age.index in stratified.age.indices)
-        { 
-            for (race in races)
-            {
-                if (time==2)
-                    value = parameters[paste0('age', age.index, '.', race, '.', category, '.susceptibility.rr.', time)]
-                else
-                    value = parameters[paste0('age', age.index, '.', race, '.', category, '.susceptibility.rr.01')]
-                
-                model.settings$set.element.functional.form.interaction.alphas(element.name = elem.name,
-                                                                              alpha.name = alpha.name,
-                                                                              value = value * age.rr.multipliers[age.index],
-                                                                              applies.to.dimension.values = list(race.to = race,
-                                                                                                                 age.to = ages[age.index]))
-            }
-        }
-
-    }
-    
-    # After Modifier
-    param.name = paste0(category, '.fraction.trate.change.after.t2')
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                  alpha.name = 'after.modifier',
-                                                                  values = parameters[param.name],
-                                                                  applies.to.dimension.values = 'all',
-                                                                  dimension = 'all')
 }
 
 # set.ehe.aging.from.parameters <- function(model.settings,

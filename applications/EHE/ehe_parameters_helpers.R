@@ -70,6 +70,43 @@ create.transmission.prior.distribution <- function(r1.log.mean,
     )
 }
 
+create.four.knot.transmission.prior.distribution <- function(r1.log.mean,
+                                                             r1.log.sd,
+                                                             rr.2.to.1.log.mean=0,
+                                                             rr.2.to.1.log.sd,
+                                                             rr.0.to.1.log.mean=rr.2.to.1.log.mean,
+                                                             rr.0.to.1.log.sd=rr.2.to.1.log.sd,
+                                                             rr.peak.to.0.log.mean,
+                                                             rr.peak.to.0.log.sd,
+                                                             race='black',
+                                                             route=c('msm')
+)
+{
+  mean = c(r1 = r1.log.mean,
+           rr.2.to.1 = rr.2.to.1.log.mean,
+           rr.0.to.1 = rr.0.to.1.log.mean,
+           rr.peak.to.0 = rr.peak.to.0.log.mean)
+  
+  var.mat = diag(c(r1.log.sd,
+                   rr.2.to.1.log.sd,
+                   rr.0.to.1.log.sd,
+                   rr.peak.to.0.log.sd)^2)
+  
+  M = rbind(r.peak = c(1,0,1,1),
+            r0 = c(1,0,1,0),
+            r1 = c(1,0,0,0),
+            r2 = c(1,1,0,0))
+  
+  Multivariate.Lognormal.Distribution(mu = M %*% mean,
+                                      sigma = M %*% var.mat %*% t(M),
+                                      var.names = paste0(race,
+                                                         '.',
+                                                         route,
+                                                         '.trate.',
+                                                         c(0,1,2,'peak'))
+  )
+}
+
 create.age.stratified.transmission.prior.distribution <- function(r1.log.mean,
                                                                   r1.log.sd,
                                                                   rr.2.to.1.log.mean=0,

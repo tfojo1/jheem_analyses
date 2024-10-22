@@ -8,8 +8,7 @@
 
 DEFAULT.POPULATION.YEARS = 2007
 
-TRATE.KNOT.TIMES = c(rate0=2000, rate1=2010, rate2=2020)
-TRATE.AFTER.TIME = 2030
+
 
 CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
 

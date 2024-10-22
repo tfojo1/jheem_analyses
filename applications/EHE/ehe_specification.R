@@ -1420,10 +1420,17 @@ register.model.element.values(EHE.SPECIFICATION,
 #-- Sexual Transmission Rates --# ----
 #-------------------------------#
 
-TIME.PRE.PEAK = 1970
-TIME.PEAK.START = 1980
-TIME.PEAK.END = 1990
-TIME.POST.PEAK = 2000
+TRATE.KNOT.TIMES = c(rate.pre.peak=1970, 
+                     rate.peak.start=1980, 
+                     rate.peak.end=1990, 
+                     rate.0=2000, 
+                     rate.1=2010, 
+                     rate.2=2020)
+TRATE.AFTER.TIME = 2030
+TIME.PRE.PEAK = TRATE.KNOT.TIMES['rate.pre.peak']
+TRATE.DEFAULT.VALUES = sapply(TRATE.KNOT.TIMES, function(time){1})
+
+
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'sexual.transmission.rates',
@@ -1434,19 +1441,19 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.transmission.rates',
                                applies.to = list(sex.from=c('heterosexual_male','msm'),
                                                  sex.to=c('heterosexual_male','msm')),
-                               value = expression(msm.trates * msm.peak.multiplier))
+                               value = 'msm.trates')
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.transmission.rates',
                                applies.to = list(sex.from=c('heterosexual_male','msm'),
                                                  sex.to=c('female')),
-                               value = expression(heterosexual.trates * heterosexual.peak.multiplier))
+                               value = 'heterosexual.trates')
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.transmission.rates',
                                applies.to = list(sex.from=c('female'),
                                                  sex.to=c('heterosexual_male','msm')),
-                               value = expression(heterosexual.trates * male.vs.female.heterosexual.rr * heterosexual.peak.multiplier))
+                               value = expression(heterosexual.trates * male.vs.female.heterosexual.rr))
 
 # The flattened rates lets us track this as an outcome
 register.model.quantity(EHE.SPECIFICATION,
@@ -1457,17 +1464,17 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='msm'),
-                               value = expression(global.trate * msm.trates * msm.peak.multiplier))
+                               value = expression(global.trate * msm.trates))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='female'),
-                               value = expression(global.trate * heterosexual.trates * heterosexual.peak.multiplier))
+                               value = expression(global.trate * heterosexual.trates))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='heterosexual_male'),
-                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr * heterosexual.peak.multiplier))
+                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr))
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'male.vs.female.heterosexual.rr',
@@ -1477,30 +1484,10 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'ratio')
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'heterosexual.peak.multiplier',
-                       scale = 'ratio',
-                       functional.form = create.linear.spline.functional.form(knot.times=c(pre.peak=TIME.PRE.PEAK,
-                                                                                           peak.start=TIME.PEAK.START,
-                                                                                           peak.end=TIME.PEAK.END,
-                                                                                           post.peak=TIME.POST.PEAK),
-                                                                              knot.values = list(pre.peak=1,
-                                                                                                 peak.start=1,
-                                                                                                 peak.end=1,
-                                                                                                 post.peak=1),
-                                                                              link = 'identity',
-                                                                              knot.link = 'log'
-                       ),
-                       functional.form.from.time = TIME.PRE.PEAK,
-                       functional.form.to.time = TIME.POST.PEAK
-)
-
-register.model.element(EHE.SPECIFICATION,
                        name = 'msm.trates',
                        scale = 'rate',
                        functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
-                                                                               knot.values = list(rate0=1,
-                                                                                                  rate1=1,
-                                                                                                  rate2=1),
+                                                                               knot.values = as.list(TRATE.DEFAULT.VALUES),
                                                                                #link = 'log',
                                                                                link = 'identity',
                                                                                min = 0,
@@ -1510,37 +1497,14 @@ register.model.element(EHE.SPECIFICATION,
                                                                                modifiers.apply.to.change = T,
                                                                                overwrite.modifiers.with.alphas = T
                        ),
-                       functional.form.from.time = TIME.POST.PEAK)
-                       # functional.form.from.time = 2000,
-                       # ramp.times = c(1960, 1970, 1980, 1990),
-                       # ramp.values = c(pre.peak=1, peak.start=1, peak.end=1, t0.start=1))
+                       functional.form.from.time = TIME.PRE.PEAK)
 
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'msm.peak.multiplier',
-                       scale = 'ratio',
-                       functional.form = create.linear.spline.functional.form(knot.times=c(pre.peak=TIME.PRE.PEAK,
-                                                                                           peak.start=TIME.PEAK.START,
-                                                                                           peak.end=TIME.PEAK.END,
-                                                                                           post.peak=TIME.POST.PEAK),
-                                                                              knot.values = list(pre.peak=1,
-                                                                                                 peak.start=1,
-                                                                                                 peak.end=1,
-                                                                                                 post.peak=1),
-                                                                              link = 'identity',
-                                                                              knot.link = 'log'
-                       ),
-                       functional.form.from.time = TIME.PRE.PEAK,
-                       functional.form.to.time = TIME.POST.PEAK
-)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'heterosexual.trates',
                        scale = 'rate',
                        functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
-                                                                               knot.values = list(rate0=1,
-                                                                                                  rate1=1,
-                                                                                                  rate2=1),
+                                                                               knot.values = as.list(TRATE.DEFAULT.VALUES),
                                                                                #link = 'log',
                                                                                link = 'identity',
                                                                                min = 0,
@@ -1551,11 +1515,7 @@ register.model.element(EHE.SPECIFICATION,
                                                                             #   after.modifier.application = 'additive.on.link.scale',
                                                                                overwrite.modifiers.with.alphas = T
                        ),
-                       functional.form.from.time = TIME.POST.PEAK,
-                       ramp.times = c(pre.peak = TIME.PRE.PEAK,
-                                      peak.start = TIME.PEAK.START,
-                                      peak.end = TIME.PEAK.END),
-                       ramp.values = c(pre.peak=1, peak.start=1, peak.end=1))
+                       functional.form.from.time = TIME.PRE.PEAK)
 
 
 ##------------------------------------##
@@ -1566,7 +1526,6 @@ register.model.quantity(EHE.SPECIFICATION,
                         name = 'idu.contact',
                         value = expression(global.trate *
                                              idu.trates * 
-                                             idu.peak.multiplier *
                                              idu.contact.by.age *
                                              idu.contact.by.race *
                                              idu.contact.by.sex))
@@ -1628,9 +1587,7 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'idu.trates',
                        scale = 'rate',
                        functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
-                                                                               knot.values = list(rate0=1,
-                                                                                                  rate1=1,
-                                                                                                  rate2=1),
+                                                                               knot.values = as.list(TRATE.DEFAULT.VALUES),
                                                                                #link = 'log',
                                                                                link = 'identity',
                                                                                min = 0,
@@ -1641,25 +1598,7 @@ register.model.element(EHE.SPECIFICATION,
                                                                              #  after.modifier.application = 'multiplicative.of.change.on.value.scale',
                                                                                overwrite.modifiers.with.alphas = T
                        ),
-                       functional.form.from.time = 2000)
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'idu.peak.multiplier',
-                       scale = 'ratio',
-                       functional.form = create.linear.spline.functional.form(knot.times=c(pre.peak=TIME.PRE.PEAK,
-                                                                                           peak.start=TIME.PEAK.START,
-                                                                                           peak.end=TIME.PEAK.END,
-                                                                                           post.peak=TIME.POST.PEAK),
-                                                                              knot.values = list(pre.peak=1,
-                                                                                                 peak.start=1,
-                                                                                                 peak.end=1,
-                                                                                                 post.peak=1),
-                                                                              link = 'identity',
-                                                                              knot.link = 'log'
-                                                                           ),
-                       functional.form.from.time = TIME.PRE.PEAK,
-                       functional.form.to.time = TIME.POST.PEAK
-)
+                       functional.form.from.time = TIME.PRE.PEAK)
 
 
 ##-----------------------------------##
