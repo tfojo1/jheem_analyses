@@ -16,28 +16,14 @@
 # setwd('../../')
 source('applications/SHIELD/shield_specification.R')
 
-# CENSUS.MANAGER$outcomes
-# #metro.deaths:
+
 # grep('US',dimnames(CENSUS.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)[2]) # TRUE
-# # #population:
-# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age)[2])# TRUE
-# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__sex)[2])# TRUE
-# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race)[2])  #FALSE
-# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__ethnicity)[2])# FALSE
-# 
-# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__sex)[2])# FALSE
-# grep('US',dimnames(CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race)[2])# FALSE
-# 
-# # #fertility rate:
-# grep('US',dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)[2]) # TRUE
-
-#US level data for fertility rate:
-# SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity[,'US',,,]
 
 
-# Baltimore MSA : C.12580
 engine = create.jheem.engine('shield', 'C.12580', 2025) #fails at reading mortality
- # engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size 
+
+#@Todd: the national model still fails
+# engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size
 
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 # params['black.fertility.rate.multiplier']=.5

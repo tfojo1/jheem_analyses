@@ -57,14 +57,18 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
   if (length(specification.metadata$dim.names$location) > 1)
     stop("We need to specify what to do with more than one location")
   
-  if (location == 'US')
+  if (location == 'US'){
+    browser()
     counties = 'US'
-  else
+  }else{
     counties = locations::get.contained.locations(location, 'county')
- #SHIELD Version
-      pop = CENSUS.MANAGER$pull(outcome = 'population', dimension.values = list(year = years, location = counties, sex = sex),
+  }
+  #SHIELD Version
+
+  pop = CENSUS.MANAGER$pull(outcome = 'population', 
+                            dimension.values = list(year = years, location = counties, sex = sex),
                             keep.dimensions = c('age', 'race', 'ethnicity', 'sex'),
-                            from.ontology.names = 'stratified.census') / length(years)
+                            from.ontology.names = 'census') / length(years)
   
   if (length(pop)==0)
     stop("We couldn't find any population data in the census manager")
@@ -515,14 +519,33 @@ get.location.mortality.rates <- function(location,
   # Note: Some MSAs span over multiple states (e.g., Washington DC  ).
   # To estimate the MSA-level mortality rate, we extract the counties within each MSA, map these counties to their corresponding states,
   # and then take a weighted average of the state-level rates to approximate the MSA-level mortality rate.
-  
+
   if (location=='US'){
+    browser()
     counties='US'
     #use the deaths instead 
-    mortality.rate = CENSUS.MANAGER$pull(outcome = 'metro.deaths',
+    mortality.rate = CENSUS.MANAGER$pull(outcome = 'deaths',
                                          location = counties,
                                          year= year.ranges,
+                                         from.ontology.names = "census",
                                          keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+    if (is.null(deaths))
+      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
+    
+    # Pull the population:
+    population = CENSUS.MANAGER$pull(outcome = 'deaths.denominator', 
+                                     location = states, 
+                                     year= year.ranges, 
+                                     keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+    if (is.null(population))
+      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
+    population[is.na(deaths)] = NA
+    
+    # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification # then divide the two
+    target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
+    national.mortality.rate = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
+      map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
+    return(national.mortality.rate)
     
   }else{
     counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
@@ -577,7 +600,8 @@ get.location.mortality.rates <- function(location,
       })
       
       apply(state.weights * rates.by.state, c('age','race','sex'), sum)
-    }}
+    }
+  }
 }
 
 
@@ -600,7 +624,7 @@ get.empiric.aging.rates <- function(location, specification.metadata,
   aging.rates = do.get.empiric.aging.rates(location = location,
                                            specification.metadata = specification.metadata,
                                            years = years)
-
+  
   create.natural.spline.functional.form(knot.times = years,
                                         knot.values = aging.rates,
                                         link = 'log',
@@ -616,7 +640,7 @@ do.get.empiric.aging.rates <- function(location,
                                        specification.metadata,
                                        years=c('2010'=2010,'2020'=2020,'2030'=2030,'2040'=2040),
                                        force.match.age.brackets.to.before.smoothing = NULL #@TODD: how do you use this? 
-                                       )
+)
 {
   if (location=='US')
     counties='US'
@@ -685,7 +709,7 @@ do.get.empiric.aging.rates <- function(location,
     # mapping to our sex groups
     sex.mapping = c(msm='male', heterosexual_male='male', female='female')
     rates.by.sex = sapply(desired.dim.names$sex, function(sex){
-          sex.from = sex.mapping[sex]
+      sex.from = sex.mapping[sex]
       if (is.na(sex.from))
         stop("'get.empiric.aging.rates' in the ehe_specification_helpers is hard-coded for sex = [msm, heterosexual_male, female]. You will need to modify this function to accomodate additional sex categories")
       raw.rates[,sex.from,]
@@ -959,7 +983,7 @@ get.geographically.aggregated.race.oes <- function(location,
   race.mapping = get.ontology.mapping(from.ontology = dimnames(population)[c('race','ethnicity')],
                                       to.ontology = specification.metadata$dim.names['race'])
   
-
+  
   if (is.null(race.mapping))
     stop("Cannot get.geographically.aggregated.race.oes() - don't know how to map race to the desired ontology for the specification")
   

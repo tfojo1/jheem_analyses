@@ -1,5 +1,6 @@
 source('../jheem_analyses/applications/SHIELD/shield_register_calibrations.R')
-# source('../jheem_analyses/commoncode/locations_of_interest.R')
+# source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
+
 clear.calibration.cache(version='shield',
                         location=LOCATION,
                         calibration.code = CALIBRATION.CODE.TO.RUN,
