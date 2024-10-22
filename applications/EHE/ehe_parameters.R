@@ -346,11 +346,11 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     # Peak Age Susceptibility Multiplier
     
-    age1.susceptibility.rr.peak = Lognormal.Distribution(0, 0.5*log(2)),
-    age2.susceptibility.rr.peak = Lognormal.Distribution(0, 0.5*log(2)),
-    age3.susceptibility.rr.peak = Lognormal.Distribution(0, 0.5*log(2)),
-    age4.susceptibility.rr.peak = Lognormal.Distribution(log(AIDS.RELATIVE.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
-    age5.susceptibility.rr.peak = Lognormal.Distribution(log(AIDS.RELATIVE.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
+    age1.susceptibility.rr.mult.peak = Lognormal.Distribution(0, 0.5*log(2)),
+    age2.susceptibility.rr.mult.peak = Lognormal.Distribution(0, 0.5*log(2)),
+    age3.susceptibility.rr.mult.peak = Lognormal.Distribution(0, 0.5*log(2)),
+    age4.susceptibility.rr.mult.peak = Lognormal.Distribution(log(AIDS.RELATIVE.SUSCEPTIBILITY.BY.AGE[4]), 0.5*log(2)),
+    age5.susceptibility.rr.mult.peak = Lognormal.Distribution(log(AIDS.RELATIVE.SUSCEPTIBILITY.BY.AGE[5]), 0.5*log(2)),
     
    
     
@@ -1257,11 +1257,11 @@ BASE.HIV.SAMPLING.BLOCKS = list(
                                'global.trate'),
   
     age.peak.multiplier = c(
-      'age1.susceptibility.rr.peak',
-      'age2.susceptibility.rr.peak',
-      'age3.susceptibility.rr.peak',
-      'age4.susceptibility.rr.peak',
-      'age5.susceptibility.rr.peak'
+      'age1.susceptibility.rr.mult.peak',
+      'age2.susceptibility.rr.mult.peak',
+      'age3.susceptibility.rr.mult.peak',
+      'age4.susceptibility.rr.mult.peak',
+      'age5.susceptibility.rr.mult.peak'
     ),
 
 #-- TESTING --#
