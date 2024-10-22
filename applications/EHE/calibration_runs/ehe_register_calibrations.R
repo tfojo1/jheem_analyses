@@ -29,7 +29,9 @@ par.names.pop = c(par.names.pop,
                                                    grepl('incident\\.idu', EHE.PARAMETERS.PRIOR@var.names) |
                                                    grepl('black\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) |
                                                    grepl('hispanic\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) |
-                                                   grepl('other\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) ]
+                                                   grepl('other\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                   grepl('fraction\\.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                   grepl('sexual\\.assortativity', EHE.PARAMETERS.PRIOR@var.names)]
                     )
  
 
