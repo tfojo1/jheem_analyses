@@ -90,7 +90,7 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
 #' @description Generates proportion of male who are msm by race
 #' @param location location
 #' @param specification.metadata specification.metadata
-#' @return ??? #Todd??
+#' @return returns a static functional form for the proportion
 get.proportion.msm.of.male.by.race.functional.form <- function(location, specification.metadata)
 {
   best.guess.proportions = get.best.guess.msm.proportions(location = location,
@@ -118,10 +118,10 @@ get.proportion.msm.of.male.by.race.functional.form <- function(location, specifi
 #' @description generates proportion of male who are msm by race
 #' @param location location
 #' @param specification.metadata specification.metadata
-#' @param years years #Todd: which years are these
-#' @param ages agegroups read from specification.metadata$dim.names$age #Todd: isn't this redundant?
-#' @param keep.age keep age #Todd: what does this mean?
-#' @param keep.race keep race #Todd: what does this mean?
+#' @param years years  
+#' @param ages agegroups read from specification.metadata$dim.names$age  
+#' @param keep.age keep age  
+#' @param keep.race keep race  
 #' @param return.proportions return proportions or frequency
 #' @return a 2D matrix showing the proportion of MSM by age (rows) and race (columns)
 get.best.guess.msm.proportions <- function(location,
@@ -272,12 +272,12 @@ get.best.guess.msm.proportions <- function(location,
 #' and total risk of being MSM is as per read.msm.proportions
 #' @param location location
 #' @param specification.metadata specification.metadata
-#' @param min.age min.age #Todd: what does this mean?
-#' @param years years #Todd: which years are these
-#' @param msm.proportions.by.race msm.proportions.by.race #Todd: what does this mean?
+#' @param min.age min.age  
+#' @param years years  
+#' @param msm.proportions.by.race msm.proportions.by.race  
 #' @param return.proportions return proportions or frequency
-#' @param keep.ages keep.ages #Todd: what does this mean?
-#' @return a 2D matrix showing the proportion of MSM by age (rows) and race (columns) #Todd: true?
+#' @param keep.ages keep.ages  
+#' @return a 2D matrix showing the proportion of MSM by age (rows) and race (columns)  
 get.best.guess.msm.proportions.by.race <- function(location,
                                                    specification.metadata,
                                                    min.age=0,
@@ -394,7 +394,7 @@ get.best.guess.msm.proportions.by.race <- function(location,
 #' @return a spline functional form for fertility rates by age, race, year 
 get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=DEFAULT.FERTILITY.RATE.YEARS){ 
   # pull fertility rates for location
-  mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years) #TODD: would you do all the calculations here?
+  mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years) 
   if (length(mapped.fertility.rates)==0)
     stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
                 locations::get.location.name(location), ")"))
@@ -509,18 +509,19 @@ get.location.mortality.rates.functional.form = function(location, specification.
 #' @description reading the mortality rates from the census manager (approximating them off state-level data)
 #' @param location location
 #' @param specification.metadata specification.metadata
-#' @param year.ranges year.ranges #Todd: ???
+#' @param year.ranges year.ranges  
 #' @return returning the mortality rates for each MSA (location) in the correct dimension
 get.location.mortality.rates <- function(location,
                                          specification.metadata,
                                          year.ranges = DEFAULT.MORTALITY.RATE.YEARS){
-  # Todd's code is designed for modeling MSAs, where each MSA consists of a collection of counties.
+  # The code is designed for modeling MSAs, where each MSA consists of a collection of counties.
   # County-level mortality data is not fully stratified, but state-level data is available with stratification.
   # Note: Some MSAs span over multiple states (e.g., Washington DC  ).
   # To estimate the MSA-level mortality rate, we extract the counties within each MSA, map these counties to their corresponding states,
   # and then take a weighted average of the state-level rates to approximate the MSA-level mortality rate.
 
   if (location=='US'){
+    #@Todd: I'm a bit uncertain about deaths vs metro.deaths at this point
     browser()
     counties='US'
     #use the deaths instead 
@@ -821,8 +822,8 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
 #' @title get.female.single.year.age.counts
 #' @description return counts of female in a single year
 #' @param location location
-#' @param population.years PARAM_DESCRIPTION, Default: DEFAULT.POPULATION.YEARS #Todd?
-#' @return OUTPUT_DESCRIPTION
+#' @param population.years population.years
+#' @return returns the number of females in single year ages
 get.female.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
 {
   counties = get.contained.locations(location, 'county')
@@ -870,8 +871,8 @@ get.msm.single.year.age.counts <- function(location, specification.metadata,
 #' @description To determine the proportion of the population that falls into specific age buckets
 #' @param location location
 #' @param specification.metadata specification.metadata
-#' @param population.years PARAM_DESCRIPTION, Default: DEFAULT.POPULATION.YEARS #Todd???
-#' @return OUTPUT_DESCRIPTION
+#' @param population.years population.years
+#' @return returns the number of heterosexual males in single year ages
 get.heterosexual.male.single.year.age.counts <- function(location, specification.metadata,
                                                          population.years=DEFAULT.POPULATION.YEARS)
 {
@@ -950,9 +951,9 @@ get.race.population.counts <- function(location,
 #' @param location location
 #' @param specification.metadata specification.metadata
 #' @param within.county.race.oes observed to expected ration for mixing by age within each county
-#' @param years PARAM_DESCRIPTION, Default: DEFAULT.POPULATION.YEARS #Todd???
-#' @param as.functional.form PARAM_DESCRIPTION, Default: T #Todd???
-#' @return todd??
+#' @param years years
+#' @param as.functional.form Should return a functional form instead of values? Default: T
+#' @return returns observed to expected (OES) ratio for race mixing 
 get.geographically.aggregated.race.oes <- function(location,
                                                    specification.metadata,
                                                    within.county.race.oes,
@@ -1023,7 +1024,7 @@ get.geographically.aggregated.race.oes <- function(location,
 #' calling code \code{oes.to.proportions}
 #' @param race.sexual.oes oes
 #' @param race.population.counts number of people by race
-#' @return todd??
+#' @return transforms observed to expected (oe) mixing ratios to proportions of contact with each race
 sexual.oes.to.contact.proportions <- function(race.sexual.oes,
                                               race.population.counts)
 {
@@ -1034,7 +1035,7 @@ sexual.oes.to.contact.proportions <- function(race.sexual.oes,
 #' @description trasforming oe values to proportions of mixing with other groups (sum to 1)
 #' @param oes oes betwen groups
 #' @param population popualtion count in each group
-#' @return todd??
+#' @return transforms observed to expected (oe) mixing ratios to proportions of contact with each race
 oes.to.proportions <- function(oes, population)
 {
   raw = oes * rep(population[ dimnames(oes)[[1]] ], each=length(population))
