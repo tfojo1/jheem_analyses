@@ -90,7 +90,7 @@ simplot(simset$last.sim(),
 
 simplot(simset$last.sim(),
         simset,
-        facet.by = "age", # age, sex, race, risk; 1-way 
+        facet.by = "race", # age, sex, race, risk; 1-way 
         outcomes = c("aids.diagnoses"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 1980:2030)) 
