@@ -142,6 +142,18 @@ total.race.risk.new.diagnoses.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
+total.new.diagnoses.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                       outcome.for.sim = "new",
+                                       levels.of.stratification = c(0), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.type = 'cv',
+                                       weights = (1*TOTAL.WEIGHT),
+                                       equalize.weight.by.year = T 
+  )
+
 new.diagnoses.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                        outcome.for.sim = "new",
@@ -169,6 +181,18 @@ total.race.risk.prevalence.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
+total.prevalence.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                       outcome.for.sim = "diagnosed.prevalence",
+                                       levels.of.stratification = c(0), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.type = 'cv',
+                                       weights = (1*TOTAL.WEIGHT),
+                                       equalize.weight.by.year = T 
+  )
+
 prevalence.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
                                        outcome.for.sim = "diagnosed.prevalence",
@@ -184,11 +208,10 @@ prevalence.likelihood.instructions =
 
 
 #-- AIDS DIAGNOSES  ----
-total.race.risk.aids.diagnoses.likelihood.instructions = 
+total.aids.diagnoses.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                        outcome.for.sim = "aids.diagnoses",
-                                       dimensions = c("race","risk"),
-                                       levels.of.stratification = c(0,1), 
+                                       levels.of.stratification = c(0), 
                                        from.year = 1990,
                                        to.year = 2001,
                                        correlation.different.years = 0.3,
@@ -683,20 +706,22 @@ joint.pop.migration.total.trans.likelihood.instructions =
                                immigration.likelihood.instructions,
                                emigration.likelihood.instructions,
                                general.mortality.likelihood.instructions,
-                               total.race.risk.prevalence.likelihood.instructions, # added race- and risk- one-way 10/21
-                               total.race.risk.new.diagnoses.likelihood.instructions,
-                               total.race.risk.aids.diagnoses.likelihood.instructions # added aids diagnoses 10/21
+                               total.prevalence.likelihood.instructions, 
+                               total.new.diagnoses.likelihood.instructions,
+                               total.aids.diagnoses.likelihood.instructions # added aids diagnoses 10/21
                                ) 
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
 transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
-  join.likelihood.instructions(new.diagnoses.likelihood.instructions,
-                               prevalence.likelihood.instructions,
+  join.likelihood.instructions(#new.diagnoses.likelihood.instructions,
+                               #prevalence.likelihood.instructions,
+                               total.race.risk.prevalence.likelihood.instructions, # switched to only total and one-way race/risk 10/23
+                               total.race.risk.new.diagnoses.likelihood.instructions, # switched to only total and one-way race/risk 10/23
+                               non.age.aids.diagnoses.likelihood.instructions,
                                proportion.tested.likelihood.instructions, 
                                population.likelihood.instructions,
                                heroin.likelihood.instructions,
                                cocaine.likelihood.instructions,
-                               non.age.aids.diagnoses.likelihood.instructions,
                                aids.deaths.likelihood.instructions,
                                awareness.likelihood.instructions #,
                                #race.ps.syphilis.year.on.year.change.likelihood.instructions,
