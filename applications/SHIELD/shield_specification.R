@@ -637,8 +637,9 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'persons',
                                                                     singular.unit = 'person'), #will read the scale from metadata
                          value.to.integrate = 'point.population',
+                         corresponding.data.outcome = 'population' ,
                          keep.dimensions = c('location','age','race','sex'),
-                         corresponding.data.outcome = 'population' #Zoe: data should include persons under 13 (JHEEM data only includes 13+)
+                          
 )
 ## Births ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
@@ -666,10 +667,10 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       scale='non.negative.number',
                       dynamic.quantity.name = 'mortality',
                       corresponding.data.outcome = 'deaths',
-                      # groups : 'infected' or 'uninfected'
+                      groups = NULL,
                       # exclude.tags = "emigration",
                       save=T,
-                      keep.dimensions = c('location','age','race','sex') #collapse on stage and continuum for infected and on profile as well
+                      keep.dimensions = character()  #c('location','age','race','sex')
 )
 
  
