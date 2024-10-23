@@ -1,7 +1,7 @@
-.Rproj.user
-.Rhistory
-.RData
-.Ruserdata
+*.Rproj.user
+*.Rhistory
+*.RData
+*.Ruserdata
 
 # Project-specific
 cached
@@ -10,5 +10,5 @@ applications/EHE/calibration_runs/markdown_summaries/outputs
 
 
 # OS-specific
-.DS_Store
-applications/.DS_Store
+*.DS_Store
+applications/*.DS_Store

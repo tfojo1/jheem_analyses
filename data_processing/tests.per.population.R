@@ -20,11 +20,12 @@ hiv.tests.clean = subset(hiv.tests.raw, location %in% hiv.test.locations.of.inte
 #census (2011-2019 here are estimated from age groups)
 adult.pop.source.one = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census.grouped.age$year__location)) %>% rename(adult.pop.value = Freq) %>% mutate(year = as.character(year))
 adult.pop.source.one.clean = subset(adult.pop.source.one,  location %in% hiv.test.locations.of.interest)
-adult.pop.source.one.final = subset(adult.pop.source.one.clean,  year %in% hiv.tests.years.of.interest)
+adult.pop.source.one.final = subset(adult.pop.source.one.clean,  year %in% hiv.tests.years.of.interest) %>% filter(year != "2020")%>% filter(year != "2021")
 
 #Census (2020-2023 calculated from single year ages)
-adult.pop.source.two = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census$year__location)) %>% rename(adult.pop.value = Freq) %>% filter(year == 2018 | year == 2019) %>% mutate(year = as.character(year))
+adult.pop.source.two = (as.data.frame.table(surveillance.manager$data$adult.population$estimate$census.aggregated.adult.population$census$year__location)) %>% rename(adult.pop.value = Freq) %>% mutate(year = as.character(year))
 adult.pop.source.two.final  = subset(adult.pop.source.two,  location %in% hiv.test.locations.of.interest)
+adult.pop.source.two.final  = subset(adult.pop.source.two.final,  year %in% hiv.tests.years.of.interest)
 
 
 adult.pop.all = rbind(adult.pop.source.one.final , adult.pop.source.two.final )

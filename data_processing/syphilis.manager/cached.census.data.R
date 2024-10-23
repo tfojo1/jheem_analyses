@@ -1,7 +1,7 @@
 #Note: This is data being pulled from the Census Manager (not exclusively data from the Census)
 
 #Load the census manager to get population data that is clean and processed
-census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
+#census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
 
 # THESE ARE ONTOLOGY = CENSUS.DATA ----------------------------------------
 

@@ -476,6 +476,9 @@ data.manager$register.ontology(
 
 # Source Data Cleaning and Processing Files -------------------------------
 
+census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata") #Loading other data managers where some data is sourced from
+surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
+
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
 source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
@@ -486,6 +489,7 @@ source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
 source('data_processing/syphilis.manager/births.msa.R') #This is CDC Wonder Birth data by age, race, eth for women 15-44 aggregated from county to MSA
+source('data_processing/syphilis.manager/aggregating.national.population.R')
 
 # RENAME ------------------------------------------------------------------
 
