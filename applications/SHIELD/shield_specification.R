@@ -619,8 +619,90 @@ register.transition(SHIELD.SPECIFICATION,
 #Dynamic outputs: (in addition to compartment size)
 # track.dynamic.outcome: a more general definition, calculated at each step of solver (mortality birth etc)
 # track.transition: people move from one compartment to another #tracking transitions along one dimension (e.g., continuum)
+## Population ----
+track.point.outcome(SHIELD.SPECIFICATION,
+                    name='point.population',
+                    outcome.metadata = NULL, #we are not saving it
+                    scale='non.negative.number',
+                    save=F,
+                    value=expression(infected+uninfected),
+                    keep.dimensions = c('location','age','race','sex') #collapse on stage and continuum for infected and on profile as well
+)
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name='population',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                                                                    description = "Population size",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Persons',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'), #will read the scale from metadata
+                         value.to.integrate = 'point.population',
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'population' #Zoe: data should include persons under 13 (JHEEM data only includes 13+)
+)
+## Births ----
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                    name='births.from',
+                    outcome.metadata = create.outcome.metadata(display.name = 'Births',
+                                                               description = "Births",
+                                                               scale = 'non.negative.number',
+                                                               axis.name = 'Persons',
+                                                               units = 'persons',
+                                                               singular.unit = 'person'),
+                    scale='non.negative.number',
+                    save=T,
+                    dynamic.quantity.name = 'births.from', #model has an internal definition for births  #births from is conditional on parent's characteristics
+                    keep.dimensions = c('location','age','race') #collapse on stage and continuum for infected and on profile as well
+)
+## Deaths ----
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name='total.mortality',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Total Deaths',
+                                                                 description = 'Total Deaths',
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Deaths',
+                                                                 units = 'deaths',
+                                                                 singular.unit = 'deaths'),
+                      scale='non.negative.number',
+                      dynamic.quantity.name = 'mortality',
+                      corresponding.data.outcome = 'deaths',
+                      # groups : 'infected' or 'uninfected'
+                      # exclude.tags = "emigration",
+                      save=T,
+                      keep.dimensions = c('location','age','race','sex') #collapse on stage and continuum for infected and on profile as well
+)
 
+ 
 
+## Incidence ----
+# (new infections + reinfections)
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'incidence',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Incidence',
+                                                                 description = "Number of Individuals Infected with Syphilis in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      dynamic.quantity.name = 'incidence.from', # use of ".from" helps us track where individuals are coming from (differentiate new vs re-infections)
+                      keep.dimensions = c('location','age','race','sex','profile')
+)
+
+## Treatment Initiations ----
+# : Immediate and Delayed
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'trt.initiation',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Treatment Initiation',
+                                                                 description = "Number of Individuals Starting Treatment in the Past Year",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      dynamic.quantity.name = "remission.from", #where they come from
+                      keep.dimensions = c('location','age','race','sex','stage')
+)
+
+## Diagnosis ----
 ## All Diagnosis (at all stages ): has 2 components
 ### 1st component:new diagnosis that dont receive treatment immediately (transition)
 track.transition(SHIELD.SPECIFICATION,
@@ -694,75 +776,6 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis' #corresponding to the name in data manager
 )
 
-## Population ----
-track.point.outcome(SHIELD.SPECIFICATION,
-                    name='point.population',
-                    outcome.metadata = NULL, #we are not saving it
-                    scale='non.negative.number',
-                    save=F,
-                    value=expression(infected+uninfected),
-                    keep.dimensions = c('location','age','race','sex') #collapse on stage and continuum for infected and on profile as well
-)
-track.integrated.outcome(SHIELD.SPECIFICATION,
-                         name='population',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
-                                                                    description = "Population size",
-                                                                    scale = 'non.negative.number',
-                                                                    axis.name = 'Persons',
-                                                                    units = 'persons',
-                                                                    singular.unit = 'person'), #will read the scale from metadata
-                         value.to.integrate = 'point.population',
-                         keep.dimensions = c('location','age','race','sex'),
-                         corresponding.data.outcome = 'population' #Zoe: data should include persons under 13 (JHEEM data only includes 13+)
-)
-
-
-## Births ----
-track.dynamic.outcome(SHIELD.SPECIFICATION,
-                    name='births',
-                    outcome.metadata = create.outcome.metadata(display.name = 'Births',
-                                                               description = "Births",
-                                                               scale = 'non.negative.number',
-                                                               axis.name = 'Persons',
-                                                               units = 'persons',
-                                                               singular.unit = 'person'), #will read the scale from metadata
-                    scale='non.negative.number',
-                    save=T,
-                    dynamic.quantity.name = 'births.from', #model has an internal definition for births  #births from is conditional on parent's characteristics
-                    keep.dimensions = c('location','age','race') #collapse on stage and continuum for infected and on profile as well
-)
-
-
-##--------------------------------------------------------------------------------------------------------------#
-##--------------------------------------------------------------------------------------------------------------#
-## Incidence ----
-# (new infections + reinfections)
-track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name = 'incidence',
-                      outcome.metadata = create.outcome.metadata(display.name = 'Incidence',
-                                                                 description = "Number of Individuals Infected with Syphilis in the Past Year",
-                                                                 scale = 'non.negative.number',
-                                                                 axis.name = 'Cases',
-                                                                 units = 'cases',
-                                                                 singular.unit = 'case'),
-                      dynamic.quantity.name = 'incidence.from', # use of ".from" helps us track where individuals are coming from (differentiate new vs re-infections)
-                      keep.dimensions = c('location','age','race','sex','profile')
-)
-
-## Treatment Initiations ----
-# : Immediate and Delayed
-track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name = 'trt.initiation',
-                      outcome.metadata = create.outcome.metadata(display.name = 'Treatment Initiation',
-                                                                 description = "Number of Individuals Starting Treatment in the Past Year",
-                                                                 scale = 'non.negative.number',
-                                                                 axis.name = 'Cases',
-                                                                 units = 'cases',
-                                                                 singular.unit = 'case'),
-                      dynamic.quantity.name = "remission.from", #where they come from
-                      keep.dimensions = c('location','age','race','sex','stage')
-)
-
 ##-- REGISTER THE SPECIFICATION ----
 ##--------------------------------------------------------------------------------------------------------------#
 ##--------------------------------------------------------------------------------------------------------------#
@@ -806,7 +819,6 @@ print("SHIELD specification sourced successfully!")
 #                                                                                                                                                                                                                                 )
 
 
-# OUTPUTS: ----
 # There are two ways to capture outputs: via 1) compartments (e.g., population size of a compartment), or 2) transitions (e/g., number of people moving from one compartment to another)
 #1::
 ## track.point.outcome(): a static outcome at a certain point in time 

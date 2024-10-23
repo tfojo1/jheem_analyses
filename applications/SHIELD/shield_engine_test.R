@@ -29,6 +29,19 @@ params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 # params['black.fertility.rate.multiplier']=.5
 sim1 = engine$run(params)
 sim1$births
+sim1$total.mortality
+simplot(sim1,
+        outcomes = c("births"), 
+        facet.by = "age", split.by = "race", 
+        dimension.values = list(year = 2000:2030)) 
+simplot(sim1,
+        outcomes = c("total.mortality"), 
+        facet.by = "age", split.by = "race", 
+        dimension.values = list(year = 2000:2030)) 
+simplot(sim1,
+        outcomes = c("population"), 
+        facet.by = "age", split.by = "race", 
+        dimension.values = list(year = 2000:2030)) 
 
 #plotting:
 #population data for Baltimore MSA
