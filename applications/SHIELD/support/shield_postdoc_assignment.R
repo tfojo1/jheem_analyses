@@ -12,10 +12,10 @@
 ##---------------------------------------------------------------##
 # Run the following code without making any changes
 
-# Clone jheem2 repository from git. This repository contains the simulation engine and other necessary files.
+# Clone jheem2 repository from git (branch: shield_assignment_applicants). This repository contains the simulation engine and other necessary files.
 # https://github.com/tfojo1/jheem2
 
-# Clone jheem_analyses repository from git to access the model specification and other necessary files.
+# Clone jheem_analyses repository (branch: shield_assignment_applicants) from git to access the model specification and other necessary files.
 # https://github.com/tfojo1/jheem_analyses
 
 # On you local computer, within the jheem_analyses directory: Create a "cached" folder.
