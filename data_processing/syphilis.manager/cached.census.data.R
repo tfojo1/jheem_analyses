@@ -260,17 +260,7 @@ for (data in national.birth.data.combined ) {
 # National Population Data by Age, Sex, Age+Sex ---------------------------
 #These are split up because different years have different ontologies bc of availability of single year age data
 
-nat.sex.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__sex)%>%
-  filter(location == "US")%>%
-  rename(value = Freq)%>%
-  mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))%>%
-  mutate(value = as.numeric(value))%>%
-  mutate(sex = as.character(sex))%>%
-  mutate(outcome = "population")%>%
-  filter(year != "2020" & year != "2021" & year != "2022" & year != "2023")
-
-nat.sex.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__sex)%>%
+nat.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__sex)%>%
   filter(location == "US")%>%
   rename(value = Freq)%>%
   mutate(year = as.character(year))%>%
@@ -279,17 +269,7 @@ nat.sex.20.23 = as.data.frame.table(census.manager$data$population$estimate$cens
   mutate(sex = as.character(sex))%>%
   mutate(outcome = "population")
 
-nat.age.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age)%>%
-  filter(location == "US")%>%
-  rename(value = Freq)%>%
-  mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))%>%
-  mutate(value = as.numeric(value))%>%
-  mutate(age = as.character(age))%>%
-  mutate(outcome = "population")%>%
-  filter(year != "2020" & year != "2021" & year != "2022" & year != "2023")
-
-nat.age.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)%>%
+nat.age = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age)%>%
   filter(location == "US")%>%
   rename(value = Freq)%>%
   mutate(year = as.character(year))%>%
@@ -298,18 +278,7 @@ nat.age.20.23 = as.data.frame.table(census.manager$data$population$estimate$cens
   mutate(age = as.character(age))%>%
   mutate(outcome = "population")
 
-nat.age.sex.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__sex)%>%
-  filter(location == "US")%>%
-  rename(value = Freq)%>%
-  mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))%>%
-  mutate(value = as.numeric(value))%>%
-  mutate(age = as.character(age))%>%
-  mutate(sex = as.character(sex))%>%
-  mutate(outcome = "population")%>%
-  filter(year != "2020" & year != "2021" & year != "2022" & year != "2023")
-
-nat.age.sex.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age__sex)%>%
+nat.age.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__sex)%>%
   filter(location == "US")%>%
   rename(value = Freq)%>%
   mutate(year = as.character(year))%>%
@@ -320,12 +289,9 @@ nat.age.sex.20.23 = as.data.frame.table(census.manager$data$population$estimate$
   mutate(outcome = "population")
 
 nat.age.sex.combined = list(
-  nat.sex.10.19,
-  nat.sex.20.23,
-  nat.age.10.19,
-  nat.age.20.23,
-  nat.age.sex.10.19,
-  nat.age.sex.20.23)
+  nat.sex,
+  nat.age,
+  nat.age.sex)
 
 #national.sex.put = lapply(national.sex, `[[`, 2)
 
