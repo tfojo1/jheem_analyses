@@ -167,14 +167,7 @@ gonorrhea.stratified <- run.outlier.process(outcome= 'gonorrhea',
                                             minimum.flagged.change = 49,
                                             locations= c(surveillance.manager$get.locations.with.data(outcome="gonorrhea")))
 
- gonorrhea.stratified$adjudication <- c (
-   T, T, F, T, T, T, T, T, T, T, 
-   T, T, F, T, T, T, T, T, T, T, 
-   T, T, T, T, T, T, T, T, T, F,
-   T, T, T, T, T, T, T, T, T, T,
-   F, T, T, T, F, F, T, T, F, F,
-   T, T, T, T, T, F, F, T, T, T,
-   T, T, T, T) 
+ gonorrhea.stratified$adjudication <- c (T) 
  
 run.outlier.process(outcome= 'gonorrhea',
                     stratifications= list('sex', 'race', 'age', 'risk'),
