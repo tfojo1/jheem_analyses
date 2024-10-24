@@ -22,19 +22,6 @@ par.names.pop = c(
     "global.trate"#,
 )
 
-# par.names.pop = c(par.names.pop,
-#                   EHE.PARAMETERS.PRIOR@var.names[grepl('msm\\.trate', EHE.PARAMETERS.PRIOR@var.names) | 
-#                                                    grepl('heterosexual\\.trate', EHE.PARAMETERS.PRIOR@var.names) |
-#                                                    grepl('idu\\.trate', EHE.PARAMETERS.PRIOR@var.names) |
-#                                                    grepl('incident\\.idu', EHE.PARAMETERS.PRIOR@var.names) |
-#                                                    grepl('black\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) |
-#                                                    grepl('hispanic\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) |
-#                                                    grepl('other\\.active\\.idu\\.initial', EHE.PARAMETERS.PRIOR@var.names) | 
-#                                                    grepl('fraction\\.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
-#                                                    grepl('sexual\\.assortativity', EHE.PARAMETERS.PRIOR@var.names)]
-#                     )
- 
-
 register.calibration.info(CALIBRATION.CODE.POPULATION,
                           likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added race/risk transmission targets 10/21
                           data.manager = SURVEILLANCE.MANAGER,
@@ -63,7 +50,45 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                             # grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
                                                           ]
 
+par.aliases.transmission = list(
+  
+  msm.trates = (EHE.PARAMETERS.PRIOR@var.names[grepl('msm\\.trate', EHE.PARAMETERS.PRIOR@var.names)]),
+  msm.trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('msm\\.trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
+  msm.trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('msm\\.trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
+  msm.trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('msm\\.trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
+  msm.trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('msm\\.trate\\.2', EHE.PARAMETERS.PRIOR@var.names)]),
+  
+  heterosexual.trates = (EHE.PARAMETERS.PRIOR@var.names[grepl('heterosexual\\.trate', EHE.PARAMETERS.PRIOR@var.names)]),
+  heterosexual.trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('heterosexual\\.trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
+  heterosexual.trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('heterosexual\\.trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
+  heterosexual.trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('heterosexual\\.trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
+  heterosexual.trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('heterosexual\\.trate\\.2', EHE.PARAMETERS.PRIOR@var.names)]),
 
+  idu.trates = (EHE.PARAMETERS.PRIOR@var.names[grepl('idu\\.trate', EHE.PARAMETERS.PRIOR@var.names)]),
+  idu.trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('idu\\.trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
+  idu.trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('idu\\.trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
+  idu.trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('idu\\.trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
+  idu.trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('idu\\.trate\\.2', EHE.PARAMETERS.PRIOR@var.names)]),
+  
+  black.trates = (EHE.PARAMETERS.PRIOR@var.names[grepl('black.*trate', EHE.PARAMETERS.PRIOR@var.names)]),
+  black.trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('black.*trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
+  black.trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('black.*trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
+  black.trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('black.*trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
+  black.trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('black.*trate\\.2', EHE.PARAMETERS.PRIOR@var.names)]),
+  
+  hispanic.trates = (EHE.PARAMETERS.PRIOR@var.names[grepl('hispanic.*trate', EHE.PARAMETERS.PRIOR@var.names)]),
+  hispanic.trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('hispanic.*trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
+  hispanic.trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('hispanic.*trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
+  hispanic.trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('hispanic.*trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
+  hispanic.trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('hispanic.*trate\\.2', EHE.PARAMETERS.PRIOR@var.names)]),
+ 
+  other.trates = (EHE.PARAMETERS.PRIOR@var.names[grepl('other.*trate', EHE.PARAMETERS.PRIOR@var.names)]),
+  other.trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('other.*trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
+  other.trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('other.*trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
+  other.trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('other.*trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
+  other.trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('other.*trate\\.2', EHE.PARAMETERS.PRIOR@var.names)])
+  
+)
 
 par.names.transmission = c(par.names.transmission,
                            "unsuppressed.peak.hiv.mortality",
@@ -83,12 +108,11 @@ par.names.transmission = c(par.names.transmission,
                            )
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
-                          # added proportion tested 4/23
-                          #likelihood.instructions = two.way.transmission.pop.idu.aware.aids.testing.likelihood.instructions,
                           likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
+                          parameter.aliases = par.aliases.transmission,
                           n.iter = N.ITER,
                           thin = 50, 
                           #fixed.initial.parameter.values = c(global.trate=0.1), 
