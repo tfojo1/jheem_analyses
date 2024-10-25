@@ -12,3 +12,4 @@ applications/EHE/calibration_runs/markdown_summaries/outputs
 # OS-specific
 *.DS_Store
 applications/*.DS_Store
+.Rproj.user
