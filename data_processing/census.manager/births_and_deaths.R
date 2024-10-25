@@ -142,7 +142,7 @@ for (data in births_race_eth ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not Reported', 'Unknown or Not Stated', 'Not Available'), ethnicity = 'Unknown or Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -155,7 +155,7 @@ for (data in births_denom ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not Reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated', 'Unknown or Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -272,7 +272,7 @@ for (data in deaths_race_eth ) {
     data = data,
     ontology.name = 'metro.deaths',
     source = 'cdc_wonder',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated', 'Unknown or Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -285,7 +285,7 @@ for (data in deaths_denom ) {
     data = data,
     ontology.name = 'metro.deaths',
     source = 'cdc_wonder',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated', 'Unknown or Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -414,7 +414,7 @@ for (data in births.national.clean.put ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not Reported', 'Unknown or Not Stated', 'Not Available'), ethnicity = 'Unknown or Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -427,7 +427,7 @@ for (data in births_denom_national ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not Reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated', 'Unknown or Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }

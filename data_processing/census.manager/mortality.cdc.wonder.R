@@ -78,7 +78,7 @@ for (data in national.metro.deaths.put ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -91,7 +91,7 @@ for (data in national.metro.deaths.denominator.put ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity = 'Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
