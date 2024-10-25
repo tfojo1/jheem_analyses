@@ -491,6 +491,10 @@ for (data in us.total.deaths.put) {
     details = 'Census Reporting')
 }
 
+
+# Aggregating County Population to National -------------------------------
+source('data_processing/census.manager/aggregating.national.population.census.R')
+
 ################################################################################
                   ###Save Census Manager###
 ################################################################################ 
