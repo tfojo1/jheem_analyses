@@ -62,10 +62,12 @@ fertility.clean = lapply(data.list.fertility, function(file){
      data<-data %>%
        select(-race)%>%
        rename(race = race.new)
-  }
+              }
   
   data <- data %>%
-    select(outcome, year, location, age, race, ethnicity, Births, 'Female.Population', value)
+    select(outcome, year, location, age, race, ethnicity, Births, 'Female.Population', value)%>%    
+    filter(race != 'More than one race') #Removing this from numerator and denominator for fertility- because this is a proportion, we'll remove this rather than redistributing it
+
   
   
   if(grepl("single.race", filename)) {
