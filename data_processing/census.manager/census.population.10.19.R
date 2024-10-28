@@ -108,7 +108,7 @@ population.ethnicity= as.data.frame(population.ethnicity)
 
 # AGE (groups) ---------------------------------------------------------------------
 
- poulation.age.groups <- county_agegr_sex_race_eth_10.19 %>%
+ population.age.groups <- county_agegr_sex_race_eth_10.19 %>%
   select(STATE, COUNTY, YEAR, AGEGRP, TOT_POP)%>%
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
@@ -378,7 +378,7 @@ population.race.eth.sex.age= as.data.frame(population.race.eth.sex.age)
  stratified.10.19.data = list(
    population.race,
    population.ethnicity,
-   poulation.age.groups,
+   population.age.groups,
    population.sex,
    population.sex.age,
    population.race.age,
