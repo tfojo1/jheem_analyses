@@ -278,7 +278,7 @@ counties = dimnames(census.manager$data$population$estimate$census.population$ce
 age.alone.20.23 = census.manager$pull(
   outcome = "population",
   source = 'census.population', 
-  from.ontology.names = "stratified.census", 
+  from.ontology.names = "census", 
   dimension.values = list(location = counties), 
   keep.dimensions = c('year', 'age'),
   na.rm = T) 
@@ -292,12 +292,60 @@ age.alone.20.23 = as.data.frame.table(age.alone.20.23)%>%
   select(-Freq, -source)
 
 # Sex 2020-2023 -----------------------------------------------------------
+counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__age)$location #3134 counties
 
+sex.alone.20.23 = census.manager$pull(
+  outcome = "population",
+  source = 'census.population', 
+  from.ontology.names = "census", 
+  dimension.values = list(location = counties), 
+  keep.dimensions = c('year', 'sex'),
+  na.rm = T) 
+
+sex.alone.20.23 = as.data.frame.table(sex.alone.20.23)%>% 
+  mutate(year = as.character(year))%>%
+  mutate(value = as.numeric(Freq))%>%
+  mutate(outcome = "population")%>%
+  mutate(location = "US")%>%
+  mutate(sex = as.character(sex))%>%
+  select(-Freq, -source)
 
 # Age + Sex 2020-2023 -----------------------------------------------------
+counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__age__sex)$location #3134 counties
 
+age.sex.20.23 = census.manager$pull(
+  outcome = "population",
+  source = 'census.population', 
+  from.ontology.names = "census", 
+  dimension.values = list(location = counties), 
+  keep.dimensions = c('year', 'age', 'sex'),
+  na.rm = T) 
+
+age.sex.20.23 = as.data.frame.table(age.sex.20.23)%>%
+  mutate(year = as.character(year))%>%
+  mutate(value = as.numeric(Freq))%>%
+  mutate(outcome = "population")%>%
+  mutate(location = "US")%>%
+  mutate(age = as.character(age))%>%
+  mutate(sex = as.character(sex))%>%
+  select(-Freq, -source)
 # Put ---------------------------------------------------------------------
 
 
 
+national.population.census = list(
+  age.alone.20.23,
+  sex.alone.20.23,
+  age.sex.20.23
+)
 
+for (data in national.population.census) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
