@@ -228,9 +228,6 @@ source('data_processing/census.manager/fertility.rate.R')
 #National Level 'metro' deaths
 source('data_processing/census.manager/mortality.cdc.wonder.R')
 
-#National Population data by age, sex, Age_sex (for SHIELD)
-source('data_processing/census.manager/national.population.data.R')
-
 ################################################################################
 ###Read in Census Files###
 ################################################################################
