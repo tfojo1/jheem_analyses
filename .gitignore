@@ -13,3 +13,6 @@ applications/EHE/calibration_runs/markdown_summaries/outputs
 *.DS_Store
 applications/*.DS_Store
 .Rproj.user
+
+# ignore
+!commoncode/data_manager_cache_metadata.Rdata
