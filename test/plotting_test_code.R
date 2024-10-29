@@ -11,6 +11,12 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum") # this i
 #load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")
 
 ## --- ANDREW TO LOOK AT ---- ## 
+# this plot should have a label that distinguishes MD data and county data 
+simplot(simset$last.sim(),
+        simset,
+        outcomes = c("awareness"), # totals only 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) 
 
 ## --- STANDARD PLOTS ---- ## 
 simplot(simset$last.sim(),
@@ -155,6 +161,8 @@ simplot(simset$last.sim(),
         style.manager = location.style.manager,
         plot.year.lag.ratio = T,
         dimension.values = list(year = 2000:2030)) 
+
+plot(1:simset$n.sim,simset$parameters["black.msm.trate.peak",])
 
 
 # simplot(sim,outcomes = "total.hiv.tests")
