@@ -82,7 +82,7 @@ for (data in clean.births.put) {
     data = data,
     ontology.name = 'cdc.fertility',
     source = 'cdc.wonder.natality',
-    dimension.values.to.distribute = list(ethnicity=c('Unknown or Not Stated')), 
+    dimension.values.to.distribute = list(ethnicity=c('Unknown or Not Stated'), race = c('More than one race')), 
     url = 'https://wonder.cdc.gov/natality.html',
     details = 'CDC Wonder Natality Data')
 }

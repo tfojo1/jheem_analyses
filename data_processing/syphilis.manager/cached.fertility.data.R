@@ -10,7 +10,8 @@ fertility.rate.data = as.data.frame.table(census.manager$data$fertility.rate$est
   mutate(ethnicity = as.character(ethnicity))%>%
   mutate(age = as.character(age))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "fertility.rate")
+  mutate(outcome = "fertility.rate")%>%
+  filter(race != "More than one race") #removing more than one race for this rate
 
 #Female.Population
 female.population.data <- as.data.frame.table(census.manager$data$female.population$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)%>%  rename(value = Freq)%>%
@@ -20,7 +21,8 @@ female.population.data <- as.data.frame.table(census.manager$data$female.populat
   mutate(ethnicity = as.character(ethnicity))%>%
   mutate(age = as.character(age))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "female.population")
+  mutate(outcome = "female.population")%>%
+  filter(race != "More than one race") #removing more than one race for this rate
 
 
 # Put into Syphilis Manager -----------------------------------------------

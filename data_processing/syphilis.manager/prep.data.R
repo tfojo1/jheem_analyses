@@ -158,7 +158,7 @@ for (data in prep_atlas_all) {
     data = data,
     ontology.name = 'cdc',
     source = 'cdc.prep',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial')),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
 }
@@ -172,7 +172,7 @@ for (data in indications_all) {
     data = data,
     ontology.name = 'cdc',
     source = 'cdc.prep.indications',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial')),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
 }

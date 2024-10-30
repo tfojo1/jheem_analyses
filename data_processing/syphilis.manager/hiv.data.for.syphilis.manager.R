@@ -410,6 +410,8 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
   }
   if(grepl("race", filename)) {
     names(data)[names(data)=='Race.Ethnicity'] = 'race'
+    data <- data %>%
+      filter(race != "Multiracial") #removing multiracial from the proportion outcomes
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -458,6 +460,8 @@ national.suppression = lapply(data.list.national.suppression , function(file){
   }
   if(grepl("race", filename)) {
     names(data)[names(data)=='Race.Ethnicity'] = 'race'
+    data <- data %>%
+      filter(race != "Multiracial") #removing multiracial from the proportion outcomes
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -492,7 +496,7 @@ for (data in diagnoses_all) {
     data = data,
     ontology.name = 'cdc',
     source = 'cdc.hiv',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial')),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
 }
@@ -506,7 +510,7 @@ for (data in prevalence_all) {
     data = data,
     ontology.name = 'cdc',
     source = 'cdc.hiv',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial')),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
 }
@@ -548,7 +552,7 @@ for (data in total_prev_all) {
     data = data,
     ontology.name = 'cdc',
     source = 'cdc.hiv',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial')),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
 }
