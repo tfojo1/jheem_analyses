@@ -251,7 +251,7 @@ for (data in national.birth.data.combined ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc.wonder.natality',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Unknown or Not Stated', 'Not Stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -346,7 +346,7 @@ national.deaths.total <- as.data.frame.table(census.manager$data$deaths$estimate
       data = national.deaths.stratified,
       ontology.name = 'census.cdc.wonder.births.deaths',
       source = 'cdc_wonder',
-      dimension.values = list(),
+      dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Unknown or Not Stated', 'Not Stated'),
       url = 'https://wonder.cdc.gov/',
       details = 'CDC Wonder')
 

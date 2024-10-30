@@ -80,7 +80,7 @@ for (data in syphilis.clean.put) {
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown')),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -162,7 +162,7 @@ for (data in early.syphilis.put) {
     data = data,
     ontology.name = 'cdc.syphilis',
     source = 'cdc.sti',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown')),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -228,7 +228,7 @@ for (data in early.syphilis.put) {
 #     data = data,
 #     ontology.name = 'cdc.sti',
 #     source = 'cdc.sti',
-#     dimension.values = list(),    
+#     dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'),  
 #     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
 #     details = 'CDC Atlas Plus')
 # }
