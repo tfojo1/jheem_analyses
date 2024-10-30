@@ -9,6 +9,7 @@ cat("*** Running Shiled_specification.R ***\n")
 # > specification.metadata=get.specification.metadata("shield","US")
 
 
+
 # NEXT STEPS:
 # Develop a functional form for fertility 
 # likelihoods 
@@ -652,6 +653,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                singular.unit = 'person'),
                     scale='non.negative.number',
                     save=T,
+                    corresponding.data.outcome = "births",
                     dynamic.quantity.name = 'births.from', #model has an internal definition for births  #births from is conditional on parent's characteristics
                     keep.dimensions = c('location','age','race') #collapse on stage and continuum for infected and on profile as well
 )

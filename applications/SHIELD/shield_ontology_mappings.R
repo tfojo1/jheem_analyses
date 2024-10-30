@@ -105,6 +105,19 @@ register.ontology.mapping('census.to.shield.race',
                                            c('asian or pacific islander', 'hispanic', 'hispanic'),
                                            c('asian or pacific islander', 'not hispanic', 'other')))
 
+#a temporary onthology to work with uppercase races
+register.ontology.mapping('census.to.shield.race.uppercase',
+                          from.dimensions = c('race', 'ethnicity'),
+                          to.dimensions = 'race',
+                          mappings = rbind(c('White', 'Hispanic or Latino', 'hispanic'),
+                                           c('White', 'Not Hispanic or Latino', 'other'),
+                                           c('Black or African American', 'Hispanic or Latino', 'hispanic'),
+                                           c('Black or African American', 'Not Hispanic or Latino', 'black'),
+                                           c('American Indian or Alaska Native', 'Hispanic or Latino', 'hispanic'),
+                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'other'),
+                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'hispanic'),
+                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'other')))
+
 #Maps Census racial groups  (ethnicity only) to what we use in SHIELD 
 register.ontology.mapping('census.to.shield.ethnicity.only',
                           from.dimensions = c('race'),

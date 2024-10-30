@@ -20,12 +20,20 @@ simset=simset;simset
 #                                                allow.incomplete = T)
 #   
 # 
-simplot(simset$last.sim(),
+simplot(simset$first.sim(),simset$last.sim(),
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
-simplot(simset$last.sim(),
-        outcomes = c("births"), 
+
+simplot(sim,
+        outcomes = c("births.from"), 
         dimension.values = list(year = 2000:2030)) 
+
+simplot(sim,
+        outcomes = c("total.mortality"), 
+        dimension.values = list(year = 2010:2030)) 
+
+rowSums(sim$total.mortality)/rowSums(sim$population)
+
 
 simplot(simset$last.sim(),
         facet.by = "age", split.by = "race", 

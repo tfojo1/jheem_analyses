@@ -58,7 +58,7 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
     stop("We need to specify what to do with more than one location")
   
   if (location == 'US'){
-    browser()
+    # browser()
     counties = 'US'
   }else{
     counties = locations::get.contained.locations(location, 'county')
@@ -395,6 +395,7 @@ get.best.guess.msm.proportions.by.race <- function(location,
 get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=DEFAULT.FERTILITY.RATE.YEARS){ 
   # pull fertility rates for location
   mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years) 
+  #
   if (length(mapped.fertility.rates)==0)
     stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
                 locations::get.location.name(location), ")"))
@@ -522,7 +523,6 @@ get.location.mortality.rates <- function(location,
 
   if (location=='US'){
     #@Todd: I'm a bit uncertain about deaths vs metro.deaths at this point
-    browser()
     counties='US'
     #use the deaths instead 
     mortality.rate = CENSUS.MANAGER$pull(outcome = 'deaths',
