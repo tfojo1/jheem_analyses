@@ -50,6 +50,23 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                             # grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
                                                           ]
 
+par.names.transmission = c(par.names.transmission,
+                           "unsuppressed.peak.hiv.mortality",
+                           "unsuppressed.hiv.mortality.0",
+                           "unsuppressed.hiv.mortality.1",
+                           # 'msm.testing.ramp.1.or',
+                           # 'msm.testing.ramp.2.or',
+                           # 'heterosexual.testing.ramp.1.or',
+                           # 'heterosexual.testing.ramp.2.or',
+                           # 'idu.testing.ramp.1.or',
+                           # 'idu.testing.ramp.2.or',
+                           'idu.remission.multiplier',
+                           'idu.relapse.multiplier',
+                           'aids.to.new.diagnoses.ratio.peak',
+                           'aids.to.new.diagnoses.ratio.0',
+                           'aids.to.new.diagnoses.ratio.1'
+)
+
 par.aliases.transmission = list(
   
   msm.trates = (EHE.PARAMETERS.PRIOR@var.names[grepl('msm\\.trate', EHE.PARAMETERS.PRIOR@var.names)]),
@@ -89,23 +106,6 @@ par.aliases.transmission = list(
   other.trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('other.*trate\\.2', EHE.PARAMETERS.PRIOR@var.names)])
   
 )
-
-par.names.transmission = c(par.names.transmission,
-                           "unsuppressed.peak.hiv.mortality",
-                           "unsuppressed.hiv.mortality.0",
-                           "unsuppressed.hiv.mortality.1",
-                           # 'msm.testing.ramp.1.or',
-                           # 'msm.testing.ramp.2.or',
-                           # 'heterosexual.testing.ramp.1.or',
-                           # 'heterosexual.testing.ramp.2.or',
-                           # 'idu.testing.ramp.1.or',
-                           # 'idu.testing.ramp.2.or',
-                           'idu.remission.multiplier',
-                           'idu.relapse.multiplier',
-                           'aids.to.new.diagnoses.ratio.peak',
-                           'aids.to.new.diagnoses.ratio.0',
-                           'aids.to.new.diagnoses.ratio.1'
-                           )
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions,
