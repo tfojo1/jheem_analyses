@@ -162,7 +162,7 @@ race.ethnicity.age.10.23 = as.data.frame.table(race.ethnicity.age.10.23)%>%
 # Age + Race + Ethnicity + Sex --------------------------------------------
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex)$location #3133 counties
 
-race.ethnicity.age.10.23 = census.manager$pull(
+race.ethnicity.age.sex.10.23 = census.manager$pull(
   outcome = "population",
   source = 'census.population', 
   from.ontology.names = "stratified.census", 
@@ -170,7 +170,7 @@ race.ethnicity.age.10.23 = census.manager$pull(
   keep.dimensions = c('year', 'race', 'ethnicity', 'age', 'sex'),
   na.rm = T) 
 
-race.ethnicity.age.10.23 = as.data.frame.table(race.ethnicity.age.10.23)%>%
+race.ethnicity.age.sex.10.23 = as.data.frame.table(race.ethnicity.age.sex.10.23)%>%
   mutate(year = as.character(year))%>%
   mutate(value = as.numeric(Freq))%>%
   mutate(outcome = "population")%>%
@@ -251,7 +251,7 @@ national.population.stratified = list(
   race.ethnicity.10.23,
   race.ethnicity.sex.10.23,
   race.ethnicity.age.10.23,
-  race.ethnicity.age.10.23,
+  race.ethnicity.age.sex.10.23,
   age.alone.10.19,
   sex.alone.10.19,
   age.sex.10.19
