@@ -154,6 +154,19 @@ new.diagnoses.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
+race.risk.new.diagnoses.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                       outcome.for.sim = "new",
+                                       dimensions = c("race","risk"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.type = 'cv',
+                                       weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                       equalize.weight.by.year = T 
+  )
+
 #-- PREVALENCE  ----
 total.prevalence.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
@@ -180,6 +193,18 @@ prevalence.likelihood.instructions =
                                        equalize.weight.by.year = T 
   )
 
+race.risk.prevalence.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                       outcome.for.sim = "diagnosed.prevalence",
+                                       dimensions = c("race","risk"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.type = 'cv',
+                                       weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                       equalize.weight.by.year = T 
+  )
 
 #-- AIDS DIAGNOSES  ----
 non.age.aids.diagnoses.likelihood.instructions =
@@ -672,15 +697,15 @@ joint.pop.migration.total.trans.likelihood.instructions =
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
 transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
-  join.likelihood.instructions(new.diagnoses.likelihood.instructions,
-                               prevalence.likelihood.instructions,
+  join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, # race/risk only 10/30
+                               race.risk.prevalence.likelihood.instructions, # race/risk only 10/30
                                non.age.aids.diagnoses.likelihood.instructions,
-                               proportion.tested.likelihood.instructions, 
+                               #proportion.tested.likelihood.instructions, # removing 10/30
                                population.likelihood.instructions,
                                heroin.likelihood.instructions,
                                cocaine.likelihood.instructions,
-                               aids.deaths.likelihood.instructions,
-                               awareness.likelihood.instructions #,
+                               aids.deaths.likelihood.instructions #,
+                               #awareness.likelihood.instructions, # removing 10/30
                                #race.ps.syphilis.year.on.year.change.likelihood.instructions,
                                #race.gonorrhea.year.on.year.change.likelihood.instructions
   )
