@@ -1,15 +1,14 @@
 cat("*** Running Shiled_register_calibration.R ***\n")
+# DO NOT SOURCE THIS FILE. IT'S CALLED FROM ELSEWHERE
 
+
+
+################################################################################################
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
-
 CALIBRATION.CODE.POPULATION = 'init.pop.shield'
-
-
-N.ITER.TEST = 1000
-N.ITER = 1500
-N.ITER.FULL = 5000
+N.ITER = 15000
 
 #-- REGISTER POPULATION CALIBRATION  --#
 par.names.pop = c(
