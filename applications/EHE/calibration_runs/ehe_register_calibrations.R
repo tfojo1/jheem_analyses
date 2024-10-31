@@ -9,7 +9,7 @@ CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid2'
 
 N.ITER.TEST = 10000
-N.ITER = 15000
+N.ITER = 20000
 N.ITER.FULL = 50000
 
 # load params manual
