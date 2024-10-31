@@ -157,7 +157,6 @@ simplot(simset$last.sim(),
         dimension.values = list(year = 2000:2030)) 
 
 plot(1:simset$n.sim,simset$parameters["black.msm.trate.peak",])
-plot(1:simset$n.sim,simset$parameters["unsuppressed.peak.hiv.mortality",])
 
 
 # simplot(sim,outcomes = "total.hiv.tests")
