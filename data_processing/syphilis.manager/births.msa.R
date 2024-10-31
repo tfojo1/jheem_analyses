@@ -67,7 +67,9 @@ clean.births.data = lapply(raw.birth.data, function(file){
   
   data <- data %>%
     mutate(location.check = locations::is.location.valid(location))%>% #Removing counties coded as 'unidentified'
-    filter(location.check == T)
+    filter(location.check == T)%>%
+    mutate(race = tolower(race))%>%
+    mutate(ethnicity = tolower(ethnicity))
   
   list(filename, data) 
   
@@ -82,7 +84,7 @@ for (data in clean.births.put) {
     data = data,
     ontology.name = 'cdc.fertility',
     source = 'cdc.wonder.natality',
-    dimension.values.to.distribute = list(ethnicity=c('Unknown or Not Stated'), race = c('More than one race')), 
+    dimension.values.to.distribute = list(ethnicity=c('unknown or not stated'), race = c('more than one race')), 
     url = 'https://wonder.cdc.gov/natality.html',
     details = 'CDC Wonder Natality Data')
 }

@@ -59,6 +59,7 @@ data.list.clean.atlas.prep = lapply(data.list.atlas.prep, function(file){
   }
   if(grepl("race", filename)) {
     names(data)[names(data)=='Race.Ethnicity'] = 'race'
+    data$race = tolower(data$race)
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -126,6 +127,7 @@ data.list.clean.indications = lapply(data.list.atlas.prep, function(file){
   }
   if(grepl("race", filename)) {
     names(data)[names(data)=='Race.Ethnicity'] = 'race'
+    data$race = tolower(data$race)
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -158,7 +160,7 @@ for (data in prep_atlas_all) {
     data = data,
     ontology.name = 'cdc',
     source = 'cdc.prep',
-    dimension.values.to.distribute = list(race=c('Multiracial')),
+    dimension.values.to.distribute = list(race=c('multiracial')),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
 }
@@ -172,7 +174,7 @@ for (data in indications_all) {
     data = data,
     ontology.name = 'cdc',
     source = 'cdc.prep.indications',
-    dimension.values.to.distribute = list(race=c('Multiracial')),
+    dimension.values.to.distribute = list(race=c('multiracial')),
     url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
     details = 'CDC Atlas Plus data')
 }

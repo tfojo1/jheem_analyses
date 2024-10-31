@@ -23,7 +23,8 @@ rename(value = Freq)%>%
   mutate(sex = as.character(sex))%>%
   mutate(race = as.character(race))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "proportion.msm")
+  mutate(outcome = "proportion.msm")%>%
+  mutate(race = tolower(race))
 
 brfss_age_sex = as.data.frame.table(surveillance.manager$data$proportion.msm$estimate$brfss$brfss$year__location__age__sex)%>%
   rename(value = Freq)%>%

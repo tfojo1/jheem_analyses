@@ -174,6 +174,7 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
   
   data = subset(data, data$race != 'Multiracial') #Removing multiracial, unknown 1-14-24
   data = subset(data, data$race != 'Unknown')
+  data$race = tolower(data$race)
   
   # Estimate Who Was Tested in the Past Year ------------------------------------
   #HIVTSTD3 = date of last test

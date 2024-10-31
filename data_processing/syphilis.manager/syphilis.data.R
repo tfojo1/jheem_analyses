@@ -59,6 +59,7 @@ syphilis.clean = lapply(syphilis.data, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
+    data$race = tolower(race)
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -80,7 +81,7 @@ for (data in syphilis.clean.put) {
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown')),
+    dimension.values.to.distribute = list(race=c('multiracial', 'unknown'), age=('Unknown')),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -140,6 +141,7 @@ syphilis.clean.early = lapply(syphilis.data.early, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
+    data$race = tolower(race)
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -162,7 +164,7 @@ for (data in early.syphilis.put) {
     data = data,
     ontology.name = 'cdc.syphilis',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown')),
+    dimension.values.to.distribute = list(race=c('multiracial', 'unknown'), age=('Unknown')),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -228,7 +230,7 @@ for (data in early.syphilis.put) {
 #     data = data,
 #     ontology.name = 'cdc.sti',
 #     source = 'cdc.sti',
-#     dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'),  
+#dimension.values.to.distribute = list(race=c('multiracial', 'unknown'), age=('Unknown')), 
 #     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
 #     details = 'CDC Atlas Plus')
 # }

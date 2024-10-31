@@ -131,7 +131,8 @@ data.list.brfss.national.msm.race = lapply(data.list.race.male.denom, function(f
   data <- data %>%
     select(outcome, year, location, race, msm, msm_total, n_weighted)%>%
     filter(!is.na(msm_total))%>%
-    mutate(value = (msm_total/n_weighted))
+    mutate(value = (msm_total/n_weighted))%>%
+    mutate(race = tolower(race))
   
   data$value = round(data$value, digits=2)
   

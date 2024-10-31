@@ -54,7 +54,8 @@ population.race = as.data.frame.table(census.manager$data$population$estimate$ce
                 mutate(year = as.character(year))%>%
                 mutate(location = as.character(location))%>%
                 mutate(value = as.numeric(value))%>%
-                mutate(outcome = "population")
+                mutate(outcome = "population")%>%
+                mutate(race = tolower(race))
 
 population.race<- as.data.frame(population.race[!duplicated(population.race), ])
 
@@ -121,7 +122,10 @@ population.race.eth.sex = as.data.frame.table(census.manager$data$population$est
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "population")
+  mutate(outcome = "population")%>%
+  mutate(race = tolower(race))%>%
+  mutate(ethnicity = tolower(ethnicity))
+  
 
 #Race+Ethnicity 2010-2023
 population.race.eth= as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity)%>%
@@ -131,7 +135,10 @@ population.race.eth= as.data.frame.table(census.manager$data$population$estimate
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "population")
+  mutate(outcome = "population")%>%
+  mutate(race = tolower(race))%>%
+  mutate(ethnicity = tolower(ethnicity))
+
 
 #Age+Sex 2010-2019 (ontology= stratifed.census because this is age group data)
 age.sex.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__sex)%>%
@@ -152,7 +159,10 @@ population.race.eth.age = as.data.frame.table(census.manager$data$population$est
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "population")
+  mutate(outcome = "population")%>%
+  mutate(race = tolower(race))%>%
+  mutate(ethnicity = tolower(ethnicity))
+
 
 #Age+Race 2010-2023
 age.race = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race)%>%
@@ -162,7 +172,8 @@ age.race = as.data.frame.table(census.manager$data$population$estimate$census.po
   mutate(value = as.numeric(value))%>%
   mutate(age = as.character(age))%>%
   mutate(race = as.character(race))%>%
-  mutate(outcome = "population")
+  mutate(outcome = "population")%>%
+  mutate(race = tolower(race))
 
 #Age+Ethnicity 2010-2023
 age.eth = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity)%>%
@@ -172,7 +183,8 @@ age.eth = as.data.frame.table(census.manager$data$population$estimate$census.pop
   mutate(value = as.numeric(value))%>%
   mutate(age = as.character(age))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
-  mutate(outcome = "population")
+  mutate(outcome = "population")%>%
+  mutate(ethnicity = tolower(ethnicity))
 
 
 # Put for ontology = stratified census ------------------------------------
@@ -227,7 +239,10 @@ national.births = as.data.frame.table(census.manager$data$births$estimate$cdc_wo
   mutate(race = as.character(race))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "births")
+  mutate(outcome = "births")%>%
+  mutate(race = tolower(race))%>%
+  mutate(ethnicity = tolower(ethnicity))
+
 
 national.births.denominator = as.data.frame.table(census.manager$data$births.denominator$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity)%>%
   filter(location == "US")%>%
@@ -237,7 +252,10 @@ national.births.denominator = as.data.frame.table(census.manager$data$births.den
   mutate(race = as.character(race))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "births.denominator")
+  mutate(outcome = "births.denominator")%>%
+  mutate(race = tolower(race))%>%
+  mutate(ethnicity = tolower(ethnicity))
+
 
 national.birth.data.combined = list(
   national.births,
@@ -251,7 +269,7 @@ for (data in national.birth.data.combined ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc.wonder.natality',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Unknown or Not Stated', 'Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not Available'), ethnicity ='unknown or not stated', 'not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -327,7 +345,10 @@ national.deaths.total <- as.data.frame.table(census.manager$data$deaths$estimate
   mutate(age = as.character(age))%>%
   mutate(sex = as.character(sex))%>%
   mutate(race = as.character(race))%>%
-  mutate(ethnicity = as.character(ethnicity))
+  mutate(ethnicity = as.character(ethnicity))%>%
+    mutate(race = tolower(race))%>%
+    mutate(ethnicity = tolower(ethnicity))
+  
 
 #Need separate puts bc these are separate sources
   
@@ -346,7 +367,7 @@ national.deaths.total <- as.data.frame.table(census.manager$data$deaths$estimate
       data = national.deaths.stratified,
       ontology.name = 'census.cdc.wonder.births.deaths',
       source = 'cdc_wonder',
-      dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Unknown or Not Stated', 'Not Stated'),
+      dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity ='unknown or not stated', 'not stated'),
       url = 'https://wonder.cdc.gov/',
       details = 'CDC Wonder')
 
