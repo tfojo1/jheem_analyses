@@ -39,10 +39,12 @@ is.cached.data.manager.out.of.date <- function(file, data.manager, error.prefix 
         stop(paste0(error.prefix, "'", file, "' is not one of our cached files. Call 'get.data.manager.cache.metadata()' to check what files are cached. File names are capitalization-sensitive."))
 
     # Check if the creation date and last modified date are both at least as new as the cached dates
-    if (!is.null(data.manager[['creation.date']]) && data.manager[['creation.date']] < data.manager.cache.metadata[[file]][['creation.date']])
-        return (TRUE)
-    if (!is.null(data.manager[['last.modified.date']]) && data.manager[['last.modified.date']] < data.manager.cache.metadata[[file]][['last.modified.date']])
-        return (TRUE)
+    if (!is.null(data.manager.cache.metadata[[file]][['creation.date']]))
+        if (!is.null(data.manager[['creation.date']]) && data.manager[['creation.date']] < data.manager.cache.metadata[[file]][['creation.date']])
+            return (TRUE)
+    if (!is.null(data.manager.cache.metadata[[file]][['last.modified.date']]))
+        if (!is.null(data.manager[['last.modified.date']]) && data.manager[['last.modified.date']] < data.manager.cache.metadata[[file]][['last.modified.date']])
+            return (TRUE)
     
     FALSE
 }
