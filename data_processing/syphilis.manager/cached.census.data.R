@@ -111,7 +111,8 @@ population.ethnicity = as.data.frame.table(census.manager$data$population$estima
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "population")
+  mutate(outcome = "population")%>%
+  mutate(ethnicity = tolower(ethnicity))
 
 # Race+Ethnicity+Sex 2010-2023
 population.race.eth.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity__sex)%>%
