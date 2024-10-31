@@ -340,8 +340,8 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('13-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years', "Unknown"),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    age=c('13-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
+    race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -353,7 +353,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('13-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years', "Unknown"),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -383,7 +383,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -393,7 +393,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -417,8 +417,8 @@ data.manager$register.ontology(
     age=c('0-4 years', '5-9 years', '10-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
           '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
           '75-79 years', '80-84 years', '85+ years'),
-    race=c('White', 'Black', 'Asian', 'American Indian and Alaska Native', 'Native Hawaiian and Other Pacific Islander'),
-    ethnicity=c('Hispanic', 'Not Hispanic'),
+    race=c('white', 'black', 'asian', 'american indian and alaska native', 'native hawaiian and other pacific islander'),
+    ethnicity=c('hispanic', 'not hispanic'),
     sex=c('male','female')
   ))
 
@@ -436,7 +436,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
-    race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Other race', 'Hispanic'),
+    race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'other race', 'hispanic'),
     sex=c('male','female'),
     risk=c('msm', 'not_msm')
   ))
@@ -448,8 +448,8 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('15-19 years', '20-24 years', '25-29 years', '30-34 years','35-39 years', '40-44 years'),
-    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White'),
-    ethnicity = c('Hispanic or Latino', 'Not Hispanic or Latino')
+    race=c('american indian or alaska native', 'asian or pacific islander', 'black or african american', 'white'),
+    ethnicity = c('hispanic or latino', 'not hispanic or latino')
   ))
 
 #This is for the births+births denominator data pulled from Census
@@ -461,8 +461,8 @@ data.manager$register.ontology(
     age=c("< 1 year", "1-4 years", "10-14 years", "15-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years",
           "45-49 years", "5-9 years", "50-54 years", "55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80-84 years", 
           "85-89 years", "90-94 years", "95-99 years", "100+ years"),
-    race=c('American Indian or Alaska Native', 'Asian or Pacific Islander', 'Black or African American', 'White'),
-    ethnicity=c('Hispanic or Latino', 'Not Hispanic or Latino'),
+    race=c('american indian or alaska native', 'asian or pacific islander', 'black or african american', 'white'),
+    ethnicity=c('hispanic or latino', 'not hispanic or latino'),
     sex=c('male','female')
   ))
 
