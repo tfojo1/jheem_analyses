@@ -489,7 +489,7 @@ source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
 source('data_processing/syphilis.manager/births.msa.R') #This is CDC Wonder Birth data by age, race, eth for women 15-44 aggregated from county to MSA
-source('data_processing/syphilis.manager/aggregating.national.population.R')
+source('data_processing/syphilis.manager/aggregating.national.population.syphilis.R')
 
 # RENAME ------------------------------------------------------------------
 
