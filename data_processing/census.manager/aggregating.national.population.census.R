@@ -30,7 +30,8 @@ race.alone.10.23 = as.data.frame.table(race.alone.10.23)%>%
   mutate(outcome = "population")%>%
   mutate(location = "US")%>%
   mutate(race = as.character(race))%>%
-  select(-Freq, -source)
+  select(-Freq, -source)%>%
+  mutate(race = tolower(race))
 
 # Ethnicity Alone 2010-2023 -----------------------------------------------
 
@@ -50,7 +51,8 @@ eth.alone.10.23 = as.data.frame.table(eth.alone.10.23)%>%
   mutate(outcome = "population")%>%
   mutate(location = "US")%>%
   mutate(ethnicity = as.character(ethnicity))%>%
-  select(-Freq, -source)
+  select(-Freq, -source)%>%
+  mutate(ethnicity = tolower(ethnicity))
 
 # Age + Race 2010-2023 -----------------------------------------------
 
@@ -71,7 +73,9 @@ age.race.10.23 = as.data.frame.table(age.race.10.23)%>%
   mutate(location = "US")%>%
   mutate(age = as.character(age))%>%
   mutate(race = as.character(race))%>%
-  select(-Freq, -source)
+  select(-Freq, -source)%>%
+  mutate(race = tolower(race))
+
 
 # Age + ethnicity 2010-2023 -----------------------------------------------
 
@@ -92,7 +96,9 @@ age.ethnicity.10.23 = as.data.frame.table(age.ethnicity.10.23)%>%
   mutate(location = "US")%>%
   mutate(age = as.character(age))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
-  select(-Freq, -source)
+  select(-Freq, -source)%>%
+  mutate(ethnicity = tolower(ethnicity))
+
 
 # Race + Ethnicity 2010-2023 -----------------------------------------------
 
@@ -113,7 +119,9 @@ race.ethnicity.10.23 = as.data.frame.table(race.ethnicity.10.23)%>%
   mutate(location = "US")%>%
   mutate(race = as.character(race))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
-  select(-Freq, -source)
+  select(-Freq, -source)%>%
+  mutate(ethnicity = tolower(ethnicity))%>%
+  mutate(race = tolower(race))
 
 
 # Race + Ethnicity + Sex 2010-2023 --------------------------------------------
@@ -135,7 +143,9 @@ race.ethnicity.sex.10.23 = as.data.frame.table(race.ethnicity.sex.10.23)%>%
   mutate(race = as.character(race))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
   mutate(sex = as.character(sex))%>%
-  select(-Freq, -source)
+  select(-Freq, -source)%>%
+  mutate(ethnicity = tolower(ethnicity))%>%
+  mutate(race = tolower(race))
 
 # Race + Ethnicity + Age 2010-2023 ----------------------------------------
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity)$location #3133 counties
@@ -156,7 +166,9 @@ race.ethnicity.age.10.23 = as.data.frame.table(race.ethnicity.age.10.23)%>%
   mutate(race = as.character(race))%>%
   mutate(ethnicity = as.character(ethnicity))%>%
   mutate(age = as.character(age))%>%
-  select(-Freq, -source)
+  select(-Freq, -source)%>%
+  mutate(ethnicity = tolower(ethnicity))%>%
+  mutate(race = tolower(race))
 
 # Age + Race + Ethnicity + Sex --------------------------------------------
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex)$location #3133 counties
@@ -178,7 +190,9 @@ race.ethnicity.age.sex.10.23 = as.data.frame.table(race.ethnicity.age.sex.10.23)
   mutate(ethnicity = as.character(ethnicity))%>%
   mutate(age = as.character(age))%>%
   mutate(sex = as.character(sex))%>%
-  select(-Freq, -source)
+  select(-Freq, -source)%>%
+  mutate(ethnicity = tolower(ethnicity))%>%
+  mutate(race = tolower(race))
 
 # Age 2010-2019 -----------------------------------------------------------
 
