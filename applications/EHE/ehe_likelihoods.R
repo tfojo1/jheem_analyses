@@ -705,7 +705,8 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
                                population.likelihood.instructions,
                                heroin.likelihood.instructions,
                                cocaine.likelihood.instructions,
-                               aids.deaths.likelihood.instructions #,
+                               aids.deaths.likelihood.instructions,
+                               hiv.mortality.likelihood.instructions # added 11/1
                                #awareness.likelihood.instructions, # removing 10/30
                                #race.ps.syphilis.year.on.year.change.likelihood.instructions,
                                #race.gonorrhea.year.on.year.change.likelihood.instructions
