@@ -26,13 +26,13 @@ year.mappings.20.23 = c('1' = 'remove',
                   '3'= "2021",
                   '4'= "2022",
                   '5'= "2023")
-census.race.mappings.20.23 = c('WA' = 'White',
-                           'BA' = 'Black',
-                           'IA'= 'American Indian and Alaska Native',
-                           'AA' = 'Asian',
-                           'NA' = 'Native Hawaiian and Other Pacific Islander')
-census.eth.mappings.20.23 = c(  'H' = 'Hispanic',
-                           'NH' = 'Not Hispanic')
+census.race.mappings.20.23 = c('WA' = 'white',
+                           'BA' = 'black',
+                           'IA'= 'american indian and alaska native',
+                           'AA' = 'asian',
+                           'NA' = 'native hawaiian and Other pacific islander')
+census.eth.mappings.20.23 = c(  'H' = 'hispanic',
+                           'NH' = 'not hispanic')
 census.age.mappings.20.23 = c('1' = '0-4 years', 
                           '2' = '5-9 years', 
                           '3' = '10-14 years', 
@@ -282,19 +282,19 @@ population.race.eth.sex.20.23 <- county_agegr_sex_race_eth.20.23%>%
                names_sep = "_",
                values_to = "count.by.sex")%>%
   mutate(ethniticy.indcator = substring(combined.race, 1, 1))%>%
-  mutate(race = case_when(combined.race == "HAA" ~ "Asian",
-                          combined.race == "HBA" ~ "Black",
-                          combined.race == "HIA" ~ "American Indian and Alaska Native",
-                          combined.race == "HNA" ~ "Native Hawaiian and Other Pacific Islander",
-                          combined.race == "HWA" ~ "White",
-                          combined.race == "NHAA" ~ "Asian",
-                          combined.race == "NHBA" ~ "Black",
-                          combined.race == "NHIA" ~ "American Indian and Alaska Native",
-                          combined.race == "NHNA" ~ "Native Hawaiian and Other Pacific Islander",
-                          combined.race == "NHWA" ~ "White"))%>%
+  mutate(race = case_when(combined.race == "HAA" ~ "asian",
+                          combined.race == "HBA" ~ "black",
+                          combined.race == "HIA" ~ "american indian and alaska native",
+                          combined.race == "HNA" ~ "native hawaiian and other pacific islander",
+                          combined.race == "HWA" ~ "white",
+                          combined.race == "NHAA" ~ "asian",
+                          combined.race == "NHBA" ~ "black",
+                          combined.race == "NHIA" ~ "american indian and alaska native",
+                          combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
+                          combined.race == "NHWA" ~ "white"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.20.23[YEAR]))%>%
-  mutate(ethnicity = ifelse(ethniticy.indcator == "N", "Not Hispanic", 'Hispanic'))%>%
+  mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
   select(location, year, race, ethnicity, sex, count.by.sex)%>%
   mutate(outcome = "population")%>%
   mutate(value = count.by.sex)%>%
@@ -324,19 +324,19 @@ population.age.race.eth.20.23 <- county_agegr_sex_race_eth.20.23%>%
                names_sep = "_",
                values_to = "count.by.sex")%>%
   mutate(ethniticy.indcator = substring(combined.race, 1, 1))%>%
-  mutate(race = case_when(combined.race == "HAA" ~ "Asian",
-                          combined.race == "HBA" ~ "Black",
-                          combined.race == "HIA" ~ "American Indian and Alaska Native",
-                          combined.race == "HNA" ~ "Native Hawaiian and Other Pacific Islander",
-                          combined.race == "HWA" ~ "White",
-                          combined.race == "NHAA" ~ "Asian",
-                          combined.race == "NHBA" ~ "Black",
-                          combined.race == "NHIA" ~ "American Indian and Alaska Native",
-                          combined.race == "NHNA" ~ "Native Hawaiian and Other Pacific Islander",
-                          combined.race == "NHWA" ~ "White"))%>%
+  mutate(race = case_when(combined.race == "HAA" ~ "asian",
+                          combined.race == "HBA" ~ "black",
+                          combined.race == "HIA" ~ "american indian and alaska native",
+                          combined.race == "HNA" ~ "native hawaiian and other pacific islander",
+                          combined.race == "HWA" ~ "white",
+                          combined.race == "NHAA" ~ "asian",
+                          combined.race == "NHBA" ~ "black",
+                          combined.race == "NHIA" ~ "american indian and alaska native",
+                          combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
+                          combined.race == "NHWA" ~ "white"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.20.23[YEAR]))%>%
-  mutate(ethnicity = ifelse(ethniticy.indcator == "N", "Not Hispanic", 'Hispanic'))%>%
+  mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
   mutate(age = as.character(census.age.mappings.20.23[AGEGRP]))%>%
   mutate(outcome = "population")%>%
   select(outcome, location, year, sex, race, ethnicity, age, count.by.sex)%>%
@@ -353,7 +353,9 @@ population.race.eth.20.23 <- population.race.eth.sex.20.23%>%
   group_by(year, location, race, ethnicity)%>%
   mutate(value.new = sum(value))%>%
   select(-sex, -value)%>%
-  rename(value = value.new)
+  rename(value = value.new)%>%
+  mutate(race = tolower(race))%>%
+  mutate(ethnicity = tolower(ethnicity))
 
 population.race.eth.20.23= as.data.frame(population.race.eth.20.23)
 
@@ -382,19 +384,19 @@ population.race.eth.sex.age.20.23 <- county_agegr_sex_race_eth.20.23%>%
                names_sep = "_",
                values_to = "count.by.sex")%>%
   mutate(ethniticy.indcator = substring(combined.race, 1, 1))%>%
-  mutate(race = case_when(combined.race == "HAA" ~ "Asian",
-                          combined.race == "HBA" ~ "Black",
-                          combined.race == "HIA" ~ "American Indian and Alaska Native",
-                          combined.race == "HNA" ~ "Native Hawaiian and Other Pacific Islander",
-                          combined.race == "HWA" ~ "White",
-                          combined.race == "NHAA" ~ "Asian",
-                          combined.race == "NHBA" ~ "Black",
-                          combined.race == "NHIA" ~ "American Indian and Alaska Native",
-                          combined.race == "NHNA" ~ "Native Hawaiian and Other Pacific Islander",
-                          combined.race == "NHWA" ~ "White"))%>%
+  mutate(race = case_when(combined.race == "HAA" ~ "asian",
+                          combined.race == "HBA" ~ "black",
+                          combined.race == "HIA" ~ "american indian and alaska native",
+                          combined.race == "HNA" ~ "native hawaiian and other pacific islander",
+                          combined.race == "HWA" ~ "white",
+                          combined.race == "NHAA" ~ "asian",
+                          combined.race == "NHBA" ~ "black",
+                          combined.race == "NHIA" ~ "american indian and alaska native",
+                          combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
+                          combined.race == "NHWA" ~ "white"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.20.23[YEAR]))%>%
-  mutate(ethnicity = ifelse(ethniticy.indcator == "N", "Not Hispanic", 'Hispanic'))%>%
+  mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
   mutate(age = as.character(census.age.mappings.20.23[AGEGRP]))%>%
   select(location, year, race, ethnicity, sex, age, count.by.sex)%>%
   mutate(outcome = "population")%>%

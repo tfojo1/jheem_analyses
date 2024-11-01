@@ -35,8 +35,8 @@ data.list.cdc.wonder.clean = lapply(data.list.cdc.wonder  , function(file){
   data$value = ifelse(data$Population == "Missing", NA, data$Population) #Replacing 'missing' with NA
   data$value = as.numeric(data$value)
   
-  data$race = data$Race
-  data$ethnicity= data$Ethnicity
+  data$race = tolower(data$Race)
+  data$ethnicity= tolower(data$Ethnicity)
   data$age= data$Age
     
   data <- data %>%
@@ -83,8 +83,8 @@ dummy.counties.cdc.wonder  <- data.frame(
   year = c('2018'),
   location = c('51560', '51780', '51123'), #These are the counties that have changed#
   value = as.numeric(NA),
-  race = c('American Indian or Alaska Native'),
-  ethnicity = c('Hispanic or Latino'),
+  race = c('american Indian or alaska native'),
+  ethnicity = c('hispanic or latino'),
   age = c('< 1 year'),
   sex = c('male'))
   
