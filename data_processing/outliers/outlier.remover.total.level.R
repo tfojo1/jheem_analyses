@@ -51,7 +51,7 @@ total.prev.adjusted<- run.outlier.process(outcome= 'total.prevalence',
 dx.prev.adjusted.one<- run.outlier.process(outcome= 'diagnosed.prevalence',
                                          stratifications= list(c()), 
                                          data.manager= surveillance.manager,
-                                         phi = 0.1,
+                                         phi = 0.2,
                                          theta = 0.05,
                                          max.year = 2019,
                                          first.choice.year = 2018,
@@ -59,12 +59,15 @@ dx.prev.adjusted.one<- run.outlier.process(outcome= 'diagnosed.prevalence',
   filter(source == "cdc.surveillance.reports")
 
 #Need to manually remove 2018 for C.3340 and C.47900 because their 2018 value is incorrect
-dx.prev.adjusted.one$adjudication <- c(T)
+dx.prev.adjusted.one$adjudication <- c(T, T, T, T, T, F, F, T, T, F, T, T, T, T, T, F)
+dx.prev.adjusted.one <- dx.prev.adjusted.one %>%
+  add_row(year = "2018", location = 'C.33340', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
+  add_row(year = "2018", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)
 
 run.outlier.process(outcome= 'diagnosed.prevalence',
                     stratifications= list(c()),
                     data.manager= surveillance.manager,
-                    phi = 0.1,
+                    phi = 0.2,
                     theta = 0.05,
                     max.year = 2019,
                     first.choice.year = 2018,
@@ -81,7 +84,7 @@ msas = locations::get.all.for.type("CBSA")
 dx.prev.adjusted.two <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                            stratifications= list(c()), 
                                            data.manager= surveillance.manager,
-                                           phi = 0.1,
+                                           phi = 0.2,
                                            theta = 0.05,
                                            max.year = 2019,
                                            first.choice.year = 2018,
@@ -93,7 +96,7 @@ dx.prev.adjusted.two$adjudication <- c(T)
 run.outlier.process(outcome= 'diagnosed.prevalence',
                     stratifications= list(c()),
                     data.manager= surveillance.manager,
-                    phi = 0.1,
+                    phi = 0.2,
                     theta = 0.05,
                     max.year = 2019,
                     first.choice.year = 2018,
@@ -105,7 +108,7 @@ run.outlier.process(outcome= 'diagnosed.prevalence',
 dx.prev.adjusted.three <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                               stratifications= list(c()), 
                                               data.manager= surveillance.manager,
-                                              phi = 0.1,
+                                              phi = 0.2,
                                               theta = 0.05,
                                               max.year = 2019,
                                               first.choice.year = 2018,
@@ -117,7 +120,7 @@ dx.prev.adjusted.three$adjudication <- c(T)
 run.outlier.process(outcome= 'diagnosed.prevalence',
                     stratifications= list(c()),
                     data.manager= surveillance.manager,
-                    phi = 0.1,
+                    phi = 0.2,
                     theta = 0.05,
                     max.year = 2019,
                     first.choice.year = 2018,

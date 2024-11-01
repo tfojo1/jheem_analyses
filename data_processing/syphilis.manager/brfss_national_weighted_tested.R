@@ -23,15 +23,15 @@ brfss.sex.mappings = c('1' = 'male',
                        '7' = NA,
                        '9' = NA)
 
-brfss.race.mappings= c('1'= "White",
-                       '2'= "Black",
-                       '3'= 'American Indian/Alaska Native',
-                       '4'= 'Asian',
-                       '5'= 'Native Hawaiian/Other Pacific Islander',
-                       '6'= 'Other race',
-                       '7'= 'Multiracial', 
-                       '8'= 'Hispanic',
-                       '9'= 'Unknown')
+brfss.race.mappings= c('1'= "white",
+                       '2'= "black",
+                       '3'= 'american indian/alaska native',
+                       '4'= 'asian',
+                       '5'= 'native hawaiian/other pacific islander',
+                       '6'= 'other race',
+                       '7'= 'multiracial', 
+                       '8'= 'hispanic',
+                       '9'= 'unknown')
 brfss.age.mappings= c('1'= '18-24 years',
                       '2'= '25-29 years',
                       '3'='30-34 years',
@@ -172,9 +172,8 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
   data$age = brfss.age.mappings[data$age]
   data$race = brfss.race.mappings[data$race]
   
-  data = subset(data, data$race != 'Multiracial') #Removing multiracial, unknown 1-14-24
-  data = subset(data, data$race != 'Unknown')
-  data$race = tolower(data$race)
+  data = subset(data, data$race != 'multiracial') #Removing multiracial, unknown 1-14-24
+  data = subset(data, data$race != 'unknown')
   
   # Estimate Who Was Tested in the Past Year ------------------------------------
   #HIVTSTD3 = date of last test
@@ -681,7 +680,8 @@ proportion.tested.msa.race <- as.data.frame.table(surveillance.manager$data$prop
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
   mutate(race = as.character(race))%>%
-  mutate(outcome = "proportion.tested")
+  mutate(outcome = "proportion.tested")%>%
+  mutate(race = tolower(race))
 
 # MSA Level proportion.tested.n -------------------------------------------
 proportion.tested.denom.msa <- as.data.frame.table(surveillance.manager$data$proportion.tested.n$estimate$brfss$brfss$year__location)%>%
@@ -717,7 +717,8 @@ proportion.tested.denom.msa.race <- as.data.frame.table(surveillance.manager$dat
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
   mutate(race = as.character(race))%>%
-  mutate(outcome = "proportion.tested.n")
+  mutate(outcome = "proportion.tested.n")%>%
+  mutate(race = tolower(race))
 
 # Put ----------------------------------------------------------------------
 
