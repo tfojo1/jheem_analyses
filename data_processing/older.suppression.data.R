@@ -12,13 +12,13 @@ older.suppression <- lapply(older.suppression.files, function(x){
 
 # Mappings ----------------------------------------------------------------
 
-races = c('American Indian/Alaska Native' = 'American Indian/Alaska Native',
-                  'Asian' = 'Asian',
-                  'Black/African American' = 'Black/African American',
-                  'Hispanic/Latino' = 'Hispanic/Latino',
-                  'Native Hawaiian/Other Pacific Islander' = 'Native Hawaiian/Other Pacific Islander',
-                  'White' = 'White',
-                  'Multiple races' = 'Multiracial')
+races = c('American Indian/Alaska Native' = 'american indian/alaska native',
+                  'Asian' = 'asian',
+                  'Black/African American' = 'black/african american',
+                  'Hispanic/Latino' = 'hispanic/latino',
+                  'Native Hawaiian/Other Pacific Islander' = 'native hawaiian/other pacific islander',
+                  'White' = 'white',
+                  'Multiple races' = 'multiracial')
 
 ages = c('13-24' = '13-24 years', 
          '25-34' = '25-34 years', 

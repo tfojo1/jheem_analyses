@@ -29,12 +29,12 @@ aids.risk.mappings = c('Heterosexual contact with HIV' = 'heterosexual',
                        'Risk not reported or identified' = "other",
                        'Hemophilia/coagulation disorder'= "other")
 
-aids.race.mappings = c('American Indian /Alaskan Native' = 'American Indian/Alaska Native',
-                      'Asian / Pacific Islander' = 'Asian',
-                      'Black (and also not Hispanic)' = 'Black',
-                      'Hispanic' = 'Hispanic',
-                      'White (and also not Hispanic)' = 'White',
-                      'Unknown'= 'Unknown')
+aids.race.mappings = c('American Indian /Alaskan Native' = 'american indian/alaska native',
+                      'Asian / Pacific Islander' = 'asian',
+                      'Black (and also not Hispanic)' = 'alack',
+                      'Hispanic' = 'hispanic',
+                      'White (and also not Hispanic)' = 'white',
+                      'Unknown'= 'unknown')
 
 aids.age.mappings = c('Less than 1 Year' = '< 1 year',
                       '1 - 12 Years' = '1-12 years',
@@ -192,7 +192,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
      data = data,
      ontology.name = 'cdc.aids', 
      source = 'cdc.aids',
-     dimension.values.to.distribute = list(race=c('Unknown')),
+     dimension.values.to.distribute = list(race=c('unknown')),
      url = 'https://wonder.cdc.gov/AIDSPublic.html',
      details = 'CDC Wonder AIDS Public Information Data')  
  }
@@ -315,7 +315,7 @@ for (data in aids.deaths.put) {
     data = data,
     ontology.name = 'cdc.aids.deaths',
     source = 'cdc.aids',
-    dimension.values.to.distribute = list(race=c('Unknown')),
+    dimension.values.to.distribute = list(race=c('unknown')),
     url = 'https://wonder.cdc.gov/AIDSPublic.html',
     details = 'CDC Wonder AIDS Public Information Data')
 }

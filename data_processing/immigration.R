@@ -29,10 +29,10 @@ age.mappings.immigration = c('01' = '1-4 years',
                              '14' = '70-74 years',
                              '15' = '75+ years')
 
-race.mappings.immigration = c('02' = 'Black')
+race.mappings.immigration = c('02' = 'black')
 
-ethnicity.mappings.immigration = c( '01' = 'White, Non-Hispanic',
-                                    '03' = 'Hispanic or Latino')
+ethnicity.mappings.immigration = c( '01' = 'white, non-hispanic',
+                                    '03' = 'hispanic or latino')
 
 ################################################################################
 #Clean
@@ -284,7 +284,7 @@ imm_hisp <- data.list.move.clean[grep("immigration_eth", names(data.list.move.cl
 imm_hisp <- as.data.frame(imm_hisp$msa_immigration_eth_11.15) 
 
 imm_hisp <- imm_hisp %>%
-  filter(race == 'Hispanic or Latino')%>%
+  filter(race == 'hispanic or latino')%>%
   rename(hispanic = race)%>%
   rename(hispanic.value = value)%>%
   select(-year, -outcome)
@@ -316,7 +316,7 @@ em_hisp <- data.list.move.clean[grep("emigration_eth", names(data.list.move.clea
 em_hisp <- as.data.frame(em_hisp$msa_emigration_eth_11.15) 
 
 em_hisp <- em_hisp %>%
-  filter(race == 'Hispanic or Latino')%>%
+  filter(race == 'hispanic or latino')%>%
   rename(hispanic = race)%>%
   rename(hispanic.value = value)
 

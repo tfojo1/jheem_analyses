@@ -118,7 +118,7 @@ data.list.brfss.state.msm.race = lapply(data.list.race.male.denom, function(file
   data=file[[2]] 
   filename = file[[1]] 
   
-  data= subset(data, data$race != "Unknown")
+  data= subset(data, data$race != "unknown")
   
   #Create MSM proportion
   data$outcome= "proportion.msm"

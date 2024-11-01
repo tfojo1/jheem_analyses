@@ -436,7 +436,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+        race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -447,7 +447,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
-    race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+    race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
@@ -469,7 +469,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years', '55+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'White'),
+        race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'white'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
         
@@ -482,7 +482,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('13-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+        race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -495,7 +495,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('13-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+        race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -525,7 +525,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
-        race=c('White', 'Black', 'American Indian/Alaska Native', 'Asian', 'Native Hawaiian/Other Pacific Islander', 'Hispanic', 'Other race'),
+        race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'hispanic', 'other race'),
         sex=c('male','female'),
         risk=c('msm', 'not_msm')
     ))
@@ -545,7 +545,7 @@ data.manager$register.ontology(
         location= NULL,
         age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                 "65-69 years", "70-74 years", "75+ years"),
-        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black", 'Other'),
+        race=c("hispanic or latino", "white, non-hispanic", "black", 'other'),
         sex=c('male','female'),
         incomplete.dimensions = c("year", "location")
     ))
@@ -557,7 +557,7 @@ data.manager$register.ontology(
         location= NULL,
         age = c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                 "65-69 years", "70-74 years", "75+ years"),
-        race=c("Hispanic or Latino", "White, Non-Hispanic", "Black", 'Other'),
+        race=c("hispanic or latino", "white, non-hispanic", "black", 'other'),
         sex=c('male','female'),
         incomplete.dimensions = c("year", "location")
     ))
@@ -568,7 +568,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('13-19 years', '20-24 years', '25-34 years', '35-44 years', '45-54 years','55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80-84 years','85+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black/African American', 'Hispanic/Latino', 'Native Hawaiian/Other Pacific Islander', 'White'),
+        race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -579,7 +579,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White'),
+        race=c('american indian/alaska native', 'asian', 'black', 'hispanic', 'white'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other')
     ))
@@ -590,7 +590,7 @@ data.manager$register.ontology(
         year= ("1981-2001"),
         location= NULL,
         age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
-        race=c('American Indian/Alaska Native', 'Asian', 'Black', 'Hispanic', 'White'),
+        race=c('american indian/alaska native', 'asian', 'black', 'hispanic', 'white'),
         sex=c('male','female'),
         risk=c('msm','idu','msm_idu','heterosexual','other'),
         incomplete.dimensions = c("year", "location")
@@ -773,6 +773,7 @@ data.list.clean.diagnoses = lapply(data.list.diagnoses, function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -839,6 +840,7 @@ data.list.clean.deaths = lapply(data.list.deaths, function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -906,6 +908,7 @@ data.list.clean.deaths.notes = lapply(data.list.deaths, function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -971,6 +974,7 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -1040,6 +1044,7 @@ data.list.clean.sle = lapply(data.list.sle, function(file){
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
         data = subset(data, data$race != "Multiracial")
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -1088,6 +1093,7 @@ national.suppression = lapply(data.list.national.suppression , function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -1159,6 +1165,7 @@ data.list.clean.knowledge = lapply(data.list.knowledge, function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -1228,6 +1235,7 @@ data.list.clean.awareness.population = lapply(data.list.knowledge, function(file
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -1335,6 +1343,7 @@ data.list.clean.atlas.prep = lapply(data.list.atlas.prep, function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -1402,6 +1411,7 @@ data.list.clean.indications = lapply(data.list.atlas.prep, function(file){
     }
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
+        data$race = tolower(data$race)
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -1437,7 +1447,7 @@ for (data in diagnoses_all) {
         data = data,
         ontology.name = 'cdc',
         source = 'cdc.hiv',
-        dimension.values.to.distribute = list(race=c('Multiracial')),
+        dimension.values.to.distribute = list(race=c('multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'CDC Atlas Plus data')
 }
@@ -1451,7 +1461,7 @@ for (data in prevalence_all) {
         data = data,
         ontology.name = 'cdc',
         source = 'cdc.hiv',
-        dimension.values.to.distribute = list(race=c('Multiracial')),
+        dimension.values.to.distribute = list(race=c('multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'CDC Atlas Plus data')
 }
@@ -1465,7 +1475,7 @@ for (data in deaths_all) {
         data = data,
         ontology.name = 'cdc',
         source = 'cdc.hiv',
-        dimension.values.to.distribute = list(race=c('Multiracial')),
+        dimension.values.to.distribute = list(race=c('multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'CDC Atlas Plus data')
 }
@@ -1479,7 +1489,7 @@ for (data in deaths_notes) {
         data = data,
         ontology.name = 'cdc',
         source = 'cdc.hiv',
-        dimension.values.to.distribute = list(race=c('Multiracial')),
+        dimension.values.to.distribute = list(race=c('multiracial')),
         url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
         details = 'Jurisdiction with incomplete reporting of deaths for most recent year.')
 }

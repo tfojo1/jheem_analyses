@@ -79,15 +79,15 @@ brfss.sex.mappings = c('1' = 'male',
                        '7' = NA,
                        '9' = NA)
 
-brfss.race.mappings= c('1'= "White",
-                       '2'= "Black",
-                       '3'= 'American Indian/Alaska Native',
-                       '4'= 'Asian',
-                       '5'= 'Native Hawaiian/Other Pacific Islander',
-                       '6'= 'Other race',
-                       '7'= 'Multiracial', 
-                       '8'= 'Hispanic',
-                       '9'= 'Unknown')
+brfss.race.mappings= c('1'= "white",
+                       '2'= "black",
+                       '3'= 'american indian/alaska native',
+                       '4'= 'asian',
+                       '5'= 'native hawaiian/other pacific islander',
+                       '6'= 'other race',
+                       '7'= 'multiracial', 
+                       '8'= 'hispanic',
+                       '9'= 'unknown')
 brfss.age.mappings= c('1'= '18-24 years',
                       '2'= '25-29 years',
                       '3'='30-34 years',
@@ -228,8 +228,8 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   data$age = brfss.age.mappings[data$age]
   data$race = brfss.race.mappings[data$race]
   
- data = subset(data, data$race != 'Multiracial') #Removing multiracial, unknown 1-14-24
- data = subset(data, data$race != 'Unknown')
+ data = subset(data, data$race != 'multiracial') #Removing multiracial, unknown 1-14-24
+ data = subset(data, data$race != 'unknown')
 
 # Estimate Who Was Tested in the Past Year ------------------------------------
   #HIVTSTD3 = date of last test
@@ -391,7 +391,7 @@ data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   filename = file[[1]] 
   
   data= subset(data, !is.na(data$race)) #Remove unknown race
-  data= subset(data, data$race != 'Unknown')
+  data= subset(data, data$race != 'unknown')
   
   data<- data %>%
     group_by(location, race) %>%
