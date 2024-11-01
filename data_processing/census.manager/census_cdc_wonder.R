@@ -83,7 +83,7 @@ dummy.counties.cdc.wonder  <- data.frame(
   year = c('2018'),
   location = c('51560', '51780', '51123'), #These are the counties that have changed#
   value = as.numeric(NA),
-  race = c('american Indian or alaska native'),
+  race = c('american indian or alaska native'),
   ethnicity = c('hispanic or latino'),
   age = c('< 1 year'),
   sex = c('male'))
