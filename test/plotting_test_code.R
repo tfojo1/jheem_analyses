@@ -73,7 +73,7 @@ simplot(simset$last.sim(),
         facet.by = "sex", # sex; 1-way 
         outcomes = c("hiv.mortality"),
         style.manager = source.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+        dimension.values = list(year = 1980:2030)) 
 
 simplot(simset$last.sim(),
         simset,
