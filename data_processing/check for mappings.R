@@ -13,3 +13,8 @@ check.for.needed.mappings(surveillance.manager,
 
 
 #For SHIELD, you need SHIELD mappings loaded (it also doesn't have risk)
+
+
+check.for.needed.mappings(syphilis.manager, 
+                          ontology(race=c('black', 'hispanic', 'other'), sex=c('heterosexual_male', 'msm', 'female')),
+                          list(c('race', 'ethnicity'), c('sex', 'risk')))

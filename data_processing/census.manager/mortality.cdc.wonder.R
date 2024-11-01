@@ -32,7 +32,9 @@ national.metro.deaths = lapply(metro.deaths.national.raw, function(file){
   data = subset(data, data$age != "Not Stated") #Removing not stated age
   
   data <- data %>%
-    select(outcome, year, location, value, sex, age, race, ethnicity)
+    select(outcome, year, location, value, sex, age, race, ethnicity)%>%
+    mutate(race = tolower(race))%>%
+    mutate(ethnicity = tolower(ethnicity))
   
   data = as.data.frame(data)
   list(filename, data)  
@@ -60,7 +62,9 @@ national.metro.deaths.denominator  = lapply(metro.deaths.national.raw, function(
   data = subset(data, data$age != "Not Stated") #Removing not stated age
   
    data <- data %>%
-     select(outcome, year, location, value, sex, age, race, ethnicity)
+     select(outcome, year, location, value, sex, age, race, ethnicity)%>%
+     mutate(race = tolower(race))%>%
+     mutate(ethnicity = tolower(ethnicity))
   
   data = as.data.frame(data)
   list(filename, data)  
@@ -78,7 +82,7 @@ for (data in national.metro.deaths.put ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity ='not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -91,7 +95,7 @@ for (data in national.metro.deaths.denominator.put ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity = 'Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity ='not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
