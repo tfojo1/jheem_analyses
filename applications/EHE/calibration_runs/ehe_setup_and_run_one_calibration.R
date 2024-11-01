@@ -6,7 +6,7 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANSMISSION, # 2
                              CALIBRATION.CODE.FULL.PLUS.AIDS, # 3
                              CALIBRATION.CODE.FULL.PLUS.COVID # 4
-                             )[c(1:3)]
+                             )[c(2)]
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {
