@@ -40,7 +40,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.black.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.black.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.black.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.black.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.hispanic.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.hispanic.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -52,7 +51,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.hispanic.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.hispanic.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.hispanic.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.hispanic.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.other.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.other.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -64,7 +62,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.other.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.other.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.other.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.other.female.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.black.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.black.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -76,7 +73,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.black.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.black.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.black.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.black.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.hispanic.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.hispanic.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -88,7 +84,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.hispanic.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.hispanic.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.hispanic.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.hispanic.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.other.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.other.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -100,7 +95,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.other.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.other.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.other.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.other.heterosexual_male.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.black.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.black.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -112,7 +106,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.black.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.black.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.black.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.black.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.hispanic.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.hispanic.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -124,7 +117,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.hispanic.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.hispanic.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.hispanic.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.hispanic.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.other.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.other.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -136,7 +128,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.other.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.other.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.other.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.other.msm.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.black.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.black.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -148,7 +139,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.black.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.black.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.black.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.black.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.hispanic.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.hispanic.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -160,7 +150,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.hispanic.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.hispanic.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.hispanic.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.hispanic.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.other.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.other.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -172,7 +161,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.other.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.other.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.other.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.other.female.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.black.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.black.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -184,7 +172,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.black.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.black.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.black.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.black.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.hispanic.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.hispanic.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -196,7 +183,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.hispanic.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.hispanic.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.hispanic.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.hispanic.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.other.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.other.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -208,7 +194,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.other.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.other.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.other.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.other.heterosexual_male.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.black.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.black.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -220,7 +205,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.black.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.black.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.black.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.black.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.hispanic.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.hispanic.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -232,7 +216,6 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age49.hispanic.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.hispanic.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age64.hispanic.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.hispanic.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.other.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.other.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -243,8 +226,7 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age44.other.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age49.other.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.other.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.other.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age65.other.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+  age64.other.msm.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
 )
 
 ## TRANSMISSION.PARAMETERS.PRIOR ----
@@ -407,8 +389,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.black.female.aging.rate.multiplier.1",
     "age49.black.female.aging.rate.multiplier.1",
     "age54.black.female.aging.rate.multiplier.1",
-    "age64.black.female.aging.rate.multiplier.1",
-    "age65.black.female.aging.rate.multiplier.1"  ),
+    "age64.black.female.aging.rate.multiplier.1"  ),
   
   aging.hispanic.female.1=c(
     "age14.hispanic.female.aging.rate.multiplier.1",
@@ -420,8 +401,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.hispanic.female.aging.rate.multiplier.1",
     "age49.hispanic.female.aging.rate.multiplier.1",
     "age54.hispanic.female.aging.rate.multiplier.1",
-    "age64.hispanic.female.aging.rate.multiplier.1",
-    "age65.hispanic.female.aging.rate.multiplier.1"  ),
+    "age64.hispanic.female.aging.rate.multiplier.1"  ),
   
   aging.other.female.1=c(
     "age14.other.female.aging.rate.multiplier.1",
@@ -433,8 +413,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.other.female.aging.rate.multiplier.1",
     "age49.other.female.aging.rate.multiplier.1",
     "age54.other.female.aging.rate.multiplier.1",
-    "age64.other.female.aging.rate.multiplier.1",
-    "age65.other.female.aging.rate.multiplier.1"),
+    "age64.other.female.aging.rate.multiplier.1"),
   
   aging.black.heterosexual_male.1<-c(
     "age14.black.heterosexual_male.aging.rate.multiplier.1",
@@ -446,8 +425,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.black.heterosexual_male.aging.rate.multiplier.1",
     "age49.black.heterosexual_male.aging.rate.multiplier.1",
     "age54.black.heterosexual_male.aging.rate.multiplier.1",
-    "age64.black.heterosexual_male.aging.rate.multiplier.1",
-    "age65.black.heterosexual_male.aging.rate.multiplier.1"),
+    "age64.black.heterosexual_male.aging.rate.multiplier.1"),
   
   aging.hispanic.heterosexual_male.1<-c(
     "age14.hispanic.heterosexual_male.aging.rate.multiplier.1",
@@ -459,8 +437,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.hispanic.heterosexual_male.aging.rate.multiplier.1",
     "age49.hispanic.heterosexual_male.aging.rate.multiplier.1",
     "age54.hispanic.heterosexual_male.aging.rate.multiplier.1",
-    "age64.hispanic.heterosexual_male.aging.rate.multiplier.1",
-    "age65.hispanic.heterosexual_male.aging.rate.multiplier.1"),
+    "age64.hispanic.heterosexual_male.aging.rate.multiplier.1"),
   
   aging.other.heterosexual_male.1<-c(
     "age14.other.heterosexual_male.aging.rate.multiplier.1",
@@ -472,8 +449,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.other.heterosexual_male.aging.rate.multiplier.1",
     "age49.other.heterosexual_male.aging.rate.multiplier.1",
     "age54.other.heterosexual_male.aging.rate.multiplier.1",
-    "age64.other.heterosexual_male.aging.rate.multiplier.1",
-    "age65.other.heterosexual_male.aging.rate.multiplier.1"),
+    "age64.other.heterosexual_male.aging.rate.multiplier.1"),
   
   aging.black.msm.1<-c(
     "age14.black.msm.aging.rate.multiplier.1",
@@ -485,8 +461,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.black.msm.aging.rate.multiplier.1",
     "age49.black.msm.aging.rate.multiplier.1",
     "age54.black.msm.aging.rate.multiplier.1",
-    "age64.black.msm.aging.rate.multiplier.1",
-    "age65.black.msm.aging.rate.multiplier.1"),
+    "age64.black.msm.aging.rate.multiplier.1"),
   
   aging.hispanic.msm.1<-c(
     "age14.hispanic.msm.aging.rate.multiplier.1",
@@ -498,8 +473,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.hispanic.msm.aging.rate.multiplier.1",
     "age49.hispanic.msm.aging.rate.multiplier.1",
     "age54.hispanic.msm.aging.rate.multiplier.1",
-    "age64.hispanic.msm.aging.rate.multiplier.1",
-    "age65.hispanic.msm.aging.rate.multiplier.1"),
+    "age64.hispanic.msm.aging.rate.multiplier.1"),
   
   aging.other.msm.1<-c(
     "age14.other.msm.aging.rate.multiplier.1",
@@ -511,8 +485,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.other.msm.aging.rate.multiplier.1",
     "age49.other.msm.aging.rate.multiplier.1",
     "age54.other.msm.aging.rate.multiplier.1",
-    "age64.other.msm.aging.rate.multiplier.1",
-    "age65.other.msm.aging.rate.multiplier.1"),
+    "age64.other.msm.aging.rate.multiplier.1"),
   aging.black.female.2=c(
     "age14.black.female.aging.rate.multiplier.2",
     "age19.black.female.aging.rate.multiplier.2",
@@ -523,8 +496,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.black.female.aging.rate.multiplier.2",
     "age49.black.female.aging.rate.multiplier.2",
     "age54.black.female.aging.rate.multiplier.2",
-    "age64.black.female.aging.rate.multiplier.2",
-    "age65.black.female.aging.rate.multiplier.2"  ),
+    "age64.black.female.aging.rate.multiplier.2" ),
   
   aging.hispanic.female.2=c(
     "age14.hispanic.female.aging.rate.multiplier.2",
@@ -536,8 +508,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.hispanic.female.aging.rate.multiplier.2",
     "age49.hispanic.female.aging.rate.multiplier.2",
     "age54.hispanic.female.aging.rate.multiplier.2",
-    "age64.hispanic.female.aging.rate.multiplier.2",
-    "age65.hispanic.female.aging.rate.multiplier.2"  ),
+    "age64.hispanic.female.aging.rate.multiplier.2" ),
   
   aging.other.female.2=c(
     "age14.other.female.aging.rate.multiplier.2",
@@ -549,8 +520,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.other.female.aging.rate.multiplier.2",
     "age49.other.female.aging.rate.multiplier.2",
     "age54.other.female.aging.rate.multiplier.2",
-    "age64.other.female.aging.rate.multiplier.2",
-    "age65.other.female.aging.rate.multiplier.2"),
+    "age64.other.female.aging.rate.multiplier.2"),
   
   aging.black.heterosexual_male.2<-c(
     "age14.black.heterosexual_male.aging.rate.multiplier.2",
@@ -562,8 +532,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.black.heterosexual_male.aging.rate.multiplier.2",
     "age49.black.heterosexual_male.aging.rate.multiplier.2",
     "age54.black.heterosexual_male.aging.rate.multiplier.2",
-    "age64.black.heterosexual_male.aging.rate.multiplier.2",
-    "age65.black.heterosexual_male.aging.rate.multiplier.2"),
+    "age64.black.heterosexual_male.aging.rate.multiplier.2"),
   
   aging.hispanic.heterosexual_male.2<-c(
     "age14.hispanic.heterosexual_male.aging.rate.multiplier.2",
@@ -575,8 +544,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.hispanic.heterosexual_male.aging.rate.multiplier.2",
     "age49.hispanic.heterosexual_male.aging.rate.multiplier.2",
     "age54.hispanic.heterosexual_male.aging.rate.multiplier.2",
-    "age64.hispanic.heterosexual_male.aging.rate.multiplier.2",
-    "age65.hispanic.heterosexual_male.aging.rate.multiplier.2"),
+    "age64.hispanic.heterosexual_male.aging.rate.multiplier.2"),
   
   aging.other.heterosexual_male.2<-c(
     "age14.other.heterosexual_male.aging.rate.multiplier.2",
@@ -588,8 +556,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.other.heterosexual_male.aging.rate.multiplier.2",
     "age49.other.heterosexual_male.aging.rate.multiplier.2",
     "age54.other.heterosexual_male.aging.rate.multiplier.2",
-    "age64.other.heterosexual_male.aging.rate.multiplier.2",
-    "age65.other.heterosexual_male.aging.rate.multiplier.2"),
+    "age64.other.heterosexual_male.aging.rate.multiplier.2"),
   
   aging.black.msm.2<-c(
     "age14.black.msm.aging.rate.multiplier.2",
@@ -601,8 +568,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.black.msm.aging.rate.multiplier.2",
     "age49.black.msm.aging.rate.multiplier.2",
     "age54.black.msm.aging.rate.multiplier.2",
-    "age64.black.msm.aging.rate.multiplier.2",
-    "age65.black.msm.aging.rate.multiplier.2"),
+    "age64.black.msm.aging.rate.multiplier.2"),
   
   aging.hispanic.msm.2<-c(
     "age14.hispanic.msm.aging.rate.multiplier.2",
@@ -614,8 +580,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.hispanic.msm.aging.rate.multiplier.2",
     "age49.hispanic.msm.aging.rate.multiplier.2",
     "age54.hispanic.msm.aging.rate.multiplier.2",
-    "age64.hispanic.msm.aging.rate.multiplier.2",
-    "age65.hispanic.msm.aging.rate.multiplier.2"),
+    "age64.hispanic.msm.aging.rate.multiplier.2"),
   
   aging.other.msm.2<-c(
     "age14.other.msm.aging.rate.multiplier.2",
@@ -627,8 +592,7 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
     "age44.other.msm.aging.rate.multiplier.2",
     "age49.other.msm.aging.rate.multiplier.2",
     "age54.other.msm.aging.rate.multiplier.2",
-    "age64.other.msm.aging.rate.multiplier.2",
-    "age65.other.msm.aging.rate.multiplier.2")
+    "age64.other.msm.aging.rate.multiplier.2")
 )
 
 ## SHIELD.TRANSMISSION.SAMPLING.BLOCKS ----
