@@ -251,33 +251,34 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 #2- LINKING PARAMETERS TO FUNCTIONAL FORMS....  -----
 SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){ 
+  ages=model.settings$specification.metadata$dim.names$age
   sexes=model.settings$specification.metadata$dim.names$sex
   races=model.settings$specification.metadata$dim.names$race
+  
   fertile.ages=model.settings$specification.metadata$dim.names$age[2:7]
   fertile.age.ranges= c("15.19","20.24","25.29","30.34","35.39","40.44") 
-  aging.from=c(14,19,24,29,34,44,49,54,64,65)
+  
+  #buckets of aging from:
+  q=specification.metadata$age.upper.bounds
+  aging.from=q[-length(q)]-1
+  
   
   ## Aging Rates ----
   #10 (ages) * 3 (races) * 3 sexes= 90 for 2 knots = 180
   #@TODD: how to set main and interaction effects?
   
   for(i in c(1,2)){ #spline with 2 knots
-    for(a in aging.from){
+    for(age.index in 1:length(aging.from)) {
       for(r in races){
         for(s in sexes){
+          agegroup=ages[age.index]
           # browser()
-          paramName=paste0("age",a,".",r,".",s,".aging.rate.multiplier.",i)
-          # print(paramName)
-          # set.element.functional.form.main.effect.alphas(model.settings,
-          #                                                element.name = "general.aging",
-          #                                                alpha.name = paste0("time",i),
-          #                                                value = parameters[paramName],
-          #                                                applies.to.dimension.values =list(age = a, race = r,sex=s))
+          paramName=paste0("age",aging.from[age.index],".",r,".",s,".aging.rate.multiplier.",i)
           set.element.functional.form.interaction.alphas(model.settings,
                                                          element.name = "general.aging",
                                                          alpha.name = paste0("time",i),
                                                          value = parameters[paramName],
-                                                         applies.to.dimension.values =list(age = a, race = r,sex=s))
+                                                         applies.to.dimension.values =list(age = agegroup, race = r,sex=s))
         }}}}                                             
   
   
@@ -286,6 +287,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){
   
   ## Transmission ----
   for(time in 0:2){
+    # browser()
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "msm.trates",
                                                    alpha.name = paste0('time',time),
@@ -616,16 +618,9 @@ SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
   AGING.PARAMETERS.PRIOR,
   TRANSMISSION.PARAMETERS.PRIOR
 )
+
 SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
   SHIELD.POPULATION.SAMPLING.BLOCKS,
   SHIELD.AGING.SAMPLING.BLOCKS,
   SHIELD.TRANSMISSION.SAMPLING.BLOCKS)
-# Demographic model ----
-SHIELD.DEMOGRAPHIC.PARAMETERS.PRIOR = distributions::join.distributions(
-  POPULATION.PARAMETERS.PRIOR,
-  AGING.PARAMETERS.PRIOR
-)
-SHIELD.DEMOGRAPHIC.PARAMETERS.SAMPLING.BLOCKS=c(
-  SHIELD.POPULATION.SAMPLING.BLOCKS,
-  SHIELD.AGING.SAMPLING.BLOCKS
-)
+

@@ -394,6 +394,7 @@ get.best.guess.msm.proportions.by.race <- function(location,
 #' @return a spline functional form for fertility rates by age, race, year 
 get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=DEFAULT.FERTILITY.RATE.YEARS){ 
   # pull fertility rates for location
+  
   mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years) 
   #
   if (length(mapped.fertility.rates)==0)

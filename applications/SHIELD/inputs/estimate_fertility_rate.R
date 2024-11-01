@@ -1,4 +1,6 @@
 # MAPPING FERTILITY RATE DATA AS A FUNCTION OF TIME AND OTHER COVARIATES 
+library(reshape2)
+library(ggplot2)
 library(splines)
 
 # DATA PREPRATION ----
@@ -31,20 +33,20 @@ target.dimnames=target.dimnames <- list(
   race = c("black", "hispanic", "other"),
   year = as.character(YEARS)
 );target.dimnames
-
 mapped.fertility.rate=map.value.ontology(fertility.rate, 
                                          target.dim.names = target.dimnames,
                                          na.rm = TRUE)
 print("data is ready")
 # Explanatory analysis ----
 # To convert a multi-dimensional object to dataframe
-library(reshape2)
 df= melt(mapped.fertility.rate, varnames = c("age", "race", "year"), value.name = "fertility.rate")
-ggplot(df, aes(x=fertility.rate)) + geom_density() #bi-modal distribution
-ggplot(df, aes(x=fertility.rate)) + geom_density()+facet_wrap(~age) # bi-modal dists 
-ggplot(df, aes(x=fertility.rate)) + geom_density()+facet_wrap(~race) # bi-modal dists
-ggplot(df, aes(x=fertility.rate)) + geom_density()+facet_wrap(~race*age) # bi-modal dists> there is a year component too
-
+ggplot(df, aes(x = factor(year), y = fertility.rate)) + 
+  geom_boxplot(fill = "lightblue") +  labs(x = "Year", y = "Fertility Rate") +  theme_minimal() 
+#slight reduction over time
+ggplot(df, aes(x = factor(year), y = fertility.rate)) +facet_wrap(~age)+  geom_boxplot(fill = "lightblue") +  labs(x = "Year", y = "Fertility Rate") +  theme_minimal() 
+#significant variation by age, changes in direction by time within different agegroups 
+ggplot(df, aes(x = factor(year), y = fertility.rate)) +facet_wrap(~race)+  geom_boxplot(fill = "lightblue") +  labs(x = "Year", y = "Fertility Rate") +  theme_minimal() 
+ggplot(df, aes(x = factor(year), y = fertility.rate)) +facet_wrap(~age*race)+  geom_boxplot(fill = "lightblue") +  labs(x = "Year", y = "Fertility Rate") +  theme_minimal() 
 # df%>%filter(race=='black') %>%
 #   ggplot( aes(x = fertility.rate)) + 
 #   geom_density() + 

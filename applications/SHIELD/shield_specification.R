@@ -795,9 +795,9 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 register.model.specification(SHIELD.SPECIFICATION)
 #
 register.calibrated.parameters.for.version('shield',
-                                           distribution = SHIELD.DEMOGRAPHIC.PARAMETERS.PRIOR,
+                                           distribution = SHIELD.FULL.PARAMETERS.PRIOR,
                                            apply.function = SHIELD.APPLY.PARAMETERS.FN,
-                                           sampling.blocks = SHIELD.DEMOGRAPHIC.PARAMETERS.SAMPLING.BLOCKS,
+                                           sampling.blocks = SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS,
                                            calibrate.to.year = 2025,
                                            join.with.previous.version = F)
 print("Calibration parameters registered for DEMOGRAPHIC model")

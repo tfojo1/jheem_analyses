@@ -9,9 +9,10 @@ source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
 CALIBRATION.NAME = 'pop.demog.shield'
 N.ITER = 15000
+# which subset of parametrs should we use for calibration?
 PARAMETER.NAMES = c(
-  POPULATION.PARAMETERS.PRIOR@var.names,
-  AGING.PARAMETERS.PRIOR@var.names
+  POPULATION.PARAMETERS.PRIOR@var.names
+  # AGING.PARAMETERS.PRIOR@var.names
 )
 LIKELIHOOD.INSTRUCTIONS= likelihood.instructions.demographics
 
