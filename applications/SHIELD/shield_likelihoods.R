@@ -65,13 +65,19 @@ births.likelihood.instructions =
                                        # equalize.weight.by.year = T
   )
 
+
+
 # if we work on proportions that it'll be different 
 
 
 
 #-- FULL LIKELIHOODS --# ----
-POPULATION.likelihood.instructions =  join.likelihood.instructions(
+likelihood.instructions.demographics =  join.likelihood.instructions(
   population.likelihood.instructions ,
-  total.mortality.likelihood.instructions,
-  births.likelihood.instructions
+  total.mortality.likelihood.instructions
+  # births.likelihood.instructions # DOEST RUN YET
 )
+#manual: 
+# lik=total.mortality.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+# lik=population.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+# lik=births.likelihood.instructions$instantiate.likelihood('shield',"C.12580")

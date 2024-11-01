@@ -17,9 +17,9 @@
 source('applications/SHIELD/shield_specification.R')
 
 location= "C.12580"
-simplot.data.only("population",location,split.by = 'race')
-simplot.data.only("population",location,split.by = 'race',facet.by = 'ethnicity')
-simplot.data.only("population",location,facet.by = 'age')
+# simplot.data.only("population",location,split.by = 'race')
+# simplot.data.only("population",location,split.by = 'race',facet.by = 'ethnicity')
+# simplot.data.only("population",location,facet.by = 'age')
 
 # SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race[,'US',]
 # dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location__race)
@@ -36,9 +36,7 @@ engine = create.jheem.engine('shield', "C.12580", 2025)
 # engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size
 
 
-params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
-# params['black.fertility.rate.multiplier']=.5
- 
+params=get.medians(SHIELD.DEMOGRAPHIC.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
 sim1$births

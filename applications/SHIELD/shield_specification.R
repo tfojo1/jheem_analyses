@@ -181,6 +181,17 @@ register.model.element(SHIELD.SPECIFICATION,
                        get.functional.form.function = get.location.mortality.rates.functional.form,
                        scale = 'rate')
 
+## -- AGING --## ----
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'general.aging',
+                       scale = 'rate',
+                       get.functional.form.function = get.empiric.aging.rates,
+                       functional.form.from.time = 2007)
+
+register.aging(SHIELD.SPECIFICATION,
+               groups = c('uninfected','infected'),
+               aging.rate.value = 'general.aging')
+
 #-- TBD/ MIGRATION --# ----
 # immigration/emigration doesnt depent on disease state- it's used to fit the population size but doesnt change the prevalence of the disease
 # the prior comes from census reports (prp getting in and leaving MSAs) - these didnt represent immigrations from other countries but more movements between MSAs
@@ -188,6 +199,7 @@ register.model.element(SHIELD.SPECIFICATION,
 # 2010-2020
 
 # when we add immigration, we need to make sure that we dont count immigrants in Births and emmigrants as Deaths!!
+
 
 #-- TRANSMISSION --# ----
 # Transmission has 4 elements: 1.susceptibility, 2.transmissibility, 3.contact, 4.new infection proportion (where does new infection go to? e.g., infected PrEP, infected not on PrEP)
@@ -780,80 +792,26 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 )
 
 ##-- REGISTER THE SPECIFICATION ----
-##--------------------------------------------------------------------------------------------------------------#
-##--------------------------------------------------------------------------------------------------------------#
-
-
 register.model.specification(SHIELD.SPECIFICATION)
-
-
 #
 register.calibrated.parameters.for.version('shield',
-                                           distribution = SHIELD.FULL.PARAMETERS.PRIOR,
+                                           distribution = SHIELD.DEMOGRAPHIC.PARAMETERS.PRIOR,
                                            apply.function = SHIELD.APPLY.PARAMETERS.FN,
-                                           sampling.blocks = SHIELD.PARAMETER.SAMPLING.BLOCKS,
+                                           sampling.blocks = SHIELD.DEMOGRAPHIC.PARAMETERS.SAMPLING.BLOCKS,
                                            calibrate.to.year = 2025,
                                            join.with.previous.version = F)
+print("Calibration parameters registered for DEMOGRAPHIC model")
 
+# register.calibrated.parameters.for.version('shield',
+#                                            distribution = SHIELD.FULL.PARAMETERS.PRIOR,
+#                                            apply.function = SHIELD.APPLY.PARAMETERS.FN,
+#                                            sampling.blocks = SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS,
+#                                            calibrate.to.year = 2025,
+#                                            join.with.previous.version = F)
+# print("Calibration parameters registered for FULL model")
 
 print("SHIELD specification sourced successfully!")
 
 
-## Notes: ----
-
-
-# interventions will be defined by parameters too (outside of specification)
-# Element: a scalar value or a functional form
-## Scalar: constant value or fix over over time
-## Functional form: either vary by strata or changes over time (an equation that will be evaluated to create value of that parameter )
-# QUANTITIES can be equal to another quantity or an element, or an expression (accepts elements) or a function of other quantities
-# a quantity has to have a scale if we want to intervene in them
-
-
-# We generally use additional parameters to model deviations from our prior knowledge and calibrate them to data
-# Parameters affect elements, quantities are calculated from elements
-
-
-
-
-# linear line on the log scale will be exponetial after transportation
-# so in general we only trnasform knots in the log scale
-# when we sample those parameters )sample alpha a change), we will multiple in the knot validate.sub.version.code(and since knows tare in the log scale I can add them in thelog scale
-#                                                                                                                                                                                                                                 )
-
-
-# There are two ways to capture outputs: via 1) compartments (e.g., population size of a compartment), or 2) transitions (e/g., number of people moving from one compartment to another)
-#1::
-## track.point.outcome(): a static outcome at a certain point in time 
-### track.integrated.outcome(): integrates a point outcome over time
-# cumulative vs point: any diagnosis that were made during a year or n at. a single time in that year
-# infected + uninfected: these are reported at a single point in time Jan 1st of each year
-# assuming that census take place at a random time during hte year, we use the integral under population curve could be used for calibration
-# average of 2 points
-# outcomes: 1.point (like infected unifected), 2. some event count (incidence)
-
-# 2::  
-## track.transition(): a dynamic outcome that starts and end from compartments (it has both a from- and to-)
-## track.dynamic.outcome(): doesnt have a from or to compartment (e.g., count people as they enter the model)
-### track.cumulative.outcome(): can add multiple dynamic outcomes together  
-
-
-
-
-
-
 cat("*** Shiled_specification.R completed! ***\n")
-# years=c('2000'=2000,'2005'=2005,'2010'=2010,'2020'=2020,'2030'=2030,'2040'=2040)
-# aging.rates<-do.get.empiric.aging.rates(location,
-#                                         specification.metadata,  
-#                                         years,
-#                                         force.match.age.brackets.to.before.smoothing = NULL)
-# aging.rates
-# new_aging_rates <- array(0, dim = c(length(years), dim(aging.rates[[1]]) ) )
-# dimnames(new_aging_rates)=c(year=list(as.character(years)),
-#                             dimnames(aging.rates[[1]]))
-# for (i in 1:length(years)) {
-#   year_name <- years[i]
-#   new_aging_rates[i, , , ] <- aging.rates[[i]]
-# }
-# new_aging_rates
+

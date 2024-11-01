@@ -423,7 +423,7 @@ get.fertility.rates.functional.form<-function(location, specification.metadata, 
   ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
                                            knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above
                                            #how to project forward:
-                                           #since linear projections are too extereme, we multiply future prediction by a modifier set at 0.5
+                                           #since linear projections are too extreme, we multiply future prediction by a modifier set at 0.5
                                            after.time = 2030,
                                            after.modifier = 0.5,#modifier.min and .max could sample
                                            modifiers.apply.to.change = T, # if True, modifier is multiplied into diff between knot1 and knot2 values; if False, modifier is multiplied into knot2 value
@@ -620,7 +620,7 @@ get.location.mortality.rates <- function(location,
 #' #' @param years knots
 #' #' @return returns a vector of aging rates that is proportional to each compartment size
 get.empiric.aging.rates <- function(location, specification.metadata,
-                                    years=c('2010'=2010,'2020'=2020,'2030'=2030,'2040'=2040) )
+                                    years=c('time1'=2010,'time2'=2020) )
 {
   aging.rates = do.get.empiric.aging.rates(location = location,
                                            specification.metadata = specification.metadata,
@@ -636,11 +636,11 @@ get.empiric.aging.rates <- function(location, specification.metadata,
 #' #' @param location location
 #' #' @param specification.metadata specification.metadata
 #' #' @param years knots
-#' #' @return returns a vector of aging rates that is proportional to each compartment size
+#' #' @return returns a list of aging rates that is proportional to each compartment size between the years identified
 do.get.empiric.aging.rates <- function(location, 
                                        specification.metadata,
-                                       years=c('2010'=2010,'2020'=2020,'2030'=2030,'2040'=2040),
-                                       force.match.age.brackets.to.before.smoothing = NULL #@TODD: how do you use this? 
+                                       years=c('time1'=2010,'time2'=2020),
+                                       force.match.age.brackets.to.before.smoothing = NULL #if we wanted to use diff age brackets
 )
 {
   if (location=='US')
