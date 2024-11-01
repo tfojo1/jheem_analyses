@@ -62,7 +62,9 @@ dx.prev.adjusted.one<- run.outlier.process(outcome= 'diagnosed.prevalence',
 dx.prev.adjusted.one$adjudication <- c(T, T, T, T, T, F, F, T, T, F, T, T, T, T, T, F)
 dx.prev.adjusted.one <- dx.prev.adjusted.one %>%
   add_row(year = "2018", location = 'C.33340', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
-  add_row(year = "2018", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)
+  add_row(year = "2016", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
+  add_row(year = "2015", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
+  add_row(year = "2014", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)
 
 run.outlier.process(outcome= 'diagnosed.prevalence',
                     stratifications= list(c()),
