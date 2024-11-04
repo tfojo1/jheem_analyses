@@ -13,76 +13,71 @@ register.ontology.mapping('shiled.to.brfss.sex.risk',
 register.ontology.mapping('brfss.prop.tested.to.shield',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
-                          mappings = rbind(c('American Indian or Alaska Native', 'Hispanic or Latino', 'Hispanic'),
-                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'American Indian/Alaska Native'),
-                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'Hispanic'),
-                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'Asian/Pacific Islander'),
-                                           c('Black or African American', 'Hispanic or Latino', 'Hispanic'),
-                                           c('Black or African American', 'Not Hispanic or Latino', 'Black'),
-                                           c('More than one race', 'Hispanic or Latino', 'Hispanic'),
-                                           c('More than one race', 'Not Hispanic or Latino', 'Multiracial'),
-                                           c('White','Hispanic or Latino','Hispanic'),
-                                           c('White','Not Hispanic or Latino','White'),
+                          mappings = rbind(c('american indian or alaska native', 'hispanic or latino', 'hispanic'),
+                                           c('american indian or alaska native', 'not hispanic or latino', 'american indian/alaska native'),
+                                           c('asian or pacific islander', 'hispanic or latino', 'hispanic'),
+                                           c('asian or pacific islander', 'not hispanic or latino', 'asian/pacific islander'),
+                                           c('black or african american', 'hispanic or latino', 'hispanic'),
+                                           c('black or african american', 'not hispanic or latino', 'black'),
+                                           c('white','hispanic or latino','hispanic'),
+                                           c('white','not hispanic or latino','white'),
                                            c(NA, NA, 'other')))
 
 #This maps data from BRFSS to census population data
 register.ontology.mapping('brfss.prop.tested.to.shield.2',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('American Indian/Alaska Native', 'American Indian/Alaska Native'),
-                                           c('Asian', 'Asian/Pacific Islander'),
-                                           c('Black', 'Black'),
-                                           c('Hispanic', 'Hispanic'),
-                                           c('Multiracial', 'Multiracial'),
-                                           c('Native Hawaiian/Other Pacific Islander', 'Asian/Pacific Islander'),
-                                           c('Other race', 'other'),
-                                           c('White', 'White')))
+                          mappings = rbind(c('american indian/alaska native', 'american indian/alaska native'),
+                                           c('asian', 'asian/pacific islander'),
+                                           c('black', 'black'),
+                                           c('hispanic', 'hispanic'),
+                                           c('native hawaiian/other pacific islander', 'asian/pacific islander'),
+                                           c('other race', 'other'),
+                                           c('white', 'white')))
 
 #Maps BRFSS racial groups (this is where proportion tested data is from) to SHIELD racial groups
 register.ontology.mapping('brfss.prop.tested.to.shield.race',
                           from.dimension = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
-                                           c('Asian', 'other'),
-                                           c('Black', 'black'),
-                                           c('Hispanic', 'hispanic'),
-                                           c('Multiracial', 'other'),
-                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
-                                           c('Other race', 'other'),
-                                           c('White', 'other')))
+                          mappings = rbind(c('american indian/alaska native', 'other'),
+                                           c('asian', 'other'),
+                                           c('black', 'black'),
+                                           c('hispanic', 'hispanic'),
+                                           c('native hawaiian/other pacific islander', 'other'),
+                                           c('other race', 'other'),
+                                           c('white', 'other')))
 
 # CDC & SHIELD ----
 #Maps racial categories from CDC data to the races we use in SHILED
 register.ontology.mapping('cdc.to.shiled.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
-                                           c('Asian', 'other'),
-                                           c('Black/African American', 'black'),
-                                           c('Hispanic/Latino', 'hispanic'),
-                                           c('Multiracial', 'other'),
-                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
-                                           c('White', 'other'))
+                          mappings = rbind(c('american indian/alaska native', 'other'),
+                                           c('asian', 'other'),
+                                           c('black/african american', 'black'),
+                                           c('hispanic/latino', 'hispanic'),
+                                           c('native hawaiian/other pacific islander', 'other'),
+                                           c('white', 'other'))
 )
 #Maps racial categories from CDC MSA Surveillance Reports to races we use for SHILED
 register.ontology.mapping('cdc.msa.reports.to.shield.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
-                                           c('Asian', 'other'),
-                                           c('Black/African American', 'black'),
-                                           c('Hispanic/Latino', 'hispanic'),
-                                           c('White', 'other')))
+                          mappings = rbind(c('american indian/alaska native', 'other'),
+                                           c('asian', 'other'),
+                                           c('black/african american', 'black'),
+                                           c('hispanic/latino', 'hispanic'),
+                                           c('white', 'other')))
 # CENSUS & SHIELD ----
 
 #Maps racial grouped used in the Census Immigration data to the racial groups used in SHIELD
 register.ontology.mapping('census.immigration.to.SHIELD.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
-                                           c('White, Non-Hispanic', 'white'),
-                                           c('Black', 'black'),
-                                           c('Other', 'other'))) # needed?
+                          mappings = rbind(c('hispanic or latino', 'hispanic'),
+                                           c('white, non-hispanic', 'white'),
+                                           c('black', 'black'),
+                                           c('other', 'other'))) # needed?
 # converting sex groups in SHIELD to sexes reported in CENSUS
 register.ontology.mapping('shield.to.census.sex',
                           from.dimensions=c('sex'),
@@ -105,19 +100,6 @@ register.ontology.mapping('census.to.shield.race',
                                            c('asian or pacific islander', 'hispanic', 'hispanic'),
                                            c('asian or pacific islander', 'not hispanic', 'other')))
 
-#a temporary onthology to work with uppercase races
-register.ontology.mapping('census.to.shield.race.uppercase',
-                          from.dimensions = c('race', 'ethnicity'),
-                          to.dimensions = 'race',
-                          mappings = rbind(c('White', 'Hispanic or Latino', 'hispanic'),
-                                           c('White', 'Not Hispanic or Latino', 'other'),
-                                           c('Black or African American', 'Hispanic or Latino', 'hispanic'),
-                                           c('Black or African American', 'Not Hispanic or Latino', 'black'),
-                                           c('American Indian or Alaska Native', 'Hispanic or Latino', 'hispanic'),
-                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'other'),
-                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'hispanic'),
-                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'other')))
-
 #Maps Census racial groups  (ethnicity only) to what we use in SHIELD 
 register.ontology.mapping('census.to.shield.ethnicity.only',
                           from.dimensions = c('race'),
@@ -130,60 +112,38 @@ register.ontology.mapping('census.to.shield.ethnicity.only',
 register.ontology.mapping('wonder.to.census.race.2',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
-                                           c('Asian or Pacific Islander', 'asian or pacific islander'),
-                                           c('Black or African American', 'black'),
-                                           c('White', 'white'),
-                                           c('More than one race', NA)))
+                          mappings = rbind(c('american indian or alaska native', 'american indian or alaska native'),
+                                           c('asian or pacific islander', 'asian or pacific islander'),
+                                           c('black or african american', 'black'),
+                                           c('white', 'white')))
+
 register.ontology.mapping('wonder.to.census.ethnicity.1',
                           from.dimensions = 'ethnicity',
                           to.dimensions = 'ethnicity',
-                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
-                                           c('Not Hispanic or Latino', 'not hispanic'),
-                                           c('Unknown or Not Stated', NA),
-                                           c('Not Stated', NA)))
-register.ontology.mapping('wonder.to.census.ethnicity.2',
-                          from.dimensions = 'ethnicity',
-                          to.dimensions = 'ethnicity',
-                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
-                                           c('Not Hispanic or Latino', 'not hispanic')))
-register.ontology.mapping('wonder.to.census.race.3',
-                          from.dimensions = 'race',
-                          to.dimensions = 'race',
-                          mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
-                                           c('Asian or Pacific Islander', 'asian or pacific islander'),
-                                           c('Black or African American', 'black'),
-                                           c('White', 'white'),
-                                           c('More than one race', NA),
-                                           c('Not Reported', NA),
-                                           c('Unknown or Not Stated', NA),
-                                           c('Not Available', NA)))
-
+                          mappings = rbind(c('hispanic or latino', 'hispanic'),
+                                           c('not hispanic or latino', 'not hispanic')))
 
 # WONDER & SHIELD ----
 #Mapping CDC Wonder racial groups to SHIELD (for SHIELD this is for fertility)
 register.ontology.mapping('wonder.to.SHIELD.race.2',
                           from.dimensions = c('race'),
                           to.dimensions = 'race',
-                          mappings = rbind(c('American Indian or Alaska Native', 'other'),
-                                           c('Asian or Pacific Islander', 'other'),
-                                           c('Black or African American', 'black'),
-                                           c('White', 'other'),
-                                           c('More than one race', 'other')))
+                          mappings = rbind(c('american indian or alaska native', 'other'),
+                                           c('asian or pacific islander', 'other'),
+                                           c('black or african american', 'black'),
+                                           c('white', 'other')))
 
 register.ontology.mapping('wonder.to.SHIELD.race.ethnicity',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
-                          mappings = rbind(c('American Indian or Alaska Native', 'Hispanic or Latino', 'hispanic'),
-                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'other'),
-                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'hispanic'),
-                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'other'),
-                                           c('Black or African American', 'Hispanic or Latino', 'hispanic'),
-                                           c('Black or African American', 'Not Hispanic or Latino', 'black'),
-                                           c('More than one race', 'Hispanic or Latino', 'hispanic'),
-                                           c('More than one race', 'Not Hispanic or Latino', 'other'),
-                                           c('White','Hispanic or Latino','hispanic'),
-                                           c('White','Not Hispanic or Latino','other')))
+                          mappings = rbind(c('american indian or alaska native', 'hispanic or latino', 'hispanic'),
+                                           c('american indian or alaska native', 'not hispanic or latino', 'other'),
+                                           c('asian or pacific islander', 'hispanic or latino', 'hispanic'),
+                                           c('asian or pacific islander', 'not hispanic or latino', 'other'),
+                                           c('black or african american', 'hispanic or latino', 'hispanic'),
+                                           c('black or african american', 'not hispanic or latino', 'black'),
+                                           c('white','hispanic or latino','hispanic'),
+                                           c('white','not hispanic or latino','other')))
 
 # EMORY & SHIELD ----
 #Maps Emory's sex groups to CDC (Emory has an estimate of MSM and so the Emory data is only relevant to men)
@@ -199,15 +159,14 @@ register.ontology.mapping('emory.sex.to.cdc.sex.temporary',
 register.ontology.mapping('census.to.brfss.race.ethnicity',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian or alaska native', 'hispanic', 'Hispanic'),
-                                           c('american indian or alaska native', 'not hispanic', 'American Indian/Alaska Native'),
-                                           c('asian or pacific islander', 'hispanic', 'Hispanic'),
-                                           c('asian or pacific islander', 'not hispanic', 'Asian/Pacific Islander'),
-                                           c('black', 'hispanic', 'Hispanic'),
-                                           c('black', 'not hispanic', 'Black'),
-                                           c('white', 'hispanic', 'Hispanic'),
-                                           c('white', 'not hispanic', 'White'),
-                                           c(NA, NA, 'Multiracial'),
+                          mappings = rbind(c('american indian or alaska native', 'hispanic', 'hispanic'),
+                                           c('american indian or alaska native', 'not hispanic', 'american indian/alaska native'),
+                                           c('asian or pacific islander', 'hispanic', 'hispanic'),
+                                           c('asian or pacific islander', 'not hispanic', 'asian/pacific islander'),
+                                           c('black', 'hispanic', 'hispanic'),
+                                           c('black', 'not hispanic', 'black'),
+                                           c('white', 'hispanic', 'hispanic'),
+                                           c('white', 'not hispanic', 'white'),
                                            c(NA, NA, 'other')))
 
 # NHANES & SHIELD ----
@@ -224,13 +183,13 @@ register.ontology.mapping('nhanes.to.SHIELD.race',
 register.ontology.mapping('stratified.census.to.census.race',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions =  c('race', 'ethnicity'),
-                          mappings = rbind(c('American Indian and Alaska Native', 'Hispanic', 'american indian or alaska native', 'hispanic'),
-                                           c('American Indian and Alaska Native', 'Not Hispanic', 'american indian or alaska native', 'not hispanic'),
-                                           c('Asian', 'Hispanic', 'asian or pacific islander', 'hispanic'),
-                                           c('Asian', 'Not Hispanic', 'asian or pacific islander', 'not hispanic'),
-                                           c('Black', 'Hispanic', 'black', 'hispanic'),
-                                           c('Black', 'Not Hispanic', 'black', 'not hispanic'),
-                                           c('Native Hawaiian and Other Pacific Islander', 'Hispanic', 'asian or pacific islander', 'hispanic'),
-                                           c('Native Hawaiian and Other Pacific Islander', 'Not Hispanic', 'asian or pacific islander', 'not hispanic'),
-                                           c('White', 'Hispanic', 'white', 'hispanic'),
-                                           c('White', 'Not Hispanic', 'white', 'not hispanic')))
+                          mappings = rbind(c('american indian and alaska native', 'hispanic', 'american indian or alaska native', 'hispanic'),
+                                           c('american indian and alaska native', 'not hispanic', 'american indian or alaska native', 'not hispanic'),
+                                           c('asian', 'hispanic', 'asian or pacific islander', 'hispanic'),
+                                           c('asian', 'not hispanic', 'asian or pacific islander', 'not hispanic'),
+                                           c('black', 'hispanic', 'black', 'hispanic'),
+                                           c('black', 'not hispanic', 'black', 'not hispanic'),
+                                           c('native hawaiian and other pacific islander', 'hispanic', 'asian or pacific islander', 'hispanic'),
+                                           c('native hawaiian and other pacific islander', 'not hispanic', 'asian or pacific islander', 'not hispanic'),
+                                           c('white', 'hispanic', 'white', 'hispanic'),
+                                           c('white', 'not hispanic', 'white', 'not hispanic')))
