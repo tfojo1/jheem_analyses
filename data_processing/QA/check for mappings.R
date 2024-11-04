@@ -3,6 +3,9 @@ library(jheem2)
 
 surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 
+syphilis.manager = load.data.manager(name="syphilis.manager", file="../../cached/syphilis.manager")
+
+
 source('applications/EHE/ehe_ontology_mappings.R')
 source('commoncode/check_for_needed_mappings.R')
 
