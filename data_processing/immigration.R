@@ -334,13 +334,13 @@ em_combo <- em_combo %>%
 imm_combo <- imm_combo %>%
   rename(value = other.race)%>%
   select(location, outcome, year, value)%>%
-  mutate(race = "Other")%>%
+  mutate(race = "other")%>%
   filter(value > 0)
 
 em_combo <- em_combo %>%
   rename(value = other.race)%>%
   select(location, outcome, year, value)%>%
-  mutate(race = "Other")%>%
+  mutate(race = "other")%>%
   filter(value > 0)
 
 other_race <- list(imm_combo, em_combo)
