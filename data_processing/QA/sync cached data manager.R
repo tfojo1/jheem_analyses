@@ -1,8 +1,6 @@
 
 library(jheem2)
 
-surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
-
 source('commoncode/cache_manager.R')
 
 #Push the data_manager_cache_metadata.Rdata once you've updated it with the sync function so that everyone else will have it
@@ -15,6 +13,7 @@ source('commoncode/cache_manager.R')
 
 # SURVEILLANCE MANAGER ----------------------------------------------------
 
+surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 
 sync.cached.data.manager("surveillance.manager.rdata",
                          allow.flag = T)
@@ -24,6 +23,7 @@ get.data.manager.cache.metadata("surveillance.manager.rdata")
 
 # CENSUS MANAGER ----------------------------------------------------------
 
+census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
 
 sync.cached.data.manager("census.manager.rdata",
                          allow.flag = T)
@@ -33,8 +33,9 @@ get.data.manager.cache.metadata("census.manager.rdata")
 
 # SYPHILIS MANAGER --------------------------------------------------------
 
+syphilis.manager = load.data.manager(name="syphilis.manager", file="../../cached/syphilis.manager.rdata")
 
-sync.cached.data.manager("census.manager.rdata",
+sync.cached.data.manager("syphilis.manager.rdata",
                          allow.flag = T)
 
-get.data.manager.cache.metadata("census.manager.rdata")
+get.data.manager.cache.metadata("syphilis.manager.rdata")
