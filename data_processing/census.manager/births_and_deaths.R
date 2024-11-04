@@ -64,6 +64,9 @@ data.list.births.clean = lapply(data.list.births, function(file){
          rename(value = combined.asian.births)%>%
          ungroup()
      }
+      
+      data$race = tolower(data$race)
+      data$ethnicity = tolower(data$ethnicity)
      
   data = as.data.frame(data)
   list(filename, data)  
@@ -126,6 +129,9 @@ data.list.births.denominator = lapply(data.list.births, function(file){
   data <- data %>%
     select(outcome, year, location, value, race, ethnicity)
   
+  data$race = tolower(data$race)
+  data$ethnicity = tolower(data$ethnicity)
+  
   data = as.data.frame(data)
   list(filename, data)  
   
@@ -142,7 +148,7 @@ for (data in births_race_eth ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not Reported', 'Unknown or Not Stated', 'Not Available'), ethnicity = 'Unknown or Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity = 'unknown or not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -155,7 +161,7 @@ for (data in births_denom ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not Reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated', 'Unknown or Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity = 'unknown or not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -212,6 +218,9 @@ data.list.deaths.clean = lapply(data.list.deaths, function(file){
      data <- data %>%
       select(outcome, year, location, value, sex, age, race, ethnicity)
   
+     data$race = tolower(data$race)
+     data$ethnicity = tolower(data$ethnicity)
+     
   data = as.data.frame(data)
   list(filename, data)  
   
@@ -254,6 +263,9 @@ data.list.deaths.denom = lapply(data.list.deaths, function(file){
 
      data <- data %>%
        select(outcome, year, location, value, sex, age, race, ethnicity)
+     
+     data$race = tolower(data$race)
+     data$ethnicity = tolower(data$ethnicity)
   
   data = as.data.frame(data)
   list(filename, data)  
@@ -272,7 +284,7 @@ for (data in deaths_race_eth ) {
     data = data,
     ontology.name = 'metro.deaths',
     source = 'cdc_wonder',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated', 'Unknown or Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity = 'unknown or not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -285,7 +297,7 @@ for (data in deaths_denom ) {
     data = data,
     ontology.name = 'metro.deaths',
     source = 'cdc_wonder',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated', 'Unknown or Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity = 'unknown or not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -347,6 +359,9 @@ births.national.clean = lapply(data.list.births.national, function(file){
       ungroup()
   }
   
+  data$race = tolower(data$race)
+  data$ethnicity = tolower(data$ethnicity)
+  
   data = as.data.frame(data)
   list(filename, data)  
   
@@ -399,6 +414,9 @@ births.denominator.national.clean = lapply(data.list.births.national, function(f
       ungroup()
   }
   
+  data$race = tolower(data$race)
+  data$ethnicity = tolower(data$ethnicity)
+  
   data = as.data.frame(data)
   list(filename, data)  
   
@@ -414,7 +432,7 @@ for (data in births.national.clean.put ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not Reported', 'Unknown or Not Stated', 'Not Available'), ethnicity = 'Unknown or Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity = 'unknown or not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }
@@ -427,7 +445,7 @@ for (data in births_denom_national ) {
     data = data,
     ontology.name = 'census.cdc.wonder.births.deaths',
     source = 'cdc_wonder',
-    dimension.values.to.distribute = list(race=c('More than one race', 'Not Reported', 'Unknown or Not Stated', 'Not Available'), ethnicity ='Not Stated', 'Unknown or Not Stated'),
+    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not available'), ethnicity ='not stated', 'unknown or not stated'),
     url = 'https://wonder.cdc.gov/',
     details = 'CDC Wonder')
 }

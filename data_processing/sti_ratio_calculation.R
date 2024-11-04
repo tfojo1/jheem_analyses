@@ -62,7 +62,8 @@ gonorrhea.ratios = lapply(gc.data.for.ratios, function(file){
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
       select(location, year, race, year.over.year)%>%
-      rename(value = year.over.year) 
+      rename(value = year.over.year)%>%
+      mutate(race = tolower(race))
   }
   
   if(grepl("age", filename)) { 
@@ -162,7 +163,8 @@ syphilis.ratios = lapply(syph.data.for.ratios, function(file){
       arrange(year, .by_group = T)%>%
       mutate(year.over.year=value/lag(value,1)) %>%
       select(location, year, race, year.over.year)%>%
-      rename(value = year.over.year) 
+      rename(value = year.over.year)%>%
+      mutate(race = tolower(race))
   }
   
   if(grepl("age", filename)) { 

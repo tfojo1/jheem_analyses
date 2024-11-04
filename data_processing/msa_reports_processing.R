@@ -56,11 +56,11 @@ age.msa.mappings = c('1' = '13-24 years',
                         '4' = '45-54 years',
                         '5' = '55+ years')
 
-race.msa.mappings = c('1'= 'American Indian/Alaska Native',
-                      '2'='Asian',
-                      '3'= 'Black/African American',
-                      '4'= 'Hispanic/Latino',
-                      '5'= 'White')
+race.msa.mappings = c('1'= 'american indian/alaska native',
+                      '2'='asian',
+                      '3'= 'black/african american',
+                      '4'= 'hispanic/latino',
+                      '5'= 'white')
 
 risk.msa.mappings = c('1'= 'msm',
                       '2'='idu',
@@ -1090,13 +1090,13 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
 
   #Create Race#
   if(grepl("black", filename)){
-    data$race="Black/African American"
+    data$race="black/african american"
   }
   if(grepl("white", filename)){
-    data$race="White"
+    data$race="white"
   }
   if(grepl("hispanic", filename)){
-    data$race="Hispanic/Latino"
+    data$race="hispanic/latino"
   }
 
   if(grepl("new", filename)){

@@ -92,6 +92,9 @@ fertility.clean = lapply(data.list.fertility, function(file){
     mutate(location.check = locations::is.location.valid(location))%>% #Removing counties coded as 'unidentified'
     filter(location.check == T)
   
+  data$race = tolower(data$race)
+  data$ethnicity = tolower(data$ethnicity)
+  
   list(filename, data) 
   
 })

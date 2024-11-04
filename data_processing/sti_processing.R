@@ -59,6 +59,7 @@ syphilis.clean = lapply(syphilis.data, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
+    data$race = tolower(data$race)
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -140,6 +141,7 @@ syphilis.clean.early = lapply(syphilis.data.early, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
+    data$race = tolower(data$race)
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
@@ -208,6 +210,7 @@ gonorrhea.clean = lapply(gonorrhea.data, function(file){
   }
   if(grepl("race", filename)) {
     data$race= data$'Race.Ethnicity'
+    data$race = tolower(data$race)
   }
   if(grepl("sex", filename)) {
     names(data)[names(data)=='Sex'] = 'sex'
