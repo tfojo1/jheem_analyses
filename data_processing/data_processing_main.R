@@ -1094,6 +1094,7 @@ national.suppression = lapply(data.list.national.suppression , function(file){
     if(grepl("race", filename)) {
         names(data)[names(data)=='Race.Ethnicity'] = 'race'
         data$race = tolower(data$race)
+        data = subset(data, data$race != "multiracial")  #removing multiracial 10-14-24
     }
     if(grepl("sex", filename)) {
         names(data)[names(data)=='Sex'] = 'sex'
@@ -1110,8 +1111,6 @@ national.suppression = lapply(data.list.national.suppression , function(file){
       names(data)[names(data)=='Sex'] = 'sex'
       data$sex = tolower(data$sex)
     }
-    
-    data = subset(data, data$race != "Multiracial")  #removing multiracial 10-14-24
                   
     list(filename, data) 
     
