@@ -9,15 +9,15 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 LOCATION='C.12580' #BALTIMORE.MSA
 CALIBRATION.CODE.TO.RUN='init.pop.shield'
 DATE=Sys.Date()
-DATE="2024-10-22"
+DATE="2024-11-04"
 # Reading from file:
 load(paste0("../jheem_analyses/prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",DATE,"_",LOCATION,".Rdata"))
 simset=simset;simset
-# reading from ongoing calibration
-# simset = assemble.simulations.from.calibration(version = 'shield',
-#                                                location = LOCATION,
-#                                                calibration.code = CALIBRATION.CODE.TO.RUN,
-#                                                allow.incomplete = T)
+# reading from ongoing calibration: doesnt require a date
+simset = assemble.simulations.from.calibration(version = 'shield',
+                                               location = LOCATION,
+                                               calibration.code = CALIBRATION.CODE.TO.RUN,
+                                               allow.incomplete = T)
 #   
 # 
 simplot(simset$first.sim(),simset$last.sim(),

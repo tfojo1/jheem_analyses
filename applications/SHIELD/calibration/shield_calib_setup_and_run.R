@@ -20,7 +20,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
   set.up.calibration(version='shield',
                      location=LOCATION,
                      calibration.code = CALIBRATION.NAME,
-                     cache.frequency = 500 #how often write to disk 
+                     cache.frequency = 50 #how often write to disk 
   )  
   print(paste0("DONE setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 }

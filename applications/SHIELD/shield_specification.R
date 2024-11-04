@@ -654,6 +654,21 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex'),
                           
 )
+
+## Fertility Rate ----
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name='fertility.rate',
+                         value=expression(births.from/population),
+                         denominator.outcome = 'population',
+                         keep.dimensions =  c('location','age','race'),
+                         subset.dimension.values = list(sex='female'),
+                         outcome.metadata = create.outcome.metadata(display.name = 'Fetility Rate',
+                                                                    description = "Fetility Rate",
+                                                                    scale = 'rate',
+                                                                    axis.name = 'Rate',
+                                                                    units = 'rate',
+                                                                    singular.unit = 'person')
+                                                  )
 ## Births ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                     name='births.from',
@@ -667,8 +682,9 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                     save=T,
                     corresponding.data.outcome = "births",
                     dynamic.quantity.name = 'births.from', #model has an internal definition for births  #births from is conditional on parent's characteristics
-                    keep.dimensions = c('location','age','race') #collapse on stage and continuum for infected and on profile as well
-)
+                    keep.dimensions = c('location','age','race','sex'), #collapse on stage and continuum for infected and on profile as well
+                    subset.dimension.values = list(sex='female') #this seems redundant but it filters all the male rows with 0 values.
+                    )
 ## Deaths ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name='total.mortality',

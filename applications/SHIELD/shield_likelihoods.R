@@ -68,6 +68,17 @@ births.likelihood.instructions =
                                        # equalize.weight.by.year = T
   )
 
+#-- FETILITY RATE  ----
+fertility.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "fertility.rate", #fix type
+                                       outcome.for.sim = "fertility.rate",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g
+                                       from.year = 2007,  #data available from 2007-2023
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.015, # in absence of data I am assuming the population level
+                                       error.variance.type = 'cv'
+  )
 
 
 # if we work on proportions that it'll be different 
@@ -78,9 +89,10 @@ births.likelihood.instructions =
 likelihood.instructions.demographics =  join.likelihood.instructions(
   population.likelihood.instructions ,
   total.mortality.likelihood.instructions
+  # fertility.likelihood.instructions
   # births.likelihood.instructions # DOEST RUN YET
 )
 #manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
 # lik=total.mortality.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
-# lik=births.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+# lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"US")
