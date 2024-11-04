@@ -2061,9 +2061,10 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       dynamic.quantity.name = 'mortality',
                       corresponding.data.outcome = 'aids.deaths',
                       groups = 'infected',
-                      exclude.tags = "emigration",
+                      #exclude.tags = "emigration",
+                      include.tags = "infection.specific.mortality",
                       keep.dimensions = c("location","race","sex","risk"),
-                      subset.dimension.values = list(continuum = "diagnosed.states"), # maybe include this? 
+                      #subset.dimension.values = list(continuum = "diagnosed.states"), # maybe include this? 
                       from.year = 1980, 
                       to.year = 2001)
 
