@@ -81,7 +81,7 @@ for (data in syphilis.clean.put) {
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'), 
+    dimension.values.to.distribute = list(race=c('multiracial', 'unknown'), age = 'Unknown'), 
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -164,7 +164,7 @@ for (data in early.syphilis.put) {
     data = data,
     ontology.name = 'cdc.syphilis',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'), 
+    dimension.values.to.distribute = list(race=c('multiracial', 'unknown'), age = 'Unknown'), 
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
@@ -231,7 +231,7 @@ for (data in gonorrhea.clean.put) {
     data = data,
     ontology.name = 'cdc.sti',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('Multiracial', 'Unknown'), age = 'Unknown'),  
+    dimension.values.to.distribute = list(race=c('multiracial', 'unknown'), age = 'Unknown'),  
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
