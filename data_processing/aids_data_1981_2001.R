@@ -31,7 +31,7 @@ aids.risk.mappings = c('Heterosexual contact with HIV' = 'heterosexual',
 
 aids.race.mappings = c('American Indian /Alaskan Native' = 'american indian/alaska native',
                       'Asian / Pacific Islander' = 'asian',
-                      'Black (and also not Hispanic)' = 'alack',
+                      'Black (and also not Hispanic)' = 'black',
                       'Hispanic' = 'hispanic',
                       'White (and also not Hispanic)' = 'white',
                       'Unknown'= 'unknown')
