@@ -30,7 +30,7 @@ census.race.mappings.20.23 = c('WA' = 'white',
                            'BA' = 'black',
                            'IA'= 'american indian and alaska native',
                            'AA' = 'asian',
-                           'NA' = 'native hawaiian and Other pacific islander')
+                           'NA' = 'native hawaiian and other pacific islander')
 census.eth.mappings.20.23 = c(  'H' = 'hispanic',
                            'NH' = 'not hispanic')
 census.age.mappings.20.23 = c('1' = '0-4 years', 
