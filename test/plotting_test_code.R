@@ -122,7 +122,13 @@ simplot(simset$last.sim(),
 
 simplot(simset$last.sim(),
         simset,
-        facet.by = "risk", # age, sex, race, risk; 1-way 
+        outcomes = c("suppression"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(simset$last.sim(),
+        simset,
+        facet.by = "race", # age, sex, race, risk; 1-way 
         outcomes = c("suppression"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
