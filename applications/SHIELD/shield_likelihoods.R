@@ -2,7 +2,10 @@
 
 
 #-- POPULATION----
-# Basic likelihood: where we have data at the location level desired# sometimes we dont have the calibration data for the location of interest. so for example we need to calibrate prop aware in Baltimiore to data from MD and building some uncertainty to account for similarities between those locations
+# Basic likelihood: where we have data at the location level desired
+# sometimes we dont have the calibration data for the location of interest. 
+# so for example we need to calibrate prop aware in Baltimiore to data from MD and building 
+# some uncertainty to account for similarities between those locations
 population.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "population", 
                                        outcome.for.sim = "population",
@@ -77,7 +80,7 @@ likelihood.instructions.demographics =  join.likelihood.instructions(
   total.mortality.likelihood.instructions
   # births.likelihood.instructions # DOEST RUN YET
 )
-#manual: 
-# lik=total.mortality.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+#manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+# lik=total.mortality.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
 # lik=births.likelihood.instructions$instantiate.likelihood('shield',"C.12580")

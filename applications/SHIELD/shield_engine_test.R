@@ -35,16 +35,20 @@ engine = create.jheem.engine('shield', "C.12580", 2025)
 #@Todd: the national model still fails
 # engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size
 
-
-params=get.medians(SHIELD.DEMOGRAPHIC.PARAMETERS.PRIOR)
+#Running:
+params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
-sim1$births
-sim1$total.mortality
-simplot(sim1,
-        outcomes = c("births"), 
+#Outcomes
+sim$births.from
+sim$total.mortality
+
+simplot(sim,
+        outcomes = c("births.from"), 
         facet.by = "age", split.by = "race", 
         dimension.values = list(year = 2000:2030)) 
+
+
 simplot(sim1,
         outcomes = c("total.mortality"), 
         facet.by = "age", split.by = "race", 

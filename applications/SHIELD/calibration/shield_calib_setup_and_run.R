@@ -2,14 +2,14 @@ JHEEM.DIR="~/OneDrive - Johns Hopkins/SHIELD/Simulation/code/jheem_analyses/"
 setwd(JHEEM.DIR)
 
 source('../jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R')
-# source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
+source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
 # Set up ----
 {
   LOCATION='C.12580'
   set.seed(12345)
   CALIBRATION.NAME = 'pop.demog.shield' 
-  print(paste0("Setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
+  print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
   #
   clear.calibration.cache(version='shield',
                           location=LOCATION,
