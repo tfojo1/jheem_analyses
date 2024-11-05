@@ -190,12 +190,19 @@ get.best.guess.msm.proportions <- function(location,
     white = as.numeric(raw.proportion.msm.by.race['white']),
     black = as.numeric(raw.proportion.msm.by.race['black']),
     'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['american indian/alaska native']),
+<<<<<<< HEAD
     'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['bative hawaiian/other pacific islander']),
     hispanic = as.numeric(raw.proportion.msm.by.race['hispanic'])
   )
   #@Todd: do we need this? 
   # proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
   #####
+=======
+    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['native hawaiian/other pacific islander']),
+    hispanic = as.numeric(raw.proportion.msm.by.race['hispanic'])
+  )
+#  proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
+>>>>>>> 45be3128865b58f2655f1c6cc115014a5b83bb05
   
   if (all(is.na(proportions.msm.by.race)))
     stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
