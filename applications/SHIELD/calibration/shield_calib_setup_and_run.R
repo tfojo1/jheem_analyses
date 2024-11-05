@@ -8,7 +8,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 {
   LOCATION='C.12580'
   set.seed(12345)
-  CALIBRATION.NAME = 'pop.demog.shield' 
+  CALIBRATION.NAME = 'pop.demog.shield.wAging' 
   print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
   #
   clear.calibration.cache(version='shield',
@@ -20,7 +20,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
   set.up.calibration(version='shield',
                      location=LOCATION,
                      calibration.code = CALIBRATION.NAME,
-                     cache.frequency = 50 #how often write to disk 
+                     cache.frequency = 500 #how often write to disk 
   )  
   print(paste0("DONE setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 }

@@ -96,3 +96,4 @@ likelihood.instructions.demographics =  join.likelihood.instructions(
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
 # lik=total.mortality.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
 # lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"US")
+dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)

@@ -134,8 +134,7 @@ get.best.guess.msm.proportions <- function(location,
 {
   counties = locations::get.contained.locations(location, 'county')
   states = locations::get.overlapping.locations(location, 'state')
-  
-  # Get county-level proportions
+   # Get county-level proportions
   proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
                                                        dimension.values = list(location=counties,
                                                                                sex='male'))
@@ -186,14 +185,17 @@ get.best.guess.msm.proportions <- function(location,
                                                                                  sex = 'male'))
   raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
   
+  #@Todd: I think that we should replace this function and link it somehow to an onthology function to keep the code generalizable 
   proportions.msm.by.race = c(
-    white = as.numeric(raw.proportion.msm.by.race['White']),
-    black = as.numeric(raw.proportion.msm.by.race['Black']),
-    'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['American Indian/Alaska Native']),
-    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['Asian'] + .1*raw.proportion.msm.by.race['Native Hawaiian/Other Pacific Islander']),
-    hispanic = as.numeric(raw.proportion.msm.by.race['Hispanic'])
+    white = as.numeric(raw.proportion.msm.by.race['white']),
+    black = as.numeric(raw.proportion.msm.by.race['black']),
+    'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['american indian/alaska native']),
+    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['bative hawaiian/other pacific islander']),
+    hispanic = as.numeric(raw.proportion.msm.by.race['hispanic'])
   )
-  proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
+  #@Todd: do we need this? 
+  # proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
+  #####
   
   if (all(is.na(proportions.msm.by.race)))
     stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
@@ -312,17 +314,19 @@ get.best.guess.msm.proportions.by.race <- function(location,
   males = apply(males, keep.dimensions, mean, na.rm=T)
   
   # A hack for now while we wait for the real function
+  # @Todd: we should change manual races here
   states = get.overlapping.locations(location, 'state')
   raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
                                                          keep.dimensions = c('year','location','race'),
                                                          dimension.values = list(location = states,
                                                                                  sex = 'male'))
   raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
-  proportion.msm.by.race = c(black = as.numeric(raw.proportion.msm.by.race['Black']),
-                             hispanic = as.numeric(raw.proportion.msm.by.race['Hispanic']),
-                             white = as.numeric(raw.proportion.msm.by.race['White']),
+  proportion.msm.by.race = c(black = as.numeric(raw.proportion.msm.by.race['black']),
+                             hispanic = as.numeric(raw.proportion.msm.by.race['hispanic']),
+                             white = as.numeric(raw.proportion.msm.by.race['white']),
                              other = mean(raw.proportion.msm.by.race[setdiff(names(raw.proportion.msm.by.race),
-                                                                             c("Black",'Hispanic','White','Native Hawaiian/Other Pacific Islander','American Indian/Alaska Native'))]))
+                                                                             c("black",'hispanic','white','native hawaiian/pther pacific islander',
+                                                                               'american indian/alaska native'))]))
   
   if (min.age > 0)
   {
