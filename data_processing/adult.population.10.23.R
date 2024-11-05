@@ -10,12 +10,12 @@ desired.ages.for.census <- c('0-4 years', '5-12 years', '13-17 years', '18-19 ye
                              '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
                              '75-79 years', '80-84 years', '85+ years')
 
-#Update for 7-23-24: Creating a racial mapping to align this race data with the census ontology.
-race.mappings.to.census = c('White' = 'white',
-                            'Black' = 'black',
-                            'American Indian and Alaska Native' = 'american indian or alaska native',
-                            'Native Hawaiian and Other Pacific Islander' = 'asian or pacific islander',
-                            'Asian' = 'asian or pacific islander') 
+# #Update for 7-23-24: Creating a racial mapping to align this race data with the census ontology.
+race.mappings.to.census = c('white' = 'white',
+                            'black' = 'black',
+                            'american indian and alaska native' = 'american indian or alaska native',
+                            'native hawaiian and other pacific islander' = 'asian or pacific islander',
+                            'asian' = 'asian or pacific islander')
 
 #ESTIMATED DATA: adult.population 2010-2023 by RACE
 population.by.race.array = census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race
