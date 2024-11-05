@@ -581,7 +581,7 @@ data.manager$register.ontology(
         age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
         race=c('american indian/alaska native', 'asian', 'black', 'hispanic', 'white'),
         sex=c('male','female'),
-        risk=c('msm','idu','msm_idu','heterosexual','other')
+        risk=c('msm','idu','msm_idu','heterosexual')
     ))
 
 data.manager$register.ontology(
@@ -592,7 +592,7 @@ data.manager$register.ontology(
         age=c( '< 1 year', '1-12 years', '13-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years','65+ years'),
         race=c('american indian/alaska native', 'asian', 'black', 'hispanic', 'white'),
         sex=c('male','female'),
-        risk=c('msm','idu','msm_idu','heterosexual','other'),
+        risk=c('msm','idu','msm_idu','heterosexual'),
         incomplete.dimensions = c("year", "location")
     ))
 

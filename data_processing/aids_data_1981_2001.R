@@ -185,14 +185,14 @@ aids.data.clean = lapply(data.list.aids, function(file){
 ################################################################################
 
  aids.data.clean.put = lapply(aids.data.clean, `[[`, 2)  
- 
+ i=0
  for (data in aids.data.clean.put) {
-
+print(i+1)
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc.aids', 
      source = 'cdc.aids',
-     dimension.values.to.distribute = list(race=c('unknown')),
+     dimension.values.to.distribute = list(race=c('unknown'), risk ='other'),
      url = 'https://wonder.cdc.gov/AIDSPublic.html',
      details = 'CDC Wonder AIDS Public Information Data')  
  }
@@ -315,7 +315,7 @@ for (data in aids.deaths.put) {
     data = data,
     ontology.name = 'cdc.aids.deaths',
     source = 'cdc.aids',
-    dimension.values.to.distribute = list(race=c('unknown')),
+    dimension.values.to.distribute = list(race=c('unknown'), risk ='other'),
     url = 'https://wonder.cdc.gov/AIDSPublic.html',
     details = 'CDC Wonder AIDS Public Information Data')
 }
