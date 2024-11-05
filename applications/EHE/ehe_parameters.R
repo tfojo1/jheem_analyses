@@ -606,18 +606,18 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     hiv.general.mortality.multiplier = Lognormal.Distribution(log(1.95),sdlog = log(2)/2,lower=1),
 
     #-- HIV-Specific Mortality (unsuppressed) --#
-    Multivariate.Lognormal.Distribution(mu=log(c((41/6.1 * 23/1000), # peak
-                                                 (9.5/6.1 * 23/1000), # 0
-                                                 (23/1000))), # 1
-                                        sigma = create.auto.regressive.covariance.matrix(
-                                          correlation.coefficient = 0.5,n=3,sd=log(2)/2),
-                                        var.names = c("unsuppressed.peak.hiv.mortality",
-                                                      "unsuppressed.hiv.mortality.0",
-                                                      "unsuppressed.hiv.mortality.1")),
+    # Multivariate.Lognormal.Distribution(mu=log(c((41/6.1 * 23/1000), # peak
+    #                                              (9.5/6.1 * 23/1000), # 0
+    #                                              (23/1000))), # 1
+    #                                     sigma = create.auto.regressive.covariance.matrix(
+    #                                       correlation.coefficient = 0.5,n=3,sd=log(2)/2),
+    #                                     var.names = c("unsuppressed.peak.hiv.mortality",
+    #                                                   "unsuppressed.hiv.mortality.0",
+    #                                                   "unsuppressed.hiv.mortality.1")),
 
-    # unsuppressed.hiv.mortality.0 = Lognormal.Distribution(log(9.5/6.1 * 23/1000), log(2)/2),
-    # unsuppressed.hiv.mortality.1 = Lognormal.Distribution(log(23/1000), log(2)),
-    # unsuppressed.peak.hiv.mortality = Lognormal.Distribution(log(41/6.1 * 23/1000), log(2)/2),
+    unsuppressed.hiv.mortality.0 = Lognormal.Distribution(log(9.5/6.1 * 23/1000), log(2)/2),
+    unsuppressed.hiv.mortality.1 = Lognormal.Distribution(log(23/1000), log(2)),
+    unsuppressed.peak.hiv.mortality = Lognormal.Distribution(log(41/6.1 * 23/1000), log(2)/2),
     #http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.688.1831&rep=rep1&type=pdf
     
     # age1.unsuppressed.hiv.mortality.multiplier = Lognormal.Distribution(log(1),sdlog = log(2)/2),
