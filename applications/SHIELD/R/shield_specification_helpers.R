@@ -187,13 +187,13 @@ get.best.guess.msm.proportions <- function(location,
   raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
   
   proportions.msm.by.race = c(
-    white = as.numeric(raw.proportion.msm.by.race['White']),
-    black = as.numeric(raw.proportion.msm.by.race['Black']),
-    'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['American Indian/Alaska Native']),
-    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['Asian'] + .1*raw.proportion.msm.by.race['Native Hawaiian/Other Pacific Islander']),
-    hispanic = as.numeric(raw.proportion.msm.by.race['Hispanic'])
+    white = as.numeric(raw.proportion.msm.by.race['white']),
+    black = as.numeric(raw.proportion.msm.by.race['black']),
+    'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['american indian/alaska native']),
+    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['native hawaiian/other pacific islander']),
+    hispanic = as.numeric(raw.proportion.msm.by.race['hispanic'])
   )
-  proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
+#  proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
   
   if (all(is.na(proportions.msm.by.race)))
     stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
