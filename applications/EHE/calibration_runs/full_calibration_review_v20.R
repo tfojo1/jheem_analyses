@@ -6,164 +6,133 @@ location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager = create.style.manager(color.data.by = "source") 
 stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
-LOCATION = BALTIMORE.MSA # Atlanta only has pop for newest simset 
+load("../jheem_analyses/prelim_results/init.transmission.ehe_simset_2024-11-01_C.35620_AR_v1.Rdata")
+simset= copy.simulation.set(simset)
+simset.old = simset  
 
-if(LOCATION==BALTIMORE.MSA){
-  load(paste0("../jheem_analyses/prelim_results/full.with.covid2_simset_2024-10-07_",LOCATION,".Rdata"))
-  simset.old = simset
-  
-  #load(paste0("../jheem_analyses/prelim_results/full.with.covid2_simset_2024-10-17_",LOCATION,".Rdata"))
-  load(paste0("../jheem_analyses/prelim_results/full.with.aids_simset_2024-10-17_",LOCATION,".Rdata"))
-  simset.new = simset
-  
-} else {
-  load(paste0("../jheem_analyses/prelim_results/full.with.aids_simset_2024-10-05_",LOCATION,".Rdata"))
-  simset.old = simset  
-  
-  load(paste0("../jheem_analyses/prelim_results/full.with.aids_simset_2024-10-17_",LOCATION,".Rdata"))
-  simset.new = simset  
-}
-# 
-# balt.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.12580')
-# nyc.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.35620')
-# houston.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.26420')
-# chicago.lik = FULL.likelihood.instructions.with.aids$instantiate.likelihood('ehe','C.16980')
-atl.lik = transmission.pop.idu.aware.aids.testing.likelihood.instructions$instantiate.likelihood('ehe','C.12060')
+load("../jheem_analyses/prelim_results/init.transmission.ehe_simset_2024-11-04_C.35620.Rdata")
+simset.new = simset
 
-plot(1:simset.new$n.sim,simset.new$parameters["black.msm.trate.0",])
-plot(1:simset.new$n.sim,simset.new$parameters["age1.black.msm.susceptibility.rr.01",])
+engine = create.jheem.engine('ehe','C.35620',end.year = 2025)
 
-simplot(simset.old$last.sim(),
+params.mcmc = simset.new$get.params()
+sim.mcmc = engine$run(parameters = params.mcmc)
+
+params.manual = params.mcmc
+sim.manual = engine$run(parameters = params.manual)
+
+cbind(sim.mcmc$get.params("prevalence"))
+round(cbind(sim.mcmc$get.params("idu.trate")))
+cbind(sim.mcmc$get.params("oe"))
+
+params.manual["black.msm.trate.0"] = 1 # 0.1559
+
+# these make heterosexual go up and msm go down; more than they change IDU? 
+params.manual["black.active.idu.initial.prevalence.ratio"] = 2 # 1.42592516 
+params.manual["hispanic.active.idu.initial.prevalence.ratio"] = 2.5 # 0.19291837 
+params.manual["other.active.idu.initial.prevalence.ratio"] =.75 # 0.01671297
+#params.manual["oe.never.idu.pairings.with.idu"] = 500 # 0.17134284 prior is at 0.2
+
+#params.manual["black.idu.trate.peak"] = 20 # 20
+#params.manual["black.idu.trate.0"] = 645 # 645
+params.manual["black.idu.trate.1"] = 100 # 224
+params.manual["black.idu.trate.2"] = 50 # 75
+
+#params.manual["hispanic.idu.trate.peak"] = 120 # 120
+params.manual["hispanic.idu.trate.0"] = 645 # 709
+#params.manual["hispanic.idu.trate.1"] = 28 # 28
+params.manual["hispanic.idu.trate.2"] = 30 # 86
+
+params.manual["black.heterosexual.trate.peak"] = .15 # 0.6688023
+#params.manual["black.heterosexual.trate.0"] # 0.0005632177
+#params.manual["black.heterosexual.trate.1"] # 0.02997865
+#params.manual["black.heterosexual.trate.2"] # 0.2110372
+
+
+sim.manual = engine$run(parameters = params.manual)
+
+#nyc.lik = transmission.pop.idu.aware.aids.testing.likelihood.instructions$instantiate.likelihood('ehe','C.35620')
+
+# seems like benefit to prevalence should outweigh small changes to new/aids, but it doesn't; why does AIDS diagnoses score that much worse???
+nyc.lik$compare.sims(sim.mcmc,sim.manual) # compare.sims(nyc.lik, sim.mcmc,sim.manual) # still second minus first 
+exp(nyc.lik$compute(sim.manual) - nyc.lik$compute(sim.mcmc))
+
+
+simplot(#simset.old$last.sim(),
         #simset.new,
-        simset.new$last.sim(),
-        facet.by = "age", split.by = "race", 
-        outcomes = c("population"), 
-        dimension.values = list(year = 2000:2030)) 
-
-simplot(#simset.old$first.sim(),
-  simset.old$last.sim(),
-  #simset.new$first.sim(),
-  simset.new$last.sim(),
-  simset.new,
-  outcomes = c("diagnosed.prevalence"), 
-  style.manager = source.style.manager,
-  dimension.values = list(year = 2000:2030)) 
-
-simplot(#simset.old$first.sim(),
-  simset.old$last.sim(),
-  #simset.new$first.sim(),
-  simset.new$last.sim(),
-  #simset.new,
-  facet.by = "risk", split.by = "race",
-  outcomes = c("diagnosed.prevalence"), 
-  dimension.values = list(year = 2000:2030)) 
-
-simplot(#simset.old$first.sim(),
-  simset.old$last.sim(),
-  #simset.new$first.sim(),
-  simset.new$last.sim(),
-  #simset.new,
-  facet.by = "age", split.by = "sex", 
-  outcomes = c("diagnosed.prevalence"), 
-  dimension.values = list(year = 2000:2030)) 
-
-simplot(#simset.old$last.sim(),
-  simset.new,      
-  simset.new$last.sim(),
-  outcomes = c("new"), 
-  style.manager = source.style.manager, 
-  dimension.values = list(year = 2000:2030)) 
-
-simplot(#simset.old$last.sim(),
-  simset.new$last.sim(),
-  facet.by = "risk", split.by = "race", 
-  outcomes = c("new"), 
-  dimension.values = list(year = 2000:2030)) 
-
-simplot(#simset.old$last.sim(),
-  simset.new$last.sim(),
-  facet.by = "age", split.by = "sex", 
-  outcomes = c("new"), 
-  dimension.values = list(year = 2000:2030)) 
-
-simplot(simset.old$last.sim(),
-        simset.new$last.sim(),
-        # facet.by = "age", 
-        outcomes = c("testing"),
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
-
-simplot(simset.old$last.sim(),
-        simset.new$last.sim(),
-        outcomes = c("awareness"),
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
-
-simplot(simset.old$last.sim(),
-        simset.new$last.sim(),
-        outcomes = c("cdc.hiv.test.positivity"), # totals only 
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
-
-simplot(simset.old$last.sim(),
-        simset.new$last.sim(),
-        facet.by = "age", # age, sex, race, risk; 1-way 
-        outcomes = c("aids.diagnoses"), 
-        style.manager = location.style.manager,
+        sim.mcmc,
+        sim.manual,
+        outcomes = c("diagnosed.prevalence"), 
+        style.manager = source.style.manager,
         dimension.values = list(year = 1980:2030)) 
 
-simplot(simset.old$last.sim(),
-        simset.new$last.sim(),
+simplot(#simset.old$last.sim(),
+        #sim.mcmc,
+        sim.manual,
+        facet.by = "risk", split.by = "race", 
+        outcomes = c("diagnosed.prevalence"), 
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(#simset.old$last.sim(),,
+        sim.mcmc,
+        sim.manual,
+        outcomes = c("new"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(#simset.old$last.sim(),
+        #sim.mcmc,
+        sim.manual,
+        facet.by = "risk", split.by = "race", 
+        outcomes = c("new"), 
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(#simset.old$last.sim(),
+        sim.mcmc,
+        sim.manual,
         outcomes = c("aids.diagnoses"), 
         style.manager = source.style.manager,
         dimension.values = list(year = 1980:2030)) 
 
-simplot(simset.old$last.sim(),
-        simset.new$last.sim(),
-        facet.by = "sex", # sex; 1-way 
+simplot(#simset.new,
+        sim.mcmc,
+        sim.manual,
+        facet.by = "risk", 
+        outcomes = c("aids.diagnoses"), 
+        style.manager = location.style.manager,
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(sim.mcmc,
+        sim.manual,
+        #facet.by = "sex", # sex; 1-way 
         outcomes = c("hiv.mortality"),
         style.manager = source.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(sim.mcmc,
+        sim.manual,
+        outcomes = c("aids.deaths"), 
+        style.manager = source.style.manager,
+        dimension.values = list(year = 1981:2001)) 
 
 simplot(simset.old$last.sim(),
         simset.new$last.sim(),
-        outcomes = c("total.mortality"), # totals only 
+        simset.new,
+        #facet.by = "age", # age; 1-way 
+        outcomes = c("proportion.using.heroin",
+                     "proportion.using.cocaine"), 
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
 
-simplot(simset.old$last.sim(),
-        simset.new$last.sim(),
-        #facet.by = "age", # age, sex, race, risk; 1-way 
-        outcomes = c("suppression"), 
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+simset.old$traceplot("black.sexual.assortativity.multiplier")
+simset.new$traceplot("black.sexual.assortativity.multiplier")
 
 
-## OLD LIKELIHOOD COMPARISONS (10/11) 
-# COMPARING TO 10/7 MCMC
+black.trates = intersect(names(params.manual[grepl("black",names(params.manual))]),
+                         names(params.manual[grepl("trate",names(params.manual))]))
 
-## CHICAGO ## 
-# New simset is worse overall, including prevalence, but suppression improved 
-chicago.lik$compare.sims(simset.old$last.sim(),simset.new$last.sim()) 
-exp(chicago.lik$compute(simset.new$last.sim()) - chicago.lik$compute(simset.old$last.sim()))
+other.trates = intersect(names(params.manual[grepl("other",names(params.manual))]),
+                         names(params.manual[grepl("trate",names(params.manual))]))
 
-## NYC ##
-# New simset is worse overall, including prevalence
-# Suppression looks better but scored worse (probably because of trend of line)
-nyc.lik$compare.sims(simset.old$last.sim(),simset.new$last.sim()) 
-exp(nyc.lik$compute(simset.new$last.sim()) - nyc.lik$compute(simset.old$last.sim()))
-
-## HOUSTON ## 
-# New simset is better overall, including suppression
-houston.lik$compare.sims(simset.old$last.sim(),simset.new$last.sim()) 
-exp(houston.lik$compute(simset.new$last.sim()) - houston.lik$compute(simset.old$last.sim()))
-
-## ATLANTA ## 
-# New simset is better overall, including suppression and prevalence (new creeping up a bit)
-atl.lik$compare.sims(simset.old$last.sim(),simset.new$last.sim()) 
-exp(atl.lik$compute(simset.new$last.sim()) - atl.lik$compute(simset.old$last.sim()))
-
-## BALTIMORE ## 
-# New simset is better overall, but new diagnoses taking off and awareness trending down
-balt.lik$compare.sims(simset.old$last.sim(),simset.new$last.sim()) 
-exp(balt.lik$compute(simset.new$last.sim()) - balt.lik$compute(simset.old$last.sim()))
+round(cbind(params.mcmc[black.trates],params.manual[black.trates]),4)
+round(cbind(params.mcmc[other.trates],params.manual[other.trates]))
