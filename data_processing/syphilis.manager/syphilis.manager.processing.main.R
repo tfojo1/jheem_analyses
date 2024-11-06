@@ -488,7 +488,7 @@ source('data_processing/syphilis.manager/cached.proportion.msm.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
-source('data_processing/syphilis.manager/births.msa.R') #This is CDC Wonder Birth data by age, race, eth for women 15-44 aggregated from county to MSA
+#source('data_processing/syphilis.manager/births.msa.R') #This is CDC Wonder Birth data by age, race, eth for women 15-44 aggregated from county to MSA
 source('data_processing/syphilis.manager/aggregating.national.population.syphilis.R')
 
 # RENAME ------------------------------------------------------------------
@@ -587,14 +587,14 @@ put.msa.data.as.new.source(outcome = 'deaths',
                            details.for.new.data = 'estimated from county data',
                            data.manager= syphilis.manager) 
 
-put.msa.data.as.new.source(outcome = 'births',
-                           from.source.name= 'cdc.wonder.natality',
-                           to.source.name = 'cdc.wonder.aggregated.births', 
-                           to.locations = MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager= syphilis.manager) 
+# put.msa.data.as.new.source(outcome = 'births',
+#                            from.source.name= 'cdc.wonder.natality',
+#                            to.source.name = 'cdc.wonder.aggregated.births', 
+#                            to.locations = MSAS.OF.INTEREST,
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager= syphilis.manager) 
 
 
 all.states = locations::get.all.for.type('state')
@@ -617,6 +617,10 @@ put.msa.data.as.new.source(outcome = 'population',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
 
+
+# Source Code to Calculate Fertility Rate by MSA --------------------------
+
+source('data_processing/syphilis.manager/fertility.rate.msa.R')
 
 # SAVE SYPHILIS.MANAGER ---------------------------------------------------
 save(syphilis.manager, file="../../cached/syphilis.manager.rdata")

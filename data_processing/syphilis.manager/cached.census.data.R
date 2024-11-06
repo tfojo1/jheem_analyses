@@ -231,49 +231,49 @@ deaths.total = as.data.frame.table(census.manager$data$deaths$estimate$census.de
     details = 'Census Reporting')
 
 # National Level Births and the Denominator -------------------------------
-
-national.births = as.data.frame.table(census.manager$data$births$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity)%>%
-  filter(location == "US")%>%
-  rename(value = Freq)%>%
-  mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))%>%
-  mutate(race = as.character(race))%>%
-  mutate(ethnicity = as.character(ethnicity))%>%
-  mutate(value = as.numeric(value))%>%
-  mutate(outcome = "births")%>%
-  mutate(race = tolower(race))%>%
-  mutate(ethnicity = tolower(ethnicity))
-
-
-national.births.denominator = as.data.frame.table(census.manager$data$births.denominator$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity)%>%
-  filter(location == "US")%>%
-  rename(value = Freq)%>%
-  mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))%>%
-  mutate(race = as.character(race))%>%
-  mutate(ethnicity = as.character(ethnicity))%>%
-  mutate(value = as.numeric(value))%>%
-  mutate(outcome = "births.denominator")%>%
-  mutate(race = tolower(race))%>%
-  mutate(ethnicity = tolower(ethnicity))
-
-
-national.birth.data.combined = list(
-  national.births,
-  national.births.denominator
-)
-
-
-for (data in national.birth.data.combined ) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'census.cdc.wonder.births.deaths',
-    source = 'cdc.wonder.natality',
-    dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not Available'), ethnicity ='unknown or not stated', 'not stated'),
-    url = 'https://wonder.cdc.gov/',
-    details = 'CDC Wonder')
-}
+# 
+# national.births = as.data.frame.table(census.manager$data$births$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity)%>%
+#   filter(location == "US")%>%
+#   rename(value = Freq)%>%
+#   mutate(year = as.character(year))%>%
+#   mutate(location = as.character(location))%>%
+#   mutate(race = as.character(race))%>%
+#   mutate(ethnicity = as.character(ethnicity))%>%
+#   mutate(value = as.numeric(value))%>%
+#   mutate(outcome = "births")%>%
+#   mutate(race = tolower(race))%>%
+#   mutate(ethnicity = tolower(ethnicity))
+# 
+# 
+# national.births.denominator = as.data.frame.table(census.manager$data$births.denominator$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__race__ethnicity)%>%
+#   filter(location == "US")%>%
+#   rename(value = Freq)%>%
+#   mutate(year = as.character(year))%>%
+#   mutate(location = as.character(location))%>%
+#   mutate(race = as.character(race))%>%
+#   mutate(ethnicity = as.character(ethnicity))%>%
+#   mutate(value = as.numeric(value))%>%
+#   mutate(outcome = "births.denominator")%>%
+#   mutate(race = tolower(race))%>%
+#   mutate(ethnicity = tolower(ethnicity))
+# 
+# 
+# national.birth.data.combined = list(
+#   national.births,
+#   national.births.denominator
+# )
+# 
+# 
+# for (data in national.birth.data.combined ) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'census.cdc.wonder.births.deaths',
+#     source = 'cdc.wonder.natality',
+#     dimension.values.to.distribute = list(race=c('more than one race', 'not reported', 'unknown or not stated', 'not Available'), ethnicity ='unknown or not stated', 'not stated'),
+#     url = 'https://wonder.cdc.gov/',
+#     details = 'CDC Wonder')
+# }
 
 
 # National Population Data by Age, Sex, Age+Sex ---------------------------
