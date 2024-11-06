@@ -54,7 +54,7 @@ par.names.transmission = c(par.names.transmission,
                            "unsuppressed.peak.hiv.mortality",
                            "unsuppressed.hiv.mortality.0",
                            "unsuppressed.hiv.mortality.1",
-                           "hiv.general.mortality.multiplier", # added 11/5
+                           #"hiv.general.mortality.multiplier", # added 11/5, took out 11/6 but may want to put back 
                            # 'msm.testing.ramp.1.or',
                            # 'msm.testing.ramp.2.or',
                            # 'heterosexual.testing.ramp.1.or',
