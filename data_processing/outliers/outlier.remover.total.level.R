@@ -93,17 +93,17 @@ dx.prev.adjusted.two <- run.outlier.process(outcome= 'diagnosed.prevalence',
                                            locations= c(states, msas))%>%
                               filter(source == "cdc.hiv")
 
-dx.prev.adjusted.two$adjudication <- c(T)
-
-run.outlier.process(outcome= 'diagnosed.prevalence',
-                    stratifications= list(c()),
-                    data.manager= surveillance.manager,
-                    phi = 0.2,
-                    theta = 0.05,
-                    max.year = 2019,
-                    first.choice.year = 2018,
-                    locations= c(states, msas),
-                    adjudication.data.frame = dx.prev.adjusted.two)
+# dx.prev.adjusted.two$adjudication <- c(T)
+# 
+# run.outlier.process(outcome= 'diagnosed.prevalence',
+#                     stratifications= list(c()),
+#                     data.manager= surveillance.manager,
+#                     phi = 0.2,
+#                     theta = 0.05,
+#                     max.year = 2019,
+#                     first.choice.year = 2018,
+#                     locations= c(states, msas),
+#                     adjudication.data.frame = dx.prev.adjusted.two)
 
 # Outcome = diagnosed.prevalence, source = cdc.aggregated.county ------------------------
 
