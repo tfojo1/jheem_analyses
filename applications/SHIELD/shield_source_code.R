@@ -1,4 +1,4 @@
-cat("*** Running Shiled_source_code.R ***\n")
+cat("*** Running Shield_source_code.R ***\n")
 NEW.SOURCE=F
  
 # The file to source to load all necessary packages, cached data, code
@@ -36,7 +36,10 @@ if (!exists('CENSUS.MANAGER') | NEW.SOURCE){
 # county-, MSA- and US- level aggregation
 if (is.null(get.default.data.manager()) | NEW.SOURCE){ #if it's in memory, it wont reload it
   print("Reading Syphilis survillance manager ...")
-  SURVEILLANCE.MANAGER = load.data.manager('cached/syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
+  if (file.exists('cached/syphilis.manager.rdata'))
+    SURVEILLANCE.MANAGER = load.data.manager('cached/syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
+  else
+    SURVEILLANCE.MANAGER = load.data.manager('../../cached/syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
   print("Syphilis survillance manager read")
 }
 
@@ -73,4 +76,4 @@ FERTILE.AGES=c('15-19 years','20-24 years','25-29 years','30-34 years','35-39 ye
 cat("FERTILE.AGES set to ",FERTILE.AGES,"\n")
 
 
-cat("*** Shiled_source_code.R completed! ***\n")
+cat("*** Shield_source_code.R completed! ***\n")
