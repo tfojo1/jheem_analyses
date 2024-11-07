@@ -5,7 +5,8 @@ register.ontology.mapping('lump.other.risk.and.heterosexual',
                                            c('idu', 'idu'),
                                            c('msm_idu', 'msm_idu'),
                                            c('heterosexual', 'heterosexual'),
-                                           c('other', 'heterosexual')))
+                                           c('other', 'heterosexual'))
+)
 
 register.ontology.mapping('idu.to.active.prior',
                           from.dimensions = 'risk',
@@ -32,7 +33,22 @@ register.ontology.mapping('jheem.to.cdc.sex.risk',
                                            c('heterosexual_male', 'IDU_in_remission', 'male', 'idu'),
                                            c('female', 'never_IDU', 'female', 'heterosexual'),
                                            c('female', 'active_IDU', 'female', 'idu'),
-                                           c('female', 'IDU_in_remission', 'female', 'idu')))
+                                           c('female', 'IDU_in_remission', 'female', 'idu'))
+)
+
+# register.ontology.mapping('jheem.to.msm.or.not.risk',
+#                           from.dimensions = c('sex', 'risk'),
+#                           to.dimensions = c('sex', 'risk'),
+#                           mappings = rbind(c('msm', 'never_IDU', 'male', 'msm'),
+#                                            c('msm', 'active_IDU', 'male', 'msm'),
+#                                            c('msm', 'IDU_in_remission', 'male', 'msm'),
+#                                            c('heterosexual_male', 'never_IDU', 'male', 'not_msm'),
+#                                            c('heterosexual_male', 'active_IDU', 'male', 'not_msm'),
+#                                            c('heterosexual_male', 'IDU_in_remission', 'male', 'not_msm'),
+#                                            c('female', 'never_IDU', 'female', 'not_msm'),
+#                                            c('female', 'active_IDU', 'female', 'not_msm'),
+#                                            c('female', 'IDU_in_remission', 'female', 'not_msm'))
+# )
 
 # Not sure if this would work - might give us some unwanted dimensions in the mapped result
 register.ontology.mapping('jheem.to.msm.or.not.risk',
@@ -40,50 +56,75 @@ register.ontology.mapping('jheem.to.msm.or.not.risk',
                           to.dimensions = c('sex', 'risk'),
                           mappings = rbind(c('msm', 'male', 'msm'),
                                            c('heterosexual_male', 'male', 'not_msm'),
-                                           c('female', 'female', 'not_msm')))
+                                           c('female', 'female', 'not_msm'))
+)
 
 register.ontology.mapping('cdc.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian/alaska native', 'other'),
-                                           c('asian', 'other'),
-                                           c('black/african american', 'black'),
-                                           c('hispanic/latino', 'hispanic'),
-                                           c('native hawaiian/other pacific islander', 'other'),
-                                           c('white', 'other')))
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black/African American', 'black'),
+                                           c('Hispanic/Latino', 'hispanic'),
+                                           #c('Multiracial', 'other'),
+                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
+                                           c('White', 'other'))
+)
 
 register.ontology.mapping('cdc.msa.reports.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian/alaska native', 'other'),
-                                           c('asian', 'other'),
-                                           c('black/african american', 'black'),
-                                           c('hispanic/latino', 'hispanic'),
-                                           c('white', 'other')))
-
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black/African American', 'black'),
+                                           c('Hispanic/Latino', 'hispanic'),
+                                           c('White', 'other')))
 register.ontology.mapping('cdc.aids.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian/alaska native', 'other'),
-                                           c('asian', 'other'),
-                                           c('black', 'black'),
-                                           c('hispanic', 'hispanic'),
-                                           c('bhite', 'other')))
-
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black', 'black'),
+                                           c('Hispanic', 'hispanic'),
+                                           c('White', 'other')))
 register.ontology.mapping('wonder.to.census.race.1',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian or alaska native', 'american indian or alaska native'),
-                                           c('asian or pacific islander', 'asian or pacific islander'),
-                                           c('black or african american', 'black'),
-                                           c('white', 'white')))
-
+                          mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
+                                           c('Asian or Pacific Islander', 'asian or pacific islander'),
+                                           c('Black or African American', 'black'),
+                                           c('White', 'white')))
+register.ontology.mapping('wonder.to.census.race.2',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
+                                           c('Asian or Pacific Islander', 'asian or pacific islander'),
+                                           c('Black or African American', 'black'),
+                                           c('White', 'white'),
+                                           c('More than one race', NA)))
+register.ontology.mapping('wonder.to.census.race.3',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('American Indian or Alaska Native', 'american indian or alaska native'),
+                                           c('Asian or Pacific Islander', 'asian or pacific islander'),
+                                           c('Black or African American', 'black'),
+                                           c('White', 'white'),
+                                           c('More than one race', NA),
+                                           c('Not Reported', NA),
+                                           c('Unknown or Not Stated', NA),
+                                           c('Not Available', NA)))
 register.ontology.mapping('wonder.to.census.ethnicity.1',
                           from.dimensions = 'ethnicity',
                           to.dimensions = 'ethnicity',
-                          mappings = rbind(c('hispanic or latino', 'hispanic'),
-                                           c('not hispanic or latino', 'not hispanic')))
-
+                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
+                                           c('Not Hispanic or Latino', 'not hispanic'),
+                                           c('Unknown or Not Stated', NA),
+                                           c('Not Stated', NA)))
+register.ontology.mapping('wonder.to.census.ethnicity.2',
+                          from.dimensions = 'ethnicity',
+                          to.dimensions = 'ethnicity',
+                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
+                                           c('Not Hispanic or Latino', 'not hispanic')))
 register.ontology.mapping('census.to.jheem.race',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
@@ -95,103 +136,107 @@ register.ontology.mapping('census.to.jheem.race',
                                            c('american indian or alaska native', 'not hispanic', 'other'),
                                            c('asian or pacific islander', 'hispanic', 'hispanic'),
                                            c('asian or pacific islander', 'not hispanic', 'other')))
-
+# register.ontology.mapping('census.to.jheem.race.only',
+#                           from.dimensions = c('race'),
+#                           to.dimensions = 'race',
+#                           mappings = rbind(c('white', 'other'),
+#                                            c('black', 'black'),
+#                                            c('american indian or alaska native',  'other'),
+#                                            c('asian or pacific islander', 'other')))
 register.ontology.mapping('census.to.jheem.ethnicity.only',
                           from.dimensions = c('race'),
                           to.dimensions = 'race',
                           mappings = rbind(c('hispanic', 'hispanic'),
                                            c('not hispanic', 'other')))
-
 register.ontology.mapping('wonder.to.jheem.race',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
-                          mappings = rbind(c('white', 'hispanic or latino', 'hispanic'),
-                                           c('white', 'not hispanic or latino', 'other'),
-                                           c('black or african american', 'hispanic or latino', 'hispanic'),
-                                           c('black or african american', 'not hispanic or latino', 'black'),
-                                           c('american indian or alaska native', 'hispanic or latino', 'hispanic'),
-                                           c('american indian or alaska native', 'not hispanic or latino', 'other'),
-                                           c('asian or pacific islander', 'hispanic or latino', 'hispanic'),
-                                           c('asian or pacific islander', 'not hispanic or latino', 'other')))
-
+                          mappings = rbind(c('White', 'Hispanic or Latino', 'hispanic'),
+                                           c('White', 'Not Hispanic or Latino', 'other'),
+                                           c('Black or African American', 'Hispanic or Latino', 'hispanic'),
+                                           c('Black or African American', 'Not Hispanic or Latino', 'black'),
+                                           c('American Indian or Alaska Native', 'Hispanic or Latino', 'hispanic'),
+                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'other'),
+                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'hispanic'),
+                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'other'),
+                                           c('More than one race','Hispanic or Latino','hispanic'),
+                                           c('More than one race','Not Hispanic or Latino','other')))
 register.ontology.mapping('wonder.to.jheem.race.2',
                           from.dimensions = c('race'),
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian/alaska native', 'other'),
-                                           c('asian', 'other'),
-                                           c('black', 'black'),
-                                           c('hispanic', 'hispanic'),
-                                           c('white', 'other')))
-
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black', 'black'),
+                                           c('Hispanic', 'hispanic'),
+                                           c('White', 'other'),
+                                           c('Unknown', 'other')))
 register.ontology.mapping('jheem.to.cdc.sex',
                           from.dimensions = 'sex',
                           to.dimensions = 'sex',
                           mappings = rbind(c('heterosexual_male', 'male'),
                                            c('msm', 'male'),
                                            c('female', 'female')))
-
 register.ontology.mapping('census.immigration.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('hispanic or latino', 'hispanic'),
-                                           c('white, non-hispanic', 'white'),
-                                           c('black', 'black'),
-                                           c('other', 'other'))) # needed?
-
+                          mappings = rbind(c('Hispanic or Latino', 'hispanic'),
+                                           c('White, Non-Hispanic', 'white'),
+                                           c('Black', 'black'),
+                                           c('Other', 'other'))) # needed?
 register.ontology.mapping('emory.sex.to.cdc.sex.temporary',
                           from.dimensions = 'sex',
                           to.dimensions = 'sex',
                           mappings = rbind(c('male', 'male'),
                                            c(NA, 'female')))
-
 register.ontology.mapping('proportion.tested.to.adult.population',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian or alaska native', 'hispanic or latino', 'hispanic'),
-                                           c('american indian or alaska native', 'not hispanic or latino', 'american indian/alaska native'),
-                                           c('asian or pacific islander', 'hispanic or latino', 'hispanic'),
-                                           c('asian or pacific islander', 'not hispanic or latino', 'asian/pacific islander'),
-                                           c('black or african american', 'hispanic or latino', 'hispanic'),
-                                           c('black or african american', 'not hispanic or latino', 'black'),
-                                           c('white','hispanic or latino','hispanic'),
-                                           c('white','not hispanic or latino','White'),
+                          mappings = rbind(c('American Indian or Alaska Native', 'Hispanic or Latino', 'Hispanic'),
+                                           c('American Indian or Alaska Native', 'Not Hispanic or Latino', 'American Indian/Alaska Native'),
+                                           c('Asian or Pacific Islander', 'Hispanic or Latino', 'Hispanic'),
+                                           c('Asian or Pacific Islander', 'Not Hispanic or Latino', 'Asian/Pacific Islander'),
+                                           c('Black or African American', 'Hispanic or Latino', 'Hispanic'),
+                                           c('Black or African American', 'Not Hispanic or Latino', 'Black'),
+                                           c('More than one race', 'Hispanic or Latino', 'Hispanic'),
+                                           c('More than one race', 'Not Hispanic or Latino', 'Multiracial'),
+                                           c('White','Hispanic or Latino','Hispanic'),
+                                           c('White','Not Hispanic or Latino','White'),
                                            c(NA, NA, 'other')))
-
 register.ontology.mapping('proportion.tested.to.adult.population.2',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian/alaska native', 'american indian/alaska native'),
-                                           c('asian', 'asian/pacific islander'),
-                                           c('black', 'black'),
-                                           c('hispanic', 'hispanic'),
-                                           c('native hawaiian/other pacific islander', 'asian/pacific islander'),
-                                           c('other race', 'other'),
-                                           c('white', 'white')))
-
+                          mappings = rbind(c('American Indian/Alaska Native', 'American Indian/Alaska Native'),
+                                           c('Asian', 'Asian/Pacific Islander'),
+                                           c('Black', 'Black'),
+                                           c('Hispanic', 'Hispanic'),
+                                           c('Multiracial', 'Multiracial'),
+                                           c('Native Hawaiian/Other Pacific Islander', 'Asian/Pacific Islander'),
+                                           c('Other race', 'other'),
+                                           c('White', 'White')))
 register.ontology.mapping('proportion.tested.to.jheem.race',
                           from.dimension = 'race',
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian/alaska native', 'other'),
-                                           c('asian', 'other'),
-                                           c('black', 'black'),
-                                           c('hispanic', 'hispanic'),
-                                           c('native hawaiian/other pacific islander', 'other'),
-                                           c('other race', 'other'),
-                                           c('white', 'other')))
-
+                          mappings = rbind(c('American Indian/Alaska Native', 'other'),
+                                           c('Asian', 'other'),
+                                           c('Black', 'black'),
+                                           c('Hispanic', 'hispanic'),
+                                           #c('Multiracial', 'other'),
+                                           c('Native Hawaiian/Other Pacific Islander', 'other'),
+                                           c('Other race', 'other'),
+                                           c('White', 'other')))
 register.ontology.mapping('census.to.brfss.race.ethnicity',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions = 'race',
-                          mappings = rbind(c('american indian or alaska native', 'hispanic', 'hispanic'),
-                                           c('american indian or alaska native', 'not hispanic', 'american indian/alaska native'),
-                                           c('asian or pacific islander', 'hispanic', 'hispanic'),
-                                           c('asian or pacific islander', 'not hispanic', 'asian/pacific islander'),
-                                           c('black', 'hispanic', 'hispanic'),
-                                           c('black', 'not hispanic', 'black'),
-                                           c('white', 'hispanic', 'hispanic'),
-                                           c('white', 'not hispanic', 'white'),
+                          mappings = rbind(c('american indian or alaska native', 'hispanic', 'Hispanic'),
+                                           c('american indian or alaska native', 'not hispanic', 'American Indian/Alaska Native'),
+                                           c('asian or pacific islander', 'hispanic', 'Hispanic'),
+                                           c('asian or pacific islander', 'not hispanic', 'Asian/Pacific Islander'),
+                                           c('black', 'hispanic', 'Hispanic'),
+                                           c('black', 'not hispanic', 'Black'),
+                                           c('white', 'hispanic', 'Hispanic'),
+                                           c('white', 'not hispanic', 'White'),
+                                           c(NA, NA, 'Multiracial'),
                                            c(NA, NA, 'other')))
-
 register.ontology.mapping('nhanes.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
@@ -199,17 +244,16 @@ register.ontology.mapping('nhanes.to.jheem.race',
                                            c('hispanic', 'hispanic'),
                                            c('other', 'other'),
                                            c('white, non hispanic', 'other')))
-
 register.ontology.mapping('stratified.census.to.census.race',
                           from.dimensions = c('race', 'ethnicity'),
                           to.dimensions =  c('race', 'ethnicity'),
-                          mappings = rbind(c('american indian and alaska native', 'hispanic', 'american indian or alaska native', 'hispanic'),
-                                           c('american indian and alaska native', 'not hispanic', 'american indian or alaska native', 'not hispanic'),
-                                           c('asian', 'hispanic', 'asian or pacific islander', 'hispanic'),
-                                           c('asian', 'not hispanic', 'asian or pacific islander', 'not hispanic'),
-                                           c('black', 'hispanic', 'black', 'hispanic'),
-                                           c('black', 'not hispanic', 'black', 'not hispanic'),
-                                           c('native hawaiian and other pacific islander', 'hispanic', 'asian or pacific islander', 'hispanic'),
-                                           c('native hawaiian and other pacific islander', 'not hispanic', 'asian or pacific islander', 'not hispanic'),
-                                           c('white', 'hispanic', 'white', 'hispanic'),
-                                           c('white', 'not hispanic', 'white', 'not hispanic')))
+                          mappings = rbind(c('American Indian and Alaska Native', 'Hispanic', 'american indian or alaska native', 'hispanic'),
+                                           c('American Indian and Alaska Native', 'Not Hispanic', 'american indian or alaska native', 'not hispanic'),
+                                           c('Asian', 'Hispanic', 'asian or pacific islander', 'hispanic'),
+                                           c('Asian', 'Not Hispanic', 'asian or pacific islander', 'not hispanic'),
+                                           c('Black', 'Hispanic', 'black', 'hispanic'),
+                                           c('Black', 'Not Hispanic', 'black', 'not hispanic'),
+                                           c('Native Hawaiian and Other Pacific Islander', 'Hispanic', 'asian or pacific islander', 'hispanic'),
+                                           c('Native Hawaiian and Other Pacific Islander', 'Not Hispanic', 'asian or pacific islander', 'not hispanic'),
+                                           c('White', 'Hispanic', 'white', 'hispanic'),
+                                           c('White', 'Not Hispanic', 'white', 'not hispanic')))
