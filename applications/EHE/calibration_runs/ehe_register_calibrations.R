@@ -29,7 +29,7 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
                           parameter.names = par.names.pop,
                           n.iter = N.ITER,
                           thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.03), 
+                          fixed.initial.parameter.values = c(global.trate=0.13), 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get population parameters in the general vicinity"
