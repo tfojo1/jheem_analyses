@@ -11,8 +11,8 @@ source('../jheem_analyses/commoncode/cache_manager.R')
 
 # Make sure that the jheem2 version is up-to-date
 # library(jheem2)
-
 source('../jheem2/R/tests/source_jheem2_package.R')
+clear.all.managers()
 source('../jheem_analyses/commoncode/file_paths.R')
 set.jheem.root.directory(ROOT.DIR)
 
