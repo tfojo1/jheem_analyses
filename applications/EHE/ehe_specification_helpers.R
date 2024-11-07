@@ -232,9 +232,9 @@ do.get.empiric.hiv.aging.rates <- function(location,
         c('idu', 'female', 'IDU_in_remission', 'female'),
         
         c('heterosexual', 'male', 'never_IDU','heterosexual_male'),
-        c('heterosexual', 'female', 'never_IDU','female'),
-        c('other', 'male', 'never_IDU','heterosexual_male'),
-        c('other', 'female', 'never_IDU','female')
+        c('heterosexual', 'female', 'never_IDU','female')
+        # c('other', 'male', 'never_IDU','heterosexual_male'),
+        # c('other', 'female', 'never_IDU','female')
       )
       
     )
@@ -384,6 +384,12 @@ do.get.empiric.hiv.aging.rates <- function(location,
                                                    desired.times = years)
     names(interpolated.aging.rates.by.year) = names(years)
     
+    for (i in (1:length(interpolated.aging.rates.by.year))[-1])
+    {
+        interpolated.aging.rates.by.year[[i]] = array.access(interpolated.aging.rates.by.year[[i]],
+                                                             dimnames(interpolated.aging.rates.by.year[[1]]))
+    }
+    
     interpolated.aging.rates.by.year
 }
 
@@ -493,7 +499,6 @@ get.best.guess.msm.proportions <- function(location,
     if (is.null(ages))
         ages = dimnames(males)$age
         
-    
     flat.census.reth = c(dimnames(males)$race, 'hispanic')
     flat.census.reth.mapping = create.ontology.mapping(
         from.dimensions = c('race','ethnicity'),
@@ -520,13 +525,12 @@ get.best.guess.msm.proportions <- function(location,
     raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
     
     proportions.msm.by.race = c(
-        white = as.numeric(raw.proportion.msm.by.race['White']),
-        black = as.numeric(raw.proportion.msm.by.race['Black']),
-        'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['American Indian/Alaska Native']),
-        'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['Asian'] + .1*raw.proportion.msm.by.race['Native Hawaiian/Other Pacific Islander']),
-        hispanic = as.numeric(raw.proportion.msm.by.race['Hispanic'])
+        white = as.numeric(raw.proportion.msm.by.race['white']),
+        black = as.numeric(raw.proportion.msm.by.race['black']),
+        'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['american indian/alaska native']),
+        'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['native hawaiian/other pacific islander']),
+        hispanic = as.numeric(raw.proportion.msm.by.race['hispanic'])
     )
-    proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
     
     if (all(is.na(proportions.msm.by.race)))
         stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
@@ -754,6 +758,7 @@ get.location.birth.rates <- function(location,
     
     # Map the ontologies
     target.dim.names = specification.metadata$dim.names[c('race')]
+
     rv = map.value.ontology(births, target.dim.names=target.dim.names) / 
         map.value.ontology(population, target.dim.names=target.dim.names)
     
@@ -798,6 +803,7 @@ get.location.mortality.rates <- function(location,
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two
     target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
+
     rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
         map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
     
