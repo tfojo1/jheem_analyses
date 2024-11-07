@@ -58,16 +58,19 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
     stop("We need to specify what to do with more than one location")
   
   if (location == 'US'){
-    # browser()
     counties = 'US'
+    #' @ZOE
+    pop = CENSUS.MANAGER$pull(outcome = 'population', 
+                              dimension.values = list(year = years, location = counties, sex = sex),
+                              keep.dimensions = c('age', 'race', 'ethnicity', 'sex'),
+                              from.ontology.names = 'stratified.census') / length(years)
   }else{
     counties = locations::get.contained.locations(location, 'county')
+    pop = CENSUS.MANAGER$pull(outcome = 'population', 
+                              dimension.values = list(year = years, location = counties, sex = sex),
+                              keep.dimensions = c('age', 'race', 'ethnicity', 'sex'),
+                              from.ontology.names = 'census') / length(years)
   }
-  #SHIELD Version
-  pop = CENSUS.MANAGER$pull(outcome = 'population', 
-                            dimension.values = list(year = years, location = counties, sex = sex),
-                            keep.dimensions = c('age', 'race', 'ethnicity', 'sex'),
-                            from.ontology.names = 'census') / length(years)
   
   if (length(pop)==0)
     stop("We couldn't find any population data in the census manager")
@@ -120,14 +123,20 @@ get.best.guess.msm.proportions <- function(location,
                                            keep.race = T,
                                            return.proportions = T)
 {
-  counties = locations::get.contained.locations(location, 'county')
-  states = locations::get.overlapping.locations(location, 'state')
-  
+  if (location=='US'){
+    counties='US'
+    states='US'
+  }else{
+    counties = locations::get.contained.locations(location, 'county')
+    states = locations::get.overlapping.locations(location, 'state')
+  }
   #step1: Get county-level proportions of male who are MSM (available from EMORY)
   # this is the total count for each county-not broken down by age/race
   proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
                                                        dimension.values = list(location=counties,
-                                                                               sex='male'))
+                                                                               sex='male'),
+                                                       sources = 'emory')
+  
   if (is.null(proportion.msm.by.county) || !setequal(counties, dimnames(proportion.msm.by.county)$location))
     stop(paste0("Cannot get best-guess msm proportions: we don't have data on proportion msm for all counties in location '", location, "'"))
   
@@ -137,12 +146,21 @@ get.best.guess.msm.proportions <- function(location,
   
   # step2: get total population of male 
   # Get number male and flatten race/ethnicity
-  males = CENSUS.MANAGER$pull(outcome = 'population',
+  #' @ZOE: there is no US data in census 
+  if (location=='US') {
+    males = CENSUS.MANAGER$pull(outcome = 'population',
                               keep.dimensions = c('location', 'age','race','ethnicity'),
                               dimension.values = list(location = counties,
                                                       year = years,
                                                       sex = 'male'),
-                              from.ontology.names = 'census')[,,,,1]
+                              from.ontology.names = 'stratified.census')[,,,,1]
+  }else{
+    males = CENSUS.MANAGER$pull(outcome = 'population',
+                                keep.dimensions = c('location', 'age','race','ethnicity'),
+                                dimension.values = list(location = counties,
+                                                        year = years,
+                                                        sex = 'male'),
+                                from.ontology.names = 'census')[,,,,1]}
   if (is.null(males))
     stop("Cannot get best-guess msm proportions: we are unable to pull any census data on the number of males")
   if (is.null(ages))
@@ -180,7 +198,7 @@ get.best.guess.msm.proportions <- function(location,
     'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['american indian/alaska native']),
     'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['native hawaiian/other pacific islander']), #assuming the combined group represents 90% asian and 10% pacific islander population
     hispanic = as.numeric(raw.proportion.msm.by.race['hispanic']))
-    proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
+  proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
   
   if (all(is.na(proportions.msm.by.race)))
     stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
@@ -191,7 +209,10 @@ get.best.guess.msm.proportions <- function(location,
   # then we compare the calculated proportion of msm with the original proportions reported from EMORY and scale it so that they agree
   # First guess at the number of MSM in each county:
   first.guess.n.msm = sapply(dimnames(males)$race, function(r){
-    males[,,r] * proportions.msm.by.race[r]
+    if (length(dim(males)) == 2) 
+            males[,r] * proportions.msm.by.race[r]# for the national model, we have 2 dimentions, age and race
+     else 
+          males[,,r] * proportions.msm.by.race[r]  # For local models, we have 3 dimensions, age, location, race
   })
   dim.names = dimnames(males)
   dim(first.guess.n.msm) = sapply(dim.names, length)
@@ -201,7 +222,11 @@ get.best.guess.msm.proportions <- function(location,
   parsed.census.ages = parse.age.strata.names(dimnames(first.guess.n.msm)$age)
   adult.mask = parsed.census.ages$lower >=13 #emory only reports proporiton of msm among adult male
   
-  first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,]) / rowSums(males[,adult.mask,]) 
+  if(length(dim(first.guess.n.msm)) == 2){ #national model:
+    first.guess.p.by.county = rowSums(first.guess.n.msm[adult.mask,]) / rowSums(males[adult.mask,]) 
+  }else{ #local models
+    first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,]) / rowSums(males[,adult.mask,]) }
+  
   scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county 
   
   fitted.n.msm = first.guess.n.msm * scale.factor.by.county 
@@ -483,11 +508,11 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
   )
   
   mapped.births=map.value.ontology(births, 
-                                           target.dim.names = target.dimnames,
-                                           na.rm = TRUE)
-  mapped.female.population=map.value.ontology(female.population, 
                                    target.dim.names = target.dimnames,
                                    na.rm = TRUE)
+  mapped.female.population=map.value.ontology(female.population, 
+                                              target.dim.names = target.dimnames,
+                                              na.rm = TRUE)
   mapped.fertility.rate=mapped.births/mapped.female.population
   
   return(mapped.fertility.rate)
@@ -523,7 +548,7 @@ get.location.mortality.rates <- function(location,
   # Note: Some MSAs span over multiple states (e.g., Washington DC  ).
   # To estimate the MSA-level mortality rate, we extract the counties within each MSA, map these counties to their corresponding states,
   # and then take a weighted average of the state-level rates to approximate the MSA-level mortality rate.
-
+  
   if (location=='US'){
     #@Todd: I'm a bit uncertain about deaths vs metro.deaths at this point
     counties='US'
