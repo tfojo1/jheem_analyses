@@ -1,16 +1,29 @@
-JHEEM.DIR="~/OneDrive - Johns Hopkins/SHIELD/Simulation/code/jheem_analyses/"
+
+# Get the command-line arguments passed to the script
+args <- commandArgs(trailingOnly = TRUE)
+
+# Check if an argument was provided (in this case, checking if it's not empty)
+if (length(args) > 0 && args[1] != "rockfish") {
+  # If the first argument is not empty, use it as the working directory
+  JHEEM.DIR="/home/pkasaie1/scratch4-pkasaie1/jheem_analyses"
+} else {
+  # If no argument is provided, print a message and don't change the working directory
+  JHEEM.DIR="~/OneDrive - Johns Hopkins/SHIELD/Simulation/code/jheem_analyses/"
+}
 setwd(JHEEM.DIR)
+cat("Working directory set to:", getwd(), "\n")
 
-source('../jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
-# Set up ----
+###############################################
 {
   LOCATION='C.12580'
   set.seed(12345)
-  CALIBRATION.NAME = 'pop.demog.shield.wAging' 
+  CALIBRATION.NAME = 'pop.demog.shield.wAging.rockfish' 
   print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
   #
+  source('../jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R')
+  source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
+    #
   clear.calibration.cache(version='shield',
                           location=LOCATION,
                           calibration.code = CALIBRATION.NAME,

@@ -40,6 +40,7 @@ params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
 #Outcomes
+simplot(sim,"population" )
 sim$births.from
 sim$total.mortality
 

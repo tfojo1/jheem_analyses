@@ -7,7 +7,7 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
-CALIBRATION.NAME = 'pop.demog.shield.wAging'
+CALIBRATION.NAME = 'pop.demog.shield.wAging.rockfish'
 N.ITER = 15000
 # which subset of parameters should we use for calibration?
 PARAMETER.NAMES = c(
@@ -30,5 +30,6 @@ register.calibration.info(CALIBRATION.NAME,
 )
 
 # it will save the runs in the root directory : get.jheem.root.directory()
-cat("*** Shiled_register_calibration.R completed!***\n")
+cat("Calibration code registered for ", CALIBRATION.NAME,"  with ",N.ITER," itterations \n")
+# cat("*** Shiled_register_calibration.R completed!***\n")
 

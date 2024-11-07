@@ -1,4 +1,6 @@
 cat("*** Running Shiled_specification.R ***\n")
+DEFAULT.FIX.STRATA.YEAR=2007 # full population breakdown is available post-2010, and birth data is available post 2007. 
+
 #CASHED FOLDER:
 # https://livejohnshopkins-my.sharepoint.com/personal/tfojo1_jh_edu/_layouts/15/onedrive.aspx?e=5%3A940bf48ba6e0498495fea5596e3dc8e7&sharingv2=true&fromShare=true&at=9&CID=425e54af%2De78b%2D4d53%2D8df4%2D6abb10af6339&id=%2Fpersonal%2Ftfojo1%5Fjh%5Fedu%2FDocuments%2FJHEEM2&FolderCTID=0x012000E74D427C3A55BC45A1C18C850CDA2DB4&view=0
 # Excel Sheet:
@@ -56,13 +58,10 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
 # 2007 earliest year for complete census data
 register.fixed.model.strata(SHIELD.SPECIFICATION,
                             applies.after.time = -Inf,
-                            applies.before.time = 2007,
+                            applies.before.time = DEFAULT.FIX.STRATA.YEAR,
                             fix.strata = T,
                             dimensions.to.fix = c('location','age','race','sex')
 )
-
-
-
 #-- INITIAL POPULATION --#----
 # Specify the initial compartment sizes  
 ##---- Base Population ----
@@ -144,7 +143,7 @@ register.natality(specification = SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fertility.rate',
                        get.functional.form.function = get.fertility.rates.functional.form,
-                       functional.form.from.time = DEFAULT.POPULATION.YEARS,
+                       functional.form.from.time = DEFAULT.POPULATION.YEARS, #only projects values from 2010 forward
                        scale = 'rate')
 
 ##---- Birth Proportions ----

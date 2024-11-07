@@ -64,7 +64,6 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
     counties = locations::get.contained.locations(location, 'county')
   }
   #SHIELD Version
-
   pop = CENSUS.MANAGER$pull(outcome = 'population', 
                             dimension.values = list(year = years, location = counties, sex = sex),
                             keep.dimensions = c('age', 'race', 'ethnicity', 'sex'),
@@ -98,24 +97,13 @@ get.proportion.msm.of.male.by.race.functional.form <- function(location, specifi
                                                           years = DEFAULT.POPULATION.YEARS,
                                                           keep.race = T,
                                                           keep.age = F)
-  
-  # best.guess.proportions = get.best.guess.msm.proportions.by.race(location,
-  #                                                                 specification.metadata = specification.metadata,
-  #                                                                 years = DEFAULT.POPULATION.YEARS,
-  #                                                                 min.age = specification.metadata$age.lower.bounds[1],
-  #                                                                 return.proportions = T)
-  
-  #best.guess.proportions = array(best.guess.proportions,
-  #                               dim=c(race=length(best.guess.proportions)),
-  #                               dimnames=list(race=names(best.guess.proportions)))
-  
   create.static.functional.form(best.guess.proportions,
                                 link = 'log',
                                 value.is.on.transformed.scale = F)
 }
 #'
 #' @title get.best.guess.msm.proportions
-#' @description generates proportion of male who are msm by race
+#' @description generates proportion of male who are msm 
 #' @param location location
 #' @param specification.metadata specification.metadata
 #' @param years years  
@@ -134,7 +122,9 @@ get.best.guess.msm.proportions <- function(location,
 {
   counties = locations::get.contained.locations(location, 'county')
   states = locations::get.overlapping.locations(location, 'state')
-   # Get county-level proportions
+  
+  #step1: Get county-level proportions of male who are MSM (available from EMORY)
+  # this is the total count for each county-not broken down by age/race
   proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
                                                        dimension.values = list(location=counties,
                                                                                sex='male'))
@@ -145,6 +135,7 @@ get.best.guess.msm.proportions <- function(location,
   if (any(is.na(proportion.msm.by.county)))
     stop(paste0("Cannot get best-guess msm proportions: we don't have data on proportion msm for all counties in location '", location, "' (we get some NAs)"))
   
+  # step2: get total population of male 
   # Get number male and flatten race/ethnicity
   males = CENSUS.MANAGER$pull(outcome = 'population',
                               keep.dimensions = c('location', 'age','race','ethnicity'),
@@ -152,14 +143,13 @@ get.best.guess.msm.proportions <- function(location,
                                                       year = years,
                                                       sex = 'male'),
                               from.ontology.names = 'census')[,,,,1]
-  
   if (is.null(males))
     stop("Cannot get best-guess msm proportions: we are unable to pull any census data on the number of males")
-  
   if (is.null(ages))
     ages = dimnames(males)$age
   
-  
+  #step 3: define the onthology mapping to remove ethnicity (we are trying to align data with proportion.msm below)
+  #converts race/ethnicity to race only
   flat.census.reth = c(dimnames(males)$race, 'hispanic')
   flat.census.reth.mapping = create.ontology.mapping(
     from.dimensions = c('race','ethnicity'),
@@ -171,13 +161,11 @@ get.best.guess.msm.proportions <- function(location,
       cbind(dimnames(males)$race,
             'hispanic',
             'hispanic')
-    )
-  )
-  
-  
+    ))
   males = flat.census.reth.mapping$apply(males)
   males[males==0] = 1
   
+  # step4: read proportion of msm by race from BRFSS
   # Estimate a proportion msm for each race
   raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
                                                          keep.dimensions = c('year','location','race'),
@@ -185,31 +173,23 @@ get.best.guess.msm.proportions <- function(location,
                                                                                  sex = 'male'))
   raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
   
-  #@Todd: I think that we should replace this function and link it somehow to an onthology function to keep the code generalizable 
+  # step5: Manually build the racial proportions by  weighting different groups in BRFSS 
   proportions.msm.by.race = c(
     white = as.numeric(raw.proportion.msm.by.race['white']),
     black = as.numeric(raw.proportion.msm.by.race['black']),
     'american indian or alaska native' = as.numeric(raw.proportion.msm.by.race['american indian/alaska native']),
-<<<<<<< HEAD
-    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['bative hawaiian/other pacific islander']),
-    hispanic = as.numeric(raw.proportion.msm.by.race['hispanic'])
-  )
-  #@Todd: do we need this? 
-  # proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
-  #####
-=======
-    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['native hawaiian/other pacific islander']),
-    hispanic = as.numeric(raw.proportion.msm.by.race['hispanic'])
-  )
-#  proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
->>>>>>> 45be3128865b58f2655f1c6cc115014a5b83bb05
+    'asian or pacific islander' = sum(.9*raw.proportion.msm.by.race['asian'] + .1*raw.proportion.msm.by.race['native hawaiian/other pacific islander']), #assuming the combined group represents 90% asian and 10% pacific islander population
+    hispanic = as.numeric(raw.proportion.msm.by.race['hispanic']))
+    proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(raw.proportion.msm.by.race[c('Other race','Multiracial')])
   
   if (all(is.na(proportions.msm.by.race)))
     stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
   
   proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(proportions.msm.by.race[setdiff(names(proportions.msm.by.race), 'american indian or alaska native')], na.rm=T)
   
-  # Make a guess as to the n msm
+  # step6: now that we have sorted out the dimensions, we can use the race.specific estiamtes from BRFSS and apply them to the male population in each county
+  # then we compare the calculated proportion of msm with the original proportions reported from EMORY and scale it so that they agree
+  # First guess at the number of MSM in each county:
   first.guess.n.msm = sapply(dimnames(males)$race, function(r){
     males[,,r] * proportions.msm.by.race[r]
   })
@@ -217,28 +197,28 @@ get.best.guess.msm.proportions <- function(location,
   dim(first.guess.n.msm) = sapply(dim.names, length)
   dimnames(first.guess.n.msm) = dim.names
   
-  # Scale it to hit the overall proportions in each msm
+  # Scale it to hit the overall proportions in each msm 
   parsed.census.ages = parse.age.strata.names(dimnames(first.guess.n.msm)$age)
-  adult.mask = parsed.census.ages$lower >=13
+  adult.mask = parsed.census.ages$lower >=13 #emory only reports proporiton of msm among adult male
   
-  first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,]) / rowSums(males[,adult.mask,])
-  scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county
+  first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,]) / rowSums(males[,adult.mask,]) 
+  scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county 
   
-  fitted.n.msm = first.guess.n.msm * scale.factor.by.county
+  fitted.n.msm = first.guess.n.msm * scale.factor.by.county 
+  # This method ensures that the final estimates align with both the overall MSM proportion from Emory and the racial distribution from BRFSS, 
+  # capturing both racial heterogeneity and county-level variation
   
-  # Map races
+  # step7: reporting: 
   if (keep.race)
   {
     race.mapping = get.ontology.mapping(from.ontology = dimnames(males)['race'],
                                         to.ontology = specification.metadata$dim.names['race'])
     if (is.null(race.mapping))
       stop("Cannot get best-guess msm proportions: we don't have a mapping from census races to the specification's races")
-    
     fitted.n.msm = race.mapping$apply(fitted.n.msm)
     if (return.proportions)
       males = race.mapping$apply(males)
   }
-  
   # Map ages
   age.mapping = get.ontology.mapping(from.ontology = dimnames(males)['age'],
                                      to.ontology = list(age=ages))
@@ -483,6 +463,14 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
   if (is.null(fertility.rate))
     stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
                 locations::get.location.name(location), ")"))
+  female.population=CENSUS.MANAGER$pull(outcome='female.population',
+                                        location = counties,
+                                        year= population.years,
+                                        keep.dimensions = c('location','age','race', 'ethnicity','year'),  
+                                        na.rm=TRUE)
+  
+  female.population[is.na(fertility.rate)]<-NA #we assume anywhere that fertility rate is NA, female population should be NA (ptherwise we count them in denom without accessing their birth ifo)
+  births=fertility.rate*female.population
   
   #2-map the dimensions to the target dimensions
   # target.dimnames: we set this manually to include female of childbearing ages and correct years
@@ -494,10 +482,13 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
     year = as.character(population.years)
   )
   
-  mapped.fertility.rate=map.value.ontology(fertility.rate, 
+  mapped.births=map.value.ontology(births, 
                                            target.dim.names = target.dimnames,
                                            na.rm = TRUE)
-  
+  mapped.female.population=map.value.ontology(female.population, 
+                                   target.dim.names = target.dimnames,
+                                   na.rm = TRUE)
+  mapped.fertility.rate=mapped.births/mapped.female.population
   
   return(mapped.fertility.rate)
 }
