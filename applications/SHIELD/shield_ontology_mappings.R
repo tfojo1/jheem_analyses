@@ -169,6 +169,19 @@ register.ontology.mapping('census.to.brfss.race.ethnicity',
                                            c('white', 'not hispanic', 'white'),
                                            c(NA, NA, 'other')))
 
+register.ontology.mapping('brfss.to.census.race',
+                          from.dimension = 'race',
+                          to.dimension = 'race',
+                          mappings = rbind(
+                            c('american indian/alaska native', 'american indian and alaska native'),
+                            c('asian', 'asian'),
+                            c('black', 'black'),
+                            c('hispanic', 'hispanic'),
+                            c('native hawaiian/other pacific islander', 'native hawaiian and other pacific islander'),
+                            c('other race', NA),
+                            c('white', 'white')
+                          ))
+
 # NHANES & SHIELD ----
 #Maps NHANES racial groups to those used in SHIELD
 register.ontology.mapping('nhanes.to.SHIELD.race',
