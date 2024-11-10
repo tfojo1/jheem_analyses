@@ -1,32 +1,38 @@
-# install.packages("httr")
-library(httr)
-
-#list of files to dowload
-download_filenames <- c("surveillance.manager.rdata",  
-                        "syphilis.manager.rdata")
-
-# Define the OneDrive shared link
-onedrive_link <- "https://livejohnshopkins-my.sharepoint.com/personal/tfojo1_jh_edu/_layouts/15/onedrive.aspx?e=5%3A70f42746096a483692d66c187b1a0b60&sharingv2=true&fromShare=true&at=9&CID=80c32991%2Dabc8%2D455b%2D8923%2D247eb8522d91&id=%2Fpersonal%2Ftfojo1%5Fjh%5Fedu%2FDocuments%2FJHEEM2%2Fcached&FolderCTID=0x012000E74D427C3A55BC45A1C18C850CDA2DB4&view=0"
+# install.packages("httr2")
+library(httr2)
 
 # Define the local download folder and filename
-download_folder <- "~/OneDrive-JohnsHopkins/SHIELD/Simulation/code/jheem_analyses/cashed/"
+download_folder <- "../jheem_analyses/cached/temp"
 
 # Create the directory if it doesn't exist
 if (!dir.exists(download_folder)) {
-  dir.create(download_folder, recursive = TRUE)
+    dir.create(download_folder, recursive = TRUE)
 }
 
-# Make an HTTP GET request to download the file
-response <- GET(onedrive_link)
+# list of files to download
+download_filenames <- c("surveillance_manager.rdata",
+                        "syphilis_manager.rdata")
 
-# Check if the request was successful
-if (status_code(response) == 200) {
-  lapply(1:length(download_filenames), function(i){
-    download_path <- file.path(download_folder, download_filenames[i])
-    # Write the downloaded content to a file
-    writeBin(content(response, "raw"), download_path)
-    cat("File downloaded successfully to:", download_path, "\n")
-  })
-} else {
-  cat("Failed to download the file. HTTP Status:", status_code(response), "\n")
+# Define the Onedrive shared links
+onedrive_links <- c(
+    paste0(
+        "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EQS1u_TFlkpCrsv5vhMlufoB7UmfiE2TYW04-CXSdAG4Xw?e=Qdupwm",
+        "&download=1"),
+    paste0(
+        "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/Ea6-pTjU9VZOqh4BFkEZjcEBr092GiFiU2KmBk5D3b6AvA?e=dhkQUF",
+        "&download=1"
+    ))
+
+# Make an HTTP GET request to download the file and save response
+for (i in seq_along(download_filenames))
+{
+    req = request(onedrive_links[i])
+    resp = req |> req_perform()
+    if (resp_status(resp)==200) {
+        download_path = file.path(download_folder, download_filenames[i])
+        writeBin(resp_body_raw(resp), download_path)
+        cat("File downloaded successfully to:", download_path, "\n")
+    } else {
+        cat("Failed to download the file. HTTP Status:", resp_status(resp), "\n")
+    }
 }

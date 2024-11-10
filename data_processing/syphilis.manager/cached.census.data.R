@@ -22,15 +22,6 @@ population.age.20.23 = as.data.frame.table(census.manager$data$population$estima
   mutate(age = as.character(age))%>%
   mutate(outcome = "population")
 
-#Sex 2010-19
-population.sex.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__sex)%>%
-  rename(value = Freq)%>%
-  mutate(year = as.character(year))%>%
-  mutate(location = as.character(location))%>%
-  mutate(value = as.numeric(value))%>%
-  mutate(sex = as.character(sex))%>%
-  mutate(outcome = "population")
-
 #Sex 2020-23
 population.sex.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__sex)%>%
   rename(value = Freq)%>%
@@ -39,25 +30,6 @@ population.sex.20.23 = as.data.frame.table(census.manager$data$population$estima
   mutate(value = as.numeric(value))%>%
   mutate(sex = as.character(sex))%>%
   mutate(outcome = "population")
-
-#Race 2010-2023
-population.race = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__race)%>%
-                rename(value = Freq)%>%
-                mutate(race = tolower(race))%>%
-                mutate(race = ifelse(race == "asian", "asian or pacific islander", race))%>%
-                mutate(race = ifelse(race == "native hawaiian and other pacific islander", "asian or pacific islander", race))%>%
-                 mutate(race = ifelse(race == "american indian and alaska native", "american indian or alaska native", race))%>%
-                group_by(year, location, race)%>%
-                mutate(new.value = sum(value))%>%
-                select(-value)%>%
-                rename(value = new.value)%>%
-                mutate(year = as.character(year))%>%
-                mutate(location = as.character(location))%>%
-                mutate(value = as.numeric(value))%>%
-                mutate(outcome = "population")%>%
-                mutate(race = tolower(race))
-
-population.race<- as.data.frame(population.race[!duplicated(population.race), ])
 
 #Age+Sex 20-23-ontology census data bc its single age 
 age.sex.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age__sex)%>%
@@ -74,8 +46,6 @@ population.data.list = list(
   population.total,
   population.age.20.23,
   population.sex.20.23,
-  population.sex.10.19,
-  population.race,
   age.sex.20.23
   
 )
@@ -103,6 +73,34 @@ population.age.10.19 = as.data.frame.table(census.manager$data$population$estima
   mutate(value = as.numeric(value))%>%
   mutate(age = as.character(age))%>%
   mutate(outcome = "population")
+
+#Sex 2010-19
+population.sex.10.19 = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__sex)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(outcome = "population")
+
+#Race 2010-2023
+population.race = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__race)%>%
+  rename(value = Freq)%>%
+  mutate(race = tolower(race))%>%
+  mutate(race = ifelse(race == "asian", "asian or pacific islander", race))%>%
+  mutate(race = ifelse(race == "native hawaiian and other pacific islander", "asian or pacific islander", race))%>%
+  mutate(race = ifelse(race == "american indian and alaska native", "american indian or alaska native", race))%>%
+  group_by(year, location, race)%>%
+  mutate(new.value = sum(value))%>%
+  select(-value)%>%
+  rename(value = new.value)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(outcome = "population")%>%
+  mutate(race = tolower(race))
+
+population.race<- as.data.frame(population.race[!duplicated(population.race), ])
 
 #Ethnicity 2010-2023
 population.ethnicity = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__ethnicity)%>%
@@ -187,18 +185,35 @@ age.eth = as.data.frame.table(census.manager$data$population$estimate$census.pop
   mutate(outcome = "population")%>%
   mutate(ethnicity = tolower(ethnicity))
 
+#Age+Race+Ethnicity+Sex 20102-2023
+age.race.eth.sex = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex)%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))%>%
+  mutate(location = as.character(location))%>%
+  mutate(value = as.numeric(value))%>%
+  mutate(age = as.character(age))%>%
+  mutate(sex = as.character(sex))%>%
+  mutate(ethnicity = as.character(ethnicity))%>%
+  mutate(race = as.character(race))%>%
+  mutate(outcome = "population")%>%
+  mutate(ethnicity = tolower(ethnicity))%>%
+  mutate(race = tolower(race))
+
 
 # Put for ontology = stratified census ------------------------------------
 #Combine
 population.stratified.census = list(
   population.age.10.19,
+  population.sex.10.19,
+  population.race,
   population.ethnicity,
   population.race.eth,
   age.race,
   age.eth,
   age.sex.10.19,
   population.race.eth.age,
-  population.race.eth.sex
+  population.race.eth.sex,
+  age.race.eth.sex
 )
 
 for (data in population.stratified.census) {

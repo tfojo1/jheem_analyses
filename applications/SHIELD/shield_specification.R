@@ -830,5 +830,5 @@ print("Calibration parameters registered for DEMOGRAPHIC model")
 print("SHIELD specification sourced successfully!")
 
 
-cat("*** Shiled_specification.R completed! ***\n")
+cat("*** Shield_specification.R completed! ***\n")
 
