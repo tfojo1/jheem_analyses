@@ -88,12 +88,12 @@ fertility.likelihood.instructions =
 #-- FULL LIKELIHOODS --# ----
 likelihood.instructions.demographics =  join.likelihood.instructions(
   population.likelihood.instructions ,
-  total.mortality.likelihood.instructions
-  # fertility.likelihood.instructions
-  # births.likelihood.instructions # DOEST RUN YET
+  total.mortality.likelihood.instructions,
+  fertility.likelihood.instructions
+  
 )
 #manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
 # lik=total.mortality.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
-# lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"US")
+# lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
 dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)

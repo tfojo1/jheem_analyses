@@ -439,6 +439,8 @@ get.fertility.rates.functional.form<-function(location, specification.metadata, 
   #define a spline function with 2 knots, and use a modifier to project forward
   ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
                                            knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above
+                                           knot.link = 'log',
+                                           knots.are.on.transformed.scale = F,
                                            #how to project forward:
                                            #since linear projections are too extreme, we multiply future prediction by a modifier set at 0.5
                                            after.time = 2030,
@@ -447,6 +449,7 @@ get.fertility.rates.functional.form<-function(location, specification.metadata, 
                                            min = 0 # this is to prevent values from falling below 0
                                            #@TODD: how does this modify the behavior
   )
+  return(ff)
   # we can run this to see the example plot:
   #ff=create.natural.spline.functional.form(knot.times = c(time1=2010, time2=2020),
   # knot.values = list(time1=knot1,time2=knot2), #estimated from linear regression above

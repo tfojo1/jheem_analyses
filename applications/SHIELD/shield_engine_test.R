@@ -30,7 +30,7 @@ location= "C.12580"
 # grep('US',dimnames(CENSUS.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)[2]) # TRUE
 
 
-# engine = create.jheem.engine('shield', "C.12580", 2025)
+engine = create.jheem.engine('shield', "C.12580", 2025)
 
 #@Todd: the national model still fails
 engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size
@@ -42,6 +42,8 @@ sim = engine$run(params)
 #Outcomes
 simplot(sim,"population" )
 sim$births.from
+simplot(sim,"fertility.rate")
+sim$fertility.rate
 sim$total.mortality
 
 simplot(sim,

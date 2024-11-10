@@ -661,6 +661,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          denominator.outcome = 'population',
                          keep.dimensions =  c('location','age','race'),
                          subset.dimension.values = list(sex='female'),
+                         corresponding.data.outcome = "fertility.rate",
                          outcome.metadata = create.outcome.metadata(display.name = 'Fetility Rate',
                                                                     description = "Fetility Rate",
                                                                     scale = 'rate',
@@ -684,6 +685,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                     keep.dimensions = c('location','age','race','sex'), #collapse on stage and continuum for infected and on profile as well
                     subset.dimension.values = list(sex='female') #this seems redundant but it filters all the male rows with 0 values.
                     )
+ 
 ## Deaths ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name='total.mortality',
