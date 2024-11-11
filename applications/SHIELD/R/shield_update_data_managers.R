@@ -2,7 +2,7 @@
 library(httr2)
 
 # Define the local download folder and filename
-download_folder <- "../jheem_analyses/cached"
+download_folder <- JHEEM.CACHE.DIR#"../jheem_analyses/cached"
 
 # Create the directory if it doesn't exist
 if (!dir.exists(download_folder)) {
