@@ -8,8 +8,8 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
 LOCATION='C.12580' #BALTIMORE.MSA
 CALIBRATION.CODE.TO.RUN='pop.demog.shield.wAging'
-DATE=Sys.Date()
-DATE="2024-11-07"
+# DATE=Sys.Date()
+DATE="2024-11-11"
 
 # completed mcmc? 
 # Reading from file:
@@ -20,14 +20,15 @@ simset=simset;simset
 # # reading from ongoing calibration: doesnt require a date
 # simset1 = assemble.simulations.from.calibration(version = 'shield',
 #                                                 location = LOCATION,
-#                                                 calibration.code = 'pop.demog.shield.wAging',
-#                                                 allow.incomplete = T)
-
-# 
+#                                                 calibration.code = CALIBRATION.CODE.TO.RUN,
+#                                                 allow.incomplete = T); 
 # simset=simset1
+
+
 simplot(simset$first.sim(),simset$last.sim(),
         outcomes = c("population"), 
-        dimension.values = list(year = 1940:2030)) 
+        # dimension.values = list(year = 1940:2030)) 
+        dimension.values = list(year = 2000:2030))
 simplot(simset$last.sim(),
         outcomes = c("population"), 
         dimension.values = list(year = 1940:2030)) 
@@ -35,16 +36,11 @@ simplot(simset,
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
 #mortality
-simplot(simset$last.sim(),
+simplot(simset$first.sim(),simset$last.sim(),
         outcomes = c("total.mortality"), 
         dimension.values = list(year = 1940:2030)) 
-
-sim=simset$last.sim()
-sim$total.mortality
-rowSums(sim$total.mortality)/rowSums(sim$population)
-
 # births
-simplot( simset,
+simplot( simset$first.sim(),simset$last.sim(),
          outcomes = c("births.from"), 
          dimension.values = list(year = 2000:2030)) 
 simplot( simset,
@@ -52,12 +48,18 @@ simplot( simset,
          dimension.values = list(year = 2000:2030)) 
 
 ## population by strata
-simplot(simset$last.sim(),
-        facet.by = "age", split.by = "race", 
+simplot(simset$first.sim(),simset$last.sim(),
+         # split.by = "race", 
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
-simplot( simset$last.sim(),
+simplot(simset$first.sim(),simset$last.sim(),
          outcomes = c("population"), 
          facet.by = "sex", split.by = "race", 
          dimension.values = list(year = 2000:2030)) 
+SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity['2023','C.12580',,]
+colSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__age__race__ethnicity['2023','C.12580',,,])
+apply(simset$last.sim()$population,c('year','race'),sum)
+# how to see likelihoods?
+si
 
+simset=copy.simulation.set(simset)

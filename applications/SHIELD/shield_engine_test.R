@@ -30,7 +30,7 @@ location= "C.12580"
 # grep('US',dimnames(CENSUS.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)[2]) # TRUE
 
 
-engine = create.jheem.engine('shield', "C.12580", 2025)
+engine = create.jheem.engine('shield', "C.12580", 2030)
 
 #@Todd: the national model still fails
 engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size
@@ -41,31 +41,26 @@ sim = engine$run(params)
 
 #Outcomes
 simplot(sim,"population" )
-sim$births.from
-simplot(sim,"fertility.rate")
-sim$fertility.rate
-sim$total.mortality
+simplot(sim,"population" ,
+        dimension.values = list(year = 2000:2030))
+#By 1 factor
+simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
+simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
+simplot(sim,"population", facet.by = "race", dimension.values = list(year = 2000:2030))
+# By 2 factors
+simplot(sim,"population",
+        facet.by = "age", split.by ="race", dimension.values = list(year = 2000:2030))
+simplot(sim,"population", 
+        facet.by = "age", split.by ="sex", dimension.values = list(year = 2000:2030))
 
+# simplot(sim,"fertility.rate") #ERROR
+
+simplot(sim,"total.mortality")
+simplot(sim,"total.mortality",
+        dimension.values = list(year = 2000:2030))
+
+# we dont have data: 
 simplot(sim,
         outcomes = c("births.from"), 
         facet.by = "age", split.by = "race", 
         dimension.values = list(year = 2000:2030)) 
-
-
-simplot(sim1,
-        outcomes = c("total.mortality"), 
-        facet.by = "age", split.by = "race", 
-        dimension.values = list(year = 2000:2030)) 
-simplot(sim1,
-        outcomes = c("population"), 
-        facet.by = "age", split.by = "race", 
-        dimension.values = list(year = 2000:2030)) 
-
-#plotting:
-#population data for Baltimore MSA
-# SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[, "C.12580"]
-simplot(c(sim,sim1),"population",data.manager = SURVEILLANCE.MANAGER,facet.by = c('age'),split.by = c('race'),dimension.values = list('age'='0-14 years',year = 2000:2030) ) #still doesnt plot the data
-
-simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER,facet.by = c('sex') )
-simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER,facet.by = c('age') )
-simplot(sim,"population",data.manager = SURVEILLANCE.MANAGER,facet.by = c('age'),split.by = c('race') )

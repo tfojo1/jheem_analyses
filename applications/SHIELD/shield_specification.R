@@ -617,20 +617,9 @@ register.transition(SHIELD.SPECIFICATION,
 
 #-- OUTPUTS --#----
 ##--------------------------------------------------------------------------------------------------------------#
-# The model reports 2 categories of outcomes:
-# 1-cumulative outcomes, reported between jan1 to dec31)
-# 2-point estimates of compartment sizes reported in Jan 1st
+# !!!for dynamic transitions that change over time (e.g., testing), the anchor points are coded at the begginign of the year 
+# (e.g., if transmission changes from 2000 to 2020, these dates represent jan 1st of those years)
 
-# The model projects the size of infected.uninfected population by default in Jan 1st of each year
-
-# For calibration purposes, we fit these estiamtes agains CDC, but it's unclear if CDC data represents Jan 1st or another time during the year (e.g., HIV prevalence, prop suppressed)
-# Because of this, we generally calculate the average value between Jan 1st and Dec 31st of each year and report that as the annual output
-
-# !!!for dynamic transitions that change over time (e.g., testing), the anchor points are coded at the begginign of the year (e.g., if transmission changes from 2000 to 2020, these dates represent jan 1st of those years)
-
-#Dynamic outputs: (in addition to compartment size)
-# track.dynamic.outcome: a more general definition, calculated at each step of solver (mortality birth etc)
-# track.transition: people move from one compartment to another #tracking transitions along one dimension (e.g., continuum)
 ## Population ----
 track.point.outcome(SHIELD.SPECIFICATION,
                     name='point.population',
@@ -704,9 +693,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       keep.dimensions = character()  #c('location','age','race','sex')
 )
 
- 
-
-## Incidence ----
+## Incidence ---- #@TODD: incidence has starting and ending compartment. why is it a dynamic outcome not a transition? 
 # (new infections + reinfections)
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'incidence',
