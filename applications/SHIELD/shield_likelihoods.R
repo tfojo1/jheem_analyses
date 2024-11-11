@@ -1,6 +1,17 @@
 # LIKELIHOODS INCLUDED: 
 
-
+#the census runs population count every 10 years, in 2010, and 2020.
+# the values reported between these years are extrapolated based on the previous census data.
+# so we have more faith in those years and less int he ones between decades
+w1=lapply(2010:2019, function(year){
+  total.weight = 0.95^(year-2010)
+  create.likelihood.weights(total.weight,dimension.values = list(year=year))
+  })
+w2=lapply(2020:2023, function(year){
+  total.weight = 0.95^(year-2020)
+  create.likelihood.weights(total.weight,dimension.values = list(year=year))
+})
+w=c(w1,w2)
 #-- POPULATION----
 # Basic likelihood: where we have data at the location level desired
 # sometimes we dont have the calibration data for the location of interest. 
@@ -25,14 +36,14 @@ population.likelihood.instructions =
                                        # e.g., estimates can be off by 3% each year
                                        error.variance.term = 0.015, 
                                        #error.variance.term = pop.year.cvs,  
-                                       error.variance.type = 'cv'
+                                       error.variance.type = 'cv',
                                        
                                        # downweight because large population size; 
                                        # can get more specific with create.likelihood.weights 
                                        #(e.g., different weight for age X)
-                                       # weights = list(create.likelihood.weights(
-                                       #   total.weight = 0.5,
-                                       #   dimension.values = list(year = as.character(2007:2014)))), 
+                                       weights = w,
+                                       equalize.weight.by.year = F #if we dont have as many data points in one year it'll be upweighted
+                                       #in years that we have more data points we will downweight them
                                        
                                        # if there are more data points for certain years, this will normalize
                                        # e.g., if there are a few years with only the totals 
@@ -48,19 +59,6 @@ total.mortality.likelihood.instructions =
                                        dimensions = character(), #census only reports total deaths by location and year (those two are implicit)
                                        levels.of.stratification = c(0),
                                        from.year = 2007, # data available from c('2001-2010','2011-2020') # we are 
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.015, # in absence of data I am assuming the population level
-                                       error.variance.type = 'cv'
-                                       # weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R
-                                       # equalize.weight.by.year = T
-  )
-#-- BIRTHS  ----
-births.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "births", #fix type
-                                       outcome.for.sim = "births.from",
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g
-                                       from.year = 2007,  #data available from 2007-2023
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
                                        error.variance.type = 'cv'
@@ -88,12 +86,13 @@ fertility.likelihood.instructions =
 #-- FULL LIKELIHOODS --# ----
 likelihood.instructions.demographics =  join.likelihood.instructions(
   population.likelihood.instructions ,
-  total.mortality.likelihood.instructions,
-  fertility.likelihood.instructions
+  total.mortality.likelihood.instructions
+  # fertility.likelihood.instructions
   
 )
 #manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
 # lik=total.mortality.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
 # lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
-dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
+# lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"US")
+# dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)

@@ -147,8 +147,12 @@ get.best.guess.msm.proportions <- function(location,
                               dimension.values = list(location = counties,
                                                       year = years,
                                                       sex = 'male'),
-                              from.ontology.names = 'stratified.census')[,,,,1]
-
+                              source="census.population",
+                              from.ontology.names = 'stratified.census')[,,,,1,drop=FALSE]
+    dim.names=dimnames(males)[-length(dimnames(males))]
+    dim(males)=sapply(dim.names,length)
+    dimnames(males)=dim.names
+    
     males = restratify.age.counts(males,
                                   desired.age.brackets = CENSUS.AGES,
                                   smooth.infinite.age.to = 101)
@@ -207,7 +211,7 @@ get.best.guess.msm.proportions <- function(location,
             males[,r] * proportions.msm.by.race[r]# for the national model, we have 2 dimentions, age and race
      else 
           males[,,r] * proportions.msm.by.race[r]  # For local models, we have 3 dimensions, age, location, race
-  })
+  })# '@TODD: to be reviewed
   dim.names = dimnames(males)
   dim(first.guess.n.msm) = sapply(dim.names, length)
   dimnames(first.guess.n.msm) = dim.names
