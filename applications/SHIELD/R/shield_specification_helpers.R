@@ -220,10 +220,8 @@ get.best.guess.msm.proportions <- function(location,
   parsed.census.ages = parse.age.strata.names(dimnames(first.guess.n.msm)$age)
   adult.mask = parsed.census.ages$lower >=13 #emory only reports proporiton of msm among adult male
 
-  if(length(dim(first.guess.n.msm)) == 2){ #national model:
-    first.guess.p.by.county = rowSums(first.guess.n.msm[adult.mask,]) / rowSums(males[adult.mask,]) 
-  }else{ #local models
-    first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,]) / rowSums(males[,adult.mask,]) }
+
+  first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,,drop=F]) / rowSums(males[,adult.mask,,drop=F])
   
   scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county 
   
