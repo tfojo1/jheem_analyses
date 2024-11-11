@@ -87,13 +87,13 @@ population.sex.10.19 = as.data.frame.table(census.manager$data$population$estima
 population.race = as.data.frame.table(census.manager$data$population$estimate$census.population$stratified.census$year__location__race)%>%
   rename(value = Freq)%>%
   mutate(race = tolower(race))%>%
-  mutate(race = ifelse(race == "asian", "asian or pacific islander", race))%>%
-  mutate(race = ifelse(race == "native hawaiian and other pacific islander", "asian or pacific islander", race))%>%
-  mutate(race = ifelse(race == "american indian and alaska native", "american indian or alaska native", race))%>%
-  group_by(year, location, race)%>%
-  mutate(new.value = sum(value))%>%
-  select(-value)%>%
-  rename(value = new.value)%>%
+  # mutate(race = ifelse(race == "asian", "asian or pacific islander", race))%>%
+  # mutate(race = ifelse(race == "native hawaiian and other pacific islander", "asian or pacific islander", race))%>%
+  #mutate(race = ifelse(race == "american indian and alaska native", "american indian or alaska native", race))%>%
+  # group_by(year, location, race)%>%
+  # mutate(new.value = sum(value))%>%
+  # select(-value)%>%
+  # rename(value = new.value)%>%
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
