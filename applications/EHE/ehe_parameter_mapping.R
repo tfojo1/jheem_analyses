@@ -351,7 +351,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                          trate.parameter.times = trate.parameter.times,
                                          age.rr.parameter.times = age.rr.parameter.times,
                                          age.rr.multiplier.parameter.times = age.rr.multiplier.parameter.times,
-                                         race.stratified.age.indices = 1:2)
+                                         race.stratified.age.indices = 1:2,
+                                         time.stratified.age.indices = 1:2)
       
     # Heterosexual
     set.ehe.trate.alphas.from.parameters(model.settings,
@@ -912,6 +913,7 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
                                                  trate.parameter.times,
                                                  age.rr.parameter.times,
                                                  age.rr.multiplier.parameter.times,
+                                                 time.stratified.age.indices = integer(),
                                                  race.stratified.age.indices = integer())
 {
     specification.metadata = model.settings$specification.metadata
@@ -919,6 +921,10 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
     non.race.stratified.age.indices = setdiff(1:specification.metadata$n.ages, race.stratified.age.indices)
+    # non.time.stratified.age.indices = setdiff(1:specification.metadata$n.ages, time.stratified.age.indices)
+    non.race.non.time.stratified.age.indices = setdiff(non.race.stratified.age.indices, time.stratified.age.indices)
+    non.race.time.stratified.age.indices = setdiff(non.race.stratified.age.indices, non.race.non.time.stratified.age.indices)
+    
     all.age.indices = 1:length(ages)
     default.age.multipliers = rep(1, length(ages))
     
@@ -947,20 +953,36 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
         
         #-- The non-race-stratified age effects --#
         
-        age.rrs = parameters[paste0('age', non.race.stratified.age.indices, '.', category, '.susceptibility.rr.', age.rr.param.time)]
+        if (length(non.race.non.time.stratified.age.indices)>0)
+        {
+            age.rrs = parameters[paste0('age', non.race.non.time.stratified.age.indices, '.', category, '.susceptibility.rr')]
+            model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                          alpha.name = alpha.name,
+                                                                          values = age.rrs * age.rr.multipliers[non.race.non.time.stratified.age.indices],
+                                                                          dimension = 'age.to',
+                                                                          applies.to.dimension.values = ages[non.race.non.time.stratified.age.indices])
+        }
         
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                      alpha.name = alpha.name,
-                                                                      values = age.rrs * age.rr.multipliers[non.race.stratified.age.indices],
-                                                                      dimension = 'age.to',
-                                                                      applies.to.dimension.values = ages[non.race.stratified.age.indices])
+        if (length(non.race.time.stratified.age.indices)>0)
+        {
+            age.rrs = parameters[paste0('age', non.race.time.stratified.age.indices, '.', category, '.susceptibility.rr.', age.rr.param.time)]
+            model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
+                                                                          alpha.name = alpha.name,
+                                                                          values = age.rrs * age.rr.multipliers[non.race.time.stratified.age.indices],
+                                                                          dimension = 'age.to',
+                                                                          applies.to.dimension.values = ages[non.race.time.stratified.age.indices])
+        }
         
         # The race-stratified age effects
         for (age.index in race.stratified.age.indices)
         { 
             for (race in races)
             {
-                age.rr = parameters[paste0('age', age.index, '.', race, '.', category, '.susceptibility.rr.', age.rr.param.time)]
+                if (any(age.index==time.stratified.age.indices))
+                    age.rr = parameters[paste0('age', age.index, '.', race, '.', category, '.susceptibility.rr.', age.rr.param.time)]
+                else
+                    age.rr = parameters[paste0('age', age.index, '.', race, '.', category, '.susceptibility.rr')]
+                    
                     
                 model.settings$set.element.functional.form.interaction.alphas(element.name = elem.name,
                                                                               alpha.name = alpha.name,
