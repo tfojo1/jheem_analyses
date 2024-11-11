@@ -7,6 +7,8 @@ if (file.exists(file.path("../test_runs", "mcmc_runs"))) # a hedge against early
     LAPTOP.ROOT.DIR = '../test_runs'
 
 RUNNING.ON.DESKTOP = file.exists(file.path(BIG.DESKTOP.ROOT.DIR, "mcmc_runs"))
+RUNNING.ON.CLUSTER = F
+RUNNING.ON.LAPTOP = !RUNNING.ON.DESKTOP && !RUNNING.ON.CLUSTER
 
 ROOT.DIR = LAPTOP.ROOT.DIR
 if (RUNNING.ON.DESKTOP)
