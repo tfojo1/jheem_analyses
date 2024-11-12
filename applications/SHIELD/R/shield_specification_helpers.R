@@ -925,7 +925,7 @@ get.geographically.aggregated.race.oes <- function(location,
   
   mapped.dim.names = c(list(location=counties),
                        specification.metadata$dim.names['race'])
-  mapped.population = race.mapping$apply(population[,age.mask,,,,], to.dim.names = mapped.dim.names)
+  mapped.population = race.mapping$apply(population[,age.mask,,,,,drop=F], to.dim.names = mapped.dim.names)
   
   #population.race.fractions = mapped.population / rowSums(mapped.population)
   
