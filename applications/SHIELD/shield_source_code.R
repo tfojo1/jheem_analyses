@@ -20,7 +20,6 @@ if (NEW.SOURCE) {
 }
 
 source('../jheem2/R/tests/source_jheem2_package.R')
-#
 
 # Common code from JHEEM ----
 source('../jheem_analyses/commoncode/cache_manager.R')
@@ -35,10 +34,7 @@ set.jheem.root.directory(ROOT.DIR)
 # Google Mobility Data ----
 load(file.path(JHEEM.CACHE.DIR, 'google_mobility_data.Rdata'))
 
-# updating data managers ----
-source('../jheem_analyses/applications/SHIELD/R/shield_update_data_managers.R')
-
-# CENSUS.MANAGE ----
+# CENSUS.MANAGER ----
 # it's a big file with a lot of information that is only needed for generating the initial population
 if (!exists('CENSUS.MANAGER') | NEW.SOURCE){
   print("Reading Census manager ...")
@@ -51,10 +47,8 @@ if (!exists('CENSUS.MANAGER') | NEW.SOURCE){
 # county-, MSA- and US- level aggregation
 if (is.null(get.default.data.manager()) | NEW.SOURCE){ #if it's in memory, it wont reload it
   print("Reading Syphilis survillance manager ...")
-  if (file.exists('cached/syphilis.manager.rdata'))
-    SURVEILLANCE.MANAGER = load.data.manager('cached/syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
-  else
-    SURVEILLANCE.MANAGER = load.data.manager('../../cached/syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
+  SURVEILLANCE.MANAGER = load.data.manager.from.cache('syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
+  # SURVEILLANCE.MANAGER$last.modified.date
   print("Syphilis survillance manager read")
 }
 
