@@ -16,24 +16,20 @@
 # setwd('../../')
 source('applications/SHIELD/shield_specification.R')
 
-location= "C.12580"
-# simplot.data.only("population",location,split.by = 'race') 
-# simplot.data.only("population",location,split.by = 'race',facet.by = 'ethnicity')
-# simplot.data.only("population",location,facet.by = 'age')
+# location= "C.12580" #Baltimore MSA
+location= "US" #National
 
-# SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race[,'US',]
-# dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location__race)
-
-# SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location__race[,'US',]
-# SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity[,'US',,]
-
-# grep('US',dimnames(CENSUS.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)[2]) # TRUE
-
-
-engine = create.jheem.engine('shield', "C.12580", 2030)
-
-#@Todd: the national model still fails
-engine = create.jheem.engine('shield', 'US', 2025) #fails at reading population size
+engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
+# specification.metadata=get.specification.metadata('shield','US')
+params=simset$last.sim()$params
+sim = engine$run(params)
+simplot(sim,simset$last.sim(),
+        "total.mortality")
+simplot(sim,simset$last.sim(),
+        "population")
+simplot(sim,simset$last.sim(),
+        "population",facet.by = "age",split.by = "race",dimension.values = list(year=2000:2030))
+params['other.general.mortality.rate.multiplier']=.9
 
 #Running:
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
