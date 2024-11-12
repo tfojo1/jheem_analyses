@@ -19,6 +19,7 @@ if (is.null(JHEEM.CACHE.DIR)) {
 ## ----PUBLIC---- ##
 
 load.data.manager.from.cache <- function(file, set.as.default = F) {
+    error.prefix <- "Cannot load.data.manager.from.cache(): "
     cache.metadata <- get.data.manager.cache.metadata(pretty.print=F)
     if (!(file %in% names(cache.metadata))) {
         stop(paste0(error.prefix, "'", file, "' is not one of our cached files. Call 'get.data.manager.cache.metadata()' to check what files are cached. File names are capitalization-sensitive."))
@@ -30,7 +31,7 @@ load.data.manager.from.cache <- function(file, set.as.default = F) {
         loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
     } else {
         loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
-        if (is.cached.data.manager.out.of.date(file, loaded.data.manager, error.prefix = "Cannot read data manager from cache - ")) {
+        if (is.cached.data.manager.out.of.date(file, loaded.data.manager, error.prefix = error.prefix)) {
             download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
         }
     }    
