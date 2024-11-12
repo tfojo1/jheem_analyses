@@ -7,7 +7,7 @@ source.style.manager = create.style.manager(color.data.by = "source")
 stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
 LOCATION='C.12580' #BALTIMORE.MSA
-CALIBRATION.CODE.TO.RUN='pop.demog.shield.wAging'
+CALIBRATION.CODE.TO.RUN='pop.demog.shield.wAging2'
 # DATE=Sys.Date()
 DATE="2024-11-11"
 
@@ -29,27 +29,40 @@ simplot(simset$first.sim(),simset$last.sim(),
         outcomes = c("population"), 
         # dimension.values = list(year = 1940:2030)) 
         dimension.values = list(year = 2000:2030))
-simplot(simset$last.sim(),
-        outcomes = c("population"), 
-        dimension.values = list(year = 1940:2030)) 
-simplot(simset,
+
+simplot(simset$first.sim(),simset$last.sim(),
+        split.by = "race", 
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
+
+simplot(simset$first.sim(),simset$last.sim(),
+        split.by = "race", 
+        facet.by = 'age',
+        outcomes = c("population"), 
+        dimension.values = list(year = 2000:2030)) 
+
 #mortality
 simplot(simset$first.sim(),simset$last.sim(),
         outcomes = c("total.mortality"), 
         dimension.values = list(year = 1940:2030)) 
+simplot(simset$first.sim(),simset$last.sim(),
+        outcomes = c("total.mortality"), 
+        dimension.values = list(year = 1940:2030)) 
+
 # births
 simplot( simset$first.sim(),simset$last.sim(),
          outcomes = c("births.from"), 
          dimension.values = list(year = 2000:2030)) 
+
+simset=copy.simulation.set(simset)
 simplot( simset,
          outcomes = c("fertility.rate"), 
          dimension.values = list(year = 2000:2030)) 
 
 ## population by strata
 simplot(simset$first.sim(),simset$last.sim(),
-         # split.by = "race", 
+         split.by = "race", 
+        # facet.by = 'age',
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
 simplot(simset$first.sim(),simset$last.sim(),

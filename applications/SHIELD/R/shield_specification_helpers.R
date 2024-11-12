@@ -142,21 +142,21 @@ get.best.guess.msm.proportions <- function(location,
   
   # step2: get total population of male 
   # Get number male and flatten race/ethnicity
-    males = CENSUS.MANAGER$pull(outcome = 'population',
+  males = CENSUS.MANAGER$pull(outcome = 'population',
                               keep.dimensions = c('location', 'age','race','ethnicity'),
                               dimension.values = list(location = counties,
                                                       year = years,
                                                       sex = 'male'),
                               source="census.population",
                               from.ontology.names = 'stratified.census')[,,,,1,drop=FALSE]
-    dim.names=dimnames(males)[-length(dimnames(males))]
-    dim(males)=sapply(dim.names,length)
-    dimnames(males)=dim.names
-    
-    males = restratify.age.counts(males,
-                                  desired.age.brackets = CENSUS.AGES,
-                                  smooth.infinite.age.to = 101)
- 
+  dim.names=dimnames(males)[-length(dimnames(males))]
+  dim(males)=sapply(dim.names,length)
+  dimnames(males)=dim.names
+  
+  males = restratify.age.counts(males,
+                                desired.age.brackets = CENSUS.AGES,
+                                smooth.infinite.age.to = 101)
+  
   if (is.null(males))
     stop("Cannot get best-guess msm proportions: we are unable to pull any census data on the number of males")
   if (is.null(ages))
@@ -200,7 +200,7 @@ get.best.guess.msm.proportions <- function(location,
   
   if (all(is.na(proportions.msm.by.race)))
     stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
-
+  
   proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(proportions.msm.by.race[setdiff(names(proportions.msm.by.race), 'american indian or alaska native')], na.rm=T)
   
   # step6: now that we have sorted out the dimensions, we can use the race.specific estiamtes from BRFSS and apply them to the male population in each county
@@ -208,9 +208,9 @@ get.best.guess.msm.proportions <- function(location,
   # First guess at the number of MSM in each county:
   first.guess.n.msm = sapply(dimnames(males)$race, function(r){
     if (length(dim(males)) == 2) 
-            males[,r] * proportions.msm.by.race[r]# for the national model, we have 2 dimentions, age and race
-     else 
-          males[,,r] * proportions.msm.by.race[r]  # For local models, we have 3 dimensions, age, location, race
+      males[,r] * proportions.msm.by.race[r]# for the national model, we have 2 dimentions, age and race
+    else 
+      males[,,r] * proportions.msm.by.race[r]  # For local models, we have 3 dimensions, age, location, race
   })# '@TODD: to be reviewed
   dim.names = dimnames(males)
   dim(first.guess.n.msm) = sapply(dim.names, length)
@@ -219,8 +219,8 @@ get.best.guess.msm.proportions <- function(location,
   # Scale it to hit the overall proportions in each msm 
   parsed.census.ages = parse.age.strata.names(dimnames(first.guess.n.msm)$age)
   adult.mask = parsed.census.ages$lower >=13 #emory only reports proporiton of msm among adult male
-
-
+  
+  
   first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,,drop=F]) / rowSums(males[,adult.mask,,drop=F])
   
   scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county 
@@ -246,7 +246,7 @@ get.best.guess.msm.proportions <- function(location,
                                      to.ontology = list(age=ages))
   if (is.null(age.mapping))
     stop("Cannot get best-guess msm proportions: we don't have a mapping from census ages to the specification's age brackets")
-
+  
   fitted.n.msm = age.mapping$apply(fitted.n.msm)
   if (return.proportions)
     males = age.mapping$apply(males)
@@ -433,30 +433,29 @@ get.location.mortality.rates <- function(location,
   # and then take a weighted average of the state-level rates to approximate the MSA-level mortality rate.
   
   if (location=='US'){
-    #@Todd: I'm a bit uncertain about deaths vs metro.deaths at this point
     counties='US'
-    #use the deaths instead 
-    mortality.rate = CENSUS.MANAGER$pull(outcome = 'deaths',
+    states='US'
+    #
+    deaths = CENSUS.MANAGER$pull(outcome = 'deaths',
                                          location = counties,
-                                         year= year.ranges,
-                                         from.ontology.names = "census",
+                                         from.ontology.names = "census.cdc.wonder.births.deaths",
                                          keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     if (is.null(deaths))
       stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
     
-    # Pull the population:
+    # Pull the death denominator:
     population = CENSUS.MANAGER$pull(outcome = 'deaths.denominator', 
                                      location = states, 
-                                     year= year.ranges, 
                                      keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     if (is.null(population))
       stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
-    population[is.na(deaths)] = NA
+    population[is.na(deaths)] = NA #remove the stratifications with no denominator
     
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification # then divide the two
     target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
     national.mortality.rate = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
       map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
+    # dimnames(national.mortality.rate)
     return(national.mortality.rate)
     
   }else{
@@ -551,7 +550,7 @@ get.empiric.aging.rates <- function(location, specification.metadata,
 do.get.empiric.aging.rates <- function(location, 
                                        specification.metadata,
                                        years=c('time1'=2010,'time2'=2020)
-#                                       force.match.age.brackets.to.before.smoothing = NULL #if we wanted to use diff age brackets
+                                       #                                       force.match.age.brackets.to.before.smoothing = NULL #if we wanted to use diff age brackets
 )
 {
   if (location=='US')
@@ -596,7 +595,7 @@ do.get.empiric.aging.rates <- function(location,
                               desired.age.brackets = min.specification.age:max.specification.age,
                               smooth.infinite.age.to = 101,
                               allow.extrapolation = T)
-
+  
   # Compute aging rates:
   aging.rates = lapply(years, function(year){
     year = as.character(min(max(year,min.year),max.year)) #!onces the census data end, it applies the last year of data and projects that forward  (e.g., for 2030, it uses data in 2017)
@@ -742,7 +741,10 @@ do.get.age.contact.proportions.for.model <- function(specification.metadata,
 #' @return returns the number of females in single year ages
 get.female.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
 {
-  counties = get.contained.locations(location, 'county')
+  if (location=='US')
+    counties='US'
+  else 
+    counties = get.contained.locations(location, 'county')
   pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=population.years, location=counties, sex='female'),
                             keep.dimensions = c('age','race','sex','ethnicity'), from.ontology.names = 'stratified.census') / length(population.years)
   pop = restratify.age.counts(pop,
@@ -759,7 +761,10 @@ get.female.single.year.age.counts <- function(location, population.years=DEFAULT
 #' @inherit get.female.single.year.age.counts return
 get.male.single.year.age.counts <- function(location, population.years=DEFAULT.POPULATION.YEARS)
 {
-  counties = get.contained.locations(location, 'county')
+  if (location=='US')
+    counties='US'
+  else 
+    counties = get.contained.locations(location, 'county')
   pop = CENSUS.MANAGER$pull(outcome='population', dimension.values = list(year=population.years, location=counties, sex='male'),
                             keep.dimensions = c('age','race','sex','ethnicity'), from.ontology.names = 'stratified.census') / length(population.years)
   pop = restratify.age.counts(pop,
@@ -842,6 +847,9 @@ get.race.population.counts <- function(location,
                                        specification.metadata,
                                        years=DEFAULT.POPULATION.YEARS)
 {
+  if(location=='US')
+    counties='US'
+  else
   counties = locations::get.contained.locations(location, 'county')
   population = CENSUS.MANAGER$pull(outcome='population',
                                    dimension.values = list(location=counties, year=years),
@@ -892,7 +900,10 @@ get.geographically.aggregated.race.oes <- function(location,
       !setequal(dimnames(within.county.race.oes)[[2]], specification.metadata$dim.names$race))
     stop("Cannot get.geographically.aggregated.race.oes() - within.county.race.oes must have dimnames set, and the names of both dimensions must match the specification's race categories")
   
-  counties = locations::get.contained.locations(location, 'county')
+  if(location=='US')
+    counties='US'
+  else
+    counties = locations::get.contained.locations(location, 'county')
   population = CENSUS.MANAGER$pull(outcome='population',
                                    dimension.values = list(location=counties, year=years),
                                    keep.dimensions = c('location','age','race','ethnicity', 'sex'),

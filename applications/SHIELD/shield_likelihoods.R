@@ -53,12 +53,13 @@ population.likelihood.instructions =
 
 #-- GENERAL MORTALITY  ----
 # everyone in the population
+# n=11+3+3 #oneway staratifications
 total.mortality.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "deaths", #fix type
                                        outcome.for.sim = "total.mortality",
                                        dimensions = character(), #census only reports total deaths by location and year (those two are implicit)
                                        levels.of.stratification = c(0),
-                                       from.year = 2007, # data available from c('2001-2010','2011-2020') # we are 
+                                       from.year = 2010, # data available from c('2001-2010','2011-2020') # we are 
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
                                        error.variance.type = 'cv'
