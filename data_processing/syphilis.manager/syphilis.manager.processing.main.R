@@ -460,7 +460,7 @@ data.manager$register.ontology(
     location= NULL,
     age=c("< 1 year", "1-4 years", "10-14 years", "15-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years",
           "45-49 years", "5-9 years", "50-54 years", "55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80-84 years", 
-          "85-89 years", "90-94 years", "95-99 years", "100+ years"),
+          "85+ years"),
     race=c('american indian or alaska native', 'asian or pacific islander', 'black or african american', 'white'),
     ethnicity=c('hispanic or latino', 'not hispanic or latino'),
     sex=c('male','female')
@@ -620,7 +620,7 @@ put.msa.data.as.new.source(outcome = 'population',
 
 # Source Code to Calculate Fertility Rate by MSA --------------------------
 
-source('data_processing/syphilis.manager/fertility.rate.msa.R')
+#source('data_processing/syphilis.manager/fertility.rate.msa.R')
 
 # SAVE SYPHILIS.MANAGER ---------------------------------------------------
 save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
