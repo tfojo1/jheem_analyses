@@ -635,6 +635,8 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.0004), 0.5*log(2), upper=1),
     oe.never.idu.pairings.with.idu = Lognormal.Distribution(log(0.2), 0.5*log(2), upper=1), #see calculations below
     
+    idu.sexual.oe.rr = Lognormal.Distribution(0, 0.2381851), # see idu_sexual_oes.R combined.sd
+    
     black.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
     hispanic.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
     other.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
@@ -1111,7 +1113,8 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     sexual.pairing = c(
       'oe.female.pairings.with.msm',
       'fraction.heterosexual.male.pairings.with.male',
-      'oe.never.idu.pairings.with.idu'
+      'oe.never.idu.pairings.with.idu',
+      'idu.sexual.oe.rr'
     ),
 
     age.mixing = 'age.mixing.sd.mult',

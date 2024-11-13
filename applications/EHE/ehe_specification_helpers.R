@@ -924,6 +924,16 @@ idu.oes.to.contact.proportions <- function(race.idu.oes,
     oes.to.proportions(oes = race.idu.oes, population = race.population.counts)
 }
 
+
+get.idu.sexual.oe.functional.form = function(specification.metadata)
+{
+
+  create.static.functional.form(value = get.idu.sexual.oes(specification.metadata), # see idu_sexual_oes.R
+                                link = "log", 
+                                value.is.on.transformed.scale = F) 
+  
+}
+
 ##---------------##
 ##-- Migration --##
 ##---------------##

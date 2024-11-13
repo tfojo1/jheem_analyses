@@ -1410,10 +1410,14 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                                            ever.idu.counts * idu.sexual.oe))
 )
 
+register.model.element(EHE.SPECIFICATION,
+                       name = 'idu.sexual.oe',
+                       get.functional.form.function = get.idu.sexual.oe.functional.form,
+                       scale = 'ratio') 
+
 register.model.element.values(EHE.SPECIFICATION,
                               scale = 'ratio',
                               never.idu.sexual.oe = 1,
-                              idu.sexual.oe = 1,
                               oe.never.idu.pairings.with.idu = EHE_BASE_PARAMETER_VALUES['oe.never.idu.pairings.with.idu'])
 
 #-------------------------------#
