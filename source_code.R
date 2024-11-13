@@ -66,6 +66,7 @@ source('../jheem_analyses/input_managers/idu_input_manager.R')
 source('../jheem_analyses/input_managers/prep_input_manager.R')
 source('../jheem_analyses/input_managers/pairing_input_manager.R')
 source('../jheem_analyses/input_managers/continuum_input_manager.R')
+source('../jheem_analyses/input_managers/idu_sexual_oes.R')
 
 # For the EHE version
 source('../jheem_analyses/applications/EHE/ehe_base_parameters.R')

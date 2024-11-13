@@ -400,7 +400,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     }
 
     set.element.functional.form.main.effect.alphas(model.settings = model.settings,
-                                                   element.name = 'idu.sexual.oe.rr',
+                                                   element.name = 'idu.sexual.oe',
                                                    alpha.name = 'value',
                                                    values = parameters['idu.sexual.oe.rr'],
                                                    applies.to.dimension.values = 'all',

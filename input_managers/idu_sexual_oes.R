@@ -53,12 +53,14 @@ get.idu.sexual.oes = function(specification.metadata){
   
   dim.names = specification.metadata$dim.names[c('sex.to')]
   
-  rv = array(1,
-             dim=sapply(dim.names, length),
-             dimnames = dim.names)
+  rv = c(heterosexual_male = male.oe,
+         msm = male.oe,
+         female = female.oe)
   
-  rv[c("heterosexual_male","msm")] = male.oe
-  rv[c("female")] = female.oe
+  dim(rv) = sapply(dim.names, length)
+  dimnames(rv) = dim.names
+  
+  
   
   rv
 }
