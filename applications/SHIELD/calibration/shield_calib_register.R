@@ -7,7 +7,7 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
-CALIBRATION.NAME = 'pop.demog.shield.wAging2'
+CALIBRATION.NAME = 'pop.demog.shield1'
 N.ITER = 15000
 # which subset of parameters should we use for calibration?
 PARAMETER.NAMES = c(

@@ -677,7 +677,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
  
 ## Deaths ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name='total.mortality',
+                      name='deaths',
                       outcome.metadata = create.outcome.metadata(display.name = 'Total Deaths',
                                                                  description = 'Total Deaths',
                                                                  scale = 'non.negative.number',
@@ -685,12 +685,12 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  units = 'deaths',
                                                                  singular.unit = 'deaths'),
                       scale='non.negative.number',
-                      dynamic.quantity.name = 'mortality',
+                      dynamic.quantity.name = 'mortality', #internal JHEEM construct for deaths
                       corresponding.data.outcome = 'deaths',
                       groups = NULL,
                       # exclude.tags = "emigration",
                       save=T,
-                      keep.dimensions = character()  #c('location','age','race','sex')
+                      keep.dimensions = c('location','age','race','sex')
 )
 
 ## Incidence ---- #@TODD: incidence has starting and ending compartment. why is it a dynamic outcome not a transition? 
