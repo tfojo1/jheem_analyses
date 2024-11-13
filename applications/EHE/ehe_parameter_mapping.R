@@ -397,6 +397,13 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                                       dimension = 'sex.to')
     }
 
+    set.element.functional.form.main.effect.alphas(model.settings = model.settings,
+                                                   element.name = 'idu.sexual.oe.rr',
+                                                   alpha.name = 'value',
+                                                   values = parameters['idu.sexual.oe.rr'],
+                                                   applies.to.dimension.values = 'all',
+                                                   dimension = 'all')
+    
     
     #-- Non-HIV Aging --#
     spline.times = c(2010,2020,2030,2040)
