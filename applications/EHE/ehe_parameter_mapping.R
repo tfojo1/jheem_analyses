@@ -352,7 +352,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                          age.rr.parameter.times = age.rr.parameter.times,
                                          age.rr.multiplier.parameter.times = age.rr.multiplier.parameter.times,
                                          race.stratified.age.indices = 1:2,
-                                         time.stratified.age.indices = 1:2)
+                                         time.stratified.age.indices = 1:5)
       
     # Heterosexual
     set.ehe.trate.alphas.from.parameters(model.settings,
@@ -361,7 +361,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                          alpha.times = trate.alpha.times,
                                          trate.parameter.times = trate.parameter.times,
                                          age.rr.parameter.times = age.rr.parameter.times,
-                                         age.rr.multiplier.parameter.times = age.rr.multiplier.parameter.times)
+                                         age.rr.multiplier.parameter.times = age.rr.multiplier.parameter.times,
+                                         time.stratified.age.indices = 1:5)
 
     # IDU
     set.ehe.trate.alphas.from.parameters(model.settings,
@@ -370,7 +371,8 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                          alpha.times = trate.alpha.times,
                                          trate.parameter.times = trate.parameter.times,
                                          age.rr.parameter.times = age.rr.parameter.times,
-                                         age.rr.multiplier.parameter.times = age.rr.multiplier.parameter.times)
+                                         age.rr.multiplier.parameter.times = age.rr.multiplier.parameter.times,
+                                         time.stratified.age.indices = 1:5)
 
     
     # Add in the MSM-IDU susceptibility multipliers

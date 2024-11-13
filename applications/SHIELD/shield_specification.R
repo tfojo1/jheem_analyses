@@ -1,5 +1,5 @@
 cat("*** Running Shiled_specification.R ***\n")
-DEFAULT.FIX.STRATA.YEAR=2007 # full population breakdown is available post-2010, and birth data is available post 2007. 
+DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. 
 
 #CASHED FOLDER:
 # https://livejohnshopkins-my.sharepoint.com/personal/tfojo1_jh_edu/_layouts/15/onedrive.aspx?e=5%3A940bf48ba6e0498495fea5596e3dc8e7&sharingv2=true&fromShare=true&at=9&CID=425e54af%2De78b%2D4d53%2D8df4%2D6abb10af6339&id=%2Fpersonal%2Ftfojo1%5Fjh%5Fedu%2FDocuments%2FJHEEM2&FolderCTID=0x012000E74D427C3A55BC45A1C18C850CDA2DB4&view=0
@@ -677,7 +677,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
  
 ## Deaths ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name='total.mortality',
+                      name='deaths',
                       outcome.metadata = create.outcome.metadata(display.name = 'Total Deaths',
                                                                  description = 'Total Deaths',
                                                                  scale = 'non.negative.number',
@@ -685,12 +685,12 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  units = 'deaths',
                                                                  singular.unit = 'deaths'),
                       scale='non.negative.number',
-                      dynamic.quantity.name = 'mortality',
+                      dynamic.quantity.name = 'mortality', #internal JHEEM construct for deaths
                       corresponding.data.outcome = 'deaths',
                       groups = NULL,
                       # exclude.tags = "emigration",
                       save=T,
-                      keep.dimensions = character()  #c('location','age','race','sex')
+                      keep.dimensions = c('location','age','race','sex')
 )
 
 ## Incidence ---- #@TODD: incidence has starting and ending compartment. why is it a dynamic outcome not a transition? 

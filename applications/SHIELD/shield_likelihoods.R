@@ -51,14 +51,16 @@ population.likelihood.instructions =
                                        # equalize.weight.by.year = F Default is TRUE
   )
 
-#-- GENERAL MORTALITY  ----
-# everyone in the population
-total.mortality.likelihood.instructions =
+#-- DEATHS  ----
+# CalibTarget: deaths: 2001-2020 by agegroup,sex, race, ethnicty for the US model 
+# dimnames(SURVEILLANCE.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)
+
+deaths.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "deaths", #fix type
-                                       outcome.for.sim = "total.mortality",
-                                       dimensions = character(), #census only reports total deaths by location and year (those two are implicit)
-                                       levels.of.stratification = c(0),
-                                       from.year = 2007, # data available from c('2001-2010','2011-2020') # we are 
+                                       outcome.for.sim = "deaths",
+                                       dimensions = c("age","sex","race"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 2010, 
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
                                        error.variance.type = 'cv'
@@ -67,12 +69,15 @@ total.mortality.likelihood.instructions =
   )
 
 #-- FETILITY RATE  ----
+# CalibTarget: Fertility.rate: 2007-2023 agegroup race ethnicty 
+# dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
+
 fertility.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "fertility.rate", #fix type
                                        outcome.for.sim = "fertility.rate",
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g
-                                       from.year = 2007,  #data available from 2007-2023
+                                       from.year = 2010,  #data available from 2007-2023
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
                                        error.variance.type = 'cv'
@@ -86,13 +91,13 @@ fertility.likelihood.instructions =
 #-- FULL LIKELIHOODS --# ----
 likelihood.instructions.demographics =  join.likelihood.instructions(
   population.likelihood.instructions ,
-  total.mortality.likelihood.instructions
-  # fertility.likelihood.instructions
+  deaths.likelihood.instructions,
+  fertility.likelihood.instructions
   
 )
 #manual setup: 
-# lik=population.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
-# lik=total.mortality.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
-# lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+# lik=population.likelihood.instructions$instantiate.likelihood('shield',"US")
+# lik=deaths.likelihood.instructions$instantiate.likelihood('shield',"US")
+# lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"55139")
 # lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"US")
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)

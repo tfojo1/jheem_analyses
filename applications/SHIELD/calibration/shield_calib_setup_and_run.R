@@ -18,7 +18,7 @@ cat("Working directory set to:", getwd(), "\n")
 {
   LOCATION='C.12580'
   set.seed(12345)
-  CALIBRATION.NAME = 'pop.demog.shield.wAging1' 
+  CALIBRATION.NAME = 'pop.demog.shield1' 
   print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
   #
   source('../jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R')

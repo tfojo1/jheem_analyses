@@ -15,7 +15,9 @@ source('commoncode/cache_manager.R')
 
 surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 
+#You have to change the link everytime
 sync.cached.data.manager("surveillance.manager.rdata",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EQS1u_TFlkpCrsv5vhMlufoB7UmfiE2TYW04-CXSdAG4Xw?e=nRPLER",
                          allow.flag = T)
 get.data.manager.cache.metadata("surveillance.manager.rdata")
 
@@ -35,7 +37,9 @@ get.data.manager.cache.metadata("census.manager.rdata")
 
 syphilis.manager = load.data.manager(name="syphilis.manager", file="../../cached/syphilis.manager.rdata")
 
+#UPDATE LINK EACH TIME
 sync.cached.data.manager("syphilis.manager.rdata",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/Ea6-pTjU9VZOqh4BFkEZjcEBr092GiFiU2KmBk5D3b6AvA?e=O9xKU4",
                          allow.flag = T)
 
 get.data.manager.cache.metadata("syphilis.manager.rdata")
