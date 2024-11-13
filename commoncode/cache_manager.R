@@ -137,12 +137,16 @@ is.cached.data.manager.out.of.date <- function(file, data.manager, error.prefix 
     
     # Check if the creation date and last modified date are both at least as new as the cached dates
     if (!is.null(data.manager.cache.metadata[[file]][["creation.date"]])) {
-        if (!is.null(data.manager[["creation.date"]]) && data.manager[["creation.date"]] < data.manager.cache.metadata[[file]][["creation.date"]]) {
+        if (is.null(data.manager[["creation.date"]]))
+            return(TRUE)
+        if (data.manager[["creation.date"]] < data.manager.cache.metadata[[file]][["creation.date"]]) {
             return(TRUE)
         }
     }
     if (!is.null(data.manager.cache.metadata[[file]][["last.modified.date"]])) {
-        if (!is.null(data.manager[["last.modified.date"]]) && data.manager[["last.modified.date"]] < data.manager.cache.metadata[[file]][["last.modified.date"]]) {
+        if (is.null(data.manager[["last.modified.date"]]))
+            return(TRUE)
+        if (data.manager[["last.modified.date"]] < data.manager.cache.metadata[[file]][["last.modified.date"]]) {
             return(TRUE)
         }
     }
