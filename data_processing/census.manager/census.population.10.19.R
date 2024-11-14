@@ -412,6 +412,6 @@ for (data in stratified.10.19.data) {
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
-    details = 'Census Reporting')
+    details = 'Census Reporting- Stratified 2010-2019 data is from the Vintage 2019')
 }
 

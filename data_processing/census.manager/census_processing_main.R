@@ -454,7 +454,7 @@ for (data in county_pop) {
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
-    details = 'Census Reporting')
+    details = 'Census Reporting- 2000-2019 data are intercensal estimates; 2020-2023 data is from the Vintage 2023')
 }
 
 

@@ -637,5 +637,5 @@ for (data in single.year.sex.put) {
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
-    details = 'Census Reporting')
+    details = 'Census Reporting- Stratified 2020-2023 data is from the Vintage 2023')
 }
