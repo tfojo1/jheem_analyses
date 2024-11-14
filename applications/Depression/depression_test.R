@@ -1,5 +1,5 @@
 # depression test #
-
+source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/Depression/dep_specification.R')
 
 joint.prior = join.distributions(DEP.PARAMETERS.PRIOR, EHE.PARAMETERS.PRIOR)

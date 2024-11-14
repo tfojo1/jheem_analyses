@@ -1,5 +1,7 @@
 ## Depression Likelihood
 
+source("applications/EHE/ehe_likelihoods.R")
+
 propdep.bias.estimates = get.cached.object.for.version(name = "propdep.bias.estimates", 
                                                            version = 'dep')
 
@@ -106,18 +108,12 @@ pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(ou
 proportionDep_likelihood <- proportionDep_likelihood_inst$instantiate.likelihood(version='dep', location='C.12580') # can also be a diff location
 # add simulation and compute
 proportionDep_likelihood$compute(sim) # sim=sim name // log-LL default // always about comparing, so we run another likelihood 
-
 # we can look at the likelihoods using simplot, visual check against the data-points // also helps decide whether our SD decisions are too strict or not
 
-# p.bias calculator ## save in a folder and load later ##
-pbias_est <- get.p.bias.estimates(dimensions = c(), levels.of.stratification = 0, 
-                                  outcome.for.p = 'depression', outcome.for.n = 'adult.population', 
-                                  sub.location.type = 'county', super.location.type = 'state', main.location.type = 'cbsa')
-                                  #minimum.sample.size = , # defaults to 12 - too little data?
-                                  #num/denom // is there too many sources? pick one
 
 # will yield 4 numbers, estimate and SD for being being inside/outside of MSA                                  
 # look at Melissa's code for this to get a sense of what to do // in EHE folder, ehe_bias_estimates_cache.R & ehe_likelihoods.R
 
-
+dep_likelihood_full <- join.likelihood.instructions(FULL.likelihood.instructions.with.aids, proportionDep_likelihood_inst, 
+                                                    prev_ratio_inst, hiv_depTx_inst, pop_depTx_inst)
 
