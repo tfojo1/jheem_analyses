@@ -154,52 +154,5 @@ for (data in female.population.county.put) {
 
 # Aggregate to MSA --------------------------------------------------------
 
-put.msa.data.as.new.source(outcome = 'births',
-                           from.source.name= 'cdc.wonder.natality',
-                           to.source.name = 'cdc.wonder.aggregated.births', 
-                           to.locations = MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager= syphilis.manager)
-put.msa.data.as.new.source(outcome = 'female.population',
-                           from.source.name= 'cdc.wonder.natality',
-                           to.source.name = 'cdc.wonder.aggregated.births', 
-                           to.locations = MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager= syphilis.manager)
-
-
-# Pull data; calculate rate for msa ---------------------------------------
-
-msa.births = as.data.frame.table(syphilis.manager$data$births$estimate$cdc.wonder.aggregated.births$cdc.fertility$year__location__age__race__ethnicity)%>% rename(births = Freq)
-
-msa.female.pop = as.data.frame.table(syphilis.manager$data$female.population$estimate$cdc.wonder.aggregated.births$cdc.fertility$year__location__age__race__ethnicity)%>% rename(female.population = Freq)
-
-msa.fertility <- merge(msa.births, msa.female.pop, by=c("location", "year","age", "race", "ethnicity"))
-
-msa.fertility$fertility.rate = (msa.fertility$births/msa.fertility$female.population)
-
-msa.fertility <- msa.fertility %>%
-  mutate(outcome = 'fertility.rate')%>%
-  mutate(year = as.character(year))%>%
-  mutate(age = as.character(age))%>%
-  mutate(race = as.character(race))%>%
-  mutate(ethnicity = as.character(ethnicity))%>%
-  mutate(location = as.character(location))%>%
-  mutate(value = as.numeric(fertility.rate))
-
-
-# Put MSA Fertility Rate --------------------------------------------------
-
-syphilis.manager$put.long.form(
-    data = msa.fertility,
-    ontology.name = 'cdc.fertility',
-    source = 'cdc.wonder.natality',
-    dimension.values = list(),
-    url = 'https://wonder.cdc.gov/natality.html',
-    details = 'CDC Wonder Natality Data')
-
+source('data_processing/syphilis.manager/aggregate.county.to.msa.R')
 

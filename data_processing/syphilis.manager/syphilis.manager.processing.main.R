@@ -620,7 +620,7 @@ put.msa.data.as.new.source(outcome = 'population',
 
 # Source Code to Calculate Fertility Rate by MSA --------------------------
 
-#source('data_processing/syphilis.manager/fertility.rate.msa.R')
+source('data_processing/syphilis.manager/fertility.rate.msa.R')
 
 # SAVE SYPHILIS.MANAGER ---------------------------------------------------
 save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
