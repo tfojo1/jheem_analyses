@@ -490,11 +490,11 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     age4.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
     age5.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
     
-    age1.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
-    age2.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
-    age3.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
-    age4.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
-    age5.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    # age1.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    # age2.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    # age3.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    # age4.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
+    # age5.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
     
     # age.proportion.tested.or = Multivariate.Lognormal.Distribution(
     #   mu = rep(0, 5),
@@ -1316,16 +1316,11 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     # ),
     
     young.age.testing = c('age1.proportion.tested.or',
-                          'age1.proportion.tested.slope.or',
                           'age2.proportion.tested.or',
-                          'age2.proportion.tested.slope.or',
-                          'age3.proportion.tested.or',
-                          'age3.proportion.tested.slope.or'),
+                          'age3.proportion.tested.or'),
     
     old.age.testing = c('age4.proportion.tested.or',
-                        'age4.proportion.tested.slope.or',
-                        'age5.proportion.tested.or',
-                        'age5.proportion.tested.slope.or'),
+                        'age5.proportion.tested.or'),
 
     testing.ramp.by.risk = c(
       'msm.testing.ramp',
