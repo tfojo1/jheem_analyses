@@ -31,27 +31,19 @@ hiv.test.positivity.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                              super.location.type = "STATE",
                                              main.location.type = "CBSA")
 
-# awareness.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
-#                                                         dimensions = c("age","race","sex","risk"),
-#                                                         levels.of.stratification = c(0,1),
-#                                                         outcome.for.p = "awareness",
-#                                                         outcome.for.n = "total.prevalence",
-#                                                         sub.location.type = NULL, 
-#                                                         super.location.type = "STATE",
-#                                                         main.location.type = "COUNTY",
-#                                                         main.location.type.n.source = "cdc.hiv")
-
 ## NEW P.BIAS ESTIMATES FOR AWARENESS WITH COUNTY/CBSA
-awareness.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
-                                                dimensions = c("age","race","sex","risk"),
-                                                levels.of.stratification = c(0,1),
-                                                outcome.for.p = "awareness",
-                                                outcome.for.n = "total.prevalence",
-                                                sub.location.type = "COUNTY", 
-                                                super.location.type = "STATE",
-                                                main.location.type = "CBSA",
-                                                main.location.type.p.source = "cdc.aggregated.proportion",
-                                                main.location.type.n.source = "cdc.aggregated.county")
+#awareness.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+#                                                dimensions = c("age","race","sex","risk"),
+#                                                levels.of.stratification = c(0,1),
+#                                                outcome.for.p = "awareness",
+#                                                outcome.for.n = "total.prevalence",
+#                                                sub.location.type = "COUNTY", 
+#                                                super.location.type = "STATE",
+#                                                main.location.type = "CBSA",
+#                                                main.location.type.p.source = "cdc.aggregated.proportion",
+#                                                main.location.type.n.source = "cdc.aggregated.county")
+
+source('../jheem_analyses/applications/ehe/awareness_covariance_calculations.R')
 
 cocaine.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                               dimensions = c("age"),
