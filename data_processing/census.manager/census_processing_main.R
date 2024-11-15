@@ -132,7 +132,7 @@ census.manager$register.ontology(
     location= NULL,
     age=c("< 1 year", "1-4 years", "10-14 years", "15-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years",
           "45-49 years", "5-9 years", "50-54 years", "55-59 years", "60-64 years", "65-69 years", "70-74 years", "75-79 years", "80-84 years", 
-          "85-89 years", "90-94 years", "95-99 years", "100+ years"),
+          "85+ years"),
     race=c('american indian or alaska native', 'asian or pacific islander', 'black or african american', 'white'),
     ethnicity=c('hispanic or latino', 'not hispanic or latino'),
     sex=c('male','female')
@@ -250,24 +250,48 @@ data.list.county = lapply(data.list.county.pop, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$county_code = as.numeric(data$COUNTY)
-  data$state_code = as.numeric(data$STATE)
-  
-  data= subset(data, data$COUNTY != "0")   #Remove county=0 (represents the county population)#
-  
-  data$state_code_clean= str_pad(data$state_code, width=2, side="left", pad="0")
-  data$county_code_clean= str_pad(data$county_code, width=3, side="left", pad="0")
-  
-  #Combine county and county codes into FIPS- change FIPS to 'location'
-  data$FIPS= paste(data$state_code_clean, data$county_code_clean, sep="")
-  
-  data$location = data$FIPS
-  
-  #Remove popestimate2010 from the 2000-2010 file so the more recent estimate from the
-  #2010-2019 file can be used instead
   if(grepl("00.10", filename)) {
-    data$POPESTIMATE2010= data$old_2010estimate  #REMOVE CENSUS AND USE POP ESTIMATE#
+    data$POPESTIMATE2010= data$old_2010estimate  #REMOVE CENSUS AND USE POP ESTIMATE#   #Remove popestimate2010 from the 2000-2010 file so the more recent estimate from the
+    #2010-2019 file can be used instead
+    data$county_code = as.numeric(data$COUNTY)
+    data$state_code = as.numeric(data$STATE)
+    
+    data= subset(data, data$COUNTY != "0")   #Remove county=0 (represents the county population)#
+    
+    data$state_code_clean= str_pad(data$state_code, width=2, side="left", pad="0")
+    data$county_code_clean= str_pad(data$county_code, width=3, side="left", pad="0")
+    
+    #Combine county and county codes into FIPS- change FIPS to 'location'
+    data$FIPS= paste(data$state_code_clean, data$county_code_clean, sep="")
+    
+    data$location = data$FIPS
   }
+  
+  if(grepl("10.19", filename)) { #Location is calculated differently here because FIPS is not available
+
+    data$state = sub('.*,\\s*', '', data$COUNTY)
+    data$county = gsub(",.*$", "", data$COUNTY)
+    data$location = locations::get.location.code(data$county, 'COUNTY')
+
+  }
+  
+  if(grepl("20.23", filename)) {
+    data$county_code = as.numeric(data$COUNTY)
+    data$state_code = as.numeric(data$STATE)
+    
+    data= subset(data, data$COUNTY != "0")   #Remove county=0 (represents the county population)#
+    
+    data$state_code_clean= str_pad(data$state_code, width=2, side="left", pad="0")
+    data$county_code_clean= str_pad(data$county_code, width=3, side="left", pad="0")
+    
+    #Combine county and county codes into FIPS- change FIPS to 'location'
+    data$FIPS= paste(data$state_code_clean, data$county_code_clean, sep="")
+    
+    data$location = data$FIPS
+
+  }
+  
+  
   
   #Begin set up for pivot longer
   data$"population_2000" = data$POPESTIMATE2000
@@ -430,7 +454,7 @@ for (data in county_pop) {
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
-    details = 'Census Reporting')
+    details = 'Census Reporting- 2000-2019 data are intercensal estimates; 2020-2023 data is from the Vintage 2023')
 }
 
 

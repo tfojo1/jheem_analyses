@@ -1,7 +1,7 @@
 ## Depression and HIV analyses
 
 ## source dependencies
-source('../jheem_analyses/applications/EHE/ehe_specification.R')
+#source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/Depression/dep_parameters.R')
 source('../jheem_analyses/applications/Depression/dep_parameter_mapping.R')
 

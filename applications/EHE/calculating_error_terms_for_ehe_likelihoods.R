@@ -1,4 +1,12 @@
 
+# POPULATION: 0.1561269 (ethnicity); 0.1939618 (age-ethnicity)
+calculate.error.terms.pop(stratification = "ethnicity",
+                          is.cv = T)
+
+calculate.error.terms.pop(stratification = "age-ethnicity",
+                          is.cv = T)
+# other estimates: 0.3023304 (all); 0.1031615 (race); 0.2771433 (age-race)
+
 
 # SUPPRESSION: 0.04560282 
 calculate.error.terms(data.type = "suppression",
@@ -144,3 +152,58 @@ calculate.error.terms = function(data.type,
 }
 
 
+calculate.error.terms.pop = function(stratification,
+                                     is.cv){
+  
+  all.values1 = numeric()
+  all.values2 = numeric()
+
+  # anything other than age alone, sex alone, and age-sex
+  
+  if(stratification=="age-ethnicity"){
+    data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity["2019",,,]
+    data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity["2020",,,]  
+  } else if(stratification=="ethnicity"){
+    data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__ethnicity["2019",,]
+    data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__ethnicity["2020",,]
+  } else if(stratification=="age-race"){
+    data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race["2019",,,]
+    data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race["2020",,,]
+  } else if(stratification=="race"){
+    data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race["2019",,]
+    data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race["2020",,]
+  } else if(stratification=="all"){
+    data1 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex["2019",,,,,]
+    data2 = CENSUS.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex["2020",,,,,]
+  } else
+    stop("right now only set up for age-ethnicity, ethnicity, age-race, race, or all")
+
+  all.values1 = data1
+  all.values2 = data2
+  
+  if(is.cv){
+    # Calculate it
+    #cvs.1 = (all.values1 - all.values2)/all.values1 
+    cvs.2 = (all.values1 - all.values2)/all.values2
+    
+    cvs = c(cvs.2) #,cvs.2)
+    cvs[is.nan(cvs)] = 0
+    cvs = cvs[!is.na(cvs) & !is.infinite(cvs)]
+    
+    # check for outliers
+    mean.cv = mean(cvs)
+    sd.cv = sd(cvs)
+    outliers.mask = cvs<(mean.cv - (3*sd.cv)) | cvs>(mean.cv + (3*sd.cv))
+    cvs = cvs[!outliers.mask]
+    rv = sqrt(sum(cvs^2, na.rm=T)/sum(!is.na(cvs))) 
+    
+  } else {
+    
+    # Calculate it
+    errors = all.values1 - all.values2
+    rv = sqrt(sum(errors^2, na.rm=T)/sum(!is.na(errors))) 
+  }
+  
+  rv
+  
+}

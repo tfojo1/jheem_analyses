@@ -347,5 +347,5 @@ for (data in us.total.70.79.put) {
     source = 'census.population',
     dimension.values = list(),
     url = 'www.census.gov',
-    details = 'Census Reporting')
+    details = 'Census Reporting- 1970-1999 data are intercensal estimates')
 }
