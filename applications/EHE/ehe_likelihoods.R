@@ -72,6 +72,40 @@ EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
 }
 
 #-- POPULATION  ----
+
+population.error.sd.fn = function(data, details)
+{
+    # Massage the data a big
+    melted.data = reshape2::melt(data)
+    years.since.preceding.census = melted.data$year %% 10
+    years.from.nearest.census = pmin(years.since.preceding.census, -melted.data$year %% 10)
+      
+    # Set up error terms
+    inherent.census.cv = 0.015
+    
+    stratified.dimension.candidates = c('age','race','sex')
+    n.stratified.dimensions = length(intersect(names(dim(data)), stratified.dimension.candidates))
+    
+    if (n.stratified.dimensions<=1)
+        max.post.censal.cv = 0.1561269 # from calculating_error_terms_for_ehe_likelihoods.R
+    else
+        max.post.censal.cv = 0.1939618
+    
+    max.post.censal.var = inherent.census.cv^2 + max.post.censal.cv^2
+    
+    post.censal.cv = exp(log(inherent.census.cv) + years.since.preceding.census * (0.5*log(max.post.censal.var) - log(inherent.census.cv)) / 9)
+    WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL = 2
+    intercensal.cv = exp(log(inherent.census.cv) + years.from.nearest.census * (0.5*log(max.post.censal.var / WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL) - log(inherent.census.cv)) / 9)  # assume variance is halved
+    
+    # this is a hack now - need to talk to Zoe about how she will formulate the details field
+    # I just know that totals are intercensal at this time
+    is.intercensal = grepl('intercensal', details, ignore.case = T) | n.stratified.dimensions==0
+    cv = post.censal.cv
+    cv[is.intercensal] = intercensal.cv
+    
+    data * cv
+}
+
 population.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
                                        outcome.for.sim = "population",
@@ -87,9 +121,10 @@ population.likelihood.instructions =
                                        
                                        # should always be specified; describes how precise the estimates are; 
                                        # e.g., estimates can be off by 3% each year
-                                       error.variance.term = 0.015, 
-                                       #error.variance.term = pop.year.cvs,  
-                                       error.variance.type = 'cv',
+#                                       error.variance.term = 0.015, 
+ #                                      error.variance.type = 'cv',
+                                       error.variance.term = population.error.sd.fn,
+                                       error.variance.type = 'function.sd',
                                        
                                        weights = (1*TOTAL.WEIGHT),
 
