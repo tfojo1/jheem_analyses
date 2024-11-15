@@ -73,7 +73,7 @@ EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
 
 #-- POPULATION  ----
 
-population.error.sd.fn = function(data, details)
+population.error.sd.fn = function(data, details=attr(data, 'details'))
 {
     # Massage the data a big
     melted.data = reshape2::melt(data)
@@ -94,7 +94,7 @@ population.error.sd.fn = function(data, details)
     max.post.censal.var = inherent.census.cv^2 + max.post.censal.cv^2
     
     post.censal.cv = exp(log(inherent.census.cv) + years.since.preceding.census * (0.5*log(max.post.censal.var) - log(inherent.census.cv)) / 9)
-    WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL = 2
+    WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL = 4
     intercensal.cv = exp(log(inherent.census.cv) + years.from.nearest.census * (0.5*log(max.post.censal.var / WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL) - log(inherent.census.cv)) / 9)  # assume variance is halved
     
     # this is a hack now - need to talk to Zoe about how she will formulate the details field
