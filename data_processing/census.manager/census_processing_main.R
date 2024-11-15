@@ -268,10 +268,21 @@ data.list.county = lapply(data.list.county.pop, function(file){
   }
   
   if(grepl("10.19", filename)) { #Location is calculated differently here because FIPS is not available
-
+    
     data$state = sub('.*,\\s*', '', data$COUNTY)
     data$county = gsub(",.*$", "", data$COUNTY)
-    data$location = locations::get.location.code(data$county, 'COUNTY')
+    data$location.list = locations::get.location.code(data$county, 'COUNTY')
+    data$state.abb = state.abb[match(data$state,state.name)]
+    
+    data$location.codes = sapply(1:nrow(data), function(i){
+      intersect(unlist(get.location.code(data$county[i], 'COUNTY')), get.contained.locations((data$state.abb[i]), 'COUNTY')
+      )})
+    
+    data$location = as.character(data$location.codes)
+    data$location.check = locations::is.location.valid(data$location)
+    
+        data <- data %>%
+      filter(location.check == 'TRUE')#Manually removing these counties until I know otherwise
 
   }
   
@@ -290,8 +301,6 @@ data.list.county = lapply(data.list.county.pop, function(file){
     data$location = data$FIPS
 
   }
-  
-  
   
   #Begin set up for pivot longer
   data$"population_2000" = data$POPESTIMATE2000
@@ -359,6 +368,8 @@ data.list.county = lapply(data.list.county.pop, function(file){
                  names_to = c("outcome", "year"),
                  names_sep = "_",
                  values_to = "value")
+  
+  data$value = as.numeric(gsub(",", '', data$value))
   
   data$year = as.character(data$year) 
   
