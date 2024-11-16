@@ -7,10 +7,12 @@ CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid2'
+CALIBRATION.CODE.EHE.FINAL = 'final'
 
 N.ITER.TEST = 10000
 N.ITER = 20000
 N.ITER.FULL = 50000
+N.ITER.FINAL = 250000
 
 # load params manual
 load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_21.Rdata") 
@@ -151,4 +153,19 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
                           description = "Full with covid likelihoods"
+)
+
+#-- REGISTER FULL CALIBRATION WITH COVID-RELATED --#
+register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
+                          likelihood.instructions = FULL.likelihood.instructions.with.covid,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FINAL, 
+                          thin = 500, 
+                          n.chains = 4,
+                          is.preliminary = F,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.PLUS.COVID),
+                          description = "FULL RUN"
 )
