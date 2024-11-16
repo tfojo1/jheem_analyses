@@ -322,22 +322,22 @@
     age = c('20-24 years')
   )
   
-  #year_location_race
-  dummy.counties.nine <- data.frame(
-    outcome = c('adult.population'),
-    year = c('2019'),
-    location = c('51560', '51780', '51123'),
-    value = as.numeric(NA),
-    race = c('white')
-  )
-  #year_location_ethnicity
-  dummy.counties.ten  <- data.frame(
-    outcome = c('adult.population'),
-    year = c('2019'),
-    location = c('51560', '51780', '51123'),
-    value = as.numeric(NA),
-    ethnicity = c('not hispanic')
-  )
+  # #year_location_race
+  # dummy.counties.nine <- data.frame(
+  #   outcome = c('adult.population'),
+  #   year = c('2019'),
+  #   location = c('51560', '51780', '51123'),
+  #   value = as.numeric(NA),
+  #   race = c('white')
+  # )
+  # #year_location_ethnicity
+  # dummy.counties.ten  <- data.frame(
+  #   outcome = c('adult.population'),
+  #   year = c('2019'),
+  #   location = c('51560', '51780', '51123'),
+  #   value = as.numeric(NA),
+  #   ethnicity = c('not hispanic')
+  # )
   
   #year_location_race_ethnicity
   dummy.counties.eleven  <- data.frame(
@@ -373,8 +373,8 @@
                          dummy.counties.six,
                          dummy.counties.seven,
                          dummy.counties.eight,
-                         dummy.counties.nine,
-                         dummy.counties.ten,
+                         #dummy.counties.nine,
+                         #dummy.counties.ten,
                          dummy.counties.eleven,
                          dummy.counties.twelve,
                          dummy.counties.thirteen)
@@ -489,22 +489,22 @@
     age = c('20-24 years')
   )
   
-  #year_location_race
-  dummy.counties.twentytwo <- data.frame(
-    outcome = c('adult.population'),
-    year = c('2019'),
-    location = c('51560', '51780', '51123'),
-    value = as.numeric(NA),
-    race = c('white')
-  )
-  #year_location_ethnicity
-  dummy.counties.twentythree  <- data.frame(
-    outcome = c('adult.population'),
-    year = c('2019'),
-    location = c('51560', '51780', '51123'),
-    value = as.numeric(NA),
-    ethnicity = c('not hispanic')
-  )
+  # #year_location_race
+  # dummy.counties.twentytwo <- data.frame(
+  #   outcome = c('adult.population'),
+  #   year = c('2019'),
+  #   location = c('51560', '51780', '51123'),
+  #   value = as.numeric(NA),
+  #   race = c('white')
+  # )
+  # #year_location_ethnicity
+  # dummy.counties.twentythree  <- data.frame(
+  #   outcome = c('adult.population'),
+  #   year = c('2019'),
+  #   location = c('51560', '51780', '51123'),
+  #   value = as.numeric(NA),
+  #   ethnicity = c('not hispanic')
+  # )
   
   #year_location_race_ethnicity
   dummy.counties.twentyfour  <- data.frame(
@@ -540,8 +540,8 @@
                              dummy.counties.nineteen,
                              dummy.counties.twenty,
                              dummy.counties.twentyone,
-                             dummy.counties.twentytwo,
-                             dummy.counties.twentythree,
+                             #dummy.counties.twentytwo,
+                             #dummy.counties.twentythree,
                              dummy.counties.twentyfour,
                              dummy.counties.twentyfive,
                              dummy.counties.twentysix)
