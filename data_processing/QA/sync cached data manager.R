@@ -41,7 +41,7 @@ syphilis.manager = load.data.manager(name="syphilis.manager", file="../../cached
 
 #UPDATE LINK EACH TIME
 sync.cached.data.manager("syphilis.manager.rdata",
-                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/Ea6-pTjU9VZOqh4BFkEZjcEBr092GiFiU2KmBk5D3b6AvA?e=O9xKU4",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/Ea6-pTjU9VZOqh4BFkEZjcEBr092GiFiU2KmBk5D3b6AvA?e=SqWoHP",
                          allow.flag = T)
 
 get.data.manager.cache.metadata()
