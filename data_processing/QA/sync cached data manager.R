@@ -28,9 +28,10 @@ get.data.manager.cache.metadata("surveillance.manager.rdata")
 census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
 
 sync.cached.data.manager("census.manager.rdata",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EajriZ0H1v9Nrh6yTjt177ABl43ytsqv9mfgRVLX2aDPBA?e=rGjTWR",
                          allow.flag = T)
 
-get.data.manager.cache.metadata("census.manager.rdata")
+get.data.manager.cache.metadata)
 
 
 # SYPHILIS MANAGER --------------------------------------------------------
