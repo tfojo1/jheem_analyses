@@ -17,9 +17,9 @@ surveillance.manager = load.data.manager(name="surveillance.manager", file="../.
 
 #You have to change the link everytime
 sync.cached.data.manager("surveillance.manager.rdata",
-                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EQS1u_TFlkpCrsv5vhMlufoB7UmfiE2TYW04-CXSdAG4Xw?e=nRPLER",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EQS1u_TFlkpCrsv5vhMlufoB7UmfiE2TYW04-CXSdAG4Xw?e=4rzT2e",
                          allow.flag = T)
-get.data.manager.cache.metadata("surveillance.manager.rdata")
+get.data.manager.cache.metadata()
 
 
 
@@ -27,11 +27,12 @@ get.data.manager.cache.metadata("surveillance.manager.rdata")
 
 census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
 
+#You have to change the link everytime
 sync.cached.data.manager("census.manager.rdata",
                          "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EajriZ0H1v9Nrh6yTjt177ABl43ytsqv9mfgRVLX2aDPBA?e=rGjTWR",
                          allow.flag = T)
 
-get.data.manager.cache.metadata)
+get.data.manager.cache.metadata()
 
 
 # SYPHILIS MANAGER --------------------------------------------------------
@@ -43,4 +44,4 @@ sync.cached.data.manager("syphilis.manager.rdata",
                          "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/Ea6-pTjU9VZOqh4BFkEZjcEBr092GiFiU2KmBk5D3b6AvA?e=O9xKU4",
                          allow.flag = T)
 
-get.data.manager.cache.metadata("syphilis.manager.rdata")
+get.data.manager.cache.metadata()
