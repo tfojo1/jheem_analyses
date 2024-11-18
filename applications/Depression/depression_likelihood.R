@@ -105,9 +105,9 @@ pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(ou
 
 
 ##---- Computing likelihoods ----##
-proportionDep_likelihood <- proportionDep_likelihood_inst$instantiate.likelihood(version='dep', location='C.12580') # can also be a diff location
+# proportionDep_likelihood <- proportionDep_likelihood_inst$instantiate.likelihood(version='dep', location='C.12580') # can also be a diff location
 # add simulation and compute
-proportionDep_likelihood$compute(sim) # sim=sim name // log-LL default // always about comparing, so we run another likelihood 
+# proportionDep_likelihood$compute(sim) # sim=sim name // log-LL default // always about comparing, so we run another likelihood 
 # we can look at the likelihoods using simplot, visual check against the data-points // also helps decide whether our SD decisions are too strict or not
 
 
