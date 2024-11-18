@@ -51,6 +51,9 @@ syphilis.clean = lapply(syphilis.data, function(file){
   if(grepl("county", filename)) {
     data$location = data$FIPS
   }
+  if(grepl("national", filename)) {
+    data$location = "US"
+  }
   
   ##Demographic conditionals##
   
@@ -133,6 +136,9 @@ syphilis.clean.early = lapply(syphilis.data.early, function(file){
   if(grepl("county", filename)) {
     data$location = data$FIPS
   }
+  if(grepl("national", filename)) {
+    data$location = "US"
+  }
   
   ##Demographic conditionals##
   
@@ -202,6 +208,7 @@ gonorrhea.clean = lapply(gonorrhea.data, function(file){
   if(grepl("county", filename)) {
     data$location = data$FIPS
   }
+  
   
   ##Demographic conditionals##
   
