@@ -38,14 +38,14 @@ sim = engine$run(params)
 #Outcomes
 simplot(sim,"population" )
 simplot(sim,"population" ,
-        dimension.values = list(year = 2000:2030))
+        dimension.values = list(year = 2009:2030))
 #By 1 factor
 simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
 simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
 simplot(sim,"population", facet.by = "race", dimension.values = list(year = 2000:2030))
 # By 2 factors
 simplot(sim,"population",
-        facet.by = "age", split.by ="race", dimension.values = list(year = 2000:2030))
+        facet.by = "age", split.by ="race", dimension.values = list(year = 2009:2030))
 simplot(sim,"population", 
         facet.by = "age", split.by ="sex", dimension.values = list(year = 2000:2030))
 
