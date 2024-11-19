@@ -54,57 +54,57 @@ census.age.mappings.10.19 = c('1' = '0-4 years',
                         '18' = '85+ years')
 # RACE --------------------------------------------------------------------
 #TAKE OUT YEAR = 1, 2
-# population.race <- county_agegr_sex_race_eth_10.19%>%
-#   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
-#          NA_MALE, NA_FEMALE)%>%
-#   mutate(YEAR = as.character(YEAR))%>%
-#   filter(YEAR != "1")%>% 
-#   filter(YEAR != "2")%>% 
-#   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
-#   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
-#   mutate(location = paste(STATE, COUNTY, sep=""))%>%
-#   filter(AGEGRP == "0")%>% #only selecting the total here
-#   pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
-#                              "NA_MALE", "NA_FEMALE")), 
-#                names_to = c("race", "sex"),
-#                names_sep = "_",
-#                values_to = "count.by.sex")%>%
-#   mutate(race = as.character(census.race.mappings.10.19[race]))%>%
-#   mutate(sex = tolower(sex))%>%
-#   mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
-#   select(location, year, race, sex, count.by.sex)%>%
-#   group_by(year, location, race)%>%
-#   mutate(value = sum(count.by.sex))%>%
-#   select(-sex, -count.by.sex)%>%
-#   mutate(outcome = "population")
-# 
-# population.race= as.data.frame(population.race)
+population.race <- county_agegr_sex_race_eth_10.19%>%
+  select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
+         NA_MALE, NA_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
+  filter(YEAR != "1")%>% 
+  filter(YEAR != "2")%>% 
+  mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
+  mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
+  mutate(location = paste(STATE, COUNTY, sep=""))%>%
+  filter(AGEGRP == "0")%>% #only selecting the total here
+  pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
+                             "NA_MALE", "NA_FEMALE")), 
+               names_to = c("race", "sex"),
+               names_sep = "_",
+               values_to = "count.by.sex")%>%
+  mutate(race = as.character(census.race.mappings.10.19[race]))%>%
+  mutate(sex = tolower(sex))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
+  select(location, year, race, sex, count.by.sex)%>%
+  group_by(year, location, race)%>%
+  mutate(value = sum(count.by.sex))%>%
+  select(-sex, -count.by.sex)%>%
+  mutate(outcome = "population")
+
+population.race= as.data.frame(population.race)
 
 
 # ETHNICITY ---------------------------------------------------------------
-# population.ethnicity <- county_agegr_sex_race_eth_10.19%>%
-#   select(STATE, COUNTY, YEAR, AGEGRP, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
-#   mutate(YEAR = as.character(YEAR))%>%
-#     filter(YEAR != "1")%>%
-#       filter(YEAR != "2")%>% 
-#   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
-#   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
-#   mutate(location = paste(STATE, COUNTY, sep=""))%>%
-#   filter(AGEGRP == "0")%>% #only selecting the total here
-#   pivot_longer(cols=c(one_of( "NH_MALE", "NH_FEMALE", "H_MALE", "H_FEMALE")),
-#                names_to = c("ethnicity", "sex"),
-#                names_sep = "_",
-#                values_to = "count.by.sex")%>%
-#   mutate(ethnicity = as.character(census.eth.mappings.10.19[ethnicity]))%>%
-#   mutate(sex = tolower(sex))%>%
-#   mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
-#   select(location, year, ethnicity, sex, count.by.sex)%>%
-#   group_by(year, location, ethnicity)%>%
-#   mutate(value = sum(count.by.sex))%>%
-#   select(-sex, -count.by.sex)%>%
-#   mutate(outcome = "population")
-# 
-# population.ethnicity= as.data.frame(population.ethnicity)
+population.ethnicity <- county_agegr_sex_race_eth_10.19%>%
+  select(STATE, COUNTY, YEAR, AGEGRP, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
+    filter(YEAR != "1")%>%
+      filter(YEAR != "2")%>% 
+  mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
+  mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
+  mutate(location = paste(STATE, COUNTY, sep=""))%>%
+  filter(AGEGRP == "0")%>% #only selecting the total here
+  pivot_longer(cols=c(one_of( "NH_MALE", "NH_FEMALE", "H_MALE", "H_FEMALE")),
+               names_to = c("ethnicity", "sex"),
+               names_sep = "_",
+               values_to = "count.by.sex")%>%
+  mutate(ethnicity = as.character(census.eth.mappings.10.19[ethnicity]))%>%
+  mutate(sex = tolower(sex))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
+  select(location, year, ethnicity, sex, count.by.sex)%>%
+  group_by(year, location, ethnicity)%>%
+  mutate(value = sum(count.by.sex))%>%
+  select(-sex, -count.by.sex)%>%
+  mutate(outcome = "population")
+
+population.ethnicity= as.data.frame(population.ethnicity)
 
 # AGE (groups) ---------------------------------------------------------------------
 
@@ -170,59 +170,59 @@ population.sex.age= as.data.frame(population.sex.age)
 
 
 # RACE + AGE --------------------------------------------------------------
-# population.race.age <- county_agegr_sex_race_eth_10.19%>%
-#   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
-#          NA_MALE, NA_FEMALE)%>%
-#   mutate(YEAR = as.character(YEAR))%>%
-#   filter(YEAR != "1")%>% 
-#   filter(YEAR != "2")%>% 
-#   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
-#   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
-#   mutate(location = paste(STATE, COUNTY, sep=""))%>%
-#   pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
-#                              "NA_MALE", "NA_FEMALE")),
-#                names_to = c("race", "sex"),
-#                names_sep = "_",
-#                values_to = "count.by.sex")%>%
-#   mutate(race = as.character(census.race.mappings.10.19[race]))%>%
-#   mutate(sex = tolower(sex))%>%
-#   mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
-#   filter(AGEGRP != "0")%>%
-#   mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
-#   select(location, year, age, race, count.by.sex)%>%
-#   group_by(year, location, age, race)%>%
-#   mutate(value = sum(count.by.sex))%>%
-#   mutate(outcome = 'population') %>%
-#   select(outcome, location, year, age, race, value)
-# 
-# population.race.age= as.data.frame(population.race.age)
+population.race.age <- county_agegr_sex_race_eth_10.19%>%
+  select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
+         NA_MALE, NA_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
+  filter(YEAR != "1")%>% 
+  filter(YEAR != "2")%>% 
+  mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
+  mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
+  mutate(location = paste(STATE, COUNTY, sep=""))%>%
+  pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
+                             "NA_MALE", "NA_FEMALE")),
+               names_to = c("race", "sex"),
+               names_sep = "_",
+               values_to = "count.by.sex")%>%
+  mutate(race = as.character(census.race.mappings.10.19[race]))%>%
+  mutate(sex = tolower(sex))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
+  filter(AGEGRP != "0")%>%
+  mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
+  select(location, year, age, race, count.by.sex)%>%
+  group_by(year, location, age, race)%>%
+  mutate(value = sum(count.by.sex))%>%
+  mutate(outcome = 'population') %>%
+  select(outcome, location, year, age, race, value)
+
+population.race.age= as.data.frame(population.race.age)
 
  
 # # ETHNICITY + AGE ---------------------------------------------------------
-# population.ethnicity.age <- county_agegr_sex_race_eth_10.19%>%
-#   select(STATE, COUNTY, YEAR, AGEGRP, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
-#   mutate(YEAR = as.character(YEAR))%>%
-#   filter(YEAR != "1")%>% 
-#   filter(YEAR != "2")%>% 
-#   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
-#   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
-#   mutate(location = paste(STATE, COUNTY, sep=""))%>%
-#   pivot_longer(cols=c(one_of("NH_MALE", "NH_FEMALE", "H_MALE", "H_FEMALE")),
-#                names_to = c("ethnicity", "sex"),
-#                names_sep = "_",
-#                values_to = "count.by.sex")%>%
-#   mutate(ethnicity = as.character(census.eth.mappings.10.19[ethnicity]))%>%
-#   mutate(sex = tolower(sex))%>%
-#   mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
-#   filter(AGEGRP != "0")%>%
-#   mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
-#   select(location, year, age, ethnicity, count.by.sex)%>%
-#   group_by(year, location, age, ethnicity)%>%
-#   mutate(value = sum(count.by.sex))%>%
-#   mutate(outcome = 'population') %>%
-#   select(outcome, location, year, age, ethnicity, value)
-# 
-# population.ethnicity.age= as.data.frame(population.ethnicity.age)
+population.ethnicity.age <- county_agegr_sex_race_eth_10.19%>%
+  select(STATE, COUNTY, YEAR, AGEGRP, NH_MALE, NH_FEMALE, H_MALE, H_FEMALE)%>%
+  mutate(YEAR = as.character(YEAR))%>%
+  filter(YEAR != "1")%>% 
+  filter(YEAR != "2")%>% 
+  mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
+  mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
+  mutate(location = paste(STATE, COUNTY, sep=""))%>%
+  pivot_longer(cols=c(one_of("NH_MALE", "NH_FEMALE", "H_MALE", "H_FEMALE")),
+               names_to = c("ethnicity", "sex"),
+               names_sep = "_",
+               values_to = "count.by.sex")%>%
+  mutate(ethnicity = as.character(census.eth.mappings.10.19[ethnicity]))%>%
+  mutate(sex = tolower(sex))%>%
+  mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
+  filter(AGEGRP != "0")%>%
+  mutate(age = as.character(census.age.mappings.10.19[AGEGRP]))%>%
+  select(location, year, age, ethnicity, count.by.sex)%>%
+  group_by(year, location, age, ethnicity)%>%
+  mutate(value = sum(count.by.sex))%>%
+  mutate(outcome = 'population') %>%
+  select(outcome, location, year, age, ethnicity, value)
+
+population.ethnicity.age= as.data.frame(population.ethnicity.age)
 
 
 # Race+Ethnicity+Sex ----------------------------------------------------------
@@ -378,13 +378,13 @@ population.race.eth.sex.age= as.data.frame(population.race.eth.sex.age)
 # # Put into CENSUS MANAGER --------------------------
 
  stratified.10.19.data = list(
-   #population.race,
-   #population.ethnicity,
+   population.race,
+   population.ethnicity,
    population.age.groups,
    population.sex,
    population.sex.age,
-   #population.race.age,
-   #population.ethnicity.age,
+   population.race.age,
+   population.ethnicity.age,
    population.race.eth,
    population.race.eth.sex,
    population.age.race.eth,
