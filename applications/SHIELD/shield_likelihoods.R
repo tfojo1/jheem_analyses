@@ -1,3 +1,12 @@
+# In the census manager: 
+# anywhere that we have a county level data, we should have a national level data with the same stratification and ontology names 
+# anywhere that we have a MSA level data, we should have a national level data with the same stratification and ontology names
+# we can have more national level estimates if we can pull them directly 
+# in the surveillance manager, we only need to have MSA level and national level data
+
+# we should bound agegroups at 85+
+
+
 # LIKELIHOODS INCLUDED: 
 
 #the census runs population count every 10 years, in 2010, and 2020.
@@ -98,6 +107,5 @@ likelihood.instructions.demographics =  join.likelihood.instructions(
 #manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"US")
 # lik=deaths.likelihood.instructions$instantiate.likelihood('shield',"US")
-# lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"55139")
 # lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"US")
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)

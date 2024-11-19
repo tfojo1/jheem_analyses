@@ -1,3 +1,11 @@
+# taking out county-level population data from census manager
+# finding a way to subset the datamanagers
+# should we keep both managers or combine them?
+#   
+  # Fertility rates MSA
+
+
+
 
 ## Notes: ----
 
