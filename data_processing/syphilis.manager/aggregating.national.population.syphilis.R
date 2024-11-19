@@ -11,6 +11,94 @@
 #   keep.dimensions = "year",
 #   na.rm = T)  
 
+
+
+# Race alone 2010-2023 ----------------------------------------------------
+
+# counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__race)$location #3133 counties
+# 
+# race.alone.10.23 = census.manager$pull(
+#   outcome = "population",
+#   source = 'census.population', 
+#   from.ontology.names = "stratified.census", 
+#   dimension.values = list(location = counties), 
+#   keep.dimensions = c('year', 'race'),
+#   na.rm = T) 
+# 
+# race.alone.10.23 = as.data.frame.table(race.alone.10.23)%>%
+#   mutate(year = as.character(year))%>%
+#   mutate(value = as.numeric(Freq))%>%
+#   mutate(outcome = "population")%>%
+#   mutate(location = "US")%>%
+#   mutate(race = as.character(race))%>%
+#   select(-Freq, -source)%>%
+#   mutate(race = tolower(race))
+
+# Ethnicity Alone 2010-2023 -----------------------------------------------
+# 
+# counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__ethnicity)$location #3133 counties
+# 
+# eth.alone.10.23 = census.manager$pull(
+#   outcome = "population",
+#   source = 'census.population', 
+#   from.ontology.names = "stratified.census", 
+#   dimension.values = list(location = counties), 
+#   keep.dimensions = c('year', 'ethnicity'),
+#   na.rm = T) 
+# 
+# eth.alone.10.23 = as.data.frame.table(eth.alone.10.23)%>%
+#   mutate(year = as.character(year))%>%
+#   mutate(value = as.numeric(Freq))%>%
+#   mutate(outcome = "population")%>%
+#   mutate(location = "US")%>%
+#   mutate(ethnicity = as.character(ethnicity))%>%
+#   select(-Freq, -source)%>%
+#   mutate(ethnicity = tolower(ethnicity))
+
+# Age + Race 2010-2023 -----------------------------------------------
+# 
+# counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race)$location #3133 counties
+# 
+# age.race.10.23 = census.manager$pull(
+#   outcome = "population",
+#   source = 'census.population', 
+#   from.ontology.names = "stratified.census", 
+#   dimension.values = list(location = counties), 
+#   keep.dimensions = c('year', 'age', 'race'),
+#   na.rm = T) 
+# 
+# age.race.10.23 = as.data.frame.table(age.race.10.23)%>%
+#   mutate(year = as.character(year))%>%
+#   mutate(value = as.numeric(Freq))%>%
+#   mutate(outcome = "population")%>%
+#   mutate(location = "US")%>%
+#   mutate(age = as.character(age))%>%
+#   mutate(race = as.character(race))%>%
+#   select(-Freq, -source)%>%
+#   mutate(race = tolower(race))
+
+# Age + ethnicity 2010-2023 -----------------------------------------------
+# 
+# counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity)$location #3133 counties
+# 
+# age.ethnicity.10.23 = census.manager$pull(
+#   outcome = "population",
+#   source = 'census.population', 
+#   from.ontology.names = "stratified.census", 
+#   dimension.values = list(location = counties), 
+#   keep.dimensions = c('year', 'age', 'ethnicity'),
+#   na.rm = T) 
+# 
+# age.ethnicity.10.23 = as.data.frame.table(age.ethnicity.10.23)%>%
+#   mutate(year = as.character(year))%>%
+#   mutate(value = as.numeric(Freq))%>%
+#   mutate(outcome = "population")%>%
+#   mutate(location = "US")%>%
+#   mutate(age = as.character(age))%>%
+#   mutate(ethnicity = as.character(ethnicity))%>%
+#   select(-Freq, -source)%>%
+#   mutate(ethnicity = tolower(ethnicity))
+
 # Race + Ethnicity 2010-2023 -----------------------------------------------
 
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity)$location #3133 counties
@@ -168,6 +256,10 @@ age.sex.10.19 = as.data.frame.table(age.sex.10.19)%>%
 # Put ---------------------------------------------------------------------
 
 national.population.stratified = list(
+  #race.alone.10.23,
+  #eth.alone.10.23,
+  #age.race.10.23,
+  #age.ethnicity.10.23,
   race.ethnicity.10.23,
   race.ethnicity.sex.10.23,
   race.ethnicity.age.10.23,
@@ -187,6 +279,8 @@ for (data in national.population.stratified) {
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
+
+
 
 # These have a separate ontology (because of single year ages) ------------
 
@@ -248,8 +342,10 @@ age.sex.20.23 = as.data.frame.table(age.sex.20.23)%>%
   mutate(age = as.character(age))%>%
   mutate(sex = as.character(sex))%>%
   select(-Freq, -source)
-
 # Put ---------------------------------------------------------------------
+
+
+
 national.population.census = list(
   age.alone.20.23,
   sex.alone.20.23,
