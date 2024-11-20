@@ -15,9 +15,12 @@ source('commoncode/cache_manager.R')
 
 surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 
+surveillance.manager = load.data.manager(name="surveillance.manager", file="C:/Users/zthomps5/OneDrive - Johns Hopkins/Desktop/First Week/Data Manager Archives/surveillance.manager_10.24.24.rdata")
+
+
 #You have to change the link everytime
 sync.cached.data.manager("surveillance.manager.rdata",
-                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EQS1u_TFlkpCrsv5vhMlufoB7UmfiE2TYW04-CXSdAG4Xw?e=4rzT2e",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EfzhTwGkOwFEmdzwTI1zOksBbkmkx7j6axHy4_kuK9bOzQ?e=vyxOVm",
                          allow.flag = T)
 get.data.manager.cache.metadata()
 
