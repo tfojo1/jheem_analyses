@@ -306,7 +306,7 @@ age.alone.20.23 = as.data.frame.table(age.alone.20.23)%>%
   select(-Freq, -source)
 
 # Sex 2020-2023 -----------------------------------------------------------
-counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__age)$location #3134 counties
+counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__sex)$location #3134 counties
 
 sex.alone.20.23 = census.manager$pull(
   outcome = "population",

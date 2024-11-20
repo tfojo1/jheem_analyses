@@ -16,6 +16,7 @@
 # Race alone 2010-2023 ----------------------------------------------------
 
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__race)$location #3133 counties
+counties = (counties[! counties%in% c("US")])
 
 race.alone.10.23 = census.manager$pull(
   outcome = "population",
@@ -37,6 +38,7 @@ race.alone.10.23 = as.data.frame.table(race.alone.10.23)%>%
 # Ethnicity Alone 2010-2023 -----------------------------------------------
 
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__ethnicity)$location #3133 counties
+counties = (counties[! counties%in% c("US")])
 
 eth.alone.10.23 = census.manager$pull(
   outcome = "population",
@@ -58,6 +60,7 @@ eth.alone.10.23 = as.data.frame.table(eth.alone.10.23)%>%
 # Age + Race 2010-2023 -----------------------------------------------
 
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race)$location #3133 counties
+counties = (counties[! counties%in% c("US")])
 
 age.race.10.23 = census.manager$pull(
   outcome = "population",
@@ -80,6 +83,8 @@ age.race.10.23 = as.data.frame.table(age.race.10.23)%>%
 # Age + ethnicity 2010-2023 -----------------------------------------------
 
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__ethnicity)$location #3133 counties
+counties = (counties[! counties%in% c("US")])
+
 
 age.ethnicity.10.23 = census.manager$pull(
   outcome = "population",
@@ -102,6 +107,7 @@ age.ethnicity.10.23 = as.data.frame.table(age.ethnicity.10.23)%>%
 # Race + Ethnicity 2010-2023 -----------------------------------------------
 
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity)$location #3133 counties
+counties = (counties[! counties%in% c("US")])
 
 race.ethnicity.10.23 = census.manager$pull(
   outcome = "population",
@@ -125,6 +131,7 @@ race.ethnicity.10.23 = as.data.frame.table(race.ethnicity.10.23)%>%
 
 # Race + Ethnicity + Sex 2010-2023 --------------------------------------------
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity__sex)$location #3133 counties
+counties = (counties[! counties%in% c("US")])
 
 race.ethnicity.sex.10.23 = census.manager$pull(
   outcome = "population",
@@ -148,6 +155,7 @@ race.ethnicity.sex.10.23 = as.data.frame.table(race.ethnicity.sex.10.23)%>%
 
 # Race + Ethnicity + Age 2010-2023 ----------------------------------------
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity)$location #3133 counties
+counties = (counties[! counties%in% c("US")])
 
 race.ethnicity.age.10.23 = census.manager$pull(
   outcome = "population",
@@ -171,6 +179,7 @@ race.ethnicity.age.10.23 = as.data.frame.table(race.ethnicity.age.10.23)%>%
 
 # Age + Race + Ethnicity + Sex --------------------------------------------
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex)$location #3133 counties
+counties = (counties[! counties%in% c("US")])
 
 race.ethnicity.age.sex.10.23 = census.manager$pull(
   outcome = "population",
@@ -196,6 +205,7 @@ race.ethnicity.age.sex.10.23 = as.data.frame.table(race.ethnicity.age.sex.10.23)
 # Age 2010-2019 -----------------------------------------------------------
 
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age)$location #3134 counties
+counties = (counties[! counties%in% c("US")])
 
 age.alone.10.19 = census.manager$pull(
   outcome = "population",
@@ -215,6 +225,7 @@ age.alone.10.19 = as.data.frame.table(age.alone.10.19)%>% #NOTE: you are current
 
 # Sex 2010-2019 -----------------------------------------------------------
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__sex)$location #3134 counties
+counties = (counties[! counties%in% c("US")])
 
 sex.alone.10.19 = census.manager$pull(
   outcome = "population",
@@ -235,6 +246,7 @@ sex.alone.10.19 = as.data.frame.table(sex.alone.10.19)%>% #NOTE: you are current
 # Age + Sex  2010-2019 ----------------------------------------------------
 
 counties = dimnames(census.manager$data$population$estimate$census.population$stratified.census$year__location__age__sex)$location #3134 counties
+counties = (counties[! counties%in% c("US")])
 
 age.sex.10.19 = census.manager$pull(
   outcome = "population",
@@ -286,7 +298,8 @@ for (data in national.population.stratified) {
 
 
 # Age 2020-2023 -----------------------------------------------------------
-counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__age)$location #3134 counties
+counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__age)$location #3144 counties
+counties = (counties[! counties%in% c("US")])
 
 age.alone.20.23 = census.manager$pull(
   outcome = "population",
@@ -305,7 +318,8 @@ age.alone.20.23 = as.data.frame.table(age.alone.20.23)%>%
   select(-Freq, -source)
 
 # Sex 2020-2023 -----------------------------------------------------------
-counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__age)$location #3134 counties
+counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__sex)$location #3144 counties
+counties = (counties[! counties%in% c("US")])
 
 sex.alone.20.23 = census.manager$pull(
   outcome = "population",
@@ -325,6 +339,7 @@ sex.alone.20.23 = as.data.frame.table(sex.alone.20.23)%>%
 
 # Age + Sex 2020-2023 -----------------------------------------------------
 counties = dimnames(census.manager$data$population$estimate$census.population$census$year__location__age__sex)$location #3134 counties
+counties = (counties[! counties%in% c("US")])
 
 age.sex.20.23 = census.manager$pull(
   outcome = "population",
