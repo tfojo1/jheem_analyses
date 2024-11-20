@@ -44,6 +44,7 @@ load.data.manager.from.cache <- function(file, set.as.default = F, offline=F) {
             } else {
                 cat("Local copy is out of date, so downloading the latest copy from the OneDrive...\n")
                 download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
+                loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
             }
         }
     }    
