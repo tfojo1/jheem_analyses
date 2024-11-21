@@ -35,11 +35,16 @@ register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments
 
 register.model.element(DEP.SPECIFICATION, name="depression.length", 
                   #     functional.form = create.static.functional.form(value=6/12, link = "log"), 
-                      value = 6/12,
+                       value = 6/12,
                        scale="time") # average length of depressive episode
 
 register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx", 
-                       functional.form = create.static.functional.form(value=0.18, link = "logit", # adults 18-24
+                       functional.form = create.static.functional.form(value=0.18, link = "logit", # HIV+, adults 18-24
+                                                                       value.is.on.transformed.scale = F), 
+                       scale = "proportion")
+
+register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx.gen", 
+                       functional.form = create.static.functional.form(value=0.65, link = "logit", # General population
                                                                        value.is.on.transformed.scale = F), 
                        scale = "proportion")
 
@@ -332,7 +337,7 @@ track.integrated.outcome(DEP.SPECIFICATION, ## HIV+ve individuals with depressio
 
 ## -- Prevalence ratio HIV depressed vs. General Population
 track.cumulative.outcome(DEP.SPECIFICATION,
-                         name = 'prevRatio',
+                         name = 'prev_ratio_depression',
                          outcome.metadata = create.outcome.metadata(display.name = 'Prevalence Ratio of Depression',
                                                                     description = "Prevalence Ratio of Depression, PwH vs. General Population",
                                                                     scale = 'proportion',
@@ -368,6 +373,31 @@ track.cumulative.outcome(DEP.SPECIFICATION,
                                                                     units = '%'),
                          value = expression(hiv.depression.treat/cumulative.infected.depressed),
                          denominator.outcome = 'cumulative.infected.depressed',
+                         keep.dimensions = c("location"), 
+                         save = T)
+
+track.integrated.outcome(DEP.SPECIFICATION,
+                         name = 'pop.depression.treat', ## General population on depression Tx
+                         outcome.metadata = create.outcome.metadata(display.name = 'Prevalence of General population with Depression on Treatment',
+                                                                    description = "The Number of People in the General Population with Depression on Treatment",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Prevalent Cases',
+                                                                    units = 'cases',
+                                                                    singular.unit = 'case'),
+                         value.to.integrate = 'uninfected',
+                         multiply.by = 'depression.proportion.tx.gen',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = T)
+
+track.cumulative.outcome(DEP.SPECIFICATION,
+                         name = 'proportion.gen.depressed.treated', 
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Depressed Treated',
+                                                                    description = "The Proportion of General Population with Depression on Treatment",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion Treated',
+                                                                    units = '%'),
+                         value = expression(pop.depression.treat/cumulative.uninfected.depressed),
+                         denominator.outcome = 'cumulative.uninfected.depressed',
                          keep.dimensions = c("location"), 
                          save = T)
 

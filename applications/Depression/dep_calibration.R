@@ -14,7 +14,7 @@ register.calibration.info('dep.init',
                           thin = 200, 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = 'full.with.aids',
+                          preceding.calibration.codes = 'full.with.covid2',
                           description = "Initial depression calibration", 
                           draw.from.parent.version = T
 )

@@ -89,14 +89,14 @@ prev_ratio_inst <- create.basic.likelihood.instructions.with.specified.outcome(o
                                                         error.variance.term = 0.03, ## To do: calculate from data CI
                                                         error.variance.type = 'sd') 
 # % PWH w dep on TX
-hiv_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'hiv_depression_tx',
+hiv_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'proportion.HIV.depressed.treated',
                                                         outcome.value = 0.184, 
                                                         from.year = 2013, ## check
                                                         to.year = 2020, ## check
                                                         error.variance.term = 0.03, ## To do: calculate from data CI
                                                         error.variance.type = 'sd') 
 # % general pop w dep on Tx
-pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'pop_depression_tx',
+pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'proportion.gen.depressed.treated',
                                                        outcome.value = 0.65, 
                                                        from.year = 2018, ## check 
                                                        to.year = 2021, ## check
