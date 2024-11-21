@@ -628,5 +628,7 @@ save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
 #Also save to Q drive
 save(syphilis.manager, file="Q:/data_managers/syphilis.manager.rdata")
 
-
-
+#Archive a version with the date to the Q Drive#
+timestamp <- Sys.Date()  
+filename <- paste0("Q:/data_managers/Archive/syphilis.manager_", timestamp, ".rdata")
+save(syphilis.manager, file=filename)

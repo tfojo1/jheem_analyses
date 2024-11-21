@@ -527,3 +527,8 @@ save(census.manager, file="../../cached/census.manager.rdata")
 
 #Also save to Q drive
 save(census.manager, file="Q:/data_managers/census.manager.rdata")
+
+#Archive a version with the date to the Q Drive#
+timestamp <- Sys.Date()  
+filename <- paste0("Q:/data_managers/Archive/census.manager_", timestamp, ".rdata")
+save(census.manager, file=filename)
