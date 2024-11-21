@@ -503,12 +503,12 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     #   var.names = paste0("age", 1:5, ".proportion.tested.or")
     # ),
     # 
-    # age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
-    #   mu = rep(0, 5),
-    #   sigma = create.auto.regressive.covariance.matrix(0.7, 5, 0.5*log(1.5)/10),
-    #   var.names = paste0("age", 1:5, ".proportion.tested.slope.or")
-    # ),
-    # 
+    age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
+      mu = rep(0, 5),
+      sigma = create.auto.regressive.covariance.matrix(0.5, 5, 0.5*log(1.5)/10),
+      var.names = paste0("age", 1:5, ".proportion.tested.slope.or")
+    ),
+
     
     # Testing Ramp
     msm.testing.ramp = Logitnormal.Distribution(0, 0.5 * log(1.5)),
@@ -542,12 +542,17 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     black.prep.or = Lognormal.Distribution(0, log(1.25)/2),
     hispanic.prep.or = Lognormal.Distribution(0, log(1.25)/2),
     
+    # prep coverage (of all the people indicated - what fraction are on prep at a given point in time)
+    # prep uptake (same denominator as coverage, but number of unique individuals who received prep at least once in the year)
+    # related mathematically via discontinuation rate
+
+    # uptake NUMBER is uptake proportion times number indicated - what we plot
     age1.prep.or = Lognormal.Distribution(0, log(2)),
     age2.prep.or = Lognormal.Distribution(0, log(2)),
     age3.prep.or = Lognormal.Distribution(0, log(2)),
     age4.prep.or = Lognormal.Distribution(0, log(2)),
     age5.prep.or = Lognormal.Distribution(0, log(2)),
-    
+
     prep.efficacy.z = Normal.Distribution(0, 1),
     # oral.prep.persistence = Normal.Distribution(0.56, 0.0587, lower=0, upper=1),
     oral.prep.persistence.or = Lognormal.Distribution(0, log(1.2)/2),
@@ -560,6 +565,12 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     non.msm.prep.indications.or = Lognormal.Distribution(0, 0.5*log(4)),
     prep.indications.slope.or = Lognormal.Distribution(0, 0.5*log(4)/5),
     
+    age1.prep.indications.or = Lognormal.Distribution(0, log(2)),
+    age2.prep.indications.or = Lognormal.Distribution(0, log(2)),
+    age3.prep.indications.or = Lognormal.Distribution(0, log(2)),
+    age4.prep.indications.or = Lognormal.Distribution(0, log(2)),
+    age5.prep.indications.or = Lognormal.Distribution(0, log(2)),
+
     #-- Proportion MSM --#
     proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
     
@@ -1316,11 +1327,16 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     # ),
     
     young.age.testing = c('age1.proportion.tested.or',
+                          'age1.proportion.tested.slope.or',
                           'age2.proportion.tested.or',
-                          'age3.proportion.tested.or'),
+                          'age2.proportion.tested.slope.or',
+                          'age3.proportion.tested.or',
+                          'age3.proportion.tested.slope.or'),
     
     old.age.testing = c('age4.proportion.tested.or',
-                        'age5.proportion.tested.or'),
+                        'age4.proportion.tested.slope.or',
+                        'age5.proportion.tested.or',
+                        'age5.proportion.tested.slope.or'),
 
     testing.ramp.by.risk = c(
       'msm.testing.ramp',
@@ -1359,7 +1375,16 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'age4.prep.or',
       'age5.prep.or'
     ),
-  
+
+    prep.indications.by.age = c(
+      'age1.prep.indications.or',
+      'age2.prep.indications.or',
+      'age3.prep.indications.or',
+      'age4.prep.indications.or',
+      'age5.prep.indications.or'
+    ),
+
+
 #-- HIV MORTALITY --#
 
     unsuppressed.hiv.mortality = c('unsuppressed.peak.hiv.mortality',

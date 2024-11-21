@@ -327,6 +327,12 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                    applies.to.dimension.values = 'all',
                                                    dimension = 'all')
     
+    set.element.functional.form.main.effect.alphas(model.settings = model.settings,
+                                                   element.name = 'prep.indication.without.covid',
+                                                   alpha.name = 'intercept',
+                                                   values = parameters[paste0('age',1:n.ages,'.prep.indications.or')],
+                                                   applies.to.dimension.values = ages,
+                                                   dimension = 'age')
     
     #-- Proportion MSM of Male --#
     
