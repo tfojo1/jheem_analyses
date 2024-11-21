@@ -190,9 +190,15 @@ put.msa.data.as.new.source = function(outcome,
                 details = aggregated.details[!sapply(aggregated.details, is.null)][[1]]
                 url = aggregated.url[!sapply(aggregated.url, is.null)][[1]]
                 if (any(sapply(aggregated.details, function(x) {!identical(x, details) && !is.null(x)})))
-                    stop(paste0(error.prefix, "'", from.source.name, "' data do not all have the same 'details'"))
+                    # stop(paste0(error.prefix, "'", from.source.name, "' data do not all have the same 'details'"))
+                    browser()
                 if (any(sapply(aggregated.url, function(x) {!identical(x, url) && !is.null(x)})))
-                    stop(paste0(error.prefix, "'", from.source.name, "' data do not all have the same 'url'"))
+                    # stop(paste0(error.prefix, "'", from.source.name, "' data do not all have the same 'url'"))
+                    browser()
+                
+                # ont.name
+                # to.location
+                # length(unique(aggregated.details))>1 #??? then look at aggregated.details
                 
                 # Details should now have the custom message appended to it indicating the use of this script
                 details = c(details, details.for.new.data)
