@@ -279,10 +279,12 @@ data.list.county = lapply(data.list.county.pop, function(file){
       )})
     
     data$location = as.character(data$location.codes)
+    data$location = ifelse(data$location.list == "11001", '11001', data$location)
     data$location.check = locations::is.location.valid(data$location)
     
-        data <- data %>%
-      filter(location.check == 'TRUE')#Manually removing these counties until I know otherwise
+    
+    location.issues <- data %>%
+      filter(location.check == "TRUE")#Manually removing these counties until I know otherwise
 
   }
   

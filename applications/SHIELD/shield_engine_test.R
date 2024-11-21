@@ -21,15 +21,15 @@ location= "US" #National
 
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 # specification.metadata=get.specification.metadata('shield','US')
-params=simset$last.sim()$params
-sim = engine$run(params)
-simplot(sim,simset$last.sim(),
-        "total.mortality")
-simplot(sim,simset$last.sim(),
-        "population")
-simplot(sim,simset$last.sim(),
-        "population",facet.by = "age",split.by = "race",dimension.values = list(year=2000:2030))
-params['other.general.mortality.rate.multiplier']=.9
+# params=simset$last.sim()$params
+# sim = engine$run(params)
+# simplot(sim,simset$last.sim(),
+#         "total.mortality")
+# simplot(sim,simset$last.sim(),
+#         "population")
+# simplot(sim,simset$last.sim(),
+#         "population",facet.by = "age",split.by = "race",dimension.values = list(year=2000:2030))
+# params['other.general.mortality.rate.multiplier']=.9
 
 #Running:
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
@@ -38,21 +38,23 @@ sim = engine$run(params)
 #Outcomes
 simplot(sim,"population" )
 simplot(sim,"population" ,
-        dimension.values = list(year = 2000:2030))
+        dimension.values = list(year = 2009:2030))
 #By 1 factor
 simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
 simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
 simplot(sim,"population", facet.by = "race", dimension.values = list(year = 2000:2030))
 # By 2 factors
 simplot(sim,"population",
-        facet.by = "age", split.by ="race", dimension.values = list(year = 2000:2030))
+        facet.by = "age", split.by ="race", dimension.values = list(year = 2009:2030))
 simplot(sim,"population", 
         facet.by = "age", split.by ="sex", dimension.values = list(year = 2000:2030))
 
-# simplot(sim,"fertility.rate") #ERROR
+simplot(sim,"fertility.rate")
+simplot(sim,"fertility.rate",
+        facet.by = "age", split.by = "race")
 
-simplot(sim,"total.mortality")
-simplot(sim,"total.mortality",
+simplot(sim,"deaths")
+simplot(sim,"deaths",
         dimension.values = list(year = 2000:2030))
 
 # we dont have data: 

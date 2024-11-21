@@ -18,21 +18,34 @@ if (is.null(JHEEM.CACHE.DIR)) {
 
 ## ----PUBLIC---- ##
 
-load.data.manager.from.cache <- function(file, set.as.default = F) {
+#' @param file Name of a data manager file, with its extension, that can be appended to the JHEEM.CACHE.DIR path.
+#' @param set.as.default Should this data manager be set as the default data manager for this session?
+#' @param offline If TRUE, having a missing or out of date data manager will not trigger a download from the internet. Use if offline to avoid errors.
+load.data.manager.from.cache <- function(file, set.as.default = F, offline=F) {
     error.prefix <- "Cannot load.data.manager.from.cache(): "
     cache.metadata <- get.data.manager.cache.metadata(pretty.print=F)
     if (!(file %in% names(cache.metadata))) {
         stop(paste0(error.prefix, "'", file, "' is not one of our cached files. Call 'get.data.manager.cache.metadata()' to check what files are cached. File names are capitalization-sensitive."))
     }
-
     # Download it if it doesn't exist or it exists but is out of date
     if (!file.exists(file.path(JHEEM.CACHE.DIR, file))) {
-        download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
-        loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
+        if (offline) {
+            stop(paste0(error.prefix, "File not found, and cannot download the latest copy from the OneDrive if 'offline' is set to TRUE"))
+        } else {
+            cat("File not found, so downloading the latest copy from the OneDrive...\n")
+            download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
+            loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
+        }
     } else {
         loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
         if (is.cached.data.manager.out.of.date(file, loaded.data.manager, error.prefix = error.prefix)) {
-            download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
+            if (offline) {
+                warning(paste0("The local copy of '", file, "' is out of date, but the latest version cannot be downloaded from the OneDrive if 'offline' is set to TRUE"))
+            } else {
+                cat("Local copy is out of date, so downloading the latest copy from the OneDrive...\n")
+                download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
+                loaded.data.manager <- load.data.manager(file.path(JHEEM.CACHE.DIR, file), set.as.default = set.as.default)
+            }
         }
     }    
     loaded.data.manager
@@ -156,7 +169,8 @@ is.cached.data.manager.out.of.date <- function(file, data.manager, error.prefix 
 
 download.data.manager.from.onedrive <- function(destination.file, onedrive.link, error.prefix, verbose = F) {
     req <- httr2::request(onedrive.link)
-    resp <- req |> httr2::req_perform()
+    tryCatch({resp <- req |> httr2::req_perform()},
+             error=function(e) {stop(paste0(error.prefix, "Failed to download the file. If you are trying to use 'load.data.manager.from.cache' offline, set argument 'offline' to TRUE and try again"))})
     if (httr2::resp_status(resp) == 200) {
         if (verbose) cat("File downloaded successfully to:", download_path, "\n")
         writeBin(httr2::resp_body_raw(resp), destination.file)

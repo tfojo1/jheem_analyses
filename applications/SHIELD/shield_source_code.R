@@ -52,6 +52,10 @@ if (is.null(get.default.data.manager()) | NEW.SOURCE){ #if it's in memory, it wo
   print("Syphilis survillance manager read")
 }
 
+
+# SURVEILLANCE.MANAGER$subset.data(dimension.values = list(location='C.12580'))
+# dimnames(SURVEILLANCE.MANAGER$data$population$estimate$census.population$census$year__location)
+
 # SHIELD specific code ----
 source('applications/SHIELD/shield_calib_parameters.R') ; print("shield_calib_parameters.R sourced")
 source('applications/SHIELD/shield_base_parameters.R') ; print("shield_base_parameters.R sourced")
