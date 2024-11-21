@@ -280,6 +280,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
     
     data$location = as.character(data$location.codes)
     data$location = ifelse(data$location.list == "11001", '11001', data$location)
+    data$location = ifelse(data$county == "Yellowstone County", '30111', data$location) #Yellowstone county is associated with 30111 and 30113.  It looks like 30113 stopped being used in 1989.
     data$location.check = locations::is.location.valid(data$location)
     
     
