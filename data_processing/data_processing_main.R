@@ -1794,6 +1794,8 @@ save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
 #Also save to Q drive
 save(surveillance.manager, file="Q:/data_managers/surveillance.manager.rdata")
 
-
-
+#Archive a version with the date to the Q Drive#
+timestamp <- Sys.Date()  
+filename <- paste0("Q:/data_managers/Archive/surveillance.manager_", timestamp, ".rdata")
+save(surveillance.manager, file=filename)
 
