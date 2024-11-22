@@ -782,6 +782,46 @@ FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
   cocaine.likelihood.instructions
 )
 
+
+#-- FULL LIKELIHOOD WITH COVID TESTING LIKELIHOOD ONLY --# ---- 
+FULL.likelihood.instructions.with.covid.testing =  join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions, 
+  immigration.likelihood.instructions, 
+  emigration.likelihood.instructions,
+  
+  # TRANSMISSION LIKELIHOODS
+  new.diagnoses.likelihood.instructions,
+  prevalence.likelihood.instructions,
+  
+  # MORTALITY LIKELIHOODS
+  hiv.mortality.likelihood.instructions,
+  general.mortality.likelihood.instructions,
+  aids.deaths.likelihood.instructions,
+  
+  # AIDS DIAGNOSES LIKELIHOOD
+  non.age.aids.diagnoses.likelihood.instructions,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions,
+  suppression.likelihood.instructions,
+  
+  # PREP LIKELIHOODS
+  prep.uptake.likelihood.instructions,
+  prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions,
+  cocaine.likelihood.instructions,
+  
+  # COVID TESTING LIKELIHOOD
+  number.of.tests.year.on.year.change.likelihood.instructions
+  
+)
+
+
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
 FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
