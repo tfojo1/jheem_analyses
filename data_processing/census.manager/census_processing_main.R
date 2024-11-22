@@ -283,8 +283,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
     data$location = ifelse(data$county == "Yellowstone County", '30111', data$location) #Yellowstone county is associated with 30111 and 30113.  It looks like 30113 stopped being used in 1989.
     data$location.check = locations::is.location.valid(data$location)
     
-    
-    location.issues <- data %>%
+    data <- data %>%
       filter(location.check == "TRUE")#Manually removing these counties until I know otherwise
 
   }
