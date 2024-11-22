@@ -547,7 +547,7 @@ for (data in county_pop) {
 
 
 #County DEATH Values
-county_deaths = lapply(data.list.county.deaths.00.23, `[[`, 2)
+county_deaths = lapply(data.list.county.deaths.21.23, `[[`, 2)
 
 for (data in county_deaths) {
   
@@ -589,9 +589,9 @@ for (data in us.total.deaths.put.10.19) {
     details = 'Census Reporting')
 }
 
-us.total.deaths.put.20.23 = lapply(us.total.deaths.20.23, `[[`, 2)
+us.total.deaths.put.21.23 = lapply(us.total.deaths.21.23, `[[`, 2)
 
-for (data in us.total.deaths.put.20.23) {
+for (data in us.total.deaths.put.21.23) {
   
   census.manager$put.long.form(
     data = data,
