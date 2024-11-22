@@ -331,18 +331,6 @@ data.list.county = lapply(data.list.county.pop, function(file){
   data$"population_2022" = data$POPESTIMATE2022
   data$"population_2023" = data$POPESTIMATE2023
 
-
-  #data$"deaths_2010" = data$DEATHS2010 #removing deaths for 2010 because it doesn't represent a full year of data
-  data$"deaths_2010" = data$DEATHS2010
-  data$"deaths_2011" = data$DEATHS2011
-  data$"deaths_2012" = data$DEATHS2012
-  data$"deaths_2013" = data$DEATHS2013
-  data$"deaths_2014" = data$DEATHS2014
-  data$"deaths_2015" = data$DEATHS2015
-  data$"deaths_2016" = data$DEATHS2016
-  data$"deaths_2017" = data$DEATHS2017
-  data$"deaths_2018" = data$DEATHS2018
-  data$"deaths_2019" = data$DEATHS2019
   #data$"deaths_2020" = data$DEATHS2020 #removing deaths for 2020 because it doesn't represent a full year of data
   data$"deaths_2021" = data$DEATHS2021
   data$"deaths_2022" = data$DEATHS2022
@@ -355,9 +343,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
     select(location,(one_of("population_2000", "population_2001", "population_2002", "population_2003", "population_2004", "population_2005", "population_2006",
                             "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", "population_2012", "population_2013", 
                             "population_2014", "population_2015", "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", 
-                            "population_2021", "population_2022", "population_2023", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
-                            "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                             "deaths_2021", "deaths_2022", "deaths_2023")))
+                            "population_2021", "population_2022", "population_2023","deaths_2021", "deaths_2022", "deaths_2023")))
   
   
   
@@ -365,9 +351,7 @@ data.list.county = lapply(data.list.county.pop, function(file){
     pivot_longer(cols=c(one_of("population_2000", "population_2001", "population_2002", "population_2003", "population_2004", "population_2005", "population_2006",
                                "population_2007", "population_2008", "population_2009", "population_2010", "population_2011", "population_2012", "population_2013", 
                                "population_2014", "population_2015", "population_2016", "population_2017", "population_2018", "population_2019", "population_2020", 
-                               "population_2021", "population_2022", "population_2023", "deaths_2011","deaths_2012", "deaths_2013", "deaths_2014", 
-                               "deaths_2015", "deaths_2016", "deaths_2017", "deaths_2018", "deaths_2019",
-                               "deaths_2021", "deaths_2022", "deaths_2023")),
+                               "population_2021", "population_2022", "population_2023","deaths_2021", "deaths_2022", "deaths_2023")),
                  names_to = c("outcome", "year"),
                  names_sep = "_",
                  values_to = "value")
@@ -397,7 +381,7 @@ data= as.data.frame(data)
 list(filename, data) #what to return# 
 })
 
-data.list.county.deaths.00.23 = lapply(data.list.county, function(file){
+data.list.county.deaths.21.23 = lapply(data.list.county, function(file){
   
   data=file[[2]]
   filename = file[[1]]
@@ -408,6 +392,79 @@ data.list.county.deaths.00.23 = lapply(data.list.county, function(file){
   
   list(filename, data) #what to return# 
 })
+
+################################################################################
+# Adding Death Data for 2010-2019 
+#This data used to be with the population estimates but once we updated the data
+#For the 2010-2019 intercensal estimates, the data is separate
+################################################################################
+DATA.DIR.CENSUS.DEATHS="../../data_raw/population/deaths_10_19"
+
+deaths_10_19_files <- Sys.glob(paste0(DATA.DIR.CENSUS.DEATHS, '/*.csv'))
+
+data.list.deaths.10.19 <- lapply(deaths_10_19_files, function(x){
+  list(filename=x, data=read.csv(x, header=TRUE))
+})
+
+data.list.deaths.10.19.clean = lapply(data.list.deaths.10.19, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$county_code = as.numeric(data$COUNTY)
+  data$state_code = as.numeric(data$STATE)
+  
+  data= subset(data, data$COUNTY != "0")   #Remove county=0 (represents the county population)#
+  
+  data$state_code_clean= str_pad(data$state_code, width=2, side="left", pad="0")
+  data$county_code_clean= str_pad(data$county_code, width=3, side="left", pad="0")
+  
+  #Combine county and county codes into FIPS- change FIPS to 'location'
+  data$FIPS= paste(data$state_code_clean, data$county_code_clean, sep="")
+  
+  data$location = data$FIPS
+  
+  data$"deaths_2010" = data$DEATHS2010
+  data$"deaths_2011" = data$DEATHS2011
+  data$"deaths_2012" = data$DEATHS2012
+  data$"deaths_2013" = data$DEATHS2013
+  data$"deaths_2014" = data$DEATHS2014
+  data$"deaths_2015" = data$DEATHS2015
+  data$"deaths_2016" = data$DEATHS2016
+  data$"deaths_2017" = data$DEATHS2017
+  data$"deaths_2018" = data$DEATHS2018
+  data$"deaths_2019" = data$DEATHS2019
+  
+  data<- data %>%
+    select(location,(one_of("deaths_2010", "deaths_2011", "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", 
+                            "deaths_2016","deaths_2017", "deaths_2018", "deaths_2019")))
+  
+  data <- data %>%
+    pivot_longer(cols=c(one_of("deaths_2010", "deaths_2011", "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", 
+                               "deaths_2016","deaths_2017", "deaths_2018", "deaths_2019")),
+                 names_to = c("outcome", "year"),
+                 names_sep = "_",
+                 values_to = "value")
+  
+  data= as.data.frame(data)
+  
+  list(filename, data) #what to return# 
+})
+
+county_deaths_10_19 = lapply(data.list.deaths.10.19.clean, `[[`, 2)
+
+for (data in county_deaths_10_19) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.deaths',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+  
+  
 
 ################################################################################
 ##Update for 8-28-24: Adding US Population (summing all counties)
@@ -434,7 +491,25 @@ data <- data %>%
 ################################################################################
 ##Update for 10-7-24: Adding US Deaths Total (summing all counties)
 ################################################################################
-us.total.deaths = lapply(data.list.county.deaths.00.23, function(file){
+us.total.deaths.21.23 = lapply(data.list.county.deaths.21.23, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  data <- data %>%
+    group_by(year)%>%
+    mutate(total = sum(value))%>%
+    select(-location, -value)%>%
+    rename(value = total)%>%
+    mutate(location = "US")
+  
+  data= as.data.frame(data)
+  
+  data<- data[!duplicated(data), ]
+  
+  list(filename, data) #what to return# 
+})
+us.total.deaths.10.19 = lapply(data.list.deaths.10.19.clean, function(file){
   
   data=file[[2]]
   filename = file[[1]]
@@ -502,9 +577,22 @@ for (data in us.total.pop.put) {
 
 
 #US Totals- deaths
-us.total.deaths.put = lapply(us.total.deaths, `[[`, 2)
+us.total.deaths.put.10.19 = lapply(us.total.deaths.10.19, `[[`, 2)
 
-for (data in us.total.deaths.put) {
+for (data in us.total.deaths.put.10.19) {
+  
+  census.manager$put.long.form(
+    data = data,
+    ontology.name = 'census',
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'www.census.gov',
+    details = 'Census Reporting')
+}
+
+us.total.deaths.put.20.23 = lapply(us.total.deaths.20.23, `[[`, 2)
+
+for (data in us.total.deaths.put.20.23) {
   
   census.manager$put.long.form(
     data = data,
