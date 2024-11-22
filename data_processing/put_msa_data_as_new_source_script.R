@@ -38,7 +38,7 @@ put.msa.data.as.new.source = function(outcome,
     
     # print(outcome)
     outcome.data.all.ontologies = data.manager$data[[outcome]][[metric]][[from.source.name]]
-    outcome.details.all.ontologies = data.manager$details[[outcome]][[metric]][[from.source.name]]
+    # outcome.details.all.ontologies = data.manager$details[[outcome]][[metric]][[from.source.name]]
     outcome.url.all.ontologies = data.manager$url[[outcome]][[metric]][[from.source.name]]
     
     if (scale=='proportion') {
@@ -55,7 +55,7 @@ put.msa.data.as.new.source = function(outcome,
             
             for (strat.name in names(outcome.data.all.ontologies[[ont.name]])) {
                 strat.data = outcome.data.all.ontologies[[ont.name]][[strat.name]]
-                strat.details = outcome.details.all.ontologies[[ont.name]][[strat.name]]
+                # strat.details = outcome.details.all.ontologies[[ont.name]][[strat.name]]
                 strat.url = outcome.url.all.ontologies[[ont.name]][[strat.name]]
 
                 # We must have data for all counties... if it's a count. Proportions just need it all in the denominator.
@@ -66,7 +66,7 @@ put.msa.data.as.new.source = function(outcome,
                 else years.in.this.strat.data = dimnames(strat.data)$year
                 
                 strat.data.from.locs.only = do.call('[', get.subset.arguments(strat.data, years.in.this.strat.data, from.locations.present))
-                strat.details.from.locs.only = do.call('[', get.subset.arguments(strat.details, years.in.this.strat.data, from.locations.present))
+                # strat.details.from.locs.only = do.call('[', get.subset.arguments(strat.details, years.in.this.strat.data, from.locations.present))
                 strat.url.from.locs.only = do.call('[', get.subset.arguments(strat.url, years.in.this.strat.data, from.locations.present))
                 if (is.null(strat.data.from.locs.only)) next
                 if (all(is.na(strat.data.from.locs.only))) next
@@ -75,7 +75,7 @@ put.msa.data.as.new.source = function(outcome,
                 non.location.margin = setdiff(names(dim(strat.data.from.locs.only)), 'location')
                 
                 ## IMPORTANT: unhash url and details
-                strat.details.from.locs.only = data.manager$unhash.details(strat.details.from.locs.only)
+                # strat.details.from.locs.only = data.manager$unhash.details(strat.details.from.locs.only)
                 strat.url.from.locs.only = data.manager$unhash.url(strat.url.from.locs.only)
 
                 if (scale == 'non.negative.number') {
@@ -90,7 +90,7 @@ put.msa.data.as.new.source = function(outcome,
                     
                     strat.data.from.locs.only = array.access(strat.data.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
                     if (length(strat.data.from.locs.only)==0) next
-                    strat.details.from.locs.only = array.access(strat.details.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
+                    # strat.details.from.locs.only = array.access(strat.details.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
                     strat.url.from.locs.only = array.access(strat.url.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
                     
                     # aggregate
@@ -141,7 +141,7 @@ put.msa.data.as.new.source = function(outcome,
                     # also subset proportion data and details to these years
                     strat.data.from.locs.only = array.access(strat.data.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
                     if (length(strat.data.from.locs.only)==0) next
-                    strat.details.from.locs.only = array.access(strat.details.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
+                    # strat.details.from.locs.only = array.access(strat.details.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
                     strat.url.from.locs.only = array.access(strat.url.from.locs.only, year=names(years.with.enough.data)[years.with.enough.data])
                     
                     # Decide which denominator values are absent either in denominator or proportion. Use negative numbers to represent this since denominator already has its own NAs
@@ -182,30 +182,21 @@ put.msa.data.as.new.source = function(outcome,
                 
                 if (all(is.na(aggregated.data))) next
                 post.agg.dimnames = dimnames(aggregated.data)
-                aggregated.details = aggregate.details.or.url(strat.details.from.locs.only, names(post.agg.dimnames), post.agg.dimnames)
+                # aggregated.details = aggregate.details.or.url(strat.details.from.locs.only, names(post.agg.dimnames), post.agg.dimnames)
                 aggregated.url = aggregate.details.or.url(strat.url.from.locs.only, names(post.agg.dimnames), post.agg.dimnames)
                 
+                # We're going to only use the first non-NA url we get, assuming it's the same for all (Zoe said this is safe).
+                # We're not going to care about details, but the put can only take in one details, and that's the one from the args
+                # Details and url can be NA, but they correspond to points that had no data, so we ignore them.
+                # details = unique(unlist(aggregated.details))
+                url = unique(unlist(aggregated.url))
+                # There was a change where now unhashed details/url can be NA rather than NULL, so we remove NA now
+                # details = details[!sapply(details, is.na)][[1]]
+                url = url[!sapply(url, is.na)][[1]]
                 
-                # Details and url should be the same for all the data, but check just in case they aren't.
-                details = aggregated.details[!sapply(aggregated.details, is.null)][[1]]
-                url = aggregated.url[!sapply(aggregated.url, is.null)][[1]]
-                
-                if (!is.character(details) || !is.character(url) || is.na(details) || is.na(url))
+                if (!is.character(url) || is.na(url))
                     browser()
                 
-                if (any(sapply(aggregated.details, function(x) {!identical(x, details) && !is.null(x)})))
-                    # stop(paste0(error.prefix, "'", from.source.name, "' data do not all have the same 'details'"))
-                    browser()
-                if (any(sapply(aggregated.url, function(x) {!identical(x, url) && !is.null(x)})))
-                    # stop(paste0(error.prefix, "'", from.source.name, "' data do not all have the same 'url'"))
-                    browser()
-                
-                # ont.name
-                # to.location
-                # length(unique(aggregated.details))>1 #??? then look at aggregated.details     
-                
-                # Details should now have the custom message appended to it indicating the use of this script
-                details = c(details, details.for.new.data)
                 # Put the data
                 data.manager$put(data = aggregated.data,
                                  outcome = outcome,
@@ -213,7 +204,7 @@ put.msa.data.as.new.source = function(outcome,
                                  ontology.name = ont.name,
                                  dimension.values = c(list(location = to.location), post.agg.dimnames),
                                  url = url,
-                                 details = details,
+                                 details = details.for.new.data,
                                  allow.na.to.overwrite = F)
             }
             
