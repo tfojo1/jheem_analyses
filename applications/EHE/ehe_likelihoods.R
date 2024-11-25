@@ -618,6 +618,9 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
                                              
+                                             # ratio.cv = ,
+                                             # ratio.correlation = , # NULL will enter default of 0
+                                             
                                              weights = (1*TOTAL.WEIGHT),
                                              equalize.weight.by.year = F 
   )
@@ -676,6 +679,9 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                              error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
+                                             
+                                             # ratio.cv = ,
+                                             # ratio.correlation = , # NULL will enter default of 0
                                              
                                              weights = (1*TOTAL.WEIGHT),
                                              equalize.weight.by.year = F 
