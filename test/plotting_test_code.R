@@ -177,6 +177,13 @@ simplot(simset$last.sim(),
         plot.year.lag.ratio = T,
         dimension.values = list(year = 2000:2030)) 
 
+simplot(simset.old$last.sim(),
+        simset.aids$last.sim(),
+        simset.tst$last.sim(),
+        outcomes = c("total.hiv.tests.per.population"), 
+        style.manager = location.style.manager,plot.year.lag.ratio = T,
+        dimension.values = list(year = 2000:2030)) 
+
 plot(1:simset$n.sim,simset$parameters["black.msm.trate.peak",])
 
 
