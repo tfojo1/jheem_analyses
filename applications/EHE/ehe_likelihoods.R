@@ -592,6 +592,8 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     error.variance.term = 0.03, # guessed this
     error.variance.type = 'cv',
     
+    ratio.cv = 1.1,
+    
     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
     equalize.weight.by.year = F,
     use.lognormal.approximation = T
@@ -618,7 +620,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
                                              
-                                             # ratio.cv = ,
+                                             ratio.cv = 1.5,
                                              # ratio.correlation = , # NULL will enter default of 0
                                              
                                              weights = (1*TOTAL.WEIGHT),
@@ -680,7 +682,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
                                              
-                                             # ratio.cv = ,
+                                             ratio.cv = 1.5,
                                              # ratio.correlation = , # NULL will enter default of 0
                                              
                                              weights = (1*TOTAL.WEIGHT),
