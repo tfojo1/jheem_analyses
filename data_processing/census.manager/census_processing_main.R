@@ -423,7 +423,7 @@ data.list.deaths.10.19.clean = lapply(data.list.deaths.10.19, function(file){
   
   data$location = data$FIPS
   
-  data$"deaths_2010" = data$DEATHS2010
+  #data$"deaths_2010" = data$DEATHS2010 #Deaths in 2010 do not represent a full year of data
   data$"deaths_2011" = data$DEATHS2011
   data$"deaths_2012" = data$DEATHS2012
   data$"deaths_2013" = data$DEATHS2013
@@ -435,11 +435,11 @@ data.list.deaths.10.19.clean = lapply(data.list.deaths.10.19, function(file){
   data$"deaths_2019" = data$DEATHS2019
   
   data<- data %>%
-    select(location,(one_of("deaths_2010", "deaths_2011", "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", 
+    select(location,(one_of( "deaths_2011", "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", 
                             "deaths_2016","deaths_2017", "deaths_2018", "deaths_2019")))
   
   data <- data %>%
-    pivot_longer(cols=c(one_of("deaths_2010", "deaths_2011", "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", 
+    pivot_longer(cols=c(one_of("deaths_2011", "deaths_2012", "deaths_2013", "deaths_2014", "deaths_2015", 
                                "deaths_2016","deaths_2017", "deaths_2018", "deaths_2019")),
                  names_to = c("outcome", "year"),
                  names_sep = "_",
