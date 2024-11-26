@@ -569,7 +569,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     observation.correlation.form = 'compound.symmetry',
     p.error.variance.term = 0.03, # guessed this
     p.error.variance.type = 'cv',
-    #ratio.cv = 1.1,
+    ratio.cv = 1.2,
     
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
     
@@ -593,7 +593,7 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     error.variance.term = 0.03, # guessed this
     error.variance.type = 'cv',
     
-    #ratio.cv = 1.1,
+    ratio.cv = 1.2,
     
     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
     equalize.weight.by.year = F,
