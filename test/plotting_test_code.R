@@ -118,6 +118,12 @@ simplot(simset$last.sim(),
 
 simplot(simset$last.sim(),
         simset,
+        outcomes = c("testing"),
+        style.manager = location.style.manager,
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(simset$last.sim(),
+        simset,
         outcomes = c("cdc.hiv.test.positivity"), # totals only 
         style.manager = location.style.manager,
         dimension.values = list(year = 2000:2030)) 
@@ -177,9 +183,8 @@ simplot(simset$last.sim(),
         plot.year.lag.ratio = T,
         dimension.values = list(year = 2000:2030)) 
 
-simplot(simset.old$last.sim(),
-        simset.aids$last.sim(),
-        simset.tst$last.sim(),
+simplot(simset$last.sim(),
+        simset,
         outcomes = c("total.hiv.tests.per.population"), 
         style.manager = location.style.manager,plot.year.lag.ratio = T,
         dimension.values = list(year = 2000:2030)) 
