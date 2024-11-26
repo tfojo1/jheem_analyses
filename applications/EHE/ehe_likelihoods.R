@@ -569,6 +569,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     observation.correlation.form = 'compound.symmetry',
     p.error.variance.term = 0.03, # guessed this
     p.error.variance.type = 'cv',
+    ratio.cv = 1.1,
     
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
     
