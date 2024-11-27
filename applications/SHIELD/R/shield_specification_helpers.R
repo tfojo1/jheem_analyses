@@ -62,7 +62,6 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
   }else{
     counties = locations::get.contained.locations(location, 'county')
   }
-  
   pop = CENSUS.MANAGER$pull(outcome = 'population', 
                             dimension.values = list(year = years, location = counties, sex = sex),
                             keep.dimensions = c('age', 'race', 'ethnicity', 'sex'),

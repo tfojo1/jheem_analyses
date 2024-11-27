@@ -116,7 +116,7 @@ register.ontology.mapping('wonder.to.shield.race.ethnicity',
                                            c('american indian or alaska native', 'not hispanic or latino', 'other'),
                                            c('asian or pacific islander', 'hispanic or latino', 'hispanic'),
                                            c('asian or pacific islander', 'not hispanic or latino', 'other'),
-                                           c('black or african americancensus.cdc.wonder.births.deaths', 'hispanic or latino', 'hispanic'),
+                                           c('black or african american', 'hispanic or latino', 'hispanic'),
                                            c('black or african american', 'not hispanic or latino', 'black'),
                                            c('white','hispanic or latino','hispanic'),
                                            c('white','not hispanic or latino','other')))
