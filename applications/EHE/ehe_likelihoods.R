@@ -569,6 +569,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     observation.correlation.form = 'compound.symmetry',
     p.error.variance.term = 0.03, # guessed this
     p.error.variance.type = 'cv',
+    ratio.cv = 1.2,
     
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
     
@@ -577,12 +578,29 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     use.lognormal.approximation = T
   )
 
-# basic version 
-number.of.tests.year.on.year.change.basic.likelihood.instructions = 
+# basic ratio likelihood (rolled back)
+# number.of.tests.year.on.year.change.basic.likelihood.instructions = 
+#   create.basic.ratio.likelihood.instructions(
+#     outcome.for.data = "hiv.tests.per.population", 
+#     outcome.for.sim = "total.hiv.tests.per.population",
+#     
+#     levels.of.stratification = c(0),
+#     from.year = 2008,
+#     
+#     observation.correlation.form = 'compound.symmetry',
+#     error.variance.term = 0.03, # guessed this
+#     error.variance.type = 'cv',
+#     
+#     ratio.cv = 1.2,
+#     
+#     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+#     equalize.weight.by.year = F
+#   )
+
+# basic version - WHAT WE WANT TO EVENTUALLY USE
+number.of.tests.year.on.year.change.basic.likelihood.instructions =
   create.time.lagged.comparison.likelihood.instructions(
-    # don't actually need this to be a per population proportion 
-    # (did this to be able to do nested likelihood), but keeping it anyway
-    outcome.for.data = "hiv.tests.per.population", 
+    outcome.for.data = "hiv.tests.per.population",
     outcome.for.sim = "total.hiv.tests.per.population",
     
     levels.of.stratification = c(0),
@@ -592,7 +610,9 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     error.variance.term = 0.03, # guessed this
     error.variance.type = 'cv',
     
-    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+    ratio.cv = 1.2,
+    
+    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R
     equalize.weight.by.year = F,
     use.lognormal.approximation = T
   )
@@ -603,6 +623,7 @@ number.of.tests.year.on.year.change.likelihood.instructions =
     number.of.tests.year.on.year.change.basic.likelihood.instructions,
     number.of.tests.year.on.year.change.nested.likelihood.instructions
   )
+
 
 #-- YEAR-ON-YEAR GONORRHEA CHANGE ----
 gonorrhea.year.on.year.change.likelihood.instructions = 
@@ -617,6 +638,9 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
+                                             
+                                             ratio.cv = 1.5,
+                                             # ratio.correlation = , # NULL will enter default of 0
                                              
                                              weights = (1*TOTAL.WEIGHT),
                                              equalize.weight.by.year = F 
@@ -676,6 +700,9 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                              error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
                                              error.variance.type = 'cv',
                                              correlation.different.years = 0.5,
+                                             
+                                             ratio.cv = 1.5,
+                                             # ratio.correlation = , # NULL will enter default of 0
                                              
                                              weights = (1*TOTAL.WEIGHT),
                                              equalize.weight.by.year = F 
@@ -820,7 +847,6 @@ FULL.likelihood.instructions.with.covid.testing =  join.likelihood.instructions(
   number.of.tests.year.on.year.change.likelihood.instructions
   
 )
-
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
 FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(

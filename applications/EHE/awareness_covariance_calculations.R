@@ -5,8 +5,10 @@ msa.awareness1 = SURVEILLANCE.MANAGER$data$awareness$estimate$cdc.aggregated.pro
 
 
 msa.awareness = reshape2::melt(msa.awareness1)
+#msa.awareness$cv = as.numeric(SURVEILLANCE.MANAGER$data$awareness$coefficient.of.variance$cdc.aggregated.proportion$cdc$year__location)
 
 awareness.data = SURVEILLANCE.MANAGER$data$awareness$estimate$cdc.hiv$cdc$year__location
+awareness.cv.data = SURVEILLANCE.MANAGER$data$awareness$coefficient.of.variance$cdc.hiv$cdc$year__location
 n.msa = SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.aggregated.county$cdc$year__location
 n.state = SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location
 
@@ -19,7 +21,6 @@ county.state.delta.list = lapply(1:dim(msa.awareness)[1], function(i){
     counties = locations::get.contained.locations(msa, 'COUNTY')
     if (length(counties)==1)
     {
-        print(paste0("aborting ", msa, " - only one county"))
         return (NULL)
     }
     
@@ -28,8 +29,10 @@ county.state.delta.list = lapply(1:dim(msa.awareness)[1], function(i){
     states = get.containing.locations(counties, 'STATE')
     
     county.values = awareness.data[year, counties]
+    county.cv = awareness.cv.data[year, counties]
     
     state.values = awareness.data[year, states]
+    state.cv = awareness.cv.data[year, states]
     
     msa.n = n.msa[year, msa]
     state.n = n.state[year, states]
@@ -37,10 +40,12 @@ county.state.delta.list = lapply(1:dim(msa.awareness)[1], function(i){
     out.of.msa.values = (state.values*state.n - msa.value*msa.n) / (state.n-msa.n)
     
     array(c(county.values-msa.value, 
-            out.of.msa.values-msa.value),
+            out.of.msa.values-msa.value,
+            county.cv,
+            state.cv),
             #state.values-msa.value),
-           dim=c(length(counties), 2),
-           dimnames=list(county=paste0(counties, "_", year), type=c('county.delta','out.of.msa.delta')))
+           dim=c(length(counties), 4),
+           dimnames=list(county=paste0(counties, "_", year), type=c('county.delta','out.of.msa.delta','county.cv','state.cv')))
 })
 
 
@@ -91,13 +96,32 @@ county.deltas = unlist(lapply(1:dim(msa.awareness)[1], function(i){
     
     
     county.values = awareness.data[year, counties]
+    county.cv = awareness.cv.data[year, counties]
     
-    county.values-msa.value
+    delta = county.values-msa.value
+    
+  #  delta - county.values*county.cv
+}))
+
+county.cvs = unlist(lapply(1:dim(msa.awareness)[1], function(i){
+    
+    msa = msa.awareness$location[i]
+    year = as.character(msa.awareness$year[i])
+    msa.value = msa.awareness$value[i]
+    
+    counties = locations::get.contained.locations(msa, 'COUNTY')
+    
+    
+    county.values = awareness.data[year, counties]
+    county.cv = awareness.cv.data[year, counties]
+    
+    county.cv
 }))
 
 mean(county.deltas)
 sd(county.deltas)
 
+sd(county.deltas/county.cvs) * mean(county.cvs)
 
 county.msa.summary.list = lapply(1:dim(msa.awareness)[1], function(i){
     
