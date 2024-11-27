@@ -597,31 +597,31 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
 #     equalize.weight.by.year = F
 #   )
 
-# ifelse to try both versions 
-number.of.tests.year.on.year.change.likelihood.instructions = 
-  create.ifelse.likelihood.instructions(
-    number.of.tests.year.on.year.change.basic.likelihood.instructions,
-    number.of.tests.year.on.year.change.nested.likelihood.instructions
-  )
-
 # basic version - WHAT WE WANT TO EVENTUALLY USE
 number.of.tests.year.on.year.change.basic.likelihood.instructions =
   create.time.lagged.comparison.likelihood.instructions(
     outcome.for.data = "hiv.tests.per.population",
     outcome.for.sim = "total.hiv.tests.per.population",
-
+    
     levels.of.stratification = c(0),
     from.year = 2008,
-
+    
     observation.correlation.form = 'compound.symmetry',
     error.variance.term = 0.03, # guessed this
     error.variance.type = 'cv',
-
+    
     ratio.cv = 1.2,
-
+    
     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R
     equalize.weight.by.year = F,
     use.lognormal.approximation = T
+  )
+
+# ifelse to try both versions 
+number.of.tests.year.on.year.change.likelihood.instructions = 
+  create.ifelse.likelihood.instructions(
+    number.of.tests.year.on.year.change.basic.likelihood.instructions,
+    number.of.tests.year.on.year.change.nested.likelihood.instructions
   )
 
 
