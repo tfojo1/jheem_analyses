@@ -5,7 +5,7 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
-CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
+CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids2'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid2'
 CALIBRATION.CODE.FULL.PLUS.TST = 'full.with.tst'
 CALIBRATION.CODE.EHE.FINAL = 'final'
