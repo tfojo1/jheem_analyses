@@ -9,10 +9,10 @@ source('data_processing/census.manager/census.processing.for.merging/births.deat
 # MERGE -------------------------------------------------------------------
 
 #LOAD the saved sections of the census manager
-population1 = load.data.manager(name="census.manager_population1", file="../../cached/data.manager.merge/census.manager_population1.rdata")
-population2 = load.data.manager(name="census.manager_population2", file="../../cached/data.manager.merge/census.manager_population2.rdata")
-population3 = load.data.manager(name="census.manager_population3", file="../../cached/data.manager.merge/census.manager_population3.rdata")
-births.deaths1 = load.data.manager(name="census.manager_births.deaths1", file="../../cached/data.manager.merge/census.manager_births.deaths1.rdata")
+population1 = load.data.manager(name="census.manager_population1", file="Q:/data_managers/data.manager.merge/census.manager_population1.rdata")
+population2 = load.data.manager(name="census.manager_population2", file="Q:/data_managers/data.manager.merge/census.manager_population2.rdata")
+population3 = load.data.manager(name="census.manager_population3", file="Q:/data_managers/data.manager.merge/census.manager_population3.rdata")
+births.deaths1 = load.data.manager(name="census.manager_births.deaths1", file="Q:/data_managers/data.manager.merge/census.manager_births.deaths.rdata")
 
 #MERGE 
 population1$import.data(population2) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)

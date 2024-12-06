@@ -25,9 +25,20 @@ census.manager$register.outcome(
     units = 'population',
     description = "Populaion Estimate"))
 
+census.manager$register.outcome(
+  'deaths',
+  metadata = create.outcome.metadata(  #This represent deaths from the census
+    scale = 'non.negative.number',
+    display.name = 'Deaths',
+    axis.name = 'Deaths',
+    units = 'deaths',
+    description = "Deaths"))
+
 #Register Sources:
 census.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census") #parent
+census.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")#parent
 census.manager$register.source('census.population', parent.source= "census", full.name = "Census Population Data", short.name='census.population')#child
+census.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths') #child
 
 #Register Ontologies:
 census.manager$register.ontology(
