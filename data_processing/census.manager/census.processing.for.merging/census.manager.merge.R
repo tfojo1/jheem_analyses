@@ -1,18 +1,31 @@
 #Use this code to merge the different saved sections of the census manager into a complete version
 
-library(jheem2)
+# PROCESS -----------------------------------------------------------------
+source('data_processing/census.manager/census.processing.for.merging/population1.processing.R')
+source('data_processing/census.manager/census.processing.for.merging/population2.processing.R')
+source('data_processing/census.manager/census.processing.for.merging/population3.processing.R')
+source('data_processing/census.manager/census.processing.for.merging/births.deaths.processing.R')
 
-#Load the saved sections of the census manager
+# MERGE -------------------------------------------------------------------
+
+#LOAD the saved sections of the census manager
 population1 = load.data.manager(name="census.manager_population1", file="../../cached/data.manager.merge/census.manager_population1.rdata")
-
 population2 = load.data.manager(name="census.manager_population2", file="../../cached/data.manager.merge/census.manager_population2.rdata")
-
 population3 = load.data.manager(name="census.manager_population3", file="../../cached/data.manager.merge/census.manager_population3.rdata")
-
 births.deaths1 = load.data.manager(name="census.manager_births.deaths1", file="../../cached/data.manager.merge/census.manager_births.deaths1.rdata")
 
-#Merge 
+#MERGE 
+population1$import.data(population2) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
+population1$import.data(population3)
+population1$import.data(births.deaths)
 
-population1$import.data(population2) #This order doesnt matter, do it this way: big.one$importdata(smaller.one)
+#SAVE Final, Complete Census Manager to Cached
+save(census.manager, file="../../cached/census.manager.rdata")
 
-population1$import.data(births.deaths1) #this would be your next
+#SAVE Final, Complete Census Manager to Q Drive
+save(census.manager, file="Q:/data_managers/census.manager.rdata")
+
+#SAVE Final, Complete Census Manager, Archive a dated version to the Q Drive#
+timestamp <- Sys.Date()  
+filename <- paste0("Q:/data_managers/Archive/census.manager_", timestamp, ".rdata")
+save(census.manager, file=filename)
