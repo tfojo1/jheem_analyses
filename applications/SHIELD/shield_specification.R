@@ -657,7 +657,9 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     axis.name = 'Rate',
                                                                     units = 'rate',
                                                                     singular.unit = 'person')
-                                                  )
+                         )
+ 
+
 ## Births ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                     name='births.from',

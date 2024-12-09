@@ -1,5 +1,5 @@
 cat("*** Running Shield_source_code.R ***\n")
-NEW.SOURCE=T
+NEW.SOURCE=F
 
 # The file to source to load all necessary packages, cached data, code
 library(reshape2)

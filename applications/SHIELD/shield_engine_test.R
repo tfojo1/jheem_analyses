@@ -40,9 +40,9 @@ simplot(sim,"population" )
 simplot(sim,"population" ,
         dimension.values = list(year = 2010:2030))
 #By 1 factor
-simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
-simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
-simplot(sim,"population", facet.by = "race", dimension.values = list(year = 2000:2030))
+# simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
+# simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
+# simplot(sim,"population", facet.by = "race", dimension.values = list(year = 2000:2030))
 # By 2 factors
 simplot(sim,"population",
         facet.by = "age", split.by ="race", dimension.values = list(year = 2009:2030))
@@ -62,3 +62,10 @@ simplot(sim,
         outcomes = c("births.from"), 
         facet.by = "age", split.by = "race", 
         dimension.values = list(year = 2000:2030)) 
+
+
+SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,]
+apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,],c('ethnicity'),sum)
+
+apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex['2010','US',,,,],
+      c('ethnicity'),sum)

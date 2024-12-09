@@ -16,9 +16,10 @@ cat("Working directory set to:", getwd(), "\n")
 
 ###############################################
 {
-  LOCATION='C.12580'
+  # LOCATION='C.12580'
+  LOCATION='US'
   set.seed(12345)
-  CALIBRATION.NAME = 'pop.demog.shield1' 
+  CALIBRATION.NAME = 'pop.demog.shield.US' 
   print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
   #
   source('../jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R')
@@ -33,7 +34,7 @@ cat("Working directory set to:", getwd(), "\n")
   set.up.calibration(version='shield',
                      location=LOCATION,
                      calibration.code = CALIBRATION.NAME,
-                     cache.frequency = 500 #how often write to disk 
+                     cache.frequency = 500 #how often write the results to disk 
   )  
   print(paste0("DONE setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 }
@@ -74,5 +75,6 @@ simset = assemble.simulations.from.calibration(version = 'shield',
 # simset = simset$burn(keep = 0.5)
 # simset = simset$thin(keep = 50)
 # 
-save(simset,file=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata"))
-
+filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+save(simset,file=filename)
+print(pate0("Simet was saved on disk as:   ", filename))
