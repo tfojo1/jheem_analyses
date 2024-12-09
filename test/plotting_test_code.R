@@ -7,6 +7,7 @@ source.style.manager = create.style.manager(color.data.by = "source")
 stratum.style.manager = create.style.manager(color.data.by = "stratum") # this is the default right now 
 
 range(simset$get.mcmc.mixing.statistic(NULL))
+cbind(head(simset$get.mcmc.mixing.statistic(NULL),20))
 
 # Need to have this file locally
 #load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")

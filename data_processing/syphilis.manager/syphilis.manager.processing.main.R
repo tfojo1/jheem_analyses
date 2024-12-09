@@ -482,13 +482,21 @@ surveillance.manager = load.data.manager(name="surveillance.manager", file="../.
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
 source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
+
+####SAVE SECTION1###
+save(data.manager, file="../../cached/data.manager.merge/syphilis.manager_section1.rdata")
+
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/prep.data.R')
 source('data_processing/syphilis.manager/cached.proportion.msm.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
-#source('data_processing/syphilis.manager/births.msa.R') #This is CDC Wonder Birth data by age, race, eth for women 15-44 aggregated from county to MSA
+
+####SAVE SECTION2###
+save(data.manager, file="../../cached/data.manager.merge/syphilis.manager_section2.rdata")
+
+
 source('data_processing/syphilis.manager/aggregating.national.population.syphilis.R')
 
 # RENAME ------------------------------------------------------------------
@@ -623,6 +631,11 @@ put.msa.data.as.new.source(outcome = 'population',
 source('data_processing/syphilis.manager/fertility.rate.msa.R')
 
 # SAVE SYPHILIS.MANAGER ---------------------------------------------------
+
+####SAVE SECTION3###
+save(syphilis.manager, file="../../cached/data.manager.merge/syphilis.manager_section3.rdata")
+
+#Save full complete syphilis manager
 save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
 
 #Also save to Q drive
