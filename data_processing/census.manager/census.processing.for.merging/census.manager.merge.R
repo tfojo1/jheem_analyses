@@ -17,15 +17,15 @@ births.deaths1 = load.data.manager(name="census.manager_births.deaths1", file="Q
 #MERGE 
 population1$import.data(population2) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
 population1$import.data(population3)
-population1$import.data(births.deaths)
+population1$import.data(births.deaths1)
 
 #SAVE Final, Complete Census Manager to Cached
-save(census.manager, file="../../cached/census.manager.rdata")
+save(population1, file="../../cached/census.manager.merged.check.rdata")
 
 #SAVE Final, Complete Census Manager to Q Drive
-save(census.manager, file="Q:/data_managers/census.manager.rdata")
+save(population1, file="Q:/data_managers/census.manager.rdata")
 
 #SAVE Final, Complete Census Manager, Archive a dated version to the Q Drive#
 timestamp <- Sys.Date()  
 filename <- paste0("Q:/data_managers/Archive/census.manager_", timestamp, ".rdata")
-save(census.manager, file=filename)
+save(population1, file=filename)
