@@ -1,5 +1,5 @@
 cat("*** Running Shield_source_code.R ***\n")
-NEW.SOURCE=F
+NEW.SOURCE=T
 
 # The file to source to load all necessary packages, cached data, code
 library(reshape2)
@@ -8,14 +8,27 @@ library(distributions)
 
 #pulling JHEEM2 # Load the git2r package ----
 if (NEW.SOURCE) {
+  cat("Checking JHEEM2 repository status.... \n")
   repo_path <- "../jheem2/"  
   # Check if the repository exists at the specified path
   if (dir.exists(repo_path)) {
     # Run the Git pull command to update the repository
     system(paste("cd", repo_path, "&& git pull"))
-    cat("JHEEM2 was pulled froum source \n")
   } else {
     cat("Can not pull from JHEEM2: ", repo_path, "\n")
+  }
+}
+
+#pulling JHEEM_ANALYSIS # Load the git2r package ----
+if (NEW.SOURCE) {
+  cat("Checking JHEEM_ANALYSIS repository status.... \n")
+  repo_path <- "../jheem_analyses//"  
+  # Check if the repository exists at the specified path
+  if (dir.exists(repo_path)) {
+    # Run the Git pull command to update the repository
+    system(paste("cd", repo_path, "&& git pull"))
+  } else {
+    cat("Can not pull from JHEEM_ANALYSIS: ", repo_path, "\n")
   }
 }
 
@@ -36,7 +49,7 @@ load(file.path(JHEEM.CACHE.DIR, 'google_mobility_data.Rdata'))
 
 # CENSUS.MANAGER ----
 # it's a big file with a lot of information that is only needed for generating the initial population
-if (!exists('CENSUS.MANAGER') | NEW.SOURCE){
+if (!exists('CENSUS.MANAGER') ){
   print("Reading Census manager ...")
   CENSUS.MANAGER = load.data.manager.from.cache('census.manager.rdata', set.as.default=F)
   print("Census manager read")
@@ -45,7 +58,7 @@ if (!exists('CENSUS.MANAGER') | NEW.SOURCE){
 # Syphilis SURVEILLANCE.MANAGER ----
 # includes all the data used for calibration and plotting
 # county-, MSA- and US- level aggregation
-if (is.null(get.default.data.manager()) | NEW.SOURCE){ #if it's in memory, it wont reload it
+if (is.null(get.default.data.manager()) ){ #if it's in memory, it wont reload it
   print("Reading Syphilis survillance manager ...")
   SURVEILLANCE.MANAGER = load.data.manager.from.cache('syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
   # SURVEILLANCE.MANAGER$last.modified.date
