@@ -4,7 +4,7 @@
 
 #At first this code is just pulling for county data but at the bottom I add national
 
-#surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
+surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
 
 
 # Source One = BRFSS -----------------------------------------------------
