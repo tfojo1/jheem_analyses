@@ -9,4 +9,4 @@
 ml gfbf/2023b
 ml R/4.3.3-gfbf-2023b
 export R_LIBS_USER=$HOME/rlibs/R-4.3.3
-Rscript cluster_scripts/set_up_calibration.r ehe C.12580 init.pop.ehe
+Rscript cluster_scripts/set_up_calibration.R ehe C.12580 init.pop.ehe

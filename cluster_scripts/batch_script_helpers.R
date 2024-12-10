@@ -47,7 +47,7 @@ make.sbatch.script <- function(filename,
 }
 
 make.setup.script <- function(location,
-                              filename=paste0(location, '.r'),
+                              filename=paste0(location, '.R'),
                               dir='cluster_scripts/setup_scripts/',
                               partition='shared',
                               account='azalesak',
@@ -60,5 +60,5 @@ make.setup.script <- function(location,
                        partition = 'shared',
                        time.hours = 48,
                        account=account,
-                       commands= paste("Rscript cluster_scripts/set_up_calibration.r", "ehe", "C.12580", "init.pop.ehe"))
+                       commands= paste("Rscript cluster_scripts/set_up_calibration.R", "ehe", "C.12580", "init.pop.ehe"))
 }
