@@ -5,7 +5,8 @@ if (length(args)<1) {
 }
 
 #-- SET THE WD --#
-setwd('jheem_analyses')
+print(getwd())
+# setwd('jheem_analyses')
 
 #-- SOURCE THE RELEVANT FILES --#
 print("Loading Source Files...")
