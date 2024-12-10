@@ -46,6 +46,27 @@ total.prev.adjusted<- run.outlier.process(outcome= 'total.prevalence',
                                        #max.year = 2019,
                                        locations= c(surveillance.manager$get.locations.with.data(outcome="total.prevalence")))
 
+
+# Update for 12-10-24 -----------------------------------------------------
+#Remove diagnosed.prevalence data for aggregated.county
+#There are dips in 2010-2011 data for some MSAs
+#The rule to remove these points is: If there is a 2% of greater decrease in any of the yers 2009-2013, then remove 2010, 2011, 2012 AND 2013
+#Decided to do this prior to removing other outliers for this outcome
+
+x = surveillance.manager$data$diagnosed.prevalence$estimate$cdc.aggregated.county$cdc$year__location
+delta = (x[as.character(2010:2013), ] - x[as.character(2009:2012), ])/(x[as.character(2009:2012), ]) #identify % change
+delta< (-0.02) #want to know which is true
+to.remove.mask = apply(delta < (-0.02), MARGIN = 'location', FUN= any, na.rm=T) #if any of those years has a less than 2% decrease from the previous year, for each col is any of these values true.  #could replace margin = 2 with margin = 'location'
+to.remove.codes = names(to.remove.mask)[to.remove.mask] #gives you names - for these you remove all the 4 years
+
+year <- rep(c("2010", "2011", "2012", "2013"), times=9)
+location <- rep(c("C.12580", "C.14460", "C.16740", "C.19820", "C.35380", "C.35620", "C.41180", "C.41740", "C.42660"), each=4)
+dx.prev.agg.county.remove <- data.frame(year, location)
+dx.prev.agg.county.remove$source = "cdc.aggregated.county"
+dx.prev.agg.county.remove$ontology = "cdc"
+dx.prev.agg.county.remove$adjudication = 'TRUE' #Create df here and then combine with other outliers below
+
+
 # Outcome = diagnosed.prevalence, source = msa.surveillance.reports ------------------------------------------
   #TOTAL- want smaller degree of variability here bc prevalence should be more consistent
 dx.prev.adjusted.one<- run.outlier.process(outcome= 'diagnosed.prevalence',
@@ -119,6 +140,9 @@ dx.prev.adjusted.three <- run.outlier.process(outcome= 'diagnosed.prevalence',
 
 dx.prev.adjusted.three$adjudication <- c(T)
 
+#Combine with the other identified diagnosed.prevalence outliers from above: 
+all.dx.prev.agg.county = rbind(dx.prev.adjusted.three, dx.prev.agg.county.remove)
+
 run.outlier.process(outcome= 'diagnosed.prevalence',
                     stratifications= list(c()),
                     data.manager= surveillance.manager,
@@ -127,7 +151,7 @@ run.outlier.process(outcome= 'diagnosed.prevalence',
                     max.year = 2019,
                     first.choice.year = 2018,
                     locations= c(states, msas),
-                    adjudication.data.frame = dx.prev.adjusted.three)
+                    adjudication.data.frame = all.dx.prev.agg.county) #This dataframe includes identified outliers + those we decided to remove
 
 
 
