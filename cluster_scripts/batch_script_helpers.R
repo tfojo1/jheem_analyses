@@ -60,5 +60,5 @@ make.setup.script <- function(location,
                        partition = 'shared',
                        time.hours = 48,
                        account=account,
-                       commands= paste("Rscript set_up_calibration.r", "ehe", "C.12580", "init.pop.ehe"))
+                       commands= paste("Rscript cluster_scripts/set_up_calibration.r", "ehe", "C.12580", "init.pop.ehe"))
 }
