@@ -4,12 +4,12 @@ if (length(args)<1) {
     stop("One argument must be supplied", call.=FALSE)
 }
 
-# #-- SET THE WD --#
-# setwd('jheem_analyses')
-# 
-# #-- SOURCE THE RELEVANT FILES --#
-# print("Loading Source Files...")
-# source('applications/EHE/ehe_specification.R')
+#-- SET THE WD --#
+setwd('jheem_analyses')
+
+#-- SOURCE THE RELEVANT FILES --#
+print("Loading Source Files...")
+source('applications/EHE/ehe_specification.R')
 
 version = args[1]
 location = args[2]
