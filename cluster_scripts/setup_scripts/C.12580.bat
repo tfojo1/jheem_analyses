@@ -4,7 +4,7 @@
 #SBATCH --output=../jheem_analyses/cluster_scripts/init_C.12580.out
 #SBATCH --time=48:00:00
 #SBATCH --partition=shared
-#SBATCH --account=azalesak
+#SBATCH --account=pkasaie1
 
 ml gfbf/2023b
 ml R/4.3.3-gfbf-2023b
