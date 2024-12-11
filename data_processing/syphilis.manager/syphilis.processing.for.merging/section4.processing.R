@@ -12,9 +12,7 @@ library(haven)
 
 data.manager = create.data.manager('syphilis', description='syphilis data manager')
 
-
 #Register outcomes:
-
 data.manager$register.outcome(
   'proportion.msm', 
   metadata = create.outcome.metadata(
@@ -43,8 +41,31 @@ data.manager$register.outcome(
     description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
 
 #Register Sources:
+data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") #parent
+data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS") #parent
+
+data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory') #child
+data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss') #child
 
 #Register Ontologies:
+data.manager$register.ontology(
+  'emory',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    sex=c('male', 'female') #needs to have male and female here to represent all possible outcomes
+  ))
+
+data.manager$register.ontology(
+  'brfss',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
+    race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'other race', 'hispanic'),
+    sex=c('male','female'),
+    risk=c('msm', 'not_msm')
+  ))
 
 #Codes:
 source('data_processing/syphilis.manager/cached.proportion.msm.R')
@@ -52,4 +73,4 @@ source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #Thi
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
 
 #Save:
-save(data.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section1.rdata")
+save(data.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section4.rdata")
