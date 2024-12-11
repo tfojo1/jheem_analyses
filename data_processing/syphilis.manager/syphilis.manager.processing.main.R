@@ -482,20 +482,12 @@ surveillance.manager = load.data.manager(name="surveillance.manager", file="../.
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
 source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
-
-####SAVE SECTION1###
-save(data.manager, file="../../cached/data.manager.merge/syphilis.manager_section1.rdata")
-
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/prep.data.R')
 source('data_processing/syphilis.manager/cached.proportion.msm.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
-
-####SAVE SECTION2###
-save(data.manager, file="../../cached/data.manager.merge/syphilis.manager_section2.rdata")
-
 
 source('data_processing/syphilis.manager/aggregating.national.population.syphilis.R')
 
@@ -595,16 +587,6 @@ put.msa.data.as.new.source(outcome = 'deaths',
                            details.for.new.data = 'estimated from county data',
                            data.manager= syphilis.manager) 
 
-# put.msa.data.as.new.source(outcome = 'births',
-#                            from.source.name= 'cdc.wonder.natality',
-#                            to.source.name = 'cdc.wonder.aggregated.births', 
-#                            to.locations = MSAS.OF.INTEREST,
-#                            geographic.type.from = 'COUNTY',
-#                            geographic.type.to = 'CBSA',
-#                            details.for.new.data = 'estimated from county data',
-#                            data.manager= syphilis.manager) 
-
-
 all.states = locations::get.all.for.type('state')
 #Aggregates census
 put.msa.data.as.new.source(outcome = 'population',
@@ -631,9 +613,6 @@ put.msa.data.as.new.source(outcome = 'population',
 source('data_processing/syphilis.manager/fertility.rate.msa.R')
 
 # SAVE SYPHILIS.MANAGER ---------------------------------------------------
-
-####SAVE SECTION3###
-save(syphilis.manager, file="../../cached/data.manager.merge/syphilis.manager_section3.rdata")
 
 #Save full complete syphilis manager
 save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
