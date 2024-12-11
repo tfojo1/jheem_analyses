@@ -1,3 +1,5 @@
+#
+
 #-- CHECK ARGUMENTS --#
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)<3) {
@@ -5,8 +7,8 @@ if (length(args)<3) {
 }
 
 #-- SET THE WD --#
-# print(getwd())
-setwd('scr4_pkasaie1/azalesak/jheem/code/jheem_analyses')
+print(getwd())
+setwd('~scr4_pkasaie1/azalesak/jheem/code/jheem_analyses')
 
 #-- SOURCE THE RELEVANT FILES --#
 print("Loading Source Files...")
