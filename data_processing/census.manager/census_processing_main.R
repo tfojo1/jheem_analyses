@@ -208,9 +208,6 @@ source('data_processing/census.manager/census_cdc_wonder.R')
 #This pulls single year age groups and demographic data from 2005-2017#
 source('data_processing/census.manager/census_sas_files.R')
 
-####SAVE POPULATION1###
-save(census.manager, file="../../cached/data.manager.merge/census.manager_population1.rdata")
-
 #Sourcing more recent census population data that is stratified but not
 #by single year age just by age group which is why we added it so much later
 source('data_processing/census.manager/census.population.10.19.R')
@@ -218,9 +215,6 @@ source('data_processing/census.manager/census.population.10.19.R')
 #UPDATE 7-16: Temporarily commenting out 181 to source the newer stratified data
 #I'll use this to decide if we want age groups or single year
 source('data_processing/census.manager/census.population.20.23.R')
-
-###SAVE POPULATION2###
-save(census.manager, file="../../cached/data.manager.merge/census.manager_population2.rdata")
 
 #This pulls birth and death data from CDC Wonder#
 source('data_processing/census.manager/births_and_deaths.R')
@@ -230,9 +224,6 @@ source('data_processing/census.manager/fertility.rate.R')
 
 #National Level 'metro' deaths
 source('data_processing/census.manager/mortality.cdc.wonder.R')
-
-###SAVE BIRTHS.DEATHS1###
-save(census.manager, file="../../cached/data.manager.merge/census.manager_births.deaths1.rdata")
 
 ################################################################################
 ###Read in Census Files###
@@ -615,11 +606,6 @@ source('data_processing/census.manager/aggregating.national.population.census.R'
 ################################################################################
                   ###Save Census Manager###
 ################################################################################ 
-
-#SAVE POPULATION3 (this is last piece of merged data)
-save(census.manager, file="../../cached/data.manager.merge/census.manager_population3.rdata")
-
-#######
 
 #Save final complete census manager
 save(census.manager, file="../../cached/census.manager.rdata")
