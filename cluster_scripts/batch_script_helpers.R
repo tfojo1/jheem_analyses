@@ -47,7 +47,7 @@ make.sbatch.script <- function(filename,
 }
 
 make.setup.script <- function(location,
-                              filename=paste0(location, '.R'),
+                              filename=paste0(location, '.bat'),
                               dir='cluster_scripts/setup_scripts/',
                               partition='shared',
                               account='azalesak',
