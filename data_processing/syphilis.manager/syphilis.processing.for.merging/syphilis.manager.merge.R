@@ -17,17 +17,17 @@ section4 = load.data.manager(name="syphilis.manager_section1", file="Q:/data_man
 #You'll need to figure out which is the largest#
 
 #MERGE 
-# population1$import.data(population2) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
-# population1$import.data(population3)
-# population1$import.data(births.deaths1)
-# 
-# #SAVE Final, Complete Census Manager to Cached
-# save(population1, file="../../cached/census.manager.merged.check.rdata")
-# 
-# #SAVE Final, Complete Census Manager to Q Drive
-# save(population1, file="Q:/data_managers/census.manager.rdata")
-# 
-# #SAVE Final, Complete Census Manager, Archive a dated version to the Q Drive#
-# timestamp <- Sys.Date()  
-# filename <- paste0("Q:/data_managers/Archive/census.manager_", timestamp, ".rdata")
-# save(population1, file=filename)
+section3$import.data(section1) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
+section3$import.data(section2)
+section3$import.data(section4)
+ 
+#SAVE Final, Complete Syphilis Manager to Cached
+save(section3, file="../../cached/syphilis.manager.merged.check.rdata")
+
+#SAVE Final, Complete Syphilis Manager to Q Drive
+save(section3, file="Q:/data_managers/syphilis.manager.rdata")
+
+#SAVE Final, Complete Syphilis Manager, Archive a dated version to the Q Drive#
+timestamp <- Sys.Date()
+filename <- paste0("Q:/data_managers/Archive/syphilis.manager_", timestamp, ".rdata")
+save(section3, file=filename)

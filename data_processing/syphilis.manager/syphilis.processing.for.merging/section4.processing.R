@@ -14,6 +14,15 @@ data.manager = create.data.manager('syphilis', description='syphilis data manage
 
 #Register outcomes:
 data.manager$register.outcome(
+  'population',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Population',
+    axis.name = 'Population',
+    units = 'population',
+    description = "Population Estimate"))
+
+data.manager$register.outcome(
   'proportion.msm', 
   metadata = create.outcome.metadata(
     scale = 'proportion',

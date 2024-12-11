@@ -142,7 +142,7 @@ data.manager$register.outcome(
     display.name = 'Population',
     axis.name = 'Population',
     units = 'population',
-    description = "Populaion Estimate"))
+    description = "Population Estimate"))
 
 data.manager$register.outcome(
   'hiv.diagnoses',
