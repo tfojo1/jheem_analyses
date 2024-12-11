@@ -51,7 +51,7 @@ make.setup.script <- function(location,
                               dir='cluster_scripts/setup_scripts/',
                               partition='shared',
                               account='pkasaie1',
-                              mem=NULL)
+                              mem='16G')
 {
     make.sbatch.script(filename=file.path(dir, filename),
                        job.name = paste0(location, '_setup'),
