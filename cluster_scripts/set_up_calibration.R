@@ -13,6 +13,7 @@ print(getwd())
 #-- SOURCE THE RELEVANT FILES --#
 print("Loading Source Files...")
 source('applications/EHE/ehe_specification.R')
+source('applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 version = args[1]
 location = args[2]
