@@ -145,7 +145,7 @@ immigration.likelihood.instructions =
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 #-- EMIGRATION  ----
@@ -159,7 +159,7 @@ emigration.likelihood.instructions =
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 
@@ -173,7 +173,7 @@ total.new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 new.diagnoses.likelihood.instructions = 
@@ -186,7 +186,7 @@ new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 race.risk.new.diagnoses.likelihood.instructions = 
@@ -199,7 +199,7 @@ race.risk.new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 #-- PREVALENCE  ----
@@ -212,7 +212,7 @@ total.prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 prevalence.likelihood.instructions = 
@@ -225,7 +225,7 @@ prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 race.risk.prevalence.likelihood.instructions = 
@@ -238,7 +238,7 @@ race.risk.prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 #-- AIDS DIAGNOSES  ----
@@ -270,7 +270,7 @@ hiv.mortality.likelihood.instructions =
                                        error.variance.term = 0.04711922, # using prevalence value from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 #-- GENERAL MORTALITY  ----
@@ -286,7 +286,7 @@ general.mortality.likelihood.instructions =
                                        error.variance.term = 0.03, # look into source and see if they have estimate 
                                        error.variance.type = 'cv',
                                        weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 #-- SUPPRESSION  ----
@@ -323,7 +323,7 @@ suppression.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (1*TOTAL.WEIGHT),
-                                                   equalize.weight.by.year = T 
+                                                   equalize.weight.by.year = F
   )
 
 #-- AIDS DEATHS  ----
@@ -341,7 +341,7 @@ aids.deaths.likelihood.instructions =
                                        error.variance.term = 0.2277531, # using aids diagnoses estimate from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 #-- PREP UPTAKE  ----
@@ -355,7 +355,7 @@ prep.uptake.likelihood.instructions =
                                        error.variance.term = 0.01239159, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (0.3*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F
   )
 
 #-- PREP INDICATIONS  ----
@@ -372,7 +372,7 @@ prep.indications.likelihood.instructions =
                                        error.variance.type = 'cv',
                                        # ^ this means you can range from 0 to 2x the number of prep indications
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T 
+                                       equalize.weight.by.year = F 
   )
 
 #-- AWARENESS ----
@@ -406,7 +406,7 @@ awareness.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-                                                   equalize.weight.by.year = T
+                                                   equalize.weight.by.year = F
   )
 
 #-- HEROIN  ----
@@ -437,7 +437,7 @@ heroin.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (1*TOTAL.WEIGHT),
-                                                   equalize.weight.by.year = T 
+                                                   equalize.weight.by.year = F
   )
 
 #-- COCAINE  ----
@@ -468,7 +468,7 @@ cocaine.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (1*TOTAL.WEIGHT),
-                                                   equalize.weight.by.year = T 
+                                                   equalize.weight.by.year = F
   )
 
 #-- PROPORTION TESTED ----
@@ -499,7 +499,7 @@ proportion.tested.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (1*TOTAL.WEIGHT),
-                                                   equalize.weight.by.year = T
+                                                   equalize.weight.by.year = F
   )
 
 #-- HIV TEST POSITIVITY ----
@@ -539,7 +539,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-                                                   equalize.weight.by.year = T
+                                                   equalize.weight.by.year = F
   )
 
 #-- YEAR-ON-YEAR TESTS CHANGE ----
