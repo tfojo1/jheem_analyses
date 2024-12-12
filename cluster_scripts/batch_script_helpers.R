@@ -97,7 +97,7 @@ get.run.filename <- function(location, chain) {
 make.setup.master.script <- function(filename,
                                      locations,
                                      master.dir="cluster_scripts/master_scripts",
-                                     dir="cluster_scripts/setup_scripts/") {
+                                     dir="cluster_scripts/setup_scripts") {
     sink(file.path(master.dir, filename))
     cat("#!/bin/bash\n\n")
     for (location in locations) {
@@ -110,7 +110,7 @@ make.run.master.script <- function(filename,
                                    locations,
                                    chains=1:4,
                                    master.dir="cluster_scripts/master_scripts",
-                                   dir="cluster_scripts/run_scripts/") {
+                                   dir="cluster_scripts/run_scripts") {
     sink(file.path(master.dir, filename))
     cat("#!/bin/bash\n\n")
     for (location in locations) {
