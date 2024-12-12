@@ -68,7 +68,7 @@ make.setup.scripts <- function(locations,
 make.run.scripts <- function(locations,
                              chains=1:4,
                              dir='cluster_scripts/run_scripts/',
-                             partition='unlimited',
+                             partition="shared",
                              account='pkasaie1',
                              mem='16G')
 {

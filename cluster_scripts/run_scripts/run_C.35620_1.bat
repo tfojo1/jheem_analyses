@@ -4,7 +4,7 @@
 #SBATCH --mem=16G
 #SBATCH --output=../jheem_analyses/cluster_scripts/run_C.35620_1.out
 #SBATCH --time=168:00:00
-#SBATCH --partition=unlimited
+#SBATCH --partition=shared
 #SBATCH --account=pkasaie1
 
 ml gfbf/2023b
