@@ -75,11 +75,11 @@ make.run.scripts <- function(locations,
     for (location in locations) {
         for (chain in chains) {
             make.sbatch.script(filename=file.path(dir, get.run.filename(location, chain)),
-                               job.name = paste0("setup_", location, "_", chain),
+                               job.name = paste0("run_", location, "_", chain),
                                mem=mem,
                                output = file.path(OUTPUT.DIR, paste0("run_", location, "_", chain, ".out")),
                                partition=partition,
-                               time.hours = 7*24,
+                               time.hours = 12, #Todd's said 7*24 but this made it hard to queue
                                account=account,
                                commands = paste("Rscript cluster_scripts/run_calibration.R", "ehe", location, "init.pop.ehe", chain))
         }
