@@ -3,7 +3,7 @@
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
 # heroin, cocaine
 
-TOTAL.WEIGHT = 1 # 0.5 universally downweighting to try to allow more mixing - NOT YET, TRYING WITH NEW CVs first 
+TOTAL.WEIGHT = 0.5 # 0.5 universally downweighting to try to allow more mixing - NOT YET, TRYING WITH NEW CVs first 
 
 #-- BIAS ESTIMATES FOR NESTED PROPORTIONS  ----
 suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
@@ -145,7 +145,7 @@ immigration.likelihood.instructions =
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 #-- EMIGRATION  ----
@@ -159,7 +159,7 @@ emigration.likelihood.instructions =
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 
@@ -173,7 +173,7 @@ total.new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 new.diagnoses.likelihood.instructions = 
@@ -186,7 +186,7 @@ new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 race.risk.new.diagnoses.likelihood.instructions = 
@@ -199,7 +199,7 @@ race.risk.new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 #-- PREVALENCE  ----
@@ -212,7 +212,7 @@ total.prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 prevalence.likelihood.instructions = 
@@ -225,7 +225,7 @@ prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 race.risk.prevalence.likelihood.instructions = 
@@ -238,7 +238,7 @@ race.risk.prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 #-- AIDS DIAGNOSES  ----
@@ -248,14 +248,14 @@ non.age.aids.diagnoses.likelihood.instructions =
                                        dimensions = c("sex","race","risk"),
                                        levels.of.stratification = c(0,1),
                                        from.year = 1985,
-                                       to.year = 2001,
+                                       to.year = 1996,
                                        correlation.different.years = 0.3,
                                        #observation.correlation.form = 'compound.symmetry',
                                        observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = 0.04621778, # new diagnoses value from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 #-- HIV-MORTALITY  ----
@@ -270,7 +270,7 @@ hiv.mortality.likelihood.instructions =
                                        error.variance.term = 0.04711922, # using prevalence value from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 #-- GENERAL MORTALITY  ----
@@ -286,7 +286,7 @@ general.mortality.likelihood.instructions =
                                        error.variance.term = 0.03, # look into source and see if they have estimate 
                                        error.variance.type = 'cv',
                                        weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 #-- SUPPRESSION  ----
@@ -323,7 +323,7 @@ suppression.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (1*TOTAL.WEIGHT),
-                                                   equalize.weight.by.year = F
+                                                   equalize.weight.by.year = T
   )
 
 #-- AIDS DEATHS  ----
@@ -341,7 +341,7 @@ aids.deaths.likelihood.instructions =
                                        error.variance.term = 0.2277531, # using aids diagnoses estimate from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 #-- PREP UPTAKE  ----
@@ -355,7 +355,7 @@ prep.uptake.likelihood.instructions =
                                        error.variance.term = 0.01239159, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (0.3*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = F
+                                       equalize.weight.by.year = T
   )
 
 #-- PREP INDICATIONS  ----
@@ -372,7 +372,7 @@ prep.indications.likelihood.instructions =
                                        error.variance.type = 'cv',
                                        # ^ this means you can range from 0 to 2x the number of prep indications
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = F 
+                                       equalize.weight.by.year = T 
   )
 
 #-- AWARENESS ----
@@ -406,7 +406,7 @@ awareness.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-                                                   equalize.weight.by.year = F
+                                                   equalize.weight.by.year = T
   )
 
 #-- HEROIN  ----
@@ -437,7 +437,7 @@ heroin.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (1*TOTAL.WEIGHT),
-                                                   equalize.weight.by.year = F
+                                                   equalize.weight.by.year = T
   )
 
 #-- COCAINE  ----
@@ -468,7 +468,7 @@ cocaine.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (1*TOTAL.WEIGHT),
-                                                   equalize.weight.by.year = F
+                                                   equalize.weight.by.year = T
   )
 
 #-- PROPORTION TESTED ----
@@ -499,7 +499,7 @@ proportion.tested.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (1*TOTAL.WEIGHT),
-                                                   equalize.weight.by.year = F
+                                                   equalize.weight.by.year = T
   )
 
 #-- HIV TEST POSITIVITY ----
@@ -539,7 +539,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
                                                    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-                                                   equalize.weight.by.year = F
+                                                   equalize.weight.by.year = T
   )
 
 #-- YEAR-ON-YEAR TESTS CHANGE ----
@@ -575,7 +575,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
     
     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-    equalize.weight.by.year = F,
+    equalize.weight.by.year = T,
     use.lognormal.approximation = T
   )
 
@@ -595,7 +595,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
 #     ratio.cv = 1.2,
 #     
 #     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-#     equalize.weight.by.year = F
+#     equalize.weight.by.year = T
 #   )
 
 # basic version - WHAT WE WANT TO EVENTUALLY USE
@@ -614,7 +614,7 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     ratio.cv = 1.2,
     
     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R
-    equalize.weight.by.year = F,
+    equalize.weight.by.year = T,
     use.lognormal.approximation = T
   )
 
@@ -644,7 +644,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              # ratio.correlation = , # NULL will enter default of 0
                                              
                                              weights = (1*TOTAL.WEIGHT),
-                                             equalize.weight.by.year = F 
+                                             equalize.weight.by.year = T 
   )
 
 
@@ -669,7 +669,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
 #                                                                                  included.multiplier.correlation = 0.5,
 #                                                                                  
 #                                                                                  weights = list(1), 
-#                                                                                  equalize.weight.by.year = F 
+#                                                                                  equalize.weight.by.year = T 
 #   )
 
 # race.gonorrhea.year.on.year.change.likelihood.instructions = 
@@ -685,7 +685,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
 #                                                         error.variance.type = 'cv',
 #                                                         correlation.different.years = 0.5,
 #                                                         weights = list(1), 
-#                                                         equalize.weight.by.year = F 
+#                                                         equalize.weight.by.year = T 
 #   )
 
 #-- YEAR-ON-YEAR SYPHILIS CHANGE ----
@@ -706,7 +706,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                              # ratio.correlation = , # NULL will enter default of 0
                                              
                                              weights = (1*TOTAL.WEIGHT),
-                                             equalize.weight.by.year = F 
+                                             equalize.weight.by.year = T 
   )
 
 # ps.syphilis.year.on.year.change.likelihood.instructions = 
@@ -730,7 +730,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
 #                                                                                  included.multiplier.correlation = 0.5,
 #                                                                                  
 #                                                                                  weights = list(1), 
-#                                                                                  equalize.weight.by.year = F 
+#                                                                                  equalize.weight.by.year = T 
 #   )
 
 # race.ps.syphilis.year.on.year.change.likelihood.instructions = 
@@ -746,7 +746,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
 #                                                         error.variance.type = 'cv',
 #                                                         correlation.different.years = 0.2,
 #                                                         weights = list(1), 
-#                                                         equalize.weight.by.year = F 
+#                                                         equalize.weight.by.year = T 
 #   )
 
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS --#  ----
