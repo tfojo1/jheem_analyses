@@ -101,7 +101,7 @@ make.setup.master.script <- function(filename,
     sink(file.path(master.dir, filename))
     cat("#!/bin/bash\n\n")
     for (location in locations) {
-        cat("sbatch ", get.setup.filename(location), "\n", sep="")
+        cat("sbatch ", file.path(dir, get.setup.filename(location)), "\n", sep="")
     }
     sink()
 }
@@ -115,7 +115,7 @@ make.run.master.script <- function(filename,
     cat("#!/bin/bash\n\n")
     for (location in locations) {
         for (chain in chains) {
-            cat("sbatch ", get.run.filename(location, chain), "\n", sep="")
+            cat("sbatch ", file.path(dir, get.run.filename(location, chain)), "\n", sep="")
         }
     }
     sink()
