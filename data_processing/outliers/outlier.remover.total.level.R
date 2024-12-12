@@ -59,8 +59,8 @@ delta< (-0.02) #want to know which is true
 to.remove.mask = apply(delta < (-0.02), MARGIN = 'location', FUN= any, na.rm=T) #if any of those years has a less than 2% decrease from the previous year, for each col is any of these values true.  #could replace margin = 2 with margin = 'location'
 to.remove.codes = names(to.remove.mask)[to.remove.mask] #gives you names - for these you remove all the 4 years
 
-year <- rep(c("2010", "2011", "2012", "2013"), times=9)
-location <- rep(c("C.12580", "C.14460", "C.16740", "C.19820", "C.35380", "C.35620", "C.41180", "C.41740", "C.42660"), each=4)
+year <- rep(c("2010", "2011", "2012", "2013"), times=52)
+location <- rep(c("C.12060", "C.12580", "C.14460", "C.16740", "C.16980", "C.19820", "C.32820", "C.35380", "C.35620", "C.37980", "C.41180", "C.41740", "C.42660"), each=4)
 dx.prev.agg.county.remove <- data.frame(year, location)
 dx.prev.agg.county.remove$source = "cdc.aggregated.county"
 dx.prev.agg.county.remove$ontology = "cdc"
