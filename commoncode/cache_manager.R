@@ -66,6 +66,17 @@ get.data.manager.cache.metadata <- function(pretty.print=T, error.prefix = "") {
     invisible(data.manager.cache.metadata)
 }
 
+# Call this on a case-by-case basis if you want to directly download the latest one without checking what you've already got
+update.data.manager <- function(file) {
+    error.prefix <- "Cannot update.data.manager(): "
+    cache.metadata <- get.data.manager.cache.metadata(pretty.print=F)
+    if (!(file %in% names(cache.metadata))) {
+        stop(paste0(error.prefix, "'", file, "' is not one of our cached files. Call 'get.data.manager.cache.metadata()' to check what files are cached. File names are capitalization-sensitive."))
+    }
+    download.data.manager.from.onedrive(file.path(JHEEM.CACHE.DIR, file), cache.metadata[[file]]$onedrive.link, error.prefix)
+    return(0)
+}
+
 ## ---- ZOE ONLY ---- ##
 
 reset.data.manager.cache.metadata <- function(allow.flag = F) {
