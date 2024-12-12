@@ -10,7 +10,7 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 LOCATION='US'
 CALIBRATION.CODE.TO.RUN='pop.demog.shield.us'
 # DATE=Sys.Date()
-DATE="2024-12-09"
+DATE="2024-12-11"
 
 # completed mcmc? 
 # Reading from file:

@@ -1,3 +1,5 @@
+# library(jheem2)
+
 cat("*** Running Shield_source_code.R ***\n")
 NEW.SOURCE=T
 
@@ -18,11 +20,16 @@ if (NEW.SOURCE) {
     cat("Can not pull from JHEEM2: ", repo_path, "\n")
   }
 }
+# 
+cat("Sourcing the jheem2 package ...  \n")
+source('../jheem2/R/tests/source_jheem2_package.R')
+cat("Done \n")
+
 
 #pulling JHEEM_ANALYSIS # Load the git2r package ----
 if (NEW.SOURCE) {
   cat("Checking JHEEM_ANALYSIS repository status.... \n")
-  repo_path <- "../jheem_analyses//"  
+  repo_path <- "../jheem_analyses/"  
   # Check if the repository exists at the specified path
   if (dir.exists(repo_path)) {
     # Run the Git pull command to update the repository
@@ -31,8 +38,6 @@ if (NEW.SOURCE) {
     cat("Can not pull from JHEEM_ANALYSIS: ", repo_path, "\n")
   }
 }
-
-source('../jheem2/R/tests/source_jheem2_package.R')
 
 # Common code from JHEEM ----
 source('../jheem_analyses/commoncode/cache_manager.R')
