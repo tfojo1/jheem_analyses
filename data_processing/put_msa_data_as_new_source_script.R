@@ -46,7 +46,7 @@ put.msa.data.as.new.source = function(outcome,
     }
     
     for (to.location in to.locations) {
-        # browser()
+        browser()
         from.locations = locations::get.contained.locations(to.location, geographic.type.from)
         for (ont.name in names(outcome.data.all.ontologies)) {
             
@@ -109,9 +109,7 @@ put.msa.data.as.new.source = function(outcome,
                     })
                     
                 }
-                
-                
-                
+
                 if (scale == 'proportion') {
 
                     if (!(strat.name %in% names(denominator.data.used.ontology))) next
@@ -150,7 +148,13 @@ put.msa.data.as.new.source = function(outcome,
                     denominator.data.from.locs.only[proportion.indices.in.denominator][proportion.values.absent] =
                         denominator.data.from.locs.only[proportion.indices.in.denominator][proportion.values.absent] * -1
                     
-                    # Decide if our denominator data that is absent from the proportion data + max suppressed values is enough
+                    # We must also consider all locations that the denominator data has that the proportion data doesn't have to be absent in the proportion, and flip their denom values negative too
+                    # Otherwise, they'll fall into the "values.not.absent.anywhere" category below, even though they are "values.only.absent.from.proportion" (or NA)
+                    # If this isn't done, the "aggregated.denominator" may add in the denominator for sub locations that are not even in the proportion data, inflating its total.
+                    indices.for.non.prop.locations.in.denominator = get.array.access.indices(dimnames(denominator.data.from.locs.only), list(location=setdiff(dimnames(denominator.data.from.locs.only)$location, from.locations.present)))
+                    denominator.data.from.locs.only[indices.for.non.prop.locations.in.denominator] = -1 * denominator.data.from.locs.only[indices.for.non.prop.locations.in.denominator]
+                    
+                    # Decide if our denominator data that is absent from the proportion data + max suppressed values is too much to trust our limited proportion data to be representative
                     aggregated.denominator = apply.robust(denominator.data.from.locs.only, non.location.margin, function(x) {
                         max.expected.from.suppression = sum(is.na(x))*maximum.suppressed.value
                         values.only.absent.from.proportion = x<0
@@ -159,7 +163,8 @@ put.msa.data.as.new.source = function(outcome,
                         sum.values.not.absent.anywhere = sum(x[values.not.absent.anywhere], na.rm=T)
                         max.sum = sum.values.not.absent.anywhere + sum.values.only.absent.from.proportion + max.expected.from.suppression
                         if (max.sum==0) return (NA)
-                        if (max.expected.from.suppression + sum.values.only.absent.from.proportion / max.sum > tolerable.fraction.suppressed.in.denominator) return (NA)
+                        # The next line triggers if the denominator sum that we'd use for our proportion is too small a fraction of the total denominator for this location
+                        if ((max.expected.from.suppression + sum.values.only.absent.from.proportion) / max.sum > tolerable.fraction.suppressed.in.denominator) return (NA)
                         if (sum.values.not.absent.anywhere==0) return (NA)
                         else return(sum.values.not.absent.anywhere)
                     })
