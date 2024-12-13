@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#SBATCH --job-name=setup_C.12580_1
+#SBATCH --job-name=run_C.12580_1
 #SBATCH --mem=16G
 #SBATCH --output=../jheem_analyses/cluster_scripts/run_C.12580_1.out
-#SBATCH --time=168:00:00
-#SBATCH --partition=unlimited
+#SBATCH --time=12:00:00
+#SBATCH --partition=shared
 #SBATCH --account=pkasaie1
 
 ml gfbf/2023b
