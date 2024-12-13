@@ -86,12 +86,36 @@ make.run.scripts <- function(locations,
     }
 }
 
+#'@param burn.keep,thin.keep 0 means to skip that operation (burn, thin)
+make.assemble.scripts <- function(locations,
+                                  burn.keep=0.5,
+                                  thin.keep=0,
+                                  dir="cluster_scripts/assemble_scripts",
+                                  partition="shared",
+                                  account="pkasaie1",
+                                  mem="16G") {
+    for (location in locations) {
+        make.sbatch.script(filename=file.path(dir, get.assemble.filename(location)),
+                           job.name = paste0("assemble_", location),
+                           mem=mem,
+                           output = file.path(OUTPUT.DIR, paste0("assemble_", location, ".out")),
+                           partition=partition,
+                           time.hours = 12,
+                           account=account,
+                           commands = paste("Rscript cluster_scripts/run_calibration.R", "ehe", location, "init.pop.ehe", burn.keep, thin.keep))
+    }
+}
+
 get.setup.filename <- function(location) {
     paste0("setup_", location, ".bat")
 }
 
 get.run.filename <- function(location, chain) {
     paste0("run_", location, "_", chain, ".bat")
+}
+
+get.assemble.filename <- function(location) {
+    paste0("assemble_", location, ".bat")
 }
 
 make.setup.master.script <- function(filename,
@@ -117,6 +141,18 @@ make.run.master.script <- function(filename,
         for (chain in chains) {
             cat("sbatch ", file.path(dir, get.run.filename(location, chain)), "\n", sep="")
         }
+    }
+    sink()
+}
+
+make.assemble.master.script <- function(filename,
+                                        locations,
+                                        master.dir="cluster_scripts/master_scripts",
+                                        dir="cluster_scripts/assemble_scripts") {
+    sink(file.path(master.dir, filename))
+    cat("#!/bin/bash\n\n")
+    for (location in locations) {
+        cat("sbatch ", file.path(dir, get.assemble.filename(location)), "\n", sep="")
     }
     sink()
 }
