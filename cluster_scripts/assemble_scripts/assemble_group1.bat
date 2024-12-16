@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --job-name=assemble_group1
-#SBATCH --mem=16G
+#SBATCH --mem=24G
 #SBATCH --output=../jheem_analyses/cluster_scripts/assemble_group1.out
 #SBATCH --time=12:00:00
 #SBATCH --partition=shared

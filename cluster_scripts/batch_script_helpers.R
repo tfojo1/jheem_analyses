@@ -98,7 +98,7 @@ make.combined.assemble.script <- function(name.for.result,
                                           dir="cluster_scripts/assemble_scripts",
                                           partition="shared",
                                           account="pkasaie1",
-                                          mem="16G") {
+                                          mem="24G") {
     all.commands = sapply(locations, function(location) {
         paste("Rscript cluster_scripts/assemble_calibration.R", "ehe", location, "init.pop.ehe", burn.keep, thin.keep)
     })
