@@ -111,3 +111,15 @@ for (data in male.put) {
     url = 'https://www.cdc.gov/std/stats17/2017-STD-Surveillance-Report_CDC-clearance-9.10.18.pdf',
     details = 'CDC STI Surveillance Reports')
 }
+
+total.put = lapply(primary.secondary.total, `[[`, 2)
+
+for (data in total.put) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.sti',
+    source = 'cdc.sti.surveillance.reports',
+    url = 'https://www.cdc.gov/std/stats17/2017-STD-Surveillance-Report_CDC-clearance-9.10.18.pdf',
+    details = 'CDC STI Surveillance Reports')
+}
