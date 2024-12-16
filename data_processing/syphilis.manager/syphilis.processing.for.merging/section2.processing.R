@@ -101,7 +101,7 @@ data.manager$register.ontology(  #Create a separate ontology for early syphilis
 
 #Codes:
 source('data_processing/syphilis.manager/syphilis.data.R')
-source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.data.R')
+source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.R')
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
