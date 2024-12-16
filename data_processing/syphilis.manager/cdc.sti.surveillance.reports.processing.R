@@ -102,7 +102,7 @@ for (data in male.put) {
 
 female.put = lapply(primary.secondary.female, `[[`, 2)
 
-for (data in male.put) {
+for (data in female.put) {
   
   data.manager$put.long.form(
     data = data,
