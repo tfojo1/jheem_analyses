@@ -46,7 +46,7 @@ put.msa.data.as.new.source = function(outcome,
     }
     
     for (to.location in to.locations) {
-        browser()
+        # browser()
         from.locations = locations::get.contained.locations(to.location, geographic.type.from)
         for (ont.name in names(outcome.data.all.ontologies)) {
             
@@ -203,6 +203,7 @@ put.msa.data.as.new.source = function(outcome,
                     browser()
                 
                 # Put the data
+                # print(paste0("putting for ", outcome, " and ", ont.name))
                 data.manager$put(data = aggregated.data,
                                  outcome = outcome,
                                  source = to.source.name,
