@@ -22,7 +22,7 @@ section3$import.data(section2)
 section3$import.data(section4)
  
 #SAVE Final, Complete Syphilis Manager to Cached
-save(section3, file="../../cached/syphilis.manager.merged.check.rdata")
+save(section3, file="../../cached/syphilis.manager.rdata")
 
 #SAVE Final, Complete Syphilis Manager to Q Drive
 save(section3, file="Q:/data_managers/syphilis.manager.rdata")
