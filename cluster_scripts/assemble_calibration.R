@@ -26,9 +26,11 @@ simset = assemble.simulations.from.calibration(version = version,
                                                location = location,
                                                calibration.code = calibration.code)
 
+print(paste0("Burning/thinning..."))
 if (burn.keep!=0)
     simset = simset$burn(keep = burn.keep) #0.5
 if (thin.keep!=0)
     simset = simset$thin(keep = thin.keep)
 
-save(simset,file=paste0("run_results/",calibration.code,"_simset_",Sys.Date(),"_",location,".Rdata"))
+print(paste0("Saving..."))
+save(simset,file=paste0("../../files/run_results/",calibration.code,"_simset_",Sys.Date(),"_",location,".Rdata"))
