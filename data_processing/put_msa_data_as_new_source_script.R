@@ -71,7 +71,7 @@ put.msa.data.as.new.source = function(outcome,
                 if (is.null(strat.data.from.locs.only)) next
                 if (all(is.na(strat.data.from.locs.only))) next
                 
-                # Aggregate across location
+                # Will be aggregating across location
                 non.location.margin = setdiff(names(dim(strat.data.from.locs.only)), 'location')
                 
                 ## IMPORTANT: unhash url and details
@@ -115,7 +115,7 @@ put.msa.data.as.new.source = function(outcome,
                     if (!(strat.name %in% names(denominator.data.used.ontology))) next
                     denominator.data = denominator.data.used.ontology[[strat.name]]
 
-                    # We must have denominator data for all counties, not necessarily proportion data
+                    # We must have denominator data for all counties, not true for proportion data
                     if(length(setdiff(from.locations, dimnames(denominator.data)$location))>0) next
 
                     years.in.this.denom.data = intersect(dimnames(denominator.data)$year, years.in.this.strat.data)
