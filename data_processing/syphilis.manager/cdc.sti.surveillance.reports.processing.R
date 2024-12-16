@@ -14,6 +14,7 @@ cdc.reports.raw <- lapply(cdc.reports.files, function(x){
 
 
 # Clean -------------------------------------------------------------------
+#male
 primary.secondary.male= lapply(cdc.reports.raw, function(file){
   
   data=file[["data"]]
@@ -37,6 +38,7 @@ data= as.data.frame(data)
 list(filename, data)
 })
 
+#female
 primary.secondary.female= lapply(cdc.reports.raw, function(file){
   
   data=file[["data"]]
@@ -59,6 +61,30 @@ primary.secondary.female= lapply(cdc.reports.raw, function(file){
   
   list(filename, data)
 })
+
+#total
+primary.secondary.total = lapply(cdc.reports.raw, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data$location = "US"
+  data$year = substr(filename, 54, 57)
+  
+  data <- data %>%
+    select(Disease, location, year, `Total Total`)%>%
+    filter(Disease == "Primary Syphilis" | Disease == 'Secondary Syphilis')%>%
+    rename(outcome = Disease)%>%
+    rename(value = 'Total Total')%>%
+    mutate(outcome = tolower(outcome))%>%
+    mutate(outcome = gsub(" ", ".", outcome))
+  
+  
+  data= as.data.frame(data)
+  
+  list(filename, data)
+})
+
 
 # Put ---------------------------------------------------------------------
 
