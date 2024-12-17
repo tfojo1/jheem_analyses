@@ -173,7 +173,7 @@ total.new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = F
   )
 
 new.diagnoses.likelihood.instructions = 
@@ -186,7 +186,7 @@ new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = F
   )
 
 race.risk.new.diagnoses.likelihood.instructions = 
@@ -199,7 +199,7 @@ race.risk.new.diagnoses.likelihood.instructions =
                                        error.variance.term = 0.04621778, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = F
   )
 
 #-- PREVALENCE  ----
@@ -212,7 +212,7 @@ total.prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = F
   )
 
 prevalence.likelihood.instructions = 
@@ -225,7 +225,7 @@ prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = F
   )
 
 race.risk.prevalence.likelihood.instructions = 
@@ -238,7 +238,7 @@ race.risk.prevalence.likelihood.instructions =
                                        error.variance.term = 0.04711922, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = F
   )
 
 #-- AIDS DIAGNOSES  ----
