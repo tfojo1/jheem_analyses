@@ -49,12 +49,32 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Unknown Duration or Late Syphilis"))
 
+data.manager$register.outcome(
+  'primary.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Primary Syphilis',
+    axis.name = 'Primary Syphilis',
+    units = 'cases',
+    description = "Primary Syphilis"))
+
+data.manager$register.outcome(
+  'secondary.syphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Secondary Syphilis',
+    axis.name = 'Secondary Syphilis',
+    units = 'cases',
+    description = "Secondary Syphilis"))
+
 #Register Sources:
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS") #parent
 data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS") #parent
+data.manager$register.parent.source('DHHS', full.name = 'U.S. Department of Health and Human Services', short.name= "DHHS") #parent
 
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('cdc.sti.surveillance.reports', parent.source= "DHHS", full.name = "CDC Sexually Transmitted Disease Surveillance", short.name='cdc.sti.surveillance.reports')
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -81,6 +101,7 @@ data.manager$register.ontology(  #Create a separate ontology for early syphilis
 
 #Codes:
 source('data_processing/syphilis.manager/syphilis.data.R')
+source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.R')
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager

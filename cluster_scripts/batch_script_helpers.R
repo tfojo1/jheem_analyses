@@ -68,21 +68,49 @@ make.setup.scripts <- function(locations,
 make.run.scripts <- function(locations,
                              chains=1:4,
                              dir='cluster_scripts/run_scripts/',
-                             partition='unlimited',
+                             partition="shared",
                              account='pkasaie1',
                              mem='16G')
 {
     for (location in locations) {
         for (chain in chains) {
             make.sbatch.script(filename=file.path(dir, get.run.filename(location, chain)),
-                               job.name = paste0("setup_", location, "_", chain),
+                               job.name = paste0("run_", location, "_", chain),
                                mem=mem,
                                output = file.path(OUTPUT.DIR, paste0("run_", location, "_", chain, ".out")),
                                partition=partition,
-                               time.hours = 7*24,
+                               time.hours = 12, #Todd's said 7*24 but this made it hard to queue
                                account=account,
                                commands = paste("Rscript cluster_scripts/run_calibration.R", "ehe", location, "init.pop.ehe", chain))
         }
+    }
+}
+
+#'@details This doesn't create one job per location but rather calls the assemble
+#' on all locations in single job, because the runtime is short and we don't want
+#' to worry about queueing.
+#' @param name.for.result Since this handles multiple locations in one batch file output, a name is needed
+#'@param burn.keep,thin.keep 0 means to skip that operation (burn, thin)
+make.combined.assemble.script <- function(name.for.result,
+                                          locations,
+                                          burn.keep=0.5,
+                                          thin.keep=0,
+                                          dir="cluster_scripts/assemble_scripts",
+                                          partition="shared",
+                                          account="pkasaie1",
+                                          mem="24G") {
+    all.commands = sapply(locations, function(location) {
+        paste("Rscript cluster_scripts/assemble_calibration.R", "ehe", location, "init.pop.ehe", burn.keep, thin.keep)
+    })
+    for (location in locations) {
+        make.sbatch.script(filename=file.path(dir, paste0("assemble_", name.for.result, ".bat")),
+                           job.name = paste0("assemble_", name.for.result),
+                           mem=mem,
+                           output = file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out")),
+                           partition=partition,
+                           time.hours = 12,
+                           account=account,
+                           commands = all.commands)
     }
 }
 
@@ -120,5 +148,3 @@ make.run.master.script <- function(filename,
     }
     sink()
 }
-
-# assemble.simulations.from.calibration() # give it a list of city, etc., takes stuff in cache and makes simset(s). Burn half and then thin

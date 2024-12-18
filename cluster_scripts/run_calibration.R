@@ -18,7 +18,7 @@ source('applications/EHE/calibration_runs/ehe_register_calibrations.R')
 version = args[1]
 location = args[2]
 calibration.code = args[3]
-chain = args[4]
+chain = as.numeric(args[4])
 
 # print(typeof(version))
 # print(typeof(location))

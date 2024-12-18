@@ -484,11 +484,11 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     # ),
 
     # Testing by Age
-    age1.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
-    age2.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
-    age3.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
-    age4.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
-    age5.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    # age1.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    # age2.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    # age3.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    # age4.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
+    # age5.proportion.tested.or = Lognormal.Distribution(0, 0.5*log(2)),
     
     # age1.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
     # age2.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
@@ -496,13 +496,13 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     # age4.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
     # age5.proportion.tested.slope.or = Lognormal.Distribution(0, 0.5*log(2)/10),
     
-    # age.proportion.tested.or = Multivariate.Lognormal.Distribution(
-    #   mu = rep(0, 5),
-    #   #sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)),
-    #   sigma = create.auto.regressive.covariance.matrix(0.7, 5, sd=0.5*log(1.5)),
-    #   var.names = paste0("age", 1:5, ".proportion.tested.or")
-    # ),
-    # 
+    age.proportion.tested.or = Multivariate.Lognormal.Distribution(
+      mu = rep(0, 5),
+      #sigma = create.compound.symmetry.covariance.matrix(0.5, 5, 0.5*log(1.5)),
+      sigma = create.auto.regressive.covariance.matrix(0.5, 5, sd=0.5*log(1.5)),
+      var.names = paste0("age", 1:5, ".proportion.tested.or")
+    ),
+
     age.proportion.tested.slope.or = Multivariate.Lognormal.Distribution(
       mu = rep(0, 5),
       sigma = create.auto.regressive.covariance.matrix(0.5, 5, 0.5*log(1.5)/10),
