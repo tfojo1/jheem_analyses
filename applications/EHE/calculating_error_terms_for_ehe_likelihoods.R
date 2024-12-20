@@ -40,6 +40,11 @@ calculate.error.terms = function(data.type,
                                  data.source.1,
                                  data.source.2,
                                  years=NULL,
+                                 use.totals = T,
+                                 use.age = T,
+                                 use.risk = T,
+                                 use.sex = T,
+                                 use.race = F,
                                  is.cv){
   
   all.values1 = numeric()
@@ -52,35 +57,40 @@ calculate.error.terms = function(data.type,
   
   
   # TOTAL
-  years.in.both.total = intersect(dimnames(data1[["year__location"]])$year,
-                                  dimnames(data2[["year__location"]])$year)
-  if(!is.null(years)){
-    years.in.both.total = intersect(years.in.both.total,years)
+  if(use.totals){
+    years.in.both.total = intersect(dimnames(data1[["year__location"]])$year,
+                                    dimnames(data2[["year__location"]])$year)
+    if(!is.null(years)){
+      years.in.both.total = intersect(years.in.both.total,years)
+    }
+    locations.in.both.total = intersect(dimnames(data1[["year__location"]])$location,
+                                        dimnames(data2[["year__location"]])$location)
+    
+    values1 = data1[["year__location"]][years.in.both.total, locations.in.both.total]
+    values2 = data2[["year__location"]][years.in.both.total, locations.in.both.total]
+    
+    all.values1 = c(all.values1, values1)
+    all.values2 = c(all.values2, values2)
   }
-  locations.in.both.total = intersect(dimnames(data1[["year__location"]])$location,
-                                      dimnames(data2[["year__location"]])$location)
-  
-  values1 = data1[["year__location"]][years.in.both.total, locations.in.both.total]
-  values2 = data2[["year__location"]][years.in.both.total, locations.in.both.total]
-  
-  all.values1 = c(all.values1, values1)
-  all.values2 = c(all.values2, values2)
-  
-  # AGE
-  years.in.both.age = intersect(dimnames(data1$year__location__age)$year,
-                                dimnames(data2$year__location__age)$year)
-  locations.in.both.age = intersect(dimnames(data1$year__location__age)$location,
-                                    dimnames(data2$year__location__age)$location)
-  ages.in.both = intersect(dimnames(data1$year__location__age)$age,
-                           dimnames(data2$year__location__age)$age)
 
-  values1 = data1$year__location__age[years.in.both.age, locations.in.both.age,ages.in.both]
-  values2 = data2$year__location__age[years.in.both.age, locations.in.both.age,ages.in.both]
-
-  all.values1 = c(all.values1, values1)
-  all.values2 = c(all.values2, values2)
+  if(use.age){
+    # AGE
+    years.in.both.age = intersect(dimnames(data1$year__location__age)$year,
+                                  dimnames(data2$year__location__age)$year)
+    locations.in.both.age = intersect(dimnames(data1$year__location__age)$location,
+                                      dimnames(data2$year__location__age)$location)
+    ages.in.both = intersect(dimnames(data1$year__location__age)$age,
+                             dimnames(data2$year__location__age)$age)
+    
+    values1 = data1$year__location__age[years.in.both.age, locations.in.both.age,ages.in.both]
+    values2 = data2$year__location__age[years.in.both.age, locations.in.both.age,ages.in.both]
+    
+    all.values1 = c(all.values1, values1)
+    all.values2 = c(all.values2, values2) 
+  }
 
 
+if(use.risk){
   # RISK
   years.in.both.risk = intersect(dimnames(data1$year__location__risk)$year,
                                  dimnames(data2$year__location__risk)$year)
@@ -94,7 +104,8 @@ calculate.error.terms = function(data.type,
 
   all.values1 = c(all.values1, values1)
   all.values2 = c(all.values2, values2)
-
+}
+  if(use.sex){
   # SEX
   years.in.both.sex = intersect(dimnames(data1$year__location__sex)$year,
                                 dimnames(data2$year__location__sex)$year)
@@ -109,20 +120,23 @@ calculate.error.terms = function(data.type,
   all.values1 = c(all.values1, values1)
   all.values2 = c(all.values2, values2)
 
+  }
   
+  if(use.race){
   # RACE
-  # years.in.both.race = intersect(dimnames(data1$year__location__race)$year,
-  #                                dimnames(data2$year__location__race)$year)
-  # locations.in.both.race = intersect(dimnames(data1$year__location__race)$location,
-  #                                    dimnames(data2$year__location__race)$location)
-  # races.in.both = intersect(dimnames(data1$year__location__race)$race,
-  #                           dimnames(data2$year__location__race)$race) # HAVE TO DO MAPPINGS HERE FOR RACE TO WORK 
-  # 
-  # values1 = data1$year__location__race[years.in.both.race, locations.in.both.race,]
-  # values2 = data2$year__location__race[years.in.both.race, locations.in.both.race,]
-  # 
-  # all.values1 = c(all.values1, values1)
-  # all.values2 = c(all.values2, values2)
+  years.in.both.race = intersect(dimnames(data1$year__location__race)$year,
+                                 dimnames(data2$year__location__race)$year)
+  locations.in.both.race = intersect(dimnames(data1$year__location__race)$location,
+                                     dimnames(data2$year__location__race)$location)
+  races.in.both = intersect(dimnames(data1$year__location__race)$race,
+                            dimnames(data2$year__location__race)$race) # HAVE TO DO MAPPINGS HERE FOR RACE TO WORK
+
+  values1 = data1$year__location__race[years.in.both.race, locations.in.both.race,]
+  values2 = data2$year__location__race[years.in.both.race, locations.in.both.race,]
+
+  all.values1 = c(all.values1, values1)
+  all.values2 = c(all.values2, values2)
+  }
   
   if(is.cv){
     # Calculate it
