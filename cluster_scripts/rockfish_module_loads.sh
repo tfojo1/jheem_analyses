@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 
 ml gfbf/2023b
 ml R/4.3.3-gfbf-2023b
