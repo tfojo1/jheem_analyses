@@ -8,7 +8,7 @@ print("Installing jheem2 required packages")
 
 for (package in CRAN.PACKAGES) {
     print(paste0("Installing '", package, "'..."))
-    trCatch(
+    tryCatch(
         {install.packages(package, lib=Sys.getenv("R_LIBS_USER"))},
         error=function(e) {print(paste0("Error installing package '", package, "' -- skipping..."))})
 }
