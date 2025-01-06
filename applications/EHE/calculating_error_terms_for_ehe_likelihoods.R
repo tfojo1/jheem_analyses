@@ -13,16 +13,22 @@ calculate.error.terms(data.type = "suppression",
                       data.source.1 = "cdc.aggregated.proportion",
                       data.source.2 = "lhd",
                       is.cv = F)
-# DIAGNOSES: 0.04621778
-calculate.error.terms(data.type = "diagnoses",
-                      data.source.1 = "cdc.surveillance.reports",
-                      data.source.2 = "cdc.aggregated.county",
-                      is.cv = T)
-# PREVALENCE: 0.04711922
-calculate.error.terms(data.type = "diagnosed.prevalence",
-                      data.source.1 = "cdc.surveillance.reports",
-                      data.source.2 = "cdc.aggregated.county",
-                      is.cv = T)
+
+# DIAGNOSES:  0.04110863
+calculate.lhd.error.terms("diagnoses")
+# (old diagnoses value = 0.04621778)
+# calculate.error.terms(data.type = "diagnoses",
+#                       data.source.1 = "cdc.surveillance.reports",
+#                       data.source.2 = "cdc.aggregated.county",
+#                       is.cv = T)
+
+# PREVALENCE: 0.07436122
+calculate.lhd.error.terms("diagnosed.prevalence")
+# (old prevalence value = 0.04711922)
+# calculate.error.terms(data.type = "diagnosed.prevalence",
+#                       data.source.1 = "cdc.surveillance.reports",
+#                       data.source.2 = "cdc.aggregated.county",
+#                       is.cv = T)
 
 # AIDS DIAGNOSES: 0.2277531 - from 1993-1997 only; one source only has totals so no stratifications anyway 
 calculate.error.terms(data.type = "aids.diagnoses",
@@ -35,6 +41,35 @@ calculate.error.terms(data.type = "prep",
                       data.source.1 = "aidsvu",
                       data.source.2 = "cdc.prep",
                       is.cv = T)
+
+calculate.lhd.error.terms = function(data.type){
+  lhd.data = read.csv("cached/LHD Diagnoses and Diagnosed Prevalence.csv")
+  lhd.data = lhd.data[lhd.data$MSA!="Indianapolis",]
+  
+  if(data.type=="diagnoses"){
+    all.values1 = as.numeric(lhd.data$LHD.New.Diganoses)
+    all.values2 = as.numeric(lhd.data$Atlas.Plus.Summed.New.Diagnoses..Data.Manager.)
+    
+  } else if(data.type=="diagnosed.prevalence"){
+    
+    all.values1 = as.numeric(lhd.data$LHD.Diagnosed.Prevalence)
+    all.values2 = as.numeric(lhd.data$Atlas.Plus.Summed.Prevalence..Data.Manager.)    
+  } else 
+    stop("only set up for diagnoses and diagnosed prevalence")
+
+  cvs.1 = (all.values1 - all.values2)/all.values1 
+  cvs.2 = (all.values1 - all.values2)/all.values2
+  
+  cvs = c(cvs.1,cvs.2)
+  cvs[is.nan(cvs)] = 0
+  cvs = cvs[!is.na(cvs) & !is.infinite(cvs)]
+  
+  rv = sqrt(sum(cvs^2, na.rm=T)/sum(!is.na(cvs))) 
+  
+  rv
+}
+
+
 
 calculate.error.terms = function(data.type,
                                  data.source.1,
