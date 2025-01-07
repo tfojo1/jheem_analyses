@@ -17,8 +17,8 @@ My home directory shows a sub-directory called `scr4_pkasaie1`, which stands for
 ### 3. Clone repositories
 Follow the instructions [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) for cloning a repository using the “SSH” method to clone the `jheem_analyses` repository from Github (https://github.com/tfojo1/jheem_analyses). I can’t recall exactly what I did, but it probably required setting up an SSH key as described here. Note that to use Git operations on Rockfish, you’ll always have to load the `git` module, using the terminal command `module load git`. Our goal is to have everything on Rockfish using jheem2 in package form, but if that’s not available yet, then you’ll want to clone the jheem2 repository from Github as well (https://github.com/tfojo1/jheem2)
 
-### 4. Prepare to install R packages
-This was the most difficult step for me because Rockfish support had to do some background setup to make available various obscure dependencies our package has. Thankfully, a lot of that work is done if we use a particular R module they’ve made for us. Since installing R packages involves running R, you should be doing this on an Interact Node. You can request and switch to this with a command like `interact -t 8:00:00 -n 6`, which in this case is requesting six cores for eight hours. Our goal will be to install all the necessary packages as found in `jheem_analyses/first_time_setup/install_packages.R`. That is, we want to install the following packages:
+### 4. Install R packages
+Since installing R packages involves running R, you should be doing this on an Interact Node. You can request and switch to this with a command like `interact -t 8:00:00 -n 6`, which in this case is requesting six cores for eight hours. We want to install these packages, which are dependencies of our jheem2 package and some helpers in jheem_analyses.
 
 - ggmap
 - ggnewscale
@@ -28,12 +28,9 @@ This was the most difficult step for me because Rockfish support had to do some 
 - tfojo1/locations
 - thk686/odeintr
 
-To do so, we will first need to set up a special location for the R library. At the HOME directory (top level), make a directory called `rlibs`. Then, set an environment variable to tell R to install packages to this location with the command `export R_LIBS_USER=$HOME/rlibs/R-4.3.3`. You’ll have to make this environment variable again on every session that you’re trying to install packages or run R outside of a batch script (the batch scripts we make run this automatically). Now you’ll load the R module, but you won’t be loading the obvious one (i.e., don’t `module load r`). Instead, you’ll load a custom R module that Rockfish support has outfitted with the dependencies we need, like certain C libraries. This takes two lines: `module load gfbf/2023b` and `module load R/4.3.3-gfbf-2023b`. Note that `ml` is a shortcut for `module load` and will do the same thing. Once these three steps are completed for this session, you can proceed to launch R and install the packages.
+Before you install, make sure you have the R modules loaded by typing `source cluster_scripts/Rockfish_module_loads.sh` from your `jheem_analyses` directory. Then, install the packages with `Rscript cluster_scripts/install_packages.R`. If any installations fail, you should be able to see which ones they are and then reach out to me to solve any issues.
 
-### 5. Install R packages
-Launch an R session with the simple command `R` (quit it with `quit()`). Install the first three packages from CRAN with `install.packages(“ggmap”, lib=Sys.getenv(“R_LIBS_USER”))` or similar, then the latter four packages from Github with `devtools::install_github(“tfojo1/distributions”, lib=Sys.getenv(“R_LIBS_USER”))`. Hopefully, the various issues I got during this process won’t re-occur because the custom R module has the right dependencies now. Note that it is critical to specify the library location during these installations because installing to other places will either prompt an access denied error or simply place the package in a location where R won’t be able to find it. If you start a new interact session, the environment variable defining the library location won’t exist anymore, and you’ll have to run the `export R_LIBS_USER…` command again. If errors occur during installation, feel free to reach out to me.
-
-### 6. Import required objects through SCP
+### 5. Import required objects through SCP
 There are several R data objects that most JHEEM model specifications use that are not transferred through Git, like data managers. Since these objects are not terribly large (at most around 100 MB), they can be imported easily from your local desktop to Rockfish with the `scp` command. Although we’ve written code to automatically download certain data managers from the Internet, I used SCP to bring these in on my first attempt since I was already doing so for some other cached objects. The full list of the required non-Git-controlled objects, as far as I know, is:
 
 - census.manager.rdata
@@ -81,5 +78,4 @@ Calibration typically takes a short setup step, wherein a cache is generated und
 
 ## Expected Workflow Improvements
 1.	Some of the batch script-generating scripts are currently hardcoded for version ‘ehe’, but this will be made into an optional argument to allow for other versions.
-2.	Some of module loading steps may be possible to bundle into a bash script to spare some typing.
-3.	The `jheem_analyses/cluster_scripts` may benefit from greater organization as more people place generate their own batch scripts in it.
+2.	The `jheem_analyses/cluster_scripts` may benefit from greater organization as more people place generate their own batch scripts in it.

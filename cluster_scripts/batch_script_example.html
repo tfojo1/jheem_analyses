@@ -9,9 +9,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Andrew Zalesak" />
 
+<meta name="date" content="2025-01-07" />
 
-<title>rockfish_documentation</title>
+<title>Batch Script Example</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -348,257 +350,78 @@ display: none;
 
 
 
+<h1 class="title toc-ignore">Batch Script Example</h1>
+<h4 class="author">Andrew Zalesak</h4>
+<h4 class="date">2025-01-07</h4>
 
 </div>
 
 
-<div id="rockfish-setup-and-usage-instructions" class="section level1">
-<h1>Rockfish Setup and Usage Instructions</h1>
-<p>Andrew Zalesak</p>
-<p>December 19, 2024</p>
-<div id="documentation" class="section level2">
-<h2>Documentation</h2>
-<p>Rockfish has decent documentation on its website, although it didn’t
-answer a few of the questions I had. The main User Guide is <a href="https://www.arch.jhu.edu/guide/">here</a> and some other
-information can be found under the “Support” tab. The Rockfish tech
-support are kind and helpful and can be contacted at <a href="mailto:help@rockfish.jhu.edu" class="email">help@rockfish.jhu.edu</a> with questions.</p>
+<pre class="r"><code>source(&quot;cluster_scripts/batch_script_helpers.R&quot;)
+MY_LOCATIONS = c(&quot;C.12580&quot;, &quot;C.12060&quot;, &quot;C.35620&quot;)</code></pre>
+<div id="make-batch-scripts-to-set-up-calibrations-for-each-of-three-locations." class="section level3">
+<h3>Make batch scripts to set up calibrations for each of three
+locations.</h3>
+<pre class="r"><code>make.setup.scripts(MY_LOCATIONS,
+                   version=&#39;ehe&#39;,
+                   calibration.code=&#39;init.pop.ehe&#39;)</code></pre>
 </div>
-<div id="setup" class="section level2">
-<h2>Setup</h2>
-<div id="join-rockfish" class="section level3">
-<h3>1. Join Rockfish</h3>
-<p>Make sure you’ve got a Rockfish account and are on Parastu’s
-allocation (pkasaie1). If so, you can log in on a Windows PowerShell (or
-other shell) using
-<code>ssh -X &lt;username&gt;@login.rockfish.jhu.edu</code> and then
-supplying your Rockfish-specific password. This will start you on a
-Login Node, which is good for setting up file organization but shouldn’t
-be used for running R. You’ll want to be familiar with basic Unix
-commands to move between directories (<code>cd</code>) and view contents
-(<code>ls</code>).</p>
+<div id="make-a-master-script-to-runs-each-of-the-above-batch-scripts-with-a-single-command." class="section level3">
+<h3>Make a master script to runs each of the above batch scripts with a
+single command.</h3>
+<pre class="r"><code>make.master.setup.script(&quot;my_example_setup_script&quot;,
+                         locations=MY_LOCATIONS,
+                         version=&#39;ehe&#39;,
+                         calibration.code=&#39;init.pop.ehe&#39;)</code></pre>
 </div>
-<div id="set-up-directories" class="section level3">
-<h3>2. Set up directories</h3>
-<p>My home directory shows a sub-directory called
-<code>scr4_pkasaie1</code>, which stands for “Parastu’s Scratch 4”
-directory. Under this directory, I have a directory called
-<code>azalesak</code> (my username), and then below that have the same
-structure we typically use on the team: <code>jheem</code> with two
-directories <code>code</code> and <code>files</code>. <code>files</code>
-will be where calibration data is written to. <code>code</code> will be
-where our code repositories like <code>jheem_analyses</code> will
-reside. Make these directories with
-<code>mkdir &lt;directory_name&gt;</code> and remove them with
-<code>rm &lt;directory_name&gt;</code> if you need. Do not create
-directories for any repositories yet, because we will create those
-automatically by cloning from Github.</p>
+<div id="run-this-master-script-from-the-command-line-of-an-interact-session-on-the-cluster" class="section level3">
+<h3>Run this master script from the command line of an interact session
+on the cluster</h3>
+<pre><code>sbatch cluster_scripts/master_scripts/setup/my_example_setup_script.bat</code></pre>
 </div>
-<div id="clone-repositories" class="section level3">
-<h3>3. Clone repositories</h3>
-<p>Follow the instructions <a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository">here</a>
-for cloning a repository using the “SSH” method to clone the
-<code>jheem_analyses</code> repository from Github (<a href="https://github.com/tfojo1/jheem_analyses" class="uri">https://github.com/tfojo1/jheem_analyses</a>). I can’t
-recall exactly what I did, but it probably required setting up an SSH
-key as described here. Note that to use Git operations on Rockfish,
-you’ll always have to load the <code>git</code> module, using the
-terminal command <code>module load git</code>. Our goal is to have
-everything on Rockfish using jheem2 in package form, but if that’s not
-available yet, then you’ll want to clone the jheem2 repository from
-Github as well (<a href="https://github.com/tfojo1/jheem2" class="uri">https://github.com/tfojo1/jheem2</a>)</p>
+<div id="make-batch-scripts-to-run-calibrations-then-make-a-master-script." class="section level3">
+<h3>Make batch scripts to run calibrations, then make a master
+script.</h3>
+<pre class="r"><code>make.run.scripts(MY_LOCATIONS,
+                 version=&#39;ehe&#39;,
+                 calibration.code=&#39;init.pop.ehe&#39;,
+                 chains=1)
+make.master.run.script(&quot;my_example_run_script&quot;,
+                       locations=MY_LOCATIONS,
+                       version=&#39;ehe&#39;,
+                       calibration.code=&#39;init.pop.ehe&#39;,
+                       chains=1)</code></pre>
 </div>
-<div id="install-r-packages" class="section level3">
-<h3>4. Install R packages</h3>
-<p>Since installing R packages involves running R, you should be doing
-this on an Interact Node. You can request and switch to this with a
-command like <code>interact -t 8:00:00 -n 6</code>, which in this case
-is requesting six cores for eight hours. We want to install these
-packages, which are dependencies of our jheem2 package and some helpers
-in jheem_analyses.</p>
-<ul>
-<li>ggmap</li>
-<li>ggnewscale</li>
-<li>httr2</li>
-<li>tfojo1/distributions</li>
-<li>tfojo1/Bayesian.simulations</li>
-<li>tfojo1/locations</li>
-<li>thk686/odeintr</li>
-</ul>
-<p>Before you install, make sure you have the R modules loaded by typing
-<code>source cluster_scripts/Rockfish_module_loads.sh</code> from your
-<code>jheem_analyses</code> directory. Then, install the packages with
-<code>Rscript cluster_scripts/install_packages.R</code>. If any
-installations fail, you should be able to see which ones they are and
-then reach out to me to solve any issues.</p>
+<div id="run-this-master-script-from-the-command-line-of-an-interact-session-on-the-cluster-1" class="section level3">
+<h3>Run this master script from the command line of an interact session
+on the cluster</h3>
+<pre><code>sbatch cluster_scripts/master_scripts/run/my_example_run_script.bat</code></pre>
 </div>
-<div id="import-required-objects-through-scp" class="section level3">
-<h3>5. Import required objects through SCP</h3>
-<p>There are several R data objects that most JHEEM model specifications
-use that are not transferred through Git, like data managers. Since
-these objects are not terribly large (at most around 100 MB), they can
-be imported easily from your local desktop to Rockfish with the
-<code>scp</code> command. Although we’ve written code to automatically
-download certain data managers from the Internet, I used SCP to bring
-these in on my first attempt since I was already doing so for some other
-cached objects. The full list of the required non-Git-controlled
-objects, as far as I know, is:</p>
-<ul>
-<li>census.manager.rdata</li>
-<li>DEFAULT.LOCALE.MAPPING.Rdata</li>
-<li>google_mobility_data.Rdata</li>
-<li>msa.surveillance.Rdata</li>
-<li>national.surveillance.Rdata</li>
-<li>surveillance.manager.rdata</li>
-<li>syphilis.manager.rdata</li>
-</ul>
-<p>To put these in using SCP, use your PowerShell from outside of
-Rockfish (quit Rockfish using <code>exit</code> as many times as
-needed). You’ll want to know the path on your own computer to where
-you’ve stored these objects, and you’ll want to know where you’re going
-to put them on Rockfish. The rough syntax for SCP file transfer is
-<code>scp &lt;path_to_local_object&gt; &lt;rockfish_address&gt;:&lt;rockfish_file_path&gt;</code>.
-I recommend using <code>cd</code> or similar on your desktop to get
-straight to where these files are located, so that the
-<code>&lt;path_to_local_object&gt;</code> can just be the file name,
-like <code>census.manager.rdata</code>. The
-<code>&lt;rockfish_address&gt;</code> is going to be your Rockfish
-username followed by an “@” sign and then the address of the Rockfish
-data transfer node, which is <code>rfdtn1.rockfish.jhu.edu</code>. The
-destination file is going to look a little different from how it is when
-you’re in Rockfish, because some of the directories you see, like
-<code>scr4_pkasaie1</code>, are actually symbolic links to places like
-<code>scratch4/pkasaie1</code>. For me to import a
-<code>census.manager.rdata</code> object that I’ve navigated to locally
-into my Rockfish directory
-<code>HOME/scr4_pkasaie1/azalesak/jheem/code/jheem_analyses/cached</code>,
-I would use the following full SCP command:</p>
-<p><code>scp census.manager.rdata azalesak@rfdtn1.rockfish.jhu.edu:/scratch4/pkasaie1/azalesak/jheem/code/jheem_analyses/cached/census.manager.rdata</code>.</p>
-<p>You’ll have to provide your Rockfish password to authorize this file
-transfer. Note that you can use the same command but with the source and
-destination flipped to get objects off Rockfish. That will come in handy
-when exporting calibration simsets.</p>
+<div id="check-their-progress" class="section level3">
+<h3>Check their progress</h3>
+<pre><code>sqme</code></pre>
 </div>
+<div id="make-an-assemble-script-to-assemble-simsets-from-the-calibrations" class="section level3">
+<h3>Make an assemble script to assemble simsets from the
+calibrations</h3>
+<pre class="r"><code># Burning the first 40% of simulations and then keeping every fifth from the remainder
+make.combined.assemble.script(&quot;my_example_assemble_script&quot;,
+                              locations=MY_LOCATIONS,
+                              version=&#39;ehe&#39;,
+                              calibration.code=&#39;init.pop.ehe&#39;,
+                              burn.keep = 0.6,
+                              thin.keep = 0.2)</code></pre>
 </div>
-<div id="usage" class="section level2">
-<h2>Usage</h2>
-<div id="use-our-r-scripts-to-generate-calibration-batch-scripts" class="section level3">
-<h3>1. Use our R scripts to generate calibration batch scripts</h3>
-<p>The purpose of Rockfish is to allow us to run lengthy and
-memory-intensive R operations simultaneously across multiple cores so
-that calibrating doesn’t take an eternity. Rockfish receives requests
-for computation through the submission of SLURM “batch scripts”. These
-batch scripts contain some header information on how much memory and
-time should be devoted to a given job, followed by the requested
-operation itself in command-line form, like running a particular R
-script. Here is an example of a batch script generated to calibrate EHE
-population for Baltimore:</p>
-<p><img src="data:image/png;base64,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" /></p>
-<p>Notice that lines 0, 1, and 2 load the R module and set the
-environment variable like we do when we join an interact session. Line 3
-is a command line call to an R script we’ve written to do the
-calibration for version “ehe”, location “C.12580”, and calibration code
-“init.pop.ehe”. We want to generate batch scripts like this for many
-cities at the same time, so to do this we can use a script in
-<code>jheem_analyses/cluster_scripts</code> called
-<code>batch_script_helpers.R</code>. It contains a method called
-<code>make.setup.scripts</code> that can take a vector of locations as
-an argument. It will then fill the
-<code>cluster_scripts/setup_scripts/</code> directory (or another, if
-specified) with batch scripts like seen above that can be queued with
-SLURM on Rockfish. Note that there are analogs to this setup script for
-other steps like “running” a calibration.</p>
+<div id="run-the-assemble-script-once-the-calibrations-are-finished" class="section level3">
+<h3>Run the assemble script once the calibrations are finished</h3>
+<pre><code>sbatch cluster_scripts/assemble_scripts/my_example_assemble_script.bat</code></pre>
 </div>
-<div id="use-another-r-script-to-generate-a-master-script" class="section level3">
-<h3>2. Use another R script to generate a master script</h3>
-<p>Having dozens of scripts like the one above would require queueing
-each one individually (see step 3). Instead, you can make a bash script
-that, when run, will queue all your dozens of batch scripts at once. We
-call this a “master script”, and you can generate one with
-<code>make.setup.master.script</code> by supplying a name for the
-resulting master script and a vector of locations. The resulting script
-might look like this:</p>
-<p><img src="data:image/png;base64,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" /></p>
-</div>
-<div id="import-the-generated-scripts-to-rockfish-with-git" class="section level3">
-<h3>3. Import the generated scripts to Rockfish with Git</h3>
-<p>The previous steps could have been performed on your local desktop or
-on a Rockfish interact session, with pros and cons to each approach. If
-you did it locally, you can use a “pull/stage/commit/push” sequence to
-push the newly generated scripts to the remote repository on Github, and
-then pull it down in Rockfish using <code>git pull</code>. In Rockfish,
-your working directory will have to be somewhere in jheem_analyses for
-Git to know what repository you’re wanting to pull, and you will have
-had to module load Git with <code>module load git</code>. You’ll also
-need to supply the Git SSH password you made during setup for each Git
-operation you do. If you always generate these batch scripts outside of
-Rockfish, then all you’ll have to worry about inside Rockfish is
-<code>git pull</code>. It’s possible that generating them inside
-Rockfish will be more convenient under some circumstances. In such a
-case, you’ll have to take extra steps like staging, committing, and
-pushing to keep your Rockfish files synced with your local ones.</p>
-</div>
-<div id="pull-git-to-update-model-code" class="section level3">
-<h3>4. Pull Git to update model code</h3>
-<p>Before starting calibration, make sure that you’ve got the most
-recent set of files in jheem_analyses if desired. Do so by module
-loading Git and calling <code>git pull</code> while in your
-jheem_analyses directory.</p>
-</div>
-<div id="submit-batch-jobs" class="section level3">
-<h3>5. Submit batch jobs</h3>
-<p>Start your calibration step (setup, run, or assembly) by queuing the
-relevant script or master script. Queue an individual batch script like
-the ones generated in Step 1 with
-<code>sbatch &lt;batch_script_file_name&gt;</code>. Queue a master
-script like the one generated in Step 2 with
-<code>bash &lt;master_script_file_name.sh&gt;</code>, which then runs
-its own <code>sbatch</code> commands for you. If successfully queued,
-you will see each job listed when you type the <code>sqme</code>
-command.</p>
-</div>
-<div id="debug-failing-jobs" class="section level3">
-<h3>6. Debug failing jobs</h3>
-<p>The jobs might fail for a variety of reasons, such as a bug in the R
-code they call or a mistaken file path. You might notice that something
-is wrong either by seeing a job never start running or a job that
-disappears earlier than expected from the <code>sqme</code> list. You
-can kill a job that is never going to start running with
-<code>scancel &lt;job ID&gt;</code> where the job ID is the number
-listed on the <code>sqme</code> list. We’ve supplied each batch script
-with a dedicated output file to which R messages, such as those from R
-itself, are logged. In the screenshot of the individual batch script
-above, you can see the line <code>--output</code> and the file where
-this log will go. You can view these files using the <code>vi</code>
-command, which will open them in a text editor. To escape the “vi” text
-editor, type SHIFT+”:” and then <code>q</code>. Note that if you run the
-same job again and there are no errors, the old error log will still be
-there but won’t be relevant.</p>
-</div>
-<div id="conduct-the-entire-calibration-process" class="section level3">
-<h3>7. Conduct the entire calibration process</h3>
-<p>Calibration typically takes a short setup step, wherein a cache is
-generated under the <code>jheem/files</code> directory for the
-calibration, a long run step, wherein the simulations are run and saved
-to that cache, and a short assembly step, wherein the simulations are
-compiled into a single JHEEM simulation set for export. The
-<code>jheem_analyses/cluster_scripts/batch_script_helpers.R</code> file
-has methods for each of these steps. The final step of exporting an
-assembled simset is best done through SCP as in Step 6 of the Set Up
-instructions.</p>
-</div>
-</div>
-<div id="expected-workflow-improvements" class="section level2">
-<h2>Expected Workflow Improvements</h2>
-<ol style="list-style-type: decimal">
-<li>Some of the batch script-generating scripts are currently hardcoded
-for version ‘ehe’, but this will be made into an optional argument to
-allow for other versions.</li>
-<li>Some of module loading steps may be possible to bundle into a bash
-script to spare some typing.</li>
-<li>The <code>jheem_analyses/cluster_scripts</code> may benefit from
-greater organization as more people place generate their own batch
-scripts in it.</li>
-</ol>
-</div>
+<div id="export-the-assembled-simsets-using-the-cli-of-your-local-desktop" class="section level3">
+<h3>Export the assembled simsets using the CLI of your local
+desktop</h3>
+<pre><code>scp azalesak@rfdtn1.rockfish.jhu.edu:/scratch4/pkasaie1/azalesak/jheem/files/run_results/init.pop.ehe_simset_2024-12-16_C.12580.Rdata my_local_path/init.pop.ehe_simset_2024-12-16_C.12580.Rdata
+scp azalesak@rfdtn1.rockfish.jhu.edu:/scratch4/pkasaie1/azalesak/jheem/files/run_results/init.pop.ehe_simset_2024-12-16_C.12060.Rdata my_local_path/init.pop.ehe_simset_2024-12-16_C.12060.Rdata
+scp azalesak@rfdtn1.rockfish.jhu.edu:/scratch4/pkasaie1/azalesak/jheem/files/run_results/init.pop.ehe_simset_2024-12-16_C.35620.Rdata my_local_path/init.pop.ehe_simset_2024-12-16_C.35620.Rdata</code></pre>
 </div>
 
 
