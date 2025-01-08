@@ -3,7 +3,7 @@
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
 # heroin, cocaine
 
-TOTAL.WEIGHT = 0.25 # 0.5 universally downweighting to try to allow more mixing - NOT YET, TRYING WITH NEW CVs first 
+TOTAL.WEIGHT = 0.5 # 1/8 changed back from 0.25 to 0.5; universally downweighting to try to allow more mixing 
 
 #-- BIAS ESTIMATES FOR NESTED PROPORTIONS  ----
 suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
