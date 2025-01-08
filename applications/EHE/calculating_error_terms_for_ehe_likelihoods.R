@@ -15,7 +15,7 @@ calculate.error.terms(data.type = "suppression",
                       is.cv = F)
 
 # DIAGNOSES:  0.04110863
-# 1/8 value: 0.1005035
+# with cities removed: 0.04869007
 calculate.lhd.error.terms("diagnoses")
 # (old diagnoses value = 0.04621778)
 # calculate.error.terms(data.type = "diagnoses",
@@ -24,7 +24,7 @@ calculate.lhd.error.terms("diagnoses")
 #                       is.cv = T)
 
 # PREVALENCE: 0.07436122
-# 1/8 value: 0.1218498
+# with cities removed: 0.08712413
 calculate.lhd.error.terms("diagnosed.prevalence")
 # (old prevalence value = 0.04711922)
 # calculate.error.terms(data.type = "diagnosed.prevalence",
@@ -46,14 +46,22 @@ calculate.error.terms(data.type = "prep",
 
 calculate.lhd.error.terms = function(data.type){
   lhd.data = read.csv("input_managers/LHD_Diagnoses_and_Diagnosed_Prevalence.csv")
-  lhd.data = lhd.data[lhd.data$MSA!="Indianapolis",]
+
+  # iffy ones for prevalence
+  lhd.data = lhd.data[lhd.data$MSA!="Riverside",]
+  lhd.data = lhd.data[lhd.data$MSA!="New York",]
+  lhd.data = lhd.data[lhd.data$MSA!="Tucson",]
+  
+  # iffy ones for diagnoses
+  lhd.data = lhd.data[lhd.data$MSA!="Philadelphia",]
+  lhd.data = lhd.data[lhd.data$MSA!="Seattle",]
+  
   
   if(data.type=="diagnoses"){
     all.values1 = as.numeric(lhd.data$LHD.New.Diganoses)
     all.values2 = as.numeric(lhd.data$Atlas.Plus.Summed.New.Diagnoses..Data.Manager.)
     
   } else if(data.type=="diagnosed.prevalence"){
-    
     all.values1 = as.numeric(lhd.data$LHD.Diagnosed.Prevalence)
     all.values2 = as.numeric(lhd.data$Atlas.Plus.Summed.Prevalence..Data.Manager.)    
   } else 
