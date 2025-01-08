@@ -51,14 +51,14 @@ make.sbatch.script <- function(filename,
 make.setup.scripts <- function(locations,
                                version,
                                calibration.code,
-                               dir='cluster_scripts/setup_scripts/',
+                               dir='cluster_scripts/setup_scripts',
                                partition='shared',
                                account='pkasaie1',
                                mem='16G')
 {
     for (location in locations) {
         if (!dir.exists(file.path(dir, version, location)))
-            dir.create(file.path(dir, version.location))
+            dir.create(file.path(dir, version,location), recursive=T)
         make.sbatch.script(filename=file.path(dir, version, location, get.setup.filename(calibration.code)),
                            mem=mem,
                            output = file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code), extension=".out"),
@@ -74,14 +74,14 @@ make.run.scripts <- function(locations,
                              version,
                              calibration.code,
                              chains=1:4,
-                             dir='cluster_scripts/run_scripts/',
+                             dir='cluster_scripts/run_scripts',
                              partition="shared",
                              account='pkasaie1',
                              mem='16G')
 {
     for (location in locations) {
         if (!dir.exists(file.path(dir, version, location)))
-            dir.create(file.path(dir, version, location))
+            dir.create(file.path(dir, version, location), recursive=T)
         for (chain in chains) {
             make.sbatch.script(filename=file.path(dir, version, location, get.run.filename(calibration.code, chain)),
                                job.name = paste0("run_", version, "_", location, "_", calibration.code, "_", chain),

@@ -17,13 +17,21 @@ make.setup.scripts(MY_LOCATIONS,
                    calibration.code='init.pop.ehe')
 ```
 
+One of these might look like this:
+
+![](batch_script_screenshot.png)
+
 ### Make a master script to runs each of the above batch scripts with a single command.
 ```{r, eval=FALSE}
-make.master.setup.script("my_example_setup_script",
+make.setup.master.script("my_example_setup_script",
                          locations=MY_LOCATIONS,
                          version='ehe',
                          calibration.code='init.pop.ehe')
 ```
+
+This might look like this:
+
+![](master_script_screenshot.png)
 
 ### Run this master script from the command line of an interact session on the cluster
 ```
@@ -36,7 +44,7 @@ make.run.scripts(MY_LOCATIONS,
                  version='ehe',
                  calibration.code='init.pop.ehe',
                  chains=1)
-make.master.run.script("my_example_run_script",
+make.run.master.script("my_example_run_script",
                        locations=MY_LOCATIONS,
                        version='ehe',
                        calibration.code='init.pop.ehe',
@@ -69,7 +77,7 @@ make.combined.assemble.script("my_example_assemble_script",
 sbatch cluster_scripts/assemble_scripts/my_example_assemble_script.bat
 ```
 
-### Export the assembled simsets using the CLI of your local desktop
+### Export the assembled simsets using SCP in the terminal of your local desktop
 ```
 scp azalesak@rfdtn1.rockfish.jhu.edu:/scratch4/pkasaie1/azalesak/jheem/files/run_results/init.pop.ehe_simset_2024-12-16_C.12580.Rdata my_local_path/init.pop.ehe_simset_2024-12-16_C.12580.Rdata
 scp azalesak@rfdtn1.rockfish.jhu.edu:/scratch4/pkasaie1/azalesak/jheem/files/run_results/init.pop.ehe_simset_2024-12-16_C.12060.Rdata my_local_path/init.pop.ehe_simset_2024-12-16_C.12060.Rdata
