@@ -11,12 +11,13 @@ if (dir.exists("../jheem_analyses/cached")) {
     JHEEM.CACHE.DIR <- "../jheem_analyses/cached"
 }
 DATA.MANAGER.CACHE.METADATA.FILE <- "../jheem_analyses/commoncode/data_manager_cache_metadata.Rdata"
+PACKAGE.VERSION.CACHE.FILE <- "../jheem_analyses/commoncode/package_version_cache.Rdata"
 
 if (is.null(JHEEM.CACHE.DIR)) {
     stop("No 'cached' directory exists - you need to get this from Todd's One-Drive")
 }
 
-## ----PUBLIC---- ##
+## PUBLIC----
 
 #' @param file Name of a data manager file, with its extension, that can be appended to the JHEEM.CACHE.DIR path.
 #' @param set.as.default Should this data manager be set as the default data manager for this session?
@@ -77,7 +78,21 @@ update.data.manager <- function(file) {
     return(0)
 }
 
-## ---- ZOE ONLY ---- ##
+is.package.out.of.date <- function(package="jheem2") {
+    error.prefix <- "Cannot check if package is out of date: "
+    if (!is.character(package) || length(package)!=1 || is.na(package))
+        stop(paste0(error.prefix, "'package' must be a single character value. Defaults to 'jheem2'"))
+    if (nchar(system.file(package = package)) == 0)
+        stop(paste0(error.prefix, "package '", package, "' is not installed. Install it with 'devtools::install_github('tfojo1/", package, "')'"))
+    if (!file.exists(PACKAGE.VERSION.CACHE.FILE))
+        stop(paste0(error.prefix, "the file with the cached version could not be found. Make sure your working directory is 'jheem_analyses' or a parallel directory"))
+    cache.file = get(load(PACKAGE.VERSION.CACHE.FILE))
+    if (!(package %in% names(cache.file)))
+        stop(paste0(error.prefix, "The version cache file has no entry for package '", package, "'. Reach out to Andrew if you would like version tracked for this package."))
+    return(packageVersion(package) < cache.file[[package]])
+}
+
+## ZOE ONLY ----
 
 reset.data.manager.cache.metadata <- function(allow.flag = F) {
     if (!allow.flag) {
@@ -141,7 +156,27 @@ sync.cached.data.manager <- function(file, onedrive.link, verbose = F, allow.fla
     save(cache.metadata, file = DATA.MANAGER.CACHE.METADATA.FILE)
 }
 
-## ---- INTERNAL USE ONLY ---- ##
+## ANDREW ONLY ----
+
+sync.package.version <- function(package="jheem2", allow.flag=F) {
+    error.prefix <- "Cannot sync.package.version(): "
+    if (!is.character(package) || length(package)!=1 || is.na(package))
+        stop(paste0(error.prefix, "'package' must be a single character value. Defaults to 'jheem2'"))
+    if (!allow.flag) {
+        stop("Are you sure you want to sync.package.version()?  - you need to set the allow.flag to TRUE if you do")
+    }
+    if (nchar(system.file(package = package)) == 0)
+        stop(paste0(error.prefix, "package '", package, "' is not installed currently. Rebuild?"))
+    current.version = packageVersion(package)
+    print(paste0("Setting cached package version to ", current.version))
+    if (file.exists(PACKAGE.VERSION.CACHE.FILE))
+        cache.file = get(load(PACKAGE.VERSION.CACHE.FILE))
+    else cache.file = list()
+    cache.file[[package]] = current.version
+    save(cache.file, file = PACKAGE.VERSION.CACHE.FILE)
+}
+
+## INTERNAL USE ONLY ----
 
 is.cached.data.manager.out.of.date <- function(file, data.manager, error.prefix = "") {
     # browser()

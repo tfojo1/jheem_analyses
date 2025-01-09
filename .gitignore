@@ -16,3 +16,4 @@ applications/*.DS_Store
 
 # ignore
 !commoncode/data_manager_cache_metadata.Rdata
+!commoncode/package_version_cache.Rdata
