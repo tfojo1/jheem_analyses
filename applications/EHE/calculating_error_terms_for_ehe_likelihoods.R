@@ -14,23 +14,11 @@ calculate.error.terms(data.type = "suppression",
                       data.source.2 = "lhd",
                       is.cv = F)
 
-# DIAGNOSES:  0.04110863
-# with cities removed: 0.04869007
+# DIAGNOSES:  0.05368198
 calculate.lhd.error.terms("diagnoses")
-# (old diagnoses value = 0.04621778)
-# calculate.error.terms(data.type = "diagnoses",
-#                       data.source.1 = "cdc.surveillance.reports",
-#                       data.source.2 = "cdc.aggregated.county",
-#                       is.cv = T)
 
-# PREVALENCE: 0.07436122
-# with cities removed: 0.08712413
+# PREVALENCE: 0.08384422
 calculate.lhd.error.terms("diagnosed.prevalence")
-# (old prevalence value = 0.04711922)
-# calculate.error.terms(data.type = "diagnosed.prevalence",
-#                       data.source.1 = "cdc.surveillance.reports",
-#                       data.source.2 = "cdc.aggregated.county",
-#                       is.cv = T)
 
 # AIDS DIAGNOSES: 0.2277531 - from 1993-1997 only; one source only has totals so no stratifications anyway 
 calculate.error.terms(data.type = "aids.diagnoses",
@@ -56,6 +44,8 @@ calculate.lhd.error.terms = function(data.type){
   lhd.data = lhd.data[lhd.data$MSA!="Philadelphia",]
   lhd.data = lhd.data[lhd.data$MSA!="Seattle",]
   
+  lhd.data = lhd.data[lhd.data$MSA!="Honolulu",]
+  
   
   if(data.type=="diagnoses"){
     all.values1 = as.numeric(lhd.data$LHD.New.Diganoses)
@@ -68,7 +58,14 @@ calculate.lhd.error.terms = function(data.type){
     stop("only set up for diagnoses and diagnosed prevalence")
 
   cvs.1 = (all.values1 - all.values2)/all.values1 
+  #names(cvs.1) = lhd.data$MSA
+  cvs.1 = cvs.1[all.values.1>100]
+  
+  #sort(abs(cvs.1))
+  print(sum(!is.na(cvs.1)))
+  
   cvs.2 = (all.values1 - all.values2)/all.values2
+  cvs.2 = cvs.2[all.values.1>100]
   
   cvs = c(cvs.1,cvs.2)
   cvs[is.nan(cvs)] = 0

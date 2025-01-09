@@ -217,11 +217,11 @@ Lafayette,2016,111,1601,108,1490
 Lafayette,2015,89,1536,84,1417
 Lafayette,2014,112,1466,109,1370
 Lafayette,2013,100,1436,89,1313
-Lafayette,2012,84,Not available,77,1219
+Lafayette,2012,84,Not available,77,No LHD Data
 Lafayette,2011,93,1371,86,1199
 Lafayette,2010,89,1320,83,1144
-Lafayette,2009,87,Not available,82,1004
-Lafayette,2008,75,Not available,63,952
+Lafayette,2009,87,Not available,82,No LHD Data
+Lafayette,2008,75,Not available,63,No LHD Data
 Denver,2021,270,10560,262,9438
 Denver,2020,224,10811,225,9403
 Denver,2019,341,10695,335,9460
@@ -265,9 +265,9 @@ San Antonio,2010,318,Not available,312,No LHD Data
 San Jose,2021,133,3618,122,3514
 San Jose,2020,115,3588,107,3442
 Miami,2019,1181,27292,1056,26474
-Miami,2018,1194,Not available,1100,No LHD Data
-Miami,2017,1169,Not available,1140,No LHD Data
-Miami,2016,1263,Not available,1236,No LHD Data
+Miami,2018,1194,28345,1100,26249
+Miami,2017,1169,27969,1140,25945
+Miami,2016,1263,26975,1236,25632
 Miami,2015,1333,Not available,1316,No LHD Data
 Miami,2014,1187,Not available,1175,No LHD Data
 Miami,2013,1123,Not available,1123,No LHD Data
@@ -293,3 +293,26 @@ Tucson,2011,59,2394,57,1924
 Tucson,2010,94,2327,94,1829
 Tucson,2009,86,2319,83,1788
 Tucson,2008,77,2263,80,1741
+Honolulu,2021,*Did not check*,3609,No LHD Data,1490
+Honolulu,2020,*Did not check*,3560,No LHD Data,1495
+Honolulu,2019,*Did not check*,3530,No LHD Data,1496
+Honolulu,2018,*Did not check*,3481,No LHD Data,1471
+Honolulu,2017,*Did not check*,3561,No LHD Data,1505
+Honolulu,2016,*Did not check*,Not available,No LHD Data,No LHD Data
+Honolulu,2015,*Did not check*,Not available,No LHD Data,No LHD Data
+Honolulu,2014,*Did not check*,3313,No LHD Data,1450
+Honolulu,2013,*Did not check*,3238,No LHD Data,1412
+El Paso,2014,109,2030,111,1975
+El Paso,2015,99,2023,121,2018
+El Paso,2016,93,2061,97,2042
+El Paso,2017,133,2179,137,2124
+El Paso,2018,137,2249,129,2219
+El Paso,2019,114,2372,114,2306
+Albuquerque,2019,70,1998,81,1927
+Albuquerque,2018,56,1950,62,1816
+Albuquerque,2017,63,Not available,61,No LHD Data
+Albuquerque,2016,76,1731,77,1642
+Albuquerque,2015,65,1634,55,1581
+Albuquerque,2014,66,1660,59,1514
+Albuquerque,2013,67,1544,62,1456
+Albuquerque,2012,50,1474,44,1459

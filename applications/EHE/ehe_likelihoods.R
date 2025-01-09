@@ -3,8 +3,10 @@
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
 # heroin, cocaine
 
-TOTAL.WEIGHT = 0.5 # 1/8 changed back from 0.25 to 0.5; universally downweighting to try to allow more mixing 
-
+TOTAL.WEIGHT = 0.5 # universally downweighting to try to allow more mixing 
+DIAGNOSES.ERROR.TERM  = 0.05368198 # for new diagnoses and aids diagnoses; from calculating_error_terms_for_ehe_likelihoods.R
+PREVALENCE.ERROR.TERM = 0.08384422 # for prevalence and hiv.mortality; from calculating_error_terms_for_ehe_likelihoods.R
+  
 #-- BIAS ESTIMATES FOR NESTED PROPORTIONS  ----
 suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
                                                            version = 'ehe')
@@ -170,7 +172,7 @@ total.new.diagnoses.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.04110863, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
@@ -183,7 +185,7 @@ new.diagnoses.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.04110863, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.term = DIAGNOSES.ERROR.TERM, 
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
@@ -196,7 +198,7 @@ race.risk.new.diagnoses.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.04110863, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.term = DIAGNOSES.ERROR.TERM, 
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
@@ -209,7 +211,7 @@ total.prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.07436122, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.term = PREVALENCE.ERROR.TERM, 
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
@@ -222,7 +224,7 @@ prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.07436122, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.term = PREVALENCE.ERROR.TERM, 
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
@@ -235,7 +237,7 @@ race.risk.prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.07436122, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.term = PREVALENCE.ERROR.TERM, 
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
@@ -252,7 +254,7 @@ non.age.aids.diagnoses.likelihood.instructions =
                                        correlation.different.years = 0.3,
                                        #observation.correlation.form = 'compound.symmetry',
                                        observation.correlation.form = 'autoregressive.1',
-                                       error.variance.term = 0.04110863, # new diagnoses value from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
@@ -267,7 +269,7 @@ hiv.mortality.likelihood.instructions =
                                        levels.of.stratification = c(0,1), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.07436122, # using prevalence value from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.term = PREVALENCE.ERROR.TERM, 
                                        error.variance.type = 'cv',
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
