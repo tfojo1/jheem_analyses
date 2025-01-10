@@ -136,12 +136,19 @@ get.covid.mobility.measure <- function(mobility.data,
     })
     dimnames(proportions.data)[[1]] = dimnames(sub.data)[[1]]
     
-    if (length(counties)>1)
-    {
-
-    }
+    county.populations = census.manager$pull(outcome = 'population',
+                                             dimension.values = list(location=counties,
+                                                                     year = as.character(from.year:to.year)),
+                                             from.ontology.names = 'census')
+    if (is.null(county.populations))
+        stop(paste0("Cannot get COVID mobility data for '", location, "' - no population data are available for contained counties"))
+    county.populations = apply(county.populations, 'location', sum)
     
-    apply(proportions.data, 'time', mean, na.rm=T)
+    iterated.populations = rep(county.populations, each=length(proportions.data)/length(counties))
+    iterated.populations[is.na(proportions.data)] = NA
+    dim(iterated.populations) = dim(proportions.data)
+    #apply(proportions.data, 'time', mean, na.rm=T)
+    apply(proportions.data * iterated.populations, 1, sum, na.rm=T) / apply(iterated.populations, 1, sum, na.rm=T)
 }
 
 get.covid.taper <- function(n.covid.months = 25,

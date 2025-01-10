@@ -11,13 +11,18 @@ if (dir.exists("../jheem_analyses/cached")) {
     JHEEM.CACHE.DIR <- "../jheem_analyses/cached"
 }
 DATA.MANAGER.CACHE.METADATA.FILE <- "../jheem_analyses/commoncode/data_manager_cache_metadata.Rdata"
+PACKAGE.VERSION.CACHE.FILE <- "../jheem_analyses/commoncode/package_version_cache.Rdata"
 
 if (is.null(JHEEM.CACHE.DIR)) {
     stop("No 'cached' directory exists - you need to get this from Todd's One-Drive")
 }
 
-## ----PUBLIC---- ##
+## PUBLIC----
 
+#' @title Load Data Manager From Cache
+#' @description
+#' Loads a data manager for which there is cached metadata, downloading the most recent copy if necessary.
+#' 
 #' @param file Name of a data manager file, with its extension, that can be appended to the JHEEM.CACHE.DIR path.
 #' @param set.as.default Should this data manager be set as the default data manager for this session?
 #' @param offline If TRUE, having a missing or out of date data manager will not trigger a download from the internet. Use if offline to avoid errors.
@@ -51,6 +56,10 @@ load.data.manager.from.cache <- function(file, set.as.default = F, offline=F) {
     loaded.data.manager
 }
 
+#' @title Get Data Manager Cache Metadata
+#' @description
+#' Get information about a cached data manager, such as its creation/last modified dates and download URL.
+#' @param pretty.print Organizes the output
 get.data.manager.cache.metadata <- function(pretty.print=T, error.prefix = "") {
     if (!file.exists(DATA.MANAGER.CACHE.METADATA.FILE)) {
         stop(paste0(error.prefix, "The 'data_manager_cache_metadata.Rdata' file is missing from commoncode - this probably requires a pull"))
@@ -67,6 +76,7 @@ get.data.manager.cache.metadata <- function(pretty.print=T, error.prefix = "") {
 }
 
 # Call this on a case-by-case basis if you want to directly download the latest one without checking what you've already got
+#' @inheritParams load.data.manager.from.cache
 update.data.manager <- function(file) {
     error.prefix <- "Cannot update.data.manager(): "
     cache.metadata <- get.data.manager.cache.metadata(pretty.print=F)
@@ -77,7 +87,34 @@ update.data.manager <- function(file) {
     return(0)
 }
 
-## ---- ZOE ONLY ---- ##
+#' @title Update JHEEM2 Package
+#' @description
+#' Install the JHEEM2 package if the version is too old, or if it is not
+#' installed at all.
+#' 
+update.jheem2.package <- function() {
+    if (nchar(system.file(package = "jheem2")) == 0) {
+        "Package 'jheem2' not found. Installing from Github..."
+        tryCatch({devtools::install_github("tfojo1/jheem2")},
+                 error=function(e) {stop("Installing 'jheem2' from Github failed")})
+    }
+    if (is.package.out.of.date("jheem2")) {
+        "Current installation of package 'jheem2' is out of date. Installing from Github..."
+        remove.packages("jheem2")
+        tryCatch({devtools::install_github("tfojo1/jheem2")},
+                 error=function(e) {stop("Installing 'jheem2' from Github failed. You may need to restart R and try again, making sure to close all R sessions that may be using the package")})
+    }
+    print(paste0("'jheem2' package is up to date with version ", packageVersion("jheem2")))
+}
+
+#' @title Check JHEEM2 Version
+#' @description
+#' Show the required JHEEM2 version and the installed version
+check.jheem2.version <- function() {
+    is.package.out.of.date("jheem2", verbose=T)
+}
+
+## ZOE ONLY ----
 
 reset.data.manager.cache.metadata <- function(allow.flag = F) {
     if (!allow.flag) {
@@ -141,7 +178,27 @@ sync.cached.data.manager <- function(file, onedrive.link, verbose = F, allow.fla
     save(cache.metadata, file = DATA.MANAGER.CACHE.METADATA.FILE)
 }
 
-## ---- INTERNAL USE ONLY ---- ##
+## ANDREW ONLY ----
+
+sync.package.version <- function(package="jheem2", allow.flag=F) {
+    error.prefix <- "Cannot sync.package.version(): "
+    if (!is.character(package) || length(package)!=1 || is.na(package))
+        stop(paste0(error.prefix, "'package' must be a single character value. Defaults to 'jheem2'"))
+    if (!allow.flag) {
+        stop("Are you sure you want to sync.package.version()?  - you need to set the allow.flag to TRUE if you do")
+    }
+    if (nchar(system.file(package = package)) == 0)
+        stop(paste0(error.prefix, "package '", package, "' is not installed currently. Rebuild?"))
+    current.version = packageVersion(package)
+    print(paste0("Setting cached package version to ", current.version))
+    if (file.exists(PACKAGE.VERSION.CACHE.FILE))
+        cache.file = get(load(PACKAGE.VERSION.CACHE.FILE))
+    else cache.file = list()
+    cache.file[[package]] = current.version
+    save(cache.file, file = PACKAGE.VERSION.CACHE.FILE)
+}
+
+## INTERNAL USE ONLY ----
 
 is.cached.data.manager.out.of.date <- function(file, data.manager, error.prefix = "") {
     # browser()
@@ -176,6 +233,24 @@ is.cached.data.manager.out.of.date <- function(file, data.manager, error.prefix 
     }
     
     FALSE
+}
+
+is.package.out.of.date <- function(package="jheem2", verbose=F) {
+    error.prefix <- "Cannot check if package is out of date: "
+    if (!is.character(package) || length(package)!=1 || is.na(package))
+        stop(paste0(error.prefix, "'package' must be a single character value. Defaults to 'jheem2'"))
+    if (!is.logical(verbose) || length(verbose)!=1 || is.na(verbose))
+        stop(paste0(error.prefix, "'verbose' must be TRUE or FALSE"))
+    if (nchar(system.file(package = package)) == 0)
+        stop(paste0(error.prefix, "package '", package, "' is not installed. Install it with 'devtools::install_github('tfojo1/", package, "')'"))
+    if (!file.exists(PACKAGE.VERSION.CACHE.FILE))
+        stop(paste0(error.prefix, "the file with the cached version could not be found. Make sure your working directory is 'jheem_analyses' or a parallel directory"))
+    cache.file = get(load(PACKAGE.VERSION.CACHE.FILE))
+    if (!(package %in% names(cache.file)))
+        stop(paste0(error.prefix, "The version cache file has no entry for package '", package, "'. Reach out to Andrew if you would like version tracked for this package."))
+    if (verbose)
+        print(paste0("The version for package '", package, "' must be >= ", cache.file[[package]], "; installed version is ", as.character(packageVersion(package)), "."))
+    invisible(packageVersion(package) < cache.file[[package]])
 }
 
 download.data.manager.from.onedrive <- function(destination.file, onedrive.link, error.prefix, verbose = F) {
