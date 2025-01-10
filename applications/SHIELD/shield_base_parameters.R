@@ -74,42 +74,19 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.bir
                                       1.05, 1.05*5, 1.05*2,
                                       citation=00000)
 ##-- STATE DURATIONS --##
-# SHIELD_BASE_PARAMETERS = add.parameter(SHIELD_BASE_PARAMETERS, 'primarySecondary.infection.duration',
-#                                        3/12, 1/12, 6/12,
-#                                        citation=0
-# )
-#
-# SHIELD_BASE_PARAMETERS = add.parameter(SHIELD_BASE_PARAMETERS, 'earlyLatent.infection.duration', #how to model it's dependancy on primarySecondary state?
-#                                        9/12, 6/12, 11/12,
-#                                        citation=0
-# )
-#
-# SHIELD_BASE_PARAMETERS = add.parameter(SHIELD_BASE_PARAMETERS, 'lateLatent.infection.duration',
-#                                        xx,xxx,xxx
-#                                        citation=0
-# )
+# duration.primary
+# duration.secondary
+# duration.el
+# 
+# rate.el.to.secondary #relapse
+# rate.ll.to.tertiary
+# rate.primary.to.cns
+# rate.secondary.to.cns
+# rate.el.to.cns
+# rate.ll.to.cns
+
+
 
 
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
-
-#https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6135657/
-#
-
-
-#THINGS I WILL WANT TO CITE
-
-#No increase in mortality if well controlled: https://www.ncbi.nlm.nih.gov/pubmed/23698063
-
-#The CDC MMWR that describes how they calculate fraction undiagnosed
-#https://www.cdc.gov/mmwr/preview/mmwrhtml/mm6424a2.htm
-#An older one with race/age/etc stratifications
-#https://www.cdc.gov/mmwr/preview/mmwrhtml/su6102a10.htm
-#
-#
-
-
-#MISC LINKS
-#
-#MMWR Reports based on NHBS
-#https://www.cdc.gov/hiv/statistics/systems/nhbs/reports.html
-
+ 

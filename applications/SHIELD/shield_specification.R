@@ -1,24 +1,3 @@
-#births to + moms = what prop received pre-natal screening
-#prpo of moms receiving screening 
-# prp of births receivng adequate prenatal screening+> mom will be diagnosed+infant on treatment 
-# P (non infected)+ (1-P [congenital])
-# P* fertility rate >>> addiitonal diagnosis among pregnant women 
-# what prop of women with syphils receive adequate prenatal screening
-# what propo of women receive prenatal screening
-# ideally by age race ...
-# 
-# # diagnosis accuracy 
-# #screening * sensitivity 
-# ### High sensitivity in early secondary syphilis (close to 100%). Moderate sensitivity in primary syphilis (~70-85%).
-# # we assume that symothomatic testing is 100% sensitive 
-# 
-# #contact tracing? 
-# proportion of cases found with contact tracing...
-# what proporiton of diagnois are made through contacts... what proporiton of cases are traced to contact .... what;s the contatc tracing criteria: how many contacts per person ...elt(
-#   calibration issue... if you are not symtphomatic, and if you don t have a titer, you;k be categirized as late unknow.
-# )
-
-
 cat("*** Running Shiled_specification.R ***\n")
 DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. 
 
@@ -52,11 +31,11 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                   age.endpoints=c(0,15,20,25,30,35,40,45,50,55,65,Inf), #11 agegroups, similar to atlas [0-15][16-20];
                                                   compartments.for.infected.only = list(
                                                     continuum = c('undiagnosed', 'diagnosed.untreated'),
-                                                    stage = c('ps', 'el','ll','ter')
-                                                  ),
+                                                    stage = c('primary','secondary', 'el','ll','ter','cns')                                                  ),
+                                                  
                                                   compartments.for.uninfected.only = list(
                                                     profile=c('susceptible','diagnosed.treated')),
-
+                                                  
                                                   compartments.for.infected.and.uninfected = list(
                                                     location = "US",
                                                     age = 'all.ages',
@@ -67,9 +46,9 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                     #try using aliases so that if we change the specification up here, the rest of the code doesnt break
                                                     # helps to define specifications for groups of compartments later on
                                                     diagnosed.treated.states=c('diagnosed.treated'),
-                                                    ps.stages=c('ps'),
-                                                    el.stages=c('el'),
-                                                    late.stages=c('ll','ter')
+                                                    ps.stages=c('primary','secondary'),
+                                                    early.stages=c('primary','secondary','el'),
+                                                    late.stages=c('ll','ter','cns')
                                                   )
 )
 
@@ -120,7 +99,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'base.initial.male.population',
                        get.value.function = get.base.initial.male.population,
                        scale = 'non.negative.number')
- 
+
 ##---- Infected ----
 # dummy values: 0.5% are infected, and they are 50% in PS and 50% in Ter stage and all undiagnosed
 # register.model.quantity(SHIELD.SPECIFICATION,
@@ -471,7 +450,19 @@ register.model.quantity(SHIELD.SPECIFICATION,
 # Infectiousness of infected persons
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.transmissibility',
-                        value = 1)
+                        value = 0)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.transmissibility',
+                               applies.to=list(stage="primary"),
+                               value = primary.rel.secondary.transmissibility) >> register as an element> so we can vary it if we want to
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.transmissibility',
+                               applies.to=list(stage="secondary"),
+                               value = 1)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.transmissibility',
+                               applies.to=list(stage="el"),
+                               value = .25)
 
 # where do nw infections go to?
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -513,56 +504,103 @@ register.model.element(SHIELD.SPECIFICATION,
 ##---- Stage Transitions ----
 ##--------------------------------------------------------------------------------------------------------------#
 # e.g., assuming a fix duration for each state: ps= 3months, earlyLatent=9months, LateLatent=10years, Teritiary=infinit
+# Primary > Secondary > EL
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'duration.ps',
+                       name = 'duration.primary',
                        scale = 'time',
-                       value = 0.25) #3/12
-
-register.transition(SHIELD.SPECIFICATION,
-                    dimension = 'stage',
-                    groups = 'infected',
-                    from.compartments = 'ps',
-                    to.compartments = 'el',
-                    value = expression(1/duration.ps))
-##
+                       value = duration.primary)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'duration.secondary',
+                       scale = 'time',
+                       value = duration.secondary)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'duration.el',
                        scale = 'time',
-                       value = 0.75) #9/12
-
+                       value = duration.el)
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'primary',
+                    to.compartments = 'secondary',
+                    value = expression(1/duration.primary))
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'secondary',
+                    to.compartments = 'el',
+                    value = expression(1/duration.secondary))
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
                     from.compartments = 'el',
                     to.compartments = 'll',
                     value = expression(1/duration.el))
-##
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'duration.ll',
-                       scale = 'time',
-                       value = 10)
-
+## EL to secondary
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'el',
+                    to.compartments = 'secondary',
+                    value = expression(rate.el.to.secondary))
+## LL to teritiary
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
                     from.compartments = 'll',
-                    to.compartments = 'ter',
-                    value = expression(1/duration.ll))
-
-##--------------------------------------------------------------------------------------------------------------#
-
-#-- TBD/ CONTINUUM TRANSISION --# ----
-##---- TESTING ----
+                    to.compartments = 'tertiary',
+                    value = expression(rate.ll.to.tertiary))
+## states to CNS:
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'primary',
+                    to.compartments = 'cns',
+                    value = expression(rate.primary.to.cns))
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'secondary',
+                    to.compartments = 'cns',
+                    value = expression(rate.secondary.to.cns))
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'el',
+                    to.compartments = 'cns',
+                    value = expression(rate.el.to.cns))
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'primary',
+                    to.compartments = 'cns',
+                    value = expression(rate.ll.to.cns))
+##
+LL to Teritiary probabilitities? 
+  each state to CNS prb? 
+  RElapse rate? 
+  
+  ##--------------------------------------------------------------------------------------------------------------#
+  #-- TBD/ CONTINUUM TRANSISION --# ----
+  ##---- TESTING ----
 # There are 2 components to testing: underlying screening rate (for everyone), additional sympthomatic testing rates (for ps and ter stages)
 #@PK: to add a functional form for symp.testing and screening rate
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'screening.rate',
                        scale = 'rate',
-                       value = 0.1)
+                       value = screening.rate) >>> 
+  
+  
+  
+  register.model.element(SHIELD.SPECIFICATION,
+                         name = 'sym.ps.testing.rate',
+                         scale = 'rate',
+                         value = 0.1)
+
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'sym.ps.testing.rate',
                        scale = 'rate',
                        value = 0.1)
+
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'sym.ter.testing.rate',
                        scale = 'rate',
@@ -629,8 +667,17 @@ register.remission(SHIELD.SPECIFICATION,
                    remission.rate.value = 'delayed.treatment.rate',
                    remission.proportions.value='remission.prp',
                    tag = 'delayed.trt' )
- 
-#-- OUTPUTS --# --#----
+
+##--------------------------------------------------------------------------------------------------------------#
+
+#screening rate
+# testing rate.ps
+#testing rate ter
+
+
+
+
+#-- OUTPUTS --#----
 ##--------------------------------------------------------------------------------------------------------------#
 # !!!for dynamic transitions that change over time (e.g., testing), the anchor points are coded at the begginign of the year 
 # (e.g., if transmission changes from 2000 to 2020, these dates represent jan 1st of those years)
@@ -655,7 +702,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          value.to.integrate = 'point.population',
                          corresponding.data.outcome = 'population' ,
                          keep.dimensions = c('location','age','race','sex'),
-                          
+                         
 )
 
 ## Fertility Rate ----
@@ -663,7 +710,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name='fertility.rate',
                          value=expression(births.from/population),
                          denominator.outcome = 'population',
-                         keep.dimensions =  c('location','age','race'),
+                         keep.dimensions =  c('location','age','race','sex'),
                          subset.dimension.values = list(sex='female'),
                          corresponding.data.outcome = "fertility.rate",
                          outcome.metadata = create.outcome.metadata(display.name = 'Fetility Rate',
@@ -672,26 +719,26 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     axis.name = 'Rate',
                                                                     units = 'rate',
                                                                     singular.unit = 'person')
-                         )
- 
+)
+
 
 ## Births ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
-                    name='births.from',
-                    outcome.metadata = create.outcome.metadata(display.name = 'Births',
-                                                               description = "Births",
-                                                               scale = 'non.negative.number',
-                                                               axis.name = 'Persons',
-                                                               units = 'persons',
-                                                               singular.unit = 'person'),
-                    scale='non.negative.number',
-                    save=T,
-                    corresponding.data.outcome = "births",
-                    dynamic.quantity.name = 'births.from', #model has an internal definition for births  #births from is conditional on parent's characteristics
-                    keep.dimensions = c('location','age','race','sex'), #collapse on stage and continuum for infected and on profile as well
-                    subset.dimension.values = list(sex='female') #this seems redundant but it filters all the male rows with 0 values.
-                    )
- 
+                      name='births.from',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Births',
+                                                                 description = "Births",
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Persons',
+                                                                 units = 'persons',
+                                                                 singular.unit = 'person'),
+                      scale='non.negative.number',
+                      save=T,
+                      corresponding.data.outcome = "births",
+                      dynamic.quantity.name = 'births.from', #model has an internal definition for births  #births from is conditional on parent's characteristics
+                      keep.dimensions = c('location','age','race','sex'), #collapse on stage and continuum for infected and on profile as well
+                      subset.dimension.values = list(sex='female') #this seems redundant but it filters all the male rows with 0 values.
+)
+
 ## Deaths ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name='deaths',
