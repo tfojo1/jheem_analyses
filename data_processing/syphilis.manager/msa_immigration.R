@@ -1,5 +1,6 @@
 #Note: this is the same as what is in the HIV surveillance manager (but this is immigration/emigration only, not adult.immigration)
-#library(readxl)
+library(readxl)
+library(tools)
 ################################################################################
 ##read in immigration/emigration##
 ################################################################################
