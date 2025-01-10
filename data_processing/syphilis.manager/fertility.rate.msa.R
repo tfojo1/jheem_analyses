@@ -153,6 +153,6 @@ for (data in female.population.county.put) {
 
 
 # Aggregate to MSA --------------------------------------------------------
-
+library(locations)
 source('data_processing/syphilis.manager/aggregate.county.to.msa.R')
 
