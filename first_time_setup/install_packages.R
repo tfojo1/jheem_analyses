@@ -1,5 +1,7 @@
 
-
+# Try Installing JHEEM2 directly
+if (nchar(system.file(package='jheem2'))==0)
+    devtools::install_github('tfojo1/jheem2')
 
 # CRAN Packages required for our custom packages
 if (nchar(system.file(package='ggmap'))==0)
@@ -8,10 +10,16 @@ if (nchar(system.file(package='ggmap'))==0)
 if (nchar(system.file(package='ggnewscale'))==0)
   install.packages('ggnewscale')
 
+if (nchar(system.file(package='httr2'))==0)
+    install.packages('httr2')
+
 # Our Custom Packages
-devtools::install_github('tfojo1/distributions')
-devtools::install_github('tfojo1/bayesian.simulations')
-devtools::install_github('tfojo1/locations')
+if (nchar(system.file(package='distributions'))==0)
+    devtools::install_github('tfojo1/distributions')
+if (nchar(system.file(package='bayesian.simulations'))==0)
+    devtools::install_github('tfojo1/bayesian.simulations')
+if (nchar(system.file(package='locations'))==0)
+    devtools::install_github('tfojo1/locations')
 
 
 # Other Github passages
