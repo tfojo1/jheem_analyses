@@ -1,3 +1,24 @@
+#births to + moms = what prop received pre-natal screening
+#prpo of moms receiving screening 
+# prp of births receivng adequate prenatal screening+> mom will be diagnosed+infant on treatment 
+# P (non infected)+ (1-P [congenital])
+# P* fertility rate >>> addiitonal diagnosis among pregnant women 
+# what prop of women with syphils receive adequate prenatal screening
+# what propo of women receive prenatal screening
+# ideally by age race ...
+# 
+# # diagnosis accuracy 
+# #screening * sensitivity 
+# ### High sensitivity in early secondary syphilis (close to 100%). Moderate sensitivity in primary syphilis (~70-85%).
+# # we assume that symothomatic testing is 100% sensitive 
+# 
+# #contact tracing? 
+# proportion of cases found with contact tracing...
+# what proporiton of diagnois are made through contacts... what proporiton of cases are traced to contact .... what;s the contatc tracing criteria: how many contacts per person ...elt(
+#   calibration issue... if you are not symtphomatic, and if you don t have a titer, you;k be categirized as late unknow.
+# )
+
+
 cat("*** Running Shiled_specification.R ***\n")
 DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. 
 
@@ -488,6 +509,48 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 
+#-- TBD/ NATURAL HISTORY --# ----
+##---- Stage Transitions ----
+##--------------------------------------------------------------------------------------------------------------#
+# e.g., assuming a fix duration for each state: ps= 3months, earlyLatent=9months, LateLatent=10years, Teritiary=infinit
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'duration.ps',
+                       scale = 'time',
+                       value = 0.25) #3/12
+
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'ps',
+                    to.compartments = 'el',
+                    value = expression(1/duration.ps))
+##
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'duration.el',
+                       scale = 'time',
+                       value = 0.75) #9/12
+
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'el',
+                    to.compartments = 'll',
+                    value = expression(1/duration.el))
+##
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'duration.ll',
+                       scale = 'time',
+                       value = 10)
+
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'll',
+                    to.compartments = 'ter',
+                    value = expression(1/duration.ll))
+
+##--------------------------------------------------------------------------------------------------------------#
+
 #-- TBD/ CONTINUUM TRANSISION --# ----
 ##---- TESTING ----
 # There are 2 components to testing: underlying screening rate (for everyone), additional sympthomatic testing rates (for ps and ter stages)
@@ -566,56 +629,8 @@ register.remission(SHIELD.SPECIFICATION,
                    remission.rate.value = 'delayed.treatment.rate',
                    remission.proportions.value='remission.prp',
                    tag = 'delayed.trt' )
-
-##--------------------------------------------------------------------------------------------------------------#
-
-#screening rate
-# testing rate.ps
-#testing rate ter
-
-
-##---- Stage Transitions ----
-##--------------------------------------------------------------------------------------------------------------#
-# e.g., assuming a fix duration for each state: ps= 3months, earlyLatent=9months, LateLatent=10years, Teritiary=infinit
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'duration.ps',
-                       scale = 'time',
-                       value = 0.25) #3/12
-
-register.transition(SHIELD.SPECIFICATION,
-                    dimension = 'stage',
-                    groups = 'infected',
-                    from.compartments = 'ps',
-                    to.compartments = 'el',
-                    value = expression(1/duration.ps))
-##
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'duration.el',
-                       scale = 'time',
-                       value = 0.75) #9/12
-
-register.transition(SHIELD.SPECIFICATION,
-                    dimension = 'stage',
-                    groups = 'infected',
-                    from.compartments = 'el',
-                    to.compartments = 'll',
-                    value = expression(1/duration.el))
-##
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'duration.ll',
-                       scale = 'time',
-                       value = 10)
-
-register.transition(SHIELD.SPECIFICATION,
-                    dimension = 'stage',
-                    groups = 'infected',
-                    from.compartments = 'll',
-                    to.compartments = 'ter',
-                    value = expression(1/duration.ll))
-
-##--------------------------------------------------------------------------------------------------------------#
-
-#-- OUTPUTS --#----
+ 
+#-- OUTPUTS --# --#----
 ##--------------------------------------------------------------------------------------------------------------#
 # !!!for dynamic transitions that change over time (e.g., testing), the anchor points are coded at the begginign of the year 
 # (e.g., if transmission changes from 2000 to 2020, these dates represent jan 1st of those years)

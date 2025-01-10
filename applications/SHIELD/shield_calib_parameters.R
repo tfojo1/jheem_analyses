@@ -39,7 +39,7 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age44.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age49.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  # age64.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
   #
   age14.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -50,7 +50,7 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age44.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age49.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  # age64.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #Todd: do we need this too?
   #
   age14.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -61,7 +61,8 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age44.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age49.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  # age64.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  
   age14.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age24.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -71,7 +72,7 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age44.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age49.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  # age64.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -82,7 +83,7 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age44.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age49.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age54.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  # age64.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   #
   age14.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age19.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -92,8 +93,8 @@ AGING.PARAMETERS.PRIOR=join.distributions(
   age39.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age44.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   age49.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age54.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+  age54.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+  # age64.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
   
 )
 
@@ -128,13 +129,11 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){
   
   #buckets of aging from:
   q=specification.metadata$age.upper.bounds
-  aging.from=q[-length(q)]-1
+  aging.from=q[1: (length(q)-2)]-1
   
   
   ## Aging Rates ----
   #10 (ages) * 3 (races) * 3 sexes= 90 for 2 knots = 180
-  #@TODD: how to set main and interaction effects?
-  
   for(i in c(1,2)){ #spline with 2 knots
     for(age.index in 1:length(aging.from)) {
       for(race in races){
@@ -245,118 +244,128 @@ SHIELD.POPULATION.SAMPLING.BLOCKS = list(
 )
 ## SHIELD.AGING.SAMPLING.BLOCKS ---- max 5
 SHIELD.AGING.SAMPLING.BLOCKS = list(
-  
-  aging.black.group1=c(
+    aging.black.group1=c(
     "age14.black.aging.rate.multiplier.1",
-    "age19.black.aging.rate.multiplier.1",
     "age14.black.aging.rate.multiplier.2",
+    "age19.black.aging.rate.multiplier.1",
     "age19.black.aging.rate.multiplier.2"),
-  
   aging.black.group2=c(
     "age19.black.aging.rate.multiplier.1",
-    "age24.black.aging.rate.multiplier.1",
-    "age29.black.aging.rate.multiplier.1",
     "age19.black.aging.rate.multiplier.2",
-    "age24.black.aging.rate.multiplier.2",
-    "age29.black.aging.rate.multiplier.2"),
-  
+    "age24.black.aging.rate.multiplier.1",
+    "age24.black.aging.rate.multiplier.2"  ),
   aging.black.group3=c(
+    "age24.black.aging.rate.multiplier.1",
+    "age24.black.aging.rate.multiplier.2" ,
     "age29.black.aging.rate.multiplier.1",
-    "age34.black.aging.rate.multiplier.1",
-    "age39.black.aging.rate.multiplier.1",
-    "age29.black.aging.rate.multiplier.2",
-    "age34.black.aging.rate.multiplier.2",
-    "age39.black.aging.rate.multiplier.2"),
-  
+    "age29.black.aging.rate.multiplier.2"),
   aging.black.group4=c(
-    "age39.black.aging.rate.multiplier.1",
-    "age44.black.aging.rate.multiplier.1",
-    "age49.black.aging.rate.multiplier.1",
-    "age39.black.aging.rate.multiplier.2",
-    "age44.black.aging.rate.multiplier.2",
-    "age49.black.aging.rate.multiplier.2"),
-  
+    "age29.black.aging.rate.multiplier.1",
+    "age29.black.aging.rate.multiplier.2",
+    "age34.black.aging.rate.multiplier.1",
+    "age34.black.aging.rate.multiplier.2" ),
   aging.black.group5=c(
+    "age34.black.aging.rate.multiplier.1",
+    "age34.black.aging.rate.multiplier.2",
+    "age39.black.aging.rate.multiplier.1",
+    "age39.black.aging.rate.multiplier.2"),
+  aging.black.group6=c(
+    "age39.black.aging.rate.multiplier.1",
+    "age39.black.aging.rate.multiplier.2",
+    "age44.black.aging.rate.multiplier.1",
+    "age44.black.aging.rate.multiplier.2"),
+  aging.black.group7=c(
+    "age44.black.aging.rate.multiplier.1",
+    "age44.black.aging.rate.multiplier.2",
     "age49.black.aging.rate.multiplier.1",
-    "age54.black.aging.rate.multiplier.1",
-    "age64.black.aging.rate.multiplier.1",
+    "age49.black.aging.rate.multiplier.2"),
+  aging.black.group8=c(
+    "age49.black.aging.rate.multiplier.1",
     "age49.black.aging.rate.multiplier.2",
-    "age54.black.aging.rate.multiplier.2",
-    "age64.black.aging.rate.multiplier.2" ),
+    "age54.black.aging.rate.multiplier.1",
+    "age54.black.aging.rate.multiplier.2"),
+  ###
   aging.hispanic.group1=c(
     "age14.hispanic.aging.rate.multiplier.1",
-    "age19.hispanic.aging.rate.multiplier.1",
     "age14.hispanic.aging.rate.multiplier.2",
+    "age19.hispanic.aging.rate.multiplier.1",
     "age19.hispanic.aging.rate.multiplier.2"),
-  
   aging.hispanic.group2=c(
     "age19.hispanic.aging.rate.multiplier.1",
-    "age24.hispanic.aging.rate.multiplier.1",
-    "age29.hispanic.aging.rate.multiplier.1",
     "age19.hispanic.aging.rate.multiplier.2",
-    "age24.hispanic.aging.rate.multiplier.2",
-    "age29.hispanic.aging.rate.multiplier.2"),
-  
+    "age24.hispanic.aging.rate.multiplier.1",
+    "age24.hispanic.aging.rate.multiplier.2"  ),
   aging.hispanic.group3=c(
+    "age24.hispanic.aging.rate.multiplier.1",
+    "age24.hispanic.aging.rate.multiplier.2" ,
     "age29.hispanic.aging.rate.multiplier.1",
-    "age34.hispanic.aging.rate.multiplier.1",
-    "age39.hispanic.aging.rate.multiplier.1",
-    "age29.hispanic.aging.rate.multiplier.2",
-    "age34.hispanic.aging.rate.multiplier.2",
-    "age39.hispanic.aging.rate.multiplier.2"),
-  
+    "age29.hispanic.aging.rate.multiplier.2"),
   aging.hispanic.group4=c(
-    "age39.hispanic.aging.rate.multiplier.1",
-    "age44.hispanic.aging.rate.multiplier.1",
-    "age49.hispanic.aging.rate.multiplier.1",
-    "age39.hispanic.aging.rate.multiplier.2",
-    "age44.hispanic.aging.rate.multiplier.2",
-    "age49.hispanic.aging.rate.multiplier.2"),
-  
+    "age29.hispanic.aging.rate.multiplier.1",
+    "age29.hispanic.aging.rate.multiplier.2",
+    "age34.hispanic.aging.rate.multiplier.1",
+    "age34.hispanic.aging.rate.multiplier.2" ),
   aging.hispanic.group5=c(
+    "age34.hispanic.aging.rate.multiplier.1",
+    "age34.hispanic.aging.rate.multiplier.2",
+    "age39.hispanic.aging.rate.multiplier.1",
+    "age39.hispanic.aging.rate.multiplier.2"),
+  aging.hispanic.group6=c(
+    "age39.hispanic.aging.rate.multiplier.1",
+    "age39.hispanic.aging.rate.multiplier.2",
+    "age44.hispanic.aging.rate.multiplier.1",
+    "age44.hispanic.aging.rate.multiplier.2"),
+  aging.hispanic.group7=c(
+    "age44.hispanic.aging.rate.multiplier.1",
+    "age44.hispanic.aging.rate.multiplier.2",
     "age49.hispanic.aging.rate.multiplier.1",
-    "age54.hispanic.aging.rate.multiplier.1",
-    "age64.hispanic.aging.rate.multiplier.1",
+    "age49.hispanic.aging.rate.multiplier.2"),
+  aging.hispanic.group8=c(
+    "age49.hispanic.aging.rate.multiplier.1",
     "age49.hispanic.aging.rate.multiplier.2",
-    "age54.hispanic.aging.rate.multiplier.2",
-    "age64.hispanic.aging.rate.multiplier.2" ),
+    "age54.hispanic.aging.rate.multiplier.1",
+    "age54.hispanic.aging.rate.multiplier.2"),
+  ##
   aging.other.group1=c(
     "age14.other.aging.rate.multiplier.1",
-    "age19.other.aging.rate.multiplier.1",
     "age14.other.aging.rate.multiplier.2",
+    "age19.other.aging.rate.multiplier.1",
     "age19.other.aging.rate.multiplier.2"),
-  
   aging.other.group2=c(
     "age19.other.aging.rate.multiplier.1",
-    "age24.other.aging.rate.multiplier.1",
-    "age29.other.aging.rate.multiplier.1",
     "age19.other.aging.rate.multiplier.2",
-    "age24.other.aging.rate.multiplier.2",
-    "age29.other.aging.rate.multiplier.2"),
-  
+    "age24.other.aging.rate.multiplier.1",
+    "age24.other.aging.rate.multiplier.2"  ),
   aging.other.group3=c(
+    "age24.other.aging.rate.multiplier.1",
+    "age24.other.aging.rate.multiplier.2" ,
     "age29.other.aging.rate.multiplier.1",
-    "age34.other.aging.rate.multiplier.1",
-    "age39.other.aging.rate.multiplier.1",
-    "age29.other.aging.rate.multiplier.2",
-    "age34.other.aging.rate.multiplier.2",
-    "age39.other.aging.rate.multiplier.2"),
-  
+    "age29.other.aging.rate.multiplier.2"),
   aging.other.group4=c(
-    "age39.other.aging.rate.multiplier.1",
-    "age44.other.aging.rate.multiplier.1",
-    "age49.other.aging.rate.multiplier.1",
-    "age39.other.aging.rate.multiplier.2",
-    "age44.other.aging.rate.multiplier.2",
-    "age49.other.aging.rate.multiplier.2"),
-  
+    "age29.other.aging.rate.multiplier.1",
+    "age29.other.aging.rate.multiplier.2",
+    "age34.other.aging.rate.multiplier.1",
+    "age34.other.aging.rate.multiplier.2" ),
   aging.other.group5=c(
+    "age34.other.aging.rate.multiplier.1",
+    "age34.other.aging.rate.multiplier.2",
+    "age39.other.aging.rate.multiplier.1",
+    "age39.other.aging.rate.multiplier.2"),
+  aging.other.group6=c(
+    "age39.other.aging.rate.multiplier.1",
+    "age39.other.aging.rate.multiplier.2",
+    "age44.other.aging.rate.multiplier.1",
+    "age44.other.aging.rate.multiplier.2"),
+  aging.other.group7=c(
+    "age44.other.aging.rate.multiplier.1",
+    "age44.other.aging.rate.multiplier.2",
     "age49.other.aging.rate.multiplier.1",
-    "age54.other.aging.rate.multiplier.1",
-    "age64.other.aging.rate.multiplier.1",
+    "age49.other.aging.rate.multiplier.2"),
+  aging.other.group8=c(
+    "age49.other.aging.rate.multiplier.1",
     "age49.other.aging.rate.multiplier.2",
-    "age54.other.aging.rate.multiplier.2",
-    "age64.other.aging.rate.multiplier.2" )
+    "age54.other.aging.rate.multiplier.1",
+    "age54.other.aging.rate.multiplier.2")
 )
 
 ## SHIELD.TRANSMISSION.SAMPLING.BLOCKS ----

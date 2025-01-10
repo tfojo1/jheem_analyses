@@ -1,6 +1,14 @@
 cat("*** Running Shield_source_code.R ***\n")
 NEW.SOURCE=T
 
+# option1: using JHEEM package
+# devtools::install_github('tfojo1/jheem2')
+
+# will need to check the version and reinstall as needed @Andrew
+library(jheem2)
+# option2: sourcing the code directly:
+# source('../jheem2/R/tests/source_jheem2_package.R')
+
 # The file to source to load all necessary packages, cached data, code
 library(reshape2)
 library(locations)
@@ -32,7 +40,6 @@ if (NEW.SOURCE) {
   }
 }
 
-source('../jheem2/R/tests/source_jheem2_package.R')
 
 # Common code from JHEEM ----
 source('../jheem_analyses/commoncode/cache_manager.R')

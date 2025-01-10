@@ -10,7 +10,8 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 LOCATION='US'
 CALIBRATION.CODE.TO.RUN='pop.demog.shield.us'
 # DATE=Sys.Date()
-DATE="2024-12-09"
+DATE="2024-12-17"
+#I removed aging out of 64year group
 
 # completed mcmc? 
 # Reading from file:
@@ -42,9 +43,13 @@ simplot(simset$first.sim(),simset$last.sim(),
         dimension.values = list(year = 2000:2030)) 
 
 simplot(simset$first.sim(),simset$last.sim(),
-        split.by = "race", 
-        facet.by = 'age',
+        split.by = "race", facet.by = 'age',
         outcomes = c("population"), 
+        dimension.values = list(year = 2000:2030)) 
+
+simplot(simset$first.sim(),simset$last.sim(),
+        outcomes = c("population"), 
+        facet.by = "sex", split.by = "race", 
         dimension.values = list(year = 2000:2030)) 
 
 #mortality
@@ -61,7 +66,13 @@ simplot( simset$first.sim(),simset$last.sim(),
          outcomes = c("births.from"), 
          dimension.values = list(year = 2000:2030)) 
 simplot( simset$first.sim(),simset$last.sim(),
+         outcomes = c("births.from"), 
+         split.by = "race", facet.by = "age",
+         dimension.values = list(year = 2000:2030)) 
+
+simplot( simset$first.sim(),simset$last.sim(),
          outcomes = c("fertility.rate"), 
+         split.by='race',
          dimension.values = list(year = 2000:2030)) 
 simplot( simset$first.sim(),simset$last.sim(),
          split.by = "race", facet.by = "age",
@@ -72,11 +83,19 @@ simplot( simset$first.sim(),simset$last.sim(),
 ## population by strata
 simplot(simset$first.sim(),simset$last.sim(),
          split.by = "race", 
-        # facet.by = 'age',
+        facet.by = 'age',
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
-simplot(simset$first.sim(),simset$last.sim(),
-         outcomes = c("population"), 
-         facet.by = "sex", split.by = "race", 
-         dimension.values = list(year = 2000:2030)) 
 
+#is the chain mixing well?  Rhat: ratio of the parameter variance in all chains/average within chain variance
+#theoritically in the steady state, it should be close to 1
+simset$get.mcmc.mixing.statistic()
+simset$traceplot("black.aging")
+simset$traceplot("hispanic.aging")
+simset$traceplot("mortality")
+simset$traceplot("fertility")
+
+# if it's not mixing it's either a likelhood or model problem
+# params= simset$last.sim()$params
+# params['']try access the params mnaually and improve 
+# comaparing likelihhoods

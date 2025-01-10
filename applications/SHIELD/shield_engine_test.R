@@ -32,7 +32,7 @@ engine = create.jheem.engine(version = 'shield', location = location, end.year =
 # params['other.general.mortality.rate.multiplier']=.9
 
 #Running:
-params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
+# params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
 #Outcomes
