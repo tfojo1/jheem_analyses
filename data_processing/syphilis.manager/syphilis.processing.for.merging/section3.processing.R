@@ -65,6 +65,24 @@ data.manager$register.outcome(
     units = 'deaths',
     description = "Deaths"))
 
+data.manager$register.outcome(
+  'immigration',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Immigration',
+    axis.name = 'Immigration',
+    units = 'population',
+    description = "Metro Immigration"))
+
+data.manager$register.outcome(
+  'emigration',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Emigration',
+    axis.name = 'Emigration',
+    units = 'population',
+    description = "Metro Emigration"))
+
 #Register Sources:
 data.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
@@ -131,9 +149,22 @@ data.manager$register.ontology(
     sex=c('male','female')
   ))
 
+data.manager$register.ontology(
+  'census.immigration',
+  ont = ontology(
+    year= c("2006-2010", "2011-2015", "2016-2020"),
+    location= NULL,
+    age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
+            "65-69 years", "70-74 years", "75+ years"),
+    race=c("hispanic or latino", "white, non-hispanic", "black", 'other'),
+    sex=c('male','female'),
+    incomplete.dimensions = c("year", "location")
+  ))
+
 #Codes:
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
+source('data_processing/syphilis.manager/msa_immigration.R')
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
