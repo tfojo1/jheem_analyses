@@ -211,8 +211,8 @@ total.prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = PREVALENCE.ERROR.TERM, 
-                                       error.variance.type = 'cv',
+                                       error.variance.term = c(PREVALENCE.ERROR.TERM,0.589321), # second term is from error_for_prevalence_formula.R
+                                       error.variance.type = c('cv','exp.of.variance'), 
                                        weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
   )
@@ -224,8 +224,8 @@ prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = PREVALENCE.ERROR.TERM, 
-                                       error.variance.type = 'cv',
+                                       error.variance.term = c(PREVALENCE.ERROR.TERM,0.589321), # second term is from error_for_prevalence_formula.R
+                                       error.variance.type = c('cv','exp.of.variance'), 
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
@@ -237,8 +237,8 @@ race.risk.prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = PREVALENCE.ERROR.TERM, 
-                                       error.variance.type = 'cv',
+                                       error.variance.term = c(PREVALENCE.ERROR.TERM,0.589321), # second term is from error_for_prevalence_formula.R
+                                       error.variance.type = c('cv','exp.of.variance'), 
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
@@ -581,26 +581,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     use.lognormal.approximation = T
   )
 
-# basic ratio likelihood (rolled back)
-# number.of.tests.year.on.year.change.basic.likelihood.instructions = 
-#   create.basic.ratio.likelihood.instructions(
-#     outcome.for.data = "hiv.tests.per.population", 
-#     outcome.for.sim = "total.hiv.tests.per.population",
-#     
-#     levels.of.stratification = c(0),
-#     from.year = 2008,
-#     
-#     observation.correlation.form = 'compound.symmetry',
-#     error.variance.term = 0.03, # guessed this
-#     error.variance.type = 'cv',
-#     
-#     ratio.cv = 1.2,
-#     
-#     weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
-#     equalize.weight.by.year = T
-#   )
-
-# basic version - WHAT WE WANT TO EVENTUALLY USE
+# basic version 
 number.of.tests.year.on.year.change.basic.likelihood.instructions =
   create.time.lagged.comparison.likelihood.instructions(
     outcome.for.data = "hiv.tests.per.population",
@@ -630,10 +611,10 @@ number.of.tests.year.on.year.change.likelihood.instructions =
 
 #-- YEAR-ON-YEAR GONORRHEA CHANGE ----
 gonorrhea.year.on.year.change.likelihood.instructions = 
-  create.basic.ratio.likelihood.instructions(outcome.for.data = "gonorrhea.ratio", 
+  create.basic.ratio.likelihood.instructions(outcome.for.data = "gonorrhea.ratio",  # can add name = gonorrhea here
                                              outcome.for.sim = "sexual.transmission.rates", 
                                              # (2020 gon diagnoses / 2019 gon diagnoses) proportional to 
-                                             # (2020 sexual transmisson/2019 sexual transmission)
+                                             # (2020 sexual transmission/2019 sexual transmission)
                                              levels.of.stratification = c(0,1), 
                                              dimensions = c("sex","race","age"),
                                              from.year = 2018, 
@@ -652,7 +633,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
 
 #-- YEAR-ON-YEAR SYPHILIS CHANGE ----
 ps.syphilis.year.on.year.change.likelihood.instructions = 
-  create.basic.ratio.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", 
+  create.basic.ratio.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # can add name = syphilis here
                                              outcome.for.sim = "sexual.transmission.rates", 
                                              # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
                                              # (2020 sexual transmisson/2019 sexual transmission)
@@ -671,6 +652,38 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                              weights = (1*TOTAL.WEIGHT),
                                              equalize.weight.by.year = T 
   )
+
+
+#-- FUTURE CHANGE PENALTY LIKELIHOOD (to prevent new diagnoses from taking off in the future) ---- 
+future.change.penalty.fn = function(sim,log=T){
+  
+  # 2009, 2019, 2029 diagnoses
+  diagnoses = sim$get(outcomes = 'new',keep.dimensions = "year",dimension.values = list(year=c(2009,2019,2029)))
+  
+  pre.change = (diagnoses[2]-diagnoses[1])/diagnoses[1]
+  post.change = (diagnoses[3]-diagnoses[2])/diagnoses[2]
+  
+  spread = 0.2 # parameter to tune how wide distribution is 
+  
+  lik = 0.5*dnorm(post.change,mean = (pre.change - spread), sd = spread) + 
+    0.5*dnorm(post.change,mean = (pre.change + spread), sd = spread)
+  
+  if(log){
+    rv = log(lik)
+  } else{
+    rv = lik
+  }
+    rv 
+  
+}
+
+if(1==2){
+  future.change.penalty.likelihood.instructions = 
+    create.custom.likelihood.instructions(name = "future.change.penalty", # default will be outcome for sim 
+                                          outcome.for.sim = NULL, # placeholder, want this to be NULL
+                                          fn = future.change.penalty.fn)
+  }
+
 
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS --#  ----
 joint.pop.migration.total.trans.likelihood.instructions = 
@@ -808,6 +821,9 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   # COVID LIKELIHOODS
   number.of.tests.year.on.year.change.likelihood.instructions,
   gonorrhea.year.on.year.change.likelihood.instructions,
-  ps.syphilis.year.on.year.change.likelihood.instructions
+  ps.syphilis.year.on.year.change.likelihood.instructions #, 
+  
+  # FUTURE CHANGE PENALTY LIKELIHOOD
+  #future.change.penalty.likelihood.instructions
   
 )
