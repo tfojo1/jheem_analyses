@@ -1,6 +1,7 @@
 library(jheem2)
 library(tidyverse)
 library(readxl)
+library(tools)
 
 ###############################################################################
 
@@ -161,10 +162,23 @@ data.manager$register.ontology(
     incomplete.dimensions = c("year", "location")
   ))
 
+data.manager$register.ontology(
+  'census.immigration.national',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
+            "65-69 years", "70-74 years", "75+ years"),
+    race=c('white', 'black', 'american indian or alaska native', 'asian', 'native hawaiian or pacific islander'),
+    sex=c('male','female'),
+    incomplete.dimensions = c("year", "location")
+  ))
+
 #Codes:
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/msa_immigration.R')
+source('data_processing/syphilis.manager/national_immigration.R')
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
