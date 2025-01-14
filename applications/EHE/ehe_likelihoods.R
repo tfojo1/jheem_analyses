@@ -677,12 +677,11 @@ future.change.penalty.fn = function(sim,log=T){
   
 }
 
-if(1==2){
-  future.change.penalty.likelihood.instructions = 
-    create.custom.likelihood.instructions(name = "future.change.penalty", # default will be outcome for sim 
-                                          outcome.for.sim = NULL, # placeholder, want this to be NULL
-                                          fn = future.change.penalty.fn)
-  }
+future.change.penalty.likelihood.instructions = 
+  create.custom.likelihood.instructions(name = "future.change.penalty", # default will be outcome for sim 
+                                        #outcome.for.sim = NULL, # placeholder, want this to be NULL
+                                        compute.function = future.change.penalty.fn)
+
 
 
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS --#  ----
