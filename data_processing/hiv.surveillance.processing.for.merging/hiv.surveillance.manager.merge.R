@@ -17,7 +17,6 @@ section4 = load.data.manager(name="surveillance.manager_section4", file="Q:/data
 section5 = load.data.manager(name="surveillance.manager_section5", file="Q:/data_managers/data.manager.merge/surveillance.manager_section5.rdata")
 
 
-
 #FIGURE OUT SIZE OF FILES THEN MERGE
 
 # #MERGE 
@@ -25,6 +24,16 @@ section5 = load.data.manager(name="surveillance.manager_section5", file="Q:/data
 # population1$import.data(population3)
 # population1$import.data(births.deaths1)
 # 
+
+
+# Remove outliers ---------------------------------------------------------
+save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
+source('data_processing/outliers/outlier.remover.total.level.R')
+source('data_processing/outliers/outlier.remover.one.way.strata.R')
+source('data_processing/outliers/outlier.remover.two.way.strata.R')
+
+
+
 # #SAVE Final, Complete Census Manager to Cached
 # save(population1, file="../../cached/census.manager.merged.check.rdata")
 # 
