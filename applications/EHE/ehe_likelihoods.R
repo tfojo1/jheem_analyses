@@ -174,7 +174,7 @@ total.new.diagnoses.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (2*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -213,7 +213,7 @@ total.prevalence.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = list(PREVALENCE.ERROR.TERM,0.589321), # second term is from error_for_prevalence_formula.R
                                        error.variance.type = c('cv','exp.of.variance'), 
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (2*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
