@@ -26,6 +26,9 @@ section5 = load.data.manager(name="surveillance.manager_section5", file="Q:/data
 # 
 
 
+# Run this code- it uses both HIV data and adult.population ---------------
+source('data_processing/tests.per.population.R') # Source code to create hiv.tests.per.population 
+
 # Remove outliers ---------------------------------------------------------
 save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
 source('data_processing/outliers/outlier.remover.total.level.R')
@@ -44,3 +47,15 @@ source('data_processing/outliers/outlier.remover.two.way.strata.R')
 # timestamp <- Sys.Date()  
 # filename <- paste0("Q:/data_managers/Archive/census.manager_", timestamp, ".rdata")
 # save(population1, file=filename)
+
+
+###Save surveillance manager####
+save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
+
+#Also save to Q drive
+save(surveillance.manager, file="Q:/data_managers/surveillance.manager.rdata")
+
+#Archive a version with the date to the Q Drive#
+timestamp <- Sys.Date()  
+filename <- paste0("Q:/data_managers/Archive/surveillance.manager_", timestamp, ".rdata")
+save(surveillance.manager, file=filename)

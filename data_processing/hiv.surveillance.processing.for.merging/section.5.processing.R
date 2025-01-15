@@ -62,6 +62,7 @@ data.manager$register.outcome(
     axis.name = 'AIDS Deaths',
     units = 'population',
     description = "AIDS Deaths"))
+
 data.manager$register.outcome(
   'diagnoses',
   metadata = create.outcome.metadata(
