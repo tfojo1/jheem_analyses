@@ -1,31 +1,6 @@
 cat("*** Running Shield_source_code.R ***\n")
 NEW.SOURCE=T
 
-# option1: using JHEEM package
-# devtools::install_github('tfojo1/jheem2')
-
-# will need to check the version and reinstall as needed @Andrew
-library(jheem2)
-# option2: sourcing the code directly:
-# source('../jheem2/R/tests/source_jheem2_package.R')
-
-# The file to source to load all necessary packages, cached data, code
-library(reshape2)
-library(locations)
-library(distributions)
-
-#pulling JHEEM2 # Load the git2r package ----
-if (NEW.SOURCE) {
-  cat("Checking JHEEM2 repository status.... \n")
-  repo_path <- "../jheem2/"  
-  # Check if the repository exists at the specified path
-  if (dir.exists(repo_path)) {
-    # Run the Git pull command to update the repository
-    system(paste("cd", repo_path, "&& git pull"))
-  } else {
-    cat("Can not pull from JHEEM2: ", repo_path, "\n")
-  }
-}
 
 #pulling JHEEM_ANALYSIS # Load the git2r package ----
 if (NEW.SOURCE) {
@@ -40,7 +15,6 @@ if (NEW.SOURCE) {
   }
 }
 
-
 # Common code from JHEEM ----
 source('../jheem_analyses/commoncode/cache_manager.R')
 source('../jheem_analyses/commoncode/target_populations.R')
@@ -48,6 +22,36 @@ source('../jheem_analyses/commoncode/age_mappings.R')
 source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
 source('../jheem_analyses/commoncode/logitnorm_helpers.R')
 source('../jheem_analyses/commoncode/file_paths.R')
+
+# option1: using JHEEM package
+# devtools::install_github('tfojo1/jheem2')
+
+# will need to check the version and reinstall as needed @Andrew
+update.jheem2.package() #this updates the jheem2 if needed
+library(jheem2)
+clear.all.managers()
+# option2: sourcing the code directly:
+# source('../jheem2/R/tests/source_jheem2_package.R')
+
+# The file to source to load all necessary packages, cached data, code
+library(reshape2)
+library(locations)
+library(distributions)
+
+# #pulling JHEEM2 # Load the git2r package ----
+# if (NEW.SOURCE) {
+#   cat("Checking JHEEM2 repository status.... \n")
+#   repo_path <- "../jheem2/"  
+#   # Check if the repository exists at the specified path
+#   if (dir.exists(repo_path)) {
+#     # Run the Git pull command to update the repository
+#     system(paste("cd", repo_path, "&& git pull"))
+#   } else {
+#     cat("Can not pull from JHEEM2: ", repo_path, "\n")
+#   }
+# }
+
+
 #
 set.jheem.root.directory(ROOT.DIR)
 #

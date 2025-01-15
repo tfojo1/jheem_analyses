@@ -115,7 +115,22 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   
 ) 
 
-
+## SYPHILIS.PARAMETERS.PRIOR ----
+# SYPHILIS.PARAMETERS.PRIOR=join.distributions( 
+#   ## Transitions:
+#   # rate.el.to.secondary.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+#   #   # rate.ll.to.tertiary.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+#   # 
+#   # # to CNS:
+#   # #should differentiate by sex?
+#   # rate.primary.to.cns.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+#   # rate.secondary.to.cns.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+#   # rate.el.to.cns.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+#   # rate.ll.to.cns.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+#  
+#   
+#   
+# ) 
 
 
 #2- LINKING PARAMETERS TO FUNCTIONAL FORMS....  -----

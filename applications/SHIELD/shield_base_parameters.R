@@ -12,30 +12,36 @@ add.parameter <- function(params, param.name,
   params$ci.upper[param.name] = ci.upper
   params$citation[[param.name]] = list(citation)
   params$comment[param.name] = comment
-
+  
   params
 }
 
 SHIELD_BASE_PARAMETER = list(values=numeric(),
-                           ci.lower=numeric(),
-                           ci.upper=numeric(),
-                           citation=list(),
-                           comment=character())
+                             ci.lower=numeric(),
+                             ci.upper=numeric(),
+                             citation=list(),
+                             comment=character())
 
 # ci's are not used
 # citation numbers are oubmed ID, they're for our own records'
 
 
-## TRANSMISSION ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
-                                             'oe.female.pairings.with.msm', #observed to estimated ratio of contacts for females with male who are msm
-                                             0.0895,0.0895*.75,0.0895*1.25, #Todd: I'm not sure what the CI should be here?
-                                             citation='Pathela 2006')
+# *** TRANSMISSION ----
+
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
-                                             'fraction.heterosexual.male.pairings.with.male',
-                                             0.004,0.004*.75,0.004*1.25, #Todd: I'm not sure what the CI should be here?
-                                             citation='assumption')
+                                      'primary.rel.secondary.transmissibility', #observed to estimated ratio of contacts for females with male who are msm
+                                      1,1,1) #?????
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
+                                      'oe.female.pairings.with.msm', #observed to estimated ratio of contacts for females with male who are msm
+                                      0.0895,0.0895*.75,0.0895*1.25, #Todd: I'm not sure what the CI should be here?
+                                      citation='Pathela 2006')
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
+                                      'fraction.heterosexual.male.pairings.with.male',
+                                      0.004,0.004*.75,0.004*1.25, #Todd: I'm not sure what the CI should be here?
+                                      citation='assumption')
 
 ## SEXUAL CONTACT BY RACE ----
 #base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
@@ -54,39 +60,78 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       citation='assumption')
 ## SEXUAL TRANSMISSION RATES ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.sexual.transmission',
-                                       4.75, 2.4, 7.1,
-                                       citation=26362321)
+                                      4.75, 2.4, 7.1,
+                                      citation=26362321)
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'female.to.male.sexual.transmission',
-                                       3.75, 1.8, 5.6,
-                                       citation=26362321)
+                                      3.75, 1.8, 5.6,
+                                      citation=26362321)
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.male.sexual.transmission',
-                                       5, 2.5, 7.5,
-                                       citation=26362321)
+                                      5, 2.5, 7.5,
+                                      citation=26362321)
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.msm.sex.with.female',
-                                       0.18, 0.18*5, 0.18*2,
-                                       citation=9525438)
+                                      0.18, 0.18*5, 0.18*2,
+                                      citation=9525438)
 
-# NEW BIRTHS ----
+# *** NEW BIRTHS ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.birth.ratio',
                                       1.05, 1.05*5, 1.05*2,
                                       citation=00000)
-##-- STATE DURATIONS --##
-# duration.primary
-# duration.secondary
-# duration.el
-# 
-# rate.el.to.secondary #relapse
-# rate.ll.to.tertiary
-# rate.primary.to.cns
-# rate.secondary.to.cns
-# rate.el.to.cns
-# rate.ll.to.cns
+# *** NATURAL HISTORY -----
+## STATE DURATIONS ---- assuming as fixed 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.primary',
+                                      4/52, 2/52, 6/52) #2-6weeks 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary',
+                                      2/12, 1/12,3/12) #1-3 months
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.el',
+                                      8/12, 9/12, 11/12) #9-11 months (to sum to 1year with secondary)
 
 
+## TRANSITION RATES ----
+# RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.el.to.secondary',
+                                      0.25,.25,.25) # Range???
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.ll.to.tertiary.male',
+                                      0,0,0) # ????
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.ll.to.tertiary.female',
+                                      0,0,0) # ????
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.non.ll.to.cns',
+                                      0,0,0) # ????
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.ll.to.cns.male',
+                                      0,0,0) # ????
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.ll.to.cns.female',
+                                      0,0,0) # ????
+
+## ASYMPTOMATIC INFECTIONS ----
+## Primary: Chancre in extra-genital areas that may be missed 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.primary.msm',
+                                      0.16, 0.05,.3) # 16% of primary chancre in non-penile areas
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.primary.heterosexual_male',
+                                      0.05,0,.1) # 5% (the range is set arbitarirly)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.primary.female',
+                                      0,0,0) # ????
+
+## Secondary: asymptomatic infection not triggering care seeking
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.secondary.msm',
+                                      0,0,0) # ????
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.secondary.heterosexual_male',
+                                      0,0,0) # ????
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.secondary.female',
+                                      0,0,0) # ????
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.latent',
+                                      1,1,1)  ## all EL/LL infections are asymothomatic (no care seeking)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.tertiary.cns',
+                                      0,0,0)## All teritiary & CNS infections are sympthomatic
+
+# SYMPTOMATIC TESTING -----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.symptomatic.base',
+                                      1,1,1) # ????
 
 
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
- 
+

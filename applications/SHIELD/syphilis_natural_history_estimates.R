@@ -9,25 +9,32 @@ ESTIMATES = list()
 
 #-- BENIGN LATE SYPHILIS --#
 
-# From Table 7
+# From Table 7: cumulative percent developing benign late syphilis by the end of the 15th, 30th, and 35th years
 male.p.benign.late = c('15'=10.9, '30'=15.7, '35'=16.4)/100
 female.p.benign.late = c('15'=15.9, '30'=19.8, '35'=21.4)/100
 times.p.benign.late = as.numeric(names(male.p.benign.late))
 
+# rates for men:
 -log(1-male.p.benign.late)/times.p.benign.late
 fit.male.p.benign.late = lm(-log(1-male.p.benign.late)~times.p.benign.late + 0)
 ESTIMATES$rate.male.benign.late.est = as.numeric(fit.male.p.benign.late$coefficients[1])
 ESTIMATES$rate.male.benign.late.sd = sqrt(as.numeric(vcov(fit.male.p.benign.late)))
-
-
-
+# women for women:
 -log(1-female.p.benign.late)/times.p.benign.late
 fit.female.p.benign.late = lm(-log(1-female.p.benign.late)~times.p.benign.late + 0)
 ESTIMATES$rate.female.benign.late.est = as.numeric(fit.female.p.benign.late$coefficients[1])
 ESTIMATES$rate.female.benign.late.sd = sqrt(as.numeric(vcov(fit.female.p.benign.late)))
 
+print(ESTIMATES)
 
 #-- CARDIOVASCULAR SYPHILIS --#
+
+# from Fig9: proportion of each agegroup developled some type of cardiovascular involvement
+cardiovascular.male.15older=0.15
+cardiovascular.female.15older=0.08
+average.time=35 #years Fig10
+ESTIMATES$rate.male.cardiovascular.15older.est.PK = -log(1-cardiovascular.male.15older)/average.time #MALE
+ESTIMATES$rate.female.cardiovascular.15older.est.PK = -log(1-cardiovascular.female.15older)/average.time #FEMALE
 
 # MALE
 cardiovascular.male.outcomes = data.frame(
@@ -75,11 +82,26 @@ cardiovascular.female.outcomes = data.frame(
 cardiovascular.female.rates.among.those.with.outcome = 1/cardiovascular.female.outcomes$mean.time
 cardiovascular.female.rates = cardiovascular.female.rates.among.those.with.outcome * cardiovascular.female.outcomes$p
 names(cardiovascular.female.rates) = dimnames(cardiovascular.female.outcomes)[[1]]
-ESTIMATES$rate.female.cardiovascular.est = as.numeric(cardiovascular.female.rates['uncomplicated.aortitis'] + cardiovascular.female.rates['total.complicated'])
+ESTIMATES$rate.female.cardiovascular.est = as.numeric(cardiovascular.female.rates['uncomplicated.aortitis'] + 
+                                                          cardiovascular.female.rates['total.complicated'])
 
 
 
-#-- NEUROSYPHILIS --#
+#-- NEUROSYPHILIS ----
+
+# Fig11. proportion of each age and sex group developed neurosyphilis 
+neurosyphilis.male.by.age=c("0-14"=0.12, "15-39"=0.1, "40+"=0)
+neurosyphilis.female.by.age=c("0-14"=0.03, "15-39"=0.05, "40+"=0.04)
+average.time=c(30,15) # fig12
+
+ESTIMATES$neurosyphilis.male.by.age = 
+    c("0-14"=list(-log(1-neurosyphilis.male.by.age[1])/average.time),
+       "15-39"=list(-log(1-neurosyphilis.male.by.age[2])/average.time),
+       "40+"=list(-log(1-neurosyphilis.male.by.age[3])/average.time))
+ESTIMATES$neurosyphilis.female.by.age = 
+    c("0-14"=list(-log(1-neurosyphilis.female.by.age[1])/average.time),
+      "15-39"=list(-log(1-neurosyphilis.female.by.age[2])/average.time),
+      "40+"=list(-log(1-neurosyphilis.female.by.age[3])/average.time))
 
 # MALE
 neurosyphilis.male.outcomes = data.frame(
@@ -102,7 +124,7 @@ neurosyphilis.male.rates = neurosyphilis.male.rates.among.those.with.outcome * n
 names(neurosyphilis.male.rates) = dimnames(neurosyphilis.male.outcomes)[[1]]
 ESTIMATES$rate.male.neurosyphilis.est = as.numeric(neurosyphilis.male.rates['diffuse.meningovascular'] + neurosyphilis.male.rates['general.paresis'] + neurosyphilis.male.rates['tabes.dorsalis'])
 # a check: over 40 years, how many would have the outcome
-1 - exp(-ESTIMATES$rate.male.neurosyphilis.est*40)
+1 - exp(-ESTIMATES$rate.male.neurosyphilis.est*40) #'@Todd: This should be 0 according to Fig11
 
 
 # FEMALE
@@ -132,7 +154,7 @@ ESTIMATES$rate.female.neurosyphilis.est = as.numeric(neurosyphilis.female.rates[
 #-- CHECK --#
 
 # MALE
-# from page 32
+# from page 339
 male.with.outcome = c(
     infection.relapse = 22.7/100,
     benign.late = 14.4/100,

@@ -39,6 +39,7 @@ sim = engine$run(params)
 simplot(sim,"population" )
 simplot(sim,"population" ,
         dimension.values = list(year = 2010:2030))
+
 #By 1 factor
 # simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
 # simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
