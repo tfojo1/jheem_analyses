@@ -7,7 +7,7 @@ CALIBRATION.CODE.TO.PROCESS = c(CALIBRATION.CODE.POPULATION, # 1
                                 CALIBRATION.CODE.TRANSMISSION, # 2
                                 CALIBRATION.CODE.FULL.PLUS.AIDS, # 3
                                 CALIBRATION.CODE.FULL.PLUS.COVID # 4
-                                )[c(3)]
+                                )[c(4)]
 
 
 # Pull just the last simulation
