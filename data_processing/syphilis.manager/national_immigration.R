@@ -217,7 +217,7 @@ black.hispanic.combined <- black.hispanic.combined%>% #Clean up dataframe
 
 black.hispanic.combined <- black.hispanic.combined %>% #Perform race calculations
   mutate(black.nh = round(black.value-(sqrt(prop.black.hisp*prop.hisp.black*hispanic.value*black.value))))%>% 
-  mutate(other.race = round(total - (hispanic.value + black.nh))) 
+  mutate(other.race = round(total - (hispanic.value + black.nh)))  #This total includes white, so you have 3 groups
 
 #create dataframes to put
 hispanic.put <- black.hispanic.combined%>%
@@ -227,9 +227,9 @@ hispanic.put <- black.hispanic.combined%>%
 
 #black
 black.put <- black.hispanic.combined%>%
-  select(year, location, outcome, black, black.value)%>%
+  select(year, location, outcome, black, black.nh)%>%
   rename(race = black)%>%
-  rename(value= black.value)
+  rename(value= black.nh)
 
 #other
 other.put <- black.hispanic.combined%>%
@@ -240,15 +240,6 @@ other.put <- black.hispanic.combined%>%
 
 
 # Put Race Data -----------------------------------------------------------
-  
-#white non hispanic
-  data.manager$put.long.form(
-    data = white.non.hispanic,
-    ontology.name = 'census.immigration.national',
-    source = 'census.population',  
-    dimension.values = list(),
-    url = 'https://data.census.gov/table/ACSDT1Y2023.B07001?q=Residential%20Mobility',
-    details = 'Geographic Mobility by Selected Characteristics in the United States')
 
 #black
 data.manager$put.long.form(
