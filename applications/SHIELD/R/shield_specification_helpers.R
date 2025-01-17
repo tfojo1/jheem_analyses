@@ -12,47 +12,47 @@ DEFAULT.FERTILITY.RATE.YEARS=c(2007:2023)
 #@rdname. The documentation of all functions with the same @rdname will be combined under one manual page.
 
 
-# BASE INITIAL POPULATION SIZE ----
-## get base initial populations sizes for different groups ----
-#' @title get.base.initial.female.population
+# INITIAL POPULATION SIZE ----
+## get initial populations sizes for different groups ----
+#' @title get.n.initial.female.population
 #' @description Generates the size of the 'female' population for the given years by calling
-#' \code{get.base.initial.population.for.sex} for sex-specific population data.
+#' \code{get.n.initial.population.for.sex} for sex-specific population data.
 #' @param location The location for which the population data is being retrieved.
 #' @param specification.metadata Metadata for specification.
 #' @param years Vector of years for which to retrieve population data. Default is `DEFAULT.POPULATION.YEARS`.
 #' @return A 2D matrix showing the number of persons broken down by race (columns) within each age group (rows).
 #' @examples
-#' get.base.initial.female.population("C.12580", specification.metadata)
+#' get.n.initial.female.population("C.12580", specification.metadata)
 #' where: specification.metadata=get.specification.metadata("shield", "C.12580")
-get.base.initial.female.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
+get.n.initial.female.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
 {
-  get.base.initial.population.for.sex(location,
+  get.n.initial.population.for.sex(location,
                                       specification.metadata = specification.metadata,
                                       sex = 'female',
                                       years = years)
 }
 
 #'
-#' @title get.base.initial.male.population
+#' @title get.n.initial.male.population
 #' @description Generates the size of the 'male' population for the given years by calling
-#' \code{get.base.initial.population.for.sex} for sex-specific population data.
-#' @inheritParams get.base.initial.female.population
-#' @inherit get.base.initial.female.population return
-get.base.initial.male.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
+#' \code{get.n.initial.population.for.sex} for sex-specific population data.
+#' @inheritParams get.n.initial.female.population
+#' @inherit get.n.initial.female.population return
+get.n.initial.male.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
 {
-  get.base.initial.population.for.sex(location,
+  get.n.initial.population.for.sex(location,
                                       specification.metadata = specification.metadata,
                                       sex = 'male',
                                       years = years)
 }
 
 #'
-#' @title get.base.initial.population.for.sex
+#' @title get.n.initial.population.for.sex
 #' @description Generates the size of the population for the given years based on sex.
-#' @inheritParams get.base.initial.male.population
+#' @inheritParams get.n.initial.male.population
 #' @param sex The sex of the designated population ('male' or 'female').
 #' @return A vector of population for the given years.
-get.base.initial.population.for.sex <- function(location, specification.metadata, sex, years=DEFAULT.POPULATION.YEARS)
+get.n.initial.population.for.sex <- function(location, specification.metadata, sex, years=DEFAULT.POPULATION.YEARS)
 {
   if (length(specification.metadata$dim.names$location) > 1)
     stop("We need to specify what to do with more than one location")
@@ -74,7 +74,7 @@ get.base.initial.population.for.sex <- function(location, specification.metadata
                                  to.ontology = specification.metadata$dim.names[c('age', 'race')])
   
   if (is.null(mapping))
-    stop(paste0("Cannot get.base.initial.population.for.sex('",
+    stop(paste0("Cannot get.n.initial.population.for.sex('",
                 sex,
                 "') - unable to find a mapping from the census to the specification's age and race categorizations"))
   
@@ -280,14 +280,14 @@ get.best.guess.msm.proportions <- function(location,
 
 
 
-# FERTILITY ----
-#' @title get.fertility.rates.functional.form
+#-- FERTILITY --# ----
+#' @title get.fertility.rate.functional.form
 #' @description generating a functional form for fertility rates based on census data (see inputs/estimate_fertility_rate.R)
 #' @param location location
 #' @param specification.metadata specification.metadata
 #' @param population.years years for which data is available
 #' @return a spline functional form for fertility rates by age, race, year 
-get.fertility.rates.functional.form<-function(location, specification.metadata, population.years=DEFAULT.FERTILITY.RATE.YEARS){ 
+get.fertility.rate.functional.form<-function(location, specification.metadata, population.years=DEFAULT.FERTILITY.RATE.YEARS){ 
   # pull fertility rates for location
   
   mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years) 
@@ -400,29 +400,29 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
   return(mapped.fertility.rate)
 }
 
-# MORTALITY ----
-#' @title get.location.mortality.rates.functional.form
+#-- MORTALITY --#----
+#' @title get.general.mortality.rates.functional.form
 #' @description generating a functional form for mortality rates based on census data
 #' @param location location
 #' @param specification.metadata specification.metadata
 #' @param population.years population.years
 #' @return a functional form for mortality rates to be used in the specification
-get.location.mortality.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.MORTALITY.RATE.YEARS)
+get.general.mortality.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.MORTALITY.RATE.YEARS)
 {
-  rates = get.location.mortality.rates(location=location,
+  rates = get.general.mortality.rates(location=location,
                                        specification.metadata = specification.metadata) 
   
   create.static.functional.form(value = rates,
                                 link = "log",
                                 value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
 }
-#' @title get.location.mortality.rates
+#' @title get.general.mortality.rates
 #' @description reading the mortality rates from the census manager (approximating them off state-level data)
 #' @param location location
 #' @param specification.metadata specification.metadata
 #' @param year.ranges year.ranges  
 #' @return returning the mortality rates for each MSA (location) in the correct dimension
-get.location.mortality.rates <- function(location,
+get.general.mortality.rates <- function(location,
                                          specification.metadata,
                                          year.ranges = DEFAULT.MORTALITY.RATE.YEARS){
   # The code is designed for modeling MSAs, where each MSA consists of a collection of counties.
@@ -440,14 +440,14 @@ get.location.mortality.rates <- function(location,
                                          from.ontology.names = "census.cdc.wonder.births.deaths",
                                          keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     if (is.null(deaths))
-      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
+      stop("Error in get.general.mortality.rates() - unable to pull any metro.deaths data for the requested years")
     
     # Pull the death denominator:
     population = CENSUS.MANAGER$pull(outcome = 'deaths.denominator', 
                                      location = states, 
                                      keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     if (is.null(population))
-      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
+      stop("Error in get.general.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
     population[is.na(deaths)] = NA #remove the stratifications with no denominator
     
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification # then divide the two
@@ -467,7 +467,7 @@ get.location.mortality.rates <- function(location,
                                  keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     
     if (is.null(deaths))
-      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
+      stop("Error in get.general.mortality.rates() - unable to pull any metro.deaths data for the requested years")
     
     # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
     population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', 
@@ -475,7 +475,7 @@ get.location.mortality.rates <- function(location,
                                      year= year.ranges, 
                                      keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     if (is.null(population))
-      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
+      stop("Error in get.general.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
     population[is.na(deaths)] = NA
     
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
@@ -485,7 +485,7 @@ get.location.mortality.rates <- function(location,
       map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
     
     if (any(is.na(rates.by.state)))
-      stop("getting NA values in rates.by.state in get.location.mortality.rates()")
+      stop("getting NA values in rates.by.state in get.general.mortality.rates()")
     
     if (length(states)==1)
       rates.by.state[1,,,]
@@ -497,7 +497,7 @@ get.location.mortality.rates <- function(location,
                                                from.ontology.names = 'stratified.census')
       
       if (is.null(county.populations))
-        stop("Error in get.location.mortality.rates(): cannot get populations for the component counties")
+        stop("Error in get.general.mortality.rates(): cannot get populations for the component counties")
       county.populations = apply(county.populations,
                                  'location', mean, na.rm=T)
       total.population = sum(county.populations, na.rm=T)
@@ -521,7 +521,7 @@ get.location.mortality.rates <- function(location,
 
 
 ##-----------##
-# AGING ----
+#-- AGING --# ----
 #' #' @title get.empiric.aging.rates
 #' #' @description  creates a spline function for aging rates
 #' #' @param location location
@@ -640,7 +640,7 @@ do.get.empiric.aging.rates <- function(location,
   names(aging.rates) = names(years)
   aging.rates
 }
-# SEXUAL CONTACT BY AGE ----
+#-- SEXUAL CONTACT BY AGE --# ----
 #' @title functions.sexual.contact.model
 #' @description sexual contacts are charactrized via 4 components: 1)transmission probability, 2)age mixing, 3)sex mixing, and 4)race mixing
 #' @references \file{inst/docs/sexual_contacts.docx}
@@ -871,7 +871,7 @@ get.race.population.counts <- function(location,
   race.mapping$apply(population[,age.mask,,,,], to.dim.names = specification.metadata$dim.names['race'])
 }
 
-# SEXUAL CONRACT BY RACE ----
+#-- SEXUAL CONRACT BY RACE --# ----
 ##-------------##
 ##-- Pairing --##
 ##-------------##
@@ -976,3 +976,103 @@ oes.to.proportions <- function(oes, population)
   raw / rowSums(raw)
 }
 
+
+
+get.hiv.testing.functional.form = function(specification.metadata){
+  
+  testing.prior = get.cached.object.for.version(name = "testing.prior",
+                                                version = specification.metadata$version) 
+  
+  testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9), #helps counteract max value below a bit
+                                                                   slope = testing.prior$slopes,
+                                                                   anchor.year = 2010,
+                                                                   max = 0.9,
+                                                                   parameters.are.on.logit.scale = T)                                         
+  
+  testing.functional.form
+}
+
+
+get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
+  #there are 2 scales: the scales that we use to manipulate the knotw, and the scales we use to interpolate them 
+  create.natural.spline.functional.form(knot.times = c("1980"=1980, "1990"=1990, "2000"=2000, "2010"=2010,"2020"=2020),
+                                        knot.values=list("1980"=0.8, "1990"=0.8, "2000"=0.8, "2010"=0.8,"2020"=0.8), 
+                                        knot.min = 0, #knot values can not exceed this range
+                                        knot.max = 1,#knot values can not exceed this range
+                                        min=0, #projected spline values should remain within this range
+                                        max=1, #projected spline values should remain within this range
+                                        knots.are.on.transformed.scale = F,
+                                        knot.link = "log",
+                                        link = "identity" #it's safer to use linear to avoid exponential growth,
+                                        
+                                        )
+syphilis.to.hiv.testing.functional.form
+}
+
+#'@:Todd: need to add an option for the national model ----
+#-- MIGRATION --# ----
+
+get.immigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.YEAR){
+  
+  rates = get.immigration.rates(location=location,
+                                specification.metadata = specification.metadata) 
+  
+  create.natural.spline.functional.form(knot.times = c(time.1 = 2010,time.2 = 2020),
+                                        knot.values = list(time.1 = rates, time.2 = rates),
+                                        link = "identity",
+                                        knot.link = 'log',
+                                        min = 0,
+                                        after.time = 2030,
+                                        after.modifier = 0.1,
+                                        knots.are.on.transformed.scale = F)
+}
+
+get.immigration.rates <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.YEAR){
+    # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
+    # oneway stratification only for one timepoint  (2011-2015) breakdown by age, by race, by sex
+  # (2016-2020) aggregate numbers 
+  #'@Zoe: to be reviewed
+  #because of limitations in data, only data from 2011-2015 was used 
+  #annual number of immigrants
+  immigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
+                                                  location = location,
+                                                  year = "2011-2015") / 5 # because it's 5-year aggregate data     
+  
+  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+                                              location = location,
+                                              year = as.character(c(2011:2015)))) 
+  
+  immigration.rates = immigration.numbers/population
+  
+  c(immigration.rates)
+}
+
+get.emigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.YEAR){
+  
+  rates = get.emigration.rates(location=location,
+                               specification.metadata = specification.metadata) 
+  
+  create.natural.spline.functional.form(knot.times = c(time.1 = 2010,time.2 = 2020),
+                                        knot.values = list(time.1 = rates, time.2 = rates),
+                                        link = "identity",
+                                        knot.link = 'log',
+                                        min = 0,
+                                        after.time = 2030, #this adds a new knot in 2030
+                                        after.modifier = 0.1,#sets the value of 2030 knot to 0.1*changes between 2010-2020
+                                        knots.are.on.transformed.scale = F)
+}
+
+get.emigration.rates <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.YEAR){
+  # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
+  emigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
+                                                 location = location,
+                                                 year = "2011-2015") / 5 # because it's 5-year aggregate data 
+  
+  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+                                              location = location,
+                                              year = as.character(c(2011:2015)))) 
+  
+  emigration.rates = emigration.numbers/population
+  
+  c(emigration.rates)
+}  

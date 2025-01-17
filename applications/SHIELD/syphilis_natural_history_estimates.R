@@ -30,11 +30,11 @@ print(ESTIMATES)
 #-- CARDIOVASCULAR SYPHILIS --#
 
 # from Fig9: proportion of each agegroup developled some type of cardiovascular involvement
-cardiovascular.male.15older=0.15
-cardiovascular.female.15older=0.08
-average.time=35 #years Fig10
-ESTIMATES$rate.male.cardiovascular.15older.est.PK = -log(1-cardiovascular.male.15older)/average.time #MALE
-ESTIMATES$rate.female.cardiovascular.15older.est.PK = -log(1-cardiovascular.female.15older)/average.time #FEMALE
+# cardiovascular.male.15older=0.15
+# cardiovascular.female.15older=0.08
+# average.time=35 #years Fig10
+# ESTIMATES$rate.male.cardiovascular.15older.est.PK = -log(1-cardiovascular.male.15older)/average.time #MALE
+# ESTIMATES$rate.female.cardiovascular.15older.est.PK = -log(1-cardiovascular.female.15older)/average.time #FEMALE
 
 # MALE
 cardiovascular.male.outcomes = data.frame(
@@ -90,18 +90,18 @@ ESTIMATES$rate.female.cardiovascular.est = as.numeric(cardiovascular.female.rate
 #-- NEUROSYPHILIS ----
 
 # Fig11. proportion of each age and sex group developed neurosyphilis 
-neurosyphilis.male.by.age=c("0-14"=0.12, "15-39"=0.1, "40+"=0)
-neurosyphilis.female.by.age=c("0-14"=0.03, "15-39"=0.05, "40+"=0.04)
-average.time=c(30,15) # fig12
-
-ESTIMATES$neurosyphilis.male.by.age = 
-    c("0-14"=list(-log(1-neurosyphilis.male.by.age[1])/average.time),
-       "15-39"=list(-log(1-neurosyphilis.male.by.age[2])/average.time),
-       "40+"=list(-log(1-neurosyphilis.male.by.age[3])/average.time))
-ESTIMATES$neurosyphilis.female.by.age = 
-    c("0-14"=list(-log(1-neurosyphilis.female.by.age[1])/average.time),
-      "15-39"=list(-log(1-neurosyphilis.female.by.age[2])/average.time),
-      "40+"=list(-log(1-neurosyphilis.female.by.age[3])/average.time))
+# neurosyphilis.male.by.age=c("0-14"=0.12, "15-39"=0.1, "40+"=0)
+# neurosyphilis.female.by.age=c("0-14"=0.03, "15-39"=0.05, "40+"=0.04)
+# average.time=c(30,15) # fig12
+# 
+# ESTIMATES$neurosyphilis.male.by.age = 
+#     c("0-14"=list(-log(1-neurosyphilis.male.by.age[1])/average.time),
+#        "15-39"=list(-log(1-neurosyphilis.male.by.age[2])/average.time),
+#        "40+"=list(-log(1-neurosyphilis.male.by.age[3])/average.time))
+# ESTIMATES$neurosyphilis.female.by.age = 
+#     c("0-14"=list(-log(1-neurosyphilis.female.by.age[1])/average.time),
+#       "15-39"=list(-log(1-neurosyphilis.female.by.age[2])/average.time),
+#       "40+"=list(-log(1-neurosyphilis.female.by.age[3])/average.time))
 
 # MALE
 neurosyphilis.male.outcomes = data.frame(
@@ -155,32 +155,33 @@ ESTIMATES$rate.female.neurosyphilis.est = as.numeric(neurosyphilis.female.rates[
 
 # MALE
 # from page 339
-male.with.outcome = c(
-    infection.relapse = 22.7/100,
-    benign.late = 14.4/100,
-    cardiovascular = 13.6/100, 
-    neurosyphilis = 9.4/100,
-    death = 15/100
-)
+# male.with.outcome = c(
+#     infection.relapse = 22.7/100,
+#     benign.late = 14.4/100,
+#     cardiovascular = 13.6/100, 
+#     neurosyphilis = 9.4/100,
+#     death = 15/100
+# )
+# 
+# 
+# # FEMALE
+# # from page 32
+# female.with.outcome = c(
+#     infection.relapse = 24/100,
+#     benign.late = 16.7/100,
+#     cardiovascular = 7.6/100,
+#     neurosyphilis = 5.0/100,
+#     death = 8/100
+# )
+# 
+# years.for.check.male = 29
+# years.for.check.female = 26
+# cbind(
+#     observed.male = male.with.outcome[c('benign.late','cardiovascular','neurosyphilis')],
+#     projected.male = round(1-exp(-as.numeric(ESTIMATES[c('rate.male.benign.late.est','rate.male.cardiovascular.est','rate.male.neurosyphilis.est')]) * years.for.check.male),3),
+#     observed.female = female.with.outcome[c('benign.late','cardiovascular','neurosyphilis')],
+#     projected.female = round(1-exp(-as.numeric(ESTIMATES[c('rate.female.benign.late.est','rate.female.cardiovascular.est','rate.female.neurosyphilis.est')]) * years.for.check.female),3)
+#     
+# )
 
-
-# FEMALE
-# from page 32
-female.with.outcome = c(
-    infection.relapse = 24/100,
-    benign.late = 16.7/100,
-    cardiovascular = 7.6/100,
-    neurosyphilis = 5.0/100,
-    death = 8/100
-)
-
-years.for.check.male = 29
-years.for.check.female = 26
-cbind(
-    observed.male = male.with.outcome[c('benign.late','cardiovascular','neurosyphilis')],
-    projected.male = round(1-exp(-as.numeric(ESTIMATES[c('rate.male.benign.late.est','rate.male.cardiovascular.est','rate.male.neurosyphilis.est')]) * years.for.check.male),3),
-    observed.female = female.with.outcome[c('benign.late','cardiovascular','neurosyphilis')],
-    projected.female = round(1-exp(-as.numeric(ESTIMATES[c('rate.female.benign.late.est','rate.female.cardiovascular.est','rate.female.neurosyphilis.est')]) * years.for.check.female),3)
-    
-)
 

@@ -25,6 +25,39 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
 # ci's are not used
 # citation numbers are oubmed ID, they're for our own records'
 
+# *** INITIAL POPULATION INFECTED ----
+# size of syphilis infected popualtion in 1940
+# asusming they are all undiagnosed
+# do we have data on subgroups ? 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.initial.population.infected.syphilis',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.initial.population.infected.syphilis.primary',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.initial.population.infected.syphilis.secondary',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.initial.population.infected.syphilis.early.latent',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.initial.population.infected.syphilis.late.latent',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.initial.population.infected.syphilis.tertiary',
+                                      0,0,0) # TBD
+
+
+# *** SYPHILIS MORTALITY ----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.primary',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.secondary',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.early.latent',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.late.latent',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.tertiary',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.cns',
+                                      0,0,0) # TBD
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.congenital',
+                                      0,0,0) # TBD 
 
 # *** TRANSMISSION ----
 
@@ -76,7 +109,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'proportion.msm.sex
                                       citation=9525438)
 
 # *** NEW BIRTHS ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.birth.ratio',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
                                       1.05, 1.05*5, 1.05*2,
                                       citation=00000)
 # *** NATURAL HISTORY -----
@@ -87,6 +120,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary
                                       2/12, 1/12,3/12) #1-3 months
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.el',
                                       8/12, 9/12, 11/12) #9-11 months (to sum to 1year with secondary)
+
 
 
 ## TRANSITION RATES ----
@@ -111,7 +145,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.ll.to.cns.fem
 ## Primary: Chancre in extra-genital areas that may be missed 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.primary.msm',
                                       0.16, 0.05,.3) # 16% of primary chancre in non-penile areas
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.primary.heterosexual_male',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.primary.heterosexual.male',
                                       0.05,0,.1) # 5% (the range is set arbitarirly)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.primary.female',
                                       0,0,0) # ????
@@ -119,7 +153,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.p
 ## Secondary: asymptomatic infection not triggering care seeking
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.secondary.msm',
                                       0,0,0) # ????
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.secondary.heterosexual_male',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.secondary.heterosexual.male',
                                       0,0,0) # ????
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.secondary.female',
                                       0,0,0) # ????
@@ -135,3 +169,4 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.sympt
 
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
 
+ 

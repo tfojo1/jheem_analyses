@@ -15,13 +15,7 @@ if (NEW.SOURCE) {
   }
 }
 
-# Common code from JHEEM ----
 source('../jheem_analyses/commoncode/cache_manager.R')
-source('../jheem_analyses/commoncode/target_populations.R')
-source('../jheem_analyses/commoncode/age_mappings.R')
-source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
-source('../jheem_analyses/commoncode/logitnorm_helpers.R')
-source('../jheem_analyses/commoncode/file_paths.R')
 
 # option1: using JHEEM package
 # devtools::install_github('tfojo1/jheem2')
@@ -32,6 +26,14 @@ library(jheem2)
 clear.all.managers()
 # option2: sourcing the code directly:
 # source('../jheem2/R/tests/source_jheem2_package.R')
+
+# Common code from JHEEM ----
+source('../jheem_analyses/commoncode/target_populations.R')
+source('../jheem_analyses/commoncode/age_mappings.R')
+source('../jheem_analyses/commoncode/cache_object_for_version_functions.R')
+source('../jheem_analyses/commoncode/logitnorm_helpers.R')
+source('../jheem_analyses/commoncode/file_paths.R')
+
 
 # The file to source to load all necessary packages, cached data, code
 library(reshape2)
@@ -104,3 +106,4 @@ cat("FERTILE.AGES set to ",FERTILE.AGES,"\n")
 
 
 cat("*** Shield_source_code.R completed! ***\n")
+

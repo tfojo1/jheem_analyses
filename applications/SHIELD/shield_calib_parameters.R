@@ -101,13 +101,13 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
   ## Transmission
-  global.trate = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #directly used in specification (will need sth uch larger) 
-  msm.trate.multiplier0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  msm.trate.multiplier1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  msm.trate.multiplier2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #directly used in specification (will need sth uch larger) 
+  transmission.rate.multiplier.msm0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   ### by race:
-  black.msm.trate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  hispanic.msm.trate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.msm.black= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.msm.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
   ## Sexual Mixing by Age
   age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)) #directly used in specification helper function
@@ -165,17 +165,16 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){
   
   ## Transmission ----
   for(time in 0:2){
-    # browser()
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "msm.trates",
+                                                   element.name = "transmission.rate.msm",
                                                    alpha.name = paste0('time',time),
-                                                   values = parameters[paste0("msm.trate.multiplier",time)],
+                                                   values = parameters[paste0("transmission.rate.multiplier.msm",time)],
                                                    dimension = 'all',
                                                    applies.to.dimension.values = 'all')
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "msm.trates",
+                                                   element.name = "transmission.rate.msm",
                                                    alpha.name = paste0('time',time),
-                                                   values = parameters[c("black.msm.trate.multiplier","hispanic.msm.trate.multiplier")],
+                                                   values = parameters[c("transmission.rate.multiplier.msm.black","transmission.rate.multiplier.msm.hispanic")],
                                                    dimension = "race.to", #recipient
                                                    applies.to.dimension.values = c("black","hispanic"))
   }
@@ -385,15 +384,15 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
 
 ## SHIELD.TRANSMISSION.SAMPLING.BLOCKS ----
 SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
-  global.trate=c("global.trate"),
+  global.transmission.rate=c("global.transmission.rate"),
   
   msm.transmission = c(
-    "msm.trate.multiplier0",
-    "msm.trate.multiplier1",
-    "msm.trate.multiplier2",
+    "transmission.rate.multiplier.msm0",
+    "transmission.rate.multiplier.msm1",
+    "transmission.rate.multiplier.msm2",
     #
-    "black.msm.trate.multiplier",
-    "hispanic.msm.trate.multiplier"),
+    "transmission.rate.multiplier.msm.black",
+    "transmission.rate.multiplier.msm.hispanic"),
   
   age.mixing.transmission=("age.mixing.sd.mult")
 )
