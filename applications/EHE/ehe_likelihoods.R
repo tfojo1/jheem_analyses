@@ -172,9 +172,10 @@ total.new.diagnoses.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
+                                       correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
-                                       weights = (2*TOTAL.WEIGHT),
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -211,9 +212,10 @@ total.prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = list(PREVALENCE.ERROR.TERM,0.589321), # second term is from error_for_prevalence_formula.R
-                                       error.variance.type = c('cv','exp.of.variance'), 
-                                       weights = (2*TOTAL.WEIGHT),
+                                       correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
+                                       error.variance.term = list(PREVALENCE.ERROR.TERM), # second term is from error_for_prevalence_formula.R
+                                       error.variance.type = c('cv'), #,'exp.of.variance'), 
+                                       weights = (1*TOTAL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -224,8 +226,8 @@ prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(PREVALENCE.ERROR.TERM,0.589321), # second term is from error_for_prevalence_formula.R
-                                       error.variance.type = c('cv','exp.of.variance'), 
+                                       error.variance.term = list(PREVALENCE.ERROR.TERM), 
+                                       error.variance.type = c('cv'),
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
@@ -237,8 +239,8 @@ race.risk.prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(PREVALENCE.ERROR.TERM,0.589321), # second term is from error_for_prevalence_formula.R
-                                       error.variance.type = c('cv','exp.of.variance'), 
+                                       error.variance.term = list(PREVALENCE.ERROR.TERM), 
+                                       error.variance.type = c('cv'),
                                        weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
