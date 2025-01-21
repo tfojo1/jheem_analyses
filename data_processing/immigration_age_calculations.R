@@ -126,28 +126,28 @@ sex.adult.prop.imm <- sex.adult.prop.imm %>%
   select(-value_new, -year.x)
 
 #RACE: EMIGRATION
-race.df.em <- data.list.move.clean[grep("emigration_race", names(data.list.move.clean))] 
-race.df.em <- as.data.frame(race.df.em$msa_emigration_race_11.15) 
-race.adult.prop.em = left_join(race.df.em, adult.prop.df.em, by="location")
-race.adult.prop.em <- race.adult.prop.em %>%
-  mutate(value_new = round(value * Freq))%>%
-  select(outcome, year.x, location, race, value_new)%>%
-  rename(value = value_new)%>%
-  mutate(year = as.character(year.x))%>%
-  mutate(outcome = 'adult.emigration')%>%
-  mutate(location = as.character(location))
+# race.df.em <- data.list.move.clean[grep("emigration_race", names(data.list.move.clean))] 
+# race.df.em <- as.data.frame(race.df.em$msa_emigration_race_11.15) 
+# race.adult.prop.em = left_join(race.df.em, adult.prop.df.em, by="location")
+# race.adult.prop.em <- race.adult.prop.em %>%
+#   mutate(value_new = round(value * Freq))%>%
+#   select(outcome, year.x, location, race, value_new)%>%
+#   rename(value = value_new)%>%
+#   mutate(year = as.character(year.x))%>%
+#   mutate(outcome = 'adult.emigration')%>%
+#   mutate(location = as.character(location))
 
 #RACE: IMMIGRATION
-race.df.imm <- data.list.move.clean[grep("immigration_race", names(data.list.move.clean))] 
-race.df.imm <- as.data.frame(race.df.imm$msa_immigration_race_11.15) 
-race.adult.prop.imm = left_join(race.df.imm, adult.prop.df.imm, by="location")
-race.adult.prop.imm <- race.adult.prop.imm %>%
-  mutate(value_new = round(value * Freq))%>%
-  select(outcome, year.x, location, race, value_new)%>%
-  rename(value = value_new)%>%
-  mutate(year = as.character(year.x))%>%
-  mutate(outcome = 'adult.immigration')%>%
-  mutate(location = as.character(location))
+# race.df.imm <- data.list.move.clean[grep("immigration_race", names(data.list.move.clean))] 
+# race.df.imm <- as.data.frame(race.df.imm$msa_immigration_race_11.15) 
+# race.adult.prop.imm = left_join(race.df.imm, adult.prop.df.imm, by="location")
+# race.adult.prop.imm <- race.adult.prop.imm %>%
+#   mutate(value_new = round(value * Freq))%>%
+#   select(outcome, year.x, location, race, value_new)%>%
+#   rename(value = value_new)%>%
+#   mutate(year = as.character(year.x))%>%
+#   mutate(outcome = 'adult.immigration')%>%
+#   mutate(location = as.character(location))
 
 #ETHNICITY: IMMIGRATION
 eth.df.imm <- data.list.move.clean[grep("immigration_eth", names(data.list.move.clean))] 
@@ -223,21 +223,49 @@ other.immigration.adults <- other.immigration.adults %>%
   mutate(year = as.character(year.y))%>%
   select (-year.x, -year.y, -Freq)
 
+#RECALCULATED BLACK NH RACE: EMIGRATION (Note this pulls dataset from immigration code)
+black.emigration <- black_nh_race[grep("emigration", names(black_nh_race))] 
+black.emigration <- as.data.frame(black.emigration$black.nh.race.emigration)
+black.emigration.adults = left_join(black.emigration, adult.prop.df.em, by = "location")
+
+black.emigration.adults <- black.emigration.adults %>%
+  mutate(outcome = "adult.emigration")%>%
+  mutate(value = round(value*Freq))%>% #this is what i keep changing
+  mutate(location = as.character(location))%>%
+  mutate(year = as.character(year.y))%>%
+  select (-year.x, -year.y, -Freq)
+
+#RECALCULATED BLACK NH RACE: IMMIGRATION (Note this pulls dataset from immigration code)
+black.immigration <- black_nh_race[grep("immigration", names(black_nh_race))] 
+black.immigration <- as.data.frame(black.immigration$black.nh.race.immigration)
+black.immigration.adults = left_join(black.immigration, adult.prop.df.imm, by = "location")
+
+black.immigration.adults <- black.immigration.adults %>%
+  mutate(outcome = "adult.immigration")%>%
+  mutate(value = round(value*Freq))%>%
+  mutate(location = as.character(location))%>%
+  mutate(year = as.character(year.y))%>%
+  select (-year.x, -year.y, -Freq)
+
+
+
 #CREATE LISTS FOR IMMIGRATION/EMIGRATION TO PUT INTO MANAGER
 adult.imm.em.list = list(
   "df.total.imm" = total.adults.df.imm, 
   "df.age.imm" = new.age.prop.1.imm,
   "df.eth.imm" = eth.adult.prop.imm, 
-  "df.race.imm" = race.adult.prop.imm, 
+  #"df.race.imm" = race.adult.prop.imm, 
   "df.sex.imm" = sex.adult.prop.imm,
   "df.other.race.imm"= other.immigration.adults,
+  "df.black.imm" =black.immigration.adults,
   
   "df.total.em" = total.adults.df.em, 
   "df.age.em" = new.age.prop.1.em,
   "df.eth.em" = eth.adult.prop.em, 
-  "df.race.em" = race.adult.prop.em, 
+  #"df.race.em" = race.adult.prop.em, 
   "df.sex.em" = sex.adult.prop.em ,
-  "df.other.em"= other.emigration.adults)
+  "df.other.em"= other.emigration.adults,
+  "df.black.em" =black.emigration.adults)
 
 
 #PUT INTO DATA MANAGER

@@ -255,6 +255,8 @@ data.list.move.clean = lapply(data.list.move, function(file){
 #Pulled from cdc wonder
 #Proportion of Black who are Hispanic: 14,568,073 / 218,869,956 = 0.067
 #Proportion of Hispanic who are Black:  14,568,073 / 269,697,533 = 0.054
+
+#Final race categories will be: Black Non Hispanic, Hispanic, and Other.
 ###############################################################################
 
 prop.black.hisp <- 0.067
@@ -331,32 +333,76 @@ em_combo <- em_combo %>%
 ######
 #Reformat for put
 
-imm_combo <- imm_combo %>%
+imm_combo_other <- imm_combo %>%
   rename(value = other.race)%>%
   select(location, outcome, year, value)%>%
   mutate(race = "other")%>%
   filter(value > 0)
 
-em_combo <- em_combo %>%
+em_combo_other <- em_combo %>%
   rename(value = other.race)%>%
   select(location, outcome, year, value)%>%
   mutate(race = "other")%>%
   filter(value > 0)
 
-other_race <- list(imm_combo, em_combo)
+other_race <- list(imm_combo_other, em_combo_other)
+
+
+imm_combo_black_nh <- imm_combo %>%
+  rename(value = black.nh)%>%
+  select(location, outcome, year, value)%>%
+  mutate(race = "black")%>%
+  filter(value > 0)
+
+em_combo_black_nh <- em_combo %>%
+  rename(value = black.nh)%>%
+  select(location, outcome, year, value)%>%
+  mutate(race = "black")%>%
+  filter(value > 0)
+
+black_nh_race <- list(imm_combo_black_nh, em_combo_black_nh)
 
 #Assign file names for other race to be used in immigration_age_calc code
 other.race.file.names = c("other.race.immigration", "other.race.emigration")
 names(other_race) = other.race.file.names
 
+black.nh.race.file.names = c("black.nh.race.immigration", "black.nh.race.emigration") #This is giving names to the file you created above
+names(black_nh_race) = black.nh.race.file.names
+
+# Remove racial groups that are no longer needed, they will be replaced by the calculated categories --------------------------
+data.list.move.clean = lapply(data.list.move.clean, function(file){
+  
+  data=file[[2]]
+  filename = file[[1]]
+  
+  if(grepl("emigration_eth", filename)) {
+    data = subset(data, data$race != "white, non-hispanic")
+  }
+  if(grepl("immigration_eth", filename)) {
+    data = subset(data, data$race != "white, non-hispanic")
+  }
+  if(grepl("immigration_race", filename)) {
+    data = subset(data, data$race != "black")
+  }
+  if(grepl("emigration_race", filename)) {
+    data = subset(data, data$race != "black")
+  }
+  
+list(filename, data)
+
+})
 
 # 10-15-24: Updating Put to Distribute Other Race -------------------------
 
 movement_data = lapply(data.list.move.clean, `[[`, 2) 
 
-movement_data[[length(movement_data)+1]]<-imm_combo
+movement_data[[length(movement_data)+1]]<-imm_combo_other #adding the other race to the movement data
 
-movement_data[[length(movement_data)+1]]<-em_combo
+movement_data[[length(movement_data)+1]]<-em_combo_other
+
+movement_data[[length(movement_data)+1]]<-imm_combo_black_nh #adding the black nh race to the movement data
+
+movement_data[[length(movement_data)+1]]<-em_combo_black_nh
 
 for (data in movement_data) {
   
