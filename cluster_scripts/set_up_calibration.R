@@ -2,26 +2,24 @@
 
 #-- CHECK ARGUMENTS --#
 args = commandArgs(trailingOnly=TRUE)
-if (length(args)<3) {
-    stop("Three arguments must be supplied", call.=FALSE)
+if (length(args)<5) {
+    stop("Five arguments must be supplied", call.=FALSE)
 }
 
 #-- SET THE WD --#
-print(getwd())
+# print(getwd())
 # setwd('~scr4_pkasaie1/azalesak/jheem/code/jheem_analyses')
-
-#-- SOURCE THE RELEVANT FILES --#
-print("Loading Source Files...")
-source('applications/EHE/ehe_specification.R')
-source('applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 version = args[1]
 location = args[2]
 calibration.code = args[3]
+specification.path = args[4]
+register.calibration.path = args[5]
 
-# print(typeof(version))
-# print(typeof(location))
-# print(typeof(calibration.code))
+#-- SOURCE THE RELEVANT FILES --#
+print("Loading Source Files...")
+source(specification.path)
+source(register.calibration.path)
 
 clear.calibration.cache(version=version,
                         location=location,

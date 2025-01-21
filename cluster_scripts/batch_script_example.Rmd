@@ -14,7 +14,9 @@ MY_LOCATIONS = c("C.12580", "C.12060", "C.35620")
 ```{r, eval=FALSE}
 make.setup.scripts(MY_LOCATIONS,
                    version='ehe',
-                   calibration.code='init.pop.ehe')
+                   calibration.code='init.pop.ehe',
+                   specification.path="applications/EHE/ehe_specification.R",
+                   register.calibration.path="applications/EHE/calibration_runs/ehe_register_calibrations.R")
 ```
 
 One of these might look like this:
@@ -43,7 +45,9 @@ sbatch cluster_scripts/master_scripts/setup/my_example_setup_script.bat
 make.run.scripts(MY_LOCATIONS,
                  version='ehe',
                  calibration.code='init.pop.ehe',
-                 chains=1)
+                 chains=1,
+                 specification.path="applications/EHE/ehe_specification.R",
+                 register.calibration.path="applications/EHE/calibration_runs/ehe_register_calibrations.R")
 make.run.master.script("my_example_run_script",
                        locations=MY_LOCATIONS,
                        version='ehe',
@@ -69,7 +73,9 @@ make.combined.assemble.script("my_example_assemble_script",
                               version='ehe',
                               calibration.code='init.pop.ehe',
                               burn.keep = 0.6,
-                              thin.keep = 0.2)
+                              thin.keep = 0.2,
+                              specification.path="applications/EHE/ehe_specification.R",
+                              register.calibration.path="applications/EHE/calibration_runs/ehe_register_calibrations.R")
 ```
 
 ### Run the assemble script once the calibrations are finished

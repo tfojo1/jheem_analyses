@@ -48,9 +48,12 @@ make.sbatch.script <- function(filename,
 
 # INDIVIDUAL SCRIPTS ----
 
+#' @param specification.path,register.calibration.path Paths to file with this version's specification and file where this calibration code is registered.
 make.setup.scripts <- function(locations,
                                version,
                                calibration.code,
+                               specification.path,
+                               register.calibration.path,
                                dir='cluster_scripts/setup_scripts',
                                partition='shared',
                                account='pkasaie1',
@@ -65,15 +68,18 @@ make.setup.scripts <- function(locations,
                            partition = partition,
                            time.hours = 12,
                            account=account,
-                           commands= paste("Rscript cluster_scripts/set_up_calibration.R", version, location, calibration.code))
+                           commands= paste("Rscript cluster_scripts/set_up_calibration.R", version, location, calibration.code, specification.path, register.calibration.path))
     }
     
 }
 
+#' @inheritParams make.setup.scripts
 make.run.scripts <- function(locations,
                              version,
                              calibration.code,
                              chains=1:4,
+                             specification.path,
+                             register.calibration.path,
                              dir='cluster_scripts/run_scripts',
                              partition="shared",
                              account='pkasaie1',
@@ -90,7 +96,7 @@ make.run.scripts <- function(locations,
                                partition=partition,
                                time.hours = 12, #Todd's said 7*24 but this made it hard to queue
                                account=account,
-                               commands = paste("Rscript cluster_scripts/run_calibration.R", version, location, calibration.code, chain))
+                               commands = paste("Rscript cluster_scripts/run_calibration.R", version, location, calibration.code, chain, specification.path, register.calibration.path))
         }
     }
 }
@@ -142,6 +148,7 @@ make.run.master.script <- function(name.for.script,
 #' @details This doesn't create one job per location but rather calls the assemble
 #' on all locations in single job, because the run time is short and we don't want
 #' to worry about queuing.
+#' @inheritParams make.setup.scripts
 #' @param name.for.result Since this handles multiple locations in one batch file output, a name is needed. Consider a username and date.
 #' @param burn.keep,thin.keep See the documentation for simset.burn() and simset.thin() in the jheem2 package.
 #' Here, 0's mean to skip the operation (burn or thin)
@@ -151,6 +158,8 @@ make.combined.assemble.script <- function(name.for.result,
                                           calibration.code,
                                           burn.keep=0.5,
                                           thin.keep=0,
+                                          specification.path,
+                                          register.calibration.path,
                                           dir="cluster_scripts/assemble_scripts",
                                           partition="shared",
                                           account="pkasaie1",
@@ -160,7 +169,7 @@ make.combined.assemble.script <- function(name.for.result,
     if (file.exists(file.path(dir, paste0("assemble_", name.for.result, ".bat"))) && !overwrite)
         stop(paste0(error.prefix, "there is already a '", name.for.result, "' at this location. Use 'overwrite=T' to proceed anyway"))
     all.commands = sapply(locations, function(location) {
-        paste("Rscript cluster_scripts/assemble_calibration.R", version, location, calibration.code, burn.keep, thin.keep)
+        paste("Rscript cluster_scripts/assemble_calibration.R", version, location, calibration.code, burn.keep, thin.keep, specification.path, register.calibration.path)
     })
     make.sbatch.script(filename=file.path(dir, paste0("assemble_", name.for.result, ".bat")),
                        job.name = paste0("assemble_", name.for.result),
