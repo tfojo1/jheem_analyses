@@ -84,6 +84,15 @@ data.manager$register.outcome(
     units = 'population',
     description = "Metro Emigration"))
 
+data.manager$register.outcome(
+  'inadequate.prenatal.care',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Inadequate Prenatal Care',
+    axis.name = 'Inadequate Prenatal Care',
+    units = '%',
+    description = "Inadequate Prenatal Care"), denominator.outcome = 'female.population')
+
 #Register Sources:
 data.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
@@ -95,6 +104,7 @@ data.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "C
 data.manager$register.source('census.aggregated.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
+data.manager$register.source('march.of.dimes', parent.source= "NCHS", full.name = "March of Dimes Peristats", short.name='march.of.dimes')
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -173,6 +183,18 @@ data.manager$register.ontology(
     sex=c('male','female'),
     incomplete.dimensions = c("year", "location")
   ))
+
+data.manager$register.ontology(
+  'prenatal.care',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age = c("<20 years", "20-29 years", "30-39 years", ">= 40 years"), 
+    race=c('black', 'hispanic', 'other', 'white'),
+    sex=c('male','female'),
+    incomplete.dimensions = c("year", "location")
+  ))
+
 
 #Codes:
 source('data_processing/syphilis.manager/cached.census.data.R')
