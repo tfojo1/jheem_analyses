@@ -1,5 +1,5 @@
 
-OUTPUT.DIR = "../jheem_analyses/cluster_scripts"
+OUTPUT.DIR = "../jheem_analyses/cluster_scripts/outputs"
 MODULE.LOAD.COMMANDS = c('source cluster_scripts/Rockfish_module_loads.sh')
 
 make.sbatch.script <- function(filename,
@@ -59,6 +59,8 @@ make.setup.scripts <- function(locations,
                                account='pkasaie1',
                                mem='16G')
 {
+    if (!dir.exists(file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code), extension=".out")))
+        dir.create(file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code), extension=".out"))
     for (location in locations) {
         if (!dir.exists(file.path(dir, version, location)))
             dir.create(file.path(dir, version,location), recursive=T)
@@ -85,6 +87,8 @@ make.run.scripts <- function(locations,
                              account='pkasaie1',
                              mem='16G')
 {
+    if (!dir.exists(file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out"))))
+        dir.create(file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out")))
     for (location in locations) {
         if (!dir.exists(file.path(dir, version, location)))
             dir.create(file.path(dir, version, location), recursive=T)
@@ -166,6 +170,9 @@ make.combined.assemble.script <- function(name.for.result,
                                           mem="24G",
                                           overwrite=F) {
     error.prefix = "Cannot make.combined.assemble.script': "
+    if (!dir.exists(file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out"))))
+        dir.create(file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out")))
+    
     if (file.exists(file.path(dir, paste0("assemble_", name.for.result, ".bat"))) && !overwrite)
         stop(paste0(error.prefix, "there is already a '", name.for.result, "' at this location. Use 'overwrite=T' to proceed anyway"))
     all.commands = sapply(locations, function(location) {
