@@ -16,9 +16,19 @@ calculate.error.terms(data.type = "suppression",
 
 # DIAGNOSES:  0.05368198
 calculate.lhd.error.terms("diagnoses")
+# OLD VALUE: 0.04621778
+calculate.error.terms(data.type = "diagnoses",
+                      data.source.1 = "cdc.surveillance.reports",
+                      data.source.2 = "cdc.aggregated.county",
+                      is.cv = T)
 
 # PREVALENCE: 0.08384422
 calculate.lhd.error.terms("diagnosed.prevalence")
+# OLD VALUE: 0.04711922 --> NO LONGER GETTING THIS, NOW GETTING 0.03623443??
+calculate.error.terms(data.type = "diagnosed.prevalence",
+                      data.source.1 = "cdc.surveillance.reports",
+                      data.source.2 = "cdc.aggregated.county",
+                      is.cv = T)
 
 # AIDS DIAGNOSES: 0.2277531 - from 1993-1997 only; one source only has totals so no stratifications anyway 
 calculate.error.terms(data.type = "aids.diagnoses",

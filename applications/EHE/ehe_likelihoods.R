@@ -3,7 +3,11 @@
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
 # heroin, cocaine
 
-TOTAL.WEIGHT = 0.5 # universally downweighting to try to allow more mixing 
+#TOTAL.WEIGHT = 0.5 # universally downweighting to try to allow more mixing 
+POPULATION.WEIGHT = 1
+TRANSMISSION.WEIGHT = 1
+FULL.WEIGHT = 0.5
+
 DIAGNOSES.ERROR.TERM  = 0.05368198 # for new diagnoses and aids diagnoses; from calculating_error_terms_for_ehe_likelihoods.R
 PREVALENCE.ERROR.TERM = 0.08384422 # for prevalence and hiv.mortality; from calculating_error_terms_for_ehe_likelihoods.R
   
@@ -108,7 +112,7 @@ population.error.sd.fn = function(data, details=attr(data, 'details'))
     data * cv
 }
 
-population.likelihood.instructions = 
+population.likelihood.instructions.pop = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
                                        outcome.for.sim = "population",
                                        dimensions = c("age","sex","race"),
@@ -120,15 +124,11 @@ population.likelihood.instructions =
                                        correlation.same.source.different.details = 0.3, # default
                                        
                                        observation.correlation.form = 'autoregressive.1', 
-                                       
-                                       # should always be specified; describes how precise the estimates are; 
-                                       # e.g., estimates can be off by 3% each year
-#                                       error.variance.term = 0.015, 
- #                                      error.variance.type = 'cv',
+
                                        error.variance.term = population.error.sd.fn,
                                        error.variance.type = 'function.sd',
                                        
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (1*POPULATION.WEIGHT),
 
                                        # if there are more datapoints for certain years, this will normalize
                                        # e.g., if there are a few years with only the totals 
@@ -136,8 +136,34 @@ population.likelihood.instructions =
                                        equalize.weight.by.year = F
   )
 
+population.likelihood.instructions.trans = 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
+                                       outcome.for.sim = "population",
+                                       dimensions = c("age","sex","race"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'autoregressive.1', 
+                                       error.variance.term = population.error.sd.fn,
+                                       error.variance.type = 'function.sd',
+                                       weights = (1*TRANSMISSION.WEIGHT),
+                                       equalize.weight.by.year = F
+  )
+
+population.likelihood.instructions.full = 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
+                                       outcome.for.sim = "population",
+                                       dimensions = c("age","sex","race"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'autoregressive.1', 
+                                       error.variance.term = population.error.sd.fn,
+                                       error.variance.type = 'function.sd',
+                                       weights = (1*FULL.WEIGHT),
+                                       equalize.weight.by.year = F
+  )
+
 #-- IMMIGRATION  ----
-immigration.likelihood.instructions = 
+immigration.likelihood.instructions.pop = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
                                        outcome.for.sim = "immigration",
                                        dimensions = c("age","race"), 
@@ -146,12 +172,25 @@ immigration.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                        error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (1*POPULATION.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+immigration.likelihood.instructions.full = 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
+                                       outcome.for.sim = "immigration",
+                                       dimensions = c("age","race"), 
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2011, 
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                       error.variance.type = 'cv',
+                                       weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
 #-- EMIGRATION  ----
-emigration.likelihood.instructions = 
+emigration.likelihood.instructions.pop = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
                                        outcome.for.sim = "emigration",
                                        dimensions = c("age","race"), 
@@ -160,7 +199,20 @@ emigration.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                        error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (1*POPULATION.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+emigration.likelihood.instructions.full = 
+  create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
+                                       outcome.for.sim = "emigration",
+                                       dimensions = c("age","race"), 
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2011, 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                       error.variance.type = 'cv',
+                                       weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -175,20 +227,7 @@ total.new.diagnoses.likelihood.instructions =
                                        correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T
-  )
-
-new.diagnoses.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                       outcome.for.sim = "new",
-                                       dimensions = c("age","sex","race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = DIAGNOSES.ERROR.TERM, 
-                                       error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                       weights = (2*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -201,9 +240,24 @@ race.risk.new.diagnoses.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = DIAGNOSES.ERROR.TERM, 
                                        error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                       weights = (4*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
+
+new.diagnoses.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                       outcome.for.sim = "new",
+                                       dimensions = c("age","sex","race","risk"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = DIAGNOSES.ERROR.TERM, 
+                                       error.variance.type = 'cv',
+                                       weights = (1*FULL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                       equalize.weight.by.year = T
+  )
+
+
 
 #-- PREVALENCE  ----
 total.prevalence.likelihood.instructions = 
@@ -215,20 +269,7 @@ total.prevalence.likelihood.instructions =
                                        correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = list(PREVALENCE.ERROR.TERM), # second term is from error_for_prevalence_formula.R
                                        error.variance.type = c('cv'), #,'exp.of.variance'), 
-                                       weights = (1*TOTAL.WEIGHT),
-                                       equalize.weight.by.year = T
-  )
-
-prevalence.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                       outcome.for.sim = "diagnosed.prevalence",
-                                       dimensions = c("age","sex","race","risk"),
-                                       levels.of.stratification = c(0,1,2), 
-                                       from.year = 2008, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = list(PREVALENCE.ERROR.TERM), 
-                                       error.variance.type = c('cv'),
-                                       weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                       weights = (2*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -241,12 +282,27 @@ race.risk.prevalence.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = list(PREVALENCE.ERROR.TERM), 
                                        error.variance.type = c('cv'),
-                                       weights = (1*TOTAL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                       weights = (4*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
 
+prevalence.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                       outcome.for.sim = "diagnosed.prevalence",
+                                       dimensions = c("age","sex","race","risk"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = list(PREVALENCE.ERROR.TERM), 
+                                       error.variance.type = c('cv'),
+                                       weights = (1*FULL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                       equalize.weight.by.year = T
+  )
+
+
+
 #-- AIDS DIAGNOSES  ----
-non.age.aids.diagnoses.likelihood.instructions =
+non.age.aids.diagnoses.likelihood.instructions.trans =
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                        outcome.for.sim = "aids.diagnoses",
                                        dimensions = c("sex","race","risk"),
@@ -258,13 +314,29 @@ non.age.aids.diagnoses.likelihood.instructions =
                                        observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (1*TRANSMISSION.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+non.age.aids.diagnoses.likelihood.instructions.full =
+  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
+                                       outcome.for.sim = "aids.diagnoses",
+                                       dimensions = c("sex","race","risk"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 1985,
+                                       to.year = 1993,
+                                       correlation.different.years = 0.3,
+                                       #observation.correlation.form = 'compound.symmetry',
+                                       observation.correlation.form = 'autoregressive.1',
+                                       error.variance.term = DIAGNOSES.ERROR.TERM,
+                                       error.variance.type = 'cv',
+                                       weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
 #-- HIV-MORTALITY  ----
 # all-cause mortality among pwh
-hiv.mortality.likelihood.instructions = 
+hiv.mortality.likelihood.instructions.trans = 
   create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
                                        outcome.for.sim = "hiv.mortality", 
                                        dimensions = c("sex"),
@@ -273,13 +345,26 @@ hiv.mortality.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = PREVALENCE.ERROR.TERM, 
                                        error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (1*TRANSMISSION.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+hiv.mortality.likelihood.instructions.full = 
+  create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
+                                       outcome.for.sim = "hiv.mortality", 
+                                       dimensions = c("sex"),
+                                       levels.of.stratification = c(0,1), 
+                                       from.year = 2008, 
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = PREVALENCE.ERROR.TERM, 
+                                       error.variance.type = 'cv',
+                                       weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
 #-- GENERAL MORTALITY  ----
 # everyone in the population, regardless of HIV 
-general.mortality.likelihood.instructions = 
+general.mortality.likelihood.instructions.pop = 
   create.basic.likelihood.instructions(outcome.for.data = "deaths",
                                        outcome.for.sim = "total.mortality", 
                                        dimensions = character(),
@@ -289,7 +374,21 @@ general.mortality.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.03, # look into source and see if they have estimate 
                                        error.variance.type = 'cv',
-                                       weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+                                       weights = (18*POPULATION.WEIGHT), # see prev_new_aware_weighting.R 
+                                       equalize.weight.by.year = T
+  )
+
+general.mortality.likelihood.instructions.full = 
+  create.basic.likelihood.instructions(outcome.for.data = "deaths",
+                                       outcome.for.sim = "total.mortality", 
+                                       dimensions = character(),
+                                       levels.of.stratification = c(0), 
+                                       from.year = 2007, 
+                                       to.year = 2019,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.03, # look into source and see if they have estimate 
+                                       error.variance.type = 'cv',
+                                       weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
 
@@ -326,7 +425,7 @@ suppression.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = (1*TOTAL.WEIGHT),
+                                                   weights = (1*FULL.WEIGHT),
                                                    equalize.weight.by.year = T
   )
 
@@ -334,7 +433,7 @@ suppression.likelihood.instructions =
 # in the data, this is the cumulative estimate of aids.diagnoses.deceased.by.2001 from 1980-2001 
 # e.g., 1995 aids.diagnoses.deceased.by.2001 gives everyone diagnosed in 1995 who is deceased by 2001 (NOT that they died in 1995)
 # so cumulative total will be helpful to get totals by sex/race/risk
-aids.deaths.likelihood.instructions = 
+aids.deaths.likelihood.instructions.trans = 
   create.basic.likelihood.instructions(outcome.for.data = "aids.deaths", 
                                        outcome.for.sim = "aids.deaths", 
                                        dimensions = c("sex","race","risk"),
@@ -344,7 +443,21 @@ aids.deaths.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.2277531, # using aids diagnoses estimate from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (1*TRANSMISSION.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+aids.deaths.likelihood.instructions.full = 
+  create.basic.likelihood.instructions(outcome.for.data = "aids.deaths", 
+                                       outcome.for.sim = "aids.deaths", 
+                                       dimensions = c("sex","race","risk"),
+                                       levels.of.stratification = c(0,1), 
+                                       from.year = 1981, 
+                                       to.year = 2001,
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.2277531, # using aids diagnoses estimate from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.type = 'cv',
+                                       weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -358,7 +471,7 @@ prep.uptake.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = 0.01239159, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'cv',
-                                       weights = (0.3*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+                                       weights = (0.3*FULL.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
 
@@ -375,7 +488,7 @@ prep.indications.likelihood.instructions =
                                        error.variance.term = 0.5, # high uncertainty,
                                        error.variance.type = 'cv',
                                        # ^ this means you can range from 0 to 2x the number of prep indications
-                                       weights = (1*TOTAL.WEIGHT),
+                                       weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T 
   )
 
@@ -409,12 +522,12 @@ awareness.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+                                                   weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R 
                                                    equalize.weight.by.year = T
   )
 
 #-- HEROIN  ----
-heroin.likelihood.instructions = 
+heroin.likelihood.instructions.trans = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
                                                    outcome.for.sim = "proportion.using.heroin",
                                                    denominator.outcome.for.data = 'adult.population',
@@ -440,12 +553,42 @@ heroin.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = (1*TOTAL.WEIGHT),
+                                                   weights = (1*TRANSMISSION.WEIGHT),
+                                                   equalize.weight.by.year = T
+  )
+
+heroin.likelihood.instructions.full = 
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
+                                                   outcome.for.sim = "proportion.using.heroin",
+                                                   denominator.outcome.for.data = 'adult.population',
+                                                   
+                                                   location.types = c('STATE','NSDUH'), 
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = c("age"),
+                                                   levels.of.stratification = c(0,1), 
+                                                   from.year = 2008, 
+                                                   
+                                                   p.bias.inside.location = 0, 
+                                                   p.bias.outside.location = heroin.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = heroin.bias.estimates$out.sd,
+                                                   p.bias.sd.outside.location = heroin.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry',
+                                                   p.error.variance.term = 0.54, # NSDUH calcs; doubled value (0.27); see NSDUH IDU Data_updated.xlsx in input_managers
+                                                   p.error.variance.type = "cv",
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = (1*FULL.WEIGHT),
                                                    equalize.weight.by.year = T
   )
 
 #-- COCAINE  ----
-cocaine.likelihood.instructions = 
+cocaine.likelihood.instructions.trans = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "cocaine",
                                                    outcome.for.sim = "proportion.using.cocaine",
                                                    denominator.outcome.for.data = 'adult.population',
@@ -471,7 +614,37 @@ cocaine.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = (1*TOTAL.WEIGHT),
+                                                   weights = (1*TRANSMISSION.WEIGHT),
+                                                   equalize.weight.by.year = T
+  )
+
+cocaine.likelihood.instructions.full = 
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "cocaine",
+                                                   outcome.for.sim = "proportion.using.cocaine",
+                                                   denominator.outcome.for.data = 'adult.population',
+                                                   
+                                                   location.types = c('STATE','NSDUH'), 
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   
+                                                   dimensions = c("age"),
+                                                   levels.of.stratification = c(0,1), 
+                                                   from.year = 2008, 
+                                                   
+                                                   p.bias.inside.location = 0, 
+                                                   p.bias.outside.location = cocaine.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = cocaine.bias.estimates$out.sd,
+                                                   p.bias.sd.outside.location = cocaine.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry', 
+                                                   p.error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
+                                                   p.error.variance.type = "cv",
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = (1*FULL.WEIGHT),
                                                    equalize.weight.by.year = T
   )
 
@@ -502,7 +675,7 @@ proportion.tested.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = (1*TOTAL.WEIGHT),
+                                                   weights = (1*FULL.WEIGHT),
                                                    equalize.weight.by.year = T
   )
 
@@ -542,7 +715,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+                                                   weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R 
                                                    equalize.weight.by.year = T
   )
 
@@ -578,7 +751,7 @@ number.of.tests.year.on.year.change.nested.likelihood.instructions =
     
     partitioning.function = EHE.PARTITIONING.FUNCTION, 
     
-    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R 
+    weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R 
     equalize.weight.by.year = T,
     use.lognormal.approximation = T
   )
@@ -598,7 +771,7 @@ number.of.tests.year.on.year.change.basic.likelihood.instructions =
     
     ratio.cv = 1.2,
     
-    weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R
+    weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R
     equalize.weight.by.year = T,
     use.lognormal.approximation = T
   )
@@ -629,7 +802,7 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              ratio.cv = 1.5,
                                              # ratio.correlation = , # NULL will enter default of 0
                                              
-                                             weights = (1*TOTAL.WEIGHT),
+                                             weights = (1*FULL.WEIGHT),
                                              equalize.weight.by.year = T 
   )
 
@@ -651,7 +824,7 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
                                              ratio.cv = 1.5,
                                              # ratio.correlation = , # NULL will enter default of 0
                                              
-                                             weights = (1*TOTAL.WEIGHT),
+                                             weights = (1*FULL.WEIGHT),
                                              equalize.weight.by.year = T 
   )
 
@@ -688,122 +861,47 @@ future.change.penalty.likelihood.instructions =
 
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS --#  ----
 joint.pop.migration.total.trans.likelihood.instructions = 
-  join.likelihood.instructions(population.likelihood.instructions,
-                               immigration.likelihood.instructions,
-                               emigration.likelihood.instructions,
-                               general.mortality.likelihood.instructions,
+  join.likelihood.instructions(population.likelihood.instructions.pop,
+                               immigration.likelihood.instructions.pop,
+                               emigration.likelihood.instructions.pop,
+                               general.mortality.likelihood.instructions.pop,
                                total.prevalence.likelihood.instructions, 
-                               total.new.diagnoses.likelihood.instructions
+                               total.new.diagnoses.likelihood.instructions #,
+                               #weight = POPULATION.WEIGHT
                                ) 
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
 transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
-  join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, # race/risk only 10/30
-                               race.risk.prevalence.likelihood.instructions, # race/risk only 10/30
-                               non.age.aids.diagnoses.likelihood.instructions,
-                               #proportion.tested.likelihood.instructions, # removing 10/30
-                               population.likelihood.instructions,
-                               heroin.likelihood.instructions,
-                               cocaine.likelihood.instructions,
-                               aids.deaths.likelihood.instructions,
-                               hiv.mortality.likelihood.instructions # added 11/1
-                               #awareness.likelihood.instructions, # removing 10/30
-                               #race.ps.syphilis.year.on.year.change.likelihood.instructions,
-                               #race.gonorrhea.year.on.year.change.likelihood.instructions
+  join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
+                               race.risk.prevalence.likelihood.instructions, 
+                               non.age.aids.diagnoses.likelihood.instructions.trans,
+                               population.likelihood.instructions.trans,
+                               heroin.likelihood.instructions.trans,
+                               cocaine.likelihood.instructions.trans,
+                               aids.deaths.likelihood.instructions.trans,
+                               hiv.mortality.likelihood.instructions.trans#,
+                               #weight = TRANSMISSION.WEIGHT
+
   )
-
-
-#-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# ---- 
-FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  non.age.aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions
-)
-
-
-#-- FULL LIKELIHOOD WITH COVID TESTING LIKELIHOOD ONLY --# ---- 
-FULL.likelihood.instructions.with.covid.testing =  join.likelihood.instructions(
-  # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
-  
-  # TRANSMISSION LIKELIHOODS
-  new.diagnoses.likelihood.instructions,
-  prevalence.likelihood.instructions,
-  
-  # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
-  
-  # AIDS DIAGNOSES LIKELIHOOD
-  non.age.aids.diagnoses.likelihood.instructions,
-  
-  # CONTINUUM LIKELIHOODS
-  proportion.tested.likelihood.instructions,
-  hiv.test.positivity.likelihood.instructions, 
-  awareness.likelihood.instructions,
-  suppression.likelihood.instructions,
-  
-  # PREP LIKELIHOODS
-  prep.uptake.likelihood.instructions,
-  prep.indications.likelihood.instructions,
-  
-  # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions,
-  
-  # COVID TESTING LIKELIHOOD
-  number.of.tests.year.on.year.change.likelihood.instructions
-  
-)
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
 FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   # POPULATION LIKELIHOODS
-  population.likelihood.instructions, 
-  immigration.likelihood.instructions, 
-  emigration.likelihood.instructions,
+  population.likelihood.instructions.full, 
+  immigration.likelihood.instructions.full, 
+  emigration.likelihood.instructions.full,
   
   # TRANSMISSION LIKELIHOODS
   new.diagnoses.likelihood.instructions,
   prevalence.likelihood.instructions,
   
   # MORTALITY LIKELIHOODS
-  hiv.mortality.likelihood.instructions,
-  general.mortality.likelihood.instructions,
-  aids.deaths.likelihood.instructions,
+  hiv.mortality.likelihood.instructions.full,
+  general.mortality.likelihood.instructions.full,
+  aids.deaths.likelihood.instructions.full,
   
   # AIDS DIAGNOSES LIKELIHOOD
-  non.age.aids.diagnoses.likelihood.instructions,
+  non.age.aids.diagnoses.likelihood.instructions.full,
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,
@@ -816,15 +914,94 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   prep.indications.likelihood.instructions,
   
   # IDU LIKELIHOODS
-  heroin.likelihood.instructions,
-  cocaine.likelihood.instructions,
+  heroin.likelihood.instructions.full,
+  cocaine.likelihood.instructions.full,
   
   # COVID LIKELIHOODS
   number.of.tests.year.on.year.change.likelihood.instructions,
   gonorrhea.year.on.year.change.likelihood.instructions,
-  ps.syphilis.year.on.year.change.likelihood.instructions #, 
+  ps.syphilis.year.on.year.change.likelihood.instructions #,
   
   # FUTURE CHANGE PENALTY LIKELIHOOD
   #future.change.penalty.likelihood.instructions
   
+  #weight = TRANSMISSION.WEIGHT
+  
 )
+
+
+# OLD "FULL" LIKELIHOODS WE'RE NO LONGER USING 
+
+#-- FULL LIKELIHOOD, ADDED AIDS DIAGNOSES BACK --# ---- 
+# FULL.likelihood.instructions.with.aids =  join.likelihood.instructions(
+#   # POPULATION LIKELIHOODS
+#   population.likelihood.instructions, 
+#   immigration.likelihood.instructions, 
+#   emigration.likelihood.instructions,
+#   
+#   # TRANSMISSION LIKELIHOODS
+#   new.diagnoses.likelihood.instructions,
+#   prevalence.likelihood.instructions,
+#   
+#   # MORTALITY LIKELIHOODS
+#   hiv.mortality.likelihood.instructions,
+#   general.mortality.likelihood.instructions,
+#   aids.deaths.likelihood.instructions,
+#   
+#   # AIDS DIAGNOSES LIKELIHOOD
+#   non.age.aids.diagnoses.likelihood.instructions,
+#   
+#   # CONTINUUM LIKELIHOODS
+#   proportion.tested.likelihood.instructions,
+#   hiv.test.positivity.likelihood.instructions, 
+#   awareness.likelihood.instructions,
+#   suppression.likelihood.instructions,
+#   
+#   # PREP LIKELIHOODS
+#   prep.uptake.likelihood.instructions,
+#   prep.indications.likelihood.instructions,
+#   
+#   # IDU LIKELIHOODS
+#   heroin.likelihood.instructions,
+#   cocaine.likelihood.instructions
+# )
+
+
+
+#-- FULL LIKELIHOOD WITH COVID TESTING LIKELIHOOD ONLY --# ---- 
+# FULL.likelihood.instructions.with.covid.testing =  join.likelihood.instructions(
+#   # POPULATION LIKELIHOODS
+#   population.likelihood.instructions, 
+#   immigration.likelihood.instructions, 
+#   emigration.likelihood.instructions,
+#   
+#   # TRANSMISSION LIKELIHOODS
+#   new.diagnoses.likelihood.instructions,
+#   prevalence.likelihood.instructions,
+#   
+#   # MORTALITY LIKELIHOODS
+#   hiv.mortality.likelihood.instructions,
+#   general.mortality.likelihood.instructions,
+#   aids.deaths.likelihood.instructions,
+#   
+#   # AIDS DIAGNOSES LIKELIHOOD
+#   non.age.aids.diagnoses.likelihood.instructions,
+#   
+#   # CONTINUUM LIKELIHOODS
+#   proportion.tested.likelihood.instructions,
+#   hiv.test.positivity.likelihood.instructions, 
+#   awareness.likelihood.instructions,
+#   suppression.likelihood.instructions,
+#   
+#   # PREP LIKELIHOODS
+#   prep.uptake.likelihood.instructions,
+#   prep.indications.likelihood.instructions,
+#   
+#   # IDU LIKELIHOODS
+#   heroin.likelihood.instructions,
+#   cocaine.likelihood.instructions,
+#   
+#   # COVID TESTING LIKELIHOOD
+#   number.of.tests.year.on.year.change.likelihood.instructions
+#   
+# )
