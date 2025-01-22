@@ -32,7 +32,7 @@ data.manager$register.outcome(
     description = "Proportion of Men who have sex with Men"), denominator.outcome = 'population') 
 
 data.manager$register.outcome(
-  'proportion.tested.n',       
+  'proportion.tested.for.hiv.n',       
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'Denominator value for proportion tested in past year',
@@ -41,13 +41,13 @@ data.manager$register.outcome(
     description = "Denominator value for proportion tested in past year"))
 
 data.manager$register.outcome(
-  'proportion.tested', 
+  'proportion.tested.for.hiv', 
   metadata = create.outcome.metadata(
     scale = 'proportion',
     display.name = 'Proportion Tested in Past Year',
     axis.name = 'Proportion Tested in Past Year',
     units = '%',
-    description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
+    description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.for.hiv.n')
 
 #Register Sources:
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") #parent
@@ -70,7 +70,7 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
+    age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65+ years'),
     race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'other race', 'hispanic'),
     sex=c('male','female'),
     risk=c('msm', 'not_msm')
@@ -78,7 +78,9 @@ data.manager$register.ontology(
 
 #Codes:
 source('data_processing/syphilis.manager/cached.proportion.msm.R')
-source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested
+source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested.for.hiv
+source('data_processing/syphilis.manager/proportion.tested.for.hiv_state_weighted.R') #This is used for state level proportion.tested.for.hiv
+source('data_processing/syphilis.manager/proportion.tested.for.hiv_msa_weighted.R') #This is used for msa level proportion.tested.for.hiv
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
 
 #Save:

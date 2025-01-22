@@ -1,6 +1,3 @@
-#This is going into the Syphilis Manager for national proportion.msm data
-#And for national proportion.tested
-
 #library(haven)
 
 ################################################################################
@@ -11,13 +8,72 @@ DATA.DIR.BRFSS.STATE="../../data_raw/brfss/brfss_state"
 
 brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.names = "TRUE")
 
+#\\\\\\To show only individuals at risk of HIV in the denominator///////#
+#Un-comment line 14, comment out line 9
+#Un-comment line 259-262
+#brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = "risk", full.names = "TRUE")
+
 brfss_file_state_list <- lapply(brfss_file_state, function(x) {
   list(filename=x, data=read_xpt(x))
 })
 
 ################################################################################
-###Create mappings
+###Create state mapping bc the function isnt working but maybe there's 
+#another way in the locations package that I don't know
 ################################################################################
+state.to.fips.mappings = c('1' = 'AL',
+                           '2'='AK',
+                           '4'='AZ',
+                           '5'='AR',
+                           '6'='CA',
+                           '8'='CO',
+                           '9'='CT',
+                           '10'='DE',
+                           '11'='DC',
+                           '12'='FL',
+                           '13'='GA',
+                           '15'='HI',
+                           '16'='ID',
+                           '17'='IL',
+                           '18'='IN',
+                           '19'='IA',
+                           '20'='KS',
+                           '21'='KY',
+                           '22'='LA',
+                           '23'='ME',
+                           '24'='MD',
+                           '25'='MA',
+                           '26'='MI',
+                           '27'='MN',
+                           '28'='MS',
+                           '29'='MO',
+                           '30'='MT',
+                           '31'='NE',
+                           '32'='NV',
+                           '33'='NH',
+                           '34'='NJ',
+                           '35'='NM',
+                           '36'='NY',
+                           '37'='NC',
+                           '38'='ND',
+                           '39'='OH',
+                           '40'='OK',
+                           '41'='OR',
+                           '42'='PA',
+                           '44'='RI',
+                           '45'='SC',
+                           '46'='SD',
+                           '47'='TN',
+                           '48'='TX',
+                           '49'='UT',
+                           '50'='VT',
+                           '51'='VA',
+                           '53'='WA',
+                           '54'='WV',
+                           '55'='WI',
+                           '56'='WY',
+                           '72'= 'PR')
+
 brfss.sex.mappings = c('1' = 'male',
                        '2' = 'female',
                        '7' = NA,
@@ -51,7 +107,7 @@ brfss.age.mappings= c('1'= '18-24 years',
 ##Creating clean template of BRFSS state data##
 ##Outcome = proportion.tested
 ################################################################################
-data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
+data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
   
   data=file[["data"]] 
   filename = file[["filename"]] 
@@ -165,7 +221,7 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$ever.tested = data$HIVTST7
   }
   
-  data$location = "US"
+  data$location = state.to.fips.mappings[data$state_fips]
   data$outcome = "proportion.tested.for.hiv" 
   
   data$sex = brfss.sex.mappings[data$sex]
@@ -213,13 +269,21 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
   
   data$tested = as.numeric(data$tested)
   
+  
+  #\\\\\\To show only individuals at risk of HIV in the denominator///////#
+  #Un-comment line 259-262
+  # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
+  # data <- data %>%
+  #    rename(any_of(brfss_risk_var))
+  # data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
+  
   list(filename, data) 
 })
 ################################################################################
-##Total-by NATIONAL##
+##Total-by state##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.totals = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.state.totals = lapply(data.list.brfss.state.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -252,7 +316,7 @@ data.list.brfss.national.totals = lapply(data.list.brfss.national.clean, functio
 ##Sex-by state##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.sex = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.state.sex = lapply(data.list.brfss.state.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -286,7 +350,7 @@ data.list.brfss.national.sex = lapply(data.list.brfss.national.clean, function(f
 ##Age-by state##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.age = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.state.age = lapply(data.list.brfss.state.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -327,13 +391,13 @@ data.list.brfss.national.age = lapply(data.list.brfss.national.clean, function(f
 ##Race-by state##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.race = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.state.race = lapply(data.list.brfss.state.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
   
   data= subset(data, !is.na(data$race)) #Remove unknown race
-  data= subset(data, data$race != 'Unknown')
+  data= subset(data, data$race != 'unknown')
   
   data<- data %>%
     group_by(location, race) %>%
@@ -362,7 +426,7 @@ data.list.brfss.national.race = lapply(data.list.brfss.national.clean, function(
 ##Risk-by state-MSM Only##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.risk = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.state.risk = lapply(data.list.brfss.state.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -393,7 +457,7 @@ data.list.brfss.national.risk = lapply(data.list.brfss.national.clean, function(
 
 #Make a separate dataset for risk - this is what will get put into the manager#
 #Need to remove NAs for the put statement but need them in for the proportion calc below#
-data.list.brfss.national.risk.put = lapply(data.list.brfss.national.risk, function(file){
+data.list.brfss.state.risk.put = lapply(data.list.brfss.state.risk, function(file){
   
   data=file[[2]] 
   filename = file[[1]]
@@ -415,7 +479,7 @@ data.list.brfss.national.risk.put = lapply(data.list.brfss.national.risk, functi
 ##Outcome = proportion.tested.n
 #WEIGHTED
 ################################################################################
-data.list.brfss.national.n = lapply(data.list.brfss.national.totals, function(file){
+data.list.brfss.state.n = lapply(data.list.brfss.state.totals, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -434,7 +498,7 @@ data.list.brfss.national.n = lapply(data.list.brfss.national.totals, function(fi
 ##Outcome = proportion.tested.n
 #WEIGHTED
 ################################################################################
-data.list.brfss.national.sex.n = lapply(data.list.brfss.national.sex, function(file){
+data.list.brfss.state.sex.n = lapply(data.list.brfss.state.sex, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -453,7 +517,7 @@ data.list.brfss.national.sex.n = lapply(data.list.brfss.national.sex, function(f
 ##Outcome = proportion.tested.n
 #WEIGHTED
 ################################################################################
-data.list.brfss.national.age.n = lapply(data.list.brfss.national.age, function(file){
+data.list.brfss.state.age.n = lapply(data.list.brfss.state.age, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -472,7 +536,7 @@ data.list.brfss.national.age.n = lapply(data.list.brfss.national.age, function(f
 ##Outcome = proportion.tested.n
 #WEIGHTED
 ################################################################################
-data.list.brfss.national.race.n = lapply(data.list.brfss.national.race, function(file){
+data.list.brfss.state.race.n = lapply(data.list.brfss.state.race, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -492,7 +556,7 @@ data.list.brfss.national.race.n = lapply(data.list.brfss.national.race, function
 ##Outcome = proportion.tested.n
 #WEIGHTED
 ################################################################################
-data.list.brfss.national.risk.n = lapply(data.list.brfss.national.risk, function(file){
+data.list.brfss.state.risk.n = lapply(data.list.brfss.state.risk, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -511,10 +575,10 @@ data.list.brfss.national.risk.n = lapply(data.list.brfss.national.risk, function
 ##PUT INTO THE DATA MANAGER###
 #10 statements#
 ################################################################################
-#National-TOTAL-proportion.tested
-national.total.num = lapply(data.list.brfss.national.totals, `[[`, 2)  
+##State-TOTAL-proportion.tested
+state.total.num = lapply(data.list.brfss.state.totals, `[[`, 2)  
 
-for (data in national.total.num) {
+for (data in state.total.num) {
   
   data.manager$put.long.form(
     data = data,
@@ -525,10 +589,10 @@ for (data in national.total.num) {
     details = 'Behavioral Risk Factor Surveillance System')
 }
 
-##national-SEX-proportion.tested
-national.sex.num = lapply(data.list.brfss.national.sex, `[[`, 2)  
+##State-SEX-proportion.tested
+state.sex.num = lapply(data.list.brfss.state.sex, `[[`, 2)  
 
-for (data in national.sex.num) {
+for (data in state.sex.num) {
   
   data.manager$put.long.form(
     data = data,
@@ -538,10 +602,10 @@ for (data in national.sex.num) {
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
-##national-AGE-proportion.tested
-national.age.num = lapply(data.list.brfss.national.age, `[[`, 2)  
+##State-AGE-proportion.tested
+state.age.num = lapply(data.list.brfss.state.age, `[[`, 2)  
 
-for (data in national.age.num) {
+for (data in state.age.num) {
   
   data.manager$put.long.form(
     data = data,
@@ -551,10 +615,10 @@ for (data in national.age.num) {
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
-##national-RACE-proportion.tested
-national.race.num = lapply(data.list.brfss.national.race, `[[`, 2)  
+##State-RACE-proportion.tested
+state.race.num = lapply(data.list.brfss.state.race, `[[`, 2)  
 
-for (data in national.race.num) {
+for (data in state.race.num) {
   
   data.manager$put.long.form(
     data = data,
@@ -564,76 +628,10 @@ for (data in national.race.num) {
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
-##national-RISK-proportion.tested
-national.risk.num = lapply(data.list.brfss.national.risk.put, `[[`, 2)  
+##State-RISK-proportion.tested
+state.risk.num = lapply(data.list.brfss.state.risk.put, `[[`, 2)  
 
-for (data in national.risk.num) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-
-#####national-TOTAL-proportion.tested.N
-national.total.denom = lapply(data.list.brfss.national.n, `[[`, 2)  
-
-for (data in national.total.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######national-SEX-proportion.tested.N
-national.sex.denom = lapply(data.list.brfss.national.sex.n, `[[`, 2)  
-
-for (data in national.sex.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######national-AGE-proportion.tested.n
-national.age.denom = lapply(data.list.brfss.national.age.n, `[[`, 2)  
-
-for (data in national.age.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######national-RACE-proportion.tested.n
-national.race.denom = lapply(data.list.brfss.national.race.n, `[[`, 2)  
-
-for (data in national.race.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######national-RISK-proportion.tested.n
-national.risk.denom = lapply(data.list.brfss.national.risk.n, `[[`, 2)  
-
-for (data in national.risk.denom) {
+for (data in state.risk.num) {
   
   data.manager$put.long.form(
     data = data,
@@ -644,4 +642,246 @@ for (data in national.risk.denom) {
     details = 'Behavioral Risk Factor Surveillance System')
 }
 
+#####State-TOTAL-proportion.tested.N
+state.total.denom = lapply(data.list.brfss.state.n, `[[`, 2)  
+
+for (data in state.total.denom) {
   
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+######State-SEX-proportion.tested.N
+state.sex.denom = lapply(data.list.brfss.state.sex.n, `[[`, 2)  
+
+for (data in state.sex.denom) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+######State-AGE-proportion.tested.n
+state.age.denom = lapply(data.list.brfss.state.age.n, `[[`, 2)  
+
+for (data in state.age.denom) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+######State-RACE-proportion.tested.n
+state.race.denom = lapply(data.list.brfss.state.race.n, `[[`, 2)  
+
+for (data in state.race.denom) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+######State-RISK-proportion.tested.n
+state.risk.denom = lapply(data.list.brfss.state.risk.n, `[[`, 2)  
+
+for (data in state.risk.denom) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+# Create Variance for proportion.tested.n (Added April 2024) --------
+
+#Variance- Total -----------------------------------------------------
+variance.total.state = lapply(data.list.brfss.state.totals, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = proportion_tested*(1-proportion_tested)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance)%>%
+    rename(value = variance) #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+#Variance- Sex -----------------------------------------------------
+variance.sex.state = lapply(data.list.brfss.state.sex, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location, sex)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance, sex)%>%
+    rename(value = variance)
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+#Variance- Age -----------------------------------------------------
+variance.age.state = lapply(data.list.brfss.state.age, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location, age)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance, age)%>%
+    rename(value = variance)
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+#Variance - Race ---------------------------------------------------
+variance.race.state = lapply(data.list.brfss.state.race, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location, race)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance, race)%>%
+    rename(value = variance)
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+
+# Variance - Risk ---------------------------------------------------------
+
+variance.risk.state = lapply(data.list.brfss.state.risk.put, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+    group_by(year, location, risk)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance, risk)%>%
+    rename(value = variance)
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+# Put the variance data ---------------------------------------------------
+prop.tested.variance.state= lapply(variance.total.state, `[[`, 2)
+
+for (data in prop.tested.variance.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.tested.variance.sex.state= lapply(variance.sex.state, `[[`, 2)
+
+for (data in prop.tested.variance.sex.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.tested.variance.age.state= lapply(variance.age.state, `[[`, 2)
+
+for (data in prop.tested.variance.age.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.tested.variance.race.state= lapply(variance.race.state, `[[`, 2)
+
+for (data in prop.tested.variance.race.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.tested.variance.risk.state= lapply(variance.risk.state, `[[`, 2)
+
+for (data in prop.tested.variance.risk.state) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    metric = 'variance',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}

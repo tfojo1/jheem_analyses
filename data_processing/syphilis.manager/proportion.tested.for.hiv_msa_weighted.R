@@ -1,22 +1,25 @@
-#This is going into the Syphilis Manager for national proportion.msm data
-#And for national proportion.tested
-
 #library(haven)
 
 ################################################################################
 ###Read in BRFSS .xpt files
 ################################################################################
 
-DATA.DIR.BRFSS.STATE="../../data_raw/brfss/brfss_state"
+DATA.DIR.BRFSS.MSA="../../data_raw/brfss/brfss_msa"
 
-brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.names = "TRUE")
+brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".xpt", full.names = "TRUE")
 
-brfss_file_state_list <- lapply(brfss_file_state, function(x) {
+#\\\\\\To show only individuals at risk of HIV in the denominator///////#
+#Un-comment line 14, comment out line 9
+#Un-comment line 175-178
+#brfss_file_msa <- list.files(DATA.DIR.BRFSS.MSA, pattern = "risk", full.names = "TRUE")
+
+brfss_file_msa_list <- lapply(brfss_file_msa, function(x) {
   list(filename=x, data=read_xpt(x))
 })
 
 ################################################################################
-###Create mappings
+###Create state mapping bc the function isnt working but maybe there's 
+#another way in the locations package that I don't know
 ################################################################################
 brfss.sex.mappings = c('1' = 'male',
                        '2' = 'female',
@@ -48,37 +51,35 @@ brfss.age.mappings= c('1'= '18-24 years',
                       '14'= 'Unknown')
 
 ################################################################################
-##Creating clean template of BRFSS state data##
+##Creating clean template of BRFSS msa data##
 ##Outcome = proportion.tested
 ################################################################################
-data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
+data.list.brfss.msa.clean = lapply(brfss_file_msa_list, function(file){
   
   data=file[["data"]] 
   filename = file[["filename"]] 
   
-  #Change _state to character#
-  data$state_fips = as.character(data$`_STATE`)
-  data= subset(data, data$state_fips != "66")  #Removing Guam#
-  data= subset(data, data$state_fips != "78")  #Removing Virgin Islands#
+  #Format MSA for data manager#
+  data$location = paste("C", data$`_MMSA`, sep=".")
+  
+  ####Removing Invalid MSAs (instructed by Todd 11/9########
+  data <- data %>%
+    mutate(location_check = locations::is.location.valid(location))%>%
+    filter(location_check == "TRUE")
   
   #Create year variable#
-  if(grepl("2013", filename)) {
-    data$year = as.numeric("2013")
-    data$sex = as.character(data$SEX)
-    data$race = data$`_RACE`
-    data$age = data$`_AGEG5YR`  
-    data$risk = NA #No sexual orientation data for 2013#
-    data$ever.tested = data$HIVTST6
-  }
+  # if(grepl("2013", filename)) {
+  #   data$year = as.numeric("2013")
+  #   data$sex = as.character(data$SEX)
+  #   data$race = data$`_RACE`
+  #   data$age = data$`_AGEG5YR`
+  #   data$ever.tested = HIVTST6
+  # }
   if(grepl("2014", filename)) {
     data$year = as.numeric("2014")
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2015", filename)) {
@@ -86,10 +87,6 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA ))
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2016", filename)) {
@@ -97,11 +94,6 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA )) %>%
-      mutate(at_risk = if_else(HIVRISK4 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2017", filename)) {
@@ -109,11 +101,6 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$SEX)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data <- data %>%
-      mutate(risk = case_when(SEX== "1" & SXORIENT == "2" ~ "msm",
-                              SEX== "1" & SXORIENT == "3" ~ "msm",
-                              TRUE ~ NA )) %>%
-      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2018", filename)) {
@@ -121,9 +108,6 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$SEX1)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
-    data <- data %>%
-      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
     data$ever.tested = data$HIVTST6
   }
   if(grepl("2019", filename)) {
@@ -131,9 +115,6 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-    data <- data %>%
-      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
     data$ever.tested = data$HIVTST7
   }
   if(grepl("2020", filename)) {
@@ -141,9 +122,6 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
-    data <- data %>%
-      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
     data$ever.tested = data$HIVTST7
   }
   if(grepl("2021", filename)) {
@@ -151,7 +129,6 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE`
     data$age = data$`_AGEG5YR`
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
     data$ever.tested = data$HIVTST7
   }
   if(grepl("2022", filename)) {
@@ -159,14 +136,11 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
     data$sex = as.character(data$`_SEX`)
     data$race = data$`_RACE1`
     data$age = data$`_AGEG5YR`
-    data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA) 
-    data <- data %>%
-      mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
     data$ever.tested = data$HIVTST7
   }
   
-  data$location = "US"
-  data$outcome = "proportion.tested.for.hiv" 
+  #Create outcome#
+  data$outcome = "proportion.tested.for.hiv"  
   
   data$sex = brfss.sex.mappings[data$sex]
   data$age = brfss.age.mappings[data$age]
@@ -179,7 +153,7 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
   #HIVTSTD3 = date of last test
   #HIVTST7 (renamed 'ever.tested') = ever tested for HIV
   
-  data = subset(data, is.na(data$HIVTSTD3) | data$HIVTSTD3 != 999999) #Remove date of last HIV is refused
+  data = subset(data, is.na(data$HIVTSTD3) | data$HIVTSTD3 != 999999) #Remove date of last HIV is refused- *this is the issue*
   
   # Create 'tested' variable (used to determine if test is in past year)------------------------------------------------
   
@@ -213,25 +187,34 @@ data.list.brfss.national.clean = lapply(brfss_file_state_list, function(file){
   
   data$tested = as.numeric(data$tested)
   
+  
+  #\\\\\\To show only individuals at risk of HIV in the denominator///////#
+  #Un-comment line 175-178
+  # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
+  # data <- data %>%
+  #   rename(any_of(brfss_risk_var))
+  # data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
+  
+  
   list(filename, data) 
 })
 ################################################################################
-##Total-by NATIONAL##
+##Total-by msa##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.totals = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.msa.totals = lapply(data.list.brfss.msa.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
   
   data<- data %>%
     group_by(location) %>%
-    mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+    mutate(n_weighted = sum(`_MMSAWT`)) %>% #denominator should be the sum of weights#
     ungroup()
   
   data<- data %>%
     group_by(location) %>%
-    mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+    mutate(sum_tested = sum(tested*`_MMSAWT`)) %>% #multiply numerator value by the weight value#
     ungroup()%>%
     mutate(proportion_tested = (sum_tested/n_weighted))
   
@@ -241,18 +224,18 @@ data.list.brfss.national.totals = lapply(data.list.brfss.national.clean, functio
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, proportion_tested, value, `_LLCPWT`)
-  
+    select(outcome, year, location, sum_tested, n_weighted, value, `_MMSAWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
 })
 
 ################################################################################
-##Sex-by state##
+##Sex-by msa##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.sex = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.msa.sex = lapply(data.list.brfss.msa.clean, function(file){
+  
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -261,12 +244,12 @@ data.list.brfss.national.sex = lapply(data.list.brfss.national.clean, function(f
   
   data<- data %>%
     group_by(location, sex) %>%
-    mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+    mutate(n_weighted = sum(`_MMSAWT`)) %>% #denominator should be the sum of weights#
     ungroup()
   
   data<- data %>%
     group_by(location, sex) %>%
-    mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+    mutate(sum_tested = sum(tested*`_MMSAWT`)) %>% #multiply numerator value by the weight value#
     ungroup()%>%
     mutate(proportion_tested = (sum_tested/n_weighted)) #denominators needs to be sum of weights by location by sex#
   
@@ -276,17 +259,16 @@ data.list.brfss.national.sex = lapply(data.list.brfss.national.clean, function(f
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`)
-  
+    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_MMSAWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
 })
 ################################################################################
-##Age-by state##
+##Age-by msa##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.age = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.msa.age = lapply(data.list.brfss.msa.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -302,12 +284,12 @@ data.list.brfss.national.age = lapply(data.list.brfss.national.clean, function(f
   
   data<- data %>%
     group_by(location, age) %>%
-    mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+    mutate(n_weighted = sum(`_MMSAWT`)) %>% #denominator should be the sum of weights#
     ungroup()
   
   data<- data %>%
     group_by(location, age) %>%
-    mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+    mutate(sum_tested = sum(tested*`_MMSAWT`)) %>% #multiply numerator value by the weight value#
     ungroup()%>%
     mutate(proportion_tested = (sum_tested/n_weighted)) #denominators needs to be sum of weights by location by age#
   
@@ -317,32 +299,31 @@ data.list.brfss.national.age = lapply(data.list.brfss.national.clean, function(f
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, age, `_LLCPWT`)
-  
+    select(outcome, year, location, sum_tested, n_weighted, value, age, `_MMSAWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
 })
 ################################################################################
-##Race-by state##
+##Race-by msa##
 #WEIGHTED#
 ################################################################################
-data.list.brfss.national.race = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.msa.race = lapply(data.list.brfss.msa.clean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
   
   data= subset(data, !is.na(data$race)) #Remove unknown race
-  data= subset(data, data$race != 'Unknown')
+  data= subset(data, data$race != 'unknown')
   
   data<- data %>%
     group_by(location, race) %>%
-    mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+    mutate(n_weighted = sum(`_MMSAWT`)) %>% #denominator should be the sum of weights#
     ungroup()
   
   data<- data %>%
     group_by(location, race) %>%
-    mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+    mutate(sum_tested = sum(tested*`_MMSAWT`)) %>% #multiply numerator value by the weight value#
     ungroup()%>%
     mutate(proportion_tested = (sum_tested/n_weighted)) #denominators needs to be sum of weights by location by race#
   
@@ -352,70 +333,25 @@ data.list.brfss.national.race = lapply(data.list.brfss.national.clean, function(
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, race, tested, `_LLCPWT`)
-  
+    select(outcome, year, location, sum_tested, n_weighted, value, race, `_MMSAWT`)
   data= as.data.frame(data)
   
   list(filename, data) 
 })
 ################################################################################
-##Risk-by state-MSM Only##
-#WEIGHTED#
 ################################################################################
-data.list.brfss.national.risk = lapply(data.list.brfss.national.clean, function(file){
-  
-  data=file[[2]] 
-  filename = file[[1]] 
-  
-  data<- data %>%
-    group_by(location, risk) %>%
-    mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
-    ungroup()
-  
-  data<- data %>%
-    group_by(location, risk) %>%
-    mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
-    ungroup()%>%
-    mutate(proportion_tested = (sum_tested/n_weighted)) #denominators needs to be sum of weights by location by risk#
-  
-  data$proportion_tested = round(data$proportion_tested, digits=2)
-  
-  data$year = as.character(data$year)
-  data$value = data$proportion_tested
-  
-  data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, risk, `_LLCPWT`)
-  
-  data= as.data.frame(data)
-  
-  list(filename, data) 
-})
 
-#Make a separate dataset for risk - this is what will get put into the manager#
-#Need to remove NAs for the put statement but need them in for the proportion calc below#
-data.list.brfss.national.risk.put = lapply(data.list.brfss.national.risk, function(file){
-  
-  data=file[[2]] 
-  filename = file[[1]]
-  
-  data <- data %>%
-    filter(risk == "msm")
-  
-  data= as.data.frame(data)
-  list(filename, data) 
-})
-################################################################################
-################################################################################
 
 ##Create outcome for the denominator value -> proportion.tested.n##
-#WEIGHTED
+#WEIGHTED#
 
 
 ################################################################################
+#Total
 ##Outcome = proportion.tested.n
-#WEIGHTED
+#WEIGHTED#
 ################################################################################
-data.list.brfss.national.n = lapply(data.list.brfss.national.totals, function(file){
+data.list.brfss.msa.n = lapply(data.list.brfss.msa.totals, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -432,9 +368,9 @@ data.list.brfss.national.n = lapply(data.list.brfss.national.totals, function(fi
 ################################################################################
 ##Sex
 ##Outcome = proportion.tested.n
-#WEIGHTED
+#WEIGHTED#
 ################################################################################
-data.list.brfss.national.sex.n = lapply(data.list.brfss.national.sex, function(file){
+data.list.brfss.msa.sex.n = lapply(data.list.brfss.msa.sex, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -451,9 +387,9 @@ data.list.brfss.national.sex.n = lapply(data.list.brfss.national.sex, function(f
 ################################################################################
 ##age
 ##Outcome = proportion.tested.n
-#WEIGHTED
+#WEIGHTED#
 ################################################################################
-data.list.brfss.national.age.n = lapply(data.list.brfss.national.age, function(file){
+data.list.brfss.msa.age.n = lapply(data.list.brfss.msa.age, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -470,9 +406,8 @@ data.list.brfss.national.age.n = lapply(data.list.brfss.national.age, function(f
 ################################################################################
 ##race
 ##Outcome = proportion.tested.n
-#WEIGHTED
 ################################################################################
-data.list.brfss.national.race.n = lapply(data.list.brfss.national.race, function(file){
+data.list.brfss.msa.race.n = lapply(data.list.brfss.msa.race, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -488,160 +423,258 @@ data.list.brfss.national.race.n = lapply(data.list.brfss.national.race, function
 })
 
 ################################################################################
-##risk
-##Outcome = proportion.tested.n
-#WEIGHTED
+##PUT INTO THE DATA MANAGER###
+#8 put statements#
 ################################################################################
-data.list.brfss.national.risk.n = lapply(data.list.brfss.national.risk, function(file){
+##msa-TOTAL-proportion.tested
+msa.total.num = lapply(data.list.brfss.msa.totals, `[[`, 2)  
+
+for (data in msa.total.num) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+##msa-SEX-proportion.tested
+msa.sex.num = lapply(data.list.brfss.msa.sex, `[[`, 2)  
+
+for (data in msa.sex.num) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+##msa-AGE-proportion.tested
+msa.age.num = lapply(data.list.brfss.msa.age, `[[`, 2)  
+
+for (data in msa.age.num) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+##msa-RACE-proportion.tested
+msa.race.num = lapply(data.list.brfss.msa.race, `[[`, 2)  
+
+for (data in msa.race.num) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+#####msa-TOTAL-proportion.tested.N
+msa.total.denom = lapply(data.list.brfss.msa.n, `[[`, 2)  
+
+for (data in msa.total.denom) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+######msa-SEX-proportion.tested.N
+msa.sex.denom = lapply(data.list.brfss.msa.sex.n, `[[`, 2)  
+
+for (data in msa.sex.denom) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+######msa-AGE-proportion.tested.n
+msa.age.denom = lapply(data.list.brfss.msa.age.n, `[[`, 2)  
+
+for (data in msa.age.denom) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+######msa-RACE-proportion.tested.n
+msa.race.denom = lapply(data.list.brfss.msa.race.n, `[[`, 2)  
+
+for (data in msa.race.denom) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'brfss',
+    source = 'brfss',
+    dimension.values = list(),
+    url = 'https://www.cdc.gov/brfss/index.html',
+    details = 'Behavioral Risk Factor Surveillance System')
+}
+
+
+# Create Variance for proportion.tested.n (Added April 2024) --------
+
+#Variance- Total -----------------------------------------------------
+variance.total = lapply(data.list.brfss.msa.totals, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
   
-  data$outcome = "proportion.tested.for.hiv.n"
-  data$value = data$n_weighted #replace the "population" calculated above as the outcome value
-  
   data <- data %>%
-    select(outcome, year, location, risk, value)%>% 
-    filter(risk == "msm")
+    mutate(weight_squared = ((`_MMSAWT`)^2))%>%
+    group_by(year, location)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance)%>%
+    rename(value = variance) #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
+  
+  data<- data[!duplicated(data), ]
   
   data= as.data.frame(data)
   list(filename, data) 
 })
-################################################################################
-##PUT INTO THE DATA MANAGER###
-#10 statements#
-################################################################################
-#National-TOTAL-proportion.tested
-national.total.num = lapply(data.list.brfss.national.totals, `[[`, 2)  
+#Variance- Sex -----------------------------------------------------
+variance.sex = lapply(data.list.brfss.msa.sex, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(weight_squared = ((`_MMSAWT`)^2))%>%
+    group_by(year, location, sex)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance, sex)%>%
+    rename(value = variance) #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+#Variance- Age -----------------------------------------------------
+variance.age = lapply(data.list.brfss.msa.age, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(weight_squared = ((`_MMSAWT`)^2))%>%
+    group_by(year, location, age)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance, age)%>%
+    rename(value = variance) #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
 
-for (data in national.total.num) {
+#Variance - Race ---------------------------------------------------
+variance.race = lapply(data.list.brfss.msa.race, function(file){
+  
+  data=file[[2]] 
+  filename = file[[1]] 
+  
+  data <- data %>%
+    mutate(weight_squared = ((`_MMSAWT`)^2))%>%
+    group_by(year, location, race)%>%
+    mutate(sum_each_sq_weight = sum(weight_squared))%>%
+    ungroup()%>%
+    mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+    select(year, location, outcome, variance, race)%>%
+    rename(value = variance) #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
+  
+  data<- data[!duplicated(data), ]
+  
+  data= as.data.frame(data)
+  list(filename, data) 
+})
+
+
+# Put the variance data ---------------------------------------------------
+prop.tested.variance= lapply(variance.total, `[[`, 2)
+
+for (data in prop.tested.variance) {
   
   data.manager$put.long.form(
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
+    metric = 'variance',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
 
-##national-SEX-proportion.tested
-national.sex.num = lapply(data.list.brfss.national.sex, `[[`, 2)  
+prop.tested.variance.sex= lapply(variance.sex, `[[`, 2)
 
-for (data in national.sex.num) {
+for (data in prop.tested.variance.sex) {
   
   data.manager$put.long.form(
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
+    metric = 'variance',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
-##national-AGE-proportion.tested
-national.age.num = lapply(data.list.brfss.national.age, `[[`, 2)  
 
-for (data in national.age.num) {
+prop.tested.variance.age= lapply(variance.age, `[[`, 2)
+
+for (data in prop.tested.variance.age) {
   
   data.manager$put.long.form(
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
+    metric = 'variance',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
-##national-RACE-proportion.tested
-national.race.num = lapply(data.list.brfss.national.race, `[[`, 2)  
 
-for (data in national.race.num) {
+prop.tested.variance.race= lapply(variance.race, `[[`, 2)
+
+for (data in prop.tested.variance.race) {
   
   data.manager$put.long.form(
     data = data,
     ontology.name = 'brfss',
     source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-##national-RISK-proportion.tested
-national.risk.num = lapply(data.list.brfss.national.risk.put, `[[`, 2)  
-
-for (data in national.risk.num) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
+    metric = 'variance',
     dimension.values = list(),
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
 
-#####national-TOTAL-proportion.tested.N
-national.total.denom = lapply(data.list.brfss.national.n, `[[`, 2)  
 
-for (data in national.total.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######national-SEX-proportion.tested.N
-national.sex.denom = lapply(data.list.brfss.national.sex.n, `[[`, 2)  
 
-for (data in national.sex.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######national-AGE-proportion.tested.n
-national.age.denom = lapply(data.list.brfss.national.age.n, `[[`, 2)  
-
-for (data in national.age.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######national-RACE-proportion.tested.n
-national.race.denom = lapply(data.list.brfss.national.race.n, `[[`, 2)  
-
-for (data in national.race.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-######national-RISK-proportion.tested.n
-national.risk.denom = lapply(data.list.brfss.national.risk.n, `[[`, 2)  
-
-for (data in national.risk.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
-
-  
