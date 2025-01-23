@@ -201,6 +201,7 @@ source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/msa_immigration.R')
 source('data_processing/syphilis.manager/national_immigration.R')
+source('data_processing/syphilis.manager/inadequate.prenatal.care.R')
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
