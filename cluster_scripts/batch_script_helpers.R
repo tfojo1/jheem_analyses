@@ -1,6 +1,7 @@
-
-OUTPUT.DIR = "../jheem_analyses/cluster_scripts/outputs"
-MODULE.LOAD.COMMANDS = c('source cluster_scripts/Rockfish_module_loads.sh')
+# Get the absolute path to jheem_analyses directory
+JHEEM_DIR = file.path("/scratch4/pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses")
+OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs")
+MODULE.LOAD.COMMANDS = c('source cluster_scripts/rockfish_module_loads.sh')
 
 make.sbatch.script <- function(filename,
                                mem='16GB',
@@ -59,20 +60,26 @@ make.setup.scripts <- function(locations,
                                account='pkasaie1',
                                mem='16G')
 {
-    if (!dir.exists(file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code), extension=".out")))
-        dir.create(file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code), extension=".out"))
+    # Create output directories for each location
     for (location in locations) {
-        if (!dir.exists(file.path(dir, version, location)))
-            dir.create(file.path(dir, version,location), recursive=T)
+        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code))
+        if (!dir.exists(output_path))
+            dir.create(output_path, recursive=TRUE)
+            
+        # Create script directories
+        script_path <- file.path(dir, version, location)
+        if (!dir.exists(script_path))
+            dir.create(script_path, recursive=TRUE)
+            
+        # Create the batch script
         make.sbatch.script(filename=file.path(dir, version, location, get.setup.filename(calibration.code)),
                            mem=mem,
-                           output = file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code), extension=".out"),
+                           output = file.path(output_path, ".out"),
                            partition = partition,
                            time.hours = 12,
                            account=account,
                            commands= paste("Rscript cluster_scripts/set_up_calibration.R", version, location, calibration.code, specification.path, register.calibration.path))
     }
-    
 }
 
 #' @inheritParams make.setup.scripts
@@ -87,11 +94,20 @@ make.run.scripts <- function(locations,
                              account='pkasaie1',
                              mem='16G')
 {
-    if (!dir.exists(file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out"))))
-        dir.create(file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out")))
     for (location in locations) {
-        if (!dir.exists(file.path(dir, version, location)))
-            dir.create(file.path(dir, version, location), recursive=T)
+        # Create output directories for each location/chain combination
+        for (chain in chains) {
+            output_path <- file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out"))
+            if (!dir.exists(output_path))
+                dir.create(output_path, recursive=TRUE)
+        }
+        
+        # Create script directories
+        script_path <- file.path(dir, version, location)
+        if (!dir.exists(script_path))
+            dir.create(script_path, recursive=TRUE)
+            
+        # Create batch scripts for each chain
         for (chain in chains) {
             make.sbatch.script(filename=file.path(dir, version, location, get.run.filename(calibration.code, chain)),
                                job.name = paste0("run_", version, "_", location, "_", calibration.code, "_", chain),
@@ -114,6 +130,10 @@ make.setup.master.script <- function(name.for.script,
                                      master.dir="cluster_scripts/master_scripts/setup",
                                      dir="cluster_scripts/setup_scripts",
                                      overwrite=F) {
+    # Create master directory if it doesn't exist
+    if (!dir.exists(master.dir))
+        dir.create(master.dir, recursive=TRUE)
+        
     error.prefix = "Cannot make.setup.master.script': "
     filename.with.extension = paste0(name.for.script, ".bat")
     if (file.exists(file.path(master.dir, filename.with.extension)) && !overwrite)
@@ -121,7 +141,7 @@ make.setup.master.script <- function(name.for.script,
     sink(file.path(master.dir, filename.with.extension))
     cat("#!/bin/bash\n\n")
     for (location in locations) {
-        cat("sbatch ", file.path(dir, location, version, get.setup.filename(calibration.code)), "\n", sep="")
+        cat("sbatch ", file.path(dir, version, location, get.setup.filename(calibration.code)), "\n", sep="")
     }
     sink()
 }
@@ -134,6 +154,10 @@ make.run.master.script <- function(name.for.script,
                                    master.dir="cluster_scripts/master_scripts/run",
                                    dir="cluster_scripts/run_scripts",
                                    overwrite=F) {
+    # Create master directory if it doesn't exist
+    if (!dir.exists(master.dir))
+        dir.create(master.dir, recursive=TRUE)
+        
     error.prefix = "Cannot make.run.master.script': "
     filename.with.extension = paste0(name.for.script, ".bat")
     if (file.exists(file.path(master.dir, filename.with.extension)) && !overwrite)
@@ -142,7 +166,7 @@ make.run.master.script <- function(name.for.script,
     cat("#!/bin/bash\n\n")
     for (location in locations) {
         for (chain in chains) {
-            cat("sbatch ", file.path(dir, location, version, get.run.filename(calibration.code, chain)), "\n", sep="")
+            cat("sbatch ", file.path(dir, version, location, get.run.filename(calibration.code, chain)), "\n", sep="")
         }
     }
     sink()
@@ -169,9 +193,13 @@ make.combined.assemble.script <- function(name.for.result,
                                           account="pkasaie1",
                                           mem="24G",
                                           overwrite=F) {
+    # Create assemble directory if it doesn't exist
+    if (!dir.exists(dir))
+        dir.create(dir, recursive=TRUE)
+        
     error.prefix = "Cannot make.combined.assemble.script': "
     if (!dir.exists(file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out"))))
-        dir.create(file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out")))
+        dir.create(file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out")), recursive=TRUE)
     
     if (file.exists(file.path(dir, paste0("assemble_", name.for.result, ".bat"))) && !overwrite)
         stop(paste0(error.prefix, "there is already a '", name.for.result, "' at this location. Use 'overwrite=T' to proceed anyway"))
@@ -186,7 +214,6 @@ make.combined.assemble.script <- function(name.for.result,
                        time.hours = 12,
                        account=account,
                        commands = all.commands)
-    
 }
 
 # HELPERS ----
