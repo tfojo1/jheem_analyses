@@ -192,7 +192,7 @@ for (data in msm.state.total) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.msm',
     source = 'brfss',
     dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -206,7 +206,7 @@ for (data in msm.state.race) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.msm',
     source = 'brfss',
     dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
@@ -220,7 +220,7 @@ for (data in msm.state.age) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.msm',
     source = 'brfss',
     dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
