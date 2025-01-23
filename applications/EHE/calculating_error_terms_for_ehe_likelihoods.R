@@ -14,7 +14,7 @@ calculate.error.terms(data.type = "suppression",
                       data.source.2 = "lhd",
                       is.cv = F)
 
-# DIAGNOSES:  0.05368198
+# DIAGNOSES:  0.05368198 (should be 0.04514847)
 calculate.lhd.error.terms("diagnoses")
 # OLD VALUE: 0.04621778
 calculate.error.terms(data.type = "diagnoses",
@@ -69,13 +69,13 @@ calculate.lhd.error.terms = function(data.type){
 
   cvs.1 = (all.values1 - all.values2)/all.values1 
   #names(cvs.1) = lhd.data$MSA
-  cvs.1 = cvs.1[all.values.1>100]
+  cvs.1 = cvs.1[all.values1>100]
   
   #sort(abs(cvs.1))
   print(sum(!is.na(cvs.1)))
   
   cvs.2 = (all.values1 - all.values2)/all.values2
-  cvs.2 = cvs.2[all.values.1>100]
+  cvs.2 = cvs.2[all.values1>100]
   
   cvs = c(cvs.1,cvs.2)
   cvs[is.nan(cvs)] = 0
