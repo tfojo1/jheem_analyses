@@ -76,6 +76,17 @@ data.manager$register.ontology(
     risk=c('msm', 'not_msm')
   ))
 
+data.manager$register.ontology(
+  'brfss.msm',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
+    race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'other race', 'hispanic'),
+    sex=c('male','female'),
+    risk=c('msm', 'not_msm')
+  ))
+
 #Codes:
 source('data_processing/syphilis.manager/cached.proportion.msm.R')
 source('data_processing/syphilis.manager/brfss_national_weighted_tested.R') #This is used for national level proportion.tested.for.hiv

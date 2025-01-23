@@ -60,7 +60,7 @@ for (data in prop.msm.brfss) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'brfss',
+    ontology.name = 'brfss.msm',
     source = 'brfss',
     dimension.values = list(sex = "male"),
     url = 'https://www.cdc.gov/brfss/index.html',
