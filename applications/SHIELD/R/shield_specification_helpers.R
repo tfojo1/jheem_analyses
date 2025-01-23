@@ -979,7 +979,6 @@ oes.to.proportions <- function(oes, population)
 
 
 get.hiv.testing.functional.form = function(specification.metadata){
-  
   testing.prior = get.cached.object.for.version(name = "testing.prior",
                                                 version = specification.metadata$version) 
   
@@ -1076,3 +1075,55 @@ get.emigration.rates <- function(location, specification.metadata, population.ye
   
   c(emigration.rates)
 }  
+
+
+
+
+#'@PK: to review 
+get.fraction.over.age <- function(location,
+                                  specification.metadata,
+                                  age,
+                                  denom.age.bracket.index="", #if it has a value, we dont loop over all ages 
+                                  years=DEFAULT.POPULATION.YEARS)
+{
+  counties = locations::get.contained.locations(location, 'COUNTY')
+  n.per = prod(sapply(specification.metadata$dim.names[c('race','sex')], length))
+  
+  #should we use a single age index in the denominator or loop over all? 
+  if (denom.age.bracket.index>"") nIndex=denom.age.bracket.index
+  else nIndex = 1:specification.metadata$n.ages
+  
+  rv = t(sapply(nIndex, function(i){
+    
+    if (specification.metadata$age.upper.bounds[i]<=age)
+      rep(0, n.per)
+    else if (specification.metadata$age.lower.bounds[i]>=age)
+      rep(1,n.per)
+    else
+    {
+      ages = specification.metadata$age.lower.bounds[i]:(specification.metadata$age.upper.bounds[i]-1)
+      
+      pop = CENSUS.MANAGER$pull(outcome='population',
+                                dimension.values = list(location=counties,
+                                                        year=years,
+                                                        age=paste0(ages, ' years')),
+                                keep.dimensions = c('age','sex','race','ethnicity'),
+                                from.ontology.names = 'census')
+      
+      age.brackets = make.age.strata.names(endpoints = c(ages[1], age, ages[length(ages)]))
+      
+      pop2 = map.value.ontology(pop, 
+                                target.dim.names = c(list(age=age.brackets),
+                                                     specification.metadata$dim.names[c('race','sex')]))
+      
+      pop2[2,,] / colSums(pop2)
+    }
+  }))
+  
+  dim.names = specification.metadata$dim.names[c('age','race','sex')] 
+  dim.names$age = dim.names$age[nIndex] #subset correct ages 
+  dim(rv) = sapply(dim.names, length)
+  dimnames(rv) = dim.names
+  
+  rv
+}

@@ -639,15 +639,37 @@ register.model.element(SHIELD.SPECIFICATION,
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
+                    applies.to = list('continuum'='undiagnosed'),
                     from.compartments = 'primary',
                     to.compartments = 'secondary',
-                    value = expression(1/duration.primary))
+                    value = expression(1/duration.primary * (1-proportion.diagnosed.primary)) ,
+                    tag = 'primary to secondary undiagnosed')
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
+                    applies.to = list('continuum'='undiagnosed'),
                     groups = 'infected',
                     from.compartments = 'secondary',
                     to.compartments = 'early.latent',
-                    value = expression(1/duration.secondary))
+                    value = expression(1/duration.secondary * (1-proportion.diagnosed.secondary)),
+                    tag = 'secondary to EL undiagnosed')
+
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    applies.to = list('continuum'='diagnosed.untreated'),
+                    from.compartments = 'primary',
+                    to.compartments = 'secondary',
+                    value = 48 , #'@PK: to ensure that they can't remain in this stage 
+                    tag = 'primary to secondary diagnosed')
+
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    applies.to = list('continuum'='diagnosed.untreated'),
+                    groups = 'infected',
+                    from.compartments = 'secondary',
+                    to.compartments = 'early.latent',
+                    value = 48,#'@PK: to ensure that they can't remain in this stage 
+                    tag = 'secondary to EL diagnosed')
 ### Relapse:
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prop.el.to.secondary',
@@ -746,7 +768,7 @@ register.model.element.values(SHIELD.SPECIFICATION,
                               'prp.asymptomatic.secondary.female'=SHIELD_BASE_PARAMETER_VALUES['prp.asymptomatic.secondary.female'] ,
                               scale = 'rate')
 
-##primary
+##primary #@PK: to remove this
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.asymptomatic',
                         value = 0) 
@@ -775,27 +797,63 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'prp.asymptomatic',
                                applies.to = list(stage='secondary',sex='female'),
                                value = 'prp.asymptomatic.secondary.female')  
-#latent (1 for all)
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.asymptomatic',
-                               applies.to = list(stage=c('early.latent','late.latent')),
-                               value = SHIELD_BASE_PARAMETER_VALUES['prp.asymptomatic.latent']) 
-#tertiary and CNS (0 for all)
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.asymptomatic',
-                               applies.to = list(stage=c('tertiary','cns')),
-                               value = SHIELD_BASE_PARAMETER_VALUES['prp.asymptomatic.tertiary.cns']) 
+
 # Symptomatic testing rates:
 # baseline testing rate * prp symptomatic
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'rate.testing.symptomatic.base',
-                       scale = 'rate',
-                       value = SHIELD_BASE_PARAMETER_VALUES['rate.testing.symptomatic.base'])
+# (1-proportion.diagnosed.primary)
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.testing.symptomatic',
-                        scale = 'rate',
-                        value = expression(rate.testing.symptomatic.base * (1-prp.asymptomatic)))
+                       name = 'rate.testing.symptomatic',
+                       scale = 'rate',
+                       value = 0)
 
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                        name = 'rate.testing.symptomatic',
+                        applies.to = list(stage='primary'),
+                        value = expression(1/duration.primary * proportion.diagnosed.primary))
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'rate.testing.symptomatic',
+                               applies.to = list(stage='secondary'),
+                               value = expression(1/duration.secondary * proportion.diagnosed.secondary))
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'proportion.diagnosed.primary',
+                        scale = 'proportion',
+                        value =0)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                        name = 'proportion.diagnosed.primary',
+                        applies.to = list(stage='primary'),
+                        value = expression(1-prp.asymptomatic)) #*sensitivity of test in primary * care seeking behavior
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'proportion.diagnosed.secondary',
+                        scale = 'proportion',
+                        value =0)
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'proportion.diagnosed.secondary',
+                               applies.to = list(stage='secondary'),
+                               value = expression(1-prp.asymptomatic)) #*sensitivity of test in primary * care seeking behavior
+
+register.model.element(SHIELD.SPECIFICATION,
+                        name = 'rate.testing.tertiary',
+                        scale = 'rate',
+                        value =12) #average of 1month
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'rate.testing.cns',
+                       scale = 'rate',
+                       value =12) #average of 1month
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                        name = 'rate.testing.symptomatic',
+                        applies.to = list(stage=c('tertiary')),
+                        value ='rate.testing.tertiary' )
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'rate.testing.symptomatic',
+                               applies.to = list(stage=c('cns')),
+                               value ='rate.testing.cns' )
 
 ##---- 2-SCREENING FOR ALL ----
 
@@ -885,6 +943,8 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         value = 1)
 
 ###---- Delayed treatment:
+#@'Todd: we want these prople to move from primary.undiagnosed to secondary.diagnosed.untreated 
+#but transitions dont move in multiple dimensions 
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'continuum',
                     groups = 'infected',
@@ -895,7 +955,7 @@ register.transition(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.treated.with.delay',
                        scale = 'rate',
-                       value = 1) # TBD: how long will it take for someone to get treated after a positive diagnosis?
+                       value = 1) # TBD: how long will it take for someone to get treated after a positive diagnosis? #'@PK
 
 register.remission(SHIELD.SPECIFICATION,
                    applies.to = list(continuum = 'diagnosed.untreated'),
@@ -937,6 +997,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex'),
                          
 )
+
 
 ##---- Fertility Rate ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
@@ -992,21 +1053,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       exclude.tags = 'emigration',
 )
 
-## Incidence ---- 
-# (new infections + reinfections)
-track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name = 'incidence',
-                      outcome.metadata = create.outcome.metadata(display.name = 'Incidence',
-                                                                 description = 'Number of Individuals Infected with Syphilis in the Past Year',
-                                                                 scale = 'non.negative.number',
-                                                                 axis.name = 'Cases',
-                                                                 units = 'cases',
-                                                                 singular.unit = 'case'),
-                      dynamic.quantity.name = 'incidence.from', # use of '.from' helps us track where individuals are coming from (differentiate new vs re-infections)
-                      keep.dimensions = c('location','age','race','sex','profile')
-)
-
-##---- MIGRATION ----
+##---- Migration ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'immigration',
                       outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
@@ -1031,22 +1078,98 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       include.tags = "emigration",
                       keep.dimensions = c('location','age','race','sex'))
 
-##---- Treatment Initiations ----
-## Immediate and Delayed
+##---- HIV Testing -----
+## ---- HIV testing:
+# track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
+#                                       name = 'hiv.testing',
+#                                       outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
+#                                                                                  description = "The Proportion of General Population who Received an HIV Test in the Past Year",
+#                                                                                  scale = 'proportion',
+#                                                                                  axis.name = 'Proportion Tested',
+#                                                                                  units = '%'),
+#                                       rate.value = 'rate.testing.hiv.over.18',  
+#                                       denominator.outcome =  'population.over.18',
+#                                       keep.dimensions = c('location','age','race','sex'),
+#                                       corresponding.data.outcome = 'proportion.tested', #'@Zoe: can you please rename this to proportion.hiv.tested?
+#                                       subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-64 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
+#                                       rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
+#                                       save = T) #'@Todd: ERROR
+### RATE.VALUE:
+# SHILED agegroups are: ('0-14', '15-19','20-24','25-34','35-44','45-54','55-64','65+')
+# BRFSS data includes '18-24','25-29','30-34',....
+# we need to calculate the number of tests done among 18-19 year olds in SHIELD and calibrate it to '18-19' in BRFSS
+# Here is the Math: 
+#RATE(18,19)= nTESTS(18,19)/POP(18,19) : rate of tests done among 18-19 year olds is calculated by dividing the number of tests done among that population
+#nTESTS(15-19)= RATE(15-19)* POP(15-19) : number of tests done among 15-19 year olds is calculated by multiplying the rate of tests done among that population
+#nTESTS(18-19/15-19)  = nTESTS(15-19) * fraction.hiv.tests.18.19.among.15.19 / POP(18,19)
+#                     = RATE(15-19)* POP(15-19) * fraction.hiv.tests.18.19.among.15.19 / POP(18,19)
+#                     = fraction.hiv.tests.18.19.among.15.19 * RATE(15-19) * 1/fraction.18.19.among.15.19 
+# so we need to compute: fraction.18.19.among.15.19: which is the fraction of 15-19 year olds that are 18-19 years old
+# we can estimate fraction.hiv.tests.18.19.among.15.19 from CDC data
+
+ 
+# what fraction of 15-19 year olds are 18-19 years?
+register.model.element(SHIELD.SPECIFICATION,
+                       'fraction.population.18.19.among.15.19',  
+                       scale = 'proportion',
+                       get.value.function = get.fraction.over.age,
+                       age = 18,
+                       denom.age.bracket.index=2 # sets the denominator to age.index=2 [15-19]
+                       )
+
+#what fraction of CDC supported HIV tests among 15-19 years oldes were done by those age 18-19?
+register.model.element(SHIELD.SPECIFICATION,
+                       'fraction.hiv.tests.18.19.among.15.19',
+                       scale = 'proportion',
+                       value = SHIELD_BASE_PARAMETER_VALUES['fraction.hiv.tests.18.19.among.15.19'], 
+                       ) #comes from CDC #@PK: to be checked 
+
+# Build the quantity that we want to integrate in outputs:
+register.model.quantity(SHIELD.SPECIFICATION,
+                        'rate.testing.hiv.over.18', 
+                        value = 'rate.testing.hiv' )
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                        'rate.testing.hiv.over.18',
+                        applies.to = list('age'='15-19'),
+                        value = expression(rate.testing.hiv * fraction.hiv.tests.18.19.among.15.19 / fraction.population.18.19.among.15.19))
+
+### DENOMINATOR.OUTCOME: 
+# we need to track the population over age of 18
+
+register.model.element(SHIELD.SPECIFICATION,
+                       'fraction.population.over.18',  
+                       scale = 'proportion',
+                       get.value.function = get.fraction.over.age,
+                       age = 18,
+                       denom.age.bracket.index=""
+                       ) #since we didnt supply a denominator.age.index, it will loop over all ages and returns a vector of fractions
+
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'population.over.18',
+                         value = expression(population * fraction.population.over.18),
+                         scale = 'non.negative.number',
+                         keep.dimensions = c('location','age','race','sex'),
+                         save = F,
+                         subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-64 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
+                         rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
+                         outcome.metadata = NULL)
+
+
+##---- Syphilis Incidence ---- 
+# (new infections + reinfections)
 track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name = 'trt.initiation',
-                      outcome.metadata = create.outcome.metadata(display.name = 'Treatment Initiation',
-                                                                 description = 'Number of Individuals Starting Treatment in the Past Year',
+                      name = 'incidence',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Incidence',
+                                                                 description = 'Number of Individuals Infected with Syphilis in the Past Year',
                                                                  scale = 'non.negative.number',
                                                                  axis.name = 'Cases',
                                                                  units = 'cases',
                                                                  singular.unit = 'case'),
-                      dynamic.quantity.name = 'remission.from', #where they come from
-                      keep.dimensions = c('location','age','race','sex','stage')
+                      dynamic.quantity.name = 'incidence.from', # use of '.from' helps us track where individuals are coming from (differentiate new vs re-infections)
+                      keep.dimensions = c('location','age','race','sex','profile')
 )
-
-
-##---- Diagnosis ----
+##---- Syphilis Diagnosis ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'diagnosis.total',
                       outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals with a Diagnosis of Non-Congenital Syphilis in the Past Year',
@@ -1161,6 +1284,22 @@ register.model.element(SHIELD.SPECIFICATION,
 #                                       corresponding.data.outcome = 'proportion.tested',
 #                                       rename.dimension.values = list(age=c('13-24 years'='18-24 years')),
 #                                       save = T)
+##---- Syphilis Treatment Initiations ----
+## Immediate and Delayed
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'trt.initiation',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Treatment Initiation',
+                                                                 description = 'Number of Individuals Starting Treatment in the Past Year',
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      dynamic.quantity.name = 'remission.from', #where they come from
+                      keep.dimensions = c('location','age','race','sex','stage')
+)
+
+
+
 ##** REGISTER THE SPECIFICATION ----
 register.model.specification(SHIELD.SPECIFICATION)
 #

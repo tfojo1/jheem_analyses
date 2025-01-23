@@ -21,7 +21,7 @@ w2=lapply(2020:2023, function(year){
   create.likelihood.weights(total.weight,dimension.values = list(year=year))
 })
 w=c(w1,w2)
-#-- POPULATION----
+#-- POPULATION SIZES ----
 # Basic likelihood: where we have data at the location level desired
 # sometimes we dont have the calibration data for the location of interest. 
 # so for example we need to calibrate prop aware in Baltimiore to data from MD and building 
@@ -95,6 +95,14 @@ fertility.likelihood.instructions =
 
 # if we work on proportions that it'll be different 
 
+
+
+
+#-- SYPHILIS DIAGNOSIS ----
+
+
+#-- MIGRATION?
+#-- HIV TESTS? 
 
 
 #-- FULL LIKELIHOODS --# ----

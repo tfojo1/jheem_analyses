@@ -166,6 +166,11 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.t
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.symptomatic.base',
                                       1,1,1) # ????
 
+# HIV TESTING BY AGE -----
+# what fraction of tests performed in 15-19 year olds are among 18-19 year olds
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
+                                      0.9,.9,.9) # #'PK: to estiamte from CDC data
+ 
 
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
 
