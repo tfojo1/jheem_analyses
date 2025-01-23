@@ -555,7 +555,7 @@ data.manager$register.ontology(
     ont = ontology(
         year= c("2011-2015", "2012-2016", "2013-2017", "2014-2018", "2015-2019", "2016-2020"),
         location= NULL,
-        age = c("1-12 years", "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
+        age = c( "13-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
                 "65-69 years", "70-74 years", "75+ years"),
         race=c("hispanic or latino", "black", 'other'),
         sex=c('male','female'),
@@ -675,8 +675,8 @@ source('data_processing/msm.R')
 source('data_processing/brfss_unweighted_denominators.R')
 
 #Source immigration data
-source('data_processing/immigration.R')
-source('data_processing/immigration_age_calculations.R')
+source('data_processing/immigration_new.R')
+source('data_processing/immigration_age_calculations_new.R')
 
 #National Atlas Plus data on diagnosis and prevalence
 source('data_processing/national_data.R')
@@ -1795,7 +1795,7 @@ save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
 save(surveillance.manager, file="Q:/data_managers/surveillance.manager.rdata")
 
 #Archive a version with the date to the Q Drive#
-timestamp <- Sys.Date()  
+timestamp <- Sys.Date()
 filename <- paste0("Q:/data_managers/Archive/surveillance.manager_", timestamp, ".rdata")
 save(surveillance.manager, file=filename)
 
