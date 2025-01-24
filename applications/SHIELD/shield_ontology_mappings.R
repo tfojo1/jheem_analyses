@@ -58,7 +58,6 @@ register.ontology.mapping('census.to.SHIELD.race.ethnicity1',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
                           mappings = rbind(c('hispanic or latino', 'hispanic'),
-                                           c('white, non-hispanic', 'white'),
                                            c('black', 'black'),
                                            c('other', 'other'))) # needed?
 
