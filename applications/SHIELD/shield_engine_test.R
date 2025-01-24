@@ -16,11 +16,11 @@
 # setwd('../../')
 source('applications/SHIELD/shield_specification.R')
 
-# location= "C.12580" #Baltimore MSA
-location= "US" #National
+location= "C.12580" #Baltimore MSA
+# location= "US" #National
 
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
-# specification.metadata=get.specification.metadata('shield','US')
+specification.metadata=get.specification.metadata('shield',location)
 # params=simset$last.sim()$params
 # sim = engine$run(params)
 # simplot(sim,simset$last.sim(),

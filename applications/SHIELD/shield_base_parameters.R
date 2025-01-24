@@ -60,12 +60,10 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mort
                                       0,0,0) # TBD 
 
 # *** TRANSMISSION ----
-
-
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'primary.rel.secondary.transmissibility', #observed to estimated ratio of contacts for females with male who are msm
                                       1,1,1) #?????
-
+## MIXING BY SEXUAL ORIENTATION ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'oe.female.pairings.with.msm', #observed to estimated ratio of contacts for females with male who are msm
                                       0.0895,0.0895*.75,0.0895*1.25, #Todd: I'm not sure what the CI should be here?
