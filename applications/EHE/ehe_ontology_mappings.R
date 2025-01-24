@@ -147,7 +147,6 @@ register.ontology.mapping('census.immigration.to.jheem.race',
                           from.dimensions = 'race',
                           to.dimensions = 'race',
                           mappings = rbind(c('hispanic or latino', 'hispanic'),
-                                           c('white, non-hispanic', 'other'),
                                            c('black', 'black'),
                                            c('other', 'other'))) # needed?
 
