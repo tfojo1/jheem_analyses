@@ -481,7 +481,8 @@ get.general.mortality.rates <- function(location,
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two
     target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
-    rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
+   
+     rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
       map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
     
     if (any(is.na(rates.by.state)))
@@ -685,12 +686,12 @@ get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
                                            availability = single.year.age.sexual.availability)
 }
 
-#' @title get.heterosexual.male.sexual.age.contact.proportions
+#' @title get.heterosexual_male.sexual.age.contact.proportions
 #' @description returns a list of age contact proportions for het male
 #' @inheritParams get.female.sexual.age.contact.proportions
 #' @inherit get.female.sexual.age.contact.proportions return
-get.heterosexual.male.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
-                                                                 single.year.heterosexual.male.age.counts,
+get.heterosexual_male.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
+                                                                 single.year.heterosexual_male.age.counts,
                                                                  single.year.age.sexual.availability,
                                                                  specification.metadata)
 {
@@ -698,7 +699,7 @@ get.heterosexual.male.sexual.age.contact.proportions <- function(age.mixing.sd.m
                                            location=location,
                                            age.mixing.sd.mult = age.mixing.sd.mult,
                                            age.model = PAIRING.INPUT.MANAGER$sex.age.models$heterosexual_male,
-                                           age.counts = single.year.heterosexual.male.age.counts,
+                                           age.counts = single.year.heterosexual_male.age.counts,
                                            availability = single.year.age.sexual.availability)
 }
 
@@ -795,13 +796,13 @@ get.msm.single.year.age.counts <- function(location, specification.metadata,
   rv
 }
 
-#' @title get.heterosexual.male.single.year.age.counts
+#' @title get.heterosexual_male.single.year.age.counts
 #' @description To determine the proportion of the population that falls into specific age buckets
 #' @param location location
 #' @param specification.metadata specification.metadata
 #' @param population.years population.years
 #' @return returns the number of heterosexual males in single year ages
-get.heterosexual.male.single.year.age.counts <- function(location, specification.metadata,
+get.heterosexual_male.single.year.age.counts <- function(location, specification.metadata,
                                                          population.years=DEFAULT.POPULATION.YEARS)
 {
   get.male.single.year.age.counts(location = location, population.years = population.years)

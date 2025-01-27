@@ -44,7 +44,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                     location = 'US',
                                                     age = 'all.ages',
                                                     race=c('black','hispanic','other'),
-                                                    sex= c('heterosexual.male', 'msm', 'female')
+                                                    sex= c('heterosexual_male', 'msm', 'female')
                                                   ),
                                                   compartment.value.aliases = list(
                                                     #try using aliases so that if we change the specification up here, the rest of the code doesnt break
@@ -80,7 +80,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value = expression(n.initial.male.population * proportion.msm.of.male))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'n.initial.population',
-                               applies.to = list(sex='heterosexual.male'),
+                               applies.to = list(sex='heterosexual_male'),
                                value = expression(n.initial.male.population * (1-proportion.msm.of.male)))
 
 # step3: uses an element with functional form to get required values
@@ -184,7 +184,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'birth.proportions',
                                value = expression( proportion.births.male*proportion.msm.of.male ))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(sex.to='heterosexual.male'),
+                               applies.to = list(sex.to='heterosexual_male'),
                                name = 'birth.proportions',
                                value = expression( proportion.births.male*(1-proportion.msm.of.male)  ))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
@@ -349,18 +349,18 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         value = 0)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.sexual.transmission',
-                               applies.to = list(sex.from=c('heterosexual.male','msm'),
-                                                 sex.to=c('heterosexual.male','msm')),
+                               applies.to = list(sex.from=c('heterosexual_male','msm'),
+                                                 sex.to=c('heterosexual_male','msm')),
                                value = 'transmission.rate.msm') #we can add msm.peak.multiplier later if needed
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.sexual.transmission',
-                               applies.to = list(sex.from=c('heterosexual.male','msm'),
+                               applies.to = list(sex.from=c('heterosexual_male','msm'),
                                                  sex.to=c('female')),
                                value = 'transmission.rate.heterosexual')
 register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming that female to male is the same as male to female
                                name = 'rate.sexual.transmission',
                                applies.to = list(sex.from=c('female'),
-                                                 sex.to=c('heterosexual.male','msm')),
+                                                 sex.to=c('heterosexual_male','msm')),
                                value = 'transmission.rate.heterosexual')
 #spline models can project negative values - we should truncate to 0
 # use the log scale: exponentiate the values # log scale for the knots,
@@ -402,14 +402,14 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.age',
                                applies.to = list(sex.to='female',
-                                                 sex.from=c('heterosexual.male','msm')),
+                                                 sex.from=c('heterosexual_male','msm')),
                                value = get.female.sexual.age.contact.proportions)
 
 # sexual contact by age for males who have sex with male partners
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.age',
-                               applies.to = list(sex.to=c('heterosexual.male','msm'),
-                                                 sex.from=c('heterosexual.male','msm')),
+                               applies.to = list(sex.to=c('heterosexual_male','msm'),
+                                                 sex.from=c('heterosexual_male','msm')),
                                value = get.msm.sexual.age.contact.proportions)
 #
 # x=get.msm.sexual.age.contact.proportions(specification.metadata = get.specification.metadata('shield',location = 'C.12580'),
@@ -418,9 +418,9 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 # sexual contact by age for males who have sex with female partners
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.age',
-                               applies.to = list(sex.to=c('heterosexual.male','msm'),
+                               applies.to = list(sex.to=c('heterosexual_male','msm'),
                                                  sex.from='female'),
-                               value = get.heterosexual.male.sexual.age.contact.proportions)
+                               value = get.heterosexual_male.sexual.age.contact.proportions)
 
 # from males...to females...
 # from (HIV+) to susceptible
@@ -430,7 +430,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 # sex.to hetrosexual male age.to 19
 # for each person at risk of HIV infecyon, what proportion of contact sar form diff groups
 #> females, msms, het males
-#> for female: get.heterosexual.male.sexual.age.contact.proportions
+#> for female: get.heterosexual_male.sexual.age.contact.proportions
 #> msm, males: get.msm.sexual.age.contact.proportions
 #what's the number of new trans in each startutm: number of new transmision to each statum * size
 # the proportion of partners in this stratum * prev of HIV in this stratum
@@ -455,8 +455,8 @@ register.model.element(SHIELD.SPECIFICATION,
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'single.year.heterosexual.male.age.counts',
-                       get.value.function = get.heterosexual.male.single.year.age.counts,
+                       name = 'single.year.heterosexual_male.age.counts',
+                       get.value.function = get.heterosexual_male.single.year.age.counts,
                        dimension.values = list(age=CENSUS.AGES),
                        resolve.dimension.values.against.model = F,
                        scale='non.negative.number')
@@ -499,7 +499,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
 # To female from het
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
-                               applies.to=list(sex.from='heterosexual.male',
+                               applies.to=list(sex.from='heterosexual_male',
                                                sex.to='female'),
                                value = expression((1-proportion.msm.of.male)/
                                                     (1-proportion.msm.of.male +
@@ -528,7 +528,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                                     fraction.male.male.that.are.with.msm))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
-                               applies.to=list(sex.from='heterosexual.male',
+                               applies.to=list(sex.from='heterosexual_male',
                                                sex.to='msm'),
                                value = expression((1-fraction.msm.pairings.with.female) *
                                                     (1-fraction.male.male.that.are.with.msm))
@@ -537,20 +537,20 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
                                applies.to=list(sex.from='female',
-                                               sex.to='heterosexual.male'),
+                                               sex.to='heterosexual_male'),
                                value = expression((1-fraction.heterosexual.male.pairings.with.male))
 )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
                                applies.to=list(sex.from='msm',
-                                               sex.to='heterosexual.male'),
+                                               sex.to='heterosexual_male'),
                                value = expression(fraction.heterosexual.male.pairings.with.male *
                                                     fraction.male.male.that.are.with.msm)
 )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
-                               applies.to=list(sex.from='heterosexual.male',
-                                               sex.to='heterosexual.male'),
+                               applies.to=list(sex.from='heterosexual_male',
+                                               sex.to='heterosexual_male'),
                                value = expression(fraction.heterosexual.male.pairings.with.male *
                                                     (1-fraction.male.male.that.are.with.msm))
 )
@@ -636,6 +636,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'duration.el',
                        scale = 'time',
                        value = SHIELD_BASE_PARAMETER_VALUES['duration.el'])
+#Disease progression to the next stage after substracting the proportions that are diagnosed during that stage 
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
@@ -778,7 +779,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value = 'prp.asymptomatic.primary.msm')  
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'prp.asymptomatic',
-                               applies.to = list(stage='primary',sex='heterosexual.male'),
+                               applies.to = list(stage='primary',sex='heterosexual_male'),
                                value = 'prp.asymptomatic.primary.heterosexual.male')      
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'prp.asymptomatic',
@@ -791,7 +792,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value = 'prp.asymptomatic.secondary.msm')  
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'prp.asymptomatic',
-                               applies.to = list(stage='secondary',sex='heterosexual.male'),
+                               applies.to = list(stage='secondary',sex='heterosexual_male'),
                                value = 'prp.asymptomatic.secondary.heterosexual.male')      
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'prp.asymptomatic',
