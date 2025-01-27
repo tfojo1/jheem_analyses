@@ -170,7 +170,7 @@ estimated.adult.pop.stratified.put = list(
 
 for (data in estimated.adult.pop.stratified.put) {
   
-  surveillance.manager$put.long.form(
+  data.manager$put.long.form(
     data = data,
     ontology.name = 'census.grouped.age', 
     source = 'census.population',
@@ -261,7 +261,7 @@ adult.pop.by.single.year.age = list(
 
 for (data in adult.pop.by.single.year.age) {
   
-  surveillance.manager$put.long.form(
+  data.manager$put.long.form(
     data = data,
     ontology.name = 'census', 
     source = 'census.population',
@@ -349,7 +349,7 @@ est.adult.pop.10.19 = list(
 
 for (data in est.adult.pop.10.19) {
   
-  surveillance.manager$put.long.form(
+  data.manager$put.long.form(
     data = data,
     ontology.name = 'census.grouped.age', 
     source = 'census.population',

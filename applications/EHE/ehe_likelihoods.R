@@ -6,7 +6,7 @@
 #TOTAL.WEIGHT = 0.5 # universally downweighting to try to allow more mixing 
 POPULATION.WEIGHT = 1
 TRANSMISSION.WEIGHT = 1
-FULL.WEIGHT = 0.5
+FULL.WEIGHT = 1
 
 DIAGNOSES.ERROR.TERM  = 0.05368198 # for new diagnoses and aids diagnoses; from calculating_error_terms_for_ehe_likelihoods.R
 PREVALENCE.ERROR.TERM = 0.08384422 # for prevalence and hiv.mortality; from calculating_error_terms_for_ehe_likelihoods.R
@@ -224,10 +224,10 @@ total.new.diagnoses.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry', 
-                                       correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
+                                       #correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
-                                       weights = (2*POPULATION.WEIGHT),
+                                       weights = (1*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -266,10 +266,10 @@ total.prevalence.likelihood.instructions =
                                        levels.of.stratification = c(0), 
                                        from.year = 2008, 
                                        observation.correlation.form = 'compound.symmetry',
-                                       correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
+                                       #correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = list(PREVALENCE.ERROR.TERM), # second term is from error_for_prevalence_formula.R
                                        error.variance.type = c('cv'), #,'exp.of.variance'), 
-                                       weights = (2*POPULATION.WEIGHT),
+                                       weights = (1*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -862,11 +862,11 @@ future.change.penalty.likelihood.instructions =
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS --#  ----
 joint.pop.migration.total.trans.likelihood.instructions = 
   join.likelihood.instructions(population.likelihood.instructions.pop,
-                               immigration.likelihood.instructions.pop,
+                               immigration.likelihood.instructions.pop, 
                                emigration.likelihood.instructions.pop,
-                               general.mortality.likelihood.instructions.pop #,
-                               #total.prevalence.likelihood.instructions, # removing 1/24 to see if it helps get unstuck
-                               #total.new.diagnoses.likelihood.instructions #,
+                               general.mortality.likelihood.instructions.pop,
+                               total.prevalence.likelihood.instructions, 
+                               total.new.diagnoses.likelihood.instructions #,
                                #weight = POPULATION.WEIGHT
                                ) 
 
