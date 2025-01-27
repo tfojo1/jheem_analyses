@@ -75,10 +75,14 @@ data.manager$register.outcome(
 #Register Sources:
 data.manager$register.parent.source('ACS', full.name = 'American Community Survey', short.name= "ACS") #parent
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS") #parent
+data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
+
 
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population') #child
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "US Census Bureau Death Data", short.name='census.deaths') #child
 data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated') #child
+data.manager$register.source('census.aggregated.adult.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
+
 
 #Register Ontologies:
 
@@ -153,6 +157,7 @@ source('../jheem2/R/HELPERS_array_helpers.R')
 
 #This aggregates county level data to state level for the recent census years for adult.population (as well as county to MSAs of interest)
 #where I wrote the restructure.recent.age.groups code to estimate for adult.pop
+surveillance.manager=data.manager
 all.states = locations::get.all.for.type('state')
 
 put.msa.data.as.new.source(outcome = 'adult.population',
@@ -194,4 +199,4 @@ get.msa.totals.from.county.simple(outcome= 'deaths',  #Sum deaths by county into
                                   data.manager.to= surveillance.manager)
 
 #Save:
-save(data.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section1.rdata")
+save(surveillance.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section1.rdata")
