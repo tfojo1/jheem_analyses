@@ -190,6 +190,8 @@ data.manager$register.source('cdc.testing', parent.source= "NHM&E", full.name = 
 data.manager$register.source('prep.aidsvu.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP AIDS Vu Aggregated County', short.name = 'prep aidsvu aggd county') #For aggregated prep data from AIDS Vu
 data.manager$register.source('prep.cdc.aggregated.county', parent.source= "IQVIA", full.name = 'PrEP CDC Aggregated County', short.name = 'prep cdc aggd county') #For aggregated prep data from Atlas Plus (CDC)
 data.manager$register.source('prep.indications.aggregated.county', parent.source= "NHANES", full.name = 'PrEP Indications Aggregated County', short.name = 'prep indications aggd county') #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('cdc.supplemental.reports', parent.source= "NHSS", full.name = "HIV Surveillance Supplemental Report", short.name='cdc.supplemental.reports')
+
 
 #Register Ontologies:
 
@@ -261,6 +263,8 @@ source('data_processing/national_data.R') #National Atlas Plus data on diagnosis
 source('data_processing/put_msa_data_as_new_source_script.R') #Sources function to aggregate county data to MSA
 source('../jheem2/R/HELPERS_array_helpers.R') #Necessary array helpers
 source('commoncode/locations_of_interest.R') #Creates MSAS.OF.INTEREST
+
+surveillance.manager=data.manager
 
 put.msa.data.as.new.source(outcome = 'diagnosed.prevalence',
                            from.source.name = 'cdc.hiv',
@@ -341,4 +345,4 @@ put.msa.data.as.new.source(outcome = 'suppression',
                            ontology.for.denominator= 'cdc') 
 
 #Save:
-save(data.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section2.rdata")
+save(surveillance.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section2.rdata")

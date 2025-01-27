@@ -154,6 +154,8 @@ source('data_processing/put_msa_data_without_estimation_script.R') #Creates adul
 source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
 source('data_processing/adult.population.10.23.R') #creates adult population for 2010-2023, stratified data
 source('../jheem2/R/HELPERS_array_helpers.R')
+source('commoncode/locations_of_interest.R')
+source('commoncode/additional_locations_of_interest.R')
 
 #This aggregates county level data to state level for the recent census years for adult.population (as well as county to MSAs of interest)
 #where I wrote the restructure.recent.age.groups code to estimate for adult.pop
