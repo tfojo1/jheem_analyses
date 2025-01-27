@@ -862,11 +862,11 @@ future.change.penalty.likelihood.instructions =
 #-- JOIN THE POPULATION-RELATED LIKELIHOODS --#  ----
 joint.pop.migration.total.trans.likelihood.instructions = 
   join.likelihood.instructions(population.likelihood.instructions.pop,
-                               immigration.likelihood.instructions.pop,
+                               immigration.likelihood.instructions.pop, 
                                emigration.likelihood.instructions.pop,
-                               general.mortality.likelihood.instructions.pop #,
-                               #total.prevalence.likelihood.instructions, # removing 1/24 to see if it helps get unstuck
-                               #total.new.diagnoses.likelihood.instructions #,
+                               general.mortality.likelihood.instructions.pop,
+                               total.prevalence.likelihood.instructions, 
+                               total.new.diagnoses.likelihood.instructions #,
                                #weight = POPULATION.WEIGHT
                                ) 
 
