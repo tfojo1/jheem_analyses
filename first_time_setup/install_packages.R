@@ -13,6 +13,9 @@ if (nchar(system.file(package='ggnewscale'))==0)
 if (nchar(system.file(package='httr2'))==0)
     install.packages('httr2')
 
+if (nchar(system.file(package='deSolve'))==0)
+  install.packages("deSolve")
+
 # Our Custom Packages
 if (nchar(system.file(package='distributions'))==0)
     devtools::install_github('tfojo1/distributions')
@@ -23,8 +26,8 @@ if (nchar(system.file(package='locations'))==0)
 
 
 # Other Github passages
-if (nchar(system.file(package='odeintr'))==0)
-  devtools::install_github('thk686/odeintr')
+# if (nchar(system.file(package='odeintr'))==0)
+#   devtools::install_github('thk686/odeintr')
 
 
 # JULIA - not using this right now
