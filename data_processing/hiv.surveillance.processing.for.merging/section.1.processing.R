@@ -124,10 +124,23 @@ data.manager$register.ontology(
     incomplete.dimensions = c("year", "location")
   ))
 
+data.manager$register.ontology(
+  'census.grouped.age',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('13-17 years', '18-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+          '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', 
+          '75-79 years', '80-84 years', '85+ years'),
+    race=c('white', 'black', 'american indian or alaska native', 'asian or pacific islander'),
+    ethnicity=c('hispanic', 'not hispanic'),
+    sex=c('male','female')
+  ))
+
 #Codes:
 
-source('data_processing/immigration.R')
-source('data_processing/immigration_age_calculations.R')
+source('data_processing/immigration_new.R')
+source('data_processing/immigration_age_calculations_new.R')
 
 #Aggregate Outcomes:
 

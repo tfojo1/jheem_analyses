@@ -36,19 +36,6 @@ source('data_processing/outliers/outlier.remover.one.way.strata.R')
 source('data_processing/outliers/outlier.remover.two.way.strata.R')
 
 
-
-# #SAVE Final, Complete Census Manager to Cached
-# save(population1, file="../../cached/census.manager.merged.check.rdata")
-# 
-# #SAVE Final, Complete Census Manager to Q Drive
-# save(population1, file="Q:/data_managers/census.manager.rdata")
-# 
-# #SAVE Final, Complete Census Manager, Archive a dated version to the Q Drive#
-# timestamp <- Sys.Date()  
-# filename <- paste0("Q:/data_managers/Archive/census.manager_", timestamp, ".rdata")
-# save(population1, file=filename)
-
-
 ###Save surveillance manager####
 save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
 
