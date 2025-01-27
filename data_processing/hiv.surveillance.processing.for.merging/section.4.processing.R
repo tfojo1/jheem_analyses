@@ -15,6 +15,15 @@ library(tools)
 
 data.manager = create.data.manager('surveillance', description='surveillance data manager')
 
+data.manager$register.outcome(
+  'adult.population',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Adult Population',
+    axis.name = 'Adult Population',
+    units = 'population',
+    description = "Adult Population Estimate, Ages 13 and over"))
+
 #Register outcomes:
 data.manager$register.outcome(
   'gonorrhea',
@@ -157,6 +166,8 @@ source('data_processing/put_msa_data_as_new_source_script.R') #Sources function 
 source('../jheem2/R/HELPERS_array_helpers.R') #Necessary array helpers
 source('commoncode/locations_of_interest.R') #Creates MSAS.OF.INTEREST
 
+surveillance.manager = data.manager
+
 put.msa.data.as.new.source(outcome = 'gonorrhea',
                            from.source.name = 'cdc.sti',
                            to.source.name = 'cdc.aggregated.county',
@@ -178,4 +189,4 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
 source('data_processing/sti_ratio_calculation.R') #Calculates STI Ratio data
 
 #Save:
-save(data.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section4.rdata")
+save(surveillance.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section4.rdata")
