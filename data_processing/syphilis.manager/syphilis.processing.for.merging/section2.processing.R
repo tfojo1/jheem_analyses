@@ -76,6 +76,15 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Late Latent Syphilis"))
 
+data.manager$register.outcome(
+  'all.syphilis.cases',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'All Syphilis Cases',
+    axis.name = 'All Syphilis Cases',
+    units = 'cases',
+    description = "All Syphilis Cases"))
+
 #Register Sources:
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS") #parent
 data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS") #parent
@@ -110,7 +119,8 @@ data.manager$register.ontology(  #Create a separate ontology for early syphilis
 
 #Codes:
 source('data_processing/syphilis.manager/syphilis.data.R')
-source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.R')
+source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.R') #This pulls one table from 2003-2017 reports, Parastu wanted this report where primary and secondary are reported separate
+source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #This pulls one table from a 2022 report that reports cases back to 1941
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
