@@ -16,15 +16,13 @@ section3 = load.data.manager(name="surveillance.manager_section3", file="Q:/data
 section4 = load.data.manager(name="surveillance.manager_section4", file="Q:/data_managers/data.manager.merge/surveillance.manager_section4.rdata")
 section5 = load.data.manager(name="surveillance.manager_section5", file="Q:/data_managers/data.manager.merge/surveillance.manager_section5.rdata")
 
+#MERGE
+section1$import.data(section2) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
+section1$import.data(section4)
+section1$import.data(section3)
+section1$import.data(section5)
 
-#FIGURE OUT SIZE OF FILES THEN MERGE
-
-# #MERGE 
-# population1$import.data(population2) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
-# population1$import.data(population3)
-# population1$import.data(births.deaths1)
-# 
-
+surveillance.manager = section1
 
 # Run this code- it uses both HIV data and adult.population ---------------
 source('data_processing/tests.per.population.R') # Source code to create hiv.tests.per.population 
@@ -43,6 +41,6 @@ save(surveillance.manager, file="../../cached/surveillance.manager.rdata")
 save(surveillance.manager, file="Q:/data_managers/surveillance.manager.rdata")
 
 #Archive a version with the date to the Q Drive#
-timestamp <- Sys.Date()  
+timestamp <- Sys.Date()
 filename <- paste0("Q:/data_managers/Archive/surveillance.manager_", timestamp, ".rdata")
 save(surveillance.manager, file=filename)
