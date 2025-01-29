@@ -1,7 +1,3 @@
-#This code pulls older data from the PDF CDC STI Surveillance Reports
-#Note: I am pulling the most recent report of each year of data- so data for 1993 comes
-#from the 1997 report.  
-
 #This pulls Table 1 from the 2022 report which reports syphilis cases from 1941-2022
 #Pulling from 2022 so we have the most recent report of the historic data
 
