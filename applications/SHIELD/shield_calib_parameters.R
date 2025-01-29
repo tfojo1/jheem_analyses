@@ -157,7 +157,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){
           # browser()
           paramName=paste0("age",aging.from[age.index],".",race,".aging.rate.multiplier.",i)
           set.element.functional.form.interaction.alphas(model.settings,
-                                                         element.name = "general.aging",
+                                                         element.name = "rate.general.aging",
                                                          alpha.name = paste0("time",i),
                                                          value = parameters[paramName],
                                                          applies.to.dimension.values =list(age = agegroup, race = race))
@@ -211,20 +211,20 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters){
   ## Mortality rates by race----
   races=model.settings$specification.metadata$dim.names$race
   set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "general.mortality.rate",
+                                                 element.name = "rate.general.mortality",
                                                  alpha.name = 'value',
                                                  values = parameters[paste0(races,".general.mortality.rate.multiplier")],
                                                  dimension = "race",
                                                  applies.to.dimension.values = races)
   ## Mortality rates by sex----
   set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "general.mortality.rate",
+                                                 element.name = "rate.general.mortality",
                                                  alpha.name = 'value',
                                                  values = parameters["male.general.mortality.rate.multiplier"],
                                                  dimension = "sex",
                                                  applies.to.dimension.values = c('heterosexual_male','msm'))
   set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "general.mortality.rate",
+                                                 element.name = "rate.general.mortality",
                                                  alpha.name = 'value',
                                                  values = parameters["female.general.mortality.rate.multiplier"],
                                                  dimension = "sex",

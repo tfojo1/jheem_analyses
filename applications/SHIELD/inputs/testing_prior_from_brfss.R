@@ -2,7 +2,7 @@
 # save this in applications/ehe; this will not be sourced though 
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
-testing.prior = get.testing.intercepts.and.slopes(version = 'shield', location = 'C.12580')
+testing.prior = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580')
 
 cache.object.for.version(object = testing.prior, 
                          name = "testing.prior", 

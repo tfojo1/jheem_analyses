@@ -16,9 +16,9 @@
     
     # rates for men:
     -log(1-male.p.benign.late)/times.p.benign.late
-    fit.male.p.benign.late = lm(-log(1-male.p.benign.late)~times.p.benign.late + 0)
-    ESTIMATES$rate.male.benign.late.est = as.numeric(fit.male.p.benign.late$coefficients[1])
-    ESTIMATES$rate.male.benign.late.sd = sqrt(as.numeric(vcov(fit.male.p.benign.late)))
+    fit.male.p.benign.late = lm(-log(1-male.p.benign.late)~times.p.benign.late + 0) # using a linear regression model (lm) (The + 0 in the formula means you're not including an intercept term in the model (you want the regression to pass through the origin).)
+    ESTIMATES$rate.male.benign.late.est = as.numeric(fit.male.p.benign.late$coefficients[1]) #extracting the coefficient (slope) from the model fit, which represents the rate
+    ESTIMATES$rate.male.benign.late.sd = sqrt(as.numeric(vcov(fit.male.p.benign.late))) #extracting the variance-covariance matrix of the model and taking the square root to get the standard deviation.
     # women for women:
     -log(1-female.p.benign.late)/times.p.benign.late
     fit.female.p.benign.late = lm(-log(1-female.p.benign.late)~times.p.benign.late + 0)
@@ -27,7 +27,7 @@
     
     print(ESTIMATES)
     
-    #-- CARDIOVASCULAR SYPHILIS --#
+    #-- CARDIOVASCULAR SYPHILIS --# ----
     
     # from Fig9: proportion of each agegroup developled some type of cardiovascular involvement
     # cardiovascular.male.15older=0.15
@@ -38,44 +38,51 @@
     
     # MALE
     cardiovascular.male.outcomes = data.frame(
-        # from table 7
+        # from table 7: PROPORTION OF "KNOWNS" OBSERVED TO HAVE DEVELOPED CARDIOVASCULAR SYPHILIS  
         p = c(uncomplicated.aortitis=2.6/100,
-              aortic.insufficiency=7.3/100,
-              saccular.aneurym=3.6/100,
-              ostial.stenosis=0.7/100,
-              aortitis.at.death=0.7/100,
+              # aortic.insufficiency=7.3/100, #uncomplicated 
+              # saccular.aneurym=3.6/100,#uncomplicated 
+              # ostial.stenosis=0.7/100,#uncomplicated 
+              # aortitis.at.death=0.7/100,#uncomplicated 
               total.complicated=12.3/100),
         
-        # from figure 10 (digitized)
+        # from figure 10 (digitized): Duration of infection at discovery, in mean years
         mean.time = c(uncomplicated.aortitis=28.9,
-                      aortic.insufficiency=31.5,
-                      saccular.aneurym=31.4,
-                      ostial.stenosis=NA,
-                      aortitis.at.death=NA,
+                      # aortic.insufficiency=31.5,
+                      # saccular.aneurym=31.4,
+                      # ostial.stenosis=NA,
+                      # aortitis.at.death=NA,
                       total.complicated=30.7)
     )
-    
+    #approach1-: rate of transition is 1/duration , then weighted based on probabiliry of event occuring (effective rate)
+    # assuming that the event follows a uniform distribution over time (i.e., the probability of the event happening is constant over time)
     cardiovascular.male.rates.among.those.with.outcome = 1/cardiovascular.male.outcomes$mean.time
     cardiovascular.male.rates = cardiovascular.male.rates.among.those.with.outcome * cardiovascular.male.outcomes$p
+    
+    #appraoch2: using -log(1-p)/time to get the rate 
+    #'@:Todd: why not this?
+    # assuming that the time to event follows a logistic or exponential distribution, where the event’s likelihood increases over time in a non-linear way.
+    # cardiovascular.male.rates = -log(1- cardiovascular.male.outcomes$p)/cardiovascular.male.outcomes$mean.time 
+
     names(cardiovascular.male.rates) = dimnames(cardiovascular.male.outcomes)[[1]]
     ESTIMATES$rate.male.cardiovascular.est = as.numeric(cardiovascular.male.rates['uncomplicated.aortitis'] + cardiovascular.male.rates['total.complicated'])
     
-    # FEMALE
+        # FEMALE
     cardiovascular.female.outcomes = data.frame(
         # from table 7
         p = c(uncomplicated.aortitis=2.9/100,
-              aortic.insufficiency=3.3/100,
-              saccular.aneurym=1.5/100,
-              ostial.stenosis=0.3/100,
-              aortitis.at.death=0.0/100,
+              # aortic.insufficiency=3.3/100,
+              # saccular.aneurym=1.5/100,
+              # ostial.stenosis=0.3/100,
+              # aortitis.at.death=0.0/100,
               total.complicated=5.1/100),
         
         # from figure 10 (digitized)
         mean.time = c(uncomplicated.aortitis=23.7,
-                      aortic.insufficiency=32.8,
-                      saccular.aneurym=36.8,
-                      ostial.stenosis=NA,
-                      aortitis.at.death=NA,
+                      # aortic.insufficiency=32.8,
+                      # saccular.aneurym=36.8,
+                      # ostial.stenosis=NA,
+                      # aortitis.at.death=NA,
                       total.complicated=32.8)
     )
     

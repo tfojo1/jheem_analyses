@@ -1088,13 +1088,14 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 #                                                                                  scale = 'proportion',
 #                                                                                  axis.name = 'Proportion Tested',
 #                                                                                  units = '%'),
-#                                       rate.value = 'rate.testing.hiv.over.18',  
+#                                       rate.value = 'rate.testing.hiv.over.18',
 #                                       denominator.outcome =  'population.over.18',
 #                                       keep.dimensions = c('location','age','race','sex'),
 #                                       corresponding.data.outcome = 'proportion.tested', #'@Zoe: can you please rename this to proportion.hiv.tested?
 #                                       subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-64 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
 #                                       rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
-#                                       save = T) #'@Todd: ERROR
+#                                       # forced.... #forces to keep the dimensions that we specify  #'@TODD:
+#                                       save = T)  
 ### RATE.VALUE:
 # SHILED agegroups are: ('0-14', '15-19','20-24','25-34','35-44','45-54','55-64','65+')
 # BRFSS data includes '18-24','25-29','30-34',....

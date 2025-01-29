@@ -980,14 +980,19 @@ oes.to.proportions <- function(oes, population)
 
 
 get.hiv.testing.functional.form = function(specification.metadata){
-  testing.prior = get.cached.object.for.version(name = "testing.prior",
-                                                version = specification.metadata$version) 
-  
-  testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9), #helps counteract max value below a bit
-                                                                   slope = testing.prior$slopes,
+  # testing.prior = get.cached.object.for.version(name = "testing.prior",
+  #                                               version = specification.metadata$version) 
+  # 
+  # testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9), #helps counteract max value below a bit
+  #                                                                  slope = testing.prior$slopes,
+  #                                                                  anchor.year = 2010,
+  #                                                                  max = 0.9,
+  #                                                                  parameters.are.on.logit.scale = T)
+  testing.functional.form = create.logistic.linear.functional.form(intercept = log(.25)-log(.75), #'helps counteract max value below a bit'@PK: to revise 
+                                                                   slope = 0,
                                                                    anchor.year = 2010,
                                                                    max = 0.9,
-                                                                   parameters.are.on.logit.scale = T)                                         
+                                                                   parameters.are.on.logit.scale = T)
   
   testing.functional.form
 }
@@ -1006,7 +1011,6 @@ get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
                                         link = "identity" #it's safer to use linear to avoid exponential growth,
                                         
                                         )
-syphilis.to.hiv.testing.functional.form
 }
 
 #'@:Todd: need to add an option for the national model ----
@@ -1031,14 +1035,14 @@ get.immigration.rates <- function(location, specification.metadata, population.y
     # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
     # oneway stratification only for one timepoint  (2011-2015) breakdown by age, by race, by sex
   # (2016-2020) aggregate numbers 
-  #'@Zoe: to be reviewed
+
   #because of limitations in data, only data from 2011-2015 was used 
   #annual number of immigrants
   immigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
                                                   location = location,
                                                   year = "2011-2015") / 5 # because it's 5-year aggregate data     
   
-  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "population", #total population not 13+ in jheem
                                               location = location,
                                               year = as.character(c(2011:2015)))) 
   
