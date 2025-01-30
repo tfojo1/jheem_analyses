@@ -1081,21 +1081,22 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 
 ##---- HIV Testing -----
 ## ---- HIV testing:
-# track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
-#                                       name = 'hiv.testing',
-#                                       outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
-#                                                                                  description = "The Proportion of General Population who Received an HIV Test in the Past Year",
-#                                                                                  scale = 'proportion',
-#                                                                                  axis.name = 'Proportion Tested',
-#                                                                                  units = '%'),
-#                                       rate.value = 'rate.testing.hiv.over.18',
-#                                       denominator.outcome =  'population.over.18',
-#                                       keep.dimensions = c('location','age','race','sex'),
-#                                       corresponding.data.outcome = 'proportion.tested', #'@Zoe: can you please rename this to proportion.hiv.tested?
-#                                       subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-64 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
-#                                       rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
-#                                       # forced.... #forces to keep the dimensions that we specify  #'@TODD:
-#                                       save = T)  
+track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
+                                      name = 'hiv.testing',
+                                      outcome.metadata = create.outcome.metadata(display.name = 'Proportion Tested',
+                                                                                 description = "The Proportion of General Population who Received an HIV Test in the Past Year",
+                                                                                 scale = 'proportion',
+                                                                                 axis.name = 'Proportion Tested',
+                                                                                 units = '%'),
+                                      rate.value = 'rate.testing.hiv.over.18',
+                                      denominator.outcome =  'population.over.18',
+                                      keep.dimensions = c('location','age','race','sex'),
+                                    #  force.dim.names.to.keep.dimensions = T,
+                                      corresponding.data.outcome = 'proportion.tested', #'@Zoe: can you please rename this to proportion.hiv.tested?
+                                      subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-54 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
+                                      rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
+                                      # forced.... #forces to keep the dimensions that we specify  #'@TODD:
+                                      save = T)
 ### RATE.VALUE:
 # SHILED agegroups are: ('0-14', '15-19','20-24','25-34','35-44','45-54','55-64','65+')
 # BRFSS data includes '18-24','25-29','30-34',....
@@ -1133,7 +1134,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
 
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                         'rate.testing.hiv.over.18',
-                        applies.to = list('age'='15-19'),
+                        applies.to = list('age'='15-19 years'),
                         value = expression(rate.testing.hiv * fraction.hiv.tests.18.19.among.15.19 / fraction.population.18.19.among.15.19))
 
 ### DENOMINATOR.OUTCOME: 
@@ -1153,7 +1154,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          scale = 'non.negative.number',
                          keep.dimensions = c('location','age','race','sex'),
                          save = F,
-                         subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-64 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
+                         subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-54 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
                          rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
                          outcome.metadata = NULL)
 
