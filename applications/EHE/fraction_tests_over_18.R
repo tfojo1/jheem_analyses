@@ -6,7 +6,7 @@
 #   https://www.cdc.gov/hiv-data/program/index.html
 
 # From Appendix Table 4
-
+# 2021
 n.tests.by.age = c(
     '0-12 years' = 2910,
     '13-19 years' = 88767,
@@ -30,6 +30,9 @@ n.tests.by.age = c(
     '40-49 years' = 267269,
     '50+ years' = 320711
 )
+
+qplot(names(n.tests.by.age),n.tests.by.age)
+qplot(0:100, restratify.age.counts(n.tests.by.age, desired.age.brackets = 0:101, smooth.infinite.age.to = 101))
 
 
 restratified.n.tests = restratify.age.counts(n.tests.by.age, 

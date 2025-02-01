@@ -8,6 +8,4 @@
 #SBATCH --account=pkasaie1
 
 source cluster_scripts/rockfish_module_loads.sh
-Rscript cluster_scripts/assemble_calibration.R shield C.12580 pop.demog.shield.US 0.6 0.2 /scratch4/pkasaie1/nsizemo1/jheem/code/jheem_analyses/applications/SHIELD/shield_specification.R /scratch4/pkasaie1/nsizemo1/jheem/code/jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R
-Rscript cluster_scripts/assemble_calibration.R shield C.12060 pop.demog.shield.US 0.6 0.2 /scratch4/pkasaie1/nsizemo1/jheem/code/jheem_analyses/applications/SHIELD/shield_specification.R /scratch4/pkasaie1/nsizemo1/jheem/code/jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R
-Rscript cluster_scripts/assemble_calibration.R shield C.35620 pop.demog.shield.US 0.6 0.2 /scratch4/pkasaie1/nsizemo1/jheem/code/jheem_analyses/applications/SHIELD/shield_specification.R /scratch4/pkasaie1/nsizemo1/jheem/code/jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R
+Rscript cluster_scripts/assemble_calibration.R shield US pop.demog.shield.US 0.6 0.2 /scratch4/pkasaie1/nsizemo1/jheem/code/jheem_analyses/applications/SHIELD/shield_specification.R /scratch4/pkasaie1/nsizemo1/jheem/code/jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R

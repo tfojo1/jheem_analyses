@@ -50,6 +50,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                     #try using aliases so that if we change the specification up here, the rest of the code doesnt break
                                                     # helps to define specifications for groups of compartments later on
                                                     ps.stages=c('primary','secondary'),
+                                                    early.stages=c('primary','secondary','early.latent'),
                                                     late.stages=c('late.latent','tertiary','cns')
                                                   )
 )
@@ -887,16 +888,25 @@ register.model.quantity(SHIELD.SPECIFICATION,
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN----
 #TBD: prop of pregnant women receiving 'successful' prenatal screening 
 # How to model treatment failures that still result in congenital syphilis? 
-register.model.element(SHIELD.SPECIFICATION,
+register.model.quantity(SHIELD.SPECIFICATION,
                        name = 'proportion.adequate.prenatal.screening.base',
                        scale = 'rate',
-                       value = .86) #this will be a functional form of age/race/location 
+                       value = expression(1-proportion.no.prenatal.screening))  
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.prenatal.screening',
                         scale = 'rate',
                         value = expression( fertility.rate/(1.03) * proportion.adequate.prenatal.screening.base)) #is fertility.rate 0 for other ages?
-# we need to factor multi-births into this (assuming 3% for now)
+# we need to factor multi-births into this (assuming 3% for now) #@PK
+##---- 4- CONTACT TRACING ----
+# number of contacts traced among those diagnosed with early syphilis 
+# how many diagnosis are generated via contact tracing of a new diagnosis.... variable by age, race... 
+# rate of diagnosis through CT= rate of diagnosis at baseline * average number of new diagnosis per index case
+
+# average number of new caes diagnosed treateed per index case. + # diagnosed but not treated
+# number of people empericlllay trated (whi have syphilis) + number diagnosed/teated 
+# number of diagnosis by stage #now  we need to split this by age race sex
+
 ##---- Treatment ----
 # a proportion will receive immediate treatment, another group will be delayed
 # we need to sepearete this for each testing because the tratment is different 
@@ -1092,10 +1102,10 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       denominator.outcome =  'population.over.18',
                                       keep.dimensions = c('location','age','race','sex'),
                                     #  force.dim.names.to.keep.dimensions = T,
-                                      corresponding.data.outcome = 'proportion.tested', #'@Zoe: can you please rename this to proportion.hiv.tested?
+                                      corresponding.data.outcome = 'proportion.tested.for.hiv', #'@Zoe: can you please rename this to proportion.hiv.tested?
                                       subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-54 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
                                       rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
-                                      # forced.... #forces to keep the dimensions that we specify  #'@TODD:
+                                      # forced.... #forces to keep the dimensions that we specify  
                                       save = T)
 ### RATE.VALUE:
 # SHILED agegroups are: ('0-14', '15-19','20-24','25-34','35-44','45-54','55-64','65+')
@@ -1124,7 +1134,7 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        'fraction.hiv.tests.18.19.among.15.19',
                        scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['fraction.hiv.tests.18.19.among.15.19'], 
+                       value = SHIELD_BASE_PARAMETER_VALUES['fraction.hiv.tests.18.19.among.15.19'],  #0.6211626 from EHE/fraction_tests_over... @PK
                        ) #comes from CDC #@PK: to be checked 
 
 # Build the quantity that we want to integrate in outputs:
@@ -1247,7 +1257,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       # corresponding.data.outcome = 'cns.syphilis', #'Zoe: can we add this for historical years
                       keep.dimensions = c('location','age','race','sex','stage')
 )
-### congenital diagnosis
+### congenital diagnosis -----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name='diagnosis.congenital',
                       groups = 'infected',
@@ -1258,20 +1268,75 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  units = 'persons',
                                                                  singular.unit = 'person'),
                       scale='non.negative.number',
-                      multiply.by = expression(proportion.adequate.prenatal.screening.base * (1-efficacy.of.prenatal.screening) * proportion.treated.immediately.following.prenatal.screening +
-                                                 (1-proportion.adequate.prenatal.screening.base* proportion.treated.immediately.following.prenatal.screening )  ), #prp of preg that pass on congenital syphilis
+                      multiply.by = expression(probability.vertical.transmission.by.stage * (
+                        proportion.prenatal.screening.1st.trimester * rr.congenital.syphilis.prenatal.screening.1st.trimester +
+                                                 proportion.prenatal.screening.2nd.trimester * rr.congenital.syphilis.prenatal.screening.2nd.trimester  +
+                                                 proportion.prenatal.screening.3rd.trimester * rr.congenital.syphilis.prenatal.screening.3rd.trimester +
+                                                 proportion.no.prenatal.screening * 1    ) ), #prp of preg that pass on congenital syphilis
                       dynamic.quantity.name = 'births.from',  #model has an internal definition for births  #births from is conditional on parent's characteristics
                       corresponding.data.outcome = 'congenital.syphilis',
                       save=T,
                       keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well
 )
-
-
-
+#probabilities of vertical trasnmission by stage 
 register.model.element(SHIELD.SPECIFICATION,
-                       name='efficacy.of.prenatal.screening',
+                       name='probability.vertical.transmission.mothers.early.syphilis',
                        scale='proportion',
+                       value=.65) #@PK
+register.model.element(SHIELD.SPECIFICATION,
+                       name='probability.vertical.transmission.mothers.late.syphilis',
+                       scale='proportion',
+                       value=.1) #@PK
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='probability.vertical.transmission.by.stage',
+                        scale='proportion',
+                        value='probability.vertical.transmission.mothers.late.syphilis')
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                        name='probability.vertical.transmission.by.stage',
+                        applies.to = list(stage=c('primary','secondary','early.latent')),
+                        value='probability.vertical.transmission.mothers.early.syphilis')
+
+#proportion receieviing prenatal care: 
+register.model.element(SHIELD.SPECIFICATION,
+                       name='proportion.prenatal.screening.1st.trimester',
+                       scale='proportion',
+                       value=.5) #@PK
+register.model.element(SHIELD.SPECIFICATION,
+                       name='proportion.prenatal.screening.2nd.trimester.of.those.not.screened.1st',
+                       scale='proportion',
+                       value=.5)
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='proportion.prenatal.screening.2nd.trimester',
+                        scale='proportion',
+                        value=expression((1-proportion.prenatal.screening.1st.trimester) * proportion.prenatal.screening.2nd.trimester.of.those.not.screened.1st))
+register.model.element(SHIELD.SPECIFICATION,
+                       name='proportion.prenatal.screening.3rd.trimester.of.those.not.screened.1st.2nd',
+                       scale='proportion',
+                       value=.5)
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='proportion.prenatal.screening.3rd.trimester',
+                        scale='proportion',
+                        value=expression((1-proportion.prenatal.screening.1st.trimester -proportion.prenatal.screening.2nd.trimester) * proportion.prenatal.screening.3rd.trimester.of.those.not.screened.1st.2nd))
+register.model.quantity(SHIELD.SPECIFICATION,
+                       name='proportion.no.prenatal.screening',
+                       scale='proportion',
+                       value=expression(1- proportion.prenatal.screening.1st.trimester -proportion.prenatal.screening.2nd.trimester -proportion.prenatal.screening.3rd.trimester))
+
+## 
+register.model.element(SHIELD.SPECIFICATION,
+                       name='rr.congenital.syphilis.prenatal.screening.1st.trimester', #propo of infants born to mom/no-treatment group
+                       scale='ratio',
                        value=.982)
+register.model.element(SHIELD.SPECIFICATION,
+                       name='rr.congenital.syphilis.prenatal.screening.2nd.trimester',
+                       scale='ratio',
+                       value=.982)
+register.model.element(SHIELD.SPECIFICATION,
+                       name='rr.congenital.syphilis.prenatal.screening.3rd.trimester',
+                       scale='ratio',
+                       value=.982)
+# assuming rr.congenital.syphilis.no.prenatal.screening =1
+
 
 # HIV test # TBD 
 # track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,

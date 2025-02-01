@@ -184,9 +184,9 @@ if(1==2){
   
   
   # checking for exterme values among projections 
-  head(sort(values.two.way,decreasing = T),50) # highest 50 values
-  head(sort(values.one.way,decreasing = T),50) # highest 50 values
-  head(sort(values.fully.interacted,decreasing = T),50) # highest 50 values
+  # head(sort(values.two.way,decreasing = T),50) # highest 50 values
+  # head(sort(values.one.way,decreasing = T),50) # highest 50 values
+  # head(sort(values.fully.interacted,decreasing = T),50) # highest 50 values
   
   # add datapoints from actual brfss data
   brfss.means = sapply(4:12, function(year){ # 2014-2022 (year anchored at 2010)

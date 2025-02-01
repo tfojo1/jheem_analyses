@@ -1,4 +1,4 @@
-#Use this code to merge the different saved sections of the census manager into a complete version
+#Use this code to merge the different saved sections of the HIV surveillance manager into a complete version
 
 # PROCESS -----------------------------------------------------------------
 source('data_processing/hiv.surveillance.processing.for.merging/section.1.processing.R')
@@ -9,7 +9,7 @@ source('data_processing/hiv.surveillance.processing.for.merging/section.5.proces
 
 # MERGE -------------------------------------------------------------------
 
-#LOAD the saved sections of the census manager
+#LOAD the saved sections of the surevillance manager
 section1 = load.data.manager(name="surveillance.manager_section1", file="Q:/data_managers/data.manager.merge/surveillance.manager_section1.rdata")
 section2 = load.data.manager(name="surveillance.manager_section2", file="Q:/data_managers/data.manager.merge/surveillance.manager_section2.rdata")
 section3 = load.data.manager(name="surveillance.manager_section3", file="Q:/data_managers/data.manager.merge/surveillance.manager_section3.rdata")
@@ -29,6 +29,7 @@ source('data_processing/tests.per.population.R') # Source code to create hiv.tes
 
 # Remove outliers ---------------------------------------------------------
 save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
+
 source('data_processing/outliers/outlier.remover.total.level.R')
 source('data_processing/outliers/outlier.remover.one.way.strata.R')
 source('data_processing/outliers/outlier.remover.two.way.strata.R')
