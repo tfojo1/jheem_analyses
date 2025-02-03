@@ -68,15 +68,6 @@ data.manager$register.outcome(
     description = "Secondary Syphilis"))
 
 data.manager$register.outcome(
-  'late.latent.syphilis',
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'Late Latent Syphilis',
-    axis.name = 'Late Latent Syphilis',
-    units = 'cases',
-    description = "Late Latent Syphilis"))
-
-data.manager$register.outcome(
   'all.syphilis.cases',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
