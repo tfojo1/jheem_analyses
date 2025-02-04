@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #SBATCH --mem=16G
-#SBATCH --output=/scratch4/pkasaie1//jheem/code/jheem_analyses/cluster_scripts/outputs/ehe/C.17140/setup_init.pop.ehe.bat/setup_init.pop.ehe.bat/.out
+#SBATCH --output=/scratch4/pkasaie1/azalesak/jheem/code/jheem_analyses/cluster_scripts/outputs/ehe/C.17140/setup_init.pop.ehe.bat/setup_init.pop.ehe.out
 #SBATCH --time=12:00:00
 #SBATCH --partition=shared
 #SBATCH --account=pkasaie1
