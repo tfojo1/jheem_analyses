@@ -64,7 +64,7 @@ delta.pre = (diag.pre2 - diag.pre1) / diag.pre1
 delta.post = (diag.post2 - diag.post1) / diag.post1
 
 lik.abs.delta <- function(x){
-  dnorm(x, delta.pre, .1)
+  dnorm(x, delta.pre, .4)
 }
 
 do.assess.likelihood(lik.abs.delta)
@@ -73,7 +73,7 @@ do.assess.likelihood(lik.abs.delta)
 # NORMAL MIX ON ABS SCALE
 lik.abs.delta.mix <- function(x){
   
-  spread = 0.15
+  spread = 0.2
 #  spread = 0.125
   
   0.5 * dnorm(x, delta.pre - spread, spread) +

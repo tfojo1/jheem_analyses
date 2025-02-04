@@ -2,7 +2,7 @@
 if (1==2)
 {
     COVID.MOBILITY.DATA = read.monthly.county.mobility.data()
-    save(COVID.MOBILITY.DATA, file='../jheem_analyses/cached/google_mobility_data.Rdata')
+    save(COVID.MOBILITY.DATA, file='../../cached/google_mobility_data.Rdata')
     
     # test
     get.covid.mobility.measure(mobility.data,
