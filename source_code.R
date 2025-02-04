@@ -1,5 +1,5 @@
 
-USE.JHEEM2.PACKAGE = F
+USE.JHEEM2.PACKAGE = T
 
 # The file to source to load all necessary packages, cached data, code
 
