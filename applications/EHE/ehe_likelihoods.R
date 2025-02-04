@@ -700,6 +700,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    p.bias.outside.location = hiv.test.positivity.bias.estimates$out.mean,
                                                    p.bias.sd.inside.location = hiv.test.positivity.bias.estimates$out.sd,
                                                    p.bias.sd.outside.location = hiv.test.positivity.bias.estimates$out.sd,
+                                                   maximum.locations.per.type = 4,
                                                    
                                                    within.location.p.error.correlation = 0.5,
                                                    within.location.n.error.correlation = 0.5,
