@@ -207,3 +207,21 @@ register.ontology.mapping('stratified.census.to.census.race.ethnicity',
                                            c('native hawaiian and other pacific islander', 'not hispanic', 'asian or pacific islander', 'not hispanic'),
                                            c('white', 'hispanic', 'white', 'hispanic'),
                                            c('white', 'not hispanic', 'white', 'not hispanic')))
+
+#Maps race from CDC STI Surveillance Reports (PDFs) to sHIELD
+register.ontology.mapping('cdc.pdf.to.shield.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('white, non hispanic', 'other'),
+                                           c('black, non hispanic', 'black'),
+                                           c('hispanic', 'hispanic'),
+                                           c('asian pacific islander', 'other'),
+                                            c('american indian alaska native', 'other')))
+
+#Map SHIELD to Atlas Plus data
+# register.ontology.mapping('shield.to.cdc.sex',
+#                           from.dimensions = 'sex',
+#                           to.dimensions = 'sex',
+#                           mappings = rbind(c('msm', 'male'),
+#                                            c('heterosexual_male', 'male'),
+#                                            c('female', 'female')))
