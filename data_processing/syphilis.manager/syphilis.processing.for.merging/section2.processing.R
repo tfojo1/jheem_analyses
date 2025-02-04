@@ -121,8 +121,9 @@ data.manager$register.ontology(
 #Codes:
 source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.2003.2017.R') #This pulls one table from 2003-2017 reports, Parastu wanted this report where primary and secondary are reported separate
-source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #This pulls one table from a 2022 report that reports cases back to 1941
 source('data_processing/syphilis.manager/cdc.pdf.reports.1997.2003.R') #This pulls syphilis data from the 1990s
+source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #These replace the US totals for certain years above, they are more recent. This pulls one table from a 2022 report that reports cases back to 1941
+
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
