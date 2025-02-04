@@ -340,9 +340,14 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact',
                         value = expression(global.transmission.rate *
                                              rate.sexual.transmission *
-                                             sexual.contact.by.age*
+                                             sexual.contact.matrix))
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'sexual.contact.matrix',
+                        value = expression(sexual.contact.by.age*
                                              sexual.contact.by.sex*
                                              sexual.contact.by.race ))
+
 ##---- Sexual Contact: Transmission Rates ----
 # probability of transmission through sexual act, it depends on the recipient, person getting infected
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -421,7 +426,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.age',
                                applies.to = list(sex.to=c('heterosexual_male','msm'),
                                                  sex.from='female'),
-                               value = get.heterosexual_male.sexual.age.contact.proportions)
+                               value = get.heterosexual_male.sexual.age.contact.proportions) # this is using a function to calculate the value of a quantity (subset) at run-time
 
 # from males...to females...
 # from (HIV+) to susceptible
@@ -907,6 +912,85 @@ register.model.quantity(SHIELD.SPECIFICATION,
 # number of people empericlllay trated (whi have syphilis) + number diagnosed/teated 
 # number of diagnosis by stage #now  we need to split this by age race sex
 
+##---- 3-CONTACT TRACING ----##
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'contacts.diagnosed.per.case',
+                       scale = 'rate',
+                       value = 0.2)
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'contacts.empirically.treated.per.case',
+                       scale = 'rate',
+                       value = 0.2)
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'proportion.of.empirically.treated.contacts.with.syphilis',
+                       scale = 'proportion',
+                       value = 0.5)
+
+register.model.element.values(SHIELD.SPECIFICATION,
+                              'proportion.infected.contacts.in.primary' = 0.1,
+                              'proportion.infected.contacts.in.secondary' = 0.2,
+                              'proportion.infected.contacts.in.early.latent' = 0.3,
+                              scale = 'proportion')
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'proportion.infected.contacts.in.late.latent',
+                        scale = 'proportion',
+                        value = expression(1-proportion.infected.contacts.in.primary-proportion.infected.contacts.in.secondary-proportion.infected.contacts.in.early.latent))
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'proportion.infected.contacts.by.stage',
+                        value = 0)
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name ='proportion.infected.contacts.by.stage',
+                               applies.to = list(stage='primary'),
+                               value = 'proportion.infected.contacts.in.primary')
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name ='proportion.infected.contacts.by.stage',
+                               applies.to = list(stage='secondary'),
+                               value = 'proportion.infected.contacts.in.secondary')
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name ='proportion.infected.contacts.by.stage',
+                               applies.to = list(stage='early.latent'),
+                               value = 'proportion.infected.contacts.in.early.latent')
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name ='proportion.infected.contacts.by.stage',
+                               applies.to = list(stage='late.latent'),
+                               value = 'proportion.infected.contacts.in.late.latent')
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'index.case.diagnosis.rate',
+                        value = expression(rate.testing.symptomatic + rate.screening))
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'index.case.diagnosis.rate',
+                               applies.to = list(sex='female',age=FERTILE.AGES),
+                               value = 'rate.prenatal.screening')
+
+
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.of.contacts.per.case',
+                        value = get.rate.of.contacts.per.case)
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.contacts.diagnosed',
+                        value = expression(rate.of.contacts.per.case * contacts.diagnosed.per.case * proportion.infected.contacts.by.stage))
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.all.contacts.empirically.treated',
+                        value = expression(rate.of.contacts.per.case * contacts.empirically.treated.per.case * proportion.infected.contacts.by.stage))
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.infected.contacts.empirically.treated',
+                        value = expression(rate.all.contacts.empirically.treated * proportion.of.empirically.treated.contacts.with.syphilis))
+
 ##---- Treatment ----
 # a proportion will receive immediate treatment, another group will be delayed
 # we need to sepearete this for each testing because the tratment is different 
@@ -922,10 +1006,15 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'proportion.treated.immediately.following.prenatal.screening',
                        scale = 'proportion',
                        value = 0.9) # TBD
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'proportion.treated.immediately.following.contact.tracing',
+                       scale = 'proportion',
+                       value = 0.9) # TBD
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.treated.immediately',
                         value = expression(rate.screening * proportion.treated.immediately.following.screening +
-                                             rate.testing.symptomatic * proportion.treated.immediately.following.testing.symptomatic))
+                                             rate.testing.symptomatic * proportion.treated.immediately.following.testing.symptomatic +
+                                             rate.contacts.diagnosed * proportion.treated.immediately.following.contact.tracing))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.treated.immediately',
                                apply.function = 'add',

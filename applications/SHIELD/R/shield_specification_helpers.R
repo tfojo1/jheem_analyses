@@ -516,10 +516,54 @@ get.general.mortality.rates <- function(location,
 }
 
 
+##-------------------------##
+##-- FOR CONTACT TRACING --##
+##-------------------------##
 
-
-
-
+#' @title Get rate of contacts identified by contact tracing (as a rate per index case)
+#' @description  This is a function used to calculate a quantity value in the specification which is too complicated to be calculated by an expression. It takes the diagnosis rate for index cases ('index.case.diagnosis.rate'), and sums up, for each 'from contact' in the contact matrix, the proportion of to.contacts who could be connected multiplied by their index-case diagnosis rate
+#' @param index.case.diagnosis.rate The value of the model quantity representing the diagnosis rate among index cases
+#' @param sexual.contact.matrix The value of the model quantity rate representing the contact matrix (the sum across all from strata for any to stratum should equal 1)
+#' @param specification.metadata
+#' @return A 3-d array (indexed [age, race, sex]) representing the distribution of contacts per case. Note, NOT the contact who are screened, but the contacts who could be screened
+get.rate.of.contacts.per.case = function(index.case.diagnosis.rate,
+                                         sexual.contact.matrix,
+                                         specification.metadata)
+{
+    # From Todd: I believe that the way we have written the specification, index.case.diagnosis.rate and sexual.contact will always have the required dimensions
+    #   but just in case not, I am putting this check here.
+    # Could use array.expand if needed if this ever throws an error
+    
+    expected.contact.matrix.dimensions  = c('age.to','race.to','sex.to','age.from','race.from','sex.from')
+    expected.diagnosis.rate.dimensions = c('age','race','sex','stage')
+    
+    if (length(expected.contact.matrix.dimensions) != length(dim(sexual.contact.matrix)) ||
+        any(expected.contact.matrix.dimensions != names(dim(sexual.contact.matrix))))
+      stop(paste0("The sexual.contact.matrix does not have the expected dimensions in the expected order"))
+    
+    if (length(expected.diagnosis.rate.dimensions) != length(dim(index.case.diagnosis.rate)) ||
+        any(expected.diagnosis.rate.dimensions != names(dim(index.case.diagnosis.rate))))
+      stop(paste0("The index.case.diagnosis.rate does not have the expected dimensionsin the expected order"))
+    
+    # Sum up just the stages who will get tracing done
+    contacts.who.get.traced = rowSums(index.case.diagnosis.rate[,,,c('primary','secondary','early.latent')], dims = 3)
+    
+    rv = sapply(specification.metadata$dim.names$sex, function(sex){
+      sapply(specification.metadata$dim.names$race, function(race){
+        sapply(specification.metadata$dim.names$age, function(age){
+          
+          sum(index.case.diagnosis.rate * as.numeric(sexual.contact.matrix[,,,age,race,sex]))
+          
+        })
+      })
+    })
+    
+    dim.names = specification.metadata$dim.names[c('age','race','sex')]
+    dim(rv) = vapply(dim.names, length, FUN.VALUE = integer(1))
+    dimnames(rv) = dim.names
+    
+    rv
+}
 
 ##-----------##
 #-- AGING --# ----
