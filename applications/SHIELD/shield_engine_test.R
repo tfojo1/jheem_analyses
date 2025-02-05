@@ -22,8 +22,6 @@ simplot(sim,"diagnosis.primary.secondary") #'@Zoe: this is not working  # SURVEI
 simplot(sim,"trt.initiation")
 
 
-
-
 simplot(sim,"births.from" )
 simplot(sim,"deaths" )
 simplot(sim,"immigration" )
@@ -58,6 +56,5 @@ simplot(sim,
 
 SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,]
 apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,],c('ethnicity'),sum)
-
 apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex['2010','US',,,,],
       c('ethnicity'),sum)

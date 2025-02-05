@@ -42,7 +42,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                     profile=c('susceptible','diagnosed.treated')),
                                                   
                                                   compartments.for.infected.and.uninfected = list(
-                                                    location = 'US',
+                                                    location = 'location',
                                                     age = 'all.ages',
                                                     race=c('black','hispanic','other'),
                                                     sex= c('heterosexual_male', 'msm', 'female')
@@ -52,9 +52,11 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                     # helps to define specifications for groups of compartments later on
                                                     ps.stages=c('primary','secondary'),
                                                     early.stages=c('primary','secondary','early.latent'),
-                                                    late.stages=c('late.latent','tertiary','cns')
+                                                    late.stages=c('late.latent','tertiary','cns'),
+                                                    location=function(location){location}
+                                                  )                                                  
+                                                  
                                                   )
-)
 
 
 #** INITIAL POPULATION --#----
@@ -1207,7 +1209,7 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       denominator.outcome =  'population.over.18',
                                       keep.dimensions = c('location','age','race','sex'),
                                     #  force.dim.names.to.keep.dimensions = T,
-                                      corresponding.data.outcome = 'proportion.tested.for.hiv', #'@Zoe: can you please rename this to proportion.hiv.tested?
+                                      corresponding.data.outcome = 'proportion.tested.for.hiv', 
                                       subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-54 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
                                       rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
                                       # forced.... #forces to keep the dimensions that we specify  
