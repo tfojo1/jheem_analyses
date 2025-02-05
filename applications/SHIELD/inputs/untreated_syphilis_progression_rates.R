@@ -93,6 +93,17 @@
                                                               cardiovascular.female.rates['total.complicated'])
     
     
+    #-- Tertiary Syphilis --#
+    # assuming that the rates are independant, we can sum the means and variances 
+    # sicne we dont have the sd for cardiovasculare, we apply the one from late.benign 
+    # to estiamte the range, we estiamte the 95% halfwidth from normal (1.96*sd)
+    rate.male.tertiary.late.est = ESTIMATES$rate.male.benign.late.est+ESTIMATES$rate.male.cardiovascular.est
+    rate.male.tertiary.late.95hw=1.96* ESTIMATES$rate.male.benign.late.sd
+    ESTIMATES$rate.male.tertiary.late.range= c(rate.male.tertiary.late.est, rate.male.tertiary.late.est-rate.male.tertiary.late.95hw,rate.male.tertiary.late.est+rate.male.tertiary.late.95hw)
+    
+    rate.female.tertiary.late.est = ESTIMATES$rate.female.benign.late.est+ESTIMATES$rate.female.cardiovascular.est
+    rate.female.tertiary.late.95hw=1.96* ESTIMATES$rate.female.benign.late.sd
+    ESTIMATES$rate.female.tertiary.late.range= c(rate.female.tertiary.late.est, rate.female.tertiary.late.est-rate.female.tertiary.late.95hw,rate.female.tertiary.late.est+rate.female.tertiary.late.95hw)
     
     #-- NEUROSYPHILIS ----
     
@@ -196,5 +207,6 @@
     # 	This results in an estimated [1.25–3%] of patients experience symptomatic CNS disease during the primary and secondary stages (2, 7)
     times.cns.primary.secondary = 3/12 #3 months
     p.cns.primary.secondary = c(0.0125, .03)
-    ESTIMATES$rate.cns.primary.secondary =  -log(1-p.cns.primary.secondary)/times.cns.primary.secondary
+    ESTIMATES$rate.cns.primary.secondary =  p.cns.primary.secondary*1/times.cns.primary.secondary
     
+    ESTIMATES

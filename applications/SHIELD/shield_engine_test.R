@@ -5,15 +5,6 @@
 # https://jheem.shinyapps.io/EndingHIV/
 
 ##################
-# create the SHIELD.SPECIFICATION
-# create an engine object
-# engine.run()
-# setwd('../../')
-# JHEEM.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/"
-# SHIELD.DIR="~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD"
-# setwd(JHEEM.DIR)
-# setwd(SHIELD.DIR)
-# setwd('../../')
 source('applications/SHIELD/shield_specification.R')
 
 location= "C.12580" #Baltimore MSA
@@ -21,24 +12,24 @@ location= "C.12580" #Baltimore MSA
 
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)
-# params=simset$last.sim()$params
-# sim = engine$run(params)
-# simplot(sim,simset$last.sim(),
-#         "total.mortality")
-# simplot(sim,simset$last.sim(),
-#         "population")
-# simplot(sim,simset$last.sim(),
-#         "population",facet.by = "age",split.by = "race",dimension.values = list(year=2000:2030))
-# params['other.general.mortality.rate.multiplier']=.9
-
-#Running:
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
 #Outcomes
 simplot(sim,"population" )
-simplot(sim,"population" ,
-        dimension.values = list(year = 2010:2030))
+simplot(sim,"hiv.testing" ) #'@Todd: no data.... and why it's 0 before 2010
+simplot(sim,"diagnosis.primary.secondary") #'@Zoe: this is not working  # SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location
+simplot(sim,"trt.initiation")
+
+
+
+
+simplot(sim,"births.from" )
+simplot(sim,"deaths" )
+simplot(sim,"immigration" )
+simplot(sim,"emigration" )
+
+simplot(sim,"diagnosis.congenital")
 
 #By 1 factor
 # simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))

@@ -99,10 +99,31 @@ fertility.likelihood.instructions =
 
 
 #-- SYPHILIS DIAGNOSIS ----
+##-- congenital syphilis / PS/ EL/ LL
 
+ps.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "ps.syphilis", #fix type
+                                       outcome.for.sim = "diagnosis.primary.secondary", #@Zoe: please add two way stratifications? 
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, # Zoe will be estimating this based on discrepency between CDC reported numbers and those reported from local health departments
+                                       error.variance.type = 'cv'
+  )
+#
+lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+
+#dimnames(SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location__sex)
+#this is reported for male/female: no msm 
+
+# can we ssume rates of diagnosis among het-male and female are similar and the rest of new diagnosis among male are msm specific 
+# @Zoe: can you please add a mapping for this? male= msm + het_male
 
 #-- MIGRATION?
 #-- HIV TESTS? 
+
+
 
 
 #-- FULL LIKELIHOODS --# ----
