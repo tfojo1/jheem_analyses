@@ -68,15 +68,6 @@ data.manager$register.outcome(
     description = "Secondary Syphilis"))
 
 data.manager$register.outcome(
-  'late.latent.syphilis',
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'Late Latent Syphilis',
-    axis.name = 'Late Latent Syphilis',
-    units = 'cases',
-    description = "Late Latent Syphilis"))
-
-data.manager$register.outcome(
   'all.syphilis.cases',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
@@ -106,7 +97,6 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
 data.manager$register.ontology(  #Create a separate ontology for early syphilis
-
   'cdc.syphilis',
   ont = ontology(
     year= NULL,
@@ -117,11 +107,23 @@ data.manager$register.ontology(  #Create a separate ontology for early syphilis
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
 
+data.manager$register.ontology(
+  'cdc.pdf.report',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age=c('10-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'),
+    race=c('white, non hispanic', 'black, non hispanic', 'hispanic', 'asian pacific islander', 'american indian alaska native'),
+    sex=c('male','female'),
+    risk=c('msm','idu','msm_idu','heterosexual','other')
+  ))
+
 #Codes:
 source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.2003.2017.R') #This pulls one table from 2003-2017 reports, Parastu wanted this report where primary and secondary are reported separate
-source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #This pulls one table from a 2022 report that reports cases back to 1941
 source('data_processing/syphilis.manager/cdc.pdf.reports.1997.2003.R') #This pulls syphilis data from the 1990s
+source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #These replace the US totals for certain years above, they are more recent. This pulls one table from a 2022 report that reports cases back to 1941
+
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager

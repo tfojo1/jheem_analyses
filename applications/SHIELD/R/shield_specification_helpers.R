@@ -12,7 +12,7 @@ DEFAULT.FERTILITY.RATE.YEARS=c(2007:2023)
 #@rdname. The documentation of all functions with the same @rdname will be combined under one manual page.
 
 
-# INITIAL POPULATION SIZE ----
+#-- INITIAL POPULATION SIZES --#  ----
 ## get initial populations sizes for different groups ----
 #' @title get.n.initial.female.population
 #' @description Generates the size of the 'female' population for the given years by calling
@@ -400,7 +400,7 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
   return(mapped.fertility.rate)
 }
 
-#-- MORTALITY --#----
+#-- MORTALITY --# --#----
 #' @title get.general.mortality.rates.functional.form
 #' @description generating a functional form for mortality rates based on census data
 #' @param location location
@@ -516,10 +516,54 @@ get.general.mortality.rates <- function(location,
 }
 
 
+##-------------------------##
+##-- FOR CONTACT TRACING --##
+##-------------------------##
 
-
-
-
+#' @title Get rate of contacts identified by contact tracing (as a rate per index case)
+#' @description  This is a function used to calculate a quantity value in the specification which is too complicated to be calculated by an expression. It takes the diagnosis rate for index cases ('index.case.diagnosis.rate'), and sums up, for each 'from contact' in the contact matrix, the proportion of to.contacts who could be connected multiplied by their index-case diagnosis rate
+#' @param index.case.diagnosis.rate The value of the model quantity representing the diagnosis rate among index cases
+#' @param sexual.contact.matrix The value of the model quantity rate representing the contact matrix (the sum across all from strata for any to stratum should equal 1)
+#' @param specification.metadata
+#' @return A 3-d array (indexed [age, race, sex]) representing the distribution of contacts per case. Note, NOT the contact who are screened, but the contacts who could be screened
+get.rate.of.contacts.per.case = function(index.case.diagnosis.rate,
+                                         sexual.contact.matrix,
+                                         specification.metadata)
+{
+    # From Todd: I believe that the way we have written the specification, index.case.diagnosis.rate and sexual.contact will always have the required dimensions
+    #   but just in case not, I am putting this check here.
+    # Could use array.expand if needed if this ever throws an error
+    
+    expected.contact.matrix.dimensions  = c('age.to','race.to','sex.to','age.from','race.from','sex.from')
+    expected.diagnosis.rate.dimensions = c('age','race','sex','stage')
+    
+    if (length(expected.contact.matrix.dimensions) != length(dim(sexual.contact.matrix)) ||
+        any(expected.contact.matrix.dimensions != names(dim(sexual.contact.matrix))))
+      stop(paste0("The sexual.contact.matrix does not have the expected dimensions in the expected order"))
+    
+    if (length(expected.diagnosis.rate.dimensions) != length(dim(index.case.diagnosis.rate)) ||
+        any(expected.diagnosis.rate.dimensions != names(dim(index.case.diagnosis.rate))))
+      stop(paste0("The index.case.diagnosis.rate does not have the expected dimensionsin the expected order"))
+    
+    # Sum up just the stages who will get tracing done
+    contacts.who.get.traced = rowSums(index.case.diagnosis.rate[,,,c('primary','secondary','early.latent')], dims = 3)
+    
+    rv = sapply(specification.metadata$dim.names$sex, function(sex){
+      sapply(specification.metadata$dim.names$race, function(race){
+        sapply(specification.metadata$dim.names$age, function(age){
+          
+          sum(index.case.diagnosis.rate * as.numeric(sexual.contact.matrix[,,,age,race,sex]))
+          
+        })
+      })
+    })
+    
+    dim.names = specification.metadata$dim.names[c('age','race','sex')]
+    dim(rv) = vapply(dim.names, length, FUN.VALUE = integer(1))
+    dimnames(rv) = dim.names
+    
+    rv
+}
 
 ##-----------##
 #-- AGING --# ----
@@ -997,19 +1041,18 @@ get.hiv.testing.functional.form = function(specification.metadata){
   testing.functional.form
 }
 
-
+# function to map the ratio of STI tests relative to hiv.tests in the US (for STI screening)
 get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
-  #there are 2 scales: the scales that we use to manipulate the knotw, and the scales we use to interpolate them 
+  #there are 2 scales: the scales that we use to manipulate the knots, and the scales we use to interpolate them 
   create.natural.spline.functional.form(knot.times = c("1980"=1980, "1990"=1990, "2000"=2000, "2010"=2010,"2020"=2020),
-                                        knot.values=list("1980"=0.8, "1990"=0.8, "2000"=0.8, "2010"=0.8,"2020"=0.8), 
+                                        knot.values=list("1980"=0.8, "1990"=0.8, "2000"=0.8, "2010"=0.8,"2020"=0.8), #'@PK: is 80% a good value?
                                         knot.min = 0, #knot values can not exceed this range
                                         knot.max = 1,#knot values can not exceed this range
                                         min=0, #projected spline values should remain within this range
                                         max=1, #projected spline values should remain within this range
                                         knots.are.on.transformed.scale = F,
                                         knot.link = "log",
-                                        link = "identity" #it's safer to use linear to avoid exponential growth,
-                                        
+                                        link = "identity" #it's safer to use linear extrapolation between knots to avoid exponential growth
                                         )
 }
 
@@ -1131,4 +1174,48 @@ get.fraction.over.age <- function(location,
   dimnames(rv) = dim.names
   
   rv
+}
+
+#-- PRENATAL SCREENING --# ----
+#'@Zoe: we need the prenatal screening data for the each trimester
+get.prp.prenatal.screening.1st.trimester<-function(location, specification.metadata, population.years=DEFAULT.STI.SCREENING.YEAR){
+  # prp.prenatal.1st.trimester = SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.1st.trimester", 
+  #                                                        location = location,
+  #                                                        year = "2011-2015"
+  
+  prp.prenatal.1st.trimester = 0
+  prp.prenatal.1st.trimester
+}
+
+get.prp.prenatal.screening.2nd.trimester.of.those.not.screened.1st<-function(location, specification.metadata, population.years=DEFAULT.STI.SCREENING.YEAR){
+  # prp.prenatal.2nd.trimester = SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.2nd.trimester", 
+  #                                                        location = location,
+  #                                                        year = "2011-2015"
+  # prp.prenatal.1st.trimester=SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.1st.trimester", 
+  #                                                        location = location,
+  #                                                        year = "2011-2015"
+  prp.prenatal.1st.trimester=0
+  prp.prenatal.2nd.trimester=0
+  # what proportion of those who didnt receive screening in the first timester, receive it in the second one: 
+  prp.prenatal.2nd.trimester.if.not.1st = prp.prenatal.2nd.trimester/(1-prp.prenatal.1st.trimester)
+  prp.prenatal.2nd.trimester.if.not.1st
+}
+
+get.prp.prenatal.screening.3rd.trimester.of.those.not.screened.1st.2nd<-function(location, specification.metadata, population.years=DEFAULT.STI.SCREENING.YEAR){
+  # prp.prenatal.3rd.trimester=SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.3rd.trimester", 
+  #                                                        location = location,
+  #                                                        year = "2011-2015"
+  # prp.prenatal.2nd.trimester = SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.2nd.trimester", 
+  #                                                        location = location,
+  #                                                        year = "2011-2015"
+  # prp.prenatal.1st.trimester=SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.1st.trimester", 
+  #                                                        location = location,
+  #                                                        year = "2011-2015"
+  prp.prenatal.3rd.trimester=0
+  prp.prenatal.2nd.trimester=0
+  prp.prenatal.1st.trimester=0
+  
+  # what proportion of those who didnt receive screening in the first timester, receive it in the second one: 
+  prp.prenatal.3rd.trimester.if.not.1st.2nd = prp.prenatal.3rd.trimester/(1-prp.prenatal.1st.trimester-prp.prenatal.2nd.trimester)
+  prp.prenatal.3rd.trimester.if.not.1st.2nd
 }

@@ -1,4 +1,6 @@
 
+USE.JHEEM2.PACKAGE = T
+
 # The file to source to load all necessary packages, cached data, code
 
 library(locations)
@@ -11,7 +13,11 @@ source('../jheem_analyses/commoncode/cache_manager.R')
 
 # Make sure that the jheem2 version is up-to-date
 # library(jheem2)
-source('../jheem2/R/tests/source_jheem2_package.R')
+if (USE.JHEEM2.PACKAGE)
+    library(jheem2)
+if (!USE.JHEEM2.PACKAGE)
+    source('../jheem2/R/tests/source_jheem2_package.R')
+
 clear.all.managers()
 source('../jheem_analyses/commoncode/file_paths.R')
 set.jheem.root.directory(ROOT.DIR)

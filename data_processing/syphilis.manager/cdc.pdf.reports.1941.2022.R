@@ -4,7 +4,7 @@
 
 # Read in -----------------------------------------------------------------
 
-DATA.DIR.2022.TABLE="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.1941.1999/2022.table"
+DATA.DIR.2022.TABLE="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/2022.table"
 
 table.2022 <- Sys.glob(paste0(DATA.DIR.2022.TABLE, '/*.xlsx'))
 
@@ -49,7 +49,7 @@ for (data in syphilis.1941.2022.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc.sti',
+    ontology.name = 'cdc.pdf.report',
     source = 'cdc.sti.surveillance.reports',
     url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/11/2022-STI-Surveillance-Report-PDF.pdf',
     details = 'CDC STI Surveillance Reports')

@@ -105,6 +105,7 @@ data.manager$register.source('census.aggregated.population', parent.source= "cen
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
 data.manager$register.source('march.of.dimes', parent.source= "NCHS", full.name = "March of Dimes Peristats", short.name='march.of.dimes')
+data.manager$register.source('cdc.wonder.aggregated.population', parent.source= "NCHS", full.name = 'CDC Wonder Aggregated Adult Population', short.name = 'cdc.wonder.agg.pop')
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -233,6 +234,15 @@ put.msa.data.as.new.source(outcome = 'population',
 put.msa.data.as.new.source(outcome = 'population',
                            from.source.name = 'census.population',
                            to.source.name = 'census.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'female.population',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
                            to.locations =  MSAS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',

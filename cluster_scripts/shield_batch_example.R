@@ -3,7 +3,7 @@ setwd(JHEEM_DIR)  # Set working directory to ensure consistent paths
 
 source('cluster_scripts/batch_script_helpers.R')
 
-MY_LOCATIONS = c("C.12580", "C.12060", "C.35620")
+MY_LOCATIONS = c("US")
 version <- "shield"
 calibration.code <- 'pop.demog.shield.US'
 specification.path <- file.path(JHEEM_DIR, "applications/SHIELD/shield_specification.R")

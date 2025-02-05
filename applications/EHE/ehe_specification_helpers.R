@@ -804,14 +804,17 @@ get.location.mortality.rates <- function(location,
     # then divide the two
     target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
 
-    rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
-        map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
+    rates.by.state.numerator = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T)
+    rates.by.state.denominator = map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
     
+    rates.by.state = rates.by.state.numerator / rates.by.state.denominator
+    rates.by.state[rates.by.state.numerator==0 & rates.by.state.denominator==0] = 0
+
     if (any(is.na(rates.by.state)))
       stop("getting NA values in rates.by.state in get.location.mortality.rates()")
     
     if (length(states)==1)
-        rates.by.state[1,,,]
+        rv = rates.by.state[1,,,]
     else
     {
         county.populations = CENSUS.MANAGER$pull(outcome = 'population',
@@ -832,8 +835,13 @@ get.location.mortality.rates <- function(location,
             sum(county.populations[counties.in.state.and.loc], na.rm=T)/total.population
         })
         
-        apply(state.weights * rates.by.state, c('age','race','sex'), sum)
+        rv = apply(state.weights * rates.by.state, c('age','race','sex'), sum)
     }
+    
+    if (any(rv==0))
+        stop("getting zero's in the calculated mortality rates from get.location.mortality.rates()")
+    
+    rv
 }
 
 
