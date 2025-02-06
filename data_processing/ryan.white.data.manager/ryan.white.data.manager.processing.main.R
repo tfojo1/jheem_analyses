@@ -25,15 +25,14 @@ data.manager$register.outcome(
     units = 'population',
     description = "Non-ADAP Clients"))
 
-  #IS THIS A PROPOTION??
-# data.manager$register.outcome(   
-#   'non.adap.viral.suppression',
-#   metadata = create.outcome.metadata(
-#     scale = 'non.negative.number',
-#     display.name = 'Non-ADAP Viral Suppression',
-#     axis.name = 'Non-ADAP Viral Suppression',
-#     units = 'population',
-#     description = "Non-ADAP Viral Suppression"))
+data.manager$register.outcome(
+  'non.adap.viral.suppression',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Non-ADAP Viral Suppression',
+    axis.name = 'Non-ADAP Viral Suppression',
+    units = '%',
+    description = "Non-ADAP Viral Suppression"), denominator.outcome = 'non.adap.clients')
 
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
