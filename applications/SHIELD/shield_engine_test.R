@@ -17,16 +17,13 @@ sim = engine$run(params)
 
 #Outcomes
 simplot(sim,"population" )
-simplot(sim,"hiv.testing" ) #'@Todd: no data.... and why it's 0 before 2010
-simplot(sim,"diagnosis.primary.secondary") #'@Zoe: this is not working  # SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location
+simplot(sim,"hiv.testing" ) 
+simplot(sim,"diagnosis.primary.secondary") 
 simplot(sim,"trt.initiation")
-
-
 simplot(sim,"births.from" )
 simplot(sim,"deaths" )
 simplot(sim,"immigration" )
 simplot(sim,"emigration" )
-
 simplot(sim,"diagnosis.congenital")
 
 #By 1 factor

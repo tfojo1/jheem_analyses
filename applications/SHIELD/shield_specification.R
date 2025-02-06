@@ -928,7 +928,6 @@ register.model.quantity(SHIELD.SPECIFICATION,
 # number of diagnosis by stage #now  we need to split this by age race sex
 
 ##---- 3-CONTACT TRACING ----##
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'contacts.diagnosed.per.case',
                        scale = 'rate',
@@ -981,15 +980,19 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'index.case.diagnosis.rate',
+                        scale='rate',
+                        value = 0)
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                        name = 'index.case.diagnosis.rate',
+                        applies.to = list(stage=c('primary','secondary','early.latent')),
                         value = expression(rate.testing.symptomatic + rate.screening))
 
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'index.case.diagnosis.rate',
-                               applies.to = list(sex='female',age=FERTILE.AGES),
-                               value = 'rate.prenatal.screening')
-
-
-
+                               applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
+                               value = expression(rate.testing.symptomatic + rate.screening +rate.prenatal.screening))
+#
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.of.contacts.per.case',
                         value = get.rate.of.contacts.per.case)
@@ -1083,11 +1086,7 @@ register.remission(SHIELD.SPECIFICATION,
                    remission.proportions.value='remission.prp',
                    tag = 'treatment.after.delay' )
 
-#** TBD/CONTACT TRACING --# ----
-#'@Todd
-#'@PK: we should check the data on this first
-#*
-#*
+
 #** OUTPUTS --#----
 ##--------------------------------------------------------------------------------------------------------------#
 # !!!for dynamic transitions that change over time (e.g., testing), the anchor points are coded at the begginign of the year 
@@ -1413,7 +1412,6 @@ register.model.element(SHIELD.SPECIFICATION,
                        # functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)  
                        value=.2)
 
-#'@Todd: I am confused here. we have the data on propo screened by trimester. are we going to convert it into a ratio and then convert back? which parameters are we going to tune? 
 register.model.element(SHIELD.SPECIFICATION,
                        name='prp.prenatal.screening.2nd.trimester.of.those.not.screened.1st',
                        scale='proportion',
@@ -1493,5 +1491,4 @@ cat('*** Shield_specification.R completed! ***\n')
 #'@PK: do we want to model miscarriages due to untreated syphilis? 
 #'@PK: do we want to model deaths among infants born with congenital syphilis?
 #'@PK: emigration for national model? 
-#'@PK: 'CONTACT TRACING
 #'@PK: 'Prenatal Care Coverage: this needs a functional form to capture changes over time

@@ -546,13 +546,14 @@ get.rate.of.contacts.per.case = function(index.case.diagnosis.rate,
       stop(paste0("The index.case.diagnosis.rate does not have the expected dimensionsin the expected order"))
     
     # Sum up just the stages who will get tracing done
-    contacts.who.get.traced = rowSums(index.case.diagnosis.rate[,,,c('primary','secondary','early.latent')], dims = 3)
+    # index.case.diagnosis.rate: index cases who gets traced
+    index.cases.who.get.traced = rowSums(index.case.diagnosis.rate[,,,c('primary','secondary','early.latent')], dims = 3)
     
     rv = sapply(specification.metadata$dim.names$sex, function(sex){
       sapply(specification.metadata$dim.names$race, function(race){
         sapply(specification.metadata$dim.names$age, function(age){
           
-          sum(index.case.diagnosis.rate * as.numeric(sexual.contact.matrix[,,,age,race,sex]))
+          sum(index.cases.who.get.traced * as.numeric(sexual.contact.matrix[,,,age,race,sex]))
           
         })
       })
@@ -1177,6 +1178,7 @@ get.fraction.over.age <- function(location,
 }
 
 #-- PRENATAL SCREENING --# ----
+# we nest the probabilities to make sure that they dont go above 1 when we vary them
 #'@Zoe: we need the prenatal screening data for the each trimester
 get.prp.prenatal.screening.1st.trimester<-function(location, specification.metadata, population.years=DEFAULT.STI.SCREENING.YEAR){
   # prp.prenatal.1st.trimester = SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.1st.trimester", 
