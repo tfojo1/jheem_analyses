@@ -26,7 +26,6 @@ data.manager$register.outcome(
     description = "Non-ADAP Clients"))
 
 #MAY NEED TO UPDATE THESE DENOMINATORS FOR THE PROPORTIONS BASED ON DATA FROM THEIR SPECIFIC TABLES
-
 data.manager$register.outcome(
   'non.adap.viral.suppression',
   metadata = create.outcome.metadata(
@@ -37,13 +36,13 @@ data.manager$register.outcome(
     description = "Non-ADAP Viral Suppression"), denominator.outcome = 'non.adap.clients')
 
 data.manager$register.outcome(
-  'non.adap.retention',
+  'ambulatory.care.past.year',
   metadata = create.outcome.metadata(
-    scale = 'proportion',
-    display.name = 'Non-ADAP Retention',
-    axis.name = 'Non-ADAP Viral Retention',
-    units = '%',
-    description = "Non-ADAP Viral Retention"), denominator.outcome = 'non.adap.clients')
+    scale = 'non.negative.number',
+    display.name = 'Received Ambulatory Care in Past Year',
+    axis.name = 'Received Ambulatory Care in Past Year',
+    units = 'population',
+    description = "Received Ambulatory Care in Past Year"))
 
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
