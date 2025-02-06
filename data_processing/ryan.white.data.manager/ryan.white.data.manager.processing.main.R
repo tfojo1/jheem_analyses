@@ -66,7 +66,7 @@ data.manager$register.ontology(
 
 
 # Source ------------------------------------------------------------------
-source('data_processing/ryan.white.data.manager/ryan.white.total.level.R')
+source('data_processing/ryan.white.data.manager/ryan.white.total.and.stratified.level.R')
 source('data_processing/ryan.white.data.manager/ryan.white.viral.suppression.R')
 source('data_processing/ryan.white.data.manager/ryan.white.ambulatory.R')
 
