@@ -63,13 +63,14 @@ data.manager$register.ontology(
     service.received = c('full pay medication support', 'insurance premium assistance', 'medication co pay/deductible', 'multiple services')
   ))
 
-
-
 # Source ------------------------------------------------------------------
 source('data_processing/ryan.white.data.manager/ryan.white.total.and.stratified.level.R')
 source('data_processing/ryan.white.data.manager/ryan.white.viral.suppression.R')
 source('data_processing/ryan.white.data.manager/ryan.white.ambulatory.R')
 
+# Save --------------------------------------------------------------------
 
-#Save:
 save(data.manager, file="Q:/data_managers/ryan.white.data.manager.rdata")
+
+
+
