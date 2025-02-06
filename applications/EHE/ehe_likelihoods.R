@@ -227,7 +227,7 @@ total.new.diagnoses.likelihood.instructions =
                                        #correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
-                                       weights = (1*POPULATION.WEIGHT),
+                                       weights = (2*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -269,7 +269,7 @@ total.prevalence.likelihood.instructions =
                                        #correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = list(PREVALENCE.ERROR.TERM), # second term is from error_for_prevalence_formula.R
                                        error.variance.type = c('cv'), #,'exp.of.variance'), 
-                                       weights = (1*POPULATION.WEIGHT),
+                                       weights = (2*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -849,7 +849,7 @@ future.change.penalty.fn = function(sim,log=T){
   } else{
     rv = lik
   }
-    rv 
+  rv 
   
 }
 
@@ -857,6 +857,8 @@ future.change.penalty.likelihood.instructions =
   create.custom.likelihood.instructions(name = "future.change.penalty", # default will be outcome for sim 
                                         #outcome.for.sim = NULL, # placeholder, want this to be NULL
                                         compute.function = future.change.penalty.fn)
+
+
 
 
 

@@ -1,25 +1,13 @@
+library(ggplot2)
 # make this a function that takes location and version; get specification metadata object from that
 # save this in applications/ehe; this will not be sourced though 
 source('../jheem_analyses/applications/EHE/ehe_specification.R') #this is sourcing the EHE application to set up the environment. should be changed to SHIELD's
 
-# Use the function below to estiamte the prior value for parameters (inlcuding intercenpt and slope)
-testing.prior = get.testing.intercepts.and.slopes(version = 'ehe', 
-                                                  location = 'C.12580')
-
-# Cache this prior for future use in the EHE (or SHIELD)
-cache.object.for.version(object = testing.prior, 
-                         name = "testing.prior", 
-                         version = 'ehe', 
-                         overwrite=T)
 
 # Main functions # -----
-# Function to fit a given model on data -----
-# A framework to fit various models to data, compare them, and choose the best model to use in the analysis 
-get.testing.intercepts.and.slopes = function(version, 
-                                             location,
-                                             model="two.way" # or fully.interacted or one.way
-){
-  #read data
+# Read and clean the BRFSS data according to the model requirements 
+clean.brfss.data<-function(version, location){
+  
   load("../jheem_analyses/cached/brfss.subset.RData") #@Navid: you will need to update your cashed folder to include all the files that are on OneDrive
   df=appended
   
@@ -91,6 +79,22 @@ get.testing.intercepts.and.slopes = function(version,
   testing.anchor.year = 2010
   df$year = df$year-testing.anchor.year
   
+  return(df)
+}
+
+
+# Function to fit a given model on data -----
+# A framework to fit various models to data, compare them, and choose the best model to use in the analysis 
+get.testing.intercepts.and.slopes = function(version, 
+                                             location,
+                                             model="two.way" # or fully.interacted or one.way
+){
+  #read data
+  df<-clean.brfss.data(version, location)
+  # dim(df)
+  # read the specification metadata from the model (EHE or SHIELD)
+  specification.metadata = get.specification.metadata(version=version,
+                                                      location=location)
   # Alternativemodels to fit ----
   if(model=="two.way"){
     fit = glm(tested.past.year ~ age*sex + age*race + race*sex + 
@@ -137,46 +141,47 @@ get.testing.intercepts.and.slopes = function(version,
   rv
 }
 
-# Function to compare fit acctoss alternative models ----
+# Function to compare fit accross alternative models ----
 # review projections to make sure they look okay in the future 
-if(1==2){
-  # fit the 3 models:
-  testing.prior.two.way = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580',
-                                                            model="two.way")
-  
-  testing.prior.one.way = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580',
-                                                            model="one.way")
-  
-  testing.prior.fully.interacted = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580',
-                                                                     model="fully.interacted")
+if(1==1){
+  version = 'ehe'
+  location = 'C.12580'
+  # read and clearn BRFSS data
+  df<-clean.brfss.data(version, location)
+  # read the specification metadata from the model (EHE or SHIELD)
+  specification.metadata = get.specification.metadata(version=version,
+                                                      location=location)
+    # fit the 3 models:
+  testing.prior.two.way = get.testing.intercepts.and.slopes(version  , location  , model="two.way")
+  testing.prior.one.way = get.testing.intercepts.and.slopes(version  , location  , model="one.way")
+  testing.prior.fully.interacted = get.testing.intercepts.and.slopes(version  , location  , model="fully.interacted")
   
   # now use the intercepts/slopes from each model to build a logistic regression model in the JHEEM that can predict the future values for the model 
   testing.functional.form.two.way = create.logistic.linear.functional.form(intercept = testing.prior.two.way$intercepts,
                                                                            slope = testing.prior.two.way$slopes,
                                                                            anchor.year = 2010,
                                                                            parameters.are.on.logit.scale = T)  
-  
   testing.functional.form.one.way = create.logistic.linear.functional.form(intercept = testing.prior.one.way$intercepts,
                                                                            slope = testing.prior.one.way$slopes,
                                                                            anchor.year = 2010,
                                                                            parameters.are.on.logit.scale = T)  
-  
   testing.functional.form.fully.interacted = create.logistic.linear.functional.form(intercept = testing.prior.fully.interacted$intercepts,
                                                                                     slope = testing.prior.fully.interacted$slopes,
                                                                                     anchor.year = 2010,
                                                                                     parameters.are.on.logit.scale = T)  
   
   # predict future values from each model
-  values.two.way = testing.functional.form.two.way$project(2015:2035) 
-  values.two.way = array(unlist(values.two.way), 
-                         dim = c(sapply(dim.names, length),length(2015:2035)),
-                         dimnames = c(dim.names, list(year=2015:2035)))
-  
   values.one.way = testing.functional.form.one.way$project(2015:2035) 
   values.one.way = array(unlist(values.one.way), 
                          dim = c(sapply(dim.names, length),length(2015:2035)),
                          dimnames = c(dim.names, list(year=2015:2035)))
-  
+  #
+  values.two.way = testing.functional.form.two.way$project(2015:2035) 
+  values.two.way = array(unlist(values.two.way), 
+                         dim = c(sapply(dim.names, length),length(2015:2035)),
+                         dimnames = c(dim.names, list(year=2015:2035)))
+
+  #
   values.fully.interacted = testing.functional.form.fully.interacted$project(2015:2035) 
   values.fully.interacted = array(unlist(values.fully.interacted), 
                                   dim = c(sapply(dim.names, length),length(2015:2035)),
@@ -189,6 +194,7 @@ if(1==2){
   # head(sort(values.fully.interacted,decreasing = T),50) # highest 50 values
   
   # add datapoints from actual brfss data
+  dim.names = specification.metadata$dim.names[c('age','race','sex')]
   brfss.means = sapply(4:12, function(year){ # 2014-2022 (year anchored at 2010)
     sapply(dim.names$sex, function(sex){
       sapply(dim.names$race, function(race){
@@ -239,6 +245,7 @@ if(1==2){
            plot.sex,width = 10,height = 7,dpi = 350)
     
   })
+  
 }
 
 # old code - these are the same (off by tiny fractions); but would have to redo the formula each time I added interactions
@@ -246,44 +253,44 @@ if(1==2){
   #'@Navid: you should read more about the create.logistic.linear.functional.form to understand all inputs and their roles 
   #'@Navid: why are we using a max of 0.9 here?
   testing.prior = get.testing.intercepts.and.slopes(version = 'ehe', location = 'C.12580',
-                                                            model="two.way")
+                                                    model="two.way")
   
   testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9),
                                                                    slope = testing.prior$slopes,
                                                                    anchor.year = 2010,
                                                                    max = 0.9,
                                                                    parameters.are.on.logit.scale = T)
-
+  
   values = testing.functional.form$project(2015:2035)
   values = array(unlist(values),
-                         dim = c(sapply(dim.names, length),length(2015:2035)),
-                         dimnames = c(dim.names, list(year=2015:2035)))
- { #Visual inspection
-   
-   # plot.age =
+                 dim = c(sapply(dim.names, length),length(2015:2035)),
+                 dimnames = c(dim.names, list(year=2015:2035)))
+  { #Visual inspection
+    
+    # plot.age =
     ggplot() + 
-    geom_line(data=reshape2::melt(apply(values, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    geom_point(data=reshape2::melt(apply(brfss.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
-    ylim(0,1) + 
-    ggtitle("Testing Projection vs. BRFSS data, Age") +
-    theme(plot.title = element_text(hjust = 0.5,size = 25))
-  
-  # plot.race =
+      geom_line(data=reshape2::melt(apply(values, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+      geom_point(data=reshape2::melt(apply(brfss.means, c("age","year"),mean)), aes(x=year, y=value, color=age)) + 
+      ylim(0,1) + 
+      ggtitle("Testing Projection vs. BRFSS data, Age") +
+      theme(plot.title = element_text(hjust = 0.5,size = 25))
+    
+    # plot.race =
     ggplot() + 
-    geom_line(data=reshape2::melt(apply(values, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    geom_point(data=reshape2::melt(apply(brfss.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
-    ylim(0,1) + 
-    ggtitle("Testing Projection vs. BRFSS data, Race") +
-    theme(plot.title = element_text(hjust = 0.5,size = 25))
-  
-  # plot.sex =
+      geom_line(data=reshape2::melt(apply(values, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+      geom_point(data=reshape2::melt(apply(brfss.means, c("race","year"),mean)), aes(x=year, y=value, color=race)) + 
+      ylim(0,1) + 
+      ggtitle("Testing Projection vs. BRFSS data, Race") +
+      theme(plot.title = element_text(hjust = 0.5,size = 25))
+    
+    # plot.sex =
     ggplot() + 
-    geom_line(data=reshape2::melt(apply(values, c("sex","year"),mean)), aes(x=year, y=value, color=sex)) + 
-    geom_point(data=reshape2::melt(apply(brfss.means, c("sex","year"),mean)), aes(x=year, y=value, color=sex)) + 
-    ylim(0,1) + 
-    ggtitle("Testing Projection vs. BRFSS data, Sex") +
-    theme(plot.title = element_text(hjust = 0.5,size = 25))
-}
+      geom_line(data=reshape2::melt(apply(values, c("sex","year"),mean)), aes(x=year, y=value, color=sex)) + 
+      geom_point(data=reshape2::melt(apply(brfss.means, c("sex","year"),mean)), aes(x=year, y=value, color=sex)) + 
+      ylim(0,1) + 
+      ggtitle("Testing Projection vs. BRFSS data, Sex") +
+      theme(plot.title = element_text(hjust = 0.5,size = 25))
+  }
   
   # check for extreme single cell values (e.g., 97% black 13-24 msm in 2035)
   #mean(df$tested.past.year[df$race=="black" & df$msm==1 & df$age=="13-24 years" & df$year=="9"])
@@ -325,6 +332,15 @@ if(1==2){
   # dimnames(intercepts) = dimnames(slopes) = dim.names
 }
 
+# Use the function below to estiamte the prior value for parameters (inlcuding intercenpt and slope)
+testing.prior = get.testing.intercepts.and.slopes(version = 'ehe', 
+                                                  location = 'C.12580')
 
+# Cache this prior for future use in the EHE (or SHIELD)
+cache.object.for.version(object = testing.prior, 
+                         name = "testing.prior", 
+                         version = 'ehe', 
+                         overwrite=T)
+print("the object testing.prior is cached sucessfully!")
 
 #'@Navid: Once your work on this code is over, can you please use Andrew's documentation style to document this code?

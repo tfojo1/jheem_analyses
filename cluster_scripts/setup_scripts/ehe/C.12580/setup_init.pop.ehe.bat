@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #SBATCH --mem=16G
-#SBATCH --output=../jheem_analyses/cluster_scripts/ehe/C.12580/setup_init.pop.ehe.bat/setup_init.pop.ehe.bat/.out
+#SBATCH --output=/scratch4/pkasaie1/azalesak/jheem/code/jheem_analyses/cluster_scripts/outputs/ehe/C.12580/setup_init.pop.ehe.bat/setup_init.pop.ehe.out
 #SBATCH --time=12:00:00
 #SBATCH --partition=shared
 #SBATCH --account=pkasaie1
 
-source cluster_scripts/Rockfish_module_loads.sh
-Rscript cluster_scripts/set_up_calibration.R ehe C.12580 init.pop.ehe
+source cluster_scripts/rockfish_module_loads.sh
+Rscript cluster_scripts/set_up_calibration.R ehe C.12580 init.pop.ehe applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R

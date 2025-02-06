@@ -62,7 +62,7 @@ make.setup.scripts <- function(locations,
 {
     # Create output directories for each location
     for (location in locations) {
-        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code))
+        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code, extension=".out"))
         if (!dir.exists(output_path))
             dir.create(output_path, recursive=TRUE)
             
@@ -74,7 +74,7 @@ make.setup.scripts <- function(locations,
         # Create the batch script
         make.sbatch.script(filename=file.path(dir, version, location, get.setup.filename(calibration.code)),
                            mem=mem,
-                           output = file.path(output_path, ".out"),
+                           output = output_path,
                            partition = partition,
                            time.hours = 12,
                            account=account,
@@ -112,7 +112,7 @@ make.run.scripts <- function(locations,
             make.sbatch.script(filename=file.path(dir, version, location, get.run.filename(calibration.code, chain)),
                                job.name = paste0("run_", version, "_", location, "_", calibration.code, "_", chain),
                                mem=mem,
-                               output = file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out")),
+                               output = output_path,
                                partition=partition,
                                time.hours = 12, #Todd's said 7*24 but this made it hard to queue
                                account=account,
@@ -198,8 +198,9 @@ make.combined.assemble.script <- function(name.for.result,
         dir.create(dir, recursive=TRUE)
         
     error.prefix = "Cannot make.combined.assemble.script': "
-    if (!dir.exists(file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out"))))
-        dir.create(file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out")), recursive=TRUE)
+    output_path <- file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out"))
+    if (!dir.exists(output_path))
+        dir.create(output_path, recursive=TRUE)
     
     if (file.exists(file.path(dir, paste0("assemble_", name.for.result, ".bat"))) && !overwrite)
         stop(paste0(error.prefix, "there is already a '", name.for.result, "' at this location. Use 'overwrite=T' to proceed anyway"))
@@ -209,7 +210,7 @@ make.combined.assemble.script <- function(name.for.result,
     make.sbatch.script(filename=file.path(dir, paste0("assemble_", name.for.result, ".bat")),
                        job.name = paste0("assemble_", name.for.result),
                        mem=mem,
-                       output = file.path(OUTPUT.DIR, paste0("assemble_", name.for.result, ".out")),
+                       output = output_path,
                        partition=partition,
                        time.hours = 12,
                        account=account,
