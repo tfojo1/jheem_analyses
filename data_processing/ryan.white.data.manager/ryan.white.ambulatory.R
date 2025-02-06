@@ -33,7 +33,7 @@ ryan.white.ambulatory.clean = lapply(ryan.white.ambulatory, function(file){
   
   data$outcome = "non.adap.retention"
   data$value = (data$value/100)
-  data$year = gsub("suppression percent", "", data$year)
+  data$year = gsub("retained percent", "", data$year)
   
   data= as.data.frame(data)
   list(filename, data)

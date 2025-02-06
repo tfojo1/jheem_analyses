@@ -25,6 +25,8 @@ data.manager$register.outcome(
     units = 'population',
     description = "Non-ADAP Clients"))
 
+#MAY NEED TO UPDATE THESE DENOMINATORS FOR THE PROPORTIONS BASED ON DATA FROM THEIR SPECIFIC TABLES
+
 data.manager$register.outcome(
   'non.adap.viral.suppression',
   metadata = create.outcome.metadata(
@@ -33,6 +35,15 @@ data.manager$register.outcome(
     axis.name = 'Non-ADAP Viral Suppression',
     units = '%',
     description = "Non-ADAP Viral Suppression"), denominator.outcome = 'non.adap.clients')
+
+data.manager$register.outcome(
+  'non.adap.retention',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Non-ADAP Retention',
+    axis.name = 'Non-ADAP Viral Retention',
+    units = '%',
+    description = "Non-ADAP Viral Retention"), denominator.outcome = 'non.adap.clients')
 
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
@@ -55,8 +66,9 @@ data.manager$register.ontology(
 
 
 # Source ------------------------------------------------------------------
-source('data_processing/ryan.white.data.manager/ryan.white.state.level.R')
+source('data_processing/ryan.white.data.manager/ryan.white.total.level.R')
 source('data_processing/ryan.white.data.manager/ryan.white.viral.suppression.R')
+source('data_processing/ryan.white.data.manager/ryan.white.ambulatory.R')
 
 
 #Save:
