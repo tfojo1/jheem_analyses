@@ -227,7 +227,7 @@ total.new.diagnoses.likelihood.instructions =
                                        #correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
-                                       weights = (1*POPULATION.WEIGHT),
+                                       weights = (2*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -269,7 +269,7 @@ total.prevalence.likelihood.instructions =
                                        #correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = list(PREVALENCE.ERROR.TERM), # second term is from error_for_prevalence_formula.R
                                        error.variance.type = c('cv'), #,'exp.of.variance'), 
-                                       weights = (1*POPULATION.WEIGHT),
+                                       weights = (2*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
 
@@ -831,34 +831,33 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
 
 
 #-- FUTURE CHANGE PENALTY LIKELIHOOD (to prevent new diagnoses from taking off in the future) ---- 
-if(1==2){
-  future.change.penalty.fn = function(sim,log=T){
-    
-    # 2009, 2019, 2029 diagnoses
-    diagnoses = sim$get(outcomes = 'new',keep.dimensions = "year",dimension.values = list(year=c(2009,2019,2029)))
-    
-    pre.change = (diagnoses[2]-diagnoses[1])/diagnoses[1]
-    post.change = (diagnoses[3]-diagnoses[2])/diagnoses[2]
-    
-    spread = 0.2 # parameter to tune how wide distribution is 
-    
-    lik = 0.5*dnorm(post.change,mean = (pre.change - spread), sd = spread) + 
-      0.5*dnorm(post.change,mean = (pre.change + spread), sd = spread)
-    
-    if(log){
-      rv = log(lik)
-    } else{
-      rv = lik
-    }
-    rv 
-    
-  }
+future.change.penalty.fn = function(sim,log=T){
   
-  future.change.penalty.likelihood.instructions = 
-    create.custom.likelihood.instructions(name = "future.change.penalty", # default will be outcome for sim 
-                                          #outcome.for.sim = NULL, # placeholder, want this to be NULL
-                                          compute.function = future.change.penalty.fn)
+  # 2009, 2019, 2029 diagnoses
+  diagnoses = sim$get(outcomes = 'new',keep.dimensions = "year",dimension.values = list(year=c(2009,2019,2029)))
+  
+  pre.change = (diagnoses[2]-diagnoses[1])/diagnoses[1]
+  post.change = (diagnoses[3]-diagnoses[2])/diagnoses[2]
+  
+  spread = 0.2 # parameter to tune how wide distribution is 
+  
+  lik = 0.5*dnorm(post.change,mean = (pre.change - spread), sd = spread) + 
+    0.5*dnorm(post.change,mean = (pre.change + spread), sd = spread)
+  
+  if(log){
+    rv = log(lik)
+  } else{
+    rv = lik
+  }
+  rv 
+  
 }
+
+future.change.penalty.likelihood.instructions = 
+  create.custom.likelihood.instructions(name = "future.change.penalty", # default will be outcome for sim 
+                                        #outcome.for.sim = NULL, # placeholder, want this to be NULL
+                                        compute.function = future.change.penalty.fn)
+
 
 
 

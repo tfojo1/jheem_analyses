@@ -225,3 +225,38 @@ register.ontology.mapping('cdc.pdf.to.shield.race',
 #                           mappings = rbind(c('msm', 'male'),
 #                                            c('heterosexual_male', 'male'),
 #                                            c('female', 'female')))
+
+# To align ages for HIV testing
+# Ideally this would be done automatically by native package code
+# But the automated age mappings are not currently smart enough to find a third mapping that aligns both
+register.ontology.mapping('shield.to.align.with.brfss.hiv.testing',
+                          from.dimensions = 'age',
+                          to.dimensions = 'age',
+                          mappings = rbind(
+                            c('18-19 years', '18-24 years'),
+                            c('20-24 years', '18-24 years'),
+                            c('25-29 years', '25-29 years'),
+                            c('30-34 years', '30-34 years'),
+                            c('35-39 years', '35-39 years'),
+                            c('40-44 years', '40-44 years'),
+                            c('45-49 years', '45-49 years'),
+                            c('50-54 years', '50-54 years'),
+                            c('55-64 years', '55-64 years'),
+                            c('65+ years', '65+ years')
+                          ))
+
+register.ontology.mapping('brfss.to.align.with.shield.hiv.testing',
+                          from.dimensions = 'age',
+                          to.dimensions = 'age',
+                          mappings = rbind(
+                            c('18-24 years', '18-24 years'),
+                            c('25-29 years', '25-29 years'),
+                            c('30-34 years', '30-34 years'),
+                            c('35-39 years', '35-39 years'),
+                            c('40-44 years', '40-44 years'),
+                            c('45-49 years', '45-49 years'),
+                            c('50-54 years', '50-54 years'),
+                            c('55-59 years', '55-64 years'),
+                            c('60-64 years', '55-64 years'),
+                            c('65+ years', '65+ years')
+                          ))

@@ -2178,3 +2178,8 @@ register.calibrated.parameters.for.version('ehe',
                                            calibrate.to.year = 2025,
                                            join.with.previous.version = F)
 
+register.sampled.parameters.for.version('ehe',
+                                        distribution = EHE.SAMPLED.PARAMETERS.DISTRIBUTION,
+                                        apply.function = EHE.APPLY.SAMPLED.PARAMETERS.FN,
+                                        join.with.previous.version = F)
+
