@@ -1,5 +1,4 @@
 
-USE.JHEEM2.PACKAGE = T
 source('../jheem_analyses/use_jheem2_package_setting.R')
 
 # The file to source to load all necessary packages, cached data, code
