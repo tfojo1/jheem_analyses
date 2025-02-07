@@ -18,12 +18,14 @@ sim = engine$run(params)
 #Outcomes
 simplot(sim,"population" )
 simplot(sim,"hiv.testing" ) 
-simplot(sim,"diagnosis.primary.secondary") 
+simplot(sim,"diagnosis.primary.secondary")  #@Andrew: no data points are shown on the plot
+# SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[,'C.12580']
+
 simplot(sim,"trt.initiation")
 simplot(sim,"births.from" )
 simplot(sim,"deaths" )
-simplot(sim,"immigration" )
-simplot(sim,"emigration" )
+simplot(sim,"immigration" ) #@Andrew: no data points are shown on the plot
+simplot(sim,"emigration" )#@Andrew: no data points are shown on the plot
 simplot(sim,"diagnosis.congenital")
 
 #By 1 factor

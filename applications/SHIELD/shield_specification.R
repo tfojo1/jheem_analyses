@@ -989,16 +989,19 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'index.case.diagnosis.rate',
                         scale='rate',
                         value = 0)
-
-register.model.quantity.subset(SHIELD.SPECIFICATION,#'@Todd: this is causing an error 
+#'@Todd: I am getting an error with this
+register.model.quantity.subset(SHIELD.SPECIFICATION,#'@Todd: this is causing an error
                         name = 'index.case.diagnosis.rate',
-                        applies.to = list(stage=c('primary','secondary','early.latent')), 
+                        applies.to = list(age='all.ages', 
+                                          race=c('black','hispanic','other'),
+                                                 sex=c('heterosexual_male', 'msm', 'female'),
+                                                                 stage=c('primary','secondary','early.latent')),
                         value = expression(rate.testing.symptomatic + rate.screening))
 
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'index.case.diagnosis.rate',
-                               applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
-                               value = expression(rate.testing.symptomatic + rate.screening +rate.prenatal.screening))
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'index.case.diagnosis.rate',
+#                                applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
+#                                value = expression(rate.testing.symptomatic + rate.screening +rate.prenatal.screening))
 
 # Mapping contact tracing rates from indexes to their contacts:
 register.model.quantity(SHIELD.SPECIFICATION,
