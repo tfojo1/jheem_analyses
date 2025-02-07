@@ -1,5 +1,5 @@
 
-USE.JHEEM2.PACKAGE = T
+source('../jheem_analyses/use_jheem2_package_setting.R')
 
 # The file to source to load all necessary packages, cached data, code
 
@@ -78,6 +78,7 @@ source('../jheem_analyses/input_managers/idu_sexual_oes.R')
 source('../jheem_analyses/applications/EHE/ehe_base_parameters.R')
 source('../jheem_analyses/applications/EHE/ehe_specification_helpers.R')
 source('../jheem_analyses/applications/EHE/ehe_ontology_mappings.R')
+source('../jheem_analyses/applications/EHE/ehe_sampled_parameters.R')
 
 # General
 source('../jheem_analyses/commoncode/target_populations.R')
