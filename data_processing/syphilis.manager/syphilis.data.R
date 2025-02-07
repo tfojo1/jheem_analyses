@@ -47,9 +47,10 @@ syphilis.clean = lapply(syphilis.data, function(file){
     names(state.abb) <- state.name
     data$location =ifelse (data$Geography == "District of Columbia", "DC", state.abb[data$Geography])
   }
-  
+
   if(grepl("county", filename)) {
     data$location = data$FIPS
+    data$location = str_pad(data$location, 5, pad="0") 
   }
   if(grepl("national", filename)) {
     data$location = "US"
@@ -79,7 +80,6 @@ syphilis.clean = lapply(syphilis.data, function(file){
 syphilis.clean.put = lapply(syphilis.clean, `[[`, 2)
 
 for (data in syphilis.clean.put) {
-  
   data.manager$put.long.form(
     data = data,
     ontology.name = 'cdc.sti',
