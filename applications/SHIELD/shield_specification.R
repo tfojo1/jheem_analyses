@@ -989,16 +989,19 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'index.case.diagnosis.rate',
                         scale='rate',
                         value = 0)
-
-register.model.quantity.subset(SHIELD.SPECIFICATION,#'@Todd: this is causing an error 
+#'@Todd: I am getting an error with this
+register.model.quantity.subset(SHIELD.SPECIFICATION,#'@Todd: this is causing an error
                         name = 'index.case.diagnosis.rate',
-                        applies.to = list(stage=c('primary','secondary','early.latent')), 
+                        applies.to = list(age='all.ages', 
+                                          race=c('black','hispanic','other'),
+                                                 sex=c('heterosexual_male', 'msm', 'female'),
+                                                                 stage=c('primary','secondary','early.latent')),
                         value = expression(rate.testing.symptomatic + rate.screening))
 
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'index.case.diagnosis.rate',
-                               applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
-                               value = expression(rate.testing.symptomatic + rate.screening +rate.prenatal.screening))
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'index.case.diagnosis.rate',
+#                                applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
+#                                value = expression(rate.testing.symptomatic + rate.screening +rate.prenatal.screening))
 
 # Mapping contact tracing rates from indexes to their contacts:
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -1331,7 +1334,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 )
 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'diagnosis.primary.secondary',
+                         name = 'diagnosis.ps',
                          value = expression(diagnosis.total),
                          subset.dimension.values = list(stage='ps.stages'), # ps.stages=c('primary','secondary'),
                          outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals with a Diagnosis of Primary and Secondary Syphilis in the Past Year',
@@ -1346,7 +1349,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 )
 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'diagnosis.early.latent',
+                         name = 'diagnosis.el',
                          value = expression(diagnosis.total),
                          subset.dimension.values = list(stage='early.latent'),  
                          outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals with a Diagnosis of Early Latent Syphilis in the Past Year',
@@ -1361,7 +1364,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 )
 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'diagnosis.late.latent.unknown',
+                         name = 'diagnosis.ll.un',
                          value = expression(diagnosis.total),
                          subset.dimension.values = list(stage='late.stages'), # late.stages=c('late.latent','tertiary','cns')
                          outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals with a Diagnosis of Late Latent Or Unknown Syphilis in the Past Year',

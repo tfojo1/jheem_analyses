@@ -216,11 +216,11 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.empirically
                                       0.4, 0.2, 0.6)
 #'@Todd: I am not sure about these. also if we vary them, we may add to >1
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.primary',
-                                      025,0.25*lb, 0.25*hb)
+                                      0.25,0.25*lb, 0.25*hb)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
-                                      025,0.25*lb, 0.25*hb)
+                                      0.25,0.25*lb, 0.25*hb)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
-                                      025,0.25*lb, 0.25*hb)
+                                      0.25,0.25*lb, 0.25*hb)
 
 ## ********** -----
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values

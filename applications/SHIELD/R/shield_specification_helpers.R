@@ -530,6 +530,7 @@ get.rate.of.contacts.per.case = function(index.case.diagnosis.rate,
                                          sexual.contact.matrix,
                                          specification.metadata)
 {
+ 
     # From Todd: I believe that the way we have written the specification, index.case.diagnosis.rate and sexual.contact will always have the required dimensions
     #   but just in case not, I am putting this check here.
     # Could use array.expand if needed if this ever throws an error
