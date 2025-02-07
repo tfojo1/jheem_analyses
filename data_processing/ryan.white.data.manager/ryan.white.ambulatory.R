@@ -44,7 +44,7 @@ ryan.white.ambulatory.clean = lapply(ryan.white.ambulatory, function(file){
       mutate(location = ifelse(`ema.tga` == "Philadelphia", "C.37980", location))%>%
       mutate(location = ifelse(`ema.tga` == "Portland", "C.38900", location))%>%
       mutate(location = ifelse(`ema.tga` == "Washington", "C.47900", location))%>%
-      mutate(location = ifelse(`ema.tga` == "Riverside", "C.40140", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Riverside San Bernardino", "C.40140", location))%>%
       mutate(location = ifelse(`ema.tga` == "Jacksonville", "C.27260", location))%>%
       mutate(location = ifelse(`ema.tga` == "Tampa", "C.45300", location))%>%
       mutate(location = ifelse(`ema.tga` == "Minneapolis", "C.33460", location))%>%
