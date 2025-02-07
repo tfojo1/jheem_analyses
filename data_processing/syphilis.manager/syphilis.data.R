@@ -14,7 +14,7 @@ outcome.mappings.syphilis = c('Primary and Secondary Syphilis'='ps.syphilis',
                               'Congenital Syphilis' = 'congenital.syphilis',
                               'Unknown Duration or Late Syphilis' = 'unknown.duration.or.late.syphilis')
 
-syphilis.mappings.age = c('0-14' = '13-14 years',  #decided to make this change on 5-6-24 to align with ontology (assume no on under 13 has STI)
+syphilis.mappings.age = c('0-14' = '0-14 years',  
                           '15-19' = '15-19 years',
                           '20-24' = '20-24 years',
                           '25-29' = '25-29 years',
@@ -100,7 +100,7 @@ syphilis.data.early <- lapply(syphilis_files_early, function(x){
   list(filename=x, data=read.csv(x, skip=skip, header=TRUE, colClasses=c(FIPS="character")))
 })
 
-early.syphilis.age = c('0-14' = '13-14 years',  #decided to make this change on 5-6-24 to align with ontology (assume no on under 13 has STI)
+early.syphilis.age = c('0-14' = '0-14 years',  
                        '15-24' = '15-24 years',
                        '25-34' = '25-34 years',
                        '35-44' = '35-44 years',
