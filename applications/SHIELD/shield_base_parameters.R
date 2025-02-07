@@ -8,8 +8,7 @@ add.parameter <- function(params, param.name,
                           ci.lower,
                           ci.upper,
                           citation=NA,
-                          comment=NA)
-{
+                          comment=NA){
   params$values[param.name] = value
   params$ci.lower[param.name] = ci.lower
   params$ci.upper[param.name] = ci.upper
@@ -18,7 +17,6 @@ add.parameter <- function(params, param.name,
   
   params
 }
-
 SHIELD_BASE_PARAMETER = list(values=numeric(),
                              ci.lower=numeric(),
                              ci.upper=numeric(),
@@ -28,7 +26,7 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
 # ci's are not used
 # citation numbers are oubmed ID, they're for our own records'
 
-# *** INITIAL POPULATION INFECTED ----
+# *** INITIAL POPULATION INFECTED ---- ## ----
 # size of syphilis infected popualtion in 1940
 # asusming they are all undiagnosed # do we have data on subgroups ? 
 # proportion of ininitial population infected with untreated syphilis (prevalence)
@@ -47,7 +45,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.po
                                       0,0,0) # TBD
 
 
-# *** SYPHILIS MORTALITY ----
+# *** SYPHILIS MORTALITY ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.primary',
                                       0,0,0) # TBD
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.secondary',
@@ -63,11 +61,11 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mort
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.congenital',
                                       0,0,0) # TBD 
 
-# *** TRANSMISSION ----
+# *** TRANSMISSION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'primary.rel.secondary.transmissibility', #observed to estimated ratio of contacts for females with male who are msm
                                       1,1,1) #?????
-## MIXING BY SEXUAL ORIENTATION ----
+## ---- MIXING BY SEXUAL ORIENTATION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'oe.female.pairings.with.msm', #observed to estimated ratio of contacts for females with male who are msm
                                       0.0895,0.0895*.75,0.0895*1.25, #Todd: I'm not sure what the CI should be here?
@@ -78,7 +76,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       0.004,0.004*.75,0.004*1.25, #Todd: I'm not sure what the CI should be here?
                                       citation='assumption')
 
-## SEXUAL CONTACT BY RACE ----
+## ---- SEXUAL CONTACT BY RACE ---- ## ----
 #base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
 #these are average values from 4 different studies that are included in the pairing_input_manager
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
@@ -93,7 +91,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'oe.sexual.byrace.oo',
                                       1.55, 1.55*.75, 1.55*1.25,
                                       citation='assumption')
-## SEXUAL TRANSMISSION RATES ----
+## ---- SEXUAL TRANSMISSION RATES ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.sexual.transmission',
                                       4.75, 2.4, 7.1,
                                       citation=26362321)
@@ -110,12 +108,29 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
                                       0.18, 0.18*5, 0.18*2,
                                       citation=9525438)
 
-# *** NEW BIRTHS ----
+# *** CONGENITAL SYPHILIS ---- ##----
+## ---- Prob of Vertical Transmission Based on Disease Stage -----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
+                                      .65,.6,.7) #
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
+                                      .1,.05,.7) #
+## ---- Risk Ratios Based on Prenatal Care timing  ----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.1st.trimester',
+                                      .1,.05,.7) #
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.2nd.trimester',
+                                      .1,.05,.7) #
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.3rd.trimester',
+                                      .1,.05,.7) #
+## ---- Prop Multibirths -----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.born', #proportion of births that are multibirth
+                                      0.03,0.03,0.03) #
+
+# *** NEW BIRTHS ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
                                       1.05, 1.05*5, 1.05*2,
                                       citation=00000)
-# *** NATURAL HISTORY -----
-## STATE DURATIONS ---- assuming as fixed 
+# *** NATURAL HISTORY ---- ##-----
+## ---- STATE DURATIONS ---- assuming as fixed 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.primary',
                                       4/52, 2/52, 6/52) #2-6weeks 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary',
@@ -123,13 +138,14 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.early.latent',
                                       8/12, 9/12, 11/12) #9-11 months (to sum to 1year with secondary)
 
-## TRANSITION RATES ----
+## ---- TRANSITION RATES ----
 # RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
                                       0.25,.25 * lb,.25 *hb) # Range??? 
 # Late Latent to Tertiary:
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
                                       0.01049095 ,0.00946867 ,0.01151324)  #untreated_syphilis_progression_rates.R
+
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
                                       0.010286933, 0.008440789, 0.012133077) #untreated_syphilis_progression_rates.R
 # Late Latent to CNS:
@@ -141,7 +157,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.t
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.early.latent.to.cns',
                                       0.085 ,0.05, 0.12) 
 
-## ASYMPTOMATIC INFECTIONS ----
+## ---- ASYMPTOMATIC INFECTIONS ----
 ## Primary: Chancre in extra-genital areas that may be missed 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.primary.msm',
                                       0.16, 0.05,.3) # 16% of primary chancre in non-penile areas
@@ -162,38 +178,17 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.l
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.asymptomatic.tertiary.cns',
                                       0,0,0)## All teritiary & CNS infections are sympthomatic
 
-# SYMPTOMATIC TESTING -----
+# *** TESTING ---- ##-----
+## --- Symptomatic testing ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.symptomatic.base',
                                       1,1,1) # ????
 
-# HIV TESTING BY AGE -----
+## ---- HIV Testing By Age ----
 # what fraction of tests performed in 15-19 year olds are among 18-19 year olds
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
-                                      0.9,.9,.9) # #'PK: to estiamte from CDC data
- 
-# VERTICALL TRANSMOSSION -----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
-                                      .65,.6,.7) #
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
-                                      .1,.05,.7) #
-# RISK based on stage of infection ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.1st.trimester',
-                                      .1,.05,.7) #
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.2nd.trimester',
-                                      .1,.05,.7) #
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.3rd.trimester',
-                                      .1,.05,.7) #
- 
-# PRENATAL SCREENING ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.prenatal.screening.1st.trimester',
-                                      0,0,0) #
+                                      0.9,.9,.9) # #'PK: to estimate from CDC data
 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.born', #proportion of births that are multibirth
-                                      0.03,0.03,0.03) #
-
-
-
-# PROP OF IMMEDIATE TREATMENTS By TESTING ROUTE ----
+# *** PROP OF IMMEDIATE TREATMENTS By TESTING ROUTE ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
                                       0,0,0) #
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.testing.symptomatic', 
@@ -203,15 +198,32 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immedi
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.contact.tracing', 
                                       0,0,0) #
 
-# RATE OF DELAYED TREATMENT ----
+# *** RATE OF DELAYED TREATMENT ---- ##----
 #if someone is diagnosed and doesnt receive immediate treatment, what is the rate of treatment
 #'@TODO: should we seperate this besed on sympthoms? or for pregnant women? 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
                                       .1,.1,.1) #
 
 
+# *** CONTACT TRACING ---- ## ----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
+                                      0.8, 0.5, 0.98)  
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
+                                      0.1, .05, 0.17)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.empirically.treated.per.index.case',
+                                      0.25, 0.12, 0.6)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.empirically.treated.contacts.with.syphilis',
+                                      0.4, 0.2, 0.6)
+#'@Todd: I am not sure about these. also if we vary them, we may add to >1
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.primary',
+                                      025,0.25*lb, 0.25*hb)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
+                                      025,0.25*lb, 0.25*hb)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
+                                      025,0.25*lb, 0.25*hb)
 
-
+## ********** -----
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
 
- 
+
+

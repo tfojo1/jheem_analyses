@@ -3,6 +3,15 @@ library(ggplot2)
 # save this in applications/ehe; this will not be sourced though 
 source('../jheem_analyses/applications/EHE/ehe_specification.R') #this is sourcing the EHE application to set up the environment. should be changed to SHIELD's
 
+# section1- reading the data:
+
+#Q1: what propotion of previous treatments were DSTB or DRTB
+# variables
+
+
+
+
+
 
 # Main functions # -----
 # Read and clean the BRFSS data according to the model requirements 
