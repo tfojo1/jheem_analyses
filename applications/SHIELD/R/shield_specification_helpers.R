@@ -537,15 +537,24 @@ get.rate.of.contacts.per.case = function(index.case.diagnosis.rate,
  
     expected.contact.matrix.dimensions  = c('age.to','race.to','sex.to','age.from','race.from','sex.from')
     expected.diagnosis.rate.dimensions = c('age','race','sex','stage')
+    expected.diagnosis.rate.dim.names = specification.metadata$dim.names[expected.diagnosis.rate.dimensions]
+    expected.diagnosis.rate.dim.names$stage = c('primary','secondary','early.latent')
     
-    if (length(expected.contact.matrix.dimensions) != length(dim(sexual.contact.matrix)) ||
-        any(expected.contact.matrix.dimensions != names(dim(sexual.contact.matrix))))
-      stop(paste0("The sexual.contact.matrix does not have the expected dimensions in the expected order"))
+#    if (length(expected.contact.matrix.dimensions) != length(dim(sexual.contact.matrix)) ||
+#        any(expected.contact.matrix.dimensions != names(dim(sexual.contact.matrix))))
+#      stop(paste0("The sexual.contact.matrix does not have the expected dimensions in the expected order"))
     
-    if (length(expected.diagnosis.rate.dimensions) != length(dim(index.case.diagnosis.rate)) ||
-        any(expected.diagnosis.rate.dimensions != names(dim(index.case.diagnosis.rate))))
-      stop(paste0("The index.case.diagnosis.rate does not have the expected dimensionsin the expected order"))
+#    if (length(expected.diagnosis.rate.dimensions) != length(dim(index.case.diagnosis.rate)) ||
+#        any(expected.diagnosis.rate.dimensions != names(dim(index.case.diagnosis.rate))))
+#      stop(paste0("The index.case.diagnosis.rate does not have the expected dimensionsin the expected order"))
+ 
+    index.case.diagnosis.rate = expand.array(to.expand = index.case.diagnosis.rate,
+                                             target.dim.names = expected.diagnosis.rate.dim.names)
     
+    sexual.contact.matrix = expand.array(to.expand = sexual.contact.matrix,
+                                         target.dim.names = specification.metadata$dim.names[expected.contact.matrix.dimensions])
+  
+     
     # Sum up just the stages who will get tracing done
     # index.case.diagnosis.rate: index cases who gets traced
     index.cases.who.get.traced = rowSums(index.case.diagnosis.rate[,,,c('primary','secondary','early.latent')], dims = 3)
