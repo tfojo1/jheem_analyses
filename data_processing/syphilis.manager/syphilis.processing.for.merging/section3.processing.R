@@ -85,13 +85,40 @@ data.manager$register.outcome(
     description = "Metro Emigration"))
 
 data.manager$register.outcome(
-  'inadequate.prenatal.care',
+  'prenatal.care.initiation.first.trimester',
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'Inadequate Prenatal Care',
-    axis.name = 'Inadequate Prenatal Care',
+    display.name = 'Prenatal Care Initiation First Trimester',
+    axis.name = 'Prenatal Care Initiation First Trimester',
     units = '%',
-    description = "Inadequate Prenatal Care"), denominator.outcome = 'female.population')
+    description = "Prenatal Care Initiation First Trimester"), denominator.outcome = 'female.population')
+
+data.manager$register.outcome(
+  'prenatal.care.initiation.second.trimester',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Prenatal Care Initiation Second Trimester',
+    axis.name = 'Prenatal Care Initiation Second Trimester',
+    units = '%',
+    description = "Prenatal Care Initiation Second Trimester"), denominator.outcome = 'female.population')
+
+data.manager$register.outcome(
+  'prenatal.care.initiation.third.trimester',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Prenatal Care Initiation Third Trimester',
+    axis.name = 'Prenatal Care Initiation Third Trimester',
+    units = '%',
+    description = "Prenatal Care Initiation Third Trimester"), denominator.outcome = 'female.population')
+
+data.manager$register.outcome(
+  'no.prenatal.care',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'No Prenatal Care',
+    axis.name = 'No Prenatal Care',
+    units = '%',
+    description = "No Prenatal Care"), denominator.outcome = 'female.population')
 
 #Register Sources:
 data.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
@@ -104,7 +131,6 @@ data.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "C
 data.manager$register.source('census.aggregated.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
 data.manager$register.source('census.population', parent.source= "ACS", full.name = "US Census Bureau Population Data", short.name='census.population')
 data.manager$register.source('census.deaths', parent.source= "NCHS", full.name = "Census Death Data", short.name='census.deaths')
-data.manager$register.source('march.of.dimes', parent.source= "NCHS", full.name = "March of Dimes Peristats", short.name='march.of.dimes')
 data.manager$register.source('cdc.wonder.aggregated.population', parent.source= "NCHS", full.name = 'CDC Wonder Aggregated Adult Population', short.name = 'cdc.wonder.agg.pop')
 
 #Register Ontologies:
@@ -185,24 +211,13 @@ data.manager$register.ontology(
     incomplete.dimensions = c("year", "location")
   ))
 
-data.manager$register.ontology(
-  'prenatal.care',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age = c("<20 years", "20-29 years", "30-39 years", ">= 40 years"), 
-    race=c('black', 'hispanic', 'other', 'white'),
-    sex=c('male','female'),
-    incomplete.dimensions = c("year", "location")
-  ))
-
 
 #Codes:
 source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/msa_immigration.R')
 source('data_processing/syphilis.manager/national_immigration.R')
-source('data_processing/syphilis.manager/inadequate.prenatal.care.R')
+source('data_processing/syphilis.manager/prenatal.care.cdc.wonder.R')
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
