@@ -189,9 +189,3 @@ simplot(simset$last.sim(),
         outcomes = c("total.hiv.tests.per.population"), 
         style.manager = location.style.manager,plot.year.lag.ratio = T,
         dimension.values = list(year = 2000:2030)) 
-
-plot(1:simset$n.sim,simset$parameters["black.msm.trate.peak",])
-
-
-# simplot(sim,outcomes = "total.hiv.tests")
-round(apply(simset$last.sim()$diagnosed.prevalence,c("year","sex"),sum)/apply(simset$last.sim()$infected,c("year","sex"),sum)[-1,],3)
