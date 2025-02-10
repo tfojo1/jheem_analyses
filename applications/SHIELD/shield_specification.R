@@ -934,7 +934,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = SHIELD_BASE_PARAMETER_VALUES['prop.index.cases.reached.for.contact.tracing'])
 
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'contacts.diagnosed.treated.per.index.case', #'@Todd: I am changing thise to diagnosed/treated to align with data.see below for immediate treatment
+                       name = 'contacts.diagnosed.treated.per.index.case',
                        scale = 'rate',
                        value = SHIELD_BASE_PARAMETER_VALUES['contacts.diagnosed.treated.per.index.case'])
 
@@ -988,20 +988,23 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'index.case.diagnosis.rate',
                         scale='rate',
+                        dimensions = c('location', 'age','race','sex','stage'),
                         value = 0)
-#'@Todd: I am getting an error with this
-register.model.quantity.subset(SHIELD.SPECIFICATION,#'@Todd: this is causing an error
-                        name = 'index.case.diagnosis.rate',
-                        applies.to = list(age='all.ages', 
-                                          race=c('black','hispanic','other'),
-                                                 sex=c('heterosexual_male', 'msm', 'female'),
-                                                                 stage=c('primary','secondary','early.latent')),
-                        value = expression(rate.testing.symptomatic + rate.screening))
 
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name = 'index.case.diagnosis.rate',
-#                                applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
-#                                value = expression(rate.testing.symptomatic + rate.screening +rate.prenatal.screening))
+register.model.quantity.subset(SHIELD.SPECIFICATION, 
+                               name = 'index.case.diagnosis.rate',
+                               applies.to = list(sex=c('msm','heterosexual_male'),age='all.ages', stage=c('primary','secondary','early.latent')),
+                               value = expression(rate.testing.symptomatic + rate.screening))
+
+register.model.quantity.subset(SHIELD.SPECIFICATION, 
+                               name = 'index.case.diagnosis.rate',
+                               applies.to = list(sex=c('female'),age=NON.FERTILE.AGES, stage=c('primary','secondary','early.latent')),
+                               value = expression(rate.testing.symptomatic + rate.screening))
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'index.case.diagnosis.rate',
+                               applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
+                               value =expression(rate.testing.symptomatic + rate.screening + rate.prenatal.screening))
 
 # Mapping contact tracing rates from indexes to their contacts:
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -1016,7 +1019,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
                                              contacts.diagnosed.treated.per.index.case * 
                                              prp.infected.contacts.by.stage))
 
-register.model.quantity(SHIELD.SPECIFICATION, #'@:Todd: why do we need this?
+register.model.quantity(SHIELD.SPECIFICATION,  
                         name = 'rate.infected.contacts.empirically.treated',
                         scale='rate',
                         value = expression(rate.of.contacts.per.case * 
@@ -1025,10 +1028,7 @@ register.model.quantity(SHIELD.SPECIFICATION, #'@:Todd: why do we need this?
                                              prp.of.empirically.treated.contacts.with.syphilis *
                                              prp.infected.contacts.by.stage))
 
-# register.model.quantity(SHIELD.SPECIFICATION, #'@Todd: I think that we only need this 
-#                         name = 'rate.infected.contacts.empirically.treated',
-#                         scale='rate',
-#                         value = expression(rate.all.contacts.empirically.treated * prp.of.empirically.treated.contacts.with.syphilis))
+ 
 
 ##** Treatment --#----
 # a proportion will receive immediate treatment, another group will be delayed
@@ -1055,7 +1055,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.treated.immediately.post.diagnosis',
                         value = expression(  rate.screening * prp.treated.immediately.following.screening +
                                              rate.testing.symptomatic * prp.treated.immediately.following.testing.symptomatic +
-                                               rate.contacts.diagnosed.treated ))#* prp.treated.immediately.following.contact.tracing))  #'@:Todd: I think that we should assume all of these contacts are treated immediately. you also didnt include them in delayed treatment below
+                                               rate.contacts.diagnosed.treated ))
 # Adding prenatal
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.treated.immediately.post.diagnosis',

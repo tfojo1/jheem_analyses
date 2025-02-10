@@ -102,6 +102,7 @@ cat("CENSUS.AGES set to ",CENSUS.AGES,"\n")
 # cat("DEFAULT.POPULATION.YEARS set to ",DEFAULT.POPULATION.YEARS,"\n")
 
 FERTILE.AGES=c('15-19 years','20-24 years','25-29 years','30-34 years','35-39 years','40-44 years')
+NON.FERTILE.AGES=c('0-14 years','45-49 years', '50-54 years', '55-64 years', '65+ years')
 cat("FERTILE.AGES set to ",FERTILE.AGES,"\n")
 
 

@@ -18,7 +18,7 @@ sim = engine$run(params)
 #Outcomes
 simplot(sim,"population" )
 simplot(sim,"hiv.testing" ) 
-# <<<<<<< HEAD
+
 simplot(sim,"diagnosis.ps")  #'@Andrew: no data points are shown on the plot
 # SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[,'C.12580']
 
