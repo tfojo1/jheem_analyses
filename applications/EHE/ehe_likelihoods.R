@@ -409,8 +409,6 @@ suppression.likelihood.instructions =
                                                    levels.of.stratification = c(0,1), 
                                                    from.year = 2008, 
                                                    
-                                                   maximum.locations.per.type = 2,
-                                                   
                                                    p.bias.inside.location = suppression.bias.estimates$in.mean, 
                                                    p.bias.outside.location = suppression.bias.estimates$out.mean,
                                                    p.bias.sd.inside.location = suppression.bias.estimates$in.sd,
