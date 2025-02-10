@@ -52,7 +52,7 @@ ryan.white.totals = lapply(ryan.white.pdf.reports, function(file){
       mutate(location = ifelse(`ema/tga` == "Minneapolis St. Paul", "C.33460", location))%>%
       mutate(location = ifelse(`ema/tga` == "Las Vegas", "C.29820", location))%>%
       mutate(location = ifelse(`ema/tga` == "Columbus", "C.18140", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Ft. Worth", "C.49380", location))
+      mutate(location = ifelse(`ema/tga` == "Ft. Worth", "C.19100", location))
     
     data$location.check = locations::is.location.valid(data$location)
     #data = subset(data, data$location.check == "TRUE")
@@ -322,7 +322,7 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
       mutate(location = ifelse(`ema.tga` == "Minneapolis St. Paul", "C.33460", location))%>%
       mutate(location = ifelse(`ema.tga` == "Las Vegas", "C.29820", location))%>%
       mutate(location = ifelse(`ema.tga` == "Columbus", "C.18140", location))%>%
-      mutate(location = ifelse(`ema.tga` == "Ft. Worth", "C.49380", location))
+      mutate(location = ifelse(`ema.tga` == "Ft. Worth", "C.19100", location))
     
     data$location.check = locations::is.location.valid(data$location)
     data = subset(data, data$location.check == "TRUE")
