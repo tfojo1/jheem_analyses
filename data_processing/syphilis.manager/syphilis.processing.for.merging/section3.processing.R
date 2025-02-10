@@ -162,7 +162,6 @@ data.manager$register.ontology(
     ethnicity = c('hispanic or latino', 'not hispanic or latino')
   ))
 data.manager$register.ontology(     #This is for the births+births denominator data pulled from Census
-
   'census.cdc.wonder.births.deaths',
   ont = ontology(
     year= NULL,

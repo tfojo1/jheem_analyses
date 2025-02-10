@@ -10,7 +10,7 @@ suppressWarnings(cdc.prenatal.data <- lapply(cdc.prenatal.files, function(x) {
 
 #Total Level Data
 
-clean.total = lapply(cdc.prenatal.data, function(file){
+clean.total.prenatal = lapply(cdc.prenatal.data, function(file){
   
   data=file[["data"]]
   filename = file[["filename"]]
@@ -36,11 +36,25 @@ clean.total = lapply(cdc.prenatal.data, function(file){
     mutate(outcome = case_when(`Trimester.Prenatal.Care.Began` == "1st to 3rd month" ~"prenatal.care.initiation.first.trimester",
                                `Trimester.Prenatal.Care.Began` == "4th to 6th month" ~"prenatal.care.initiation.second.trimester",
                                `Trimester.Prenatal.Care.Began` == "7th to final month" ~"prenatal.care.initiation.third.trimester",
-                               `Trimester.Prenatal.Care.Began` == "No prenatal care" ~"no.prenatal.care",))
+                               `Trimester.Prenatal.Care.Began` == "No prenatal care" ~"no.prenatal.care"))%>%
+    mutate(location.check = locations::is.location.valid(location))%>%
+    filter(location.check == T) #Remove the 'unidentified counties'
 
   data= as.data.frame(data)
   
   list(filename, data)
 })
 
-check = clean.total[[1]][[2]]
+#Put total level
+total.prenatal.put = lapply(clean.total.prenatal, `[[`, 2)
+
+for (data in total.prenatal.put) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.fertility',
+    source = 'cdc.wonder.natality',
+    dimension.values = list(),
+    url = 'https://wonder.cdc.gov/natality-expanded-current.html',
+    details = 'CDC Wonder Natality Data 2016-2023')
+}
