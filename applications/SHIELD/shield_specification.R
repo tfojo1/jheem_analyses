@@ -738,10 +738,10 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'rate',
                        value = SHIELD_BASE_PARAMETER_VALUES['rate.early.latent.to.cns']) #* can add multiplier to sample 
 #'@Todd: why doesnt this work?
-# register.transition(SHIELD.SPECIFICATION, 
+# register.transition(SHIELD.SPECIFICATION,
 #                     dimension = 'stage',
 #                     groups = 'infected',
-#                     from.compartments = list(stage=c('primary','secondary','early.latent'),
+#                     from.compartments = list(stage=c('primary','secondary','early.latent')),
 #                     to.compartments = 'cns',
 #                     value = 'rate.early.latent.to.cns')
 register.transition(SHIELD.SPECIFICATION,
