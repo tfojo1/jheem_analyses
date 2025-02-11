@@ -41,7 +41,6 @@ ryan.white.totals = lapply(ryan.white.pdf.reports, function(file){
     mutate(location = ifelse(`ema/tga` == "Austin", "C.12420", location))%>%
       mutate(location = ifelse(`ema/tga` == "Charlotte", "C.16740", location))%>%
       mutate(location = ifelse(`ema/tga` == "Cleveland", "C.17460", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Miami", "C.33100", location))%>%
       mutate(location = ifelse(`ema/tga` == "Norfolk", "C.47260", location))%>%
       mutate(location = ifelse(`ema/tga` == "Philadelphia", "C.37980", location))%>%
       mutate(location = ifelse(`ema/tga` == "Portland", "C.38900", location))%>%
@@ -52,10 +51,33 @@ ryan.white.totals = lapply(ryan.white.pdf.reports, function(file){
       mutate(location = ifelse(`ema/tga` == "Minneapolis St. Paul", "C.33460", location))%>%
       mutate(location = ifelse(`ema/tga` == "Las Vegas", "C.29820", location))%>%
       mutate(location = ifelse(`ema/tga` == "Columbus", "C.18140", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Ft. Worth", "C.19100", location))
-    
-    data$location.check = locations::is.location.valid(data$location)
-    #data = subset(data, data$location.check == "TRUE")
+      
+      #These are MSAs that need to be combined
+      mutate(location = ifelse(`ema/tga` == "San Francisco", "C.41860", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Oakland", "C.41860", location))%>%
+      
+      mutate(location = ifelse(`ema/tga` == "Los Angeles", "C.31080", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Orange County", "C.31080", location))%>%
+      
+      mutate(location = ifelse(`ema/tga` == "Miami", "C.33100", location))%>%
+      mutate(location = ifelse(`ema/tga` == "West Palm Beach", "C.33100", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Ft. Lauderdale", "C.33100", location))%>%
+      
+      mutate(location = ifelse(`ema/tga` == "Dallas", "C.19100", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Ft. Worth", "C.19100", location))%>%
+      
+      mutate(location = ifelse(`ema/tga` == "New York", "C.35620", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Middlesex", "C.35620", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Nassau Suffolk", "C.35620", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Bergen Passaic", "C.35620", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Jersey City", "C.35620", location))%>%
+      mutate(location = ifelse(`ema/tga` == "Newark", "C.35620", location))%>%
+      
+      #Sum the combined MSAs
+      group_by(location, year)%>%
+      mutate(summed.value = sum(value))%>%
+      select(-value)%>%
+      rename(value = summed.value)
       
   }
   
@@ -235,83 +257,13 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
   data=file[["data"]]
   filename = file[["filename"]]
   
-  if(grepl("race.ethnicity", filename)) {
-    data <- data %>%
-      pivot_longer(cols = contains("count"),
-                   names_to = "race",
-                   values_to = "value")%>%
-      select('ema.tga', race, value)%>%
-      mutate(race = gsub("count", "", race))%>%
-      mutate(race = trimws(race))%>%
-      filter(race != 'total')
-  }
-  
-  if(grepl("agegroup", filename)) {
-    data <- data %>%
-      pivot_longer(cols = contains("count"),
-                   names_to = "age",
-                   values_to = "value")%>%
-      select('ema.tga', age, value)%>%
-      mutate(age = gsub("count", "", age))%>%
-      mutate(age = trimws(age))%>%
-      filter(age != "<13 years")%>%
-      filter(age != 'total')
-  }
-  
-  if(grepl("fpl", filename)) {
-    data <- data %>%
-      pivot_longer(cols = contains("count"),
-                   names_to = "fpl",
-                   values_to = "value")%>%
-      select('ema.tga', fpl, value)%>%
-      mutate(fpl = gsub("count", "", fpl))%>%
-      mutate(fpl = gsub("FPL", "", fpl))%>%
-      mutate(fpl = trimws(fpl))%>%
-      filter(fpl != 'total')
-  }
-  
-  if(grepl("service.received", filename)) {
-    data <- data %>%
-      pivot_longer(cols = contains("count"),
-                   names_to = "service.received",
-                   values_to = "value")%>%
-      select('ema.tga', service.received, value)%>%
-      mutate(service.received = gsub("count", "", service.received))%>%
-      mutate(service.received = trimws(service.received))%>%
-      filter(service.received != 'total')
-  }
-  
-  if(grepl("risk_sex", filename)) {
-    data <- data %>%
-      pivot_longer(cols = contains("count"),
-                   names_to = "risk",
-                   values_to = "value")%>%
-      select('ema.tga', risk, value)%>%
-      mutate(risk = gsub("count", "", risk))%>%
-      mutate(risk = trimws(risk))%>%
-      filter(risk != 'total')
-  }
-  
-  if(grepl("msa_sex_only", filename)) {
-    data <- data %>%
-      pivot_longer(cols = contains("count"),
-                   names_to = "sex",
-                   values_to = "value")%>%
-      select('ema.tga', sex, value)%>%
-      mutate(sex = gsub("count", "", sex))%>%
-      mutate(sex = trimws(sex))%>%
-      filter(sex == "male" | sex == 'female')
-  }
-  
-  
   if(grepl("_msa", filename)) {
     data$location = locations::get.location.code(data$`ema.tga`, 'CBSA')
-    
+
     data<- data %>%
       mutate(location = ifelse(`ema.tga` == "Austin", "C.12420", location))%>%
       mutate(location = ifelse(`ema.tga` == "Charlotte", "C.16740", location))%>%
       mutate(location = ifelse(`ema.tga` == "Cleveland", "C.17460", location))%>%
-      mutate(location = ifelse(`ema.tga` == "Miami", "C.33100", location))%>%
       mutate(location = ifelse(`ema.tga` == "Norfolk", "C.47260", location))%>%
       mutate(location = ifelse(`ema.tga` == "Philadelphia", "C.37980", location))%>%
       mutate(location = ifelse(`ema.tga` == "Portland", "C.38900", location))%>%
@@ -322,49 +274,146 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
       mutate(location = ifelse(`ema.tga` == "Minneapolis St. Paul", "C.33460", location))%>%
       mutate(location = ifelse(`ema.tga` == "Las Vegas", "C.29820", location))%>%
       mutate(location = ifelse(`ema.tga` == "Columbus", "C.18140", location))%>%
-      mutate(location = ifelse(`ema.tga` == "Ft. Worth", "C.19100", location))
-    
-    data$location.check = locations::is.location.valid(data$location)
-    data = subset(data, data$location.check == "TRUE")
-    data$location = as.character(data$location)
+
+      #These are MSAs that need to be combined
+      mutate(location = ifelse(`ema.tga` == "San Francisco", "C.41860", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Oakland", "C.41860", location))%>%
+
+      mutate(location = ifelse(`ema.tga` == "Los Angeles", "C.31080", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Orange County", "C.31080", location))%>%
+
+      mutate(location = ifelse(`ema.tga` == "Miami", "C.33100", location))%>%
+      mutate(location = ifelse(`ema.tga` == "West Palm Beach", "C.33100", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Ft. Lauderdale", "C.33100", location))%>%
+
+      mutate(location = ifelse(`ema.tga` == "Dallas", "C.19100", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Ft. Worth", "C.19100", location))%>%
+
+      mutate(location = ifelse(`ema.tga` == "New York", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Middlesex", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Nassau Suffolk", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Bergen Passaic", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Jersey City", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Newark", "C.35620", location))
   }
-  
-  data$value = gsub(",", '', data$value)
-  data$value = as.numeric(data$value)
-  
+
+  if(grepl("race.ethnicity", filename)) {
+    data <- data %>%
+      pivot_longer(cols = contains("count"),
+                   names_to = "race",
+                   values_to = "value")%>%
+      select('ema.tga', race, value, location)%>%
+      mutate(value = as.numeric(gsub(",", "", value)))%>%
+      mutate(race = gsub("count", "", race))%>%
+      mutate(race = trimws(race))%>%
+      filter(race != 'total')%>%
+      group_by(location, race)%>%
+      mutate(summed.value = sum(value))
+  }
+
+  if(grepl("agegroup", filename)) {
+    data <- data %>%
+      pivot_longer(cols = contains("count"),
+                   names_to = "age",
+                   values_to = "value")%>%
+      select('ema.tga', age, value, location)%>%
+        mutate(value = as.numeric(gsub(",", "", value)))%>%
+      mutate(age = gsub("count", "", age))%>%
+      mutate(age = trimws(age))%>%
+      filter(age != "<13 years")%>%
+      filter(age != 'total')%>%
+      group_by(location, age)%>%
+      mutate(summed.value = sum(value))
+  }
+
+  if(grepl("fpl", filename)) {
+    data <- data %>%
+      pivot_longer(cols = contains("count"),
+                   names_to = "fpl",
+                   values_to = "value")%>%
+      select('ema.tga', fpl, value, location)%>%
+        mutate(value = as.numeric(gsub(",", "", value)))%>%
+      mutate(fpl = gsub("count", "", fpl))%>%
+      mutate(fpl = gsub("FPL", "", fpl))%>%
+      mutate(fpl = trimws(fpl))%>%
+      filter(fpl != 'total')%>%
+      group_by(location, fpl)%>%
+      mutate(summed.value = sum(value))
+  }
+
+  if(grepl("service.received", filename)) {
+    data <- data %>%
+      pivot_longer(cols = contains("count"),
+                   names_to = "service.received",
+                   values_to = "value")%>%
+      select('ema.tga', service.received, value, location)%>%
+        mutate(value = as.numeric(gsub(",", "", value)))%>%
+      mutate(service.received = gsub("count", "", service.received))%>%
+      mutate(service.received = trimws(service.received))%>%
+      filter(service.received != 'total')%>%
+      group_by(location, service.received)%>%
+      mutate(summed.value = sum(value))
+  }
+
+  if(grepl("risk_sex", filename)) {
+    data <- data %>%
+      pivot_longer(cols = contains("count"),
+                   names_to = "risk",
+                   values_to = "value")%>%
+      select('ema.tga', risk, value, location)%>%
+        mutate(value = as.numeric(gsub(",", "", value)))%>%
+      mutate(risk = gsub("count", "", risk))%>%
+      mutate(risk = trimws(risk))%>%
+      filter(risk != 'total')
+  }
+
+  if(grepl("msa_sex_only", filename)) {
+    data <- data %>%
+      pivot_longer(cols = contains("count"),
+                   names_to = "sex",
+                   values_to = "value")%>%
+      select('ema.tga', sex, value, location)%>%
+        mutate(value = as.numeric(gsub(",", "", value)))%>%
+      mutate(sex = gsub("count", "", sex))%>%
+      mutate(sex = trimws(sex))%>%
+      filter(sex == "male" | sex == 'female')%>%
+      group_by(location, sex)%>%
+      mutate(summed.value = sum(value))
+  }
+
   if(grepl("non.adap", filename)) {
     data$outcome = 'non.adap.clients'
   }
   if(grepl("adap.clients", filename)) {
     data$outcome = 'adap.clients'
   }
-  
-  if(grepl("2022", filename)) {
-    data$year = "2022"
-  }
+
   if(grepl("2023", filename)) {
     data$year = "2023"
   }
-  
-  #Group and sum the 'other' risk category for risk_sex
+
+  # #Group and sum the 'other' risk category for risk_sex
   if(grepl("risk_sex", filename)) {
     data <- data %>%
-      select(outcome, year, location, risk, value)%>%
+      select('ema.tga', outcome, year, location, risk, value)%>%
       mutate(risk = trimws(risk))%>%
       mutate(risk = ifelse(risk == "perinatal", 'other', risk))%>%
       group_by(year, location, risk)%>%
-      mutate(test = sum(value))%>%
-      select(-value)%>%
-      rename(value = test)
+      mutate(summed.value = sum(value))
+
   }
-  
+
   if(grepl("risk_sex_female", filename)) {
     data$sex = 'female'
   }
   if(grepl("risk_sex_male", filename)) {
     data$sex = 'male'
   }
-  
+
+  data <- data %>%
+    select(-value)%>%
+    rename(value = summed.value)
+
   data= as.data.frame(data)
   list(filename, data)
 })
