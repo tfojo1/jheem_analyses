@@ -161,3 +161,14 @@ register.ontology.mapping('nhanes.to.jheem.race',
                                            c('hispanic', 'hispanic'),
                                            c('other', 'other'),
                                            c('white, non hispanic', 'other')))
+
+#-----------------#
+#-- FROM AIDS VU --#
+#-----------------#
+
+register.ontology.mapping('aidsvu.to.jheem.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('black', 'black'),
+                                           c('hispanic', 'hispanic'),
+                                           c('white', 'other')))
