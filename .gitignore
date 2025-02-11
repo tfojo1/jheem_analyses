@@ -7,13 +7,13 @@
 cached
 prelim_results
 applications/EHE/calibration_runs/markdown_summaries/outputs
-
+use_jheem2_package_setting.R
 
 # OS-specific
 *.DS_Store
 applications/*.DS_Store
 .Rproj.user
 
-# ignore
+# ignore ignoring
 !commoncode/data_manager_cache_metadata.Rdata
 !commoncode/package_version_cache.Rdata
