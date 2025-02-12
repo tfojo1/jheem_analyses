@@ -1,6 +1,6 @@
 
 
-source('applications/EHE/ehe_specification.R')
+source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
 RW.SPECIFICATION = create.jheem.specification(version='rw',
                                               iteration = '1',
@@ -8,74 +8,64 @@ RW.SPECIFICATION = create.jheem.specification(version='rw',
                                               parent.version = 'ehe')
 
 register.model.element(RW.SPECIFICATION,
-                       name = 'proportion.pwh.receiving.amb.rw',
+                       name = 'proportion.pwh.with.rw',
                        scale = 'proportion',
                        value = 0.5)
 
 
 register.model.element(RW.SPECIFICATION,
-                       name = 'proportion.amb.rw.receiving.adap',
+                       name = 'proportion.rw.with.adap',
                        scale = 'proportion',
                        value = 0.5)
 
 
 register.model.quantity(RW.SPECIFICATION,
-                        name = 'proportion.pwh.receiving.no.amb.rw',
-                        value = expression(1 - proportion.pwh.receiving.amb.rw))
+                        name = 'proportion.pwh.without.rw',
+                        value = expression(1 - proportion.pwh.with.rw))
 
 
 register.model.quantity(RW.SPECIFICATION,
-                        name = 'proportion.pwh.receiving.adap',
-                        value = expression(proportion.amb.rw.receiving.adap*proportion.pwh.receiving.amb.rw))
+                        name = 'proportion.pwh.with.rw.and.adap',
+                        value = expression(proportion.pwh.with.rw * proportion.rw.with.adap))
 
 register.model.quantity(RW.SPECIFICATION,
-                        name = 'proportion.pwh.receiving.amb.rw.non.adap',
-                        value = expression(proportion.pwh.receiving.amb.rw*(1-proportion.amb.rw.receiving.adap)))
-
+                        name = 'proportion.pwh.with.rw.without.adap',
+                        value = expression(proportion.pwh.with.rw * (1-proportion.rw.with.adap)))
 
 register.model.element(RW.SPECIFICATION, 
-                       name = 'proportion.amb.rw.non.adap.suppressed',
+                       name = 'proportion.rw.suppressed',
                        scale = 'proportion',
                        value = 0.9 )
 
 register.model.quantity(RW.SPECIFICATION,
-                        name = 'proportion.suppressed.receiving.amb.rw.non.adap',
-                        value = expression(proportion.pwh.receiving.amb.rw.non.adap*proportion.amb.rw.non.adap.suppressed / super.suppression.of.diagnosed))
+                        name = 'proportion.pwh.who.are.suppressed.with.rw.without.adap',
+                        value = expression(proportion.pwh.with.rw.without.adap * proportion.rw.suppressed))
+
+register.model.quantity(RW.SPECIFICATION,
+                        name = 'proportion.pwh.who.are.suppressed.with.rw.and.adap',
+                        value = expression(proportion.pwh.with.rw.and.adap * proportion.rw.suppressed))
+
+register.model.quantity(RW.SPECIFICATION,
+                        name = 'proportion.pwh.who.are.suppressed.without.rw',
+                        value = expression(super.suppression.of.diagnosed - proportion.pwh.who.are.suppressed.with.rw.without.adap - proportion.pwh.who.are.suppressed.with.rw.and.adap))
 
 
 register.model.element(RW.SPECIFICATION,
-                        name = 'proportion.adap.suppressed',
-                        scale = 'proportion',
-                       value = 0.9)
-
-register.model.quantity(RW.SPECIFICATION,
-                        name = 'proportion.suppressed.receiving.adap',
-                        value = expression(proportion.pwh.receiving.adap*proportion.adap.suppressed / super.suppression.of.diagnosed))
-
-register.model.quantity(RW.SPECIFICATION,
-                        name = 'proportion.suppressed.receiving.no.amb.rw',
-                        value = expression(1 - proportion.suppressed.receiving.amb.rw.non.adap - proportion.suppressed.receiving.adap))
-
-
-register.model.element(RW.SPECIFICATION,
-                       name = 'amb.rw.no.adap.effect',
+                       name = 'rw.without.adap.suppression.effect',
                        scale = 'proportion',
                        value = 1)
 
 register.model.element(RW.SPECIFICATION,
-                       name = 'adap.effect',
+                       name = 'adap.suppression.effect',
                        scale = 'proportion',
                        value = 1)
 
 
 register.model.quantity(RW.SPECIFICATION,
                         name= 'suppression.of.diagnosed',
-                        value = expression(super.suppression.of.diagnosed * 
-                                             (proportion.suppressed.receiving.amb.rw.non.adap*amb.rw.no.adap.effect+
-                                                proportion.suppressed.receiving.adap*adap.effect +
-                                                proportion.suppressed.receiving.no.amb.rw*1)
-                        )
-                        
+                        value = expression(proportion.pwh.who.are.suppressed.without.rw +
+                                             proportion.pwh.who.are.suppressed.with.rw.without.adap * rw.without.adap.suppression.effect +
+                                             proportion.pwh.who.are.suppressed.with.rw.and.adap * adap.suppression.effect)
 )
 
 register.model.specification(RW.SPECIFICATION)
