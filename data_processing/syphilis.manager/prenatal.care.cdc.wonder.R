@@ -54,7 +54,7 @@ for (data in total.prenatal.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc.fertility',
+    ontology.name = 'cdc.prenatal',
     source = 'cdc.wonder.natality',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/natality-expanded-current.html',
@@ -62,7 +62,6 @@ for (data in total.prenatal.put) {
 }
 
 #Stratified by Age Only
-
 DATA.DIR.PRENATAL.AGE="../../data_raw/syphilis.manager/prenatal.care.cdc.wonder/age"
 
 prenatal.age.files <- Sys.glob(paste0(DATA.DIR.PRENATAL.AGE, '/*.csv'))
@@ -70,7 +69,6 @@ prenatal.age.files <- Sys.glob(paste0(DATA.DIR.PRENATAL.AGE, '/*.csv'))
 prenatal.age.data <- lapply(prenatal.age.files, function(x){
   list(filename=x, data=read.csv(x))
 })
-
 
 prenatal.age.data.clean = lapply(prenatal.age.data, function(file){
   
@@ -101,9 +99,25 @@ prenatal.age.data.clean = lapply(prenatal.age.data, function(file){
                                `Trimester.Prenatal.Care.Began` == "7th to final month" ~"prenatal.care.initiation.third.trimester",
                                `Trimester.Prenatal.Care.Began` == "No prenatal care" ~"no.prenatal.care"))%>%
     mutate(location.check = locations::is.location.valid(location))%>%
-    filter(location.check == T) #Remove the 'unidentified counties'
+    filter(location.check == T)%>% #Remove the 'unidentified counties'
+    select(outcome, year, location, age, value)%>%
+    mutate(age = if_else(age == '50 years and over', '50+ years', age))%>%
+    mutate(age = if_else(age == 'Under 15 years', '>15 years', age))
   
   data= as.data.frame(data)
   
   list(filename, data)
 })
+
+prenatal.age.data.clean.put = lapply(prenatal.age.data.clean, `[[`, 2)
+
+for (data in prenatal.age.data.clean.put) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.prenatal',
+    source = 'cdc.wonder.natality',
+    dimension.values = list(),
+    url = 'https://wonder.cdc.gov/natality-expanded-current.html',
+    details = 'CDC Wonder Natality Data 2016-2023')
+}
