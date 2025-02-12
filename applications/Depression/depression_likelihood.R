@@ -74,6 +74,7 @@ proportionDep_likelihood_inst <- create.nested.proportion.likelihood.instruction
                                         
                                         # n.multiplier.cv = , # defaults to 0.1 ## how do the denominators compare, internally done by the model
                                         weights = NULL, # are there certain data-points that are more important?
+                                        ## if we want to give depression a higher weight / weight=20 to start and see how it affects simulations ##
                                         # equalize.weight.by.year = , # normalises data points by year, so all years are equally important
                                         partitioning.function = DEP.PARTITIONING.FUNCTION 
                                                                    # different sources will stratify the data differently from the model, 
@@ -114,6 +115,6 @@ pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(ou
 # will yield 4 numbers, estimate and SD for being being inside/outside of MSA                                  
 # look at Melissa's code for this to get a sense of what to do // in EHE folder, ehe_bias_estimates_cache.R & ehe_likelihoods.R
 
-dep_likelihood_full <- join.likelihood.instructions(FULL.likelihood.instructions.with.aids, proportionDep_likelihood_inst, 
+dep_likelihood_full <- join.likelihood.instructions(FULL.likelihood.instructions.with.covid, proportionDep_likelihood_inst, 
                                                     prev_ratio_inst, hiv_depTx_inst, pop_depTx_inst)
 

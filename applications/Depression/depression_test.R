@@ -8,7 +8,7 @@ params["global.trate"] = 0.075
 
 engine=create.jheem.engine("dep", "C.12580", end.year = 2025)
 sim = engine$run(params)
-simplot(sim,"new")
+simplot(sim,'proportion.depressed')
 
 
 ## intervention: example get 90% on depression tx
