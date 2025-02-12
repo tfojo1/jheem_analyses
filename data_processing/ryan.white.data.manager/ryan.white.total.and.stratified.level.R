@@ -413,6 +413,8 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
   data <- data %>%
     select(-value)%>%
     rename(value = summed.value)
+  
+  data$location = as.character(data$location)
 
   data= as.data.frame(data)
   list(filename, data)
