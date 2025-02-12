@@ -35,6 +35,7 @@ ryan.white.suppression.clean = lapply(ryan.white.suppression, function(file){
  data$outcome = "non.adap.viral.suppression"
  data$value = (data$value/100)
  data$year = gsub("suppression percent", "", data$year)
+ data$year = trimws(data$year)
   
   data= as.data.frame(data)
   list(filename, data)
@@ -124,9 +125,7 @@ ryan.white.suppression.clean.msa = lapply(ryan.white.suppression.msa, function(f
     group_by(year, location)%>%
     mutate(denominator = sum(` total count`))%>%
     mutate(numerator = sum(` suppression count`))%>%
-    select(year, location, numerator, denominator)%>%
-    filter(!is.na(numerator))%>%
-    filter(!is.na(denominator))
+    select(year, location, numerator, denominator)
   
   data<- data[!duplicated(data), ]
   
@@ -136,6 +135,7 @@ ryan.white.suppression.clean.msa = lapply(ryan.white.suppression.msa, function(f
     select(-numerator, -denominator)
   
   data$location = as.character(data$location)
+  data$year = trimws(data$year)
 
 data= as.data.frame(data)
 list(filename, data)
