@@ -131,6 +131,8 @@ ryan.white.suppression.clean.msa = lapply(ryan.white.suppression.msa, function(f
   data<-data %>%
     mutate(value=(numerator/denominator))%>%
     mutate(outcome = "non.adap.viral.suppression")
+  
+  data$location = as.character(data$location)
 
 data= as.data.frame(data)
 list(filename, data)
