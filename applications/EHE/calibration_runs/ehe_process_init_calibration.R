@@ -1,7 +1,7 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = BALTIMORE.MSA
+LOCATION = CHICAGO.MSA
 
 CALIBRATION.CODE.TO.PROCESS = c(CALIBRATION.CODE.POPULATION, # 1
                                 CALIBRATION.CODE.TRANSMISSION, # 2

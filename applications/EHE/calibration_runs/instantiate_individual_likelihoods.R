@@ -1,32 +1,38 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
-LOCATION = BALTIMORE.MSA
+LOCATION = PHOENIX.MSA
 
-pop.lik = population.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
-imm.lik = immigration.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
-em.lik = emigration.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
+
+# likelihoods in full
+pop.lik = population.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
+imm.lik = immigration.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
+em.lik = emigration.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
 new.lik = new.diagnoses.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 prev.lik = prevalence.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 
-new.lik.two.way = race.risk.sex.two.way.new.diagnoses.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
-prev.lik.two.way = race.risk.sex.two.way.prevalence.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
+hiv.mort.lik = hiv.mortality.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
+gen.mort.lik = general.mortality.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
+aids.deaths.lik = aids.deaths.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
+aids.diag.lik = non.age.aids.diagnoses.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
 
-hiv.mort.lik = hiv.mortality.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
-gen.mort.lik = general.mortality.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
-aids.deaths.lik = aids.deaths.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
-aids.diag.lik = aids.diagnoses.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 prop.tested.lik = proportion.tested.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 positivity.lik = hiv.test.positivity.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 aware.lik = awareness.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 supp.lik = suppression.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
+
 prep.uptake.lik = prep.uptake.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 prep.ind.lik = prep.indications.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
-heroin.lik = heroin.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
-cocaine.lik = cocaine.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
+heroin.lik = heroin.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
+cocaine.lik = cocaine.likelihood.instructions.full$instantiate.likelihood('ehe',LOCATION)
 tests.change.lik = number.of.tests.year.on.year.change.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 gon.change.lik = gonorrhea.year.on.year.change.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 syph.change.lik = ps.syphilis.year.on.year.change.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
+
+
+# other likelihoods/old code
+new.lik.two.way = race.risk.sex.two.way.new.diagnoses.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
+prev.lik.two.way = race.risk.sex.two.way.prevalence.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
 
 exp(pop.lik$compute.piecewise(sim.full) - pop.lik$compute.piecewise(sim.old))
 exp(imm.lik$compute.piecewise(sim.full) - imm.lik$compute.piecewise(sim.old))
