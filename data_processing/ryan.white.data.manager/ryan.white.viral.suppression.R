@@ -124,13 +124,16 @@ ryan.white.suppression.clean.msa = lapply(ryan.white.suppression.msa, function(f
     group_by(year, location)%>%
     mutate(denominator = sum(` total count`))%>%
     mutate(numerator = sum(` suppression count`))%>%
-    select(year, location, numerator, denominator)
+    select(year, location, numerator, denominator)%>%
+    filter(!is.na(numerator))%>%
+    filter(!is.na(denominator))
   
   data<- data[!duplicated(data), ]
   
   data<-data %>%
     mutate(value=(numerator/denominator))%>%
-    mutate(outcome = "non.adap.viral.suppression")
+    mutate(outcome = "non.adap.viral.suppression")%>%
+    select(-numerator, -denominator)
   
   data$location = as.character(data$location)
 
