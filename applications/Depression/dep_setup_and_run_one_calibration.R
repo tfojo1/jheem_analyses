@@ -1,3 +1,4 @@
+devtools::install_github('tfojo1/jheem2')
 source('../jheem_analyses/applications/Depression/dep_calibration.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
@@ -15,6 +16,7 @@ for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
                           calibration.code = CALIBRATION.CODE.TO.RUN,
                           allow.remove.incomplete = T)
   
+  #comment set-up out if restarting calibration from where we left off#
   set.up.calibration(version='dep',
                      location=LOCATION,
                      calibration.code = CALIBRATION.CODE.TO.RUN,

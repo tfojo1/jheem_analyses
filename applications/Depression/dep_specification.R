@@ -30,7 +30,7 @@ register.transition(DEP.SPECIFICATION, dimension="depression", from.compartments
 ##--------------------------------------##
 ##--------------------------------------##
 ##--        GENERAL QUANTITIES        --##
-##--------------------------------------##
+##------------(PRIORS)------------------##
 ##--------------------------------------##
 
 register.model.element(DEP.SPECIFICATION, name="depression.length", 
@@ -44,15 +44,15 @@ register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx",
                        scale = "proportion")
 
 register.model.element(DEP.SPECIFICATION, name="depression.proportion.tx.gen", 
-                       functional.form = create.static.functional.form(value=0.65, link = "logit", # General population
+                       functional.form = create.static.functional.form(value=0.65, link = "logit", # General population (HIV-)
                                                                        value.is.on.transformed.scale = F), 
                        scale = "proportion")
 
-depression.inc.betas <- array(c(.42/.5, .34/.5, .34/.5, .34/.5, .18/.5,
-                                .42/.5, .34/.5, .34/.5, .34/.5, .18/.5,
-                                .26/.5, .22/.5, .22/.5, .22/.5, .12/.5), dim=c(sex=3,age=5),  ## add gender + interaction term ##
-                              dimnames = list(sex=c("female","msm","heterosexual_male"),
-                                              age=c("13-24 years", "25-34 years","35-44 years", "45-54 years", "55+ years")))
+depression.inc.betas <- array(c(.2/.5, .1/.5, .1/.5, .1/.5, .04/.5, # from "depression prevalence.docx", taking average of SMI and MDE by age and sexual orientation from NSDUH
+                                .3/.5, .15/.5, .15/.5, .15/.5, .1/.5,
+                                .1/.5, .07/.5,.07/.5,.07/.5,.03/.5), dim=c(age=5,sex=3),  ## add gender + interaction term ##
+                              dimnames = list(age=c("13-24 years", "25-34 years","35-44 years", "45-54 years", "55+ years"),
+                                              sex=c("female","msm","heterosexual_male")))
 
 register.model.element(DEP.SPECIFICATION, name="depression.incidence",
                        functional.form = create.static.functional.form(value = depression.inc.betas, link = "logit",
@@ -264,7 +264,8 @@ track.cumulative.outcome(DEP.SPECIFICATION,
                          value.is.numerator = T,
                          denominator.outcome = 'population',
                          keep.dimensions = c('location','age','race','sex'),
-                         save = T)
+                         save = T, 
+                         corresponding.data.outcome = "depression")
 
 track.cumulative.outcome(DEP.SPECIFICATION, ## number of depressed individuals in the population
                          name = 'n.depressed',
@@ -293,7 +294,7 @@ track.integrated.outcome(DEP.SPECIFICATION, ## total Population numbers
 
 track.integrated.outcome(DEP.SPECIFICATION, ## HIV-ve individuals only
                          name = 'population_noHIV',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population HIV-',
                                                                     description = "The Number of Uninfected Individuals in the Population",
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Population',
@@ -306,7 +307,7 @@ track.integrated.outcome(DEP.SPECIFICATION, ## HIV-ve individuals only
 
 track.integrated.outcome(DEP.SPECIFICATION, ## HIV+ve individuals only
                          name = 'population.HIV',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Population',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Population HIV+',
                                                                     description = "The Number of Uninfected Individuals in the Population",
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Population',
@@ -366,7 +367,7 @@ track.integrated.outcome(DEP.SPECIFICATION,
 
 track.cumulative.outcome(DEP.SPECIFICATION,
                          name = 'proportion.HIV.depressed.treated', 
-                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Depressed Treated',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Depressed Treated (HIV+)',
                                                                     description = "The Proportion of PwH with Depression on Treatment",
                                                                     scale = 'proportion',
                                                                     axis.name = 'Proportion Treated',
@@ -391,7 +392,7 @@ track.integrated.outcome(DEP.SPECIFICATION,
 
 track.cumulative.outcome(DEP.SPECIFICATION,
                          name = 'proportion.gen.depressed.treated', 
-                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Depressed Treated',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Depressed Treated (HIV-)',
                                                                     description = "The Proportion of General Population with Depression on Treatment",
                                                                     scale = 'proportion',
                                                                     axis.name = 'Proportion Treated',
@@ -406,6 +407,9 @@ update.outcome.keep.dimensions(DEP.SPECIFICATION,
                                keep.dimensions = c('location','age','race','sex','risk','depression'))
 update.outcome.keep.dimensions(DEP.SPECIFICATION,
                                outcome.name = 'cumulative.uninfected',
+                               keep.dimensions = c('location','age','race','sex','risk','depression'))
+update.outcome.keep.dimensions(DEP.SPECIFICATION,
+                               outcome.name = 'new',
                                keep.dimensions = c('location','age','race','sex','risk','depression'))
 
 ##--------------##
