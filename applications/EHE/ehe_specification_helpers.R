@@ -491,7 +491,11 @@ get.best.guess.msm.proportions <- function(location,
                                 dimension.values = list(location = counties,
                                                         year = years,
                                                         sex = 'male'),
-                                from.ontology.names = 'census')[,,,,1]
+                                from.ontology.names = 'census')[,,,,1,drop=F]
+    
+    dim.names = dimnames(males)[-length(dim(males))]
+    dim(males) = sapply(dim.names, length)
+    dimnames(males) = dim.names
     
     if (is.null(males))
         stop("Cannot get best-guess msm proportions: we are unable to pull any census data on the number of males")
@@ -536,7 +540,7 @@ get.best.guess.msm.proportions <- function(location,
         stop("Cannot get best-guess msm proportions: we are getting NA proportions MSM by race at the state level (from BRFSS)")
     
     proportions.msm.by.race[is.na(proportions.msm.by.race)] = mean(proportions.msm.by.race[setdiff(names(proportions.msm.by.race), 'american indian or alaska native')], na.rm=T)
-    
+
     # Make a guess as to the n msm
     first.guess.n.msm = sapply(dimnames(males)$race, function(r){
         males[,,r] * proportions.msm.by.race[r]
@@ -549,7 +553,7 @@ get.best.guess.msm.proportions <- function(location,
     parsed.census.ages = parse.age.strata.names(dimnames(first.guess.n.msm)$age)
     adult.mask = parsed.census.ages$lower >=13
     
-    first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,]) / rowSums(males[,adult.mask,])
+    first.guess.p.by.county = rowSums(first.guess.n.msm[,adult.mask,,drop=F]) / rowSums(males[,adult.mask,,drop=F])
     scale.factor.by.county = proportion.msm.by.county / first.guess.p.by.county
     
     fitted.n.msm = first.guess.n.msm * scale.factor.by.county
@@ -885,7 +889,8 @@ get.geographically.aggregated.race.oes <- function(location,
     
     mapped.dim.names = c(list(location=counties),
                          specification.metadata$dim.names['race'])
-    mapped.population = race.mapping$apply(population[,age.mask,,,,], to.dim.names = mapped.dim.names)
+    
+    mapped.population = race.mapping$apply(population[,age.mask,,,,,drop=F], to.dim.names = mapped.dim.names)
     
     #population.race.fractions = mapped.population / rowSums(mapped.population)
     
