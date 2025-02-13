@@ -819,32 +819,53 @@ gonorrhea.year.on.year.change.likelihood.instructions =
                                              correlation.different.years = 0.5,
                                              
                                              use.lognormal.approximation = T,
-                                             ratio.cv = 1.5,
+                                             ratio.cv = 1.35,
                                              # ratio.correlation = , # NULL will enter default of 0
                                              
                                              weights = (1*FULL.WEIGHT),
                                              equalize.weight.by.year = T 
   )
 #-- YEAR-ON-YEAR SYPHILIS CHANGE ----
+# ps.syphilis.year.on.year.change.likelihood.instructions = 
+#   create.basic.ratio.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # can add name = syphilis here
+#                                              outcome.for.sim = "sexual.transmission.rates", 
+#                                              # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
+#                                              # (2020 sexual transmisson/2019 sexual transmission)
+#                                              levels.of.stratification = c(0,1), 
+#                                              dimensions = c("sex","race","age"),
+#                                              from.year = 2018, 
+#                                              to.year = 2022,
+#                                              observation.correlation.form = 'compound.symmetry', 
+#                                              error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
+#                                              error.variance.type = 'cv',
+#                                              correlation.different.years = 0.5,
+#                                              
+#                                              ratio.cv = 1.5,
+#                                              # ratio.correlation = , # NULL will enter default of 0
+#                                              
+#                                              weights = (1*FULL.WEIGHT),
+#                                              equalize.weight.by.year = T 
+#   )
 ps.syphilis.year.on.year.change.likelihood.instructions = 
-  create.basic.ratio.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # can add name = syphilis here
-                                             outcome.for.sim = "sexual.transmission.rates", 
-                                             # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
-                                             # (2020 sexual transmisson/2019 sexual transmission)
-                                             levels.of.stratification = c(0,1), 
-                                             dimensions = c("sex","race","age"),
-                                             from.year = 2018, 
-                                             to.year = 2022,
-                                             observation.correlation.form = 'compound.symmetry', 
-                                             error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
-                                             error.variance.type = 'cv',
-                                             correlation.different.years = 0.5,
-                                             
-                                             ratio.cv = 1.35,
-                                             # ratio.correlation = , # NULL will enter default of 0
-                                             
-                                             weights = (1*FULL.WEIGHT),
-                                             equalize.weight.by.year = T 
+  create.time.lagged.comparison.likelihood.instructions(outcome.for.data = "ps.syphilis.ratio", # can add name = syphilis here
+                                                        outcome.for.sim = "sexual.transmission.rates", 
+                                                        # (2020 ps diagnoses / 2019 ps diagnoses) proportional to 
+                                                        # (2020 sexual transmisson/2019 sexual transmission)
+                                                        levels.of.stratification = c(0,1), 
+                                                        dimensions = c("sex","race","age"),
+                                                        from.year = 2018, 
+                                                        to.year = 2022,
+                                                        observation.correlation.form = 'compound.symmetry', 
+                                                        error.variance.term = 0.03, # if we can't find something better, use diagnoses estimate from above (0.07425679)
+                                                        error.variance.type = 'cv',
+                                                        correlation.different.years = 0.5,
+                                                        
+                                                        use.lognormal.approximation = T,
+                                                        ratio.cv = 1.35,
+                                                        # ratio.correlation = , # NULL will enter default of 0
+                                                        
+                                                        weights = (1*FULL.WEIGHT),
+                                                        equalize.weight.by.year = T 
   )
 
 
