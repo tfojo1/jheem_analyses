@@ -13,20 +13,22 @@ EHE.SAMPLED.PARAMETERS.DISTRIBUTION = join.distributions(
 
 EHE.APPLY.SAMPLED.PARAMETERS.FN <- function(model.settings, parameters)
 {
-  model.settings$set.element.functional.form.future.slope.after.time(element.name = 'general.population.testing.without.covid',
-                                                                     after.time = parameters['future.testing.slope.after.year'])
-  model.settings$set.element.functional.form.future.slope(element.name = 'general.population.testing.without.covid',
-                                                          slope = parameters['future.testing.slope'])
   
-  
-  model.settings$set.element.functional.form.future.slope.after.time(element.name = 'suppression.of.diagnosed.without.covid',
-                                                                     after.time = parameters['future.suppression.slope.after.year'])
-  model.settings$set.element.functional.form.future.slope(element.name = 'suppression.of.diagnosed.without.covid',
-                                                          slope = parameters['future.suppression.slope'])
-  
-  model.settings$set.element.functional.form.future.slope.after.time(element.name = 'oral.prep.uptake.without.covid',
-                                                                     after.time = parameters['future.prep.slope.after.year'])
-  model.settings$set.element.functional.form.future.slope(element.name = 'oral.prep.uptake.without.covid',
-                                                          slope = parameters['future.prep.slope'])
+    model.settings$set.element.functional.form.future.slope.after.time(element.names = 'general.population.testing.without.covid',
+                                                                       after.time = parameters['future.testing.slope.after.year'])
+    model.settings$set.element.functional.form.future.slope(element.names = 'general.population.testing.without.covid',
+                                                            slope = parameters['future.testing.slope'])
+    
+    
+    model.settings$set.element.functional.form.future.slope.after.time(element.names = 'suppression.of.diagnosed.without.covid',
+                                                                       after.time = parameters['future.suppression.slope.after.year'])
+    model.settings$set.element.functional.form.future.slope(element.names = 'suppression.of.diagnosed.without.covid',
+                                                            slope = parameters['future.suppression.slope'])
+    
+    
+    model.settings$set.element.functional.form.future.slope.after.time(element.names = 'oral.prep.uptake.without.covid',
+                                                                       after.time = parameters['future.prep.slope.after.year'])
+    model.settings$set.element.functional.form.future.slope(element.names = 'oral.prep.uptake.without.covid',
+                                                            slope = parameters['future.prep.slope'])
 
 }
