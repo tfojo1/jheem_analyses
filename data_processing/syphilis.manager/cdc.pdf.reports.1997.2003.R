@@ -627,3 +627,63 @@ for (data in national.sex.clean.put) {
     details = 'CDC STI Surveillance Reports')
 }
 
+
+# National Level Neurosyphilis --------------------------------------------
+#Reports for neurosyphilis are from the current year of report (not reported retrospectively like the other outcomes)
+DATA.DIR.NEURO="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/neurosyphilis"
+
+pdf.reports.neuro <- Sys.glob(paste0(DATA.DIR.NEURO, '/*.csv'))
+
+cdc.pdf.reports.neuro <- lapply(pdf.reports.neuro, function(x){
+  list(filename=x, data=read.csv(x, skip=1))
+})
+
+neurosyphilis.clean = lapply(cdc.pdf.reports.neuro, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data <- data %>%
+    select(disease, `total.total`)%>%
+    filter(disease == "Neurosyphilis")%>%
+    mutate(location= "US")%>%
+    mutate(outcome = "neurosyphilis")%>%
+    rename(value = `total.total`)%>%
+    mutate(value = as.numeric(value))
+  
+  if(grepl("2003", filename)) {
+    data$year = "2003"
+  }
+  if(grepl("2002", filename)) {
+    data$year = "2002"
+  }
+  if(grepl("2001", filename)) {
+    data$year = "2001"
+  }
+  if(grepl("2000", filename)) {
+    data$year = "2000"
+  }
+  if(grepl("1999", filename)) {
+    data$year = "1999"
+  }
+  if(grepl("1998", filename)) {
+    data$year = "1998"
+  }
+  if(grepl("1997", filename)) {
+    data$year = "1997"
+  }
+  
+  data= as.data.frame(data)
+  list(filename, data)
+})
+
+neurosyphilis.clean.put = lapply(neurosyphilis.clean, `[[`, 2)
+
+for (data in neurosyphilis.clean.put) {
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.pdf.report',
+    source = 'cdc.sti.surveillance.reports',
+    url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
+    details = 'CDC STI Surveillance Reports. Neurosyphilis cases are not included with Total Syphilis cases but are included in the late and late latent syphilis cases.')
+}

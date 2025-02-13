@@ -76,6 +76,16 @@ data.manager$register.outcome(
     units = 'cases',
     description = "All Syphilis Cases"))
 
+data.manager$register.outcome(
+  'neurosyphilis',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Neurosyphilis',
+    axis.name = 'Neurosyphiliss',
+    units = 'cases',
+    description = "Neurosyphilis"))
+
+
 #Register Sources:
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS") #parent
 data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS") #parent
