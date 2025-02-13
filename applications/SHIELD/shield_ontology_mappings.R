@@ -120,6 +120,20 @@ register.ontology.mapping('wonder.to.shield.race.ethnicity',
                                            c('white','hispanic or latino','hispanic'),
                                            c('white','not hispanic or latino','other')))
 
+register.ontology.mapping('wonder.to.shield.race.ethnicity.two',
+                          from.dimensions = c('race', 'ethnicity'),
+                          to.dimensions = 'race',
+                          mappings = rbind(c('american indian or alaska native', 'hispanic or latino', 'hispanic'),
+                                           c('american indian or alaska native', 'not hispanic or latino', 'other'),
+                                           c('asian', 'hispanic or latino', 'hispanic'),
+                                           c('asian', 'not hispanic or latino', 'other'),
+                                           c('native hawaiian or other pacific islander', 'hispanic or latino', 'hispanic'),
+                                           c('native hawaiian or other pacific islander', 'not hispanic or latino', 'other'),
+                                           c('black or african american', 'hispanic or latino', 'hispanic'),
+                                           c('black or african american', 'not hispanic or latino', 'black'),
+                                           c('white','hispanic or latino','hispanic'),
+                                           c('white','not hispanic or latino','other')))
+
 # EMORY & SHIELD ----
 #Maps Emory's sex groups to CDC (Emory has an estimate of MSM and so the Emory data is only relevant to men)
 register.ontology.mapping('emory.to.cdc.sex.temporary',
