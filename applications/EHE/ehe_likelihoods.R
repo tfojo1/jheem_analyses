@@ -1,3 +1,4 @@
+source('../jheem_analyses/commoncode/locations_of_interest.R')
 # LIKELIHOODS INCLUDED: 
 # population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
@@ -396,9 +397,6 @@ general.mortality.likelihood.instructions.full =
 suppression.basic.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "suppression",
                                        outcome.for.sim = "suppression",
-                                       denominator.outcome.for.data = 'diagnosed.prevalence',
-                                       
-                                       location.types = c('COUNTY','STATE','CBSA'), 
                                        
                                        dimensions = c("age","sex","race","risk"),
                                        
@@ -519,10 +517,6 @@ prep.indications.likelihood.instructions =
 awareness.basic.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "awareness",
                                        outcome.for.sim = "awareness",
-                                       denominator.outcome.for.data = "total.prevalence",
-                                       outcome.for.n.multipliers = "diagnosed.prevalence",
-                                       
-                                       location.types = c('STATE','CBSA','COUNTY'),
                                        
                                        dimensions = character(), 
                                        levels.of.stratification = 0, 
@@ -582,9 +576,6 @@ awareness.likelihood.instructions =
 heroin.basic.likelihood.instructions.trans = 
   create.basic.likelihood.instructions(outcome.for.data = "heroin",
                                        outcome.for.sim = "proportion.using.heroin",
-                                       denominator.outcome.for.data = 'adult.population',
-                                       
-                                       location.types = c('STATE','NSDUH'), 
                                        
                                        dimensions = c("age"),
                                        levels.of.stratification = c(0,1), 
@@ -641,9 +632,6 @@ heroin.likelihood.instructions.trans =
 heroin.basic.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "heroin",
                                        outcome.for.sim = "proportion.using.heroin",
-                                       denominator.outcome.for.data = 'adult.population',
-                                       
-                                       location.types = c('STATE','NSDUH'), 
                                        
                                        dimensions = c("age"),
                                        levels.of.stratification = c(0,1), 
@@ -701,17 +689,14 @@ heroin.likelihood.instructions.full =
 cocaine.basic.likelihood.instructions.trans = 
   create.basic.likelihood.instructions(outcome.for.data = "cocaine",
                                        outcome.for.sim = "proportion.using.cocaine",
-                                       denominator.outcome.for.data = 'adult.population',
-                                       
-                                       location.types = c('STATE','NSDUH'), 
                                        
                                        dimensions = c("age"),
                                        levels.of.stratification = c(0,1), 
                                        from.year = 2008, 
                                        
                                        observation.correlation.form = 'compound.symmetry', 
-                                       p.error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
-                                       p.error.variance.type = "cv",
+                                       error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
+                                       error.variance.type = "cv",
                                        
                                        weights = (1*TRANSMISSION.WEIGHT),
                                        equalize.weight.by.year = T
@@ -760,17 +745,14 @@ cocaine.likelihood.instructions.trans =
 cocaine.basic.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "cocaine",
                                        outcome.for.sim = "proportion.using.cocaine",
-                                       denominator.outcome.for.data = 'adult.population',
-                                       
-                                       location.types = c('STATE','NSDUH'), 
                                        
                                        dimensions = c("age"),
                                        levels.of.stratification = c(0,1), 
                                        from.year = 2008, 
                                        
                                        observation.correlation.form = 'compound.symmetry', 
-                                       p.error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
-                                       p.error.variance.type = "cv",
+                                       error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
+                                       error.variance.type = "cv",
                                        
                                        weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
