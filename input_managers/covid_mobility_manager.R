@@ -131,11 +131,21 @@ get.covid.mobility.measure <- function(mobility.data,
     
     sub.data = mobility.data[times, types, counties, drop=F]
     proportions.data = apply(sub.data, 2:3, function(x){
-        norm.to = x[2]
-        x / norm.to
+        
+        if (any(is.na(x)))
+            rep(as.numeric(NA), length(x))
+        else
+        {
+            norm.to = x[2]
+            rv = x / norm.to
+            
+            if (any(rv>1.5) || any(rv<(-1.5)))
+                rep(as.numeric(NA), length(x))
+            else
+                rv
+        }
     })
     dimnames(proportions.data)[[1]] = dimnames(sub.data)[[1]]
-    
     county.populations = census.manager$pull(outcome = 'population',
                                              dimension.values = list(location=counties,
                                                                      year = as.character(from.year:to.year)),
