@@ -1,7 +1,18 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
-LOCATION = PHOENIX.MSA
+LOCATION = SAN.DIEGO.MSA
+
+# likelihoods in trans
+race.risk.new.lik = race.risk.new.diagnoses.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
+race.risk.prev.lik = race.risk.prevalence.likelihood.instructions$instantiate.likelihood('ehe',LOCATION)
+non.age.aids.lik = non.age.aids.diagnoses.likelihood.instructions.trans$instantiate.likelihood('ehe',LOCATION)
+pop.trans.lik = population.likelihood.instructions.trans$instantiate.likelihood('ehe',LOCATION)
+heroin.trans.lik = heroin.likelihood.instructions.trans$instantiate.likelihood('ehe',LOCATION)
+cocaine.trans.lik = cocaine.likelihood.instructions.trans$instantiate.likelihood('ehe',LOCATION)
+aids.deaths.trans.lik = aids.deaths.likelihood.instructions.trans$instantiate.likelihood('ehe',LOCATION)
+hiv.mortality.trans.lik = hiv.mortality.likelihood.instructions.trans$instantiate.likelihood('ehe',LOCATION)
+
 
 
 # likelihoods in full

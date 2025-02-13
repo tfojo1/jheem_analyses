@@ -1,3 +1,4 @@
+source('../jheem_analyses/commoncode/locations_of_interest.R')
 # LIKELIHOODS INCLUDED: 
 # population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
@@ -393,19 +394,33 @@ general.mortality.likelihood.instructions.full =
   )
 
 #-- SUPPRESSION  ----
-suppression.likelihood.instructions = 
+suppression.basic.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "suppression",
+                                       outcome.for.sim = "suppression",
+                                       
+                                       dimensions = c("age","sex","race","risk"),
+                                       
+                                       levels.of.stratification = c(0,1), 
+                                       from.year = 2008, 
+                                       
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.type = 'sd',
+                                       
+                                       weights = (1*FULL.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+suppression.nested.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
                                                    outcome.for.sim = "suppression",
                                                    denominator.outcome.for.data = 'diagnosed.prevalence',
                                                    
-                                                   # want to be able to specify max # for each location type;
-                                                   # have to decide how to order (probably by denominator)
                                                    location.types = c('COUNTY','STATE','CBSA'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
-                                                   # limit.to.n.location
                                                    
                                                    dimensions = c("age","sex","race","risk"),
-                                                   #dimensions = c("sex"),
+                                                   
                                                    levels.of.stratification = c(0,1), 
                                                    from.year = 2008, 
                                                    
@@ -425,6 +440,15 @@ suppression.likelihood.instructions =
                                                    
                                                    weights = (1*FULL.WEIGHT),
                                                    equalize.weight.by.year = T
+  )
+
+suppression.likelihood.instructions = 
+  create.location.based.ifelse.likelihood.instructions(
+    suppression.basic.likelihood.instructions,
+    suppression.nested.likelihood.instructions,
+    locations.list = list(c(RIVERSIDE.MSA,
+                            MIAMI.MSA)) # first list - first instructions; anything not in first list will use second instructions
+                        
   )
 
 #-- AIDS DEATHS  ----
@@ -491,7 +515,24 @@ prep.indications.likelihood.instructions =
   )
 
 #-- AWARENESS ----
-awareness.likelihood.instructions =
+awareness.basic.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "awareness",
+                                       outcome.for.sim = "awareness",
+                                       
+                                       dimensions = character(), 
+                                       levels.of.stratification = 0, 
+                                       
+                                       from.year = 2008,
+                                       
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = NULL, 
+                                       error.variance.type = 'data.cv', 
+                                      
+                                       weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R 
+                                       equalize.weight.by.year = T
+  )
+
+awareness.nested.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "awareness",
                                                    outcome.for.sim = "awareness",
                                                    denominator.outcome.for.data = "total.prevalence",
@@ -500,8 +541,8 @@ awareness.likelihood.instructions =
                                                    location.types = c('STATE','CBSA','COUNTY'),
                                                    minimum.geographic.resolution.type = 'COUNTY',
                                                    
-                                                   dimensions = character(), # would like to write NULL
-                                                   levels.of.stratification = 0, # would like to have an auto of 0:length(d)
+                                                   dimensions = character(),
+                                                   levels.of.stratification = 0,
                                                    
                                                    from.year = 2008,
                                                    
@@ -516,7 +557,6 @@ awareness.likelihood.instructions =
                                                    observation.correlation.form = 'compound.symmetry',
                                                    p.error.variance.term = NULL, 
                                                    p.error.variance.type = 'data.cv', 
-                                                   # the data estimate is a coefficient of variance 
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
@@ -524,8 +564,33 @@ awareness.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
+
+awareness.likelihood.instructions = 
+  create.location.based.ifelse.likelihood.instructions(
+    awareness.basic.likelihood.instructions,
+    awareness.nested.likelihood.instructions,
+    locations.list = list(c(RIVERSIDE.MSA,
+                            MIAMI.MSA))  # first list - first instructions; anything not in first list will use second instructions
+  )
+
 #-- HEROIN  ----
-heroin.likelihood.instructions.trans = 
+heroin.basic.likelihood.instructions.trans = 
+  create.basic.likelihood.instructions(outcome.for.data = "heroin",
+                                       outcome.for.sim = "proportion.using.heroin",
+                                       
+                                       dimensions = c("age"),
+                                       levels.of.stratification = c(0,1), 
+                                       from.year = 2008, 
+                                       
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.54, # NSDUH calcs; doubled value (0.27); see NSDUH IDU Data_updated.xlsx in input_managers
+                                       error.variance.type = "cv",
+                                       
+                                       weights = (1*TRANSMISSION.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+heroin.nested.likelihood.instructions.trans = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
                                                    outcome.for.sim = "proportion.using.heroin",
                                                    denominator.outcome.for.data = 'adult.population',
@@ -555,7 +620,33 @@ heroin.likelihood.instructions.trans =
                                                    equalize.weight.by.year = T
   )
 
-heroin.likelihood.instructions.full = 
+
+heroin.likelihood.instructions.trans = 
+  create.location.based.ifelse.likelihood.instructions(
+    heroin.basic.likelihood.instructions.trans,
+    heroin.nested.likelihood.instructions.trans,
+    locations.list = list(c(LA.MSA,
+                            VEGAS.MSA,
+                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
+  )
+
+heroin.basic.likelihood.instructions.full = 
+  create.basic.likelihood.instructions(outcome.for.data = "heroin",
+                                       outcome.for.sim = "proportion.using.heroin",
+                                       
+                                       dimensions = c("age"),
+                                       levels.of.stratification = c(0,1), 
+                                       from.year = 2008, 
+                                       
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.54, # NSDUH calcs; doubled value (0.27); see NSDUH IDU Data_updated.xlsx in input_managers
+                                       error.variance.type = "cv",
+                                       
+                                       weights = (1*FULL.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+heroin.nested.likelihood.instructions.full = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "heroin",
                                                    outcome.for.sim = "proportion.using.heroin",
                                                    denominator.outcome.for.data = 'adult.population',
@@ -583,10 +674,36 @@ heroin.likelihood.instructions.full =
                                                    
                                                    weights = (1*FULL.WEIGHT),
                                                    equalize.weight.by.year = T
+  )
+
+
+heroin.likelihood.instructions.full = 
+  create.location.based.ifelse.likelihood.instructions(
+    heroin.basic.likelihood.instructions.full,
+    heroin.nested.likelihood.instructions.full,
+    locations.list = list(c(LA.MSA,
+                            VEGAS.MSA,
+                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
   )
 
 #-- COCAINE  ----
-cocaine.likelihood.instructions.trans = 
+cocaine.basic.likelihood.instructions.trans = 
+  create.basic.likelihood.instructions(outcome.for.data = "cocaine",
+                                       outcome.for.sim = "proportion.using.cocaine",
+                                       
+                                       dimensions = c("age"),
+                                       levels.of.stratification = c(0,1), 
+                                       from.year = 2008, 
+                                       
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
+                                       error.variance.type = "cv",
+                                       
+                                       weights = (1*TRANSMISSION.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+cocaine.nested.likelihood.instructions.trans = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "cocaine",
                                                    outcome.for.sim = "proportion.using.cocaine",
                                                    denominator.outcome.for.data = 'adult.population',
@@ -616,7 +733,33 @@ cocaine.likelihood.instructions.trans =
                                                    equalize.weight.by.year = T
   )
 
-cocaine.likelihood.instructions.full = 
+
+cocaine.likelihood.instructions.trans = 
+  create.location.based.ifelse.likelihood.instructions(
+    cocaine.basic.likelihood.instructions.trans,
+    cocaine.nested.likelihood.instructions.trans,
+    locations.list = list(c(LA.MSA,
+                            VEGAS.MSA,
+                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
+)
+
+cocaine.basic.likelihood.instructions.full = 
+  create.basic.likelihood.instructions(outcome.for.data = "cocaine",
+                                       outcome.for.sim = "proportion.using.cocaine",
+                                       
+                                       dimensions = c("age"),
+                                       levels.of.stratification = c(0,1), 
+                                       from.year = 2008, 
+                                       
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
+                                       error.variance.type = "cv",
+                                       
+                                       weights = (1*FULL.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+cocaine.nested.likelihood.instructions.full = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "cocaine",
                                                    outcome.for.sim = "proportion.using.cocaine",
                                                    denominator.outcome.for.data = 'adult.population',
@@ -644,6 +787,16 @@ cocaine.likelihood.instructions.full =
                                                    
                                                    weights = (1*FULL.WEIGHT),
                                                    equalize.weight.by.year = T
+  )
+
+
+cocaine.likelihood.instructions.full = 
+  create.location.based.ifelse.likelihood.instructions(
+    cocaine.basic.likelihood.instructions.full,
+    cocaine.nested.likelihood.instructions.full,
+    locations.list = list(c(LA.MSA,
+                            VEGAS.MSA,
+                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
   )
 
 #-- PROPORTION TESTED ----
