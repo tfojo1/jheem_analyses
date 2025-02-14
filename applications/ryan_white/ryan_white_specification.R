@@ -68,4 +68,19 @@ register.model.quantity(RW.SPECIFICATION,
                                              proportion.pwh.who.are.suppressed.with.rw.and.adap * adap.suppression.effect)
 )
 
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'ryan.white.clients',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Ryan White Clients',
+                                                                    description = "Number of Individuals Receiving any Ryan White Services",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Cases',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.with.rw',
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'non.adap.clients',
+                         save = T)
+
 register.model.specification(RW.SPECIFICATION)
