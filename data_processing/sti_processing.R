@@ -50,6 +50,7 @@ syphilis.clean = lapply(syphilis.data, function(file){
   
   if(grepl("county", filename)) {
     data$location = data$FIPS
+    data$location = str_pad(data$location, 5, pad="0") 
   }
   if(grepl("national", filename)) {
     data$location = "US"
