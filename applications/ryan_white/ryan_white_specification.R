@@ -49,6 +49,10 @@ register.model.quantity(RW.SPECIFICATION,
                         name = 'proportion.pwh.who.are.suppressed.without.rw',
                         value = expression(super.suppression.of.diagnosed - proportion.pwh.who.are.suppressed.with.rw.without.adap - proportion.pwh.who.are.suppressed.with.rw.and.adap))
 
+register.model.quantity(RW.SPECIFICATION,
+                        name = 'proportion.pwh.who.are.suppressed.with.rw',
+                        value = expression(proportion.pwh.who.are.suppressed.with.rw.without.adap + proportion.pwh.who.are.suppressed.with.rw.and.adap))
+
 
 register.model.element(RW.SPECIFICATION,
                        name = 'rw.without.adap.suppression.effect',
@@ -82,5 +86,41 @@ track.integrated.outcome(RW.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex','risk'),
                          corresponding.data.outcome = 'non.adap.clients',
                          save = T)
+
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'adap',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Ryan White Clients on ADAP',
+                                                                    description = "Proportion of Ryan White Clients Receiving any AIDs Drug Assistance Program Services",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.with.rw.and.adap',
+                         denominator.outcome = 'ryan.white.clients',
+                         value.is.numerator = T,
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'adap.proportion',
+                         save = T)
+
+
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'rw.suppression',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Ryan White Clients Suppressed',
+                                                                    description = "Proportion of Ryan White Clients who are Virally Suppressed",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.who.are.suppressed.with.rw',
+                         denominator.outcome = 'ryan.white.clients',
+                         value.is.numerator = T,
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'non.adap.viral.suppression',
+                         save = T)
+
 
 register.model.specification(RW.SPECIFICATION)
