@@ -85,15 +85,36 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Neurosyphilis"))
 
+data.manager$register.outcome(
+  'total.syphilis.deaths',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Total Syphilis Deaths',
+    axis.name = 'Total Syphilis Deaths',
+    units = 'cases',
+    description = "Total Syphilis Deaths, does not include congenital"))
+
+data.manager$register.outcome(
+  'congenital.syphilis.deaths',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Congenital Syphilis Deaths',
+    axis.name = 'Congenital Syphilis Deaths',
+    units = 'cases',
+    description = "Congenital Syphilis Deaths"))
+
 
 #Register Sources:
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS") #parent
 data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS") #parent
 data.manager$register.parent.source('DHHS', full.name = 'U.S. Department of Health and Human Services', short.name= "DHHS") #parent
+data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
 
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('cdc.sti.surveillance.reports', parent.source= "DHHS", full.name = "CDC Sexually Transmitted Disease Surveillance", short.name='cdc.sti.surveillance.reports')
+data.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
+
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -133,7 +154,7 @@ source('data_processing/syphilis.manager/syphilis.data.R')
 source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing.2003.2017.R') #This pulls one table from 2003-2017 reports, Parastu wanted this report where primary and secondary are reported separate
 source('data_processing/syphilis.manager/cdc.pdf.reports.1997.2003.R') #This pulls syphilis data from the 1990s
 source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #These replace the US totals for certain years above, they are more recent. This pulls one table from a 2022 report that reports cases back to 1941
-
+source('data_processing/syphilis.manager/syphilis.deaths.R')
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
