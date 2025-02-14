@@ -125,6 +125,7 @@ data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Di
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "CDC STI Data", short.name='cdc.sti') #child
 data.manager$register.source('nsduh', parent.source= "NSDUH", full.name = "National Survey on Drug Use and Health", short.name='nsduh') #child 
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #child #Note this is for the aggregated county data being used to represent MSAs
+data.manager$register.source('nsduh.aggregated', parent.source= "NSDUH", full.name = 'NSDUH Aggregated', short.name = 'nsduh.aggd') #child #Note this is for the aggregated county data being used to represent MSAs
 
 
 #Register Ontologies:
@@ -185,6 +186,91 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
+
+#Aggregate cocaine + heroin for LA (C.31080), Vegas (C.29820), San Diego (C.41740)
+
+los.angeles.msa <- c('CA.11', 'CA.14') 
+
+las.vegas.msa <- c("NV.2") 
+
+san.diego.msa <- c("CA.16R")
+
+la.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
+                                                  metric = "estimate",
+                                                  dimension.values=list(location=los.angeles.msa),
+                                                  keep.dimensions='year')
+
+la.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
+                                                 metric = "estimate",
+                                                 dimension.values=list(location=los.angeles.msa),
+                                                 keep.dimensions='year')
+
+sd.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
+                                                  metric = "estimate",
+                                                  dimension.values=list(location=san.diego.msa),
+                                                  keep.dimensions='year')
+
+sd.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
+                                                 metric = "estimate",
+                                                 dimension.values=list(location=san.diego.msa),
+                                                 keep.dimensions='year')
+
+vegas.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
+                                                     metric = "estimate",
+                                                     dimension.values=list(location=las.vegas.msa),
+                                                     keep.dimensions='year')
+
+vegas.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
+                                                    metric = "estimate",
+                                                    dimension.values=list(location=las.vegas.msa),
+                                                    keep.dimensions='year')
+
+la.cocaine = as.data.frame.table(la.cocaine.aggregated)%>%
+  mutate(year = as.character(year))%>%
+  mutate(value = as.numeric(Freq))%>%
+  mutate(outcome = "cocaine")%>%
+  mutate(location = 'C.31080')
+
+sd.cocaine = as.data.frame.table(sd.cocaine.aggregated)%>%
+  mutate(year = as.character(year))%>%
+  mutate(value = as.numeric(Freq))%>%
+  mutate(outcome = "cocaine")%>%
+  mutate(location = 'C.41740')
+
+vegas.cocaine = as.data.frame.table(vegas.cocaine.aggregated)%>%
+  mutate(year = as.character(year))%>%
+  mutate(value = as.numeric(Freq))%>%
+  mutate(outcome = "cocaine")%>%
+  mutate(location = 'C.29820')
+
+la.heroin = as.data.frame.table(la.heroin.aggregated)%>%
+  mutate(year = as.character(year))%>%
+  mutate(value = as.numeric(Freq))%>%
+  mutate(outcome = "heroin")%>%
+  mutate(location = 'C.31080')
+
+sd.heroin = as.data.frame.table(sd.heroin.aggregated)%>%
+  mutate(year = as.character(year))%>%
+  mutate(value = as.numeric(Freq))%>%
+  mutate(outcome = "heroin")%>%
+  mutate(location = 'C.41740')
+
+vegas.heroin = as.data.frame.table(vegas.heroin.aggregated)%>%
+  mutate(year = as.character(year))%>%
+  mutate(value = as.numeric(Freq))%>%
+  mutate(outcome = "heroin")%>%
+  mutate(location = 'C.29820')
+
+aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, la.heroin, sd.heroin, vegas.heroin)
+
+data.manager$put.long.form(
+  data = aggregated.nsduh.data,
+  ontology.name = 'nsduh',
+  source = 'nsduh.aggregated',
+  dimension.values = list(),
+  url = 'https://pdas.samhsa.gov/saes/substate',
+  details = 'NSDUH Substate Estimates, aggregated from substate to MSA')
+
 
 source('data_processing/sti_ratio_calculation.R') #Calculates STI Ratio data
 
