@@ -7,5 +7,4 @@
 #SBATCH --account=pkasaie1
 
 source cluster_scripts/rockfish_module_loads.sh
-Rscript cluster_scripts/set_up_calibration.R ehe C.35620 init.transmission.ehe applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_regiLoading Surveillance Manager (may take a minute or two)...Done!
-Loading Census Manager (may take a minute or two)...Done!
+Rscript cluster_scripts/set_up_calibration.R ehe C.35620 init.transmission.ehe applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R
