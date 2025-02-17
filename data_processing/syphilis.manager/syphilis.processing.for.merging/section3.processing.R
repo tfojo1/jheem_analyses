@@ -152,15 +152,7 @@ data.manager$register.ontology(
     race=c('american indian or alaska native', 'asian or pacific islander', 'black or african american', 'white'),
     ethnicity = c('hispanic or latino', 'not hispanic or latino')
   ))
-data.manager$register.ontology(
-  'cdc.prenatal',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('>15 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years','35-39 years', '40-44 years', '45-49 years', '50+ years'),
-    race=c('american indian or alaska native', 'asian', 'black or african american', 'white', 'native hawaiian or other pacific islander'),
-    ethnicity = c('hispanic or latino', 'not hispanic or latino')
-  ))
+
 data.manager$register.ontology(     #This is for the births+births denominator data pulled from Census
   'census.cdc.wonder.births.deaths',
   ont = ontology(
