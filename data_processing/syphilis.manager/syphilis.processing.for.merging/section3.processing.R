@@ -31,15 +31,6 @@ data.manager$register.outcome(
     description = "Births"))
 
 data.manager$register.outcome(
-  'births.denominator',
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'Births Denominator',
-    axis.name = 'Births Denominator',
-    units = 'births',
-    description = "Births Denominator"))
-
-data.manager$register.outcome(
   'female.population', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
@@ -271,6 +262,20 @@ put.msa.data.as.new.source(outcome = 'female.population',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
+
+
+# Aggregate Prenatal Care to MSA ------------------------------------------
+# put.msa.data.as.new.source(outcome = 'no.prenatal.care',
+#                            from.source.name = 'cdc.wonder.natality',
+#                            to.source.name = 'cdc.wonder.aggregated.population',
+#                            to.locations =  MSAS.OF.INTEREST,
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            source.for.denominator = 'cdc.wonder.natality',
+#                            ontology.for.denominator = 'cdc.fertility',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = syphilis.manager)
+
 
 
 # Source Code to Calculate Fertility Rate by MSA 
