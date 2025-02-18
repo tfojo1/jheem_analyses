@@ -345,7 +345,7 @@ put.msa.data.as.new.source(outcome = 'suppression',
                            ontology.for.denominator= 'cdc') 
 
 #Update for 2-11-25: Andrew/Todd requested the Coefficient of Variance for Awareness to be aggregated from County to MSA for Riverside C.40140 only since we have data for both counties:
-
+#update for 2-18-25: Adding the same for Miami
 Riverside_Counties <- locations::get.contained.locations("C.40140", "COUNTY") #06065, 06071
 
 riverside.msa.coefficient.of.variance = surveillance.manager$pull(outcome = "awareness",
@@ -368,6 +368,32 @@ surveillance.manager$put.long.form(
   dimension.values = list(),
   url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
   details = 'CDC Atlas Plus data')
+
+# MIAMI: C.33100
+
+miami.counties <- locations::get.contained.locations("C.33100", "COUNTY") #12011, 12086, 12099
+
+miami.msa.coefficient.of.variance = surveillance.manager$pull(outcome = "awareness",
+                                                              metric = "coefficient.of.variance",
+                                                              dimension.values=list(location=miami.counties),
+                                                              keep.dimensions='year')
+
+miami.msa.coefficient.of.variance <- as.data.frame.table(miami.msa.coefficient.of.variance)%>%
+  mutate(outcome = 'awareness')%>%
+  mutate(metric = "coefficient.of.variance")%>%
+  mutate(location = "C.33100")%>%
+  rename(value = Freq)%>%
+  mutate(year = as.character(year))
+
+surveillance.manager$put.long.form(
+  data = miami.msa.coefficient.of.variance,
+  ontology.name = 'cdc',
+  source = 'cdc.hiv',
+  metric = 'coefficient.of.variance',
+  dimension.values = list(),
+  url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
+  details = 'CDC Atlas Plus data')
+
 
 #Save:
 save(surveillance.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section2.rdata")
