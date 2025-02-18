@@ -26,7 +26,7 @@ data.manager$register.outcome(
     description = "Non-ADAP Clients"))
 
 data.manager$register.outcome(
-  'ambulatory.care.past.year',
+  'oahs.clients', #was previously ambulatory.care.past.year
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
     display.name = 'Received Ambulatory Care in Past Year',
@@ -41,7 +41,7 @@ data.manager$register.outcome(
     display.name = 'Non-ADAP Viral Suppression',
     axis.name = 'Non-ADAP Viral Suppression',
     units = '%',
-    description = "Non-ADAP Viral Suppression"), denominator.outcome = 'ambulatory.care.past.year')
+    description = "Non-ADAP Viral Suppression"), denominator.outcome = 'oahs.clients')
 
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent

@@ -1,4 +1,4 @@
-#Table 28a from Ryan White Reports (denoinator will be non.adap)
+#Table 28a from Ryan White Reports (denominator will be non.adap)
 
 # Viral Suppression Data --------------------------------------------------------
 DATA.DIR.RYAN.WHITE.SUPPRESSION="../../data_raw/ryan.white.pdf.tables/viral.suppression/state"
