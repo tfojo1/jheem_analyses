@@ -4,6 +4,7 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 #source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
+CALIBRATION.CODE.POPULATION.TEST = 'init.pop.ehe.2'
 CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
 CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid2'
@@ -30,6 +31,28 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = par.names.pop,
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          fixed.initial.parameter.values = c(global.trate=0.13), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get population parameters in the general vicinity"
+)
+
+par.aliases.population = list(
+  
+  trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
+  trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
+  trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
+  trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.2', EHE.PARAMETERS.PRIOR@var.names)])
+)
+
+register.calibration.info(CALIBRATION.CODE.POPULATION.TEST,
+                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added race/risk transmission targets 10/21
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = par.names.pop,
+                          parameter.aliases = par.aliases.population,
                           n.iter = N.ITER,
                           thin = 50, 
                           fixed.initial.parameter.values = c(global.trate=0.13), 
