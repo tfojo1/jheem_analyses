@@ -56,7 +56,7 @@ testing.criterion = create.monotonic.criterion(parameter.name = 'testing.multipl
                                                min.acceptable.value = .94,
                                                max.acceptable.value = .96,
                                                dimension.values=list(year='2030'),
-                                               min.acceptable.parameter.value = 0.5,
+                                               min.acceptable.parameter.value = 1,
                                                max.acceptable.parameter.value = 10)
 suppression.criterion = create.monotonic.criterion(parameter.name = 'unsuppressed.multiplier',
                                                    outcome = 'suppression', #percent suppressed
