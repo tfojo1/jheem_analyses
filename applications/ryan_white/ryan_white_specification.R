@@ -29,7 +29,7 @@ register.model.element(RW.SPECIFICATION,
                        name = 'proportion.non.adap.rw.with.oahs',
                        scale = 'proportion',
                        functional.form = create.logistic.linear.functional.form(
-                         intercept = log(0.6)-log(0.4),
+                         intercept = log(0.7)-log(0.3),
                          slope = 0, 
                          parameters.are.on.logit.scale = T,
                          anchor.year = 2020
