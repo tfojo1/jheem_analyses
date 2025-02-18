@@ -23,17 +23,17 @@ ryan.white.ambulatory.clean = lapply(ryan.white.ambulatory, function(file){
   
   data$value = gsub(",", "", data$value)
   data$value = as.numeric(data$value)
-  
+
   if(grepl("state", filename)) {
-    
+
     data <- data %>%
       select(state, year, value)%>%
       filter(state != 'Subtotal')
-    
+
     data$location = locations::get.location.code(data$state, 'STATE')
     data$location = as.character(data$location)
   }
-  
+
   if(grepl("_msa", filename)) {
     data$location = locations::get.location.code(data$`ema.tga`, 'CBSA')
 
@@ -51,38 +51,46 @@ ryan.white.ambulatory.clean = lapply(ryan.white.ambulatory, function(file){
       mutate(location = ifelse(`ema.tga` == "Minneapolis St. Paul", "C.33460", location))%>%
       mutate(location = ifelse(`ema.tga` == "Las Vegas", "C.29820", location))%>%
       mutate(location = ifelse(`ema.tga` == "Columbus", "C.18140", location))%>%
-      
+
       #These are MSAs that need to be combined
       mutate(location = ifelse(`ema.tga` == "San Francisco", "C.41860", location))%>%
       mutate(location = ifelse(`ema.tga` == "Oakland", "C.41860", location))%>%
-      
+
       mutate(location = ifelse(`ema.tga` == "Los Angeles", "C.31080", location))%>%
       mutate(location = ifelse(`ema.tga` == "Orange County", "C.31080", location))%>%
-      
+
       mutate(location = ifelse(`ema.tga` == "Miami", "C.33100", location))%>%
       mutate(location = ifelse(`ema.tga` == "West Palm Beach", "C.33100", location))%>%
       mutate(location = ifelse(`ema.tga` == "Ft. Lauderdale", "C.33100", location))%>%
-      
+
       mutate(location = ifelse(`ema.tga` == "Dallas", "C.19100", location))%>%
       mutate(location = ifelse(`ema.tga` == "Ft. Worth", "C.19100", location))%>%
-      
+
       mutate(location = ifelse(`ema.tga` == "New York", "C.35620", location))%>%
       mutate(location = ifelse(`ema.tga` == "Middlesex", "C.35620", location))%>%
       mutate(location = ifelse(`ema.tga` == "Nassau Suffolk", "C.35620", location))%>%
       mutate(location = ifelse(`ema.tga` == "Bergen Passaic", "C.35620", location))%>%
       mutate(location = ifelse(`ema.tga` == "Jersey City", "C.35620", location))%>%
       mutate(location = ifelse(`ema.tga` == "Newark", "C.35620", location))%>%
-      
+
       #Sum the combined MSAs
       group_by(location, year)%>%
       mutate(summed.value = sum(value))%>%
       select(-value)%>%
       rename(value = summed.value)
   }
-  
+
   data$outcome = "oahs.clients"
   data$year = gsub("total count", "", data$year)
   data$location = as.character(data$location)
+
+
+  ##Check with Todd: the only new year from data from 2022 report is 2018, the other years are reported in 2023 so I'm using those##
+  if(grepl("2022", filename)) {
+    data<-data %>%
+      filter(year == "2018")
+  }
+  ##   ##
   
   data= as.data.frame(data)
   list(filename, data)
