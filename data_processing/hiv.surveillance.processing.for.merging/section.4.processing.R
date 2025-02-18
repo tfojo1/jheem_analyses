@@ -15,15 +15,6 @@ library(tools)
 
 data.manager = create.data.manager('surveillance', description='surveillance data manager')
 
-data.manager$register.outcome(
-  'adult.population',
-  metadata = create.outcome.metadata(
-    scale = 'non.negative.number',
-    display.name = 'Adult Population',
-    axis.name = 'Adult Population',
-    units = 'population',
-    description = "Adult Population Estimate, Ages 13 and over"))
-
 #Register outcomes:
 data.manager$register.outcome(
   'gonorrhea',
@@ -90,43 +81,12 @@ data.manager$register.outcome(
     units = 'cases',
     description = "Unknown Duration or Late Syphilis"))
 
-data.manager$register.outcome(
-  'heroin', #can change to heroin use but leave display name the same#
-  metadata = create.outcome.metadata(
-    scale = 'proportion',
-    display.name = 'Heroin Use in the Past Year',
-    axis.name = 'Heroin Use in the Past Year',
-    units = '%',
-    description = "Heroin Use in the Past Year"), denominator.outcome = 'adult.population')
-
-data.manager$register.outcome(
-  'cocaine', 
-  metadata = create.outcome.metadata(
-    scale = 'proportion',
-    display.name = 'Cocaine use in the Past Year',
-    axis.name = 'Cocaine use in the Past Year',
-    units = '%',
-    description = "Cocaine Use in the Past Year"), denominator.outcome = 'adult.population')
-
-data.manager$register.outcome(
-  'depression',
-  metadata = create.outcome.metadata(
-    scale = 'proportion',
-    display.name = 'Major Depressive Episode in the Past Year',
-    axis.name = 'Depression',
-    units =  '%',
-    description = "Major Depressive Episode in the Past Year"), denominator.outcome = 'adult.population')
-
 #Register Sources:
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS") #parent
-data.manager$register.parent.source('NSDUH', full.name = 'National Survey on Drug Use and Health', short.name= "NSDUH") #parent
 data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS") #parent
 
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "CDC STI Data", short.name='cdc.sti') #child
-data.manager$register.source('nsduh', parent.source= "NSDUH", full.name = "National Survey on Drug Use and Health", short.name='nsduh') #child 
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #child #Note this is for the aggregated county data being used to represent MSAs
-data.manager$register.source('nsduh.aggregated', parent.source= "NSDUH", full.name = 'NSDUH Aggregated', short.name = 'nsduh.aggd') #child #Note this is for the aggregated county data being used to represent MSAs
-
 
 #Register Ontologies:
 data.manager$register.ontology(   #This is for the Atlas Plus STI data, creating a separate ontology bc age groups are different#
@@ -151,16 +111,9 @@ data.manager$register.ontology(   #Create a separate ontology for early syphilis
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
 
-data.manager$register.ontology(
-  'nsduh',
-  ont = ontology(
-    year= NULL,
-    location= NULL,
-    age=c('13-24', '25+')))
 
 #Codes:
 source('data_processing/sti_processing.R') #STI data
-source('data_processing/nsduh_processing_new.R') #NSDUH processing
 
 #Aggregate Outcomes:
 source('data_processing/put_msa_data_as_new_source_script.R') #Sources function to aggregate county data to MSA
@@ -186,90 +139,6 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
-
-#Aggregate cocaine + heroin for LA (C.31080), Vegas (C.29820), San Diego (C.41740)
-
-los.angeles.msa <- c('CA.11', 'CA.14') 
-
-las.vegas.msa <- c("NV.2") 
-
-san.diego.msa <- c("CA.16R")
-
-la.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
-                                                  metric = "estimate",
-                                                  dimension.values=list(location=los.angeles.msa),
-                                                  keep.dimensions='year')
-
-la.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
-                                                 metric = "estimate",
-                                                 dimension.values=list(location=los.angeles.msa),
-                                                 keep.dimensions='year')
-
-sd.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
-                                                  metric = "estimate",
-                                                  dimension.values=list(location=san.diego.msa),
-                                                  keep.dimensions='year')
-
-sd.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
-                                                 metric = "estimate",
-                                                 dimension.values=list(location=san.diego.msa),
-                                                 keep.dimensions='year')
-
-vegas.cocaine.aggregated = surveillance.manager$pull(outcome = "cocaine",
-                                                     metric = "estimate",
-                                                     dimension.values=list(location=las.vegas.msa),
-                                                     keep.dimensions='year')
-
-vegas.heroin.aggregated = surveillance.manager$pull(outcome = "heroin",
-                                                    metric = "estimate",
-                                                    dimension.values=list(location=las.vegas.msa),
-                                                    keep.dimensions='year')
-
-la.cocaine = as.data.frame.table(la.cocaine.aggregated)%>%
-  mutate(year = as.character(year))%>%
-  mutate(value = as.numeric(Freq))%>%
-  mutate(outcome = "cocaine")%>%
-  mutate(location = 'C.31080')
-
-sd.cocaine = as.data.frame.table(sd.cocaine.aggregated)%>%
-  mutate(year = as.character(year))%>%
-  mutate(value = as.numeric(Freq))%>%
-  mutate(outcome = "cocaine")%>%
-  mutate(location = 'C.41740')
-
-vegas.cocaine = as.data.frame.table(vegas.cocaine.aggregated)%>%
-  mutate(year = as.character(year))%>%
-  mutate(value = as.numeric(Freq))%>%
-  mutate(outcome = "cocaine")%>%
-  mutate(location = 'C.29820')
-
-la.heroin = as.data.frame.table(la.heroin.aggregated)%>%
-  mutate(year = as.character(year))%>%
-  mutate(value = as.numeric(Freq))%>%
-  mutate(outcome = "heroin")%>%
-  mutate(location = 'C.31080')
-
-sd.heroin = as.data.frame.table(sd.heroin.aggregated)%>%
-  mutate(year = as.character(year))%>%
-  mutate(value = as.numeric(Freq))%>%
-  mutate(outcome = "heroin")%>%
-  mutate(location = 'C.41740')
-
-vegas.heroin = as.data.frame.table(vegas.heroin.aggregated)%>%
-  mutate(year = as.character(year))%>%
-  mutate(value = as.numeric(Freq))%>%
-  mutate(outcome = "heroin")%>%
-  mutate(location = 'C.29820')
-
-aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, la.heroin, sd.heroin, vegas.heroin)
-
-data.manager$put.long.form(
-  data = aggregated.nsduh.data,
-  ontology.name = 'nsduh',
-  source = 'nsduh.aggregated',
-  dimension.values = list(),
-  url = 'https://pdas.samhsa.gov/saes/substate',
-  details = 'NSDUH Substate Estimates, aggregated from substate to MSA')
 
 
 source('data_processing/sti_ratio_calculation.R') #Calculates STI Ratio data
