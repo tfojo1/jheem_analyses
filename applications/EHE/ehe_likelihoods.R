@@ -447,7 +447,9 @@ suppression.likelihood.instructions =
     suppression.basic.likelihood.instructions,
     suppression.nested.likelihood.instructions,
     locations.list = list(c(RIVERSIDE.MSA,
-                            MIAMI.MSA)) # first list - first instructions; anything not in first list will use second instructions
+                            MIAMI.MSA,
+                            LA.MSA,
+                            VEGAS.MSA)) # first list - first instructions; anything not in first list will use second instructions
                         
   )
 
