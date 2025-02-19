@@ -52,9 +52,21 @@ data.manager$register.outcome(
     units = '%',
     description = "Non-ADAP Viral Suppression"), denominator.outcome = 'oahs.clients')
 
+data.manager$register.outcome(
+  'adap.suppression', 
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'ADAP Viral Suppression',
+    axis.name = 'ADAP Viral Suppression',
+    units = '%',
+    description = "ADAP Viral Suppression"), denominator.outcome = 'adap.clients')
+
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
+data.manager$register.parent.source('NASTAD', full.name = 'National Alliance of State and Territorial AIDS Directors', short.name= "NASTAD") #parent
+
 data.manager$register.source('ryan.white.program', parent.source= "HRSA", full.name = "Ryan White HIV/AIDS Program Annual Data Report", short.name='ryan.white.program') #child
+data.manager$register.source('nastad.adap', parent.source= "NASTAD", full.name = "ADAP Monitoring Project Annual Report", short.name='nastad.adap') #child
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -72,9 +84,10 @@ data.manager$register.ontology(
 
 # Source ------------------------------------------------------------------
 source('data_processing/ryan.white.data.manager/ryan.white.total.and.stratified.level.R') #oucome = non.adap.clients; adap.clients
-source('data_processing/ryan.white.data.manager/ryan.white.viral.suppression.R') #outcome = oahs.suppression
+source('data_processing/ryan.white.data.manager/ryan.white.oahs.suppression.R') #outcome = oahs.suppression
 source('data_processing/ryan.white.data.manager/ryan.white.ambulatory.R') #outcome = oahs.clients
 source('data_processing/ryan.white.data.manager/ryan.white.adap.proportion.R') #outcome = adap.proportion
+source('data_processing/ryan.white.data.manager/ryan.white.adap.suppression.R') #outcome = adap.suppression
 
 # Save --------------------------------------------------------------------
 
