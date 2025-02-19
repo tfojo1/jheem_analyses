@@ -317,8 +317,8 @@ ryan.white.suppression.msa.strata.clean = lapply(ryan.white.suppression.msa.stra
     pivot_wider(names_from = "outcome", values_from = "value", values_fill = 0)%>%
     select(year, location, `total count`, `suppression count`, strata)%>%
     group_by(year, location, strata)%>%
-    mutate(denominator = sum(`total count`))%>%
-    mutate(numerator = sum(`suppression count`))%>%
+    mutate(denominator = sum(`total count`, na.rm=T))%>%
+    mutate(numerator = sum(`suppression count`, na.rm=T))%>%
     select(year, location, numerator, denominator)
 
   data<- data[!duplicated(data), ]
