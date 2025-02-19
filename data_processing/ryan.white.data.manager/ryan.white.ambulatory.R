@@ -83,7 +83,7 @@ ryan.white.ambulatory.clean = lapply(ryan.white.ambulatory, function(file){
   data$outcome = "oahs.clients"
   data$year = gsub("total count", "", data$year)
   data$location = as.character(data$location)
-
+  data$year = trimws(data$year)
 
   ##Check with Todd: the only new year from data from 2022 report is 2018, the other years are reported in 2023 so I'm using those##
   if(grepl("2022", filename)) {
