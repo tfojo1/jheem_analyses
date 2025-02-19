@@ -26,6 +26,15 @@ data.manager$register.outcome(
     description = "Non-ADAP Clients"))
 
 data.manager$register.outcome(
+  'adap.proportion',  #Decided to make this a ratio bc some states have more adap than non and it creates a proportion >1
+  metadata = create.outcome.metadata(
+    scale = 'ratio',
+    display.name = 'ADAP Ratio',
+    axis.name = 'ADAP Ratio',
+    units = '%',
+    description = "ADAP Ratio"), denominator.outcome = 'non.adap.clients')
+
+data.manager$register.outcome(
   'oahs.clients', #was previously ambulatory.care.past.year
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
@@ -62,9 +71,10 @@ data.manager$register.ontology(
   ))
 
 # Source ------------------------------------------------------------------
-source('data_processing/ryan.white.data.manager/ryan.white.total.and.stratified.level.R')
-source('data_processing/ryan.white.data.manager/ryan.white.viral.suppression.R')
-source('data_processing/ryan.white.data.manager/ryan.white.ambulatory.R')
+source('data_processing/ryan.white.data.manager/ryan.white.total.and.stratified.level.R') #oucome = non.adap.clients; adap.clients
+source('data_processing/ryan.white.data.manager/ryan.white.viral.suppression.R') #outcome = oahs.suppression
+source('data_processing/ryan.white.data.manager/ryan.white.ambulatory.R') #outcome = oahs.clients
+source('data_processing/ryan.white.data.manager/ryan.white.adap.proportion.R') #outcome = adap.proportion
 
 # Save --------------------------------------------------------------------
 
