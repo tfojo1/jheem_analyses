@@ -1,5 +1,7 @@
 # Get the absolute path to jheem_analyses directory
-JHEEM_DIR = file.path("/scratch4/pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses")
+# JHEEM_DIR = file.path("/scratch4/pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses")
+USER = 'azalesak'
+JHEEM_DIR = file.path("/scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
 OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs")
 MODULE.LOAD.COMMANDS = c('source cluster_scripts/rockfish_module_loads.sh')
 
@@ -57,7 +59,7 @@ make.setup.scripts <- function(locations,
                                register.calibration.path,
                                dir='cluster_scripts/setup_scripts',
                                partition='shared',
-                               account='pkasaie1',
+                               account='tfojo1',
                                mem='16G')
 {
     # Create output directories for each location
@@ -91,7 +93,7 @@ make.run.scripts <- function(locations,
                              register.calibration.path,
                              dir='cluster_scripts/run_scripts',
                              partition="shared",
-                             account='pkasaie1',
+                             account='tfojo1',
                              mem='16G')
 {
     for (location in locations) {
@@ -190,7 +192,7 @@ make.combined.assemble.script <- function(name.for.result,
                                           register.calibration.path,
                                           dir="cluster_scripts/assemble_scripts",
                                           partition="shared",
-                                          account="pkasaie1",
+                                          account="tfojo1",
                                           mem="24G",
                                           overwrite=F) {
     # Create assemble directory if it doesn't exist
