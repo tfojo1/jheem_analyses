@@ -110,7 +110,6 @@ data.manager$register.source('census.deaths', parent.source= "NCHS", full.name =
 data.manager$register.source('census.deaths.aggregated', parent.source= "NCHS", full.name = 'Census Deaths Aggregated', short.name = 'census deaths aggregated') #child
 data.manager$register.source('census.aggregated.adult.population', parent.source= "census", full.name = 'Census Aggregated Adult Population', short.name = 'census.agg.pop')
 data.manager$register.source('nsduh', parent.source= "NSDUH", full.name = "National Survey on Drug Use and Health", short.name='nsduh') #child 
-data.manager$register.source('nsduh.aggregated', parent.source= "NSDUH", full.name = 'NSDUH Aggregated', short.name = 'nsduh.aggd') #child #Note this is for the aggregated county data being used to represent MSAs
 
 #Register Ontologies:
 
@@ -319,7 +318,7 @@ aggregated.nsduh.data <- rbind(la.cocaine, sd.cocaine, vegas.cocaine, la.heroin,
 data.manager$put.long.form(
   data = aggregated.nsduh.data,
   ontology.name = 'nsduh',
-  source = 'nsduh.aggregated',
+  source = 'nsduh',
   dimension.values = list(),
   url = 'https://pdas.samhsa.gov/saes/substate',
   details = 'NSDUH Substate Estimates, aggregated from substate to MSA')
