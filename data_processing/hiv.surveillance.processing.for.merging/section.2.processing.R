@@ -363,7 +363,7 @@ riverside.msa.coefficient.of.variance <- as.data.frame.table(riverside.msa.coeff
 surveillance.manager$put.long.form(
   data = riverside.msa.coefficient.of.variance,
   ontology.name = 'cdc',
-  source = 'cdc.hiv',
+  source = 'cdc.aggregated.proportion',
   metric = 'coefficient.of.variance',
   dimension.values = list(),
   url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
@@ -388,7 +388,7 @@ miami.msa.coefficient.of.variance <- as.data.frame.table(miami.msa.coefficient.o
 surveillance.manager$put.long.form(
   data = miami.msa.coefficient.of.variance,
   ontology.name = 'cdc',
-  source = 'cdc.hiv',
+  source = 'cdc.aggregated.proportion',
   metric = 'coefficient.of.variance',
   dimension.values = list(),
   url = 'https://www.cdc.gov/nchhstp/atlas/index.htm',
