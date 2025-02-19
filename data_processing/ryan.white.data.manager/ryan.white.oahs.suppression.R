@@ -331,6 +331,17 @@ ryan.white.suppression.msa.strata.clean = lapply(ryan.white.suppression.msa.stra
   data$location = as.character(data$location)
   data$year = trimws(data$year)
   
+  if(grepl("_race", filename)) {
+    data<-data %>%
+      rename(race=strata)
+    data$race = trimws(data$race)
+  }
+  if(grepl("_age", filename)) {
+    data<-data %>%
+      rename(age=strata)%>%
+      mutate(age = gsub("years ", "years", age))%>%
+      filter(age != "<13 years")
+  }
   
   data= as.data.frame(data)
   list(filename, data)

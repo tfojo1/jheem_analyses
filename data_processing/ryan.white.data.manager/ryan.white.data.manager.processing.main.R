@@ -93,5 +93,3 @@ source('data_processing/ryan.white.data.manager/ryan.white.adap.suppression.R') 
 
 save(data.manager, file="Q:/data_managers/ryan.white.data.manager.rdata")
 
-
-
