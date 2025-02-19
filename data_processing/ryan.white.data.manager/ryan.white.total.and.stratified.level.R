@@ -30,48 +30,48 @@ ryan.white.totals = lapply(ryan.white.pdf.reports, function(file){
   
   if(grepl("_state", filename)) {
     data <- data %>%
-      filter(State != 'Subtotal')
-    data$location = locations::get.location.code(data$State, 'STATE')
+      filter(state != 'Subtotal')
+    data$location = locations::get.location.code(data$state, 'STATE')
   }
   
   if(grepl("_msa", filename)) {
-    data$location = locations::get.location.code(data$`ema/tga`, 'CBSA')
+    data$location = locations::get.location.code(data$`ema.tga`, 'CBSA')
     
     data<- data %>%
-    mutate(location = ifelse(`ema/tga` == "Austin", "C.12420", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Charlotte", "C.16740", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Cleveland", "C.17460", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Norfolk", "C.47260", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Philadelphia", "C.37980", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Portland", "C.38900", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Washington", "C.47900", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Riverside San Bernardino", "C.40140", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Jacksonville", "C.27260", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Tampa St. Petersburg", "C.45300", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Minneapolis St. Paul", "C.33460", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Las Vegas", "C.29820", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Columbus", "C.18140", location))%>%
+    mutate(location = ifelse(`ema.tga` == "Austin", "C.12420", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Charlotte", "C.16740", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Cleveland", "C.17460", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Norfolk", "C.47260", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Philadelphia", "C.37980", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Portland", "C.38900", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Washington", "C.47900", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Riverside San Bernardino", "C.40140", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Jacksonville", "C.27260", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Tampa St. Petersburg", "C.45300", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Minneapolis St. Paul", "C.33460", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Las Vegas", "C.29820", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Columbus", "C.18140", location))%>%
       
       #These are MSAs that need to be combined
-      mutate(location = ifelse(`ema/tga` == "San Francisco", "C.41860", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Oakland", "C.41860", location))%>%
+      mutate(location = ifelse(`ema.tga` == "San Francisco", "C.41860", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Oakland", "C.41860", location))%>%
       
-      mutate(location = ifelse(`ema/tga` == "Los Angeles", "C.31080", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Orange County", "C.31080", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Los Angeles", "C.31080", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Orange County", "C.31080", location))%>%
       
-      mutate(location = ifelse(`ema/tga` == "Miami", "C.33100", location))%>%
-      mutate(location = ifelse(`ema/tga` == "West Palm Beach", "C.33100", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Ft. Lauderdale", "C.33100", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Miami", "C.33100", location))%>%
+      mutate(location = ifelse(`ema.tga` == "West Palm Beach", "C.33100", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Ft. Lauderdale", "C.33100", location))%>%
       
-      mutate(location = ifelse(`ema/tga` == "Dallas", "C.19100", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Ft. Worth", "C.19100", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Dallas", "C.19100", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Ft. Worth", "C.19100", location))%>%
       
-      mutate(location = ifelse(`ema/tga` == "New York", "C.35620", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Middlesex", "C.35620", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Nassau Suffolk", "C.35620", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Bergen Passaic", "C.35620", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Jersey City", "C.35620", location))%>%
-      mutate(location = ifelse(`ema/tga` == "Newark", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "New York", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Middlesex", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Nassau Suffolk", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Bergen Passaic", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Jersey City", "C.35620", location))%>%
+      mutate(location = ifelse(`ema.tga` == "Newark", "C.35620", location))%>%
       
       #Sum the combined MSAs
       group_by(location, year)%>%
@@ -80,6 +80,13 @@ ryan.white.totals = lapply(ryan.white.pdf.reports, function(file){
       rename(value = summed.value)
       
   }
+  
+  ##Until further notice from Todd, just putting 2018 data from 2022 report##
+  if(grepl("non.adap_2022", filename)) {
+    data <- data %>%
+      filter(year == "2018")
+  }
+  ####
   
   data$location = as.character(data$location)
   
@@ -256,7 +263,7 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
   
   data=file[["data"]]
   filename = file[["filename"]]
-  
+
   if(grepl("_msa", filename)) {
     data$location = locations::get.location.code(data$`ema.tga`, 'CBSA')
 
@@ -390,6 +397,9 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
 
   if(grepl("2023", filename)) {
     data$year = "2023"
+  }
+  if(grepl("2022", filename)) {
+    data$year = "2022"
   }
 
   # #Group and sum the 'other' risk category for risk_sex

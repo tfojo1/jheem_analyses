@@ -35,7 +35,7 @@ data.manager$register.outcome(
     description = "Received Ambulatory Care in Past Year"))
 
 data.manager$register.outcome(
-  'non.adap.viral.suppression',
+  'oahs.suppression', #previously non.adap.viral.suppression
   metadata = create.outcome.metadata(
     scale = 'proportion',
     display.name = 'Non-ADAP Viral Suppression',
