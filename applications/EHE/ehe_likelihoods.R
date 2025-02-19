@@ -418,7 +418,8 @@ suppression.nested.likelihood.instructions =
                                                    
                                                    location.types = c('COUNTY','STATE','CBSA'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
-                                                   
+                                                   redundant.location.threshold = 1, # default
+                                          
                                                    dimensions = c("age","sex","race","risk"),
                                                    
                                                    levels.of.stratification = c(0,1), 
