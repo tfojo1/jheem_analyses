@@ -258,7 +258,7 @@ ryan.white.suppression.msa.strata.clean = lapply(ryan.white.suppression.msa.stra
   
   data <- data %>%
     pivot_longer(cols = contains("count"),
-                 names_to = "outcome",
+                 names_to = "strata",
                  values_to = "value")
   
    data$value = as.numeric(gsub(",", "", data$value))
@@ -270,8 +270,8 @@ ryan.white.suppression.msa.strata.clean = lapply(ryan.white.suppression.msa.stra
     data$year = "2022"
   }
    
-   ##Need to separate outcome from race or age###
-  # data$outcome = gsub('[0-9.]', '', data$outcome)
+    data$outcome = str_extract(data$strata, "suppression count|total count")
+    data$strata = gsub("viral suppression count|total count", "", data$strata)
   
   if(grepl("msa", filename)) {
     data$location = locations::get.location.code(data$`ema.tga`, 'CBSA')
@@ -312,26 +312,37 @@ ryan.white.suppression.msa.strata.clean = lapply(ryan.white.suppression.msa.stra
       mutate(location = ifelse(`ema.tga` == "Jersey City", "C.35620", location))%>%
       mutate(location = ifelse(`ema.tga` == "Newark", "C.35620", location))
   }
-  # 
-  # data <- data %>%
-  #   pivot_wider(names_from = "outcome", values_from = "value", values_fill = 0)%>%
-  #   select(year, location, ` total count`, ` suppression count`)%>%
-  #   group_by(year, location)%>%
-  #   mutate(denominator = sum(` total count`))%>%
-  #   mutate(numerator = sum(` suppression count`))%>%
-  #   select(year, location, numerator, denominator)
-  # 
-  # data<- data[!duplicated(data), ]
-  # 
-  # data<-data %>%
-  #   mutate(value=(numerator/denominator))%>%
-  #   mutate(outcome = "oahs.suppression")%>%
-  #   select(-numerator, -denominator)
-  # 
-  # data$location = as.character(data$location)
-  # data$year = trimws(data$year)
+
+  data <- data %>%
+    pivot_wider(names_from = "outcome", values_from = "value", values_fill = 0)%>%
+    select(year, location, `total count`, `suppression count`, strata)%>%
+    group_by(year, location, strata)%>%
+    mutate(denominator = sum(`total count`))%>%
+    mutate(numerator = sum(`suppression count`))%>%
+    select(year, location, numerator, denominator)
+
+  data<- data[!duplicated(data), ]
+
+  data<-data %>%
+    mutate(value=(numerator/denominator))%>%
+    mutate(outcome = "oahs.suppression")%>%
+    select(-numerator, -denominator)
+
+  data$location = as.character(data$location)
+  data$year = trimws(data$year)
   
   
   data= as.data.frame(data)
   list(filename, data)
 })
+
+ryan.white.suppression.msa.strata.clean.put = lapply(ryan.white.suppression.msa.strata.clean, `[[`, 2)
+
+for (data in ryan.white.suppression.msa.strata.clean.put) {
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'ryan.white.pdfs',
+    source = 'ryan.white.program',
+    url = 'https://ryanwhite.hrsa.gov/data/reports',
+    details = 'Ryan White Downloaded PDF Reports')
+}
