@@ -216,6 +216,12 @@ ryan.white.stratified = lapply(ryan.white.pdf.reports.stratified, function(file)
     data$outcome = 'adap.clients'
   }
   
+  if(grepl("2020", filename)) {
+    data$year = "2020"
+  }
+  if(grepl("2021", filename)) {
+    data$year = "2021"
+  }
   if(grepl("2022", filename)) {
     data$year = "2022"
   }
