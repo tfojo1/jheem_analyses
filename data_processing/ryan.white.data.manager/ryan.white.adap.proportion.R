@@ -3,7 +3,7 @@
 
 
 # UPDATE this as we have more years of data -------------------------------
-years.of.adap.data <- c("2022") #adjust this as we add more years
+years.of.adap.data <- c("2020", "2021","2022") #adjust this as we add more years
 locations.of.adap.data <- locations::get.all.for.type("state")
 
 # -------------------------------------------------------------------------
