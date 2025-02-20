@@ -107,7 +107,7 @@ prenatal.age.data.clean = lapply(prenatal.age.data, function(file){
                                `Trimester.Prenatal.Care.Began` == "No prenatal care" ~"no.prenatal.care"))%>%
     mutate(location.check = locations::is.location.valid(location))%>%
     filter(location.check == T)%>% #Remove the 'unidentified counties'
-    select(outcome, year, location, age, value)%>%
+    select(outcome, year, location, age, value, Births)%>%
     mutate(age = if_else(age == '50 years and over', '50+ years', age))%>%
     mutate(age = if_else(age == 'Under 15 years', '>15 years', age))
   
@@ -190,7 +190,7 @@ prenatal.race.data.clean = lapply(prenatal.race.data, function(file){
                                `Trimester.Prenatal.Care.Began` == "No prenatal care" ~"no.prenatal.care"))%>%
     mutate(location.check = locations::is.location.valid(location))%>%
     filter(location.check == T)%>% #Remove the 'unidentified counties'
-   select(outcome, year, location, race, ethnicity, value)
+   select(outcome, year, location, race, ethnicity, value, Births)
 
   data= as.data.frame(data)
   
@@ -292,7 +292,7 @@ prenatal.data.fully.stratified = lapply(prenatal.race.data.three, function(file)
                                `Trimester.Prenatal.Care.Began` == "No prenatal care" ~"no.prenatal.care"))%>%
     mutate(location.check = locations::is.location.valid(location))%>%
     filter(location.check == T) %>% #Remove the 'unidentified counties'
-    select(outcome, year, location, age, race, ethnicity, value)
+    select(outcome, year, location, age, race, ethnicity, value, Births)
 
   data= as.data.frame(data)
   

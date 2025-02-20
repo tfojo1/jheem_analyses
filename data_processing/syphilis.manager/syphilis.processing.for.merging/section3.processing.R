@@ -76,13 +76,22 @@ data.manager$register.outcome(
     description = "Metro Emigration"))
 
 data.manager$register.outcome(
+  'prenatal.screening.denominator',
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Prenatal Screening Denominator',
+    axis.name = 'Prenatal Screening Denominator',
+    units = 'population',
+    description = "Prenatal Screening Denominator"))
+
+data.manager$register.outcome(
   'prenatal.care.initiation.first.trimester',
   metadata = create.outcome.metadata(
     scale = 'proportion',
     display.name = 'Prenatal Care Initiation First Trimester',
     axis.name = 'Prenatal Care Initiation First Trimester',
     units = '%',
-    description = "Prenatal Care Initiation First Trimester"), denominator.outcome = 'female.population')
+    description = "Prenatal Care Initiation First Trimester"), denominator.outcome = 'prenatal.screening.denominator')
 
 data.manager$register.outcome(
   'prenatal.care.initiation.second.trimester',
@@ -91,7 +100,7 @@ data.manager$register.outcome(
     display.name = 'Prenatal Care Initiation Second Trimester',
     axis.name = 'Prenatal Care Initiation Second Trimester',
     units = '%',
-    description = "Prenatal Care Initiation Second Trimester"), denominator.outcome = 'female.population')
+    description = "Prenatal Care Initiation Second Trimester"), denominator.outcome = 'prenatal.screening.denominator')
 
 data.manager$register.outcome(
   'prenatal.care.initiation.third.trimester',
@@ -100,7 +109,7 @@ data.manager$register.outcome(
     display.name = 'Prenatal Care Initiation Third Trimester',
     axis.name = 'Prenatal Care Initiation Third Trimester',
     units = '%',
-    description = "Prenatal Care Initiation Third Trimester"), denominator.outcome = 'female.population')
+    description = "Prenatal Care Initiation Third Trimester"), denominator.outcome = 'prenatal.screening.denominator')
 
 data.manager$register.outcome(
   'no.prenatal.care',
@@ -109,7 +118,7 @@ data.manager$register.outcome(
     display.name = 'No Prenatal Care',
     axis.name = 'No Prenatal Care',
     units = '%',
-    description = "No Prenatal Care"), denominator.outcome = 'female.population')
+    description = "No Prenatal Care"), denominator.outcome = 'prenatal.screening.denominator')
 
 #Register Sources:
 data.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
@@ -209,6 +218,7 @@ source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/msa_immigration.R')
 source('data_processing/syphilis.manager/national_immigration.R')
 source('data_processing/syphilis.manager/prenatal.care.cdc.wonder.R')
+source('data_processing/syphilis.manager/prenatal.screening.denominator.R')
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
@@ -255,23 +265,53 @@ put.msa.data.as.new.source(outcome = 'female.population',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
 
-
-# Aggregate Prenatal Care to MSA ------------------------------------------
-# put.msa.data.as.new.source(outcome = 'no.prenatal.care',
-#                            from.source.name = 'cdc.wonder.natality',
-#                            to.source.name = 'cdc.wonder.aggregated.population',
-#                            to.locations =  MSAS.OF.INTEREST,
-#                            geographic.type.from = 'COUNTY',
-#                            geographic.type.to = 'CBSA',
-#                            source.for.denominator = 'cdc.wonder.natality',
-#                            ontology.for.denominator = 'cdc.fertility',
-#                            details.for.new.data = 'estimated from county data',
-#                            data.manager = syphilis.manager)
-
-
-
 # Source Code to Calculate Fertility Rate by MSA 
 source('data_processing/syphilis.manager/fertility.rate.msa.R')
+
+# Aggregate Prenatal Care to MSA ------------------------------------------
+put.msa.data.as.new.source(outcome = 'no.prenatal.care',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           source.for.denominator = 'cdc.wonder.natality',
+                           ontology.for.denominator = 'cdc.fertility',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.first.trimester',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           source.for.denominator = 'cdc.wonder.natality',
+                           ontology.for.denominator = 'cdc.fertility',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.second.trimester',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           source.for.denominator = 'cdc.wonder.natality',
+                           ontology.for.denominator = 'cdc.fertility',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           source.for.denominator = 'cdc.wonder.natality',
+                           ontology.for.denominator = 'cdc.fertility',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = syphilis.manager)
 
 #Save:
 save(syphilis.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section3.rdata")
