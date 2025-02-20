@@ -81,10 +81,20 @@ ryan.white.totals = lapply(ryan.white.pdf.reports, function(file){
       
   }
   
-  ##Until further notice from Todd, just putting 2018 data from 2022 report##
+##Taking the most recent report of the oldest year:
   if(grepl("non.adap_2022", filename)) {
     data <- data %>%
       filter(year == "2018")
+  }
+  
+  if(grepl("adap.clients_2021", filename)) {
+    data <- data %>%
+      filter(year == "2017")
+  }
+  
+  if(grepl("adap.clients_2020", filename)) {
+    data <- data %>%
+      filter(year == "2016")
   }
   ####
   
