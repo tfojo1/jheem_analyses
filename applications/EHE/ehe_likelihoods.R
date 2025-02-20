@@ -228,6 +228,7 @@ total.new.diagnoses.likelihood.instructions =
                                        #correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = DIAGNOSES.ERROR.TERM,
                                        error.variance.type = 'cv',
+                                       minimum.error.sd = 1,
                                        weights = (2*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
@@ -241,6 +242,7 @@ race.risk.new.diagnoses.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = DIAGNOSES.ERROR.TERM, 
                                        error.variance.type = 'cv',
+                                       minimum.error.sd = 1,
                                        weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
@@ -254,6 +256,7 @@ new.diagnoses.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = DIAGNOSES.ERROR.TERM, 
                                        error.variance.type = 'cv',
+                                       minimum.error.sd = 1,
                                        weights = (1*FULL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
@@ -270,6 +273,7 @@ total.prevalence.likelihood.instructions =
                                        #correlation.different.years = 0, # zeroing out 1/17 because we don't care about trend for the population calibration
                                        error.variance.term = list(PREVALENCE.ERROR.TERM), # second term is from error_for_prevalence_formula.R
                                        error.variance.type = c('cv'), #,'exp.of.variance'), 
+                                       minimum.error.sd = 1,
                                        weights = (2*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
@@ -283,6 +287,7 @@ race.risk.prevalence.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = list(PREVALENCE.ERROR.TERM), 
                                        error.variance.type = c('cv'),
+                                       minimum.error.sd = 1,
                                        weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
@@ -296,6 +301,7 @@ prevalence.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = list(PREVALENCE.ERROR.TERM), 
                                        error.variance.type = c('cv'),
+                                       minimum.error.sd = 1,
                                        weights = (1*FULL.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
