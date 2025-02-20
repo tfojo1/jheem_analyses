@@ -418,7 +418,7 @@ suppression.nested.likelihood.instructions =
                                                    
                                                    location.types = c('COUNTY','STATE','CBSA'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
-                                                   redundant.location.threshold = 1, # default
+                                                   location.stratum.keep.threshold = 1, # default
                                           
                                                    dimensions = c("age","sex","race","risk"),
                                                    
@@ -851,7 +851,7 @@ hiv.test.positivity.likelihood.instructions =
                                                    levels.of.stratification = c(0),
                                                    from.year = 2014,
                                                    to.year = 2020, # REMOVE WHEN ADULT POPULATION IS READY
-                                                   redundant.location.threshold = 0,
+                                                   location.stratum.keep.threshold = 0,
                                                    
                                                    p.bias.inside.location = 0, 
                                                    p.bias.outside.location = hiv.test.positivity.bias.estimates$out.mean,
