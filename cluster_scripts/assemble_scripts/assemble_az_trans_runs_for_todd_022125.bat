@@ -8,6 +8,6 @@
 #SBATCH --account=tfojo1
 
 source cluster_scripts/rockfish_module_loads.sh
-Rscript cluster_scripts/assemble_calibration.R ehe C.41860 init.transmission.ehe 0.5 0 applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R
-Rscript cluster_scripts/assemble_calibration.R ehe C.17140 init.transmission.ehe 0.5 0 applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R
-Rscript cluster_scripts/assemble_calibration.R ehe C.41180 init.transmission.ehe 0.5 0 applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R
+Rscript cluster_scripts/assemble_calibration.R ehe C.41860 init.transmission.ehe 0.1 0 applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R
+Rscript cluster_scripts/assemble_calibration.R ehe C.17140 init.transmission.ehe 0.1 0 applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R
+Rscript cluster_scripts/assemble_calibration.R ehe C.41180 init.transmission.ehe 0.1 0 applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R
