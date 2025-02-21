@@ -424,7 +424,7 @@ suppression.nested.likelihood.instructions =
                                                    
                                                    location.types = c('COUNTY','STATE','CBSA'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
-                                                   location.stratum.keep.threshold = 1, # default
+                                                   location.stratum.keep.threshold = 2, # default
                                           
                                                    dimensions = c("age","sex","race","risk"),
                                                    
@@ -456,7 +456,8 @@ suppression.likelihood.instructions =
     locations.list = list(c(RIVERSIDE.MSA,
                             MIAMI.MSA,
                             LA.MSA,
-                            VEGAS.MSA)) # first list - first instructions; anything not in first list will use second instructions
+                            VEGAS.MSA,
+                            SAN.DIEGO.MSA)) # first list - first instructions; anything not in first list will use second instructions
                         
   )
 
