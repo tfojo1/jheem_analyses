@@ -292,6 +292,7 @@ get.pairing.proportions <- function(oe.ratios, marginal.counts)
 ##-- HELPERS --##
 ##-------------##
 
+# assumes from is on the rows and to is on the columns
 matrix.to.scatter <- function(mat,
                               age.cutoffs)
 {
