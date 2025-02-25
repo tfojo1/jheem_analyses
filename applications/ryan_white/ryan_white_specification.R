@@ -9,6 +9,14 @@ RW.SPECIFICATION = create.jheem.specification(version='rw',
                                               parent.version = 'ehe')
 
 
+## OVERVIEW
+##
+## This model presumes effects for 3 groups of PWH vis-a-vis Ryan White:
+## (1) ADAP (AIDS Drug Assistance Program) recipients with/without any other Ryan White services
+## (2) OAHS (Outpatient Ambulatory Health Services) recipients who do not receive any ADAP
+## (3) Ryan White recipients who do not receive any ADAP or OAHS services (ie, supportive services from Ryan White)
+
+
 ##------------------------------------------##
 ##-- THE INPUT PROPORTIONS ON TYPES OF RW --##
 ##------------------------------------------##
