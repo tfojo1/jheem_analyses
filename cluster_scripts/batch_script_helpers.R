@@ -116,7 +116,7 @@ make.run.scripts <- function(locations,
                                mem=mem,
                                output = output_path,
                                partition=partition,
-                               time.hours = 12, #Todd's said 7*24 but this made it hard to queue
+                               time.hours = 72, #Todd's said 7*24 but this made it hard to queue
                                account=account,
                                commands = paste("Rscript cluster_scripts/run_calibration.R", version, location, calibration.code, chain, specification.path, register.calibration.path))
         }
