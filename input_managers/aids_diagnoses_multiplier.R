@@ -881,7 +881,7 @@ ggplot() + geom_point(data=aids.to.hiv.df, aes(x=year, y=ratio, size=weight)) +
 
 
 # get contrasts for
-desired.spline.times = c(1980, 1998, 2007)
+desired.spline.times = c(1980, 1995, 2007)
 mat = matrix(c(rep(1,length(desired.spline.times)),
                desired.spline.times-anchor.year,
                pmax(0, desired.spline.times-knot1.year)),
@@ -905,6 +905,65 @@ AIDS.TO.NEW.DIAGNOSES.COV.MAT = sapply(1:nrow(AIDS.TO.NEW.DIAGNOSES.COV.MAT), fu
             AIDS.TO.NEW.DIAGNOSES.COV.MAT[j,i]
     })
 })
+
+
+#-- GET THE 2007 RATIO --#
+
+aids.dx = SURVEILLANCE.MANAGER$data$aids.diagnoses$estimate$cdc.surveillance.reports$cdc.msa.reports$year__location
+hiv.dx = SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.surveillance.reports$cdc.msa.reports$year__location
+
+locations.with.aids.and.hiv.dx = intersect(dimnames(aids.dx)[[2]], dimnames(hiv.dx)[[2]])
+
+
+aids.dx = aids.dx[,locations.with.aids.and.hiv.dx,drop=F]
+hiv.dx = hiv.dx[,locations.with.aids.and.hiv.dx,drop=F]
+
+
+naive.ratio = aids.dx['2007',]/hiv.dx['2008',]
+
+hiv.years = as.numeric(dimnames(hiv.dx)[[1]]) - 2007
+aids.years = as.numeric(dimnames(aids.dx)[[1]]) - 2007
+aids.years.sp = pmin(aids.years-(2000-2007), 0)
+
+regression.ratio = sapply(locations.with.aids.and.hiv.dx, function(loc){
+  
+  hiv.response = hiv.dx[,loc]
+  hiv.fit = lm(hiv.response~hiv.years)
+  pred.hiv = hiv.fit$coefficients[1] # the intercept
+  
+  aids.response = aids.dx[,loc]
+  aids.fit = lm(aids.response ~ aids.years + aids.years.sp)
+  pred.aids = aids.fit$coefficients[1]
+  
+  log(pred.aids/pred.hiv)
+})
+
+log.regression.ratio = sapply(locations.with.aids.and.hiv.dx, function(loc){
+  
+    hiv.response = hiv.dx[,loc]
+    hiv.fit = lm(log(hiv.response)~hiv.years)
+    pred.hiv = hiv.fit$coefficients[1] # the intercept
+    
+    aids.response = aids.dx[,loc]
+    aids.fit = lm(log(aids.response) ~ aids.years + aids.years.sp)
+    pred.aids = aids.fit$coefficients[1]
+    
+    pred.aids - pred.hiv
+})
+
+mean(regression.ratio)
+mean(log.regression.ratio)
+
+exp(mean(regression.ratio))
+exp(mean(log.regression.ratio))
+
+sd(log.regression.ratio) / mean(log.regression.ratio)
+
+#-- PUT IT ALL TOGETHER --#
+
+AIDS.TO.NEW.DIAGNOSES.MEAN[3] = mean(log.regression.ratio)
+AIDS.TO.NEW.DIAGNOSES.COV.MAT[3,] = AIDS.TO.NEW.DIAGNOSES.COV.MAT[,3] = 0
+AIDS.TO.NEW.DIAGNOSES.COV.MAT[3,3] = var(log.regression.ratio)
 
 cat("c(", paste0(AIDS.TO.NEW.DIAGNOSES.MEAN, collapse=', '), ")", sep='')
 cat("matrix(c(",
