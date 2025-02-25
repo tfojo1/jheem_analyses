@@ -844,7 +844,29 @@ proportion.tested.likelihood.instructions =
   )
 
 #-- HIV TEST POSITIVITY ----
-hiv.test.positivity.likelihood.instructions =
+hiv.test.positivity.basic.likelihood.instructions = 
+  create.basic.likelihood.instructions.with.included.multiplier(outcome.for.data = "cdc.hiv.test.positivity",
+                                                                outcome.for.sim = "cdc.hiv.test.positivity",
+                                                                
+                                                                dimensions = character(),
+                                                                levels.of.stratification = c(0),
+                                                                from.year = 2014,
+                                                                to.year = 2020, 
+                                                                
+                                                                observation.correlation.form = 'compound.symmetry',
+                                                                
+                                                                included.multiplier = 2.810587, # from cdc_positivity.bias.R
+                                                                included.multiplier.sd = sqrt(0.1391234), # from cdc_positivity.bias.R
+                                                                included.multiplier.correlation = 0.5,
+                                                                
+                                                                error.variance.term = 0.5, # can be off by two fold; guessing this 
+                                                                error.variance.type = 'cv',
+                                                                
+                                                                weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R 
+                                                                equalize.weight.by.year = T
+  )
+
+hiv.test.positivity.nested.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions.with.included.multiplier(outcome.for.data = "cdc.hiv.test.positivity",
                                                    outcome.for.sim = "cdc.hiv.test.positivity",
                                                    denominator.outcome.for.data = "hiv.tests",
@@ -882,6 +904,12 @@ hiv.test.positivity.likelihood.instructions =
                                                    
                                                    weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R 
                                                    equalize.weight.by.year = T
+  )
+
+hiv.test.positivity.likelihood.instructions = 
+  create.ifelse.likelihood.instructions(
+    hiv.test.positivity.nested.likelihood.instructions,
+    hiv.test.positivity.basic.likelihood.instructions
   )
 
 #-- YEAR-ON-YEAR TESTS CHANGE ----
