@@ -1,0 +1,24 @@
+#!/bin/bash
+
+sbatch cluster_scripts/run_scripts/ehe/C.26420/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.45300/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.40140/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.35620/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.33100/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.31080/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.37980/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.36740/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.38060/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.12580/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.29820/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.14460/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.16740/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.41700/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.27260/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.35380/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.32820/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.42660/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.26900/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.12940/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.17460/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.16980/run_full.with.covid2_1.bat
