@@ -5,7 +5,7 @@ sbatch cluster_scripts/run_scripts/ehe/C.45300/run_full.with.covid2_1.bat
 sbatch cluster_scripts/run_scripts/ehe/C.40140/run_full.with.covid2_1.bat
 sbatch cluster_scripts/run_scripts/ehe/C.35620/run_full.with.covid2_1.bat
 sbatch cluster_scripts/run_scripts/ehe/C.33100/run_full.with.covid2_1.bat
-sbatch cluster_scripts/run_scripts/ehe/C.30180/run_full.with.covid2_1.bat
+sbatch cluster_scripts/run_scripts/ehe/C.31080/run_full.with.covid2_1.bat
 sbatch cluster_scripts/run_scripts/ehe/C.37980/run_full.with.covid2_1.bat
 sbatch cluster_scripts/run_scripts/ehe/C.36740/run_full.with.covid2_1.bat
 sbatch cluster_scripts/run_scripts/ehe/C.38060/run_full.with.covid2_1.bat
