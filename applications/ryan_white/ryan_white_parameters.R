@@ -61,7 +61,7 @@ RYAN.WHITE.PARAMETERS.PRIOR = join.distributions(
     adap.age4.or = Lognormal.Distribution(0, RW.PARAM.SD),
     adap.age5.or = Lognormal.Distribution(0, RW.PARAM.SD),
     
-    proportion.adap.without.non.adap.rw = Logitnormal.Distribution(),
+    proportion.adap.without.non.adap.rw = Logitnormal.Distribution(log(.22)-log(1-.22), .5),
     
     #-- SUPPRESSION --#
     
@@ -101,7 +101,7 @@ ryan.white.apply.set.parameters <- function(model.settings, parameters)
     
     parameter.prefixes = c(
         proportion.pwh.with.non.adap.rw = 'non.adap.',
-        proportion.non.adap.rw.with.oahs = 'oahs',
+        proportion.non.adap.rw.with.oahs = 'oahs.',
         proportion.non.adap.rw.with.adap = 'adap.',
         proportion.adap.suppressed = 'rw.suppression.',
         proportion.oahs.without.adap.suppressed = 'rw.suppression.',
@@ -115,7 +115,6 @@ ryan.white.apply.set.parameters <- function(model.settings, parameters)
         parameter.prefix = parameter.prefixes[i]
       
         # Sex/Risk Terms
-    
         set.element.functional.form.interaction.alphas(model.settings,
                                                        element.name = element.name, 
                                                        alpha.name = 'intercept', 
