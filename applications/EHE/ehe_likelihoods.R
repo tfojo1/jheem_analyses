@@ -361,7 +361,7 @@ aids.to.hiv.diagnosis.ratio.likelihood.instructions =
         ratio = get.aids.to.hiv.diagnosis.ratio.07.08(location)
         
         list(
-          log.ratio = log.ratio,
+          log.ratio = log(ratio),
           log.sd = sqrt(2 * (1-0.6))*DIAGNOSES.ERROR.TERM) # assume the variances add, with a correlation of 0.5
     }
 )
