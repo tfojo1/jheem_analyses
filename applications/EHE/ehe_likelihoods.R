@@ -343,6 +343,37 @@ non.age.aids.diagnoses.likelihood.instructions.full =
                                        equalize.weight.by.year = T
   )
 
+aids.to.hiv.diagnosis.ratio.likelihood.instructions = 
+  create.custom.likelihood.instructions(
+    name = "aids.to.hiv.dx.ratio",
+    compute.function = function(sim, data, log=T)
+    {
+        sim.aids.dx.2007 = sim$get(outcomes = 'aids.diagnoses', dimension.values=list(year='2007'), keep.dimensions=character())
+        sim.hiv.dx.2008 = sim$get('new', dimension.values=list(year='2008'), keep.dimensions=character())
+      
+        dlnorm(sim.aids.dx.2007/sim.hiv.dx.2008, 
+               meanlog = data$log.ratio, 
+               sdlog = data$log.sd, 
+               log=T)
+    },
+    get.data.function = function(version, location)
+    {
+        aids.dx = SURVEILLANCE.MANAGER$pull(outcome = 'aids.diagnoses', location=location, year='2007')
+        if (is.null(aids.dx) || all(is.na(aids.dx)))
+          stop(paste0("Cannot get data to create aids-to-hiv diagnosis ratio likelihood: there are no data on AIDS diagnoses for location ", location, " in 2007"))          
+        aids.dx = mean(aids.dx, na.rm = T)
+        
+        hiv.dx = SURVEILLANCE.MANAGER$pull(outcome = 'diagnoses', location=location, year='2008')
+        if (is.null(hiv.dx) || all(is.na(hiv.dx)))
+            stop(paste0("Cannot get data to create aids-to-hiv diagnosis ratio likelihood: there are no data on HIV diagnoses for location ", location, " in 2008"))          
+        hiv.dx = mean(hiv.dx, na.rm = T)
+        
+        list(
+          log.ratio = log(aids.dx)-log(hiv.dx),
+          log.sd = sqrt(2)*DIAGNOSES.ERROR.TERM) # assume the variances add
+    }
+)
+
 #-- HIV-MORTALITY  ----
 # all-cause mortality among pwh
 hiv.mortality.likelihood.instructions.trans = 
@@ -1113,6 +1144,7 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
   join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
                                race.risk.prevalence.likelihood.instructions, 
                                non.age.aids.diagnoses.likelihood.instructions.trans,
+                               aids.to.hiv.diagnosis.ratio.likelihood.instructions,
                                population.likelihood.instructions.trans,
                                heroin.likelihood.instructions.trans,
                                cocaine.likelihood.instructions.trans,
@@ -1140,6 +1172,7 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   
   # AIDS DIAGNOSES LIKELIHOOD
   non.age.aids.diagnoses.likelihood.instructions.full,
+  aids.to.hiv.diagnosis.ratio.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,

@@ -2054,7 +2054,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(new*cumulative.aids.to.new.diagnoses.ratio),
                          corresponding.data.outcome = "aids.diagnoses",
                          keep.dimensions = c("location","age","race","sex","risk"),
-                         to.year = 2005)
+                         to.year = 2007)
 
 track.dynamic.outcome(EHE.SPECIFICATION,
                       name = 'aids.deaths',
