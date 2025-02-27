@@ -358,19 +358,11 @@ aids.to.hiv.diagnosis.ratio.likelihood.instructions =
     },
     get.data.function = function(version, location)
     {
-        aids.dx = SURVEILLANCE.MANAGER$pull(outcome = 'aids.diagnoses', location=location, year='2007')
-        if (is.null(aids.dx) || all(is.na(aids.dx)))
-          stop(paste0("Cannot get data to create aids-to-hiv diagnosis ratio likelihood: there are no data on AIDS diagnoses for location ", location, " in 2007"))          
-        aids.dx = mean(aids.dx, na.rm = T)
-        
-        hiv.dx = SURVEILLANCE.MANAGER$pull(outcome = 'diagnoses', location=location, year='2008')
-        if (is.null(hiv.dx) || all(is.na(hiv.dx)))
-            stop(paste0("Cannot get data to create aids-to-hiv diagnosis ratio likelihood: there are no data on HIV diagnoses for location ", location, " in 2008"))          
-        hiv.dx = mean(hiv.dx, na.rm = T)
+        ratio = get.aids.to.hiv.diagnosis.ratio.07.08(location)
         
         list(
-          log.ratio = log(aids.dx)-log(hiv.dx),
-          log.sd = sqrt(2)*DIAGNOSES.ERROR.TERM) # assume the variances add
+          log.ratio = log.ratio,
+          log.sd = sqrt(2 * (1-0.6))*DIAGNOSES.ERROR.TERM) # assume the variances add, with a correlation of 0.5
     }
 )
 

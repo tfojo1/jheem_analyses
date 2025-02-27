@@ -1634,3 +1634,38 @@ get.fraction.sexual.transmission.avoidable.logit.parameter <- function(get.mean=
           dim = c(sex=3),
           dimnames = list(sex=c("heterosexual_male","msm","female")))
 }
+
+##---------------------------------##
+##-- AIDS to HIV DIANGOSIS RATIO --##
+##---------------------------------##
+
+get.aids.to.hiv.diagnosis.ratio.07.08 <- function(location)
+{
+    aids.dx = SURVEILLANCE.MANAGER$pull(outcome = 'aids.diagnoses', location=location, year='2007')
+    if (is.null(aids.dx) || all(is.na(aids.dx)))
+      stop(paste0("Cannot get data to create aids-to-hiv diagnosis ratio likelihood: there are no data on AIDS diagnoses for location ", location, " in 2007"))          
+    aids.dx = mean(aids.dx, na.rm = T)
+    
+    hiv.dx = SURVEILLANCE.MANAGER$pull(outcome = 'diagnoses', location=location, year='2008')
+    if (is.null(hiv.dx) || all(is.na(hiv.dx)))
+      stop(paste0("Cannot get data to create aids-to-hiv diagnosis ratio likelihood: there are no data on HIV diagnoses for location ", location, " in 2008"))          
+    hiv.dx = mean(hiv.dx, na.rm = T)
+    
+    aids.dx / hiv.dx
+}
+
+get.aids.to.hiv.diagnosis.ratio.functional.form <- function(location)
+{
+    create.linear.spline.functional.form(knot.times = c(time.peak=1980,
+                                                        time.0 = 1995,#1998,
+                                                        time.1 = 2007),#2005),
+                                         knot.values = list(time.peak = 1.09264522805781, # see aids_diagnoses_multiplier.R
+                                                            time.0 = 0.163728677501474,
+                                                            time.1 = log(get.aids.to.hiv.diagnosis.ratio.07.08(location))),
+                                         overwrite.knot.values.with.alphas = F,
+                                         link = 'log', 
+                                         knot.link = 'log',
+                                         knots.are.on.transformed.scale = T,
+                                         min = 0,
+                                         max = Inf)
+}
