@@ -57,6 +57,36 @@ register.ontology.mapping(name = 'male.risk.only.with.to.sex',
                             c('heterosexual_male', 'IDU_in_remission', 'idu','male')
                           ))
 
+register.ontology.mapping(name = 'male.risk.only.with.to.sex.omit.female',
+                          from.dimensions = c('sex','risk'),
+                          to.dimensions = c('risk','sex'),
+                          mappings = rbind(
+                            c('msm', 'never_IDU', 'msm', 'male'),
+                            c('msm', 'active_IDU', 'msm_idu', 'male'),
+                            c('msm', 'IDU_in_remission', 'msm_idu', 'male'),
+                            c('heterosexual_male', 'never_IDU', 'heterosexual','male'),
+                            c('heterosexual_male', 'active_IDU', 'idu','male'),
+                            c('heterosexual_male', 'IDU_in_remission', 'idu','male'),
+                            c(NA, NA, 'heterosexual','female'),
+                            c(NA, NA, 'idu','female'),
+                            c(NA, NA, 'idu','female')
+                          ))
+
+register.ontology.mapping(name = 'female.risk.only.with.to.sex.omit.male',
+                          from.dimensions = c('sex','risk'),
+                          to.dimensions = c('risk','sex'),
+                          mappings = rbind(
+                            c(NA, NA, 'msm', 'male'),
+                            c(NA, NA, 'msm_idu', 'male'),
+                            c(NA, NA, 'msm_idu', 'male'),
+                            c(NA, NA, 'heterosexual','male'),
+                            c(NA, NA, 'idu','male'),
+                            c(NA, NA, 'idu','male'),
+                            c('female', 'never_IDU', 'heterosexual','female'),
+                            c('female', 'active_IDU', 'idu','female'),
+                            c('female', 'IDU_in_remission', 'idu','female')
+                          ))
+
 register.ontology.mapping(name = 'idu.het.risk.only.with.to.sex',
                           from.dimensions = c('sex','risk'),
                           to.dimensions = c('sex','risk'),
@@ -154,6 +184,8 @@ build.rw.proportion.outcome.data.frame <- function(numerator.data,
                 if (verbose)
                   print(paste0("Skipping data for year ", year, " - has risk without sex"))
             }
+            else if (length(dimnames(num)$sex)==1 && dimnames(num)$sex=='transgender')
+            {}
             else
             {
                 if (use.single.denominator)
@@ -209,6 +241,9 @@ build.rw.proportion.outcome.data.frame <- function(numerator.data,
                         if (use.single.denominator)
                           denom = array.access(denominator.data, risk=c('idu'))
                     }
+                    
+                    if (length(dimnames(denom)$risk)>0 && any(dimnames(denom)$risk=='other'))
+                      denom = array.access(denom, risk=setdiff(dimnames(denom)$risk, 'other'))
                 }    
                 
                 if (length(dimnames(num)$sex)==1 && length(intersect(dimnames(num)$sex, target.dim.names$sex))==1)
@@ -381,7 +416,7 @@ read.oahs.and.suppression.data <- function(root.dir)
                                                        n.per.col = 3,
                                                        get.nth.per.col = 2,
                                                        fixed.dimension.values = list(sex='male'))
-        
+
         het.male.only.oahs = male.race.oahs.values[[1]] - msm.race.oahs.values[[1]]
         het.male.only.supp = male.race.suppression.values[[1]] - msm.race.suppression.values[[1]]
         dimnames(het.male.only.oahs)$sex = 'heterosexual_male'
@@ -418,6 +453,43 @@ read.oahs.and.suppression.data <- function(root.dir)
     rv
 }
 
+read.adap.data <- function(root.dir)
+{
+    sub.dirs = list.dirs(root.dir, full.names = F, recursive = F)
+    years = as.numeric(substr(sub.dirs, 1, 4))
+    
+    rv = list()
+    for (i in 1:length(sub.dirs))
+    {
+      sub.dir = file.path(root.dir, sub.dirs[i])
+      year = years[i]
+      
+      files = list.files(sub.dir)
+      
+      # Race Table
+      race.table.name = paste0(year, "_table_2_race.csv")
+      race.table = read.csv(file.path(sub.dir, race.table.name), stringsAsFactors = F)
+      rv = c(rv,
+             read.rw.table(data=race.table,
+                           column.dimension='race',
+                           year=year,
+                           location='US',
+                           fixed.dimension.values = list()))
+      
+      # Sex Table
+      sex.table.name = paste0(year, "_table_3_sex.csv")
+      sex.table = read.csv(file.path(sub.dir, sex.table.name), stringsAsFactors = F)
+      rv = c(rv,
+             read.rw.table(data=sex.table,
+                           column.dimension='sex',
+                           year=year,
+                           location='US',
+                           fixed.dimension.values = list()))
+    }
+    
+    rv
+}
+
 # returns a list of arrays
 read.rw.table <- function(data, column.dimension, year, location, 
                           n.per.col = 2,
@@ -441,6 +513,11 @@ read.rw.table <- function(data, column.dimension, year, location,
     num.col.indices = 1 + n.per.col*(1:floor(n.col/n.per.col)) - (n.per.col-get.nth.per.col)
     col.name.indices = 1 + n.per.col*(1:floor(n.col/n.per.col)) - (n.per.col-1)
     column.values = dimnames(data)[[2]][col.name.indices]
+    
+    keep.mask = !grepl('total', column.values)
+    num.col.indices = num.col.indices[keep.mask]
+    col.name.indices = col.name.indices[keep.mask]
+    column.values = column.values[keep.mask]
      
     # Split up the rows by each category
     category.row.indices = (1:n.row)[is.na(data[,2]) | data[,2]=='']
@@ -493,7 +570,7 @@ read.rw.table <- function(data, column.dimension, year, location,
     category.row.indices = category.row.indices[keep.mask]
     categories = categories[keep.mask]
     category.data.row.indices = category.data.row.indices[keep.mask]
-    
+
     # Parse up the data
     lapply(1:length(categories), function(category.i){
         
@@ -519,7 +596,7 @@ read.rw.table <- function(data, column.dimension, year, location,
           
           dim.names = list(as.character(year), location, as.character(row.values), column.values)
           names(dim.names) = c('year', 'location', category.dimensions[category.i], column.dimension)
-          dim.names = c(dim.names, fixed.dimension.values)
+          dim.names = c(dim.names, category.dimension.values[[category.i]], fixed.dimension.values)
           
           if (!is.null(dim.names$race))
               dim.names$race = gsub('Latinob', 'Latino', dim.names$race)

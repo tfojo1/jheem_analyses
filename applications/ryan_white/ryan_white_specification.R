@@ -3,6 +3,12 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_parameters.R')
 
+source('../jheem_analyses/applications/ryan_white/process_rw_data_for_priors.R')
+source('../jheem_analyses/applications/ryan_white/build_rw_priors.R')
+
+
+RW.DATA.MANAGER = load.data.manager('../../cached/ryan.white.data.manager.rdata', set.as.default = F)
+
 RW.SPECIFICATION = create.jheem.specification(version='rw',
                                               iteration = '1',
                                               description='Model to study the impacts of Ryan-White program on HIV transmission',
@@ -24,35 +30,23 @@ RW.SPECIFICATION = create.jheem.specification(version='rw',
 register.model.element(RW.SPECIFICATION,
                        name = 'proportion.pwh.with.non.adap.rw',
                        scale = 'proportion',
-                       functional.form = create.logistic.linear.functional.form(
-                         intercept = 1, # ie 0.5 on the logit scale
-                         slope = 0, 
-                         parameters.are.on.logit.scale = T,
-                         anchor.year = 2020
-                       ),
+                       functional.form = get.cached.object.for.version(name = "p.non.adap.functional.form", 
+                                                                       version = 'rw'),
                        functional.form.from.time = 2010)
 
 
 register.model.element(RW.SPECIFICATION,
                        name = 'proportion.non.adap.rw.with.oahs',
                        scale = 'proportion',
-                       functional.form = create.logistic.linear.functional.form(
-                         intercept = log(0.7)-log(0.3),
-                         slope = 0, 
-                         parameters.are.on.logit.scale = T,
-                         anchor.year = 2020
-                       ),
+                       functional.form = get.cached.object.for.version(name = "p.oahs.functional.form", 
+                                                                       version = 'rw'),
                        functional.form.from.time = 2010)
 
 register.model.element(RW.SPECIFICATION,
                        name = 'proportion.non.adap.rw.with.adap',
                        scale = 'proportion',
-                       functional.form = create.logistic.linear.functional.form(
-                         intercept = log(1/3)-log(2/3),
-                         slope = 0,
-                         parameters.are.on.logit.scale = T,
-                         anchor.year = 2020
-                       ),
+                       functional.form = get.cached.object.for.version(name = "p.adap.functional.form", 
+                                                                       version = 'rw'),
                        functional.form.from.time = 2010)
 
 register.model.element(RW.SPECIFICATION,
@@ -68,34 +62,22 @@ register.model.element(RW.SPECIFICATION,
 register.model.element(RW.SPECIFICATION,
                        name = 'proportion.adap.suppressed',
                        scale = 'proportion',
-                       functional.form = create.logistic.linear.functional.form(
-                         intercept = log(0.8)-log(0.2),
-                         slope = 0, 
-                         parameters.are.on.logit.scale = T,
-                         anchor.year = 2020
-                       ),
+                       functional.form = get.cached.object.for.version(name = "p.suppression.oahs.functional.form", 
+                                                                       version = 'rw'),
                        functional.form.from.time = 2010)
 
 register.model.element(RW.SPECIFICATION,
                        name = 'proportion.oahs.without.adap.suppressed',
                        scale = 'proportion',
-                       functional.form = create.logistic.linear.functional.form(
-                         intercept = log(0.9)-log(0.1),
-                         slope = 0, 
-                         parameters.are.on.logit.scale = T,
-                         anchor.year = 2020
-                       ),
+                       functional.form = get.cached.object.for.version(name = "p.suppression.oahs.functional.form", 
+                                                                       version = 'rw'),
                        functional.form.from.time = 2010)
 
 register.model.element(RW.SPECIFICATION,
                        name = 'proportion.rw.without.adap.or.oahs.suppressed',
                        scale = 'proportion',
-                       functional.form = create.logistic.linear.functional.form(
-                         intercept = log(0.4)-log(0.6),
-                         slope = 0, 
-                         parameters.are.on.logit.scale = T,
-                         anchor.year = 2020
-                       ),
+                       functional.form = get.cached.object.for.version(name = "p.suppression.oahs.functional.form", 
+                                                                       version = 'rw'),
                        functional.form.from.time = 2010)
 
 ##------------------------------------------------------------##
