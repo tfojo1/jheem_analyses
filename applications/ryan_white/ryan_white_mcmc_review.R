@@ -18,7 +18,7 @@ mcmc = RW.MCMC.CHECKING$mcmc.runs[[1]]
 mcmc.simset = join.simulation.sets(mcmc@simulations)
 
 #-- Take a look at how it went --#
-simplot(mcmc@simulations[[1]], mcmc@simulations[[length(mcmc@simulations)]], 'non.adap.clients', data.manager = RW.DATA.MANAGER)
+bayesian.simulations::likelihood.plot(mcmc, show.log.prior = F)
 
-simplot(mcmc1.simset, 'non.adap.clients', data.manager = RW.DATA.MANAGER)
+simplot(mcmc.simset, 'non.adap.clients', data.manager = RW.DATA.MANAGER)
 bayesian.simulations::trace.plot(mcmc, 'non.adap')
