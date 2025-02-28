@@ -74,31 +74,6 @@ rw.oahs.suppression.likelihood.instructions = create.basic.likelihood.instructio
 )
 
 
-rw.oahs.suppression.likelihood.instructions = create.basic.likelihood.instructions(
-  outcome.for.data = "oahs.suppression", 
-  outcome.for.sim = "oahs.suppression",
-  dimensions = c("age","sex","race","risk"),
-  levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
-  from.year = 2010,
-  correlation.different.years = 0.5, # this is the default
-  correlation.different.strata = 0.1, # this is the default
-  correlation.different.sources = 0.3, # default
-  correlation.same.source.different.details = 0.3, # default
-  
-  observation.correlation.form = 'compound.symmetry', 
-  
-  error.variance.term = 0.05,
-  error.variance.type = 'cv',
-  
-  weights = 1,
-  
-  # if there are more datapoints for certain years, this will normalize
-  # e.g., if there are a few years with only the totals 
-  # before the stratifications are available
-  equalize.weight.by.year = T
-)
-
-
 rw.adap.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "adap.proportion",
                                                    outcome.for.sim = "adap.proportion",
@@ -163,4 +138,13 @@ rw.adap.suppression.likelihood.instructions =
                                                    equalize.weight.by.year = T
   )
 
-
+ryan.white.likelihood.instructions = join.likelihood.instructions(
+  
+#    rw.adap.likelihood.instructions,
+#    rw.adap.suppression.likelihood.instructions,
+  
+    rw.non.adap.likelihood.instructions,
+    rw.oahs.likelihood.instructions,
+    rw.oahs.suppression.likelihood.instructions
+    
+)

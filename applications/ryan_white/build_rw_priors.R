@@ -29,6 +29,44 @@ if (1==2)
 RW.REGRESSION.FORMULA = p ~ age + race + sex + risk
 RW.REGRESSION.FORMULA.SANS.RISK = p ~ age + race + sex
 
+
+ADAP.TOTALS = c(
+  '2018'=285101,
+  '2019'=296930,
+  '2020'=300785,
+  '2021'=289289,
+  '2022'=291170)
+
+NON.ADAP.TOTALS = c(
+  '2018'=533758,
+  '2019'=567803,
+  '2020'=561416,
+  '2021'=576076,
+  '2022'=566846)
+
+OAHS.TOTALS = c(
+  '2018'=359101,
+  '2019'=370119,
+  '2020'=357914,
+  '2021'=366856,
+  '2022'=367846)
+
+OAHS.SUPPRESSION.TOTALS = c(
+  '2018'=.871,
+  '2019'=.881,
+  '2020'=.894,
+  '2021'=.897,
+  '2022'=.896)
+
+HIV.PREVALENCE.TOTALS = c(
+  '2018'=1014481,
+  '2019'=1036801,
+  '2020'=1047709,
+  '2021'=1068119,
+  '2022'=1092023) # from atlasplus
+
+FRAC.ADAP.WITHOUT.NON.ADAP = 0.22
+
 get.p.non.adap.functional.form <- function(specification.metadata, verbose=F)
 {
     numerator.data = read.non.adap.data('../jheem_analyses/applications/ryan_white/ryan_white_data/non_adap_clients')
@@ -39,7 +77,9 @@ get.p.non.adap.functional.form <- function(specification.metadata, verbose=F)
                                                 specification.metadata = specification.metadata,
                                                 verbose = verbose)
     
-    do.create.rw.functional.form(df)
+    do.create.rw.functional.form(df, 
+                                 target.to.average.p = mean(NON.ADAP.TOTALS/HIV.PREVALENCE.TOTALS),
+                                 specification.metadata=specification.metadata)
 }
 
 get.p.oahs.functional.form <- function(specification.metadata, verbose=F)
@@ -97,7 +137,9 @@ get.p.oahs.functional.form <- function(specification.metadata, verbose=F)
                                                 specification.metadata = specification.metadata,
                                                 verbose = verbose)
     
-    do.create.rw.functional.form(df)
+    do.create.rw.functional.form(df,
+                                 target.to.average.p = mean(OAHS.TOTALS/NON.ADAP.TOTALS),
+                                 specification.metadata=specification.metadata)
     
 }
 
@@ -111,7 +153,9 @@ get.p.suppression.oahs.functional.form <- function(specification.metadata, verbo
                                                 verbose = verbose)
 
     
-    do.create.rw.functional.form(df)
+    do.create.rw.functional.form(df,
+                                 target.to.average.p = mean(OAHS.SUPPRESSION.TOTALS),
+                                 specification.metadata=specification.metadata)
 }
 
 get.p.adap.functional.form <- function(specification.metadata, verbose=F)
@@ -125,14 +169,19 @@ get.p.adap.functional.form <- function(specification.metadata, verbose=F)
                                                 denominator.data = non.adap.data[denom.indices],
                                                 specification.metadata = specification.metadata,
                                                 verbose = verbose)
-    
-    
-    do.create.rw.functional.form(df, ff=RW.REGRESSION.FORMULA.SANS.RISK)
+
+    do.create.rw.functional.form(df, 
+                                 specification.metadata=specification.metadata, 
+                                 target.to.average.p = mean(ADAP.TOTALS*(1-FRAC.ADAP.WITHOUT.NON.ADAP)/NON.ADAP.TOTALS),
+                                 ff=RW.REGRESSION.FORMULA.SANS.RISK)
 }
 
 ##-- HELPERS --##
 
-do.create.rw.functional.form <- function(df, ff=RW.REGRESSION.FORMULA, check.in=F)
+do.create.rw.functional.form <- function(df, specification.metadata, 
+                                         target.to.average.p=NULL,
+                                         target.to.average.p.in.year = 2020,
+                                         ff=RW.REGRESSION.FORMULA, check.in=F)
 {    
     anchor.year = 2020
     df$year = df$year - anchor.year
@@ -159,10 +208,26 @@ do.create.rw.functional.form <- function(df, ff=RW.REGRESSION.FORMULA, check.in=
     dimnames(intercept) = dimnames(slope) = dim.names
     
     # Make a functional form
-    create.logistic.linear.functional.form(intercept = intercept,
-                                           slope = slope,
-                                           anchor.year = anchor.year,
-                                           parameters.are.on.logit.scale = T)
+    ff = create.logistic.linear.functional.form(intercept = intercept,
+                                                slope = slope,
+                                                anchor.year = anchor.year,
+                                                parameters.are.on.logit.scale = T)
+    
+    if (!is.null(target.to.average.p))
+    {
+        projected.p = ff$project(target.to.average.p.in.year)[[1]]
+        average.p = mean(projected.p)
+        average.log.odds = log(average.p) - log(1-average.p)
+        target.log.odds = log(target.to.average.p) - log(1-target.to.average.p)
+        
+        offset = target.log.odds - average.log.odds
+        ff = create.logistic.linear.functional.form(intercept = intercept + offset,
+                                                    slope = slope,
+                                                    anchor.year = anchor.year,
+                                                    parameters.are.on.logit.scale = T)
+    }
+    
+    ff
 }
 
 get.rw.denominator.data.indices <- function(numerator.data, denominator.data)

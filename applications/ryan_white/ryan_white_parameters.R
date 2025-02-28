@@ -188,6 +188,31 @@ ryan.white.apply.set.parameters <- function(model.settings, parameters)
                                                    applies.to.dimension.values='all')
 }
 
+common.ryan.white.prior.elements = gsub("non.adap.", "", RYAN.WHITE.PARAMETERS.PRIOR@var.names[grepl("^non.adap", RYAN.WHITE.PARAMETERS.PRIOR@var.names)])
+RYAN.WHITE.SAMPLING.BLOCKS = lapply(common.ryan.white.prior.elements, function(elem){
+    paste0(c("non.adap","oahs","adap","rw.suppression"), ".", elem)
+})
+names(RYAN.WHITE.SAMPLING.BLOCKS) = common.ryan.white.prior.elements
+
+RYAN.WHITE.SAMPLING.BLOCKS = c(
+    RYAN.WHITE.SAMPLING.BLOCKS,
+    list(
+        proportion.adap.without.non.adap.rw = 'proportion.adap.without.non.adap.rw',
+        other.rw.suppression = c(
+            'adap.vs.oahs.suppression.or',
+            'non.oahs.vs.oahs.suppression.or'
+        )
+    )
+)
+
+if (length(setdiff(RYAN.WHITE.PARAMETERS.PRIOR@var.names, unlist(RYAN.WHITE.SAMPLING.BLOCKS))))
+    stop(paste0("We are missing Ryan White parameters from the RYAN.WHITE.SAMPLING.BLOCKS: ",
+                paste0(setdiff(RYAN.WHITE.PARAMETERS.PRIOR@var.names, unlist(RYAN.WHITE.SAMPLING.BLOCKS)), collapse='\n')))
+
+
+if (length(setdiff(unlist(RYAN.WHITE.SAMPLING.BLOCKS), RYAN.WHITE.PARAMETERS.PRIOR@var.names)))
+  stop(paste0("We have EXCESS parameters in the RYAN.WHITE.SAMPLING.BLOCKS: ",
+              paste0(setdiff(unlist(RYAN.WHITE.SAMPLING.BLOCKS), RYAN.WHITE.PARAMETERS.PRIOR@var.names), collapse='\n')))
 
 if (1==2)
 {
