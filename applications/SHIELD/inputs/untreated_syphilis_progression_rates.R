@@ -15,8 +15,8 @@
     times.p.benign.late = as.numeric(names(male.p.benign.late))
     
     # rates for men:
-    -log(1-male.p.benign.late)/times.p.benign.late
-    fit.male.p.benign.late = lm(-log(1-male.p.benign.late)~times.p.benign.late + 0) # using a linear regression model (lm) (The + 0 in the formula means you're not including an intercept term in the model (you want the regression to pass through the origin).)
+    # -log(1-male.p.benign.late)/times.p.benign.late
+    fit.male.p.benign.late = lm(-log(1-male.p.benign.late)~ times.p.benign.late + 0) # using a linear regression model (lm) (The + 0 in the formula means you're not including an intercept term in the model (you want the regression to pass through the origin).)
     ESTIMATES$rate.male.benign.late.est = as.numeric(fit.male.p.benign.late$coefficients[1]) #extracting the coefficient (slope) from the model fit, which represents the rate
     ESTIMATES$rate.male.benign.late.sd = sqrt(as.numeric(vcov(fit.male.p.benign.late))) #extracting the variance-covariance matrix of the model and taking the square root to get the standard deviation.
     # women for women:
@@ -38,7 +38,7 @@
     
     # MALE
     cardiovascular.male.outcomes = data.frame(
-        # from table 7: PROPORTION OF "KNOWNS" OBSERVED TO HAVE DEVELOPED CARDIOVASCULAR SYPHILIS  
+        # from table 8: PROPORTION OF "KNOWNS" OBSERVED TO HAVE DEVELOPED CARDIOVASCULAR SYPHILIS  
         p = c(uncomplicated.aortitis=2.6/100,
               # aortic.insufficiency=7.3/100, #uncomplicated 
               # saccular.aneurym=3.6/100,#uncomplicated 
@@ -54,22 +54,21 @@
                       # aortitis.at.death=NA,
                       total.complicated=30.7)
     )
-    #approach1-: rate of transition is 1/duration , then weighted based on probabiliry of event occuring (effective rate)
-    # assuming that the event follows a uniform distribution over time (i.e., the probability of the event happening is constant over time)
-    cardiovascular.male.rates.among.those.with.outcome = 1/cardiovascular.male.outcomes$mean.time
-    cardiovascular.male.rates = cardiovascular.male.rates.among.those.with.outcome * cardiovascular.male.outcomes$p
+    #approach1-: rate of transition is 1/duration, then weighted based on probabiliry of event occuring (effective rate)
+    # assuming that the risk of event is uniform over time:
+    # cardiovascular.male.rates.among.those.with.outcome = 1/cardiovascular.male.outcomes$mean.time
+    # cardiovascular.male.rates = cardiovascular.male.rates.among.those.with.outcome * cardiovascular.male.outcomes$p
     
     #appraoch2: using -log(1-p)/time to get the rate 
-    #'@:Todd: why not this?
-    # assuming that the time to event follows a logistic or exponential distribution, where the event’s likelihood increases over time in a non-linear way.
-    # cardiovascular.male.rates = -log(1- cardiovascular.male.outcomes$p)/cardiovascular.male.outcomes$mean.time 
+    # assuming that the rate of event is fix over time (but the risk of event is not): the time to event follows a logistic or exponential distribution, where the event’s likelihood increases over time in a non-linear way.
+    cardiovascular.male.rates = -log(1- cardiovascular.male.outcomes$p)/cardiovascular.male.outcomes$mean.time
 
     names(cardiovascular.male.rates) = dimnames(cardiovascular.male.outcomes)[[1]]
     ESTIMATES$rate.male.cardiovascular.est = as.numeric(cardiovascular.male.rates['uncomplicated.aortitis'] + cardiovascular.male.rates['total.complicated'])
     
         # FEMALE
     cardiovascular.female.outcomes = data.frame(
-        # from table 7
+        # from table 8
         p = c(uncomplicated.aortitis=2.9/100,
               # aortic.insufficiency=3.3/100,
               # saccular.aneurym=1.5/100,
@@ -85,9 +84,7 @@
                       # aortitis.at.death=NA,
                       total.complicated=32.8)
     )
-    
-    cardiovascular.female.rates.among.those.with.outcome = 1/cardiovascular.female.outcomes$mean.time
-    cardiovascular.female.rates = cardiovascular.female.rates.among.those.with.outcome * cardiovascular.female.outcomes$p
+    cardiovascular.female.rates = -log(1- cardiovascular.female.outcomes$p)/cardiovascular.female.outcomes$mean.time
     names(cardiovascular.female.rates) = dimnames(cardiovascular.female.outcomes)[[1]]
     ESTIMATES$rate.female.cardiovascular.est = as.numeric(cardiovascular.female.rates['uncomplicated.aortitis'] + 
                                                               cardiovascular.female.rates['total.complicated'])
@@ -123,27 +120,23 @@
     
     # MALE
     neurosyphilis.male.outcomes = data.frame(
-        # from table 9
+        # from table 9: proportion of cases developing neurosyphilis by type and sex
         p = c(diffuse.meningovascular = 3.6/100,
               general.paresis = 3.0/100,
               tabes.dorsalis = 2.5/100,
               gumma.of.brain = 0.3/100),
-        
-        
-        # from figure 12
+        # from figure 12:Duration of infection at discovery, in years, by type and sex
         mean.time = c(diffuse.meningovascular = 14.9,
                       general.paresis = 25.4,
                       tabes.dorsalis = 28.8,
                       gumma.of.brain = NA)
     )
     
-    neurosyphilis.male.rates.among.those.with.outcome = 1/neurosyphilis.male.outcomes$mean.time
-    neurosyphilis.male.rates = neurosyphilis.male.rates.among.those.with.outcome * neurosyphilis.male.outcomes$p
+    # neurosyphilis.male.rates.among.those.with.outcome = 1/neurosyphilis.male.outcomes$mean.time
+    # neurosyphilis.male.rates = neurosyphilis.male.rates.among.those.with.outcome * neurosyphilis.male.outcomes$p
+    neurosyphilis.male.rates= - log(1-neurosyphilis.male.outcomes$p)/neurosyphilis.male.outcomes$mean.time
     names(neurosyphilis.male.rates) = dimnames(neurosyphilis.male.outcomes)[[1]]
     ESTIMATES$rate.male.neurosyphilis.est = as.numeric(neurosyphilis.male.rates['diffuse.meningovascular'] + neurosyphilis.male.rates['general.paresis'] + neurosyphilis.male.rates['tabes.dorsalis'])
-    # a check: over 40 years, how many would have the outcome
-    1 - exp(-ESTIMATES$rate.male.neurosyphilis.est*40) #'@Todd: This should be 0 according to Fig11
-    
     
     # FEMALE
     neurosyphilis.female.outcomes = data.frame(
@@ -152,8 +145,6 @@
               general.paresis = 1.7/100,
               tabes.dorsalis = 1.4/100,
               gumma.of.brain = 0.2/100),
-        
-        
         # from figure 12
         mean.time = c(diffuse.meningovascular = 18.8,
                       general.paresis = 19.6,
@@ -161,12 +152,12 @@
                       gumma.of.brain = NA)
     )
     
-    neurosyphilis.female.rates.among.those.with.outcome = 1/neurosyphilis.female.outcomes$mean.time
-    neurosyphilis.female.rates = neurosyphilis.female.rates.among.those.with.outcome * neurosyphilis.female.outcomes$p
+    # neurosyphilis.female.rates.among.those.with.outcome = 1/neurosyphilis.female.outcomes$mean.time
+    # neurosyphilis.female.rates = neurosyphilis.female.rates.among.those.with.outcome * neurosyphilis.female.outcomes$p
+    neurosyphilis.female.rates= - log(1-neurosyphilis.female.outcomes$p)/neurosyphilis.female.outcomes$mean.time
     names(neurosyphilis.female.rates) = dimnames(neurosyphilis.female.outcomes)[[1]]
     ESTIMATES$rate.female.neurosyphilis.est = as.numeric(neurosyphilis.female.rates['diffuse.meningovascular'] + neurosyphilis.female.rates['general.paresis'] + neurosyphilis.female.rates['tabes.dorsalis'])
-    # a check: over 40 years, how many would have the outcome
-    1 - exp(-ESTIMATES$rate.female.neurosyphilis.est*40)
+    
     
     
     #-- CHECK --#
@@ -201,12 +192,5 @@
     #     projected.female = round(1-exp(-as.numeric(ESTIMATES[c('rate.female.benign.late.est','rate.female.cardiovascular.est','rate.female.neurosyphilis.est')]) * years.for.check.female),3)
     #     
     # )
+
     
-    
-    # Golden (2003) & Kent (2008) estimate that 25–60% of patients experience CNS invasion during the primary and secondary stages, with 5% of these cases being symptomatic. 
-    # 	This results in an estimated [1.25–3%] of patients experience symptomatic CNS disease during the primary and secondary stages (2, 7)
-    times.cns.primary.secondary = 3/12 #3 months
-    p.cns.primary.secondary = c(0.0125, .03)
-    ESTIMATES$rate.cns.primary.secondary =  p.cns.primary.secondary*1/times.cns.primary.secondary
-    
-    ESTIMATES

@@ -8,7 +8,6 @@
 
 
 # LIKELIHOODS INCLUDED: 
-
 #the census runs population count every 10 years, in 2010, and 2020.
 # the values reported between these years are extrapolated based on the previous census data.
 # so we have more faith in those years and less int he ones between decades
@@ -21,7 +20,7 @@ w2=lapply(2020:2023, function(year){
   create.likelihood.weights(total.weight,dimension.values = list(year=year))
 })
 w=c(w1,w2)
-#-- POPULATION SIZES ----
+#** POPULATION SIZES ** ----
 # Basic likelihood: where we have data at the location level desired
 # sometimes we dont have the calibration data for the location of interest. 
 # so for example we need to calibrate prop aware in Baltimiore to data from MD and building 
@@ -60,10 +59,9 @@ population.likelihood.instructions =
                                        # equalize.weight.by.year = F Default is TRUE
   )
 
-#-- DEATHS  ----
+#** DEATHS **  ----
 # CalibTarget: deaths: 2001-2020 by agegroup,sex, race, ethnicty for the US model 
 # dimnames(SURVEILLANCE.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)
-
 deaths.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "deaths", #fix type
                                        outcome.for.sim = "deaths",
@@ -77,10 +75,9 @@ deaths.likelihood.instructions =
                                        # equalize.weight.by.year = T
   )
 
-#-- FETILITY RATE  ----
+#** FETILITY RATE **  ----
 # CalibTarget: Fertility.rate: 2007-2023 agegroup race ethnicty 
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
-
 fertility.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "fertility.rate", #fix type
                                        outcome.for.sim = "fertility.rate",
@@ -92,49 +89,221 @@ fertility.likelihood.instructions =
                                        error.variance.type = 'cv'
   )
 
+#** MIGRATION **  ----
+#*#data is available for 6 overlapping 5-year period (2011-2015, 2012-2016, ....)
+#*#one way stratifiation is only for 2011-2015
+immigration.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "immigration", 
+                                       outcome.for.sim = "immigration",
+                                       dimensions = c('age','race','sex'), 
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2011, 
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary ???
+                                       error.variance.type = 'cv',
+                                       weights = 1,
+                                       equalize.weight.by.year = T
+  )
 
-# if we work on proportions that it'll be different 
+emigration.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "emigration", 
+                                       outcome.for.sim = "emigration",
+                                       dimensions = c("age","race"), 
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2011, 
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                       error.variance.type = 'cv',
+                                       weights = 1,
+                                       equalize.weight.by.year = T
+  )
 
-
-
-
-#-- SYPHILIS DIAGNOSIS ----
-##-- congenital syphilis / PS/ EL/ LL
-
+#---- PRENATAL CARE COVERAGE -----: 
+# we have 4 Categories representing a multinomial likelihood . 
+# for now we are modeling 4 independant likelihoods. This may overpenalize deviations from a single bin because we are not accounting for the correlation between the 4 categories.)
+# Error estimate: @zoe: what proportion of prenatals were unknown at the national level? we can use that to inform this error here 
+prenatal.first.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.first.trimester", 
+                                       outcome.for.sim = "prenatal.care.initiation.first.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, #5% error relative to the estimated value 
+                                       error.variance.type = 'cv'
+  )
+prenatal.second.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.second.trimester", 
+                                       outcome.for.sim = "prenatal.care.initiation.second.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05,  
+                                       error.variance.type = 'cv'
+  )
+prenatal.third.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.third.trimester", 
+                                       outcome.for.sim = "prenatal.care.initiation.third.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05,  
+                                       error.variance.type = 'cv'
+  )
+no.prenatal.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prp.no.prenatal.care", 
+                                       outcome.for.sim = "no.prenatal.care",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05,  
+                                       error.variance.type = 'cv'
+  )
+#** SYPHILIS DIAGNOSIS ** ----
+# we have modeled the misclassification of EL/LL diagnosis in the model and here we only fit to reported (biased) data
+##---- PS ----
 ps.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "ps.syphilis", #fix type
-                                       outcome.for.sim = "diagnosis.primary.secondary", #@Zoe: please add two way stratifications? 
+  create.basic.likelihood.instructions(outcome.for.data = "ps.syphilis",  
+                                       outcome.for.sim = "diagnosis.primary.secondary",  
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 2000,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv'
+  )
+##---- EARLY ----
+early.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "early.syphilis", 
+                                       outcome.for.sim = "diagnosis.el.misclassified",
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2,3),
+                                       from.year = 2000,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv'
+  )
+##---- Late/Unknown ----
+late.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "unknown.duration.or.late.syphilis", 
+                                       outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2,3),
+                                       from.year = 2000,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv'
+  )
+##---- CNS ----
+cns.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 
+                                       outcome.for.sim = "diagnosis.cns",
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2000,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv'
+  )
+##---- Congenital ----
+congenital.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "congenital.syphilis", #fix type
+                                       outcome.for.sim = "diagnosis.congenital",
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2),
                                        from.year = 2010,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, # Zoe will be estimating this based on discrepency between CDC reported numbers and those reported from local health departments
+                                       error.variance.term = 0.05, 
                                        error.variance.type = 'cv'
   )
-#
-lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+##---- Total ----
+total.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "all.syphilis.cases",  
+                                       outcome.for.sim = "diagnosis.total",
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 1941,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv')
+##---- Primary ----
+# primary.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "primary.syphilis",  
+#                                        outcome.for.sim = "diagnosis.primary",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 1941,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv')
+##---- Secondary ----
+# secondary.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "secondary.syphilis",  
+#                                        outcome.for.sim = "secondary.total",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 1941,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv')
 
-#dimnames(SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location__sex)
-#this is reported for male/female: no msm 
-
-# can we ssume rates of diagnosis among het-male and female are similar and the rest of new diagnosis among male are msm specific 
-# @Zoe: can you please add a mapping for this? male= msm + het_male
-
-#-- MIGRATION?
-#-- HIV TESTS? 
 
 
-
+##** HIV TESTS ** ----
+hiv.testing.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv", 
+                                       outcome.for.sim = "hiv.testing",
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2014,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv'
+                                       )
 
 #-- FULL LIKELIHOODS --# ----
 likelihood.instructions.demographics =  join.likelihood.instructions(
   population.likelihood.instructions ,
   deaths.likelihood.instructions,
-  fertility.likelihood.instructions
+  fertility.likelihood.instructions,
   
+  immigration.likelihood.instructions,
+  emmigration.likelihood.instructions,
+  
+  prenatal.first.trimester.likelihood.instructions,
+  prenatal.second.trimester.likelihood.instructions,
+  prenatal.third.trimester.likelihood.instructions,
+  no.prenatal.likelihood.instructions,
+  
+  hiv.testing.likelihood.instructions,
+  
+  ps.diagnosis.likelihood.instructions,
+  early.diagnosis.likelihood.instructions,
+  late.diagnosis.likelihood.instructions,
+  cns.diagnosis.likelihood.instructions,
+  congenital.diagnosis.likelihood.instructions,
+  total.diagnosis.likelihood.instructions,
 )
 #manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"US")
 # lik=deaths.likelihood.instructions$instantiate.likelihood('shield',"US")
 # lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"US")
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
+
+
+
+# estiamting errors for syphilis stages: # Zoe will be estimating this based on discrepency between CDC reported numbers and those reported from local health departments
+# ps.syphilis: @Zoe: we have 0,1,2 way interactions for this, but for early.syphilis, we also have the 3 way interaction
+# for unknown.duration.or.late.syphilis we only have year__location__age
+# Zoe: what about primary.syphilis and secondary.syphilis estimates? 
+
+
+# lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+#dimnames(SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location__sex)
+#this is reported for male/female: no msm 
+
+# can we ssume rates of diagnosis among het-male and female are similar and the rest of new diagnosis among male are msm specific 
+# @Zoe: can you please add a mapping for this? male= msm + het_male

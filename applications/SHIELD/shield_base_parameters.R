@@ -63,8 +63,8 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mort
 
 # *** TRANSMISSION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
-                                      'primary.rel.secondary.transmissibility', #observed to estimated ratio of contacts for females with male who are msm
-                                      1,1,1) #?????
+                                      'primary.rel.secondary.transmissibility',  
+                                      1,1,1)  
 ## ---- MIXING BY SEXUAL ORIENTATION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'oe.female.pairings.with.msm', #observed to estimated ratio of contacts for females with male who are msm
@@ -111,24 +111,26 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
 # *** CONGENITAL SYPHILIS ---- ##----
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
-                                      .65,.6,.7) #
+                                      0.5,0.3,0.6) #
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
-                                      .1,.05,.7) #
+                                      0.1,0.05,0.15) #
+
 ## ---- Risk Ratios Based on Prenatal Care timing  ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.1st.trimester',
-                                      .1,.05,.7) #
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.2nd.trimester',
-                                      .1,.05,.7) #
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.screening.3rd.trimester',
-                                      .1,.05,.7) #
-## ---- Prop Multibirths -----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.born', #proportion of births that are multibirth
-                                      0.03,0.03,0.03) #
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.no.prenatal.care',
+                                      1,1,1) #
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.first.trimester',
+                                      0.104, 0.077, 0.14) #
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.second.trimester',
+                                      0.176, 0.118, 0.254) #
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.third.trimester',
+                                      0.406, 0.313, 0.507) #
 
 # *** NEW BIRTHS ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ratio.birth.male.to.female',
-                                      1.05, 1.05*5, 1.05*2,
-                                      citation=00000)
+                                      1.05, 1.05*5, 1.05*2)
+## ---- Prop Multibirths -----
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.born', #proportion of births that are multibirth
+                                      0.031,0.031,0.031) # 
 # *** NATURAL HISTORY ---- ##-----
 ## ---- STATE DURATIONS ---- assuming as fixed 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.primary',
@@ -193,7 +195,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immedi
                                       0,0,0) #
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.testing.symptomatic', 
                                       0,0,0) #
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.prenatal.screening', 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.prenatal.care', 
                                       0,0,0) #
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.contact.tracing', 
                                       0,0,0) #
@@ -220,6 +222,13 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.conta
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
                                       0.25,0.25*lb, 0.25*hb)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
+                                      0.25,0.25*lb, 0.25*hb)
+
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
+                                      0.25,0.25*lb, 0.25*hb)
+
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
                                       0.25,0.25*lb, 0.25*hb)
 
 ## ********** -----

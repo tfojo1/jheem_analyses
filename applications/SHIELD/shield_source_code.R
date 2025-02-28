@@ -20,12 +20,18 @@ source('../jheem_analyses/commoncode/cache_manager.R')
 # option1: using JHEEM package
 # devtools::install_github('tfojo1/jheem2')
 
-# will need to check the version and reinstall as needed @Andrew
-update.jheem2.package() #this updates the jheem2 if needed
-library(jheem2)
+USE.JHEEM2.PACKAGE=F
+
+if (USE.JHEEM2.PACKAGE){
+  update.jheem2.package # will need to check the version and reinstall as needed 
+  library(jheem2)} # option2: sourcing the code directly:
+if (!USE.JHEEM2.PACKAGE){
+  print("Using JHEEM2 source code")
+  source('../jheem2/R/tests/source_jheem2_package.R')
+}
+
+ 
 clear.all.managers()
-# option2: sourcing the code directly:
-# source('../jheem2/R/tests/source_jheem2_package.R')
 
 # Common code from JHEEM ----
 source('../jheem_analyses/commoncode/target_populations.R')
