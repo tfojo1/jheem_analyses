@@ -241,6 +241,15 @@ ryan.white.stratified = lapply(ryan.white.pdf.reports.stratified, function(file)
     data$outcome = 'adap.clients'
   }
   
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
+  if(grepl("2018", filename)) {
+    data$year = "2018"
+  }
+  if(grepl("2019", filename)) {
+    data$year = "2019"
+  }
   if(grepl("2020", filename)) {
     data$year = "2020"
   }
@@ -436,11 +445,26 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
     data$outcome = 'adap.clients'
   }
 
-  if(grepl("2023", filename)) {
-    data$year = "2023"
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
+  if(grepl("2018", filename)) {
+    data$year = "2018"
+  }
+  if(grepl("2019", filename)) {
+    data$year = "2019"
+  }
+  if(grepl("2020", filename)) {
+    data$year = "2020"
+  }
+  if(grepl("2021", filename)) {
+    data$year = "2021"
   }
   if(grepl("2022", filename)) {
     data$year = "2022"
+  }
+  if(grepl("2023", filename)) {
+    data$year = "2023"
   }
 
   # #Group and sum the 'other' risk category for risk_sex
@@ -451,7 +475,6 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
       mutate(risk = ifelse(risk == "perinatal", 'other', risk))%>%
       group_by(year, location, risk)%>%
       mutate(summed.value = sum(value))
-
   }
 
   if(grepl("risk_sex_female", filename)) {
@@ -472,8 +495,9 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
 })
 
 ryan.white.stratified.msa.put = lapply(ryan.white.stratified.msa, `[[`, 2)
-
+i=1
 for (data in ryan.white.stratified.msa.put) {
+  print(i+1)
   data.manager$put.long.form(
     data = data,
     ontology.name = 'ryan.white.pdfs',
