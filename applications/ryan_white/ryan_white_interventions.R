@@ -12,29 +12,63 @@ simset = load.simulation.set("../jheem_analyses/cached/simsets_for_lauren/simset
 ss=simset$subset(1:5)
 
 
+# Complete Loss of ADAP
+lose.adap.effect = create.intervention.effect(quantity.name = 'adap.suppression.effect',
+                                              start.time = START.YEAR,
+                                              effect.values = 0,
+                                              apply.effects.as = 'value',
+                                              scale = 'proportion',
+                                              times = IMPLEMENTED.BY.YEAR,
+                                              allow.values.less.than.otherwise = T,
+                                              allow.values.greater.than.otherwise = F )
 
-lose.adap.2.effect = create.intervention.effect(quantity.name = 'suppression.of.diagnosed',
-                                       start.time = START.YEAR,
-                                       effect.values = 0.75,
-                                       apply.effects.as = 'multiplier',
-                                       scale = 'proportion',
-                                       times = IMPLEMENTED.BY.YEAR,
-                                       allow.values.less.than.otherwise = T,
-                                       allow.values.greater.than.otherwise = F )
 
-lose.adap.2 = create.intervention(lose.adap.2.effect, WHOLE.POPULATION, code = "loseAdap")
+lose.adap = create.intervention(lose.adap.2.effect, WHOLE.POPULATION, code = "loseAdap")
 
-# 
-# fake.null.effect = create.intervention.effect(quantity.name = 'suppression.of.diagnosed',
-#                                          start.time = START.YEAR,
-#                                          effect.values = 1,
-#                                          apply.effects.as = 'multiplier',
-#                                          scale = 'proportion',
-#                                          times = IMPLEMENTED.BY.YEAR,
-#                                          allow.values.less.than.otherwise = T,
-#                                          allow.values.greater.than.otherwise = F )
-# 
-# fake.null = create.intervention(fake.null.effect, WHOLE.POPULATION, code = "fakeNull")
+# Temporary Lapse of ADAP
+temp.lose.adap.effect = create.intervention.effect(quantity.name = 'adap.suppression.effect',
+                                                   start.time = START.YEAR,
+                                                   effect.values = c(0,0,1),
+                                                   apply.effects.as = 'value',
+                                                   scale = 'proportion',
+                                                   times = c(START.YEAR + 0.25, 2028, 2028.25),
+                                                   allow.values.less.than.otherwise = T,
+                                                   allow.values.greater.than.otherwise = F )
+
+temp.lose.adap = create.intervention(temp.lose.adap.effect, WHOLE.POPULATION, code = "loseAdap2")
+
+
+
+# Complete Loss of ADAP and X% OAHS
+
+lose.oahs.effect = create.intervention.effect(quantity.name = 'oahs.suppression.effect',
+                                              start.time = START.YEAR,
+                                              effect.values = X,
+                                              apply.effects.as = 'value',
+                                              scale = 'proportion',
+                                              times = IMPLEMENTED.BY.YEAR,
+                                              allow.values.less.than.otherwise = T,
+                                              allow.values.greater.than.otherwise = F )
+
+lose.adap.oahs = create.intervention(c(lose.adap.effect, lose.oahs.effect) , WHOLE.POPULATION, code = "loseRW")
+
+
+# Temporary Lapse of ADAP and X% OAHS
+
+temp.lose.oahs.effect = create.intervention.effect(quantity.name = 'oahs.suppression.effect',
+                                                   start.time = START.YEAR,
+                                                   effect.values = c(X,X,1),
+                                                   apply.effects.as = 'value',
+                                                   scale = 'proportion',
+                                                   times = c(START.YEAR + 0.25, 2028, 2028.25),
+                                                   allow.values.less.than.otherwise = T,
+                                                   allow.values.greater.than.otherwise = F )
+
+temp.lose.adap.oahs = create.intervention(c(temp.lose.adap.effect, temp.lose.oahs.effect) , WHOLE.POPULATION, code = "loseRW2")
+
+
+
+
 
 #No intervention
 noint=get.null.intervention()

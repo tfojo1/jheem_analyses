@@ -32,6 +32,7 @@ data.manager$register.outcome(
     display.name = 'ADAP Ratio',
     axis.name = 'ADAP Ratio',
     units = '%',
+    display.as.percent = T,
     description = "ADAP Ratio"), denominator.outcome = 'non.adap.clients')
 
 data.manager$register.outcome(

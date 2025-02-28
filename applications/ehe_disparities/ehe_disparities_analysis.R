@@ -27,7 +27,7 @@ load_simset(date="2025_01-31", msa="26420") #Houston
 load_simset(date="2025_01-31", msa="35620") #NYC
 
 CALIBRATION.CODE="full.with.covid2"
-LOCATIONS=c("C.12060","C.12580","C.16980","C.26420","C.35620")
+LOCATIONS=c("C.12060","C.12580","C.26420","C.35620") #,"C.16980"
 INTERVENTIONS=c("noint", "fullint")
 
 ### Run a set of interventions and select relevant results
@@ -65,7 +65,7 @@ results
 dim(results)
 
 results = collection$get(outcomes = c("new", "incidence", "population"),
-                         dimension.values = list(year=2020),
+                         dimension.values = list(year=2025),
                          keep.dimensions = c("race"))
 
 #################################
@@ -170,6 +170,7 @@ ir_total_upper = apply(ir_total, c("location", "intervention"), quantile, probs=
 ir_total_medianci = paste0(round(ir_total_median*100000, 0), " (", round(ir_total_lower*100000, 0), ", ", round(ir_total_upper*100000, 0), ")")
 dim(ir_total_medianci) = dim(ir_total_median)
 dimnames(ir_total_medianci) = dimnames(ir_total_median)
+ir_total_medianci
 
 #Calculate IRD
 ird_black <- ir_black - ir_other
@@ -234,9 +235,25 @@ write.csv(table, file="../../code/jheem_analyses/applications/ehe_disparities/ta
 #################################
 
 #Figures
-#Compare estimated incidence rates under null vs. full intervention
+#Estimated incidence rates by race/ethnicity under null vs. full intervention
 
-#no intervention (through 2030)
+#Atlanta
+#no intervention
+file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.12060',intervention.code='noint',sub.version=NULL,n.sim=100)
+load(file)
+noint=simset
+apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
+
+#full intervention (through 2030)
+file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.12060',intervention.code='fullint',sub.version=NULL,n.sim=100)
+load(file)
+int=simset
+apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+simplot(int,'incidence', split.by='race')
+
+#Baltimore
+#no intervention
 file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.12580',intervention.code='noint',sub.version=NULL,n.sim=100)
 load(file)
 noint=simset
@@ -250,4 +267,32 @@ int=simset
 apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
 simplot(int,'incidence', split.by='race')
 
-grobs
+#Houston
+#no intervention
+file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.26420',intervention.code='noint',sub.version=NULL,n.sim=100)
+load(file)
+noint=simset
+apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+simplot(noint,'incidence', split.by='race')
+
+#full intervention (through 2030)
+file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.26420',intervention.code='fullint',sub.version=NULL,n.sim=100)
+load(file)
+int=simset
+apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+simplot(int,'incidence', split.by='race')
+
+#New York
+#no intervention
+file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.35620',intervention.code='noint',sub.version=NULL,n.sim=100)
+load(file)
+noint=simset
+apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+simplot(noint,'incidence', split.by='race')
+
+#full intervention (through 2030)
+file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.35620',intervention.code='fullint',sub.version=NULL,n.sim=100)
+load(file)
+int=simset
+apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+simplot(int,'incidence', split.by='race')
