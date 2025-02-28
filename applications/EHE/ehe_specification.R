@@ -2013,7 +2013,18 @@ track.dynamic.outcome(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'aids.to.new.diagnoses.ratio',
-                       get.functional.form.function = get.aids.to.hiv.diagnosis.ratio.functional.form,
+                       functional.form = create.linear.spline.functional.form(knot.times = c(time.peak=1980,
+                                                                                             time.0 = 1998,
+                                                                                             time.1 = 2005),
+                                                                              knot.values = list(time.peak = 1.09264522805781,
+                                                                                                 time.0 = -0.022054632609793,
+                                                                                                 time.1 = -0.0811281287465434),
+                                                                              overwrite.knot.values.with.alphas = T,
+                                                                              link = 'log', 
+                                                                              knot.link = 'log',
+                                                                              knots.are.on.transformed.scale = T,
+                                                                              min = 0,
+                                                                              max = Inf),
                        functional.form.from.time = 1980,
                        functional.form.to.time = 2008,
                        scale = 'ratio')
@@ -2043,7 +2054,7 @@ track.cumulative.outcome(EHE.SPECIFICATION,
                          value = expression(new*cumulative.aids.to.new.diagnoses.ratio),
                          corresponding.data.outcome = "aids.diagnoses",
                          keep.dimensions = c("location","age","race","sex","risk"),
-                         to.year = 2007)
+                         to.year = 2005)
 
 track.dynamic.outcome(EHE.SPECIFICATION,
                       name = 'aids.deaths',

@@ -315,8 +315,7 @@ non.age.aids.diagnoses.likelihood.instructions.trans =
                                        dimensions = c("sex","race","risk"),
                                        levels.of.stratification = c(0,1),
                                        from.year = 1985,
-                                       to.year = 2007,
-#                                       to.year = 1993,
+                                       to.year = 1993,
                                        correlation.different.years = 0.3,
                                        #observation.correlation.form = 'compound.symmetry',
                                        observation.correlation.form = 'autoregressive.1',
@@ -332,8 +331,7 @@ non.age.aids.diagnoses.likelihood.instructions.full =
                                        dimensions = c("sex","race","risk"),
                                        levels.of.stratification = c(0,1),
                                        from.year = 1985,
-                                       to.year = 2007,
-#                                       to.year = 1993,
+                                       to.year = 1993,
                                        correlation.different.years = 0.3,
                                        #observation.correlation.form = 'compound.symmetry',
                                        observation.correlation.form = 'autoregressive.1',
@@ -342,29 +340,6 @@ non.age.aids.diagnoses.likelihood.instructions.full =
                                        weights = (1*FULL.WEIGHT),
                                        equalize.weight.by.year = T
   )
-
-aids.to.hiv.diagnosis.ratio.likelihood.instructions = 
-  create.custom.likelihood.instructions(
-    name = "aids.to.hiv.dx.ratio",
-    compute.function = function(sim, data, log=T)
-    {
-        sim.aids.dx.2007 = sim$get(outcomes = 'aids.diagnoses', dimension.values=list(year='2007'), keep.dimensions=character())
-        sim.hiv.dx.2008 = sim$get('new', dimension.values=list(year='2008'), keep.dimensions=character())
-      
-        dlnorm(sim.aids.dx.2007/sim.hiv.dx.2008, 
-               meanlog = data$log.ratio, 
-               sdlog = data$log.sd, 
-               log=T)
-    },
-    get.data.function = function(version, location)
-    {
-        ratio = get.aids.to.hiv.diagnosis.ratio.07.08(location)
-        
-        list(
-          log.ratio = log(ratio),
-          log.sd = sqrt(2 * (1-0.6))*DIAGNOSES.ERROR.TERM) # assume the variances add, with a correlation of 0.5
-    }
-)
 
 #-- HIV-MORTALITY  ----
 # all-cause mortality among pwh
@@ -1136,7 +1111,6 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
   join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
                                race.risk.prevalence.likelihood.instructions, 
                                non.age.aids.diagnoses.likelihood.instructions.trans,
-                               aids.to.hiv.diagnosis.ratio.likelihood.instructions,
                                population.likelihood.instructions.trans,
                                heroin.likelihood.instructions.trans,
                                cocaine.likelihood.instructions.trans,
@@ -1164,7 +1138,6 @@ FULL.likelihood.instructions.with.covid =  join.likelihood.instructions(
   
   # AIDS DIAGNOSES LIKELIHOOD
   non.age.aids.diagnoses.likelihood.instructions.full,
-  aids.to.hiv.diagnosis.ratio.likelihood.instructions,
   
   # CONTINUUM LIKELIHOODS
   proportion.tested.likelihood.instructions,
