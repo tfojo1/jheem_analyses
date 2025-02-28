@@ -1,8 +1,8 @@
 
 #-- Set Up --#
+source('applications/ryan_white/ryan_white_specification.R')
 RW.DATA.MANAGER = load.data.manager('../../cached/ryan.white.data.manager.rdata', set.as.default = F)
 
-source('applications/ryan_white/ryan_white_specification.R')
 source('applications/ryan_white/ryan_white_mcmc.R')
 source('applications/ryan_white/ryan_white_likelihoods.R')
 
