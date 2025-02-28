@@ -733,7 +733,7 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
       # The 1/96 is us saying that this ratio is going to independently to all 135 strata, if they were correlated with a compound symmetry matrix with rho=0.5
       var.names = paste0('aids.to.new.diagnoses.ratio.', c('peak','0'))), # see aids_diagnoses_multiplier.R
 
-    aids.to.new.diagnoses.ratio.1 = Lognormal.Distribution(0, log(1.25)/2)
+    aids.to.new.diagnoses.ratio.1 = Lognormal.Distribution(0, log(1.25)/2 * 1/96)
     # aids.to.new.diagnosis.ratio = Multivariate.Lognormal.Distribution(
     #   mu = c(1.09264522805781, 0.163728677501474, -0.197536701163503),
     #   sigma = matrix(c(0.0540150046153106, 0.00446270384370855, 0, 0.00446270384370855, 0.000963074947806267, 0, 0, 0, 0.0657664422223631), nrow=3) *
