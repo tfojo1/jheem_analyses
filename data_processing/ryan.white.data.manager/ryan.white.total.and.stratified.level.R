@@ -495,9 +495,8 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
 })
 
 ryan.white.stratified.msa.put = lapply(ryan.white.stratified.msa, `[[`, 2)
-i=1
+
 for (data in ryan.white.stratified.msa.put) {
-  print(i+1)
   data.manager$put.long.form(
     data = data,
     ontology.name = 'ryan.white.pdfs',
