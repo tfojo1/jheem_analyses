@@ -705,7 +705,7 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     # PrEP use
     # parameter: max.covid.effect.prep.uptake.reduction
-    max.covid.effect.prep.uptake.reduction = Lognormal.Distribution(0, .5*log(2)),
+    max.covid.effect.prep.uptake.reduction = Lognormal.Distribution(log(.85), .5*log(1.5)),
     
     # Suppression
     # parameter: max.covid.effect.suppression.of.diagnosed.reduction

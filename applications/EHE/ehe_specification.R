@@ -254,7 +254,6 @@ register.model.quantity(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'oral.prep.uptake.covid.multiplier',
-                        scale = 'proportion',
                         value = expression((1-(1-max.covid.effect.prep.uptake.reduction) * covid.on *
                                               (1-prep.uptake.transmission.mobility.correlation+
                                                  (prep.uptake.transmission.mobility.correlation*covid.mobility.change))))
