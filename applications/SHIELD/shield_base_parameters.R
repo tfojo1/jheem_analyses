@@ -58,8 +58,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mort
                                       0,0,0) # TBD
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.cns',
                                       0,0,0) # TBD
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.congenital',
-                                      0,0,0) # TBD 
+
 
 # *** TRANSMISSION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,

@@ -223,14 +223,13 @@ register.model.element.values(SHIELD.SPECIFICATION,
                               'rate.syphilis.mortality.late.latent'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.late.latent'],
                               'rate.syphilis.mortality.tertiary'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.tertiary'],
                               'rate.syphilis.mortality.cns'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.cns'],
-                              'rate.syphilis.mortality.congenital'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.congenital'],
                               scale = 'rate')
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.syphilis.mortality',
                         scale = 'rate',
                         value = 0)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(stage='primary'), #'@Todd: do I need to specify the profile as undiagnosed & diagnosed/untreated? I doubt it. 
+                               applies.to = list(stage='primary'),  
                                name = 'rate.syphilis.mortality',
                                value = 'rate.syphilis.mortality.primary')
 register.model.quantity.subset(SHIELD.SPECIFICATION,
@@ -253,12 +252,6 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(stage='cns'),
                                name = 'rate.syphilis.mortality',
                                value = 'rate.syphilis.mortality.cns')
-
-#'@Todd: if we decide to model congenital mortality, we have to do it seperately based on fertility rate
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                applies.to = list(stage='congenital'),
-#                                name = 'rate.syphilis.mortality',
-#                                value = 'rate.syphilis.mortality.congenital')
 # register mortality:
 register.mortality(SHIELD.SPECIFICATION,
                    tag = 'syphilis.mortality',
@@ -1320,13 +1313,14 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        'fraction.el.misclassified.ll',
                        scale = 'proportion',
+                       dimensions = c("race"),#@Todd: The dimensions for quantity 'fraction.el.misclassified.ll' include 'continuum' and 'stage'. However these dimensions are not present in the outcome dim.names inferred from the other outcomes
                        value = SHIELD_BASE_PARAMETER_VALUES['fraction.el.misclassified.ll'],
 )  
 register.model.element(SHIELD.SPECIFICATION,
                        'fraction.ll.misclassified.el',
                        scale = 'proportion',
+                       dimensions = c("race"),#@Todd: The dimensions for quantity 'fraction.el.misclassified.ll' include 'continuum' and 'stage'. However these dimensions are not present in the outcome dim.names inferred from the other outcomes
                        value = SHIELD_BASE_PARAMETER_VALUES['fraction.ll.misclassified.el'],
-                       
 )  
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'diagnosis.total',

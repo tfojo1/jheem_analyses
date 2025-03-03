@@ -1,9 +1,8 @@
 cat("*** Running Shield_source_code.R ***\n")
 NEW.SOURCE=T
-
+USE.JHEEM2.PACKAGE=F
 
 #pulling JHEEM_ANALYSIS # Load the git2r package ----
-if (NEW.SOURCE) {
   cat("Checking JHEEM_ANALYSIS repository status.... \n")
   repo_path <- "../jheem_analyses//"  
   # Check if the repository exists at the specified path
@@ -13,20 +12,24 @@ if (NEW.SOURCE) {
   } else {
     cat("Can not pull from JHEEM_ANALYSIS: ", repo_path, "\n")
   }
-}
 
 source('../jheem_analyses/commoncode/cache_manager.R')
 
-# option1: using JHEEM package
-# devtools::install_github('tfojo1/jheem2')
-
-USE.JHEEM2.PACKAGE=F
-
 if (USE.JHEEM2.PACKAGE){
+  print("Using JHEEM2 package ... ")
   update.jheem2.package # will need to check the version and reinstall as needed 
-  library(jheem2)} # option2: sourcing the code directly:
+  library(jheem2)
+  } # option2: sourcing the code directly:
 if (!USE.JHEEM2.PACKAGE){
-  print("Using JHEEM2 source code")
+  # devtools::install_github('tfojo1/jheem2')
+  print("Using JHEEM2 source code ...")
+  cat("Checking JHEEM2 repository status.... \n")
+    repo_path <- "../jheem2/"
+    if (dir.exists(repo_path)) {# Check if the repository exists at the specified path
+      system(paste("cd", repo_path, "&& git pull"))# Run the Git pull command to update the repository
+    } else {
+      cat("Can not pull from JHEEM2: ", repo_path, "\n")
+    }
   source('../jheem2/R/tests/source_jheem2_package.R')
 }
 
@@ -46,19 +49,7 @@ library(reshape2)
 library(locations)
 library(distributions)
 
-# #pulling JHEEM2 # Load the git2r package ----
-# if (NEW.SOURCE) {
-#   cat("Checking JHEEM2 repository status.... \n")
-#   repo_path <- "../jheem2/"  
-#   # Check if the repository exists at the specified path
-#   if (dir.exists(repo_path)) {
-#     # Run the Git pull command to update the repository
-#     system(paste("cd", repo_path, "&& git pull"))
-#   } else {
-#     cat("Can not pull from JHEEM2: ", repo_path, "\n")
-#   }
-# }
-
+ 
 
 #
 set.jheem.root.directory(ROOT.DIR)
