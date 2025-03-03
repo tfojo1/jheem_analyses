@@ -3,7 +3,7 @@ rw.non.adap.likelihood.instructions = create.basic.likelihood.instructions(
   outcome.for.data = "non.adap.clients", 
   outcome.for.sim = "non.adap.clients",
   dimensions = c("age","sex","race","risk"),
-  levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
+  levels.of.stratification = c(0,1), # 0 = totals, 1 = 1-way stratification
   from.year = 2010,
   correlation.different.years = 0.5, # this is the default
   correlation.different.strata = 0.1, # this is the default

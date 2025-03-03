@@ -1,9 +1,12 @@
 
 RW.PARAM.SD = log(1.5)/2
+RW.TOTAL.OR.SD = log(2)/2
 
 RYAN.WHITE.PARAMETERS.PRIOR = join.distributions(
   
     #-- Non-ADAP --#
+    non.adap.or = Lognormal.Distribution(0, RW.TOTAL.OR.SD),
+    
     non.adap.msm.or = Lognormal.Distribution(0, RW.PARAM.SD),
     non.adap.msm.idu.or = Lognormal.Distribution(0, RW.PARAM.SD),
     non.adap.idu.male.or = Lognormal.Distribution(0, RW.PARAM.SD),
@@ -23,6 +26,8 @@ RYAN.WHITE.PARAMETERS.PRIOR = join.distributions(
     
     
     #-- OAHS given non-ADAP --#
+    
+    oahs.or = Lognormal.Distribution(0, RW.TOTAL.OR.SD),
     
     oahs.msm.or = Lognormal.Distribution(0, RW.PARAM.SD),
     oahs.msm.idu.or = Lognormal.Distribution(0, RW.PARAM.SD),
@@ -44,6 +49,8 @@ RYAN.WHITE.PARAMETERS.PRIOR = join.distributions(
     
     #-- ADAP given non-ADAP --#
     
+    adap.or = Lognormal.Distribution(0, RW.TOTAL.OR.SD),
+    
     adap.msm.or = Lognormal.Distribution(0, RW.PARAM.SD),
     adap.msm.idu.or = Lognormal.Distribution(0, RW.PARAM.SD),
     adap.idu.male.or = Lognormal.Distribution(0, RW.PARAM.SD),
@@ -64,6 +71,8 @@ RYAN.WHITE.PARAMETERS.PRIOR = join.distributions(
     proportion.adap.without.non.adap.rw = Logitnormal.Distribution(log(.22)-log(1-.22), .5),
     
     #-- SUPPRESSION --#
+    
+    rw.suppression.or = Lognormal.Distribution(0, RW.TOTAL.OR.SD),
     
     rw.suppression.msm.or = Lognormal.Distribution(0, RW.PARAM.SD),
     rw.suppression.msm.idu.or = Lognormal.Distribution(0, RW.PARAM.SD),
@@ -90,8 +99,8 @@ ryan.white.apply.set.parameters <- function(model.settings, parameters)
 {
     specification.metadata = model.settings$specification.metadata
     
-    idu.states = specification.metadata$compartment.aliases$active.idu.states
-    non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
+    non.idu.states = specification.metadata$compartment.aliases$never.idu.states
+    idu.states = setdiff(specification.metadata$dim.names$risk, non.idu.states)
     
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
@@ -114,6 +123,14 @@ ryan.white.apply.set.parameters <- function(model.settings, parameters)
         element.name = element.names[i]
         parameter.prefix = parameter.prefixes[i]
       
+        # All
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       value = parameters[paste0(parameter.prefix, 'or')],
+                                                       dimension = 'all',
+                                                       applies.to.dimension.values='all')
+        
         # Sex/Risk Terms
         set.element.functional.form.interaction.alphas(model.settings,
                                                        element.name = element.name, 

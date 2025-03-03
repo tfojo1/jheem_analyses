@@ -40,6 +40,9 @@ fit.rw.simset <- function(simset, verbose=F)
                                                                            location=simset$location, 
                                                                            data.manager = RW.DATA.MANAGER)
     
+    if (RW.DEBUG)
+        RW.MCMC.CHECKING$likelihoods = likelihood
+    
     compute.likelihood = function(sim)
     {
         if (is.null(sim))
@@ -75,8 +78,23 @@ fit.rw.simset <- function(simset, verbose=F)
         })
     })
     
+    # Take a quick guess for non.adap.proportion
+    default.start.values = get.medians(RYAN.WHITE.PARAMETERS.PRIOR)
+    sim0 = transmuter$transmute(sim.index = 1, parameters = default.start.values)
+    
+    non.adap.clients = RW.DATA.MANAGER$pull('non.adap.clients', location=simset$location)[,1,1]
+    diagnosed.pwh = apply(SURVEILLANCE.MANAGER$pull('diagnosed.prevalence', location=simset$location, year=names(non.adap.clients)), 'year', mean, na.rm=T)
+    years.to.use = intersect(names(non.adap.clients)[!is.na(non.adap.clients)], names(diagnosed.pwh)[!is.na(diagnosed.pwh)])
+    mean.p.non.adap = mean(non.adap.clients[years.to.use] / diagnosed.pwh[years.to.use])
+    
+    sim.p.adap = mean(sim0$get(outcomes='non.adap.clients', year=years.to.use)[,,] / sim0$get(outcomes='diagnosed.prevalence', year=years.to.use)[,,])
+    
+    adjust.by.or = ( mean.p.non.adap / (1-mean.p.non.adap) ) / ( sim.p.adap / (1-sim.p.adap) )
+    
+    default.start.values['non.adap.or'] = default.start.values['non.adap.or'] * adjust.by.or
+    
     # Pull it together in MCMC settings
-    mcmc.settings$start.values = default.start.values = get.medians(RYAN.WHITE.PARAMETERS.PRIOR)
+    mcmc.settings$start.values = default.start.values
     mcmc.settings$ctrl = bayesian.simulations::create.adaptive.blockwise.metropolis.control(
         var.names = RYAN.WHITE.PARAMETERS.PRIOR@var.names,
         simulation.function = transmute.simulation,
