@@ -311,6 +311,8 @@ data.list.emory.msm.county = lapply(data.list.emory.msm, function(file){
   data$state_code= str_pad(data$STATEFP, width=2, side="left", pad="0")
   data$county_code= str_pad(data$COUNTYFP, width=3, side="left", pad="0")
   data$location = paste(data$state_code, data$county_code, sep="")
+  
+  data = subset(data, data$location != "51515") #Removed this from the locations package March 2025
 
   #Need to add sex column in for put statment dimensions
   data$sex = "male"

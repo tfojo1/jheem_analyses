@@ -50,7 +50,8 @@ rename(value = Freq)%>%
   mutate(location = as.character(location))%>%
   mutate(sex = as.character(sex))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "proportion.msm")
+  mutate(outcome = "proportion.msm")%>%
+  filter(location != "51515") #Removed this from the locations package March 2025
 
 
 # Need Two Put Statements because Sources are different -------------------
