@@ -62,6 +62,33 @@ data.manager$register.outcome(
     units = '%',
     description = "ADAP Viral Suppression"), denominator.outcome = 'adap.clients')
 
+data.manager$register.outcome(
+  'diagnosed.prevalence', #Changing this from prevalence to diagnosed.prevalence bc CDC's prevalence only includes people who know their status#
+  metadata = create.outcome.metadata(
+    scale = 'non.negative.number',
+    display.name = 'Diganosed Prevalence',
+    axis.name = 'Diganosed Prevalence (n)',
+    units = 'cases',
+    description = "Diagnosed HIV Prevalence"))
+
+data.manager$register.outcome(
+  'adap.proportion.of.diagnosed',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'ADAP Proportion of Diagnosed',
+    axis.name = 'ADAP Proportion of Diagnosed',
+    units = '%',
+    description = "ADAP Proportion of Diagnosed"), denominator.outcome = 'diagnosed.prevalence')
+
+data.manager$register.outcome(
+  'adap.suppressed.proportion.of.diagnosed',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'ADAP Suppressed Proportion of Diagnosed',
+    axis.name = 'ADAP Suppressed Proportion of Diagnosed',
+    units = '%',
+    description = "ADAP Suppressed Proportion of Diagnosed"), denominator.outcome = 'diagnosed.prevalence')
+
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
 data.manager$register.parent.source('NASTAD', full.name = 'National Alliance of State and Territorial AIDS Directors', short.name= "NASTAD") #parent
@@ -89,6 +116,7 @@ source('data_processing/ryan.white.data.manager/ryan.white.oahs.suppression.R') 
 source('data_processing/ryan.white.data.manager/ryan.white.ambulatory.R') #outcome = oahs.clients
 source('data_processing/ryan.white.data.manager/ryan.white.adap.proportion.R') #outcome = adap.proportion
 source('data_processing/ryan.white.data.manager/ryan.white.adap.suppression.R') #outcome = adap.suppression
+source('data_processing/ryan.white.data.manager/proportions.of.diagnosed.R') #outcomes = diagnosed.prevalence; adap.proportion.of.diagnosed; adap.suppressed.proportion.of.diagnosed
 
 # Save --------------------------------------------------------------------
 
