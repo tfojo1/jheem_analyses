@@ -21,7 +21,7 @@ primary.secondary.male= lapply(cdc.reports.raw, function(file){
   filename = file[["filename"]]
   
   data$location = "US"
-  data$year = substr(filename, 54, 57)
+  data$year = str_sub(filename, -9, -6)
   data$sex = 'male'
 
   data <- data %>%
@@ -45,7 +45,7 @@ primary.secondary.female= lapply(cdc.reports.raw, function(file){
   filename = file[["filename"]]
   
   data$location = "US"
-  data$year = substr(filename, 54, 57)
+  data$year = str_sub(filename, -9, -6)
   data$sex = 'female'
   
   data <- data %>%
@@ -69,7 +69,7 @@ primary.secondary.total = lapply(cdc.reports.raw, function(file){
   filename = file[["filename"]]
   
   data$location = "US"
-  data$year = substr(filename, 54, 57)
+  data$year = str_sub(filename, -9, -6)
   
   data <- data %>%
     select(Disease, location, year, `Total Total`)%>%
