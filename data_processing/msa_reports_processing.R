@@ -243,6 +243,12 @@ data.list.msa_total.clean = lapply(data.list.msa_total, function(file){
   data = subset(data, data$drop_var != "1")
   ##
   
+  #Update for March 2025- want to remove all diagnosed.prevalence data for Riverside MSA in 2015 or before
+  data <- data %>%
+    mutate(drop_riverside = as.character(ifelse(location == "C.40140" & (year=="2014"|year == "2015") & outcome=='diagnosed.prevalence', "1", "0")))%>%
+    filter(drop_riverside != "1")
+    
+  
   data= as.data.frame(data)
   list(filename, data) 
   
@@ -344,6 +350,12 @@ data.list.msa_sex.clean = lapply(data.list.msa_sex, function(file){
   
   data = subset(data, data$drop_var != "1")
   ##
+  
+  #Update for March 2025- want to remove all diagnosed.prevalence data for Riverside MSA in 2015 or before
+  data <- data %>%
+    mutate(drop_riverside = as.character(ifelse(location == "C.40140" & (year=="2014"|year == "2015") & outcome=='diagnosed.prevalence', "1", "0")))%>%
+    filter(drop_riverside != "1")
+  
   
   data= as.data.frame(data)
   
@@ -500,6 +512,12 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
   
   data = subset(data, data$drop_var != "1")
   ##
+  
+  #Update for March 2025- want to remove all diagnosed.prevalence data for Riverside MSA in 2015 or before
+  data <- data %>%
+    mutate(drop_riverside = as.character(ifelse(location == "C.40140" & (year=="2014"|year == "2015") & outcome=='diagnosed.prevalence', "1", "0")))%>%
+    filter(drop_riverside != "1")
+  
   
   data= as.data.frame(data)
   
@@ -845,6 +863,12 @@ gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa))))))))))))))))))))))))))
   
   data<- data[!duplicated(data), ] #This will take out the dup values
   
+  #Update for March 2025- want to remove all diagnosed.prevalence data for Riverside MSA in 2015 or before
+  data <- data %>%
+    mutate(drop_riverside = as.character(ifelse(location == "C.40140" & (year=="2014"|year == "2015") & outcome=='diagnosed.prevalence', "1", "0")))%>%
+    filter(drop_riverside != "1")
+  
+  
   
   data= as.data.frame(data)
   
@@ -1006,6 +1030,12 @@ data <- data %>%
 
 data = subset(data, data$drop_var != "1")
 ##
+
+#Update for March 2025- want to remove all diagnosed.prevalence data for Riverside MSA in 2015 or before
+data <- data %>%
+  mutate(drop_riverside = as.character(ifelse(location == "C.40140" & (year=="2014"|year == "2015") & outcome=='diagnosed.prevalence', "1", "0")))%>%
+  filter(drop_riverside != "1")
+
    
 data= as.data.frame(data)
 
@@ -1185,6 +1215,12 @@ data.list.msa_race_risk.clean = lapply(data.list.msa_race_risk, function(file){
   data = subset(data, data$drop_var != "1")
   data = subset(data, data$drop_var_2 != "1")
   ##
+  
+  #Update for March 2025- want to remove all diagnosed.prevalence data for Riverside MSA in 2015 or before
+  data <- data %>%
+    mutate(drop_riverside = as.character(ifelse(location == "C.40140" & (year=="2014"|year == "2015") & outcome=='diagnosed.prevalence', "1", "0")))%>%
+    filter(drop_riverside != "1")
+  
   
   data= as.data.frame(data)
   
@@ -1382,6 +1418,12 @@ data.list.msa_sex_risk.clean = lapply(data.list.msa_sex_risk, function(file){
   data = subset(data, data$drop_var != "1")
   data = subset(data, data$drop_var_2 != "1")
   ##
+  
+  #Update for March 2025- want to remove all diagnosed.prevalence data for Riverside MSA in 2015 or before
+  data <- data %>%
+    mutate(drop_riverside = as.character(ifelse(location == "C.40140" & (year=="2014"|year == "2015") & outcome=='diagnosed.prevalence', "1", "0")))%>%
+    filter(drop_riverside != "1")
+  
   
   data= as.data.frame(data)
   

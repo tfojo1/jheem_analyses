@@ -264,12 +264,14 @@ source('data_processing/put_msa_data_as_new_source_script.R') #Sources function 
 source('../jheem2/R/HELPERS_array_helpers.R') #Necessary array helpers
 source('commoncode/locations_of_interest.R') #Creates MSAS.OF.INTEREST
 
+msas.minus.riverside = MSAS.OF.INTEREST[ !MSAS.OF.INTEREST == "C.40140"] #Update for March 2025- removing Riverside from Diagnosed Prevalence data
+
 surveillance.manager=data.manager
 
 put.msa.data.as.new.source(outcome = 'diagnosed.prevalence',
                            from.source.name = 'cdc.hiv',
                            to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+                           to.locations =  msas.minus.riverside,  #Think of this as containing location 
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
