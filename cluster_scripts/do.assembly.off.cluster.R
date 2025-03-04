@@ -1,19 +1,19 @@
 #' @param output.dir Directory within "files/run_results"
 do.assembly.off.cluster <- function(output.dir,
                                     locations,
-                                    version,
+                                    version="ehe",
                                     calibration.code,
-                                    burn.keep=0.5,
+                                    burn.keep=150,
                                     thin.keep=0,
-                                    specification.path,
-                                    register.calibration.path) {
+                                    specification.path="../jheem_analyses/applications/EHE/ehe_specification.R",
+                                    register.calibration.path="../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R") {
     
     source(specification.path)
     source(register.calibration.path)
     
     for (location in locations) {
         
-        print(paste0("Saving mcmc for '", version, "', '", location, "', '", calibration.code, "'"))
+        print(paste0("Assembling mcmc for '", version, "', '", location, "', '", calibration.code, "'"))
         simset = assemble.simulations.from.calibration(version = version,
                                                        location = location,
                                                        calibration.code = calibration.code)
