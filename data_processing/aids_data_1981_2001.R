@@ -185,9 +185,9 @@ aids.data.clean = lapply(data.list.aids, function(file){
 ################################################################################
 
  aids.data.clean.put = lapply(aids.data.clean, `[[`, 2)  
- i=0
+
  for (data in aids.data.clean.put) {
-print(i+1)
+
    data.manager$put.long.form(
      data = data,
      ontology.name = 'cdc.aids', 
