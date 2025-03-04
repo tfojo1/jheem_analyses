@@ -80,7 +80,7 @@ dx.prev.adjusted.one<- run.outlier.process(outcome= 'diagnosed.prevalence',
   filter(source == "cdc.surveillance.reports")
 
 #Need to manually remove 2018 for C.3340 and C.47900 because their 2018 value is incorrect
-dx.prev.adjusted.one$adjudication <- c(T, T, T, T, T, F, F, T, T, F, T, T, T, T, T, F)
+dx.prev.adjusted.one$adjudication <- c(T, T, T, T, T, F, F, T, T, F, T, T, T, T, F)
 dx.prev.adjusted.one <- dx.prev.adjusted.one %>%
   add_row(year = "2018", location = 'C.33340', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
   add_row(year = "2016", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
