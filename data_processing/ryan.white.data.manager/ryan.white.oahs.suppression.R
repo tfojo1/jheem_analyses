@@ -37,12 +37,42 @@ ryan.white.suppression.clean = lapply(ryan.white.suppression, function(file){
  data$year = gsub("suppression percent", "", data$year)
  data$year = trimws(data$year)
  
- ##Check with Todd: the only new year from data from 2022 report is 2018, the other years are reported in 2023 so I'm using those##
- if(grepl("2022", filename)) {
-   data<-data %>%
+ ##Taking the most recent report of the oldest year:
+ if(grepl("non.adap_2022", filename)) {
+   data <- data %>%
      filter(year == "2018")
  }
- ##   ##
+ if(grepl("non.adap_2021", filename)) {
+   data <- data %>%
+     filter(year == "2017")
+ }
+ if(grepl("non.adap_2020", filename)) {
+   data <- data %>%
+     filter(year == "2016")
+ }
+ if(grepl("non.adap_2019", filename)) {
+   data <- data %>%
+     filter(year == "2015")
+ }
+ if(grepl("non.adap_2018", filename)) {
+   data <- data %>%
+     filter(year == "2014")
+ }
+ if(grepl("non.adap_2017", filename)) {
+   data <- data %>%
+     filter(year == "2013")
+ }
+ 
+ 
+ # if(grepl("adap.clients_2021", filename)) {
+ #   data <- data %>%
+ #     filter(year == "2017")
+ # }
+ # if(grepl("adap.clients_2020", filename)) {
+ #   data <- data %>%
+ #     filter(year == "2016")
+ # }
+ ####
   
   data= as.data.frame(data)
   list(filename, data)
@@ -144,12 +174,42 @@ ryan.white.suppression.clean.msa = lapply(ryan.white.suppression.msa, function(f
   data$location = as.character(data$location)
   data$year = trimws(data$year)
   
-  ##Check with Todd: the only new year from data from 2022 report is 2018, the other years are reported in 2023 so I'm using those##
-  if(grepl("2022", filename)) {
-    data<-data %>%
+  ##Taking the most recent report of the oldest year:
+  if(grepl("non.adap_2022", filename)) {
+    data <- data %>%
       filter(year == "2018")
   }
-  ##   ##
+  if(grepl("non.adap_2021", filename)) {
+    data <- data %>%
+      filter(year == "2017")
+  }
+  if(grepl("non.adap_2020", filename)) {
+    data <- data %>%
+      filter(year == "2016")
+  }
+  if(grepl("non.adap_2019", filename)) {
+    data <- data %>%
+      filter(year == "2015")
+  }
+  if(grepl("non.adap_2018", filename)) {
+    data <- data %>%
+      filter(year == "2014")
+  }
+  if(grepl("non.adap_2017", filename)) {
+    data <- data %>%
+      filter(year == "2013")
+  }
+
+  # if(grepl("adap.clients_2021", filename)) {
+  #   data <- data %>%
+  #     filter(year == "2017")
+  # }
+  # 
+  # if(grepl("adap.clients_2020", filename)) {
+  #   data <- data %>%
+  #     filter(year == "2016")
+  # }
+  ####
 
 data= as.data.frame(data)
 list(filename, data)
@@ -218,6 +278,21 @@ state.stratified.suppression.clean = lapply(ryan.white.suppression.state.strata,
   if(grepl("2022", filename)) {
     data$year = "2022"
   }
+  if(grepl("2021", filename)) {
+    data$year = "2021"
+  }
+  if(grepl("2020", filename)) {
+    data$year = "2021"
+  }
+  if(grepl("2019", filename)) {
+    data$year = "2019"
+  }
+  if(grepl("2018", filename)) {
+    data$year = "2018"
+  }
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
   
   data$value = as.numeric(gsub(",", "", data$value))
   data$value = (data$value/100)
@@ -263,12 +338,27 @@ ryan.white.suppression.msa.strata.clean = lapply(ryan.white.suppression.msa.stra
   
    data$value = as.numeric(gsub(",", "", data$value))
    
-  if(grepl("2023", filename)) {
-    data$year = "2023"
-  }
-  if(grepl("2022", filename)) {
-    data$year = "2022"
-  }
+   if(grepl("2023", filename)) {
+     data$year = "2023"
+   }
+   if(grepl("2022", filename)) {
+     data$year = "2022"
+   }
+   if(grepl("2021", filename)) {
+     data$year = "2021"
+   }
+   if(grepl("2020", filename)) {
+     data$year = "2021"
+   }
+   if(grepl("2019", filename)) {
+     data$year = "2019"
+   }
+   if(grepl("2018", filename)) {
+     data$year = "2018"
+   }
+   if(grepl("2017", filename)) {
+     data$year = "2017"
+   }
    
     data$outcome = str_extract(data$strata, "suppression count|total count")
     data$strata = gsub("viral suppression count|total count", "", data$strata)
