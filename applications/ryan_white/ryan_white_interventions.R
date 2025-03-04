@@ -2,11 +2,35 @@
 
 source("../jheem_analyses/applications/ryan_white/ryan_white_specification.R")
 
+library(ks)
+get_suppresion_effect = function(n, rw_survey) {
+  ## returns a matrix with 3 rows and n columns ##
+  ## columns lose.adap.effect, lose.oahs.effect, lose.rw.support.effect ##
+  
+  # Select the relevant columns for KDE
+  X = rw_survey[,c("q1_adap_loss","q2_oahs_loss","q3_support_loss")]
+  mask = apply(!is.na(X),1, all)
+  X = X[mask,]
+  
+  # Convert to matrix for KDE estimation
+  X = as.matrix(X)
+  
+  # Fit multivariate KDE using ks::kde()
+  kde_fit = kde(x = X)
+  
+  # Sample 'n' points from the estimated KDE
+  sampled_values = rkde(n, kde_fit)
+  
+  # Return the sampled values as a matrix with 3 rows and n columns
+  return(t(sampled_values))  # Transpose to match the required format
+}
+
+rw_survey = read.csv("../jheem_analyses/applications/ryan_white/rw_survey.csv")
+RW.effect.values = get_suppresion_effect(1000, rw_survey)
+
 #Interventions are scaled up linearly from July 1st of START.YEAR to October 1st of IMPLEMENTED.BY.YEAR
 START.YEAR = 2025.5
 IMPLEMENTED.BY.YEAR = 2025.8
-
-RW.effect.values = matrix(rnorm(1000,0.5,0.05), nrow = 1, dimnames = list("lose.adap.effect", NULL) )
 
 # Complete Loss of ADAP
 lose.adap.effect = create.intervention.effect(quantity.name = 'adap.suppression.effect',
@@ -41,12 +65,6 @@ lose.rw.support.effect = create.intervention.effect(quantity.name = 'rw.support.
                                               allow.values.less.than.otherwise = T,
                                               allow.values.greater.than.otherwise = F )
 
-
-
-RW.effect.values = rbind(
-  matrix(rnorm(1000,0.5,0.05), nrow = 1, dimnames = list("lose.adap.effect", NULL) ),
-  matrix(rnorm(1000,0.5,0.05), nrow = 1, dimnames = list("lose.oahs.effect", NULL) ),
-  matrix(rnorm(1000,0.5,0.05), nrow = 1, dimnames = list("lose.rw.support.effect", NULL) ))
 
 lose.RW.intervention = create.intervention(lose.adap.effect,lose.oahs.effect,lose.rw.support.effect, parameters = RW.effect.values, WHOLE.POPULATION, code = "loseRW")
 
