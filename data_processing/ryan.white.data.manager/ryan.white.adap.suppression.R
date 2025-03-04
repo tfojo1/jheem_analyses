@@ -31,6 +31,12 @@ nastad.suppression.clean = lapply(nastad.suppression, function(file){
   if(grepl("2021", filename)) {
     data$year = "2021"
   }
+  if(grepl("2020", filename)) {
+    data$year = "2020"
+  }
+  if(grepl("2019", filename)) {
+    data$year = "2019"
+  }
   
   data= as.data.frame(data)
   list(filename, data)
