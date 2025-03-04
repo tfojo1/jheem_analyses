@@ -53,7 +53,7 @@ lose.RW.intervention = create.intervention(lose.adap.effect,lose.oahs.effect,los
 # Temporary Lapse of ADAP
 temp.lose.adap.effect = create.intervention.effect(quantity.name = 'adap.suppression.effect',
                                                    start.time = START.YEAR,
-                                                   effect.values = c(0,0,1),
+                                                   effect.values = expression(c(0,0,lose.adap.effect)),
                                                    apply.effects.as = 'value',
                                                    scale = 'proportion',
                                                    times = c(START.YEAR + 0.25, 2028, 2028.25),
@@ -61,9 +61,9 @@ temp.lose.adap.effect = create.intervention.effect(quantity.name = 'adap.suppres
                                                    allow.values.greater.than.otherwise = F )
 
 # Temporary Lapse of ADAP
-temp.lose.adap.effect = create.intervention.effect(quantity.name = 'oahs.suppression.effect',
+temp.lose.oahs.effect = create.intervention.effect(quantity.name = 'oahs.suppression.effect',
                                                    start.time = START.YEAR,
-                                                   effect.values = c(0,0,1),
+                                                   effect.values = expression(c(0,0,lose.oahs.effect)),
                                                    apply.effects.as = 'value',
                                                    scale = 'proportion',
                                                    times = c(START.YEAR + 0.25, 2028, 2028.25),
@@ -71,11 +71,13 @@ temp.lose.adap.effect = create.intervention.effect(quantity.name = 'oahs.suppres
                                                    allow.values.greater.than.otherwise = F )
 
 # Temporary Lapse of ADAP
-temp.lose.adap.effect = create.intervention.effect(quantity.name = 'rw.support.suppression.effect',
+temp.lose.rw.support.effect = create.intervention.effect(quantity.name = 'rw.support.suppression.effect',
                                                    start.time = START.YEAR,
-                                                   effect.values = c(0,0,1),
+                                                   effect.values = expression(c(0,0,lose.rw.support.effect)),
                                                    apply.effects.as = 'value',
                                                    scale = 'proportion',
                                                    times = c(START.YEAR + 0.25, 2028, 2028.25),
                                                    allow.values.less.than.otherwise = T,
                                                    allow.values.greater.than.otherwise = F )
+
+temp.lose.RW.intervention = create.intervention(temp.lose.adap.effect,temp.lose.oahs.effect,temp.lose.rw.support.effect, parameters = RW.effect.values, WHOLE.POPULATION, code = "temploseRW")

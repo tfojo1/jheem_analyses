@@ -4,9 +4,8 @@ RW.N.ITER.SUBSEQUENT.SIMS = 200
 RW.N.ITER.SUBSEQUENT.SIMS.IF.RESTART.PARAMS = 1000
 
 RW.MCMC.CHECKING = new.env()
-RW.DEBUG = T
 
-fit.rw.simset <- function(simset, verbose=F)
+fit.rw.simset <- function(simset, verbose=F, track.mcmc=F)
 {
     if (verbose)
         print(paste0("Setting up to fit Ryan White parameters for ", simset$n.sim, " simulations in ", simset$location))
@@ -40,7 +39,7 @@ fit.rw.simset <- function(simset, verbose=F)
                                                                            location=simset$location, 
                                                                            data.manager = RW.DATA.MANAGER)
     
-    if (RW.DEBUG)
+    if (track.mcmc)
         RW.MCMC.CHECKING$likelihoods = likelihood
     
     compute.likelihood = function(sim)
@@ -100,7 +99,7 @@ fit.rw.simset <- function(simset, verbose=F)
         simulation.function = transmute.simulation,
         log.prior.distribution = get.density.function(RYAN.WHITE.PARAMETERS.PRIOR),
         log.likelihood = compute.likelihood, # saves the data manager in here!
-        burn = ifelse(RW.DEBUG, 0, RW.N.ITER - 1),
+        burn = ifelse(track.mcmc, 0, RW.N.ITER.FIRST.SIM - 1),
         thin = 1,
         var.blocks = RYAN.WHITE.SAMPLING.BLOCKS,
         reset.adaptive.scaling.update.after = 0,
@@ -123,7 +122,7 @@ fit.rw.simset <- function(simset, verbose=F)
     
     # Run an MCMC for each sim
     
-    if (RW.DEBUG)
+    if (track.mcmc)
         RW.MCMC.CHECKING$mcmc.runs = list()
     
     if (verbose)
@@ -181,7 +180,7 @@ fit.rw.simset <- function(simset, verbose=F)
         if (verbose)
             print("   DONE")
         
-        if (RW.DEBUG)
+        if (track.mcmc)
             RW.MCMC.CHECKING$mcmc.runs = c(RW.MCMC.CHECKING$mcmc.runs, mcmc)
         
         update.rw.mcmc.settings(mcmc = mcmc,
@@ -217,14 +216,15 @@ get.fitted.rw.simulation <- function(sim.transmuter,
 ##-- HELPERS --##
 
 update.rw.mcmc.settings <- function(mcmc,
-                                    mcmc.settings)
+                                    mcmc.settings,
+                                    track.mcmc = F)
 {
     new.ctrl = bayesian.simulations::create.adaptive.blockwise.metropolis.control(
       var.names = mcmc.settings$ctrl@var.names,
       simulation.function = mcmc.settings$ctrl@simulation.function,
       log.prior.distribution = mcmc.settings$ctrl@log.prior.distribution,
       log.likelihood = mcmc.settings$ctrl@log.likelihood,
-      burn = mcmc.settings$ctrl@burn,
+      burn = ifelse(track.mcmc, 0, RW.N.ITER.SUBSEQUENT.SIMS - 1),
       thin = mcmc.settings$ctrl@thin,
       var.blocks = mcmc.settings$ctrl@var.blocks,
       reset.adaptive.scaling.update.after = mcmc.settings$ctrl@reset.adaptive.scaling.update.after,

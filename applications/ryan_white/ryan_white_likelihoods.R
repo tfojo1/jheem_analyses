@@ -1,4 +1,4 @@
-source('applications/EHE/ehe_likelihoods.R')
+source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 rw.non.adap.likelihood.instructions = create.basic.likelihood.instructions(
   outcome.for.data = "non.adap.clients", 
   outcome.for.sim = "non.adap.clients",
