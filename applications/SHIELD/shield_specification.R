@@ -1449,6 +1449,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     axis.name = 'Cases',
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
+                         force.dim.names.to.keep.dimensions = T,
                          scale='non.negative.number',
                          corresponding.data.outcome = 'early.syphilis',
                          keep.dimensions = c('location','age','race','sex')
