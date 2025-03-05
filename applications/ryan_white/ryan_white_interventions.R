@@ -27,16 +27,20 @@ get_suppresion_effect = function(n, rw_survey) {
 }
 
 rw_survey = read.csv("../jheem_analyses/applications/ryan_white/rw_survey.csv")
-RW.effect.values = get_suppresion_effect(1000, rw_survey)
+reset.seed = floor(runif(1, 0, .Machine$integer.max))
+set.seed(1234)
+RW.effect.values = get_suppresion_effect(1000, rw_survey)/100
+set.seed(reset.seed)
 
 #Interventions are scaled up linearly from July 1st of START.YEAR to October 1st of IMPLEMENTED.BY.YEAR
 START.YEAR = 2025.5
 IMPLEMENTED.BY.YEAR = 2025.8
+RESTART.YEAR = 2029
 
 # Complete Loss of ADAP
 lose.adap.effect = create.intervention.effect(quantity.name = 'adap.suppression.effect',
                                               start.time = START.YEAR,
-                                              effect.values = "lose.adap.effect",
+                                              effect.values = expression(1-lose.adap.effect),
                                               apply.effects.as = 'value',
                                               scale = 'proportion',
                                               times = IMPLEMENTED.BY.YEAR,
@@ -48,7 +52,7 @@ lose.adap.effect = create.intervention.effect(quantity.name = 'adap.suppression.
 # Complete Loss of OAHS
 lose.oahs.effect = create.intervention.effect(quantity.name = 'oahs.suppression.effect',
                                               start.time = START.YEAR,
-                                              effect.values = "lose.oahs.effect" ,
+                                              effect.values = expression(1-lose.oahs.effect),
                                               apply.effects.as = 'value',
                                               scale = 'proportion',
                                               times = IMPLEMENTED.BY.YEAR,
@@ -59,7 +63,7 @@ lose.oahs.effect = create.intervention.effect(quantity.name = 'oahs.suppression.
 # Complete Loss of RW support
 lose.rw.support.effect = create.intervention.effect(quantity.name = 'rw.support.suppression.effect',
                                               start.time = START.YEAR,
-                                              effect.values = "lose.rw.support.effect",
+                                              effect.values = expression(1-lose.rw.support.effect),
                                               apply.effects.as = 'value',
                                               scale = 'proportion',
                                               times = IMPLEMENTED.BY.YEAR,
@@ -72,30 +76,33 @@ lose.RW.intervention = create.intervention(lose.adap.effect,lose.oahs.effect,los
 # Temporary Lapse of ADAP
 temp.lose.adap.effect = create.intervention.effect(quantity.name = 'adap.suppression.effect',
                                                    start.time = START.YEAR,
-                                                   effect.values = expression(c(0,0,lose.adap.effect)),
+                                                   end.time = RESTART.YEAR + 0.25,
+                                                   effect.values = expression(c(1-lose.adap.effect,1-lose.adap.effect)),
                                                    apply.effects.as = 'value',
                                                    scale = 'proportion',
-                                                   times = c(START.YEAR + 0.25, 2028, 2028.25),
+                                                   times = c(START.YEAR + 0.25, RESTART.YEAR),
                                                    allow.values.less.than.otherwise = T,
                                                    allow.values.greater.than.otherwise = F )
 
 # Temporary Lapse of ADAP
 temp.lose.oahs.effect = create.intervention.effect(quantity.name = 'oahs.suppression.effect',
                                                    start.time = START.YEAR,
-                                                   effect.values = expression(c(0,0,lose.oahs.effect)),
+                                                   end.time = RESTART.YEAR + 0.25,
+                                                   effect.values = expression(c(1-lose.oahs.effect,1-lose.oahs.effect)),
                                                    apply.effects.as = 'value',
                                                    scale = 'proportion',
-                                                   times = c(START.YEAR + 0.25, 2028, 2028.25),
+                                                   times = c(START.YEAR + 0.25, RESTART.YEAR),
                                                    allow.values.less.than.otherwise = T,
                                                    allow.values.greater.than.otherwise = F )
 
 # Temporary Lapse of ADAP
 temp.lose.rw.support.effect = create.intervention.effect(quantity.name = 'rw.support.suppression.effect',
                                                    start.time = START.YEAR,
-                                                   effect.values = expression(c(0,0,lose.rw.support.effect)),
+                                                   end.time = RESTART.YEAR + 0.25,
+                                                   effect.values = expression(c(1-lose.rw.support.effect,1-lose.rw.support.effect)),
                                                    apply.effects.as = 'value',
                                                    scale = 'proportion',
-                                                   times = c(START.YEAR + 0.25, 2028, 2028.25),
+                                                   times = c(START.YEAR + 0.25, RESTART.YEAR),
                                                    allow.values.less.than.otherwise = T,
                                                    allow.values.greater.than.otherwise = F )
 
