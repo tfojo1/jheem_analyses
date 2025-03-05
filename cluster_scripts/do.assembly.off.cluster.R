@@ -6,7 +6,8 @@ do.assembly.off.cluster <- function(output.dir,
                                     burn.keep=150,
                                     thin.keep=0,
                                     specification.path="../jheem_analyses/applications/EHE/ehe_specification.R",
-                                    register.calibration.path="../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R") {
+                                    register.calibration.path="../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R",
+                                    allow.incomplete=F) {
     
     source(specification.path)
     source(register.calibration.path)
@@ -15,7 +16,8 @@ do.assembly.off.cluster <- function(output.dir,
         tryCatch({print(paste0("Assembling mcmc for '", version, "', '", location, "', '", calibration.code, "'"))
             simset = assemble.simulations.from.calibration(version = version,
                                                            location = location,
-                                                           calibration.code = calibration.code)
+                                                           calibration.code = calibration.code,
+                                                           allow.incomplete=allow.incomplete)
             
             print(paste0("Burning/thinning..."))
             if (burn.keep!=0)
