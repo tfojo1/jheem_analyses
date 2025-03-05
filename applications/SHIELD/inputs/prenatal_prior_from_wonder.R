@@ -42,24 +42,12 @@ df <- df %>%
   mutate(p2.exc = p2 / (1 - p1)) %>% #proportion of births not receiving prenatal care in trimester 1 that receive it second trimester
   mutate(p3.exc = p3 / (1 - p1 - p2)) %>% #proportion of births not receiving prenatal care in trimester 1 and 2 that receive it third trimester
   # dplyr::select(-p2, -p3, -p0) %>%
-  rename(race = race1)%>%
-  filter(year<=2020) #filtering to trend pre-Covid
-#
-anchor.year = 2016
-df$year = df$year-anchor.year
+  rename(race = race1) 
 
-
-# INPUTS ----
-# choose an item below to model probability of receiving prenatal care in the first, second (if not 1st) or third (if not 1st and 2nd) trimester
-df$P <- df$p1;trimester = '1st Trimester'
-# df$P <- df$p2.exc;trimester = '2nd Trimester'
-# df$P <- df$p3.exc;trimester = '3rd Trimester'
-df$P[df$P>0.99]<-0.99 #to avoid infinite values in the logit
 
 
 #fitting alternative models and returning intercepts/slopes:
-get.intercepts.and.slopes = function(df,  model="two.way" # or fully.interacted or one.way
-){
+get.intercepts.and.slopes = function(df,  model ){
     library(splines)
   
   if(model=="fully.interacted"){
@@ -99,8 +87,25 @@ get.intercepts.and.slopes = function(df,  model="two.way" # or fully.interacted 
   rv
 }
 
+
+
+# INPUTS ----
+# choose an item below to model probability of receiving prenatal care in the first, second (if not 1st) or third (if not 1st and 2nd) trimester
+df$P <- df$p1;trimester = '1st Trimester'
+# df$P <- df$p2.exc;trimester = '2nd Trimester'
+# df$P <- df$p3.exc;trimester = '3rd Trimester'
+df$P[df$P>0.99]<-0.99 #to avoid infinite values in the logit
+# Filter to pre-covid?
+# df<-df%>%filter(year<=2020) 
+# which model to test? 
+selected.model= "fully.interacted"
+# set the anchor year
+anchor.year = 2016
+df$year = df$year-anchor.year
+
+
 if(1==1){
-  prior= get.intercepts.and.slopes(df, model="fully.interacted")
+  prior= get.intercepts.and.slopes(df, model=selected.model)
   # prior= get.intercepts.and.slopes(df, model="two.way")
   
   functional.form = create.logistic.linear.functional.form(intercept = prior$intercepts,
@@ -167,6 +172,17 @@ if(1==1){
     ggtitle(paste0("Prenatal ",trimester," Projection vs. WONDER data, age&Race")) +
     theme(plot.title = element_text(hjust = 0.5,size = 10))
   print(plot.age.race)
+  
+  
+  # SAVE ###########
+  ggsave(filename = paste0("prelim_results/prenatal_",trimester,"_",selected.model,"_year.jpeg"),
+         plot.year,width = 10,height = 7,dpi = 350)
+  ggsave(filename = paste0("prelim_results/prenatal_",trimester,"_",selected.model,"_age.jpeg"),
+         plot.age,width = 10,height = 7,dpi = 350)
+  ggsave(filename = paste0("prelim_results/prenatal_",trimester,"_",selected.model,"_race.jpeg"),
+         plot.race,width = 10,height = 7,dpi = 350)
+  ggsave(filename = paste0("prelim_results/prenatal_",trimester,"_",selected.model,"_age_race.jpeg"),
+         plot.age.race,width = 10,height = 7,dpi = 350)
 }
 
 #
