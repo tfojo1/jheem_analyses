@@ -2,7 +2,7 @@
 
 source("../jheem_analyses/applications/ryan_white/ryan_white_specification.R")
 
-install.packages('ks')
+#install.packages('ks')
 library(ks)
 get_suppresion_effect = function(n, rw_survey) {
   ## returns a matrix with 3 rows and n columns ##
