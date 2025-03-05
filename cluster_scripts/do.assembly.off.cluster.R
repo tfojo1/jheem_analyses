@@ -30,3 +30,22 @@ do.assembly.off.cluster <- function(output.dir,
     }
     print("Done with all locations!")
 }
+
+do.save.simsets <- function(locations,
+                            version="ehe",
+                            calibration.code="full.with.covid2",
+                            date="2025-03-04",
+                            dir="rw") {
+    
+    for (location in locations) {
+        
+        tryCatch({
+            print(paste0("Saving location '", location, "'"))
+            filename = paste0("../../files/run_results/",calibration.code,"_simset_",Sys.Date(),"_",location,".Rdata")
+            simset = get(load(filename))
+            simset$save()
+        }, error=function(e) {print(paste0("Error: skipping location '", location, "'"))})
+        
+    }
+    print("All done!")
+}
