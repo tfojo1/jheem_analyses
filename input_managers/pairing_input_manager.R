@@ -294,20 +294,26 @@ get.pairing.proportions <- function(oe.ratios, marginal.counts)
 
 # assumes from is on the rows and to is on the columns
 matrix.to.scatter <- function(mat,
-                              age.cutoffs)
+                              age.cutoffs,
+                              n.bootstrap = 10)
 {
+    reset.seed = runif(1, 0, .Machine$integer.max)
+    set.seed(13241)
+    
     rv = list(age.from=numeric(), age.to=numeric())
     for (i.from in 1:dim(mat)[1])
     {
         for (j.to in 1:dim(mat)[2])
         {
-            n = mat[i.from,j.to]
+            n = mat[i.from,j.to] * n.bootstrap
             rv$age.from = c(rv$age.from, runif(n, age.cutoffs[i.from], age.cutoffs[i.from+1]))
             #            rv$age.from = c(rv$age.from, rep((age.cutoffs[i.from]+age.cutoffs[i.from+1])/2, n))
             rv$age.to = c(rv$age.to, runif(n, age.cutoffs[j.to], age.cutoffs[j.to+1]))
             #            rv$age.to = c(rv$age.from, rep((age.cutoffs[j.to]+age.cutoffs[j.to+1])/2, n))
         }
     }
+    
+    set.seed(reset.seed)
     
     rv
 }

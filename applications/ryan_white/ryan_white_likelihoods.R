@@ -75,9 +75,9 @@ rw.oahs.suppression.likelihood.instructions = create.basic.likelihood.instructio
 
 
 rw.adap.likelihood.instructions = 
-  create.nested.proportion.likelihood.instructions(outcome.for.data = "adap.proportion",
-                                                   outcome.for.sim = "adap.proportion",
-                                                   denominator.outcome.for.data = 'non.adap.clients',
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "adap.proportion.of.diagnosed",
+                                                   outcome.for.sim = "adap.proportion.of.diagnosed",
+                                                   denominator.outcome.for.data = 'diagnosed.prevalence',
                                                    
                                                    location.types = c('STATE','CBSA'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
@@ -97,7 +97,7 @@ rw.adap.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry', 
-                                                   p.error.variance.term = 0.05, # from calculating_error_terms_for_ehe_likelihoods.R
+                                                   p.error.variance.term = 0.05, 
                                                    p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
@@ -107,9 +107,9 @@ rw.adap.likelihood.instructions =
   )
 
 rw.adap.suppression.likelihood.instructions = 
-  create.nested.proportion.likelihood.instructions(outcome.for.data = "adap.suppression",
-                                                   outcome.for.sim = "adap.suppression",
-                                                   denominator.outcome.for.data = 'adap.clients',
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "adap.suppressed.proportion.of.diagnosed",
+                                                   outcome.for.sim = "adap.suppressed.proportion.of.diagnosed",
+                                                   denominator.outcome.for.data = 'diagnosed.prevalence',
                                                    
                                                    location.types = c('STATE','CBSA'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
@@ -129,7 +129,7 @@ rw.adap.suppression.likelihood.instructions =
                                                    within.location.n.error.correlation = 0.5,
                                                    
                                                    observation.correlation.form = 'compound.symmetry', 
-                                                   p.error.variance.term = 0.05, # from calculating_error_terms_for_ehe_likelihoods.R
+                                                   p.error.variance.term = 0.05,
                                                    p.error.variance.type = 'sd',
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
@@ -141,7 +141,7 @@ rw.adap.suppression.likelihood.instructions =
 ryan.white.likelihood.instructions = join.likelihood.instructions(
   
 #    rw.adap.likelihood.instructions,
-#    rw.adap.suppression.likelihood.instructions,
+ #   rw.adap.suppression.likelihood.instructions,
   
     rw.non.adap.likelihood.instructions,
     rw.oahs.likelihood.instructions,

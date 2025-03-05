@@ -1,11 +1,11 @@
 
-RW.N.ITER.FIRST.SIM = 2000
-RW.N.ITER.SUBSEQUENT.SIMS = 200
-RW.N.ITER.SUBSEQUENT.SIMS.IF.RESTART.PARAMS = 1000
-
 RW.MCMC.CHECKING = new.env()
 
-fit.rw.simset <- function(simset, verbose=F, track.mcmc=F)
+fit.rw.simset <- function(simset, 
+                          n.iter.first.sim=2000, 
+                          n.iter.subsequent.sims=200, 
+                          n.iter.subsequent.sims.if.restart.params=1000,
+                          verbose=F, track.mcmc=F)
 {
     if (verbose)
         print(paste0("Setting up to fit Ryan White parameters for ", simset$n.sim, " simulations in ", simset$location))
@@ -99,7 +99,7 @@ fit.rw.simset <- function(simset, verbose=F, track.mcmc=F)
         simulation.function = transmute.simulation,
         log.prior.distribution = get.density.function(RYAN.WHITE.PARAMETERS.PRIOR),
         log.likelihood = compute.likelihood, # saves the data manager in here!
-        burn = ifelse(track.mcmc, 0, RW.N.ITER.FIRST.SIM - 1),
+        burn = ifelse(track.mcmc, 0, n.iter.first.sim - 1),
         thin = 1,
         var.blocks = RYAN.WHITE.SAMPLING.BLOCKS,
         reset.adaptive.scaling.update.after = 0,
@@ -130,9 +130,9 @@ fit.rw.simset <- function(simset, verbose=F, track.mcmc=F)
     sim.list = lapply(1:simset$n.sim, function(i){
         mcmc.settings$sim.index = i
         if (i==1)
-            n.iter.for.i = RW.N.ITER.FIRST.SIM
+            n.iter.for.i = n.iter.first.sim
         else
-            n.iter.for.i = RW.N.ITER.SUBSEQUENT.SIMS
+            n.iter.for.i = n.iter.subsequent.sims
         
         if (verbose)
             print(paste0("STARTING MCMC FOR SIM ", i, " of ", simset$n.sim))
@@ -153,7 +153,7 @@ fit.rw.simset <- function(simset, verbose=F, track.mcmc=F)
             }
             
             mcmc.settings$start.values = default.start.values
-            n.iter.for.i = RW.N.ITER.SUBSEQUENT.SIMS.IF.RESTART.PARAMS
+            n.iter.for.i = n.iter.subsequent.sims.if.restart.params
         }
         
         if (likelihood$compute(sim, use.optimized.get=T)==-Inf)
@@ -184,7 +184,8 @@ fit.rw.simset <- function(simset, verbose=F, track.mcmc=F)
             RW.MCMC.CHECKING$mcmc.runs = c(RW.MCMC.CHECKING$mcmc.runs, mcmc)
         
         update.rw.mcmc.settings(mcmc = mcmc,
-                                mcmc.settings = mcmc.settings)
+                                mcmc.settings = mcmc.settings,
+                                n.iter = n.iter.subsequent.sims)
         
         mcmc@simulations[[length(mcmc@simulations)]]
     })
@@ -217,6 +218,7 @@ get.fitted.rw.simulation <- function(sim.transmuter,
 
 update.rw.mcmc.settings <- function(mcmc,
                                     mcmc.settings,
+                                    n.iter,
                                     track.mcmc = F)
 {
     new.ctrl = bayesian.simulations::create.adaptive.blockwise.metropolis.control(
@@ -224,7 +226,7 @@ update.rw.mcmc.settings <- function(mcmc,
       simulation.function = mcmc.settings$ctrl@simulation.function,
       log.prior.distribution = mcmc.settings$ctrl@log.prior.distribution,
       log.likelihood = mcmc.settings$ctrl@log.likelihood,
-      burn = ifelse(track.mcmc, 0, RW.N.ITER.SUBSEQUENT.SIMS - 1),
+      burn = ifelse(track.mcmc, 0, n.iter - 1),
       thin = mcmc.settings$ctrl@thin,
       var.blocks = mcmc.settings$ctrl@var.blocks,
       reset.adaptive.scaling.update.after = mcmc.settings$ctrl@reset.adaptive.scaling.update.after,

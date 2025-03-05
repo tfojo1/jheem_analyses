@@ -225,6 +225,22 @@ track.integrated.outcome(RW.SPECIFICATION,
                          corresponding.data.outcome = 'adap.proportion',
                          save = T)
 
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'adap.proportion.of.diagnosed',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Ryan White Clients on ADAP',
+                                                                    description = "Proportion of Non-ADAP Ryan White Clients Receiving any AIDs Drug Assistance Program Services",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.with.adap',
+                         denominator.outcome = 'diagnosed.prevalence',
+                         value.is.numerator = T,
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'adap.proportion.of.diagnosed',
+                         save = T)
 
 track.integrated.outcome(RW.SPECIFICATION,
                          name = 'oahs.suppression',
@@ -240,7 +256,7 @@ track.integrated.outcome(RW.SPECIFICATION,
                          value.is.numerator = T,
                          subset.dimension.values = list(continuum='diagnosed.states'),
                          keep.dimensions = c('location','age','race','sex','risk'),
-                         corresponding.data.outcome = 'non.adap.viral.suppression',
+                         corresponding.data.outcome = 'oahs.suppression',
                          save = T)
 
 track.integrated.outcome(RW.SPECIFICATION,
@@ -257,7 +273,24 @@ track.integrated.outcome(RW.SPECIFICATION,
                          value.is.numerator = T,
                          subset.dimension.values = list(continuum='diagnosed.states'),
                          keep.dimensions = c('location','age','race','sex','risk'),
-                         corresponding.data.outcome = 'non.adap.viral.suppression',
+                         corresponding.data.outcome = 'adap.suppression',
+                         save = T)
+
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'adap.suppressed.proportion.of.diagnosed',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of ADAP Suppressed',
+                                                                    description = "Proportion of Ryan White ADAP Clients who are Virally Suppressed",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.who.are.suppressed.with.adap',
+                         denominator.outcome = 'diagnosed.prevalence',
+                         value.is.numerator = T,
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location'),
+                         corresponding.data.outcome = 'adap.suppressed.proportion.of.diagnosed',
                          save = T)
 
 register.model.specification(RW.SPECIFICATION)
