@@ -55,8 +55,6 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     data$Geography= gsub('[^[:alnum:] ]',"",data$Geography) #some states have ^ for preliminary data#
     names(data)[names(data)=='Geography'] = 'state'
     data$location =ifelse (data$state == "District of Columbia", "DC", state.abb[data$state])
-    
-    data$state.data = T
   }
   if(grepl("ehe", filename)) {
     data$location = as.character(data$FIPS)
@@ -71,13 +69,9 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
     
     data$cbsa = substring(data$FIPS, 1, 5)
     data$location = paste("C", data$cbsa, sep=".")
-    
-    data$state.data = F
   }
   if(grepl("allcounty", filename)) {
     data$location = as.character(data$FIPS)
-    
-    data$state.data = F
   } 
   
   if(grepl("age", filename)) {
@@ -102,9 +96,7 @@ data.list.clean.prevalence = lapply(data.list.prevalence, function(file){
   if(grepl("risk", filename)) {
     data$risk = risk.mappings[data$Transmission.Category]
   }
-  
-  data = subset(data, data$state.data == T) #only pull state data bc that is what we have for adap
-  
+
   list(filename, data) 
 })
 
@@ -131,8 +123,11 @@ adap.clients = as.data.frame.table(data.manager$data$adap.clients$estimate$ryan.
 
 #Can only pull overlapping years
 overlapping.years <- c("2016", "2017", "2018", "2019", "2020", "2021")
+states.only <- locations::get.all.for.type('state')
 
 diagnosed.prevalence = filter(diagnosed.prevalence, year %in% overlapping.years)%>% rename(diagnosed.prevalence = Freq)
+diagnosed.prevalence= filter(diagnosed.prevalence,location %in% states.only) 
+
 adap.clients = filter(adap.clients, year %in% overlapping.years)%>%rename(adap.clients = Freq)
 
 combined = merge(diagnosed.prevalence, adap.clients, by=c("year", "location"))
@@ -155,6 +150,8 @@ adap.proportion.dx.df <- combined %>%
   adap.clients.sex = as.data.frame.table(data.manager$data$adap.clients$estimate$ryan.white.program$ryan.white.pdfs$year__location__sex) 
   
   diagnosed.prevalence.sex = filter(diagnosed.prevalence.sex, year %in% overlapping.years)%>% rename(diagnosed.prevalence = Freq)
+  diagnosed.prevalence= filter(diagnosed.prevalence.sex,location %in% states.only) 
+  
   adap.clients.sex = filter(adap.clients.sex, year %in% overlapping.years)%>%rename(adap.clients = Freq)
   
   combined.sex = merge(diagnosed.prevalence.sex, adap.clients.sex, by=c("year", "location", "sex"))
@@ -179,6 +176,7 @@ adap.proportion.dx.df <- combined %>%
   adap.clients.age = as.data.frame.table(data.manager$data$adap.clients$estimate$ryan.white.program$ryan.white.pdfs$year__location__age) 
   
   diagnosed.prevalence.age = filter(diagnosed.prevalence.age, year %in% overlapping.years)%>% rename(diagnosed.prevalence = Freq)
+  diagnosed.prevalence= filter(diagnosed.prevalence.age,location %in% states.only) 
   adap.clients.age = filter(adap.clients.age, year %in% overlapping.years)%>%rename(adap.clients = Freq)
   
   #align age groups
@@ -217,6 +215,7 @@ adap.proportion.dx.df <- combined %>%
   adap.clients.race = as.data.frame.table(data.manager$data$adap.clients$estimate$ryan.white.program$ryan.white.pdfs$year__location__race) 
   
   diagnosed.prevalence.race = filter(diagnosed.prevalence.race, year %in% overlapping.years)%>% rename(diagnosed.prevalence = Freq)
+  diagnosed.prevalence= filter(diagnosed.prevalence.race,location %in% states.only) 
   adap.clients.race = filter(adap.clients.race, year %in% overlapping.years)%>%rename(adap.clients = Freq)
   
   #align race groups:
