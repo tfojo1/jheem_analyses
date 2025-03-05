@@ -115,7 +115,7 @@ female.population.county = lapply(births.county, function(file){
    data <- data %>%
      select(-outcome)%>%
      select(year, location, age, race, ethnicity, value)%>%
-     mutate(outcome = 'female.population')
+     mutate(outcome = 'female.population.denominator.for.fertility.rate')
   
    data = as.data.frame(data)
 list(filename, data) 

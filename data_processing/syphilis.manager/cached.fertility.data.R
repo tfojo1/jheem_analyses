@@ -23,7 +23,7 @@ female.population.data <- as.data.frame.table(census.manager$data$female.populat
   mutate(ethnicity = as.character(ethnicity))%>%
   mutate(age = as.character(age))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "female.population")%>%
+  mutate(outcome = "female.population.denominator.for.fertility.rate")%>%
   filter(race != "More than one race")%>% #removing more than one race for this rate
   mutate(race = tolower(race))%>%
   mutate(ethnicity = tolower(ethnicity))

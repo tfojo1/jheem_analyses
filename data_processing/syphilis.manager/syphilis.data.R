@@ -9,10 +9,10 @@ syphilis.data <- lapply(syphilis_files, function(x){
 
 # Mappings ----------------------------------------------------------------
 
-outcome.mappings.syphilis = c('Primary and Secondary Syphilis'='ps.syphilis',
-                              'Early Non-Primary, Non-Secondary Syphilis' = 'early.syphilis',
-                              'Congenital Syphilis' = 'congenital.syphilis',
-                              'Unknown Duration or Late Syphilis' = 'unknown.duration.or.late.syphilis')
+outcome.mappings.syphilis = c('Primary and Secondary Syphilis'='ps.syphilis.diagnoses',
+                              'Early Non-Primary, Non-Secondary Syphilis' = 'early.syphilis.diagnoses',
+                              'Congenital Syphilis' = 'congenital.syphilis.diagnoses',
+                              'Unknown Duration or Late Syphilis' = 'unknown.duration.or.late.syphilis.diagnoses')
 
 syphilis.mappings.age = c('0-14' = '0-14 years',  
                           '15-19' = '15-19 years',

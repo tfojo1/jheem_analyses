@@ -28,11 +28,11 @@ data <- data %>%
   pivot_longer(cols = contains("cases"),
                names_to = "outcome",
                values_to = "value")%>%
-  mutate(outcome = case_when(outcome == "Total Syphilis Cases" ~ "all.syphilis.cases",
-                             outcome == "Primary and Secondary Cases" ~ "ps.syphilis",
-                             outcome == "Early Non-Primary Non-Secondary Cases" ~ "early.syphilis",
-                             outcome == "Unknown Duration or Late Cases" ~ "unknown.duration.or.late.syphilis",
-                             outcome == "Congenital Cases" ~ "congenital.syphilis"))
+  mutate(outcome = case_when(outcome == "Total Syphilis Cases" ~ "total.syphilis.diagnoses",
+                             outcome == "Primary and Secondary Cases" ~ "ps.syphilis.diagnoses",
+                             outcome == "Early Non-Primary Non-Secondary Cases" ~ "early.syphilis.diagnoses",
+                             outcome == "Unknown Duration or Late Cases" ~ "unknown.duration.or.late.syphilis.diagnoses",
+                             outcome == "Congenital Cases" ~ "congenital.syphilis.diagnoses"))
 
 data$location = "US"
 

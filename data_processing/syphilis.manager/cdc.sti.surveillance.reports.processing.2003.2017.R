@@ -30,7 +30,9 @@ primary.secondary.male= lapply(cdc.reports.raw, function(file){
     rename(outcome = Disease)%>%
     rename(value = 'Total Male')%>%
     mutate(outcome = tolower(outcome))%>%
-    mutate(outcome = gsub(" ", ".", outcome))
+    mutate(outcome = gsub(" ", ".", outcome))%>%
+    mutate(outcome = paste(outcome, ".diagnoses"))%>%
+    mutate(outcome = gsub(" ", "", outcome))
 
   
 data= as.data.frame(data)
@@ -54,7 +56,9 @@ primary.secondary.female= lapply(cdc.reports.raw, function(file){
     rename(outcome = Disease)%>%
     rename(value = 'Total Female')%>%
     mutate(outcome = tolower(outcome))%>%
-    mutate(outcome = gsub(" ", ".", outcome))
+    mutate(outcome = gsub(" ", ".", outcome))%>%
+    mutate(outcome = paste(outcome, ".diagnoses"))%>%
+    mutate(outcome = gsub(" ", "", outcome))
   
   
   data= as.data.frame(data)
@@ -77,7 +81,9 @@ primary.secondary.total = lapply(cdc.reports.raw, function(file){
     rename(outcome = Disease)%>%
     rename(value = 'Total Total')%>%
     mutate(outcome = tolower(outcome))%>%
-    mutate(outcome = gsub(" ", ".", outcome))
+    mutate(outcome = gsub(" ", ".", outcome))%>%
+    mutate(outcome = paste(outcome, ".diagnoses"))%>%
+    mutate(outcome = gsub(" ", "", outcome))
   
   
   data= as.data.frame(data)

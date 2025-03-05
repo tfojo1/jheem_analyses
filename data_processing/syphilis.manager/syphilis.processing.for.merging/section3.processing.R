@@ -22,22 +22,22 @@ data.manager$register.outcome(
     description = "Populaion Estimate"))
 
 data.manager$register.outcome(
-  'births',
+  'births.numerator.for.fertility.rate',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Births',
-    axis.name = 'Births',
+    display.name = 'Births- Numerator for Fertility Rate',
+    axis.name = 'Births- Numerator for Fertility Rate',
     units = 'births',
-    description = "Births"))
+    description = "Births- Numerator for Fertility Rate"))
 
 data.manager$register.outcome(
-  'female.population', 
+  'female.population.denominator.for.fertility.rate', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Female Population',
-    axis.name = 'Female Population',
+    display.name = 'Female Population- Denominator for Fertility Rate',
+    axis.name = 'Female Population- Denominator for Fertility Rate',
     units = 'cases',
-    description = "Female Population Age 15-44"))
+    description = "Female Population Age 15-44 - - Denominator for Fertility Rate"))
 
 data.manager$register.outcome(
   'fertility.rate', 
@@ -46,7 +46,7 @@ data.manager$register.outcome(
     display.name = 'Fertility Rate',
     axis.name = 'Fertility Rate',
     units = '%',
-    description = "Fertility Rate"), denominator.outcome = 'female.population') 
+    description = "Fertility Rate"), denominator.outcome = 'female.population.denominator.for.fertility.rate') 
 
 data.manager$register.outcome(
   'deaths',
@@ -256,7 +256,7 @@ put.msa.data.as.new.source(outcome = 'population',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
 
-put.msa.data.as.new.source(outcome = 'female.population',
+put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertility.rate',
                            from.source.name = 'cdc.wonder.natality',
                            to.source.name = 'cdc.wonder.aggregated.population',
                            to.locations =  MSAS.OF.INTEREST,

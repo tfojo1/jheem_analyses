@@ -14,76 +14,76 @@ data.manager = create.data.manager('syphilis', description='syphilis data manage
 
 #Register outcomes:
 data.manager$register.outcome(
-  'congenital.syphilis',
+  'congenital.syphilis.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Congenital Syphilis',
-    axis.name = 'Congenital Syphilis',
+    display.name = 'Congenital Syphilis Diagnoses',
+    axis.name = 'Congenital Syphilis Diagnoses',
     units = 'cases',
-    description = "Congenital Syphilis"))
+    description = "Congenital Syphilis Diagnoses"))
 
 data.manager$register.outcome(
-  'early.syphilis',
+  'early.syphilis.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Early, non-primary, non-Secondary Syphilis',
-    axis.name = 'Early, non-primary, non-Secondary Syphilis',
+    display.name = 'Early, non-primary, non-Secondary Syphilis Diagnoses',
+    axis.name = 'Early, non-primary, non-Secondary Syphilis Diagnoses',
     units = 'cases',
-    description = "Early, non-primary, non-Secondary Syphilis"))
+    description = "Early, non-primary, non-Secondary Syphilis Diagnoses"))
 
 data.manager$register.outcome(
-  'ps.syphilis',
+  'ps.syphilis.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Primary and Secondary Syphilis',
-    axis.name = 'Primary and Secondary Syphilis',
+    display.name = 'Primary and Secondary Syphilis Diagnoses',
+    axis.name = 'Primary and Secondary Syphilis Diagnoses',
     units = 'cases',
-    description = "Primary and Secondary Syphilis"))
+    description = "Primary and Secondary Syphilis Diagnoses"))
 
 data.manager$register.outcome(
-  'unknown.duration.or.late.syphilis',
+  'unknown.duration.or.late.syphilis.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Unknown Duration or Late Syphilis',
-    axis.name = 'Unknown Duration or Late Syphilis',
+    display.name = 'Unknown Duration or Late Syphilis Diagnoses',
+    axis.name = 'Unknown Duration or Late Syphilis Diagnoses',
     units = 'cases',
-    description = "Unknown Duration or Late Syphilis"))
+    description = "Unknown Duration or Late Syphilis Diagnoses"))
 
 data.manager$register.outcome(
-  'primary.syphilis',
+  'primary.syphilis.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Primary Syphilis',
-    axis.name = 'Primary Syphilis',
+    display.name = 'Primary Syphilis Diagnoses',
+    axis.name = 'Primary Syphilis Diagnoses',
     units = 'cases',
-    description = "Primary Syphilis"))
+    description = "Primary Syphilis Diagnoses"))
 
 data.manager$register.outcome(
-  'secondary.syphilis',
+  'secondary.syphilis.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Secondary Syphilis',
-    axis.name = 'Secondary Syphilis',
+    display.name = 'Secondary Syphilis Diagnoses',
+    axis.name = 'Secondary Syphilis Diagnoses',
     units = 'cases',
-    description = "Secondary Syphilis"))
+    description = "Secondary Syphilis Diagnoses"))
 
 data.manager$register.outcome(
-  'all.syphilis.cases',
+  'total.syphilis.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'All Syphilis Cases',
-    axis.name = 'All Syphilis Cases',
+    display.name = 'Total Syphilis Diagnoses',
+    axis.name = 'Total Syphilis Diagnoses',
     units = 'cases',
-    description = "All Syphilis Cases"))
+    description = "Total Syphilis Diagnoses"))
 
 data.manager$register.outcome(
-  'neurosyphilis',
+  'cns.syphilis.diagnoses',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Neurosyphilis',
-    axis.name = 'Neurosyphiliss',
+    display.name = 'Neurosyphilis Diagnoses',
+    axis.name = 'Neurosyphilis Diagnoses',
     units = 'cases',
-    description = "Neurosyphilis"))
+    description = "Neurosyphilis Diagnoses"))
 
 data.manager$register.outcome(
   'total.syphilis.deaths',
@@ -164,7 +164,7 @@ source('commoncode/additional_locations_of_interest.R') #Additional locations of
 source('../jheem2/R/HELPERS_array_helpers.R') 
 source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
 
-put.msa.data.as.new.source(outcome = 'ps.syphilis',
+put.msa.data.as.new.source(outcome = 'ps.syphilis.diagnoses',
                            from.source.name = 'cdc.sti',
                            to.source.name = 'cdc.aggregated.county',
                            to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
@@ -173,7 +173,7 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
 
-put.msa.data.as.new.source(outcome = 'early.syphilis',
+put.msa.data.as.new.source(outcome = 'early.syphilis.diagnoses',
                            from.source.name = 'cdc.sti',
                            to.source.name = 'cdc.aggregated.county',
                            to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
