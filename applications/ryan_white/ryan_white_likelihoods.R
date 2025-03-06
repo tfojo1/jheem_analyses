@@ -140,8 +140,8 @@ rw.adap.suppression.likelihood.instructions =
 
 ryan.white.likelihood.instructions = join.likelihood.instructions(
   
-#    rw.adap.likelihood.instructions,
- #   rw.adap.suppression.likelihood.instructions,
+    rw.adap.likelihood.instructions,
+    rw.adap.suppression.likelihood.instructions,
   
     rw.non.adap.likelihood.instructions,
     rw.oahs.likelihood.instructions,

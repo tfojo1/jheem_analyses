@@ -32,9 +32,9 @@ fit.rw.simset <- function(simset,
     }
     
     # Set up RW engine
-    if (verbose)
-        print("Setting up the Ryan-White engine...")
-    rw.engine = create.jheem.engine('rw', simset$location, simset$to.year)
+    # if (verbose)
+    #     print("Setting up the Ryan-White engine...")
+    # rw.engine = create.jheem.engine('rw', simset$location, simset$to.year)
     
     # Instantiate the likelihood
     
@@ -132,6 +132,9 @@ fit.rw.simset <- function(simset,
     
     if (verbose)
         print(paste0("Looping through all ", simset$n.sim, " simulations..."))
+    
+    start.time = Sys.time()
+    
     sim.list = lapply(1:simset$n.sim, function(i){
         mcmc.settings$sim.index = i
         if (i==1)
@@ -179,11 +182,32 @@ fit.rw.simset <- function(simset,
                                               n.iter = n.iter.for.i,
                                               starting.values = mcmc.settings$start.values,
                                               cache.frequency = NA,
-                                              #update.frequency = NA)
-                                              update.frequency = ifelse(verbose, 50, NA))
+                                              update.detail = 'none',
+                                              update.frequency = NA)
+                                              #update.frequency = ifelse(verbose, 50, NA))
+        
+        if (i==1)
+          start.time.after.first = Sys.time()
         
         if (verbose)
-            print("   DONE")
+        {
+            total.minutes = (as.numeric(Sys.time())-as.numeric(start.time)) / 60
+          
+            if (i==1)
+            {
+                seconds.per = (as.numeric(Sys.time()) - as.numeric(start.time)) 
+                print(paste0("   DONE. ",
+                             round(total.minutes, 1), " minutes elapsed - ",
+                             round(seconds.per, 1), " seconds for the first simulation"))
+            }
+            else
+            {
+                seconds.per = (as.numeric(Sys.time()) - as.numeric(start.time.after.first)) / i
+                print(paste0("   DONE. ",
+                             round(total.minutes, 1), " minutes elapsed - ",
+                             round(seconds.per, 1), " seconds per simulation (after the first simulation) on average"))          
+            }
+        }
         
         if (track.mcmc)
             RW.MCMC.CHECKING$mcmc.runs = c(RW.MCMC.CHECKING$mcmc.runs, mcmc)
@@ -192,33 +216,22 @@ fit.rw.simset <- function(simset,
                                 mcmc.settings = mcmc.settings,
                                 n.iter = n.iter.subsequent.sims)
         
-        params = mcmc@simulations[[length(mcmc@simulations)]]$params
-        rw.engine$run(params)
+       # params = mcmc@simulations[[length(mcmc@simulations)]]$params
+      #   rw.engine$run(params)
+        mcmc@simulations[[length(mcmc@simulations)]]
     })
     
     # Put the sims back together
+    
     if (verbose)
       print(paste0("All done fitting Ryan White parameters for ", simset$n.sim, " simulations in ", simset$location, ". Packaging up"))
+    transmuted.simset = join.simulation.sets(sim.list)
     
-    join.simulation.sets(sim.list)
+    rerun.simset = rerun.simulations(transmuted.simset, verbose=verbose)
+    
+    rerun.simset
 }
 
-get.fitted.rw.simulation <- function(sim.transmuter,
-                                     sim.index,
-                                     mcmc.settings)
-{
-    params = get.medians(RYAN.WHITE.PARAMETERS.PRIOR)#generate.random.samples(RYAN.WHITE.PARAMETERS.PRIOR, 1)
-    sim.transmuter$transmute(sim.index = sim.index,
-                             parameters = params)
-    
-    mcmc = bayesian.simulations::run.mcmc(control = mcmc.settings$ctrl,
-                                          n.iter = 1000,
-                                          starting.values = mcmc.settings$start.values,
-                                          update.frequency = ifelse(verbose, 50, NA))
-    
-    
-    mcmc@simulations[[length(mcmc@simulations)]]
-}
 
 ##-- HELPERS --##
 

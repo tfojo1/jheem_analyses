@@ -8,7 +8,7 @@ source('applications/ryan_white/ryan_white_mcmc.R')
 source('applications/ryan_white/ryan_white_likelihoods.R')
 source('commoncode/locations_of_interest.R')
 
-LOCATIONS.TO.TRANSMUTE = BALTIMORE.MSA#MSAS.OF.INTEREST
+LOCATIONS.TO.TRANSMUTE = c(BALTIMORE.MSA, NYC.MSA, DALLAS.MSA)#MSAS.OF.INTEREST
 VERBOSE = T
 CALIBRATION.CODE = 'full.with.covid2'
 N.SIM = 100
@@ -18,7 +18,7 @@ print(paste0("PREPARING TO TRANSMUTE SIMULATIONS FOR ", length(LOCATIONS.TO.TRAN
 print("------------------------------------------------------------------------------")
 
 N.SUCCESS = 0
-FORCE.REDO = F
+FORCE.REDO = T
 
 for (i in 1:length(LOCATIONS.TO.TRANSMUTE))
 {
