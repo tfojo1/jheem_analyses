@@ -422,7 +422,7 @@ suppression.nested.likelihood.instructions =
                                                    outcome.for.sim = "suppression",
                                                    denominator.outcome.for.data = 'diagnosed.prevalence',
                                                    
-                                                   location.types = c('COUNTY','STATE','CBSA'), 
+                                                   location.types = c('CBSA', 'STATE', 'COUNTY'), 
                                                    minimum.geographic.resolution.type = 'COUNTY',
                                                    location.stratum.keep.threshold = 2, # default
                                           
