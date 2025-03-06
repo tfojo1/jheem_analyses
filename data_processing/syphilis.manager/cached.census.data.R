@@ -11,7 +11,8 @@ population.total = as.data.frame.table(census.manager$data$population$estimate$c
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "population")
+  mutate(outcome = "population")%>%
+  filter(location != "51123" & location != "51515" & location != "51560" & location != "51780")
 
 #Age 2020-2023 (SINGLE YEAR)
 population.age.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)%>%
