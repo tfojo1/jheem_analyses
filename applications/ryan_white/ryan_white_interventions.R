@@ -14,22 +14,32 @@ get_suppresion_effect = function(n, rw_survey) {
   X = X[mask,]
   
   # Convert to matrix for KDE estimation
-  X = as.matrix(X)
+  X = as.matrix(X+1)/102
+  
+  # Put on logit scale
+  X = log(X) - log(1-X)
   
   # Fit multivariate KDE using ks::kde()
   kde_fit = kde(x = X)
   
   # Sample 'n' points from the estimated KDE
-  sampled_values = rkde(n, kde_fit)
+  logit_sampled_values = rkde(n, kde_fit)
+  
+  # Back-transform
+  sampled_values = 1 / (1+exp(-logit_sampled_values))
   
   # Return the sampled values as a matrix with 3 rows and n columns
-  return(t(sampled_values))  # Transpose to match the required format
+  rv = t(sampled_values)  # Transpose to match the required format
+  
+  dimnames(rv)[[1]] = c('lose.adap.effect', 'lose.oahs.effect', 'lose.rw.support.effect')
+  
+  rv
 }
 
 rw_survey = read.csv("../jheem_analyses/applications/ryan_white/rw_survey.csv")
 reset.seed = floor(runif(1, 0, .Machine$integer.max))
 set.seed(1234)
-RW.effect.values = get_suppresion_effect(1000, rw_survey)/100
+RW.effect.values = get_suppresion_effect(1000, rw_survey)
 set.seed(reset.seed)
 
 #Interventions are scaled up linearly from July 1st of START.YEAR to October 1st of IMPLEMENTED.BY.YEAR

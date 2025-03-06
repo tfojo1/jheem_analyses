@@ -8,7 +8,7 @@ source('applications/ryan_white/ryan_white_mcmc.R')
 source('applications/ryan_white/ryan_white_likelihoods.R')
 source('commoncode/locations_of_interest.R')
 
-LOCATIONS.TO.TRANSMUTE = MSAS.OF.INTEREST
+LOCATIONS.TO.TRANSMUTE = BALTIMORE.MSA#MSAS.OF.INTEREST
 VERBOSE = T
 CALIBRATION.CODE = 'full.with.covid2'
 N.SIM = 100

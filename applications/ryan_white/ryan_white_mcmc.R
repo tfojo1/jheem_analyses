@@ -31,6 +31,11 @@ fit.rw.simset <- function(simset,
         })
     }
     
+    # Set up RW engine
+    if (verbose)
+        print("Setting up the Ryan-White engine...")
+    rw.engine = create.jheem.engine('rw', simset$location, simset$to.year)
+    
     # Instantiate the likelihood
     
     if (verbose)
@@ -187,7 +192,8 @@ fit.rw.simset <- function(simset,
                                 mcmc.settings = mcmc.settings,
                                 n.iter = n.iter.subsequent.sims)
         
-        mcmc@simulations[[length(mcmc@simulations)]]
+        params = mcmc@simulations[[length(mcmc@simulations)]]$params
+        rw.engine$run(params)
     })
     
     # Put the sims back together
