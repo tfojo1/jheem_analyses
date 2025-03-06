@@ -29,7 +29,7 @@ get_suppresion_effect_arcsin = function(n, rw_survey) {
   sampled_arcsin = rkde(n, kde_fit)
   
   # Transform back using inverse logit
-  sampled_values = sampled_arcsin <- (sin(sampled_arcsin))^2
+  sampled_values = sampled_arcsin = (sin(sampled_arcsin))^2
   
   
   ## Ensure the output is a 3 x n matrix
@@ -39,15 +39,15 @@ get_suppresion_effect_arcsin = function(n, rw_survey) {
 get_suppresion_effect_bootstrapped = function(n, rw_survey) {
   
   # Extract relevant columns and remove rows with NA values, scale 0->1 
-  X <- rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
-  X <- X[complete.cases(X), ] / 100  # Convert percentage to proportions
+  X = rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
+  X = X[complete.cases(X), ] / 100  # Convert percentage to proportions
   
   # Convert to matrix 
-  X <- as.matrix(X)
+  X = as.matrix(X)
   
   # --- BOOTSTRAP SAMPLING ---
   # Randomly sample 'n' points with replacement from the original data
-  sampled_values <- X[sample(1:nrow(X), size = n, replace = TRUE), ]
+  sampled_values = X[sample(1:nrow(X), size = n, replace = TRUE), ]
   
   # Ensure output is a 3 x n matrix
   return(t(sampled_values))  # Transpose for correct dimensions
