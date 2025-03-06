@@ -30,4 +30,4 @@ save(total.incidence,
      incidence.by.race,
      incidence.by.age,
      incidence.by.sex,
-     file='ryan_white_results.Rdata')
+     file='applications/ryan_white/results/ryan_white_results.Rdata')

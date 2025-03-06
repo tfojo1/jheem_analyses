@@ -1,6 +1,6 @@
 
 
-load('ryan_white_results.Rdata')
+load('applications/ryan_white/results/ryan_white_results.Rdata')
 
 YEARS.TO.CONSIDER = as.character(2025:2030)
 
