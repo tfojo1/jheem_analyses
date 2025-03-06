@@ -186,3 +186,19 @@ register.ontology.mapping('ryan.white.to.jheem.race',
                                            c('american indian alaska native', 'other'),
                                            c('native hawaiian pacific islander', 'other'),
                                            c('asian', 'other')))
+
+#-----------------#
+#-- RYAN WHITE TO CDC --#
+#-----------------#
+
+register.ontology.mapping('ryan.white.to.cdc',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('black', 'black/african american'),
+                                           c('hispanic', 'hispanic/latino'),
+                                           c('white', 'white'),
+                                           c('american indian alaska native', 'american indian/alaska native'),
+                                           c('native hawaiian pacific islander', 'native hawaiian/other pacific islander'),
+                                           c('asian', 'asian')))
+
+
