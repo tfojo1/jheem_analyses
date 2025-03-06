@@ -126,7 +126,8 @@ if(1==1){
   data.means = sapply(years, function(year){ # 2016-2023 (year anchored at 2015)
     sapply(races, function(race){
       sapply(ages, function(age){
-        mean(df$P[df$year==year & df$race==race & df$age==age],na.rm=TRUE)
+        weighted.mean(x = df$P[df$year==year & df$race==race & df$age==age],
+                      w = df$w[df$year==year & df$race==race & df$age==age],na.rm=TRUE)
       })
     })
   })
