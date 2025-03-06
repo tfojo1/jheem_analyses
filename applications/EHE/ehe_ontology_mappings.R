@@ -172,3 +172,17 @@ register.ontology.mapping('aidsvu.to.jheem.race',
                           mappings = rbind(c('black', 'black'),
                                            c('hispanic', 'hispanic'),
                                            c('white', 'other')))
+
+#-----------------#
+#-- For RYAN WHITE --#
+#-----------------#
+
+register.ontology.mapping('ryan.white.to.jheem.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('black', 'black'),
+                                           c('hispanic', 'hispanic'),
+                                           c('white', 'other'),
+                                           c('american indian alaska native', 'other'),
+                                           c('native hawaiian pacific islander', 'other'),
+                                           c('asian', 'other')))
