@@ -2,34 +2,61 @@
 
 source("../jheem_analyses/applications/ryan_white/ryan_white_specification.R")
 
-#install.packages('ks')
-library(ks)
-get_suppresion_effect = function(n, rw_survey) {
-  ## returns a matrix with 3 rows and n columns ##
-  ## columns lose.adap.effect, lose.oahs.effect, lose.rw.support.effect ##
+get_suppresion_effect_arcsin = function(n, rw_survey) {
+  # Install 'ks' package if not installed
+  if (!requireNamespace("ks", quietly = T)) {
+    install.packages("ks")}
+  library(ks)
   
-  # Select the relevant columns for KDE
-  X = rw_survey[,c("q1_adap_loss","q2_oahs_loss","q3_support_loss")]
-  mask = apply(!is.na(X),1, all)
-  X = X[mask,]
+  # Extract relevant columns, remove rows with NA values, and scale 0->1
+  X = rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
+  X = X[complete.cases(X), ]/100
   
-  # Convert to matrix for KDE estimation
+  ## Convert to matrix for KDE estimation
   X = as.matrix(X)
   
-  # Fit multivariate KDE using ks::kde()
-  kde_fit = kde(x = X)
+  # Small constant to avoid logit errors
+  epsilon = 1e-6  
+  X = pmax(pmin(X, 1 - epsilon), epsilon)  # Ensure all values are within (0,1)
   
-  # Sample 'n' points from the estimated KDE
-  sampled_values = rkde(n, kde_fit)
+  # Logit transformation
+  arcsin_X = asin(sqrt(X))
   
-  # Return the sampled values as a matrix with 3 rows and n columns
-  return(t(sampled_values))  # Transpose to match the required format
+  # Fit KDE in logit space
+  kde_fit = kde(x = arcsin_X )
+  
+  # Sample 'n' points in logit space
+  sampled_arcsin = rkde(n, kde_fit)
+  
+  # Transform back using inverse logit
+  sampled_values = sampled_arcsin <- (sin(sampled_arcsin))^2
+  
+  
+  ## Ensure the output is a 3 x n matrix
+  return(t(sampled_values))  # Transpose for correct dimensions
+}
+
+get_suppresion_effect_bootstrapped = function(n, rw_survey) {
+  
+  # Extract relevant columns and remove rows with NA values, scale 0->1 
+  X <- rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
+  X <- X[complete.cases(X), ] / 100  # Convert percentage to proportions
+  
+  # Convert to matrix 
+  X <- as.matrix(X)
+  
+  # --- BOOTSTRAP SAMPLING ---
+  # Randomly sample 'n' points with replacement from the original data
+  sampled_values <- X[sample(1:nrow(X), size = n, replace = TRUE), ]
+  
+  # Ensure output is a 3 x n matrix
+  return(t(sampled_values))  # Transpose for correct dimensions
 }
 
 rw_survey = read.csv("../jheem_analyses/applications/ryan_white/rw_survey.csv")
 reset.seed = floor(runif(1, 0, .Machine$integer.max))
 set.seed(1234)
-RW.effect.values = get_suppresion_effect(1000, rw_survey)/100
+RW.effect.values = get_suppresion_effect_arcsin(1000, rw_survey)
 set.seed(reset.seed)
 
 #Interventions are scaled up linearly from July 1st of START.YEAR to October 1st of IMPLEMENTED.BY.YEAR
