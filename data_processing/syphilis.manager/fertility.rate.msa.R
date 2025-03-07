@@ -19,7 +19,7 @@ births.county = lapply(data.list.fertility, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$outcome = 'births'
+  data$outcome = 'births.numerator.for.fertility.rate'
   data$year = as.character(data$Year)
   data$age = data$'Age.of.Mother.9'
   data$ethnicity = data$'Mother.s.Hispanic.Origin'

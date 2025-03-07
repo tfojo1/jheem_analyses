@@ -48,3 +48,14 @@ sync.cached.data.manager("syphilis.manager.rdata",
                          allow.flag = T)
 
 get.data.manager.cache.metadata()
+
+# ryan.white MANAGER --------------------------------------------------------
+
+ryan.white.data.manager = load.data.manager("Q:/data_managers/ryan.white.data.manager.rdata")
+
+#UPDATE LINK EACH TIME
+sync.cached.data.manager("ryan.white.data.manager.rdata",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EUO4ZLEl6MVPrwq6FcDWyDcB3rNqnAAr_L3Nu3lpAa0T9Q?e=giM938",
+                         allow.flag = T)
+
+get.data.manager.cache.metadata()
