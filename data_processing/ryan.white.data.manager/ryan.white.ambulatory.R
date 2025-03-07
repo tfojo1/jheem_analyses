@@ -247,6 +247,11 @@ ryan.white.ambulatory.stratified.clean = lapply(ryan.white.ambulatory.stratified
     mutate(summed.value = sum(value, na.rm = T))%>%
     select(-value)%>%
     rename(value = summed.value)
+  
+  #Manually remove Dallas MSA (they did not report data for 2022 by race but Fort Worth did)
+  data<-data%>%
+    mutate(drop_var = ifelse(location == "C.19100" & year == "2019", "1", "0"))%>%
+    filter(drop_var != "1")
   }
   if(grepl("age", filename)) {
     data <- data %>%
