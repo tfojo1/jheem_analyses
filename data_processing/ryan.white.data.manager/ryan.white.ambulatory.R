@@ -244,12 +244,16 @@ ryan.white.ambulatory.stratified.clean = lapply(ryan.white.ambulatory.stratified
   if(grepl("race", filename)) {
   data <- data %>%
     group_by(location, race)%>%
-    mutate(summed.value = sum(value, na.rm = T))
+    mutate(summed.value = sum(value, na.rm = T))%>%
+    select(-value)%>%
+    rename(value = summed.value)
   }
   if(grepl("age", filename)) {
     data <- data %>%
       group_by(location, age)%>%
-      mutate(summed.value = sum(value, na.rm = T))
+      mutate(summed.value = sum(value, na.rm = T))%>%
+      select(-value)%>%
+      rename(value = summed.value)
   }
   data$location = as.character(data$location)
   
