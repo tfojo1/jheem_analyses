@@ -1,6 +1,7 @@
 
 RW.PARAM.SD = log(1.5)/2
 RW.TOTAL.OR.SD = log(2)/2
+RW.SLOPE.PARAM.SD = log(1.5)/2/5
 
 RYAN.WHITE.PARAMETERS.PRIOR = join.distributions(
   
@@ -73,6 +74,7 @@ RYAN.WHITE.PARAMETERS.PRIOR = join.distributions(
     #-- SUPPRESSION --#
     
     rw.suppression.or = Lognormal.Distribution(0, RW.TOTAL.OR.SD),
+    rw.suppression.slope.or = Lognormal.Distribution(0, RW.SLOPE.PARAM.SD),
     
     rw.suppression.msm.or = Lognormal.Distribution(0, RW.PARAM.SD),
     rw.suppression.msm.idu.or = Lognormal.Distribution(0, RW.PARAM.SD),
@@ -90,6 +92,10 @@ RYAN.WHITE.PARAMETERS.PRIOR = join.distributions(
     rw.suppression.age3.or = Lognormal.Distribution(0, RW.PARAM.SD),
     rw.suppression.age4.or = Lognormal.Distribution(0, RW.PARAM.SD),
     rw.suppression.age5.or = Lognormal.Distribution(0, RW.PARAM.SD),
+    
+    rw.suppression.black.slope.or = Lognormal.Distribution(0, RW.SLOPE.PARAM.SD),
+    rw.suppression.hispanic.slope.or = Lognormal.Distribution(0, RW.SLOPE.PARAM.SD),
+    rw.suppression.other.slope.or = Lognormal.Distribution(0, RW.SLOPE.PARAM.SD),
     
     adap.vs.oahs.suppression.or = Lognormal.Distribution(-0.6664765, 0.7653844),
     non.oahs.vs.oahs.suppression.or = Lognormal.Distribution(log(0.8/1.5)) #https://pmc.ncbi.nlm.nih.gov/articles/PMC5848228/, figure 2, panel B, 'support' vs 'core'
@@ -177,6 +183,23 @@ ryan.white.apply.set.parameters <- function(model.settings, parameters)
                                                        dimension = 'race',
                                                        applies.to.dimension.values=races)
         
+        if (!is.na(parameters[paste0(parameter.prefix,'slope.or')]))
+        {
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                           element.name = element.name,
+                                                           alpha.name = 'slope',
+                                                           values = parameters[paste0(parameter.prefix,'slope.or')],
+                                                           dimension = 'all',
+                                                           applies.to.dimension.values='all')
+          
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                           element.name = element.name,
+                                                           alpha.name = 'slope',
+                                                           values = parameters[paste0(parameter.prefix, races,'.slope.or')],
+                                                           dimension = 'race',
+                                                           applies.to.dimension.values=races)
+        }
+        
         # Age Terms
         
         set.element.functional.form.main.effect.alphas(model.settings,
@@ -207,15 +230,66 @@ ryan.white.apply.set.parameters <- function(model.settings, parameters)
 
 common.ryan.white.prior.elements = gsub("non.adap.", "", RYAN.WHITE.PARAMETERS.PRIOR@var.names[grepl("^non.adap", RYAN.WHITE.PARAMETERS.PRIOR@var.names)])
 RYAN.WHITE.SAMPLING.BLOCKS = lapply(common.ryan.white.prior.elements, function(elem){
-    paste0(c("non.adap","oahs","adap","rw.suppression"), ".", elem)
+    paste0(c("non.adap","oahs","adap"), ".", elem)
 })
 names(RYAN.WHITE.SAMPLING.BLOCKS) = common.ryan.white.prior.elements
 
 RYAN.WHITE.SAMPLING.BLOCKS = c(
     RYAN.WHITE.SAMPLING.BLOCKS,
+    
+    list(
+      
+        rw.suppression = c(
+            'rw.suppression.or',
+            'rw.suppression.slope.or'
+        ),
+      
+        black.rw.suppression = c(
+            'rw.suppression.black.or',
+            'rw.suppression.black.slope.or'
+        ),
+        
+        hispanic.rw.suppression = c(
+          'rw.suppression.hispanic.or',
+          'rw.suppression.hispanic.slope.or'
+        ),
+        
+        other.rw.suppression = c(
+          'rw.suppression.other.or',
+          'rw.suppression.other.slope.or'
+        ),
+        
+        young.rw.suppression = c(
+          'rw.suppression.age1.or',
+          'rw.suppression.age2.or'
+        ),
+        
+        old.rw.suppression = c(
+          'rw.suppression.age3.or',
+          'rw.suppression.age4.or',
+          'rw.suppression.age5.or'
+        ),
+        
+        msm.rw.suppression = c(
+            'rw.suppression.msm.or',
+            'rw.suppression.msm.idu.or'
+        ),
+        
+        female.rw.suppression = c(
+            'rw.suppression.idu.female.or',
+            'rw.suppression.heterosexual.female.or'
+        ),
+        
+        heterosexual.male.rw.suppression = c(
+          'rw.suppression.idu.male.or',
+          'rw.suppression.heterosexual.male.or'
+        )
+      
+    ),
+    
     list(
         proportion.adap.without.non.adap.rw = 'proportion.adap.without.non.adap.rw',
-        other.rw.suppression = c(
+        adap.oahs.rw.suppression = c(
             'adap.vs.oahs.suppression.or',
             'non.oahs.vs.oahs.suppression.or'
         )
@@ -223,13 +297,13 @@ RYAN.WHITE.SAMPLING.BLOCKS = c(
 )
 
 if (length(setdiff(RYAN.WHITE.PARAMETERS.PRIOR@var.names, unlist(RYAN.WHITE.SAMPLING.BLOCKS))))
-    stop(paste0("We are missing Ryan White parameters from the RYAN.WHITE.SAMPLING.BLOCKS: ",
-                paste0(setdiff(RYAN.WHITE.PARAMETERS.PRIOR@var.names, unlist(RYAN.WHITE.SAMPLING.BLOCKS)), collapse='\n')))
+    stop(paste0("We are missing Ryan White parameters from the RYAN.WHITE.SAMPLING.BLOCKS: \n",
+                paste0("- ", setdiff(RYAN.WHITE.PARAMETERS.PRIOR@var.names, unlist(RYAN.WHITE.SAMPLING.BLOCKS)), collapse='\n')))
 
 
 if (length(setdiff(unlist(RYAN.WHITE.SAMPLING.BLOCKS), RYAN.WHITE.PARAMETERS.PRIOR@var.names)))
-  stop(paste0("We have EXCESS parameters in the RYAN.WHITE.SAMPLING.BLOCKS: ",
-              paste0(setdiff(unlist(RYAN.WHITE.SAMPLING.BLOCKS), RYAN.WHITE.PARAMETERS.PRIOR@var.names), collapse='\n')))
+  stop(paste0("We have EXCESS parameters in the RYAN.WHITE.SAMPLING.BLOCKS: \n",
+              paste0("- ", setdiff(unlist(RYAN.WHITE.SAMPLING.BLOCKS), RYAN.WHITE.PARAMETERS.PRIOR@var.names), collapse='\n')))
 
 if (1==2)
 {

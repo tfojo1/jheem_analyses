@@ -1,15 +1,10 @@
 
 print("Sourcing code prior to extracting from interventions")
 
-source('../jheem_analyses/applications/ryan_white/ryan_white_specification.R')
-source("../jheem_analyses/applications/ryan_white/ryan_white_interventions.R")
-source('../jheem_analyses/commoncode/locations_of_interest.R')
+source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-LOCATIONS = c(BALTIMORE.MSA, NYC.MSA, DALLAS.MSA)#MSAS.OF.INTEREST
-VERBOSE = T
-CALIBRATION.CODE = 'full.with.covid2'
-N.SIM = 100
-FORCE.OVERWRITE = F
+LOCATIONS = RW.LOCATIONS
+FORCE.OVERWRITE = FORCE.REDO
 INTERVENTION.CODES = c('noint','loseRW','temploseRW')
 
 

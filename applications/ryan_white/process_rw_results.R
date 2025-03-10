@@ -44,19 +44,22 @@ print(paste0("Relative Increase in Infections if Lose Ryan White until 2029: ",
 
 
 abs.total.infections.averted.loseRW.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'loseRW',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
-rel.total.infections.averted.loseRW.by.city = abs.total.infections.averted.loseRW  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+rel.total.infections.averted.loseRW.by.city = abs.total.infections.averted.loseRW.by.city  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 
-abs.total.infections.averted.temploseRW = apply(total.incidence[YEARS.TO.CONSIDER,,,'temploseRW',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
-rel.total.infections.averted.temploseRW = abs.total.infections.averted.temploseRW  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+abs.total.infections.averted.temploseRW.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'temploseRW',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+rel.total.infections.averted.temploseRW.by.city = abs.total.infections.averted.temploseRW.by.city  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 
-abs.total.summary.by.city = cbind(mean=apply(abs.total.infections.averted.loseRW.by.city, 'location', mean),
-                                  lower=apply(abs.total.infections.averted.loseRW.by.city, 'location', quantile, probs=.025),
-                                  upper=apply(abs.total.infections.averted.loseRW.by.city, 'location', quantile, probs=.975))
+abs.total.summary.by.city = cbind(mean=apply(abs.total.infections.averted.loseRW.by.city, 'location', mean, na.rm=T),
+                                  lower=apply(abs.total.infections.averted.loseRW.by.city, 'location', quantile, probs=.025, na.rm=T),
+                                  upper=apply(abs.total.infections.averted.loseRW.by.city, 'location', quantile, probs=.975, na.rm=T))
 print(format(round(abs.total.summary.by.city), big.mark=','))
 
-rel.total.summary.by.city = cbind(mean=apply(rel.total.infections.averted.loseRW.by.city, 'location', mean),
-                                  lower=apply(rel.total.infections.averted.loseRW.by.city, 'location', quantile, probs=.025),
-                                  upper=apply(rel.total.infections.averted.loseRW.by.city, 'location', quantile, probs=.975))
+rel.total.summary.by.city = cbind(mean=apply(rel.total.infections.averted.loseRW.by.city, 'location', mean, na.rm=T),
+                                  lower=apply(rel.total.infections.averted.loseRW.by.city, 'location', quantile, probs=.025, na.rm=T),
+                                  upper=apply(rel.total.infections.averted.loseRW.by.city, 'location', quantile, probs=.975, na.rm=T))
+dimnames(rel.total.summary.by.city)[[1]] = get.location.name(dimnames(rel.total.summary.by.city)[[1]])
 print(round(100*rel.total.summary.by.city,1))
+
+
 
       

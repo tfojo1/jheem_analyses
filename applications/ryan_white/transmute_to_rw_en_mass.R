@@ -1,24 +1,17 @@
 
 print("Sourcing code prior to transmuting...")
 
-source('applications/ryan_white/ryan_white_specification.R')
-RW.DATA.MANAGER = load.data.manager('../../cached/ryan.white.data.manager.rdata', set.as.default = F)
+source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-source('applications/ryan_white/ryan_white_mcmc.R')
-source('applications/ryan_white/ryan_white_likelihoods.R')
-source('commoncode/locations_of_interest.R')
-
-LOCATIONS.TO.TRANSMUTE = c(BALTIMORE.MSA, NYC.MSA, DALLAS.MSA)#MSAS.OF.INTEREST
-VERBOSE = T
-CALIBRATION.CODE = 'full.with.covid2'
-N.SIM = 100
+LOCATION.INDICES = (4-1)*8 + 1:8
+LOCATIONS.TO.TRANSMUTE = RW.LOCATIONS[ LOCATION.INDICES[LOCATION.INDICES<=length(RW.LOCATIONS)] ] 
+#LOCATIONS.TO.TRANSMUTE = rev(LOCATIONS.TO.TRANSMUTE)
 
 print("------------------------------------------------------------------------------")
 print(paste0("PREPARING TO TRANSMUTE SIMULATIONS FOR ", length(LOCATIONS.TO.TRANSMUTE), " LOCATIONS TO RYAN-WHITE"))
 print("------------------------------------------------------------------------------")
 
 N.SUCCESS = 0
-FORCE.REDO = T
 
 for (i in 1:length(LOCATIONS.TO.TRANSMUTE))
 {
@@ -66,11 +59,19 @@ for (i in 1:length(LOCATIONS.TO.TRANSMUTE))
         if (redo)
         {
             ehe.simset = load.simulation.set(ehe.filename)
-            rw.simset = fit.rw.simset(ehe.simset, verbose=VERBOSE, track.mcmc = F)
-        
-            print(paste0("  ..DONE transmuting ", loc, " - saving..."))
-        
-            rw.simset$save()
+            tryCatch({
+                rw.simset = fit.rw.simset(ehe.simset, verbose=VERBOSE, track.mcmc = F)
+                
+                print(paste0("  ..DONE transmuting ", loc, " - saving..."))
+                
+                rw.simset$save()
+              
+            },
+            error = function(e){
+                print(paste0("  ..ERROR transmuting ", loc, ":"))
+                print(e$message)
+                print(" MOVING ON...")
+            })
         
             print(paste0("  ..DONE with ", loc))
         }

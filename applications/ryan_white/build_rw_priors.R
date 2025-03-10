@@ -28,7 +28,9 @@ if (1==2)
 
 RW.REGRESSION.FORMULA = p ~ age + race + sex + risk
 RW.REGRESSION.FORMULA.SANS.RISK = p ~ age + race + sex
+RW.TIME.VARYING.REGRESSION.FORMULA = p ~ age + race + sex + risk + year + year:race + year:age + year:sex + year:risk
 
+RW.CHECK.IN = F
 
 ADAP.TOTALS = c(
   '2018'=285101,
@@ -154,8 +156,9 @@ get.p.suppression.oahs.functional.form <- function(specification.metadata, verbo
 
     
     do.create.rw.functional.form(df,
+                                 ff = RW.TIME.VARYING.REGRESSION.FORMULA,
                                  target.to.average.p = mean(OAHS.SUPPRESSION.TOTALS),
-                                 specification.metadata=specification.metadata)
+                                 specification.metadata=specification.metadata,)
 }
 
 get.p.adap.functional.form <- function(specification.metadata, verbose=F)
@@ -181,7 +184,7 @@ get.p.adap.functional.form <- function(specification.metadata, verbose=F)
 do.create.rw.functional.form <- function(df, specification.metadata, 
                                          target.to.average.p=NULL,
                                          target.to.average.p.in.year = 2020,
-                                         ff=RW.REGRESSION.FORMULA, check.in=F)
+                                         ff=RW.REGRESSION.FORMULA, check.in=RW.CHECK.IN)
 {    
     anchor.year = 2020
     df$year = df$year - anchor.year

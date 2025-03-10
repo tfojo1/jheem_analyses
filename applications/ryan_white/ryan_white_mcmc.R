@@ -2,8 +2,8 @@
 RW.MCMC.CHECKING = new.env()
 
 fit.rw.simset <- function(simset, 
-                          n.iter.first.sim=2000, 
-                          n.iter.subsequent.sims=200, 
+                          n.iter.first.sim=3000, 
+                          n.iter.subsequent.sims=300, 
                           n.iter.subsequent.sims.if.restart.params=1000,
                           verbose=F, track.mcmc=F)
 {
@@ -134,6 +134,7 @@ fit.rw.simset <- function(simset,
         print(paste0("Looping through all ", simset$n.sim, " simulations..."))
     
     start.time = Sys.time()
+    start.time.after.first = NULL
     
     sim.list = lapply(1:simset$n.sim, function(i){
         mcmc.settings$sim.index = i
@@ -187,7 +188,7 @@ fit.rw.simset <- function(simset,
                                               #update.frequency = ifelse(verbose, 50, NA))
         
         if (i==1)
-          start.time.after.first = Sys.time()
+          start.time.after.first <<- Sys.time()
         
         if (verbose)
         {
