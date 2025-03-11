@@ -29,15 +29,8 @@ fit.rw.simset <- function(simset,
                                  parameters = parameters)
         },
         error = function(e){
-          browser()
-              tryCatch({
-                  transmuter$transmute(sim.index = mcmc.settings$sim.index,
-                                       parameters = parameters)
-              },
-              error = function(e){
-                  browser()
-                  NULL
-              })
+              #browser()
+              NULL
         })
     }
     
