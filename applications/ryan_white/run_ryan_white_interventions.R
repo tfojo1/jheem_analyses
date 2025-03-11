@@ -3,7 +3,7 @@ print("Sourcing code prior to running interventions")
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-LOCATIONS = LOCATIONS.TO.TRANSMUTE #MSAS.OF.INTEREST
+LOCATIONS = LOCATIONS.TO.TRANSMUTE 
 FORCE.OVERWRITE = FORCE.REDO
 INTERVENTION.CODES = c('loseRW','temploseRW')
 

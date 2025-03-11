@@ -4,7 +4,7 @@ print("Sourcing code prior to transmuting...")
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
 LOCATION.INDICES = (4-1)*8 + 1:8
-LOCATIONS.TO.TRANSMUTE = RW.LOCATIONS[ LOCATION.INDICES[LOCATION.INDICES<=length(RW.LOCATIONS)] ] 
+LOCATIONS.TO.TRANSMUTE = COLUMBUS.MSA#RW.LOCATIONS[ LOCATION.INDICES[LOCATION.INDICES<=length(RW.LOCATIONS)] ] [4]
 #LOCATIONS.TO.TRANSMUTE = rev(LOCATIONS.TO.TRANSMUTE)
 
 print("------------------------------------------------------------------------------")

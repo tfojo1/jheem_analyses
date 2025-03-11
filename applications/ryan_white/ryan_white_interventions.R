@@ -1,7 +1,5 @@
 # Modeling the loss Ryan White funding
 
-source("../jheem_analyses/applications/ryan_white/ryan_white_specification.R")
-
 get_suppresion_effect_arcsin = function(n, rw_survey) {
   # Install 'ks' package if not installed
   if (!requireNamespace("ks", quietly = T)) {

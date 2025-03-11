@@ -21,13 +21,23 @@ fit.rw.simset <- function(simset,
     # Set up the 'run' simulation function
     transmute.simulation = function(parameters)
     {
+      return(
+        transmuter$transmute(sim.index = mcmc.settings$sim.index,
+                             parameters = parameters))
         tryCatch({
             transmuter$transmute(sim.index = mcmc.settings$sim.index,
                                  parameters = parameters)
         },
         error = function(e){
           browser()
-            NULL
+              tryCatch({
+                  transmuter$transmute(sim.index = mcmc.settings$sim.index,
+                                       parameters = parameters)
+              },
+              error = function(e){
+                  browser()
+                  NULL
+              })
         })
     }
     
@@ -90,6 +100,7 @@ fit.rw.simset <- function(simset,
     diagnosed.pwh = apply(SURVEILLANCE.MANAGER$pull('diagnosed.prevalence', location=simset$location, year=names(non.adap.clients)), 'year', mean, na.rm=T)
     years.to.use = intersect(names(non.adap.clients)[!is.na(non.adap.clients)], names(diagnosed.pwh)[!is.na(diagnosed.pwh)])
     mean.p.non.adap = mean(non.adap.clients[years.to.use] / diagnosed.pwh[years.to.use])
+    mean.p.non.adap = min(.95, mean.p.non.adap)
     
     sim.p.adap = mean(sim0$get(outcomes='non.adap.clients', year=years.to.use)[,,] / sim0$get(outcomes='diagnosed.prevalence', year=years.to.use)[,,])
     

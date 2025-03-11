@@ -296,29 +296,34 @@ get.adap.proportion.of.diagnosed.bias <- function(version, location,
     #-- Calculate ADAP/non-ADAP for state --#
     state.adap.to.non.adap.ratio = state.adap.clients / state.non.adap.clients
     non.na.mask = apply(!is.na(state.adap.to.non.adap.ratio), 1, all)
+    use.state.mask = rep(T, ncol(state.adap.to.non.adap.ratio))
     if (multiply.by.p.suppressed)
-        non.na.mask = non.na.mask & apply(!is.na(state.p.suppressed.adap), 1, all)
+    {
+        use.state.mask = use.state.mask & apply(!is.na(state.p.suppressed.adap), 2, any)
+        non.na.mask = non.na.mask & apply(!is.na(state.p.suppressed.adap[,use.state.mask,drop=F]), 1, all)
+    }
     
+    state.weights = state.weights[use.state.mask] / sum(state.weights[use.state.mask]) 
     
-    state.adap.to.non.adap.ratio = colSums(t(state.adap.to.non.adap.ratio[non.na.mask,,drop=F]) * state.weights)
+    state.adap.to.non.adap.ratio = colSums(t(state.adap.to.non.adap.ratio[non.na.mask,use.state.mask,drop=F]) * state.weights)
     years = names(state.adap.to.non.adap.ratio)
     
     #-- Calculate non-ADAP/prevalence for state and MSA --#
-    state.non.adap.to.prevalence.ratio = state.non.adap.clients[years,,drop=F] / state.diagnosed.pwh[years,,drop=F]
+    state.non.adap.to.prevalence.ratio = state.non.adap.clients[years,use.state.mask,drop=F] / state.diagnosed.pwh[years,use.state.mask,drop=F]
     msa.non.adap.to.prevalence.ratio = msa.non.adap.clients[years] / msa.diagnosed.pwh[years]
 
     #-- msa.portion.in.state.adap.proportion.of.diagnosed = msa.portion.in.state.adap.clients / msa.portion.in.state.diagnosed.pwh --#
-    msa.portion.in.state.adap.clients = msa.portion.in.state.diagnosed.pwh[years,,drop=F] * msa.non.adap.to.prevalence.ratio * state.adap.to.non.adap.ratio[years]
+    msa.portion.in.state.adap.clients = msa.portion.in.state.diagnosed.pwh[years,use.state.mask,drop=F] * msa.non.adap.to.prevalence.ratio * state.adap.to.non.adap.ratio[years]
     msa.adap.proportion = msa.non.adap.to.prevalence.ratio * state.adap.to.non.adap.ratio[years]
     
-    in.state.out.of.msa.adap.clients = state.adap.clients[years,,drop=F] - msa.portion.in.state.adap.clients
-    in.state.out.of.msa.diagnosed.pwh = state.diagnosed.pwh[years,,drop=F] - msa.portion.in.state.diagnosed.pwh[years,,drop=F]
+    in.state.out.of.msa.adap.clients = state.adap.clients[years,use.state.mask,drop=F] - msa.portion.in.state.adap.clients
+    in.state.out.of.msa.diagnosed.pwh = state.diagnosed.pwh[years,use.state.mask,drop=F] - msa.portion.in.state.diagnosed.pwh[years,use.state.mask,drop=F]
     in.state.out.of.msa.adap.proportion.of.diagnosed = in.state.out.of.msa.adap.clients / in.state.out.of.msa.diagnosed.pwh
     
     p.bias.by.year.state = in.state.out.of.msa.adap.proportion.of.diagnosed - msa.adap.proportion
 
     if (multiply.by.p.suppressed)
-        p.bias.by.year.state = p.bias.by.year.state * state.p.suppressed.adap[non.na.mask,,drop=F];
+        p.bias.by.year.state = p.bias.by.year.state * state.p.suppressed.adap[non.na.mask,use.state.mask,drop=F];
     
     p.bias.by.year = colSums(t(p.bias.by.year.state)*state.weights)
     mean(p.bias.by.year)
