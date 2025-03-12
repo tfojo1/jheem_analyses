@@ -811,7 +811,7 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.mortality.rate',
-                       functional.form = create.linear.spline.functional.form(
+                       functional.form = create.natural.spline.functional.form(
                            knot.times = c(time0=2000, time1=2010, time2=2020),
                            knot.values = list(
                                time0 = EHE_BASE_PARAMETER_VALUES['idu.mortality'],

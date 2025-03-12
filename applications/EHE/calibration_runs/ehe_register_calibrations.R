@@ -44,20 +44,6 @@ par.aliases.population = list(
   trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.2', EHE.PARAMETERS.PRIOR@var.names)])
 )
 
-register.calibration.info(CALIBRATION.CODE.POPULATION.TEST,
-                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added race/risk transmission targets 10/21
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = par.names.pop,
-                          parameter.aliases = par.aliases.population,
-                          n.iter = N.ITER,
-                          thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.13), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get population parameters in the general vicinity"
-)
-
 #-- REGISTER TRANSMISSION CALIBRATION  --#
 par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('msm\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility', 
