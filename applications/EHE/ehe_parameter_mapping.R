@@ -61,73 +61,97 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     for(time in migration.times)
     {   
-        # Immigration - by Race 
+        # Immigration - HIV 
         set.element.functional.form.main.effect.alphas(model.settings,
-                                                       element.name = "immigration",
+                                                       element.name = 'hiv.immigration',
                                                        alpha.name = time,
-                                                       values = parameters[paste0(races, '.immigration.multiplier.',time)],
-                                                       dimension = "race",
-                                                       applies.to.dimension.values = races) 
-  
+                                                       values = parameters[paste0('hiv.migration.multiplier.',time)],
+                                                       dimension = "all",
+                                                       applies.to.dimension.values = 'all') 
         
-        # Emigration - by Race 
+        
+        # Emigration - HIV
         set.element.functional.form.main.effect.alphas(model.settings,
-                                                       element.name = "emigration",
+                                                       element.name = 'hiv.emigration',
                                                        alpha.name = time,
-                                                       values = parameters[paste0(races, '.emigration.multiplier.',time)],
-                                                       dimension = "race",
-                                                       applies.to.dimension.values = races) 
-        
-        # Age - immigration + emigration
-        migration.multipliers = parameters[paste0("age", age.indices, '.migration.multiplier.',time)]
-        race.interacted.ages = (1:length(age.indices))[is.na(migration.multipliers)]
-        non.interacted.ages = (1:length(age.indices))[!is.na(migration.multipliers)]
-        
-        if (length(non.interacted.ages)>0)
+                                                       values = 1/parameters[paste0('hiv.migration.multiplier.',time)],
+                                                       dimension = "all",
+                                                       applies.to.dimension.values = 'all') 
+      
+      
+        for (element.prefix in c('general.', 'hiv.'))
         {
-            multipliers = parameters[paste0("age", non.interacted.ages, '.migration.multiplier.',time)]
-            
+            immigration.element.name = paste0(element.prefix, 'immigration')
+            emigration.element.name = paste0(element.prefix, 'emigration')
+          
+            # Immigration - by Race 
             set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "immigration",
+                                                           element.name = immigration.element.name,
                                                            alpha.name = time,
-                                                           values = multipliers,
-                                                           dimension = "age",
-                                                           applies.to.dimension.values = ages[non.interacted.ages]) 
+                                                           values = parameters[paste0(races, '.immigration.multiplier.',time)],
+                                                           dimension = "race",
+                                                           applies.to.dimension.values = races) 
+      
             
+            # Emigration - by Race 
             set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "emigration",
+                                                           element.name = emigration.element.name,
                                                            alpha.name = time,
-                                                           values = 1/multipliers,
-                                                           dimension = "age",
-                                                           applies.to.dimension.values = ages[non.interacted.ages]) 
-        }
-        
-        if (length(race.interacted.ages)>0)
-        {
-            for (age.index in race.interacted.ages)
+                                                           values = parameters[paste0(races, '.emigration.multiplier.',time)],
+                                                           dimension = "race",
+                                                           applies.to.dimension.values = races) 
+            
+            # Age - immigration + emigration
+            migration.multipliers = parameters[paste0("age", age.indices, '.migration.multiplier.',time)]
+            race.interacted.ages = (1:length(age.indices))[is.na(migration.multipliers)]
+            non.interacted.ages = (1:length(age.indices))[!is.na(migration.multipliers)]
+            
+            if (length(non.interacted.ages)>0)
             {
-                for (race in races)
+                multipliers = parameters[paste0("age", non.interacted.ages, '.migration.multiplier.',time)]
+                
+                set.element.functional.form.main.effect.alphas(model.settings,
+                                                               element.name = immigration.element.name,
+                                                               alpha.name = time,
+                                                               values = multipliers,
+                                                               dimension = "age",
+                                                               applies.to.dimension.values = ages[non.interacted.ages]) 
+                
+                set.element.functional.form.main.effect.alphas(model.settings,
+                                                               element.name = emigration.element.name,
+                                                               alpha.name = time,
+                                                               values = 1/multipliers,
+                                                               dimension = "age",
+                                                               applies.to.dimension.values = ages[non.interacted.ages]) 
+            }
+            
+            if (length(race.interacted.ages)>0)
+            {
+                for (age.index in race.interacted.ages)
                 {
-                    multiplier = parameters[paste0(race, ".age", age.index, '.migration.multiplier.',time)]
-                    
-                    set.element.functional.form.interaction.alphas(model.settings,
-                                                                   element.name = 'immigration', 
-                                                                   alpha.name = time, 
-                                                                   value = multiplier,
-                                                                   applies.to.dimension.values = list(age = ages[age.index],
-                                                                                                      race = race))
-                    
-                    set.element.functional.form.interaction.alphas(model.settings,
-                                                                   element.name = 'emigration', 
-                                                                   alpha.name = time, 
-                                                                   value = 1/multiplier,
-                                                                   applies.to.dimension.values = list(age = ages[age.index],
-                                                                                                      race = race))
+                    for (race in races)
+                    {
+                        multiplier = parameters[paste0(race, ".age", age.index, '.migration.multiplier.',time)]
+                        
+                        set.element.functional.form.interaction.alphas(model.settings,
+                                                                       element.name = immigration.element.name, 
+                                                                       alpha.name = time, 
+                                                                       value = multiplier,
+                                                                       applies.to.dimension.values = list(age = ages[age.index],
+                                                                                                          race = race))
+                        
+                        set.element.functional.form.interaction.alphas(model.settings,
+                                                                       element.name = emigration.element.name, 
+                                                                       alpha.name = time, 
+                                                                       value = 1/multiplier,
+                                                                       applies.to.dimension.values = list(age = ages[age.index],
+                                                                                                          race = race))
+                    }
                 }
             }
         }
     }
-
+    
     #-- Assortativity --#
     
     for (race in races)
@@ -642,6 +666,15 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     #-- IDU --#
     set.ehe.idu.from.parameters(model.settings,
                                 parameters = parameters)
+    
+    for (time in 0:2)
+    {
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.mortality.rate',
+                                                                      alpha.name = paste0('time', time),
+                                                                      values = parameters[paste0('idu.mortality.',time)],
+                                                                      applies.to.dimension.values = 'all',
+                                                                      dimension = 'all')
+    }
     
     #-- Increased General Mortality among all HIV --#
      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'hiv.general.mortality.multiplier',

@@ -4,11 +4,8 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 #source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
-CALIBRATION.CODE.POPULATION.TEST = 'init.pop.ehe.2'
-CALIBRATION.CODE.TRANSMISSION = 'init.transmission.ehe'
-CALIBRATION.CODE.FULL.PLUS.AIDS = 'full.with.aids'
-CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid2'
-CALIBRATION.CODE.FULL.PLUS.TST = 'full.with.tst'
+CALIBRATION.CODE.TRANSMISSION = 'init.trans.ehe'
+CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
 CALIBRATION.CODE.EHE.FINAL = 'final'
 
 N.ITER.TEST = 10000
@@ -22,7 +19,7 @@ load("../jheem_analyses/applications/EHE/calibration_runs/params.manual_2024_02_
 print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
 par.names.pop = c(
-    POPULATION.PARAMETERS.PRIOR@var.names,
+    POPULATION.PARAMETERS.PRIOR@var.names[!grepl('hiv\\..*migration', POPULATION.PARAMETERS.PRIOR@var.names)],
     "global.trate"#,
 )
 
@@ -91,7 +88,10 @@ par.names.transmission = c(par.names.transmission,
                            'idu.relapse.multiplier',
                            'aids.to.new.diagnoses.ratio.peak',
                            'aids.to.new.diagnoses.ratio.0',
-                           'aids.to.new.diagnoses.ratio.1'
+                           'aids.to.new.diagnoses.ratio.1',
+                           'idu.mortality.0',
+                           'idu.mortality.1',
+                           'idu.mortality.2'
 )
 
 par.aliases.transmission = list(

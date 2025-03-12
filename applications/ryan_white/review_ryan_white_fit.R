@@ -5,7 +5,7 @@ RW.DATA.MANAGER = load.data.manager('../../cached/ryan.white.data.manager.rdata'
 x=RW.LOCATIONS[c(1,9,17,25)+5];x
 
 # load simset
-simset = retrieve.simulation.set('rw','C.40140','full.with.covid2',100)
+simset = retrieve.simulation.set('rw','C.12060','full.with.covid2',100)
 
 simplot(simset, 'non.adap.clients', data.manager=RW.DATA.MANAGER)
 simplot(simset, 'non.adap.clients', data.manager=RW.DATA.MANAGER, facet.by='race')

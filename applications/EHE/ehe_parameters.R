@@ -126,6 +126,9 @@ POPULATION.PARAMETERS.PRIOR = distributions::join.distributions(
     hispanic.age5.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
     other.age5.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(2)),
     
+    hiv.migration.multiplier.time.1 = Lognormal.Distribution(0, sdlog = 0.5 * log(1.5)),
+    hiv.migration.multiplier.time.2 = Lognormal.Distribution(0, sdlog = 0.5 * log(1.5)),
+
     #-- Aging --#
     black.age1.aging.multiplier.1 = Lognormal.Distribution(0, 0.5*log(2)),
     hispanic.age1.aging.multiplier.1 = Lognormal.Distribution(0, 0.5*log(2)),
@@ -605,8 +608,12 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
         
     idu.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
     idu.relapse.multiplier = Lognormal.Distribution(0, .5*log(2)),
-    #idu.mortality = Lognormal.Distribution(log(0.0166), 0.1322), 
+
+    idu.mortality.0 = Lognormal.Distribution(log(0.0166), 0.1322), 
+    idu.mortality.1 = Lognormal.Distribution(log(0.0166), 0.1322), 
+    idu.mortality.2 = Lognormal.Distribution(log(0.0166), 0.1322), 
     #citation=25409098,
+
     #non-AIDS mortality in hiv-negative from table 3'
     
     #-- Increased mortality among HIV vs. HIV-negative --#
@@ -976,6 +983,17 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
     sex.specific.mortality = c(
       'male.non.idu.general.mortality.rate.multiplier',
       'female.non.idu.general.mortality.rate.multiplier'
+    ),
+    
+    hiv.migration = c(
+      'hiv.migration.multiplier.time.1',
+      'hiv.migration.multiplier.time.2'
+    ),
+    
+    idu.mortality = c(
+      'idu.mortality.0',
+      'idu.mortality.1',
+      'idu.mortality.2'
     )
 )
 # BASE.HIV.SAMPLING.BLOCKS ----

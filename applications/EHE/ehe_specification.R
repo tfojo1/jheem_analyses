@@ -804,10 +804,28 @@ register.model.element(EHE.SPECIFICATION,
                                                                        value.is.on.transformed.scale = F),
                        scale = 'ratio')
 
+#register.model.element(EHE.SPECIFICATION,
+#                       name = 'idu.mortality.rate',
+#                       value = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
+#                       scale = 'rate')
+
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.mortality.rate',
-                       value = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
+                       functional.form = create.linear.spline.functional.form(
+                           knot.times = c(time0=2000, time1=2010, time2=2020),
+                           knot.values = list(
+                               time0 = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
+                               time1 = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
+                               time2 = EHE_BASE_PARAMETER_VALUES['idu.mortality']
+                           ),
+                           link = 'identity',
+                           knot.link = 'log',
+                           min = 0,
+                           overwrite.knot.values.with.alphas = T
+                       ),
+                       functional.form.from.time = 2000,
                        scale = 'rate')
+
 
 ##------------------------##
 ##------------------------##
@@ -858,11 +876,17 @@ register.model.element(EHE.SPECIFICATION,
 ##----------------------------##
 
 ##-----------------##
-##-- Immigration --## ----
+##-- Immigration --##
 ##-----------------##
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'immigration',
+                       name = 'general.immigration',
+                       get.functional.form.function = get.immigration.rates.functional.form,
+                       functional.form.from.time = 2007,
+                       scale = 'rate')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'hiv.immigration',
                        get.functional.form.function = get.immigration.rates.functional.form,
                        functional.form.from.time = 2007,
                        scale = 'rate')
@@ -874,7 +898,7 @@ register.model.quantity(EHE.SPECIFICATION,
 register.natality(specification = EHE.SPECIFICATION,
                   parent.groups = 'uninfected',
                   child.groups = 'uninfected',
-                  fertility.rate.value = 'immigration',
+                  fertility.rate.value = 'general.immigration',
                   birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
                   parent.child.concordant.dimensions = c('age','race','sex','risk'),
                   all.births.into.compartments = list(),
@@ -883,27 +907,37 @@ register.natality(specification = EHE.SPECIFICATION,
 register.natality(specification = EHE.SPECIFICATION,
                   parent.groups = 'infected',
                   child.groups = 'infected',
-                  fertility.rate.value = 'immigration',
+                  fertility.rate.value = 'hiv.immigration',
                   birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
                   parent.child.concordant.dimensions = c('age','race','sex','risk','continuum'),
                   all.births.into.compartments = list(),
                   tag = "immigration")
 
 ##----------------##
-##-- Emigration --## ----
+##-- Emigration --##
 ##----------------##
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'emigration',
+                       name = 'general.emigration',
+                       get.functional.form.function = get.emigration.rates.functional.form,
+                       functional.form.from.time = 2007,
+                       scale = 'rate')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'hiv.emigration',
                        get.functional.form.function = get.emigration.rates.functional.form,
                        functional.form.from.time = 2007,
                        scale = 'rate')
 
 register.mortality(EHE.SPECIFICATION,
-                   mortality.rate.value = "emigration",
-                   groups = c("uninfected","infected"), 
+                   mortality.rate.value = "general.emigration",
+                   groups = c("uninfected"), 
                    tag = "emigration")
 
+register.mortality(EHE.SPECIFICATION,
+                   mortality.rate.value = "hiv.emigration",
+                   groups = c("infected"), 
+                   tag = "emigration")
 
 
 ##--------------------------------##
