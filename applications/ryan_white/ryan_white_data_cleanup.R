@@ -33,6 +33,49 @@ if (nrow(melted)>0)
     }
 }
 
+
+RW.DATA.MANAGER$put(data = as.numeric(NA),
+                    dimension.values = list(
+                      year = '2022',
+                      location = 'C.19100',
+                      race = RW.DATA.MANAGER$ontologies$ryan.white.pdfs$race
+                    ),
+                    outcome='oahs.clients', 
+                    source = 'ryan.white.program', 
+                    ontology.name = 'ryan.white.pdfs', 
+                    allow.na.to.overwrite = T,
+                    url = "https://ryanwhite.hrsa.gov/data/reports",
+                    details = "Ryan White Downloaded PDF Reports")
+
+RW.DATA.MANAGER$put(data = as.numeric(NA),
+                    dimension.values = list(
+                      year = '2022',
+                      location = 'C.19100',
+                      race = RW.DATA.MANAGER$ontologies$ryan.white.pdfs$race
+                    ),
+                    outcome='oahs.suppression', 
+                    source = 'ryan.white.program', 
+                    ontology.name = 'ryan.white.pdfs', 
+                    allow.na.to.overwrite = T,
+                    url = "https://ryanwhite.hrsa.gov/data/reports",
+                    details = "Ryan White Downloaded PDF Reports")
+
+RW.DATA.MANAGER$put(data = as.numeric(NA),
+                    dimension.values = list(
+                      year = '2022',
+                      location = 'C.12580',
+                      race = RW.DATA.MANAGER$ontologies$ryan.white.pdfs$race
+                    ),
+                    outcome='oahs.clients', 
+                    source = 'ryan.white.program', 
+                    ontology.name = 'ryan.white.pdfs', 
+                    allow.na.to.overwrite = T,
+                    url = "https://ryanwhite.hrsa.gov/data/reports",
+                    details = "Ryan White Downloaded PDF Reports")
+
+
+#-- TODD'S CODE BELOW --#
+
 strats.to.do = names(RW.DATA.MANAGER$data$non.adap.clients$estimate$ryan.white.program$ryan.white.pdfs)
 strats.to.do = strats.to.do[!grepl('fpl', strats.to.do)]
 for (strat in strats.to.do)
@@ -234,43 +277,5 @@ for (strat in strats.to.do)
     }
 }
 
-RW.DATA.MANAGER$put(data = as.numeric(NA),
-                    dimension.values = list(
-                        year = '2022',
-                        location = 'C.19100',
-                        race = RW.DATA.MANAGER$ontologies$ryan.white.pdfs$race
-                    ),
-                    outcome='oahs.clients', 
-                    source = 'ryan.white.program', 
-                    ontology.name = 'ryan.white.pdfs', 
-                    allow.na.to.overwrite = T,
-                    url = "https://ryanwhite.hrsa.gov/data/reports",
-                    details = "Ryan White Downloaded PDF Reports")
-
-RW.DATA.MANAGER$put(data = as.numeric(NA),
-                    dimension.values = list(
-                      year = '2022',
-                      location = 'C.19100',
-                      race = RW.DATA.MANAGER$ontologies$ryan.white.pdfs$race
-                    ),
-                    outcome='oahs.suppression', 
-                    source = 'ryan.white.program', 
-                    ontology.name = 'ryan.white.pdfs', 
-                    allow.na.to.overwrite = T,
-                    url = "https://ryanwhite.hrsa.gov/data/reports",
-                    details = "Ryan White Downloaded PDF Reports")
-
-RW.DATA.MANAGER$put(data = as.numeric(NA),
-                    dimension.values = list(
-                      year = '2022',
-                      location = 'C.12580',
-                      race = RW.DATA.MANAGER$ontologies$ryan.white.pdfs$race
-                    ),
-                    outcome='oahs.clients', 
-                    source = 'ryan.white.program', 
-                    ontology.name = 'ryan.white.pdfs', 
-                    allow.na.to.overwrite = T,
-                    url = "https://ryanwhite.hrsa.gov/data/reports",
-                    details = "Ryan White Downloaded PDF Reports")
 
 save(RW.DATA.MANAGER, file='../../cached/ryan.white.data.manager.rdata')
