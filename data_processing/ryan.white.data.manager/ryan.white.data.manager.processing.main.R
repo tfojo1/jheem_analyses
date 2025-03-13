@@ -132,6 +132,10 @@ source('data_processing/ryan.white.data.manager/ryan.white.adap.proportion.R') #
 source('data_processing/ryan.white.data.manager/ryan.white.adap.suppression.R') #outcome = adap.suppression
 source('data_processing/ryan.white.data.manager/proportions.of.diagnosed.R') #outcomes = diagnosed.prevalence; adap.proportion.of.diagnosed; adap.suppressed.proportion.of.diagnosed
 
+
+# Source Todd's Additional Cleaning Code ----------------------------------
+source('applications/ryan_white/ryan_white_data_cleanup.R')
+
 # Save --------------------------------------------------------------------
 
 save(data.manager, file="Q:/data_managers/ryan.white.data.manager.rdata")
