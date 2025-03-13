@@ -121,16 +121,6 @@ final.completeness.first.tri <- as.data.frame(final.completeness.first.tri)
 
 # NO.PRENATAL.CARE - TOTAL--------------------------------------------------------
 
-  
-  #1
-  counties.in.each.msa = locations::get.contained.locations(MSAS.OF.INTEREST, "COUNTY", return.list = T)
-  counties.in.each.msa.df = stack(counties.in.each.msa)%>% rename(county.code = values) %>% rename(msa = ind)
-  
-  # #unlist
-  unlisted.counties.in.msas = as.data.frame(unlist(counties.in.each.msa))
-  unlisted.counties.in.msas <- unlisted.counties.in.msas %>%
-    rename(county = `unlist(counties.in.each.msa)`)
-  
   #2 
   prenatal.counties = as.data.frame.table(data.manager$data$no.prenatal.care$estimate$cdc.wonder.natality$cdc.fertility$year__location)
   
@@ -139,23 +129,6 @@ final.completeness.first.tri <- as.data.frame(final.completeness.first.tri)
     mutate(outcome = "counties we have prenatal data for")%>%
     select(-Freq)%>%
     mutate(county.we.have.prenatal.for = "1")
-  
-  #3
-  total.msa.population = as.data.frame.table(data.manager$data$population$estimate$census.aggregated.population$census$year__location)
-  
-  total.msa.population$msa.indicator = (total.msa.population$location %in% MSAS.OF.INTEREST) 
-  
-  total.msa.population <- total.msa.population %>%
-    filter(msa.indicator == T)%>%
-    filter(year == "2016" | year == "2017" | year == "2018" | year == "2019" | year== "2020" | year == "2021" | year == "2022" |year == "2023")%>%
-    rename(total.msa.population = Freq)
-  
-  #4
-  county.population = as.data.frame.table(data.manager$data$population$estimate$census.population$census$year__location)
-  county.population <- county.population %>%
-    filter(location != "US")%>%
-    rename(total.county.population = Freq)%>%
-    filter(year == "2016" | year == "2017" | year == "2018" | year == "2019" | year== "2020" | year == "2021" | year == "2022" |year == "2023")
   
   
   #Match the counties we have prenatal data for to their population
@@ -179,11 +152,7 @@ final.completeness.first.tri <- as.data.frame(final.completeness.first.tri)
   everything_v2 = left_join(everything_v1, counties.in.each.msa.df, by = 'county.code')
   
   everything_v2$msa = as.character(everything_v2$msa)
-  
-  total.msa.population <- total.msa.population%>%
-    rename(msa = location)%>%
-    select(year, msa, total.msa.population)%>%
-    mutate(msa = as.character(msa))
+
   
   everything_v3 = left_join(everything_v2, total.msa.population, by = c("year", "msa"))
   
@@ -205,12 +174,6 @@ final.completeness.first.tri <- as.data.frame(final.completeness.first.tri)
     mutate(outcome = "completeness.no.prenatal.care")
   
   final.completeness.no.prenatal.care <- as.data.frame(final.completeness.no.prenatal.care)
-  
-  #there's 33 MSAs here which matches the MSAs of interest
-  # check.how.many <- everything_v5%>%
-  #   ungroup()%>%
-  #   select(location)%>%
-  #   count(location)
   
   data.manager$put.long.form(
     data = final.completeness.no.prenatal.care,
