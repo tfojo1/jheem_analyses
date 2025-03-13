@@ -1,5 +1,5 @@
 #syphilis.manager = load.data.manager(name="syphilis.manager", file="../../cached/syphilis.manager.rdata")
-source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
+#source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
 
 
 # This code creates a 'completeness' variable which tells how much data we have available to make up the entire MSA for prenatal care

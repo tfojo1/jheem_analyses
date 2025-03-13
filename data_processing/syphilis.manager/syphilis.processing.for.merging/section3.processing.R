@@ -237,7 +237,6 @@ source('data_processing/syphilis.manager/msa_immigration.R')
 source('data_processing/syphilis.manager/national_immigration.R')
 source('data_processing/syphilis.manager/prenatal.care.cdc.wonder.R')
 source('data_processing/syphilis.manager/prenatal.screening.denominator.R')
-source('data_processing/syphilis.manager/prenatal.completeness.R')
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
@@ -286,6 +285,9 @@ put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertilit
 
 # Source Code to Calculate Fertility Rate by MSA 
 source('data_processing/syphilis.manager/fertility.rate.msa.R')
+
+#Source code for prenatal data completes (needs to come after the population aggregation to mSA)
+source('data_processing/syphilis.manager/prenatal.completeness.R')
 
 # Aggregate Prenatal Care to MSA ------------------------------------------
 put.msa.data.as.new.source(outcome = 'no.prenatal.care',
