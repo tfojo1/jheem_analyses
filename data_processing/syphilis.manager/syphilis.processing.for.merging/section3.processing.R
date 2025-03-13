@@ -120,6 +120,24 @@ data.manager$register.outcome(
     units = '%',
     description = "No Prenatal Care"), denominator.outcome = 'prenatal.screening.denominator')
 
+data.manager$register.outcome(
+  'completeness.no.prenatal.care',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'No Prenatal Care - Completeness',
+    axis.name = 'No Prenatal Care - Completeness',
+    units = '%',
+    description = "No Prenatal Care - Completeness"), denominator.outcome = 'population')
+
+data.manager$register.outcome(
+  'completeness.prenatal.care.initiation.first.trimester',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Prenatal Care Initiation First Trimester - Completeness',
+    axis.name = 'Prenatal Care Initiation First Trimester - Completeness',
+    units = '%',
+    description = "Prenatal Care Initiation First Trimester - Completeness"), denominator.outcome = 'population')
+
 #Register Sources:
 data.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
@@ -219,6 +237,7 @@ source('data_processing/syphilis.manager/msa_immigration.R')
 source('data_processing/syphilis.manager/national_immigration.R')
 source('data_processing/syphilis.manager/prenatal.care.cdc.wonder.R')
 source('data_processing/syphilis.manager/prenatal.screening.denominator.R')
+source('data_processing/syphilis.manager/prenatal.completeness.R')
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
