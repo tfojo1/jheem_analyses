@@ -795,7 +795,8 @@ register.mortality(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'non.idu.general.mortality',
                        get.functional.form.function = get.location.mortality.rates.functional.form,
-                       scale = 'rate')
+                       scale = 'rate',
+                       functional.form.from.time = 2007)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'hiv.general.mortality.multiplier',

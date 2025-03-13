@@ -1,6 +1,6 @@
 
 
-load('applications/ryan_white/results/ryan_white_results.Rdata')
+load('Q:results/ryan_white/ryan_white_results_', Sys.Date(), ".Rdata")
 
 YEARS.TO.CONSIDER = as.character(2025:2030)
 

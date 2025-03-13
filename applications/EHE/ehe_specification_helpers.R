@@ -726,6 +726,15 @@ get.location.birth.rates.functional.form = function(location, specification.meta
   create.static.functional.form(value = rates,
                                 link = "log",
                                 value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+  
+  # create.natural.spline.functional.form(
+  #     knot.times = c(time1 = 2010, time2 = 2020),
+  #     knot.values = list(time1 = rates, time2 = rates),
+  #     link = 'identity',
+  #     knot.link = 'log',
+  #     min = 0,
+  #     knots.are.on.transformed.scale = F
+  # )
 }
 
 get.location.birth.rates <- function(location,
@@ -776,9 +785,18 @@ get.location.mortality.rates.functional.form = function(location, specification.
     rates = get.location.mortality.rates(location=location,
                                      specification.metadata = specification.metadata) 
     
-    create.static.functional.form(value = rates,
-                                  link = "log",
-                                  value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+   create.static.functional.form(value = rates,
+                                 link = "log",
+                                 value.is.on.transformed.scale = F) # not giving the log rates; don't need to transform this value
+    
+      # create.natural.spline.functional.form(
+      #     knot.times = c(time1 = 2010, time2 = 2020),
+      #     knot.values = list(time1 = rates, time2 = rates),
+      #     link = 'identity',
+      #     knot.link = 'log',
+      #     min = 0,
+      #     knots.are.on.transformed.scale = F
+      # )
 }
 
 get.location.mortality.rates <- function(location,

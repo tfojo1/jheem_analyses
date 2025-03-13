@@ -381,7 +381,7 @@ general.mortality.likelihood.instructions.pop =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.03, # look into source and see if they have estimate 
                                        error.variance.type = 'cv',
-                                       weights = (18*POPULATION.WEIGHT), # see prev_new_aware_weighting.R 
+                                       weights = (POPULATION.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
 
@@ -395,7 +395,7 @@ general.mortality.likelihood.instructions.full =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.03, # look into source and see if they have estimate 
                                        error.variance.type = 'cv',
-                                       weights = (18*FULL.WEIGHT), # see prev_new_aware_weighting.R 
+                                       weights = (FULL.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
 

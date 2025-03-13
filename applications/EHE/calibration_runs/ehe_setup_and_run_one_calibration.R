@@ -1,7 +1,7 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = MIAMI.MSA
+LOCATION = CHICAGO.MSA
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANSMISSION, # 2
                              CALIBRATION.CODE.FULL.PLUS.COVID, # 3
@@ -44,17 +44,8 @@ for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
                            update.detail = 'med')
     end.time = Sys.time()
     run.time = as.numeric(end.time) - as.numeric(start.time)
-    # Rprof(NULL)
-    # summ = summaryRprof()
-    # print(paste0("DONE RUNNING MCMC: Took ",
-    #              round(run.time/60, 0), " minutes to run ",
-    #              format(N.ITER, big.mark = ","),
-    #              " simulations (",
-    #              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
-    
-    # Save sim 
-    # sim = mcmc@simulations[[length(mcmc@simulations)]]
-    # save(sim,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_",Sys.Date(),"_",LOCATION,".Rdata"))
+
+    mcmc = NULL
     
     # Save simset
     simset = assemble.simulations.from.calibration(version = 'ehe',
@@ -65,4 +56,8 @@ for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
     # simset = simset$thin(keep = 50)
     # 
     save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",Sys.Date(),"_",LOCATION,".Rdata"))
+    
+    simset = NULL
+    
+    gc()
 }

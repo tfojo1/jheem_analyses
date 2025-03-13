@@ -52,21 +52,33 @@ POPULATION.PARAMETERS.PRIOR = distributions::join.distributions(
     black.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)), # can be off by factor of 4
     hispanic.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
     other.birth.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(4)),
-    
+
     #-- Non IDU general mortality rates --#
-    black.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    hispanic.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    other.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
     
-    age1.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    age2.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    age3.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    age4.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    age5.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    black.age1.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    hispanic.age1.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    other.age1.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
     
+    black.age2.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    hispanic.age2.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    other.age2.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    
+    black.age3.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    hispanic.age3.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    other.age3.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    
+    black.age4.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    hispanic.age4.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    other.age4.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    
+    black.age5.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    hispanic.age5.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+    other.age5.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
+
+
     male.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
     female.non.idu.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-    
+
     #-- Immigration/emigration rates --#
     
     Multivariate.Lognormal.Distribution(mu=0,
@@ -798,188 +810,158 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
 
 #-- POPULATION PARAMETERS --#
 
-    black.birth.rate = c('black.birth.rate.multiplier'),
+    black.birth.rate = c(
+      'black.birth.rate.multiplier'),
   
     black.immigration = c(
       "black.immigration.multiplier.time.1",
       "black.immigration.multiplier.time.2"
     ),
     
-    black.death.and.emigration = c(
+    black.emigration = c(
       "black.emigration.multiplier.time.1",
-      "black.emigration.multiplier.time.2",
-      'black.non.idu.general.mortality.rate.multiplier'
+      "black.emigration.multiplier.time.2"
     ),
   
-    black.age1.aging.and.migration.1 = c(
-      'black.age1.aging.multiplier.1',
-      'black.age1.migration.multiplier.time.1'
-    ),
-    
-    black.age1.aging.and.migration.2 = c(
-      'black.age1.aging.multiplier.2',
+    black.age1.aging1 = 'black.age1.aging.multiplier.1',
+    black.age1.aging2 = 'black.age1.aging.multiplier.2',
+    black.age1.mortality = 'black.age1.non.idu.general.mortality.rate.multiplier',
+    black.age1.migration = c(
+      'black.age1.migration.multiplier.time.1',
       'black.age1.migration.multiplier.time.2'
     ),
     
-    black.age2.aging.and.migration.1 = c(
-      'black.age2.aging.multiplier.1',
-      'black.age2.migration.multiplier.time.1'
-    ),
-    
-    black.age2.aging.and.migration.2 = c(
-      'black.age2.aging.multiplier.2',
+    black.age2.aging1 = 'black.age2.aging.multiplier.1',
+    black.age2.aging2 = 'black.age2.aging.multiplier.2',
+    black.age2.mortality = 'black.age2.non.idu.general.mortality.rate.multiplier',
+    black.age2.migration = c(
+      'black.age2.migration.multiplier.time.1',
       'black.age2.migration.multiplier.time.2'
     ),
     
-    black.age3.aging.and.migration.1 = c(
-      'black.age3.aging.multiplier.1',
-      'black.age3.migration.multiplier.time.1'
-    ),
-    
-    black.age3.aging.and.migration.2 = c(
-      'black.age3.aging.multiplier.2',
+    black.age3.aging1 = 'black.age3.aging.multiplier.1',
+    black.age3.aging2 = 'black.age3.aging.multiplier.2',
+    black.age3.mortality = 'black.age3.non.idu.general.mortality.rate.multiplier',
+    black.age3.migration = c(
+      'black.age3.migration.multiplier.time.1',
       'black.age3.migration.multiplier.time.2'
     ),
     
-    black.age4.aging.and.migration.1 = c(
-      'black.age4.aging.multiplier.1',
-      'black.age4.migration.multiplier.time.1'
-    ),
-    
-    black.age4.aging.and.migration.2 = c(
-      'black.age4.aging.multiplier.2',
+    black.age4.aging1 = 'black.age4.aging.multiplier.1',
+    black.age4.aging2 = 'black.age4.aging.multiplier.2',
+    black.age4.mortality = 'black.age4.non.idu.general.mortality.rate.multiplier',
+    black.age4.migration = c(
+      'black.age4.migration.multiplier.time.1',
       'black.age4.migration.multiplier.time.2'
     ),
     
-    black.age5migration = c(
+    black.age5.mortality = 'black.age5.non.idu.general.mortality.rate.multiplier',
+    black.age5.migration = c(
       'black.age5.migration.multiplier.time.1',
       'black.age5.migration.multiplier.time.2'
     ),
-    
-    hispanic.birth.rate = c('hispanic.birth.rate.multiplier'),
+
+    hispanic.birth.rate = c(
+      'hispanic.birth.rate.multiplier'),
     
     hispanic.immigration = c(
       "hispanic.immigration.multiplier.time.1",
       "hispanic.immigration.multiplier.time.2"
     ),
     
-    hispanic.death.and.emigration = c(
+    hispanic.emigration = c(
       "hispanic.emigration.multiplier.time.1",
-      "hispanic.emigration.multiplier.time.2",
-      'hispanic.non.idu.general.mortality.rate.multiplier'
+      "hispanic.emigration.multiplier.time.2"
     ),
     
-    hispanic.age1.aging.and.migration.1 = c(
-      'hispanic.age1.aging.multiplier.1',
-      'hispanic.age1.migration.multiplier.time.1'
-    ),
-    
-    hispanic.age1.aging.and.migration.2 = c(
-      'hispanic.age1.aging.multiplier.2',
+    hispanic.age1.aging1 = 'hispanic.age1.aging.multiplier.1',
+    hispanic.age1.aging2 = 'hispanic.age1.aging.multiplier.2',
+    hispanic.age1.mortality = 'hispanic.age1.non.idu.general.mortality.rate.multiplier',
+    hispanic.age1.migration = c(
+      'hispanic.age1.migration.multiplier.time.1',
       'hispanic.age1.migration.multiplier.time.2'
     ),
     
-    hispanic.age2.aging.and.migration.1 = c(
-      'hispanic.age2.aging.multiplier.1',
-      'hispanic.age2.migration.multiplier.time.1'
-    ),
-    
-    hispanic.age2.aging.and.migration.2 = c(
-      'hispanic.age2.aging.multiplier.2',
+    hispanic.age2.aging1 = 'hispanic.age2.aging.multiplier.1',
+    hispanic.age2.aging2 = 'hispanic.age2.aging.multiplier.2',
+    hispanic.age2.mortality = 'hispanic.age2.non.idu.general.mortality.rate.multiplier',
+    hispanic.age2.migration = c(
+      'hispanic.age2.migration.multiplier.time.1',
       'hispanic.age2.migration.multiplier.time.2'
     ),
     
-    hispanic.age3.aging.and.migration.1 = c(
-      'hispanic.age3.aging.multiplier.1',
-      'hispanic.age3.migration.multiplier.time.1'
-    ),
-    
-    hispanic.age3.aging.and.migration.2 = c(
-      'hispanic.age3.aging.multiplier.2',
+    hispanic.age3.aging1 = 'hispanic.age3.aging.multiplier.1',
+    hispanic.age3.aging2 = 'hispanic.age3.aging.multiplier.2',
+    hispanic.age3.mortality = 'hispanic.age3.non.idu.general.mortality.rate.multiplier',
+    hispanic.age3.migration = c(
+      'hispanic.age3.migration.multiplier.time.1',
       'hispanic.age3.migration.multiplier.time.2'
     ),
     
-    hispanic.age4.aging.and.migration.1 = c(
-      'hispanic.age4.aging.multiplier.1',
-      'hispanic.age4.migration.multiplier.time.1'
-    ),
-    
-    hispanic.age4.aging.and.migration.2 = c(
-      'hispanic.age4.aging.multiplier.2',
+    hispanic.age4.aging1 = 'hispanic.age4.aging.multiplier.1',
+    hispanic.age4.aging2 = 'hispanic.age4.aging.multiplier.2',
+    hispanic.age4.mortality = 'hispanic.age4.non.idu.general.mortality.rate.multiplier',
+    hispanic.age4.migration = c(
+      'hispanic.age4.migration.multiplier.time.1',
       'hispanic.age4.migration.multiplier.time.2'
     ),
     
-    hispanic.age5migration = c(
+    hispanic.age5.mortality = 'hispanic.age5.non.idu.general.mortality.rate.multiplier',
+    hispanic.age5.migration = c(
       'hispanic.age5.migration.multiplier.time.1',
       'hispanic.age5.migration.multiplier.time.2'
     ),
   
-    other.birth.rate = c('other.birth.rate.multiplier'),
+    other.birth.rate = c(
+      'other.birth.rate.multiplier'),
   
     other.immigration = c(
       "other.immigration.multiplier.time.1",
       "other.immigration.multiplier.time.2"
     ),
     
-    other.death.and.emigration = c(
+    other.emigration = c(
       "other.emigration.multiplier.time.1",
-      "other.emigration.multiplier.time.2",
-      'other.non.idu.general.mortality.rate.multiplier'
+      "other.emigration.multiplier.time.2"
     ),
-    
-    other.age1.aging.and.migration.1 = c(
-      'other.age1.aging.multiplier.1',
-      'other.age1.migration.multiplier.time.1'
-    ),
-    
-    other.age1.aging.and.migration.2 = c(
-      'other.age1.aging.multiplier.2',
+    other.age1.aging1 = 'other.age1.aging.multiplier.1',
+    other.age1.aging2 = 'other.age1.aging.multiplier.2',
+    other.age1.mortality = 'other.age1.non.idu.general.mortality.rate.multiplier',
+    other.age1.migration = c(
+      'other.age1.migration.multiplier.time.1',
       'other.age1.migration.multiplier.time.2'
     ),
     
-    other.age2.aging.and.migration.1 = c(
-      'other.age2.aging.multiplier.1',
-      'other.age2.migration.multiplier.time.1'
-    ),
-    
-    other.age2.aging.and.migration.2 = c(
-      'other.age2.aging.multiplier.2',
+    other.age2.aging1 = 'other.age2.aging.multiplier.1',
+    other.age2.aging2 = 'other.age2.aging.multiplier.2',
+    other.age2.mortality = 'other.age2.non.idu.general.mortality.rate.multiplier',
+    other.age2.migration = c(
+      'other.age2.migration.multiplier.time.1',
       'other.age2.migration.multiplier.time.2'
     ),
     
-    other.age3.aging.and.migration.1 = c(
-      'other.age3.aging.multiplier.1',
-      'other.age3.migration.multiplier.time.1'
-    ),
-    
-    other.age3.aging.and.migration.2 = c(
-      'other.age3.aging.multiplier.2',
+    other.age3.aging1 = 'other.age3.aging.multiplier.1',
+    other.age3.aging2 = 'other.age3.aging.multiplier.2',
+    other.age3.mortality = 'other.age3.non.idu.general.mortality.rate.multiplier',
+    other.age3.migration = c(
+      'other.age3.migration.multiplier.time.1',
       'other.age3.migration.multiplier.time.2'
     ),
     
-    other.age4.aging.and.migration.1 = c(
-      'other.age4.aging.multiplier.1',
-      'other.age4.migration.multiplier.time.1'
-    ),
-    
-    other.age4.aging.and.migration.2 = c(
-      'other.age4.aging.multiplier.2',
+    other.age4.aging1 = 'other.age4.aging.multiplier.1',
+    other.age4.aging2 = 'other.age4.aging.multiplier.2',
+    other.age4.mortality = 'other.age4.non.idu.general.mortality.rate.multiplier',
+    other.age4.migration = c(
+      'other.age4.migration.multiplier.time.1',
       'other.age4.migration.multiplier.time.2'
     ),
     
-    other.age5migration = c(
+    other.age5.mortality = 'other.age5.non.idu.general.mortality.rate.multiplier',
+    other.age5.migration = c(
       'other.age5.migration.multiplier.time.1',
       'other.age5.migration.multiplier.time.2'
     ),
 
-    age.specific.mortality = c(
-      'age1.non.idu.general.mortality.rate.multiplier',
-      'age2.non.idu.general.mortality.rate.multiplier',
-      'age3.non.idu.general.mortality.rate.multiplier',
-      'age4.non.idu.general.mortality.rate.multiplier',
-      'age5.non.idu.general.mortality.rate.multiplier'
-    ),
-    
     sex.specific.mortality = c(
       'male.non.idu.general.mortality.rate.multiplier',
       'female.non.idu.general.mortality.rate.multiplier'
@@ -1493,10 +1475,11 @@ EHE.SUPPRESSION.SAMPLING.BLOCKS = list(
 EHE.NON.POPULATION.SAMPLING.BLOCKS = c(BASE.HIV.SAMPLING.BLOCKS,
                                        EHE.SUPPRESSION.SAMPLING.BLOCKS)
 
-# Population parameters are sampled 1/3 as much
+# Population parameters are sampled 1/4 as much
 # EHE.PARAMETER.SAMPLING.BLOCKS ----
 EHE.PARAMETER.SAMPLING.BLOCKS = 
   c(EHE.POPULATION.SAMPLING.BLOCKS,
+    EHE.NON.POPULATION.SAMPLING.BLOCKS,
     EHE.NON.POPULATION.SAMPLING.BLOCKS,
     EHE.NON.POPULATION.SAMPLING.BLOCKS,
     EHE.NON.POPULATION.SAMPLING.BLOCKS

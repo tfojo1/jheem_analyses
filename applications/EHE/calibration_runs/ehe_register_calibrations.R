@@ -3,13 +3,14 @@ source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 #source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-CALIBRATION.CODE.POPULATION = 'init.pop.ehe'
-CALIBRATION.CODE.TRANSMISSION = 'init.trans.ehe'
-CALIBRATION.CODE.FULL.PLUS.COVID = 'full.with.covid'
-CALIBRATION.CODE.EHE.FINAL = 'final'
+CALIBRATION.CODE.POPULATION = 'pop.ehe'
+CALIBRATION.CODE.TRANSMISSION = 'trans.ehe'
+CALIBRATION.CODE.FULL.PLUS.COVID = 'full.ehe'
+CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
 
 N.ITER.TEST = 10000
-N.ITER = 20000
+N.ITER.POP = 25000
+N.ITER.TRANS = 25000
 N.ITER.FULL = 50000
 N.ITER.FINAL = 250000
 
@@ -28,7 +29,7 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = par.names.pop,
-                          n.iter = N.ITER,
+                          n.iter = N.ITER.POP,
                           thin = 50, 
                           fixed.initial.parameter.values = c(global.trate=0.13), 
                           is.preliminary = T,
@@ -126,7 +127,7 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
                           parameter.aliases = par.aliases.transmission,
-                          n.iter = N.ITER,
+                          n.iter = N.ITER.TRANS,
                           thin = 50, 
                           #fixed.initial.parameter.values = c(global.trate=0.1), 
                           is.preliminary = T,

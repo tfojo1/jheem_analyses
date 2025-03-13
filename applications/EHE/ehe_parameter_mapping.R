@@ -15,33 +15,17 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     age.indices = 1:length(ages)
     n.ages = length(ages)
     
-    #-- Birth rates --#
-
+    #-- Birth and Mortality rates --#
+ 
+    # Births
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "fertility",
                                                    alpha.name = 'value',
                                                    values = parameters[paste0(races,'.birth.rate.multiplier')],
                                                    dimension = 'race',
                                                    applies.to.dimension.values=races)
-
-    #-- Mortality rates --#
-    # Race
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "non.idu.general.mortality",
-                                                   alpha.name = 'value',
-                                                   values = parameters[paste0(races,'.non.idu.general.mortality.rate.multiplier')],
-                                                   dimension = 'race',
-                                                   applies.to.dimension.values=races)
     
-    # Age
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "non.idu.general.mortality",
-                                                   alpha.name = 'value',
-                                                   values = parameters[paste0('age', age.indices, '.non.idu.general.mortality.rate.multiplier')],
-                                                   dimension = 'age',
-                                                   applies.to.dimension.values=ages)
-    
-    # Sex
+    # Mortality by Sex
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "non.idu.general.mortality",
                                                    alpha.name = 'value',
@@ -56,6 +40,21 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                    dimension = 'sex',
                                                    applies.to.dimension.values='female')
     
+    # Mortality by Age/Race
+    for (age.index in 1:n.ages)
+    {
+        for (race in races)
+        {
+            set.element.functional.form.interaction.alphas(
+                model.settings,
+                element.name = 'non.idu.general.mortality', 
+                alpha.name = 'value', 
+                value = parameters[paste0(race, '.age', age.index, '.non.idu.general.mortality.rate.multiplier')],
+                applies.to.dimension.values = list(age = ages[age.index],
+                                                   race = race))
+        }
+    }
+ 
     #-- Migration rates --#
     migration.times = c("time.1","time.2")
     
