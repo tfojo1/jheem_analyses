@@ -121,15 +121,6 @@ data.manager$register.outcome(
     description = "No Prenatal Care"), denominator.outcome = 'prenatal.screening.denominator')
 
 data.manager$register.outcome(
-  'completeness.no.prenatal.care',
-  metadata = create.outcome.metadata(
-    scale = 'proportion',
-    display.name = 'No Prenatal Care - Completeness',
-    axis.name = 'No Prenatal Care - Completeness',
-    units = '%',
-    description = "No Prenatal Care - Completeness"), denominator.outcome = 'population')
-
-data.manager$register.outcome(
   'completeness.prenatal.care.initiation.first.trimester',
   metadata = create.outcome.metadata(
     scale = 'proportion',
