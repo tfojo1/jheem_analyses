@@ -124,6 +124,46 @@ make.run.scripts <- function(locations,
     }
 }
 
+#' @inheritParams make.setup.scripts
+#' @param calibration.codes A vector of calibration codes in the order they should be attempted
+make.multiphase.scripts <- function(locations,
+                                    version,
+                                    calibration.codes,
+                                    chains=1,
+                                    specification.path,
+                                    register.calibration.path,
+                                    dir='cluster_scripts/multiphase_scripts',
+                                    partition="parallel",
+                                    account="tfojo1",
+                                    mem="16G")
+{
+    for (location in locations) {
+        # Create output directories for each location/chain combination
+        for (chain in chains) {
+            output_path <- file.path(OUTPUT.DIR, version, location, get.multiphase.filename(calibration.codes, chain, extension=".out"))
+            if (!dir.exists(output_path))
+                dir.create(output_path, recursive=TRUE)
+        }
+        
+        # Create script directories
+        script_path <- file.path(dir, version, location)
+        if (!dir.exists(script_path))
+            dir.create(script_path, recursive=TRUE)
+        
+        # Create batch scripts for each chain
+        for (chain in chains) {
+            make.sbatch.script(filename=file.path(dir, version, location, get.multiphase.filename(calibration.codes, chain)),
+                               job.name = paste0("M_", location, "_", chain),
+                               mem=mem,
+                               output = output_path,
+                               partition=partition,
+                               time.hours = 36,
+                               account=account,
+                               commands = paste("Rscript cluster_scripts/do_multiphase_calibration.R", version, location, calibration.codes, chain, specification.path, register.calibration.path))
+        }
+    }
+}
+
 # MASTER SCRIPTS ----
 
 make.setup.master.script <- function(name.for.script,
@@ -170,6 +210,32 @@ make.run.master.script <- function(name.for.script,
     for (location in locations) {
         for (chain in chains) {
             cat("sbatch ", file.path(dir, version, location, get.run.filename(calibration.code, chain)), "\n", sep="")
+        }
+    }
+    sink()
+}
+
+make.multiphase.master.script <- function(name.for.script,
+                                          locations,
+                                          version,
+                                          calibration.codes,
+                                          chains=1:4,
+                                          master.dir="cluster_scripts/master_scripts/multiphase",
+                                          dir="cluster_scripts/multiphase_scripts",
+                                          overwrite=F) {
+    # Create master directory if it doesn't exist
+    if (!dir.exists(master.dir))
+        dir.create(master.dir, recursive=TRUE)
+    
+    error.prefix = "Cannot make.multiphase.master.script': "
+    filename.with.extension = paste0(name.for.script, ".bat")
+    if (file.exists(file.path(master.dir, filename.with.extension)) && !overwrite)
+        stop(paste0(error.prefix, "there is already a '", filename.with.extension, "' at this location. Use 'overwrite=T' to proceed anyway"))
+    sink(file.path(master.dir, filename.with.extension))
+    cat("#!/bin/bash\n\n")
+    for (location in locations) {
+        for (chain in chains) {
+            cat("sbatch ", file.path(dir, version, location, get.multiphase.filename(calibration.codes, chain)), "\n", sep="")
         }
     }
     sink()
@@ -228,4 +294,8 @@ get.setup.filename <- function(calibration.code, extension=".bat") {
 
 get.run.filename <- function(calibration.code, chain, extension=".bat") {
     paste0("run_", calibration.code, "_", chain, extension)
+}
+
+get.multiphase.filename <- function(calibration.codes, chain, extension=".bat") {
+    paste0("multiphase_", paste(calibration.codes, collapse="__"), chain, extension)
 }
