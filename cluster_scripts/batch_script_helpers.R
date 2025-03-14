@@ -58,7 +58,7 @@ make.setup.scripts <- function(locations,
                                specification.path,
                                register.calibration.path,
                                dir='cluster_scripts/setup_scripts',
-                               partition='shared',
+                               partition='parallel',
                                account='tfojo1',
                                mem='16G')
 {
@@ -93,7 +93,7 @@ make.run.scripts <- function(locations,
                              specification.path,
                              register.calibration.path,
                              dir='cluster_scripts/run_scripts',
-                             partition="shared",
+                             partition="parallel",
                              account='tfojo1',
                              mem='16G')
 {

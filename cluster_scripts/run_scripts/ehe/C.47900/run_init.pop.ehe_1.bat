@@ -4,7 +4,7 @@
 #SBATCH --mem=16G
 #SBATCH --output=/scratch4/pkasaie1/azalesak/jheem/code/jheem_analyses/cluster_scripts/outputs/ehe/C.47900/run_init.pop.ehe_1.out
 #SBATCH --time=36:00:00
-#SBATCH --partition=shared
+#SBATCH --partition=parallel
 #SBATCH --account=tfojo1
 
 source cluster_scripts/rockfish_module_loads.sh
