@@ -1,0 +1,35 @@
+#!/bin/bash
+
+sbatch cluster_scripts/setup_scripts/ehe/C.35620/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.33100/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.31080/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.12060/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.26420/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.19100/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.16980/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.47900/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.37980/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.36740/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.41860/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.38060/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.45300/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.40140/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.19820/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.12580/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.29820/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.14460/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.41740/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.16740/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.41700/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.27260/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.35380/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.32820/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.42660/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.12420/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.26900/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.17140/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.18140/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.12940/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.40900/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.17460/setup_full.ehe.bat
+sbatch cluster_scripts/setup_scripts/ehe/C.41180/setup_full.ehe.bat
