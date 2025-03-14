@@ -1305,7 +1305,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'incidence.from', # use of '.from' helps us track where individuals are coming from (differentiate new vs re-infections)
                       keep.dimensions = c('location','age','race','sex','profile')
 )
-##---- Syphilis Diagnosis ----
+##---- Syphilis Diagnosies ----
 register.model.element(SHIELD.SPECIFICATION,
                        'fraction.el.misclassified.ll',
                        scale = 'proportion',
@@ -1328,10 +1328,10 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  singular.unit = 'case'),
                       scale='non.negative.number',
                       dynamic.quantity.name = 'remission.from', 
-                      # corresponding.data.outcome = 'total.syphilis' #'@Zoe: should we add historical values
+                      corresponding.data.outcome = 'total.syphilis.diagnoses'  ,
                       keep.dimensions = c('location','age','race','sex','stage')
 )
-# Primary/Secondary Syphilis
+### Primary/Secondary diagnoses ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.primary',
                          value = expression(diagnosis.total),
@@ -1343,7 +1343,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'primary.syphilis' ,
+                         corresponding.data.outcome = 'primary.syphilis.diagnoses' ,
                          keep.dimensions = c('location','age','race','sex')
 )
 track.cumulative.outcome(SHIELD.SPECIFICATION,
@@ -1357,7 +1357,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'secondary.syphilis' ,
+                         corresponding.data.outcome = 'secondary.syphilis.diagnoses' ,
                          keep.dimensions = c('location','age','race','sex')
 )
 track.cumulative.outcome(SHIELD.SPECIFICATION,
@@ -1371,9 +1371,28 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'ps.syphilis' ,
+                         corresponding.data.outcome = 'ps.syphilis.diagnses' ,
                          keep.dimensions = c('location','age','race','sex')
 )
+
+### CNS diagnoses ---- 
+#(all cases are symptomatic: no misclassification)
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'diagnosis.cns',
+                      subset.dimension.values = list(stage='cns'),
+                      outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals with a Diagnosis of CNS Syphilis in the Past Year',
+                                                                 description = 'Number of Individuals with a Diagnosis of CNS Syphilis in the Past Year',
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      scale='non.negative.number',
+                      dynamic.quantity.name = 'remission.from', #where they come from
+                      corresponding.data.outcome = 'cns.syphilis.diagnoses',
+                      keep.dimensions = c('location','age','race','sex','stage')
+)
+
+### Early/Late Latent diagnoses ----
 # Tertiary diagnosis (all cases are symptomatic: no misclassification)
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.tertiary',
@@ -1388,23 +1407,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          scale='non.negative.number',
                          keep.dimensions = c('location','age','race','sex')
 )
-# CNS diagnosis (all cases are symptomatic: no misclassification)
-track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name = 'diagnosis.cns',
-                      subset.dimension.values = list(stage='cns'),
-                      outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals with a Diagnosis of CNS Syphilis in the Past Year',
-                                                                 description = 'Number of Individuals with a Diagnosis of CNS Syphilis in the Past Year',
-                                                                 scale = 'non.negative.number',
-                                                                 axis.name = 'Cases',
-                                                                 units = 'cases',
-                                                                 singular.unit = 'case'),
-                      scale='non.negative.number',
-                      dynamic.quantity.name = 'remission.from', #where they come from
-                      corresponding.data.outcome = 'neurosyphilis',
-                      keep.dimensions = c('location','age','race','sex','stage')
-)
-
-# Early Latent Syphilis: True Estimate
+# Early Latent Syphilis: True Estimate 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.el.true',
                          value = expression(diagnosis.total),
@@ -1416,10 +1419,10 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'early.syphilis',
+                         corresponding.data.outcome = 'early.syphilis.diagnoses',
                          keep.dimensions = c('location','age','race','sex')
 )
-# Late Latent Syphilis: True Estimate
+### Late Latent Syphilis: True Estimate 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.ll.true', 
                          value = expression(diagnosis.total),
@@ -1431,7 +1434,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis', 
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', 
                          keep.dimensions = c('location','age','race','sex')
 )
 # Early Latent Syphilis: Misclassified Estimate reported
@@ -1447,7 +1450,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          force.dim.names.to.keep.dimensions = T,
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'early.syphilis',
+                         corresponding.data.outcome = 'early.syphilis.diagnoses',
                          keep.dimensions = c('location','age','race','sex')
 )
 
@@ -1463,7 +1466,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis',#these also include tertiary, cns and unknown duration
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#these also include tertiary, cns and unknown duration
                          keep.dimensions = c('location','age','race','sex')
 )
 
@@ -1479,7 +1482,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis',#these also include tertiary, cns and unknown duration
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#these also include tertiary, cns and unknown duration
                          keep.dimensions = c('location','age','race','sex')
 )
 
@@ -1494,11 +1497,12 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis',
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',
                          keep.dimensions = c('location','age','race','sex')
 )
 
-##---- Congenital Diagnosis -----
+
+### Congenital Diagnoses -----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name='diagnosis.congenital',
                       groups = 'infected',
@@ -1516,7 +1520,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                           prp.prenatal.care.third.trimester * rr.congenital.syphilis.prenatal.care.third.trimester +
                           prp.no.prenatal.care * rr.congenital.syphilis.no.prenatal.care    ) ), #prp of preg that pass on congenital syphilis
                       dynamic.quantity.name = 'births.from',  #model has an internal definition for births  #births from is conditional on parent's characteristics
-                      corresponding.data.outcome = 'congenital.syphilis',
+                      corresponding.data.outcome = 'congenital.syphilis.diagnoses',
                       save=T,
                       keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well
 )
@@ -1681,7 +1685,7 @@ print('SHIELD specification sourced successfully!')
 cat('*** Shield_specification.R completed! ***\n')
 
 
-#next steps: 
+#next steps ----
 #'@PK: do we want to model miscarriages due to untreated syphilis? 
 #'@PK: do we want to model deaths among infants born with congenital syphilis?
 #'@PK: should we include population sie before 2010 (we dont have city level data)
