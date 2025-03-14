@@ -182,7 +182,7 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
 
 #-- REGISTER FULL CALIBRATION WITH COVID-RELATED --#
 register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
-                          likelihood.instructions = FULL.likelihood.instructions.with.covid,
+                          likelihood.instructions = FINAL.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
