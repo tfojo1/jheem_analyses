@@ -8,7 +8,7 @@ if (length(args)<6) {
 
 version = args[1]
 location = args[2]
-calibration.codes = args[3]
+calibration.codes = unlist(strsplit(args[3], "__"))
 chain = as.numeric(args[4])
 specification.path = args[4]
 register.calibration.path = args[5]

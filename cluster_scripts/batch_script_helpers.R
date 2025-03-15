@@ -159,7 +159,7 @@ make.multiphase.scripts <- function(locations,
                                partition=partition,
                                time.hours = 36,
                                account=account,
-                               commands = paste("Rscript cluster_scripts/do_multiphase_calibration.R", version, location, calibration.codes, chain, specification.path, register.calibration.path))
+                               commands = paste("Rscript cluster_scripts/do_multiphase_calibration.R", version, location, paste(calibration.codes, collapse="__"), chain, specification.path, register.calibration.path))
         }
     }
 }

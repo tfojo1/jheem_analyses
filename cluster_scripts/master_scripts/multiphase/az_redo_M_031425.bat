@@ -1,6 +1,12 @@
 #!/bin/bash
 
-sbatch cluster_scripts/multiphase_scripts/ehe/C.35620/multiphase_pop.ehe__trans.ehe__full.ehe1.bat
+[[1]]
+[1] "a" "b"
+
+[[1]]
+[1] "a" "b"
+
+e/C.35620/multiphase_pop.ehe__trans.ehe__full.ehe1.bat
 sbatch cluster_scripts/multiphase_scripts/ehe/C.33100/multiphase_pop.ehe__trans.ehe__full.ehe1.bat
 sbatch cluster_scripts/multiphase_scripts/ehe/C.31080/multiphase_pop.ehe__trans.ehe__full.ehe1.bat
 sbatch cluster_scripts/multiphase_scripts/ehe/C.12060/multiphase_pop.ehe__trans.ehe__full.ehe1.bat
