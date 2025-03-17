@@ -1,17 +1,21 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = CHICAGO.MSA
+LOCATION = BALTIMORE.MSA
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANSMISSION, # 2
                              CALIBRATION.CODE.FULL.PLUS.COVID, # 3
                              CALIBRATION.CODE.EHE.FINAL # 4
-                             )[1:3]
+                             )[c(3,4)]
 
 #CALIBRATION.CODE.TO.RUN = CALIBRATION.CODES.TO.RUN
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
-{
+{   
+    simset = NULL
+
+    gc()
+    
     set.seed(12345)
     
     print(paste0("Setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
@@ -57,7 +61,5 @@ for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
     # 
     save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",Sys.Date(),"_",LOCATION,".Rdata"))
     
-    simset = NULL
-    
-    gc()
+
 }
