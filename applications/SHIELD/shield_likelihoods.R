@@ -176,6 +176,7 @@ ps.diagnosis.likelihood.instructions =
                                        error.variance.type = 'cv'
   )
 ##---- EARLY ----
+#MISCLASSIFICATION ERROR 
 early.diagnosis.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "early.syphilis", 
                                        outcome.for.sim = "diagnosis.el.misclassified",
