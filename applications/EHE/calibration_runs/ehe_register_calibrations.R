@@ -7,6 +7,7 @@ CALIBRATION.CODE.POPULATION = 'pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'trans.ehe'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.ehe'
 CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
+CALIBRATION.CODE.EHE.FINAL.EXP.V = 'final.ehe.expv'
 CALIBRATION.CODE.EHE.FINAL.2x = 'final.ehe.2x'
 CALIBRATION.CODE.EHE.FINAL.4x = 'final.ehe.4xs'
 CALIBRATION.CODE.EHE.FINAL.8x = 'final.ehe.8x'
@@ -159,7 +160,9 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
 
 #-- REGISTER FULL CALIBRATION WITH COVID-RELATED --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
-                          likelihood.instructions = FULL.likelihood.instructions.with.covid,
+                          #likelihood.instructions = FULL.likelihood.instructions.with.covid,
+                          likelihood.instructions = FINAL.2x.likelihood.instructions,
+                          special.case.likelihood.instructions = list(C.33100=FINAL.32x.likelihood.instructions),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -187,7 +190,24 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
 
 #-- REGISTER FINAL CALIBRATION --#
 register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
-                          likelihood.instructions = FINAL.likelihood.instructions,
+                          likelihood.instructions = FINAL.2x.likelihood.instructions,
+                          special.case.likelihood.instructions = list(C.33100=FINAL.32x.likelihood.instructions),
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FINAL, 
+                          thin = 500, 
+                          n.chains = 4,
+                          n.burn = ifelse(RUNNING.ON.DESKTOP, 0, floor(N.ITER.FINAL/2)),
+                          is.preliminary = F,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.PLUS.COVID),
+                          description = "FULL RUN"
+)
+
+#-- REGISTER FINAL CALIBRATION --#
+register.calibration.info(CALIBRATION.CODE.EHE.FINAL.EXP.V,
+                          likelihood.instructions = FINAL.exp.v.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 

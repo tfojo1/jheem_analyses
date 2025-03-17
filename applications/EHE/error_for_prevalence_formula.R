@@ -42,6 +42,7 @@ ggplot(df, aes(n, se)) + geom_point()
 ggplot(df, aes(log(n), log(se))) + geom_point()
 ggplot(df, aes(se, calc.se)) + geom_point()
 
+print(paste0("Exponent of variance from regression = ", exp.of.variance))
 
 coefs = lm(log(se) ~ log(n), data=df)$coefficients
 
