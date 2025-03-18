@@ -275,11 +275,22 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     # take the OR of borrowing needles from table 2 of 
     # https://pubmed.ncbi.nlm.nih.gov/9489050/
     # as an RR
-    msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    black.msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    black.msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    black.msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    black.msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
     
+    hispanic.msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    hispanic.msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    hispanic.msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    hispanic.msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    
+    other.msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    other.msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    other.msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    other.msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+
+
     #-- Age Susceptibility --#
     
     # MSM Susceptibility by Age
@@ -768,27 +779,27 @@ EHE.SUPPRESSION.PRIOR = distributions::join.distributions(
     age4.suppressed.or = Lognormal.Distribution(0, log(2)),
     age5.suppressed.or = Lognormal.Distribution(0, log(2)),
     
-    heterosexual.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    heterosexual.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                                   5),
-    msm.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) / 5),
-    idu.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) / 5),
-    msm.idu.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    msm.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) / 5),
+    idu.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) / 5),
+    msm.idu.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                              5),
     
-    black.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    black.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                            5),
-    hispanic.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    hispanic.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                               5),
     
-    age1.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    age1.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                           5),
-    age2.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    age2.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                         5),
-    age3.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    age3.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                         5),
-    age4.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    age4.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                           5),
-    age5.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(2) /
+    age5.suppressed.slope.or = Lognormal.Distribution(0, 0.5 * log(1.5) /
                                                           5)
 )
 
@@ -1217,11 +1228,25 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     
     female.vs.heterosexual.male.idu.susceptibility = 'female.vs.heterosexual.male.idu.susceptibility.rr',
     
-    msm.idu.transmission = c(
-      'msm.idu.susceptibility.rr.peak',
-      'msm.idu.susceptibility.rr.0',
-      'msm.idu.susceptibility.rr.1',
-      'msm.idu.susceptibility.rr.2'
+    black.msm.idu.transmission = c(
+      'black.msm.idu.susceptibility.rr.peak',
+      'black.msm.idu.susceptibility.rr.0',
+      'black.msm.idu.susceptibility.rr.1',
+      'black.msm.idu.susceptibility.rr.2'
+    ),
+    
+    other.msm.idu.transmission = c(
+      'other.msm.idu.susceptibility.rr.peak',
+      'other.msm.idu.susceptibility.rr.0',
+      'other.msm.idu.susceptibility.rr.1',
+      'other.msm.idu.susceptibility.rr.2'
+    ),
+    
+    hispanic.msm.idu.transmission = c(
+      'hispanic.msm.idu.susceptibility.rr.peak',
+      'hispanic.msm.idu.susceptibility.rr.0',
+      'hispanic.msm.idu.susceptibility.rr.1',
+      'hispanic.msm.idu.susceptibility.rr.2'
     ),
 
     idu.age.susceptibility.01 = c(
