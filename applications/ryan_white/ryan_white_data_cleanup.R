@@ -17,8 +17,7 @@ if (nrow(melted)>0)
                                                     year=as.character(melted$year[i])),
                             allow.na.to.overwrite = T,
                             url = "https://nastad.org/adap-monitoring-project",
-                            details = "NASTAD PDF Reports", 
-                            is.removal = T)
+                            details = "NASTAD PDF Reports")
       
       RW.DATA.MANAGER$put(data = as.numeric(NA),
                           outcome='adap.suppressed.proportion.of.diagnosed', 
@@ -28,8 +27,7 @@ if (nrow(melted)>0)
                                                   year=as.character(melted$year[i])),
                           allow.na.to.overwrite = T,
                           url = "https://nastad.org/adap-monitoring-project",
-                          details = "NASTAD PDF Reports", 
-                          is.removal = T)
+                          details = "NASTAD PDF Reports")
     }
 }
 
@@ -279,3 +277,4 @@ for (strat in strats.to.do)
 
 
 save(RW.DATA.MANAGER, file='../../cached/ryan.white.data.manager.rdata')
+save(RW.DATA.MANAGER, file="Q:/data_managers/ryan.white.data.manager.rdata")
