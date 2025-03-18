@@ -235,7 +235,8 @@ total.new.diagnoses.likelihood.instructions =
                                        error.variance.type = 'cv',
                                        minimum.error.sd = 1,
                                        weights = (2*POPULATION.WEIGHT),
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = T,
+                                       name = 'total.new'
   )
 
 race.risk.new.diagnoses.likelihood.instructions = 
@@ -278,7 +279,8 @@ total.new.diagnoses.16x.cv.expv.likelihood.instructions =
                                        error.variance.type = c('cv','exp.of.variance'),
                                        minimum.error.sd = 1,
                                        weights = (16), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = T,
+                                       name = 'total.new'
   )
 
 total.new.diagnoses.4x.cv.expv.likelihood.instructions = 
@@ -292,7 +294,8 @@ total.new.diagnoses.4x.cv.expv.likelihood.instructions =
                                        error.variance.type = c('cv','exp.of.variance'),
                                        minimum.error.sd = 1,
                                        weights = (4), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = T,
+                                       name = 'total.new'
   )
 
 new.diagnoses.halfx.cv.expv.likelihood.instructions = 
@@ -336,7 +339,8 @@ total.prevalence.likelihood.instructions =
                                        error.variance.type = c('cv'), #,'exp.of.variance'), 
                                        minimum.error.sd = 1,
                                        weights = (2*POPULATION.WEIGHT),
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = T,
+                                       name = 'total.prevalence'
   )
 
 race.risk.prevalence.likelihood.instructions = 
@@ -379,7 +383,8 @@ total.prevalence.16x.cv.expv.likelihood.instructions =
                                        error.variance.type = c('cv','exp.of.variance'),
                                        minimum.error.sd = 1,
                                        weights = (16), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = T,
+                                       name = 'total.prevalence'
   )
 
 total.prevalence.4x.cv.expv.likelihood.instructions = 
@@ -393,7 +398,8 @@ total.prevalence.4x.cv.expv.likelihood.instructions =
                                        error.variance.type = c('cv','exp.of.variance'),
                                        minimum.error.sd = 1,
                                        weights = (4), #list(0.3), # see prev_new_aware_weighting.R 
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = T,
+                                       name = 'total.prevalence'
   )
 
 prevalence.halfx.cv.and.exp.v.likelihood.instructions = 
@@ -610,7 +616,68 @@ suppression.likelihood.instructions =
   )
 
 
-total.suppression.4x.basic.likelihood.instructions = 
+suppression.halfx.basic.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "suppression",
+                                       outcome.for.sim = "suppression",
+                                       
+                                       dimensions = c("age","sex","race","risk"),
+                                       
+                                       levels.of.stratification = c(0,1), 
+                                       from.year = 2008, 
+                                       
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.type = 'sd',
+                                       
+                                       weights = (1/2),
+                                       equalize.weight.by.year = T
+  )
+
+suppression.halfx.nested.likelihood.instructions = 
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
+                                                   outcome.for.sim = "suppression",
+                                                   denominator.outcome.for.data = 'diagnosed.prevalence',
+                                                   
+                                                   location.types = c('CBSA', 'STATE', 'COUNTY'), 
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   location.stratum.keep.threshold = 2, # default
+                                                   
+                                                   dimensions = c("age","sex","race","risk"),
+                                                   
+                                                   levels.of.stratification = c(0,1), 
+                                                   from.year = 2008, 
+                                                   
+                                                   p.bias.inside.location = suppression.bias.estimates$in.mean, 
+                                                   p.bias.outside.location = suppression.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = suppression.bias.estimates$in.sd,
+                                                   p.bias.sd.outside.location = suppression.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry', 
+                                                   p.error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
+                                                   p.error.variance.type = 'sd',
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = (1/2),
+                                                   equalize.weight.by.year = T
+  )
+
+suppression.halfx.likelihood.instructions = 
+  create.location.based.ifelse.likelihood.instructions(
+    suppression.halfx.basic.likelihood.instructions,
+    suppression.halfx.nested.likelihood.instructions,
+    locations.list = list(c(RIVERSIDE.MSA,
+                            MIAMI.MSA,
+                            LA.MSA,
+                            VEGAS.MSA,
+                            SAN.DIEGO.MSA)) # first list - first instructions; anything not in first list will use second instructions
+    
+  )
+
+total.suppression.6x.basic.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "suppression",
                                        outcome.for.sim = "suppression",
                                        
@@ -623,11 +690,12 @@ total.suppression.4x.basic.likelihood.instructions =
                                        error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
                                        error.variance.type = 'sd',
                                        
-                                       weights = (4),
-                                       equalize.weight.by.year = T
+                                       weights = (6),
+                                       equalize.weight.by.year = T,
+                                       name = 'total.suppression'
   )
 
-total.suppression.4x.nested.likelihood.instructions = 
+total.suppression.6x.nested.likelihood.instructions = 
   create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
                                                    outcome.for.sim = "suppression",
                                                    denominator.outcome.for.data = 'diagnosed.prevalence',
@@ -655,16 +723,18 @@ total.suppression.4x.nested.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = (4),
-                                                   equalize.weight.by.year = T
+                                                   weights = (6),
+                                                   equalize.weight.by.year = T,
+                                                   name = 'total.suppression'
   )
 
-total.suppression.4x.likelihood.instructions = 
+total.suppression.6x.likelihood.instructions = 
   create.ifelse.likelihood.instructions(
-    total.suppression.4x.nested.likelihood.instructions,
-    total.suppression.4x.basic.likelihood.instructions,
+    total.suppression.6x.nested.likelihood.instructions,
+    total.suppression.6x.basic.likelihood.instructions,
     name = 'total.suppression'
   )
+
 
 #-- AIDS DEATHS  ----
 # in the data, this is the cumulative estimate of aids.diagnoses.deceased.by.2001 from 1980-2001 
@@ -1326,7 +1396,7 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
   )
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
-FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
+FULL.likelihood.instructions.32x.new.prev.12x.supp = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions.full, 
   immigration.likelihood.instructions.full, 
@@ -1338,6 +1408,47 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   total.prevalence.16x.cv.expv.likelihood.instructions,
   prevalence.halfx.cv.and.exp.v.likelihood.instructions,
 
+  # MORTALITY LIKELIHOODS
+  hiv.mortality.likelihood.instructions.full,
+  general.mortality.likelihood.instructions.full,
+  aids.deaths.likelihood.instructions.full,
+  
+  # AIDS DIAGNOSES LIKELIHOOD
+  non.age.aids.diagnoses.likelihood.instructions.full,
+  
+  # CONTINUUM LIKELIHOODS
+  proportion.tested.likelihood.instructions,
+  hiv.test.positivity.likelihood.instructions, 
+  awareness.likelihood.instructions,
+  total.suppression.6x.likelihood.instructions,
+  suppression.halfx.likelihood.instructions,
+  
+  # PREP LIKELIHOODS
+  prep.uptake.likelihood.instructions,
+  prep.indications.likelihood.instructions,
+  
+  # IDU LIKELIHOODS
+  heroin.likelihood.instructions.full,
+  cocaine.likelihood.instructions.full,
+  
+  # COVID LIKELIHOODS
+  number.of.tests.year.on.year.change.likelihood.instructions,
+  gonorrhea.year.on.year.change.likelihood.instructions,
+  ps.syphilis.year.on.year.change.likelihood.instructions
+)
+
+FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
+  # POPULATION LIKELIHOODS
+  population.likelihood.instructions.full, 
+  immigration.likelihood.instructions.full, 
+  emigration.likelihood.instructions.full,
+  
+  # TRANSMISSION LIKELIHOODS
+  total.new.diagnoses.16x.cv.expv.likelihood.instructions,
+  new.diagnoses.halfx.cv.expv.likelihood.instructions,
+  total.prevalence.16x.cv.expv.likelihood.instructions,
+  prevalence.halfx.cv.and.exp.v.likelihood.instructions,
+  
   # MORTALITY LIKELIHOODS
   hiv.mortality.likelihood.instructions.full,
   general.mortality.likelihood.instructions.full,
@@ -1365,6 +1476,7 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   gonorrhea.year.on.year.change.likelihood.instructions,
   ps.syphilis.year.on.year.change.likelihood.instructions
 )
+
 
 FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
