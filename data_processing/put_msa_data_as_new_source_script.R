@@ -1,5 +1,6 @@
 # Implementing the county aggregation with the NA suppressed values being estimated
 
+#' @param override.insufficent.denom.data.constraints Setting this to TRUE will lead to aggregating data even when denominator data can't be found for all the counties in an MSA. In other words, this will assume that counties without denominator data are not major contributors to the overall MSA proportion.
 put.msa.data.as.new.source = function(outcome,
                                       years = NULL,
                                       from.source.name,
@@ -14,7 +15,8 @@ put.msa.data.as.new.source = function(outcome,
                                       ontology.for.denominator=NULL,
                                       maximum.suppressed.value = 4,
                                       tolerable.fraction.suppressed = 0.05,
-                                      tolerable.fraction.suppressed.in.denominator = 0.1) {
+                                      tolerable.fraction.suppressed.in.denominator = 0.1,
+                                      override.insufficent.denom.data.constraints=F) {
     # browser()
     error.prefix = "Cannot estimate data from contained location data: "
     # validate if desired
@@ -46,7 +48,7 @@ put.msa.data.as.new.source = function(outcome,
     }
     
     for (to.location in to.locations) {
-        # browser()
+        
         from.locations = locations::get.contained.locations(to.location, geographic.type.from)
         for (ont.name in names(outcome.data.all.ontologies)) {
             
@@ -115,13 +117,17 @@ put.msa.data.as.new.source = function(outcome,
                     if (!(strat.name %in% names(denominator.data.used.ontology))) next
                     denominator.data = denominator.data.used.ontology[[strat.name]]
 
-                    # We must have denominator data for all counties, not true for proportion data
-                    if(length(setdiff(from.locations, dimnames(denominator.data)$location))>0) next
+                    # We must have denominator data for all counties, not true for proportion data. If we're ignoring this, we still need to have the locations we prop data has.
+                    if (!override.insufficent.denom.data.constraints && length(setdiff(from.locations, dimnames(denominator.data)$location))>0) next
+                    if (override.insufficent.denom.data.constraints && length(intersect(from.locations.present, dimnames(denominator.data)$location))==0) next
 
                     years.in.this.denom.data = intersect(dimnames(denominator.data)$year, years.in.this.strat.data)
                     if (length(years.in.this.denom.data)==0) next
                     
-                    denominator.data.from.locs.only = do.call('[', get.subset.arguments(denominator.data, years.in.this.denom.data, from.locations))
+                    if (override.insufficent.denom.data.constraints)
+                        denominator.data.from.locs.only = do.call('[', get.subset.arguments(denominator.data, years.in.this.denom.data, from.locations.present))
+                    else
+                        denominator.data.from.locs.only = do.call('[', get.subset.arguments(denominator.data, years.in.this.denom.data, from.locations))
                     if (is.null(denominator.data.from.locs.only)) next
                     if (all(is.na(denominator.data.from.locs.only))) next
                     
