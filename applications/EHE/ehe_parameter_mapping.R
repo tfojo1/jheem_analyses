@@ -409,17 +409,24 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     for (i in 1:length(trate.alpha.times))
     {
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
-                                                                      alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                                      values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
-                                                                      applies.to.dimension.values = 'msm',
-                                                                      dimension = 'sex.to')
-      
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.trates',
-                                                                      alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                                      values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
-                                                                      applies.to.dimension.values = idu.states,
-                                                                      dimension = 'risk.to')
+        alpha.name = paste0('rate.', trate.alpha.times[i])
+        for (race in races)
+        {
+            param.value = parameters[paste0(race, '.msm.idu.susceptibility.rr.', trate.parameter.times[i])]
+            set.element.functional.form.interaction.alphas(model.settings,
+                                                           element.name = "idu.trates",
+                                                           alpha.name = alpha.name,
+                                                           value = param.value,
+                                                           applies.to.dimension.values = list(sex.to= 'msm',
+                                                                                              race.to = race))
+          
+            set.element.functional.form.interaction.alphas(model.settings,
+                                                           element.name = "msm.trates",
+                                                           alpha.name = alpha.name,
+                                                           value = param.value,
+                                                           applies.to.dimension.values = list(risk.to = idu.states,
+                                                                                              race.to = race))
+        }
         
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
                                                                       alpha.name = paste0('rate.', trate.alpha.times[i]),
@@ -1132,6 +1139,8 @@ set.ehe.idu.from.parameters = function(model.settings,
     specification.metadata = model.settings$specification.metadata
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
+    sexes = specification.metadata$dim.names$sex
+    sexes.for.params = gsub("_", ".", sexes)
     
     for (time in times)
     {
@@ -1158,11 +1167,11 @@ set.ehe.idu.from.parameters = function(model.settings,
         #                                                               applies.to.dimension.values = 1, # first age only 
         #                                                               dimensions = 'age')
         
-        param.name = paste0('msm.incident.idu.multiplier.', time)
+        param.names = paste0(sexes.for.params, '.incident.idu.multiplier.', time)
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
                                                                       alpha.name = alpha.name,
                                                                       values = parameters[param.name],
-                                                                      applies.to.dimension.values = 'msm',
+                                                                      applies.to.dimension.values = sexes,
                                                                       dimension = 'sex')
     }
     
