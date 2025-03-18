@@ -137,5 +137,7 @@ save(data.manager, file="Q:/data_managers/ryan.white.data.manager.rdata")
 save(data.manager, file = '../../cached/ryan.white.data.manager.rdata')
 
 # Source Todd's Additional Cleaning Code ----------------------------------
+source('applications/EHE/ehe_ontology_mappings.R')
+source('applications/ryan_white/ryan_white_data_ontology_mappings.R')
 source('applications/ryan_white/ryan_white_data_cleanup.R')
 
