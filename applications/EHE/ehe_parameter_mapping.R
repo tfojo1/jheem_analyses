@@ -1170,7 +1170,7 @@ set.ehe.idu.from.parameters = function(model.settings,
         param.names = paste0(sexes.for.params, '.incident.idu.multiplier.', time)
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
                                                                       alpha.name = alpha.name,
-                                                                      values = parameters[param.name],
+                                                                      values = parameters[param.names],
                                                                       applies.to.dimension.values = sexes,
                                                                       dimension = 'sex')
     }
