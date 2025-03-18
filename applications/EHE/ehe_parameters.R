@@ -728,7 +728,7 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     # Suppression
     # parameter: max.covid.effect.suppression.of.diagnosed.reduction
-    max.covid.effect.suppression.of.diagnosed.reduction = Lognormal.Distribution(0, .5*log(1.1)),
+    max.covid.effect.suppression.of.diagnosed.reduction = Lognormal.Distribution(0, .5*log(1.04)),
     
     # IDU
     # parameter: max.covid.effect.idu.transmission.reduction

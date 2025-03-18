@@ -34,6 +34,7 @@ calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.exponent.of.var
 calculate.lhd.error.terms("diagnosed.prevalence", output='exponent.of.variance')
 calculate.lhd.error.terms("diagnosed.prevalence", output='cv.sqrt')
 calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.cv.sqrt')
+calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.fixed.exponent.of.variance',PREVALENCE.EXP.OF.VAR)
 # OLD VALUE: 0.04711922 --> NO LONGER GETTING THIS, NOW GETTING 0.03623443??
 calculate.error.terms(data.type = "diagnosed.prevalence",
                       data.source.1 = "cdc.surveillance.reports",
@@ -78,7 +79,9 @@ calculate.lhd.error.terms = function(data.type,
                                               'exponent.of.variance',
                                               'cv.and.exponent.of.variance',
                                               'cv.and.exponent.of.variance.eq.1',
-                                              'cv.sqrt')[1]){
+                                              'cv.sqrt')[1],
+                                     fixed.exp.of.var=NA,
+                                     verbose = T){
   lhd.data = read.csv("input_managers/LHD_Diagnoses_and_Diagnosed_Prevalence.csv")
 
   # iffy ones for prevalence
@@ -94,31 +97,29 @@ calculate.lhd.error.terms = function(data.type,
   
   
   if(data.type=="diagnoses"){
-    all.values1 = as.numeric(lhd.data$LHD.New.Diganoses)
-    all.values2 = as.numeric(lhd.data$Atlas.Plus.Summed.New.Diagnoses..Data.Manager.)
+    all.values1 = suppressWarnings(as.numeric(lhd.data$LHD.New.Diganoses))
+    all.values2 = suppressWarnings(as.numeric(lhd.data$Atlas.Plus.Summed.New.Diagnoses..Data.Manager.))
     
   } else if(data.type=="diagnosed.prevalence"){
-    all.values1 = as.numeric(lhd.data$LHD.Diagnosed.Prevalence)
-    all.values2 = as.numeric(lhd.data$Atlas.Plus.Summed.Prevalence..Data.Manager.)    
+    all.values1 = suppressWarnings(as.numeric(lhd.data$LHD.Diagnosed.Prevalence))
+    all.values2 = suppressWarnings(as.numeric(lhd.data$Atlas.Plus.Summed.Prevalence..Data.Manager.))
   } else 
     stop("only set up for diagnoses and diagnosed prevalence")
 
   x1 = all.values1
   e1 = all.values2 - all.values1
   cvs.1 = e1/all.values1 
-  #names(cvs.1) = lhd.data$MSA
-  mask = all.values1>100
+  mask = !is.na(all.values1) & all.values1>100
   x1 = x1[mask]
   e1 = e1[mask]
   cvs.1 = cvs.1[mask]
   
   #sort(abs(cvs.1))
-  print(sum(!is.na(cvs.1)))
   
   x2 = all.values2
   e2 = all.values1 - all.values2
   cvs.2 = e2/all.values2
-  mask = all.values2>100
+  mask = !is.na(all.values2) & all.values2>100
   x2 = x2[mask]
   e2 = e2[mask]
   cvs.2 = cvs.2[mask]
@@ -136,10 +137,24 @@ calculate.lhd.error.terms = function(data.type,
   x = x[keep.mask]
   e = e[keep.mask]
   
-   do.calculate.variance.parameters(e=e, x=x, output=output)
+  # cv.sd = sd(cvs)
+  # cv.mean = mean(cvs)
+  # reject.gt.z = qnorm(1-1/length(cvs), 0, 1)
+  # cvs.z = (cvs-cv.mean)/cv.sd
+  # reject.mask = abs(cvs.z) > reject.gt.z
+  # 
+  # cvs = cvs[!reject.mask]
+  # e = e[!reject.mask]
+  # x = x[!reject.mask]
+    
+    if (verbose)
+      print(paste0("N observations = ", length(cvs)/2))
+
+  
+   do.calculate.variance.parameters(e=e, x=x, output=output, fixed.exp.of.var=fixed.exp.of.var, verbose=verbose)
 }
 
-do.calculate.variance.parameters <- function(e, x, output, verbose=T)
+do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, verbose=T)
 {
   mask = !is.na(e) & !is.na(x)
   e = e[mask]
@@ -206,6 +221,21 @@ do.calculate.variance.parameters <- function(e, x, output, verbose=T)
     
     exponent.of.variance
   }
+  else if (output=='cv.and.fixed.exponent.of.variance')
+  {
+    optimize.result = optimize(
+      f = function(v){
+        sum(dnorm(e, mean=0, sd=sqrt(x^(2*fixed.exp.of.var) + (v*x)^2), log=T))
+      },
+      interval = c(0,1),
+      maximum = T)
+    
+    cv = as.numeric(optimize.result$maximum)
+    log.l = sum(dnorm(e, mean=0, sd=sqrt(x^(2*fixed.exp.of.var) + (cv*x)^2), log=T))
+    print(paste0("With exponent.of.variance fixed to = ", fixed.exp.of.var, "and cv = ", cv, ", log L = ", log.l))
+    
+    cv
+  }
   else if (output=='cv.and.exponent.of.variance.eq.1')
   {
     optimize.result = optimize(
@@ -217,7 +247,7 @@ do.calculate.variance.parameters <- function(e, x, output, verbose=T)
     
     cv = as.numeric(optimize.result$maximum)
     log.l = sum(dnorm(e, mean=0, sd=sqrt(x + (cv*x)^2), log=T))
-    print(paste0("With exponent.of.variance = 0.5 and cv = ", cv, ", log L = ", log.l))
+    print(paste0("With exponent.of.variance fixed to = 0.5 and cv = ", cv, ", log L = ", log.l))
     
     cv
   }
@@ -281,7 +311,8 @@ calculate.error.terms = function(data.type,
                                  use.risk = T,
                                  use.sex = T,
                                  use.race = F,
-                                 output='cv'){
+                                 output='cv',
+                                 fixed.exp.of.var=NA){
   
   all.values1 = numeric()
   all.values2 = numeric()
@@ -398,7 +429,7 @@ if(use.risk){
     x = x[!outliers.mask]
     errors = errors[!outliers.mask]
 
-    do.calculate.variance.parameters(e = errors, x = x, output=output)
+    do.calculate.variance.parameters(e = errors, x = x, fixed.exp.of.var=fixed.exp.of.var, output=output)
 }
 
 

@@ -14,8 +14,8 @@ PREVALENCE.ERROR.TERM = 0.08384422 # for prevalence and hiv.mortality; from calc
 
 DIAGNOSES.CV = 0.03331971 #from calculating_error_terms_for_ehe_likelihoods.R - calculate.lhd.error.terms("diagnoses", output='cv.and.exponent.of.variance')
 DIAGNOSES.EXP.OF.VAR = 0.3893292 #from calculating_error_terms_for_ehe_likelihoods.R - calculate.lhd.error.terms("diagnoses", output='cv.and.exponent.of.variance')
-PREVALENCE.CV = 0.08384422 #from calculating_error_terms_for_ehe_likelihoods.R - calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.exponent.of.variance') --> zeroes out the exp of variance
-PREVALENCE.EXP.OF.VAR = 0.589321036824478 #from error_for_prevalence_formula.R
+PREVALENCE.CV = 0.07956432 #from calculating_error_terms_for_ehe_likelihoods.R - calculate.lhd.error.terms("diagnosed.prevalence", output='cv.and.fixed.exponent.of.variance',PREVALENCE.EXP.OF.VAR)
+PREVALENCE.EXP.OF.VAR = 0.590671901063418 #from error_for_prevalence_formula.R
   
 #-- BIAS ESTIMATES FOR NESTED PROPORTIONS  ----
 suppression.bias.estimates = get.cached.object.for.version(name = "suppression.bias.estimates", 
@@ -609,6 +609,62 @@ suppression.likelihood.instructions =
                         
   )
 
+
+total.suppression.4x.basic.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.data = "suppression",
+                                       outcome.for.sim = "suppression",
+                                       
+                                       dimensions = character(),
+                                       
+                                       levels.of.stratification = 0, 
+                                       from.year = 2008, 
+                                       
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
+                                       error.variance.type = 'sd',
+                                       
+                                       weights = (4),
+                                       equalize.weight.by.year = T
+  )
+
+total.suppression.4x.nested.likelihood.instructions = 
+  create.nested.proportion.likelihood.instructions(outcome.for.data = "suppression",
+                                                   outcome.for.sim = "suppression",
+                                                   denominator.outcome.for.data = 'diagnosed.prevalence',
+                                                   
+                                                   location.types = c('CBSA', 'STATE', 'COUNTY'), 
+                                                   minimum.geographic.resolution.type = 'COUNTY',
+                                                   location.stratum.keep.threshold = 2, # default
+                                                   
+                                                   dimensions = character(),
+                                                   
+                                                   levels.of.stratification = c(0), 
+                                                   from.year = 2008, 
+                                                   
+                                                   p.bias.inside.location = suppression.bias.estimates$in.mean, 
+                                                   p.bias.outside.location = suppression.bias.estimates$out.mean,
+                                                   p.bias.sd.inside.location = suppression.bias.estimates$in.sd,
+                                                   p.bias.sd.outside.location = suppression.bias.estimates$out.sd,
+                                                   
+                                                   within.location.p.error.correlation = 0.5,
+                                                   within.location.n.error.correlation = 0.5,
+                                                   
+                                                   observation.correlation.form = 'compound.symmetry', 
+                                                   p.error.variance.term = 0.04560282, # from calculating_error_terms_for_ehe_likelihoods.R
+                                                   p.error.variance.type = 'sd',
+                                                   
+                                                   partitioning.function = EHE.PARTITIONING.FUNCTION, 
+                                                   
+                                                   weights = (4),
+                                                   equalize.weight.by.year = T
+  )
+
+total.suppression.4x.likelihood.instructions = 
+  create.ifelse.likelihood.instructions(
+    total.suppression.4x.nested.likelihood.instructions,
+    total.suppression.4x.basic.likelihood.instructions,
+    name = 'total.suppression'
+  )
 
 #-- AIDS DEATHS  ----
 # in the data, this is the cumulative estimate of aids.diagnoses.deceased.by.2001 from 1980-2001 
