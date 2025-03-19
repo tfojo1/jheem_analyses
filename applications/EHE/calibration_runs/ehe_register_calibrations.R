@@ -153,7 +153,7 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
 
 #-- REGISTER FULL CALIBRATION WITH COVID-RELATED --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
-                          likelihood.instructions = FULL.likelihood.instructions.32x.new.prev.12x.supp,
+                          likelihood.instructions = FULL.likelihood.instructions.32x.new.prev,
 #                          special.case.likelihood.instructions = list(C.33100=FULL.likelihood.instructions.32x.new.prev),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
