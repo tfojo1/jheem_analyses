@@ -16,5 +16,6 @@ applications/*.DS_Store
 .Rproj.user
 
 # ignore ignoring
+!commoncode/object_for_version_cache/*.Rdata
 !commoncode/data_manager_cache_metadata.Rdata
 !commoncode/package_version_cache.Rdata

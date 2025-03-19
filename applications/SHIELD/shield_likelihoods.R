@@ -220,6 +220,8 @@ congenital.diagnosis.likelihood.instructions =
                                        error.variance.term = 0.05, 
                                        error.variance.type = 'cv'
   )
+
+
 ##---- Total ----
 total.diagnosis.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "all.syphilis.cases",  
@@ -253,6 +255,35 @@ total.diagnosis.likelihood.instructions =
 
 
 
+##** PRENATAL CARE COVERAGE ** ----#'@Todd: the function to capture incompleteness index
+# prp.prenatal.care.first.trimester
+prenatal.care.first.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.first.trimester",  
+                                       outcome.for.sim = "prp.prenatal.care.first.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv')
+prenatal.care.second.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.second.trimester",  
+                                       outcome.for.sim = "prp.prenatal.care.second.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05,  
+                                       error.variance.type = 'cv')
+prenatal.care.third.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.third.trimester",  
+                                       outcome.for.sim = "prp.prenatal.care.third.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2010,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv')
 ##** HIV TESTS ** ----
 hiv.testing.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv", 

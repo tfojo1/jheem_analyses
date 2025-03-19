@@ -14,6 +14,10 @@ DEFAULT.STI.SCREENING.YEAR=1980 # year to start the STI screenings
 # > specification.metadata=get.specification.metadata('shield','C.12580')
 # > specification.metadata=get.specification.metadata('shield','US')
 
+# HIV testing priors from BRFSS
+# source("applications/SHIELD/inputs/input_hiv_testing_prior_brfss.R")
+# PRENATAL care coverage estiamtes from Wonder 
+# source("applications/SHIELD/inputs/input_")
 
 
 # NEXT STEPS:

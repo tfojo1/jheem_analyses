@@ -1,4 +1,4 @@
-# library(tidyverse)
+library(dplyr) 
 library(reshape2)
 
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")
@@ -6,7 +6,8 @@ source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 # CLEANING DATA -----
 clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
   load("../jheem_analyses/cached/brfss.subset.RData")
-  df <- as_tibble(appended)
+  df <- as.data.frame(appended)
+  
   rm(appended)
   
   # MSM: We calculated this variable. 
@@ -29,9 +30,9 @@ clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
   # Cleaning: 
   # Since missing data for MSM, sex, and race is less than 5%, we opted to remove NAs.
   # Data from 2020-2022 was removed to minimize the impact of COVID-19.
-  df <- df |> 
-    filter(!is.na(msm), !is.na(sex), !is.na(race), !(age=='Unknown')) |>  
-    filter(year < 2020 | year > 2022) |> 
+  df <- df%>%
+    filter(!is.na(msm), !is.na(sex), !is.na(race), !(age=='Unknown')) %>%
+    filter(year < 2020 | year > 2022) %>% 
     dplyr::select(year:race, msm, tested.past.year, weighting.var)
   
   
@@ -48,17 +49,17 @@ clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
   ##   We physically split each row in the “18–24” category into two new rows:
   ##  one row labeled “18–19” with partial weight 2/7 of the original weight
   ##  another row labeled “20–24” with partial weight 5/7 of the original weight.
-  df <- df |>
-    filter(age != "18-24 years") |>
+  df <- df %>%
+    filter(age != "18-24 years") %>%
     bind_rows(
-      df |>
-        filter(age == "18-24 years") |>
+      df %>%
+        filter(age == "18-24 years") %>%
         mutate(age = "18-19 years",
                weighting.var = weighting.var * (2/7))
-    ) |>
+    ) %>%
     bind_rows(
-      df |>
-        filter(age == "18-24 years") |>
+      df %>%
+        filter(age == "18-24 years") %>%
         mutate(age = "20-24 years",
                weighting.var = weighting.var * (5/7))
     )
@@ -83,12 +84,12 @@ clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
   ref_index <- 1 #'@Melissa: Shouldnt this start from smallest agegroup? 
   age_levels <- c(specification.metadata$dim.names$age[ref_index],
                   specification.metadata$dim.names$age[-ref_index])
-  df <- df |> 
+  df <- df %>% 
     mutate(age = factor(age, levels = age_levels))
   
   
   # RACE
-  df <- df |> 
+  df <- df %>% 
     mutate(orig_race = race)
   
   race_ontology_mapping <- get.ontology.mapping(
@@ -98,22 +99,22 @@ clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
   
   race_map <- race_ontology_mapping$get.mapping.vector()
   
-  df <- df |> 
+  df <- df %>% 
     mutate(race = race_map[tolower(orig_race)])
   
   race_levels <- union("other", specification.metadata$dim.names$race)
-  df <- df |> 
+  df <- df %>% 
     mutate(race = factor(race, levels = race_levels)) #"other" is the first (reference) category. 
   # table(df$race)
   
   # SEX
-  df <- df |>  
+  df <- df %>%
     mutate(orig_sex = sex,
            sex = case_when(
              msm == 1 ~ "msm",
              sex == "male" ~ "heterosexual_male",
              TRUE ~ sex
-           )) |> 
+           )) %>% 
     mutate(sex = factor(sex, levels = c("msm", "heterosexual_male", "female"))) #msm is the first (ref) category. 
   # table(df$sex)
   
@@ -123,12 +124,12 @@ clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
   # scale of the year variable by starting it from 1. 
   # This approach helps to stabilize the estimates and improve model convergence
   testing_anchor_year <- 2010 
-  df <- df |> 
+  df <- df %>% 
     mutate(year = year - testing_anchor_year) # year range: 4-9
   
   # table(df$age): no data for 0-14 and 15-19 age groups. 
   # drop unused factor levels
-  df <- df |>
+  df <- df %>%
     mutate(across(c(age, race, sex), droplevels))
   
 }
@@ -183,9 +184,9 @@ get.testing.intercepts.and.slopes <- function(version,
   iterated_values <- as_tibble(get.every.combination(dim.names))
   
   # predicting with year = 0 cancels out all of the year terms --> gives you the intercepts for each stratum 
-  year0.data <- iterated_values |> 
+  year0.data <- iterated_values %>% 
     mutate(year = 0)
-  year1.data <- iterated_values |> 
+  year1.data <- iterated_values %>% 
     mutate(year = 1)
   
   # this will work, even with interaction terms as long as you use a standard linear year term (not squared, splined, etc.), 
@@ -325,6 +326,7 @@ if (1==2) {
 version = 'shield'
 location = 'C.12580'
 selected.model="three.way.interacted"
+# selected.model="one.way"
 df <- clean.brfss.data(version, location)
 
 
@@ -332,7 +334,8 @@ testing.prior <- get.testing.intercepts.and.slopes(version = version,
                                                    location = location,
                                                    model = selected.model,
                                                    df )
-
+#'@Andrew: any idea why this object is so big? I know that we have a lot of coefficient, but I still wouldnt expect it to be this big. 
+#'
 cache.object.for.version(object = testing.prior,
                          name = "hiv.testing.prior",
                          version = 'shield',
