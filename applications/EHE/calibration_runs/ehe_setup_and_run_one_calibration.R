@@ -4,17 +4,16 @@ source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibra
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 LOCATION.LIST = setdiff(MSAS.OF.INTEREST, c('C.17140','C.44180','C.12580'))
-#LOCATION.LIST = c(MIAMI.MSA, BALTIMORE.MSA, NYC.MSA, ATLANTA.MSA, HOUSTON.MSA, CHICAGO.MSA)
-#LOCATION = LOCATION.LIST[LOCATION.INDEX]
+LOCATION = LOCATION.LIST[LOCATION.INDEX]
 
 print(paste0("Running for ", LOCATION, " - ", locations::get.location.name(LOCATION)))
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANSMISSION, # 2
                              CALIBRATION.CODE.FULL.PLUS.COVID, # 3
                              CALIBRATION.CODE.EHE.FINAL # 4
-                             )[2:3]
+                             )[1:3]
 
-RESUME.FIRST = T
+RESUME.FIRST = F
 
 #CALIBRATION.CODE.TO.RUN = CALIBRATION.CODES.TO.RUN
 
