@@ -191,13 +191,13 @@ get.testing.intercepts.and.slopes <- function(df,
   #'Log-odds of -1.27 means the odds of testing in the past year are about 0.280 to 1, or the event is about 28% as likely to happen as it is to not happen.
   # The probability of testing in the past year for this baseline group (before adjusting for other predictors) is about 21.9%.
   list(intercepts = intercepts,
-       slopes = slopes,
-       fit = fit )
+       slopes = slopes )
 }
 
 
 # CHECKING MODEL PERFORMANCE ----
 checking.model.performance<- function(df, specification.metadata, selected.model) {
+  print(paste("checking model performance for ", selected.model, " model ...."))
   anchor.year= 2010
   proj.years <- 2010:2035
   #
@@ -213,8 +213,7 @@ checking.model.performance<- function(df, specification.metadata, selected.model
   testing.prior <- get.testing.intercepts.and.slopes(df = df,
                                                      specification.metadata = specification.metadata,
                                                      selected.model)
-  aic <- AIC(testing.prior$fit);print(aic)
-  
+  print("Model is fitted")
   testing.functional.form <- create.logistic.linear.functional.form(
     intercept = testing.prior$intercepts,
     slope = testing.prior$slopes,
@@ -233,7 +232,7 @@ checking.model.performance<- function(df, specification.metadata, selected.model
     sapply(dim.names$sex, function(sex) {
       sapply(dim.names$race, function(race) {
         sapply(dim.names$age, function(age) {
-          weighted.mean(df$tested.past.year[df$year == year & df$sex == sex & df$race == race & df$age == age],w=df$weighting.var)
+          weighted.mean(df$tested.past.year[df$year == year & df$sex == sex & df$race == race & df$age == age],w=df$weighting.var[df$year == year & df$sex == sex & df$race == race & df$age == age])
         })
       })
     })
@@ -247,7 +246,7 @@ checking.model.performance<- function(df, specification.metadata, selected.model
     geom_line(data = reshape2::melt(apply(values, c("age","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = age)) +
     geom_point(data = reshape2::melt(apply(brfss_means, c("age","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = age)) +
     ylim(0, 1) +
-    ggtitle(paste("Testing Projection vs. BRFSS (Age) -", selected.model,"-AIC = ",aic)) +
+    ggtitle(paste("Testing Projection vs. BRFSS (Age) -", selected.model)) +
     theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
   
   plots_race <-  ggplot() +
@@ -296,28 +295,29 @@ checking.model.performance<- function(df, specification.metadata, selected.model
            width = 10, height = 10, dpi = 300)
     print(paste0("Saved ", paste0("prelim_results/testing_prior_",selected.model,"_",PLOTS.Names[x],".jpeg")))
   })
+  print("All plots are saved")
 }
 
 
 
 # CASHING FINAL MODELS ----
-version = 'shield'
-location = 'US'
-specification.metadata <- get.specification.metadata(version = version,
-                                                     location = location)
-selected.model="three.way.interacted"
-#
+# creates a specification metadata for shield that includes all the necessary information on dimensions
+specification.metadata <- get.specification.metadata(version = 'shield', location = 'US')
+
+# reading and cleaning the BRFSS data:
 df <- clean.brfss.data(specification.metadata)
-#
-## Checking performances:
+
+## Checking performances: fitting each model takes a long time
 checking.model.performance(df,specification.metadata,selected.model = "two.way")
 checking.model.performance(df,specification.metadata,"three.way.interacted")
 checking.model.performance(df,specification.metadata,"fully.interacted")
 
-
+#fitting the final model 
+selected.model="three.way.interacted"
+print("final model is selected as three.way.interacted ....")
 testing.prior <- get.testing.intercepts.and.slopes(df = df,
                                                    specification.metadata = specification.metadata,
-                                                   model = selected.model)
+                                                   selected.model = selected.model)
 cache.object.for.version(object = testing.prior,
                          name = "hiv.testing.prior",
                          version = 'shield',
