@@ -409,24 +409,17 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     for (i in 1:length(trate.alpha.times))
     {
-        alpha.name = paste0('rate.', trate.alpha.times[i])
-        for (race in races)
-        {
-            param.value = parameters[paste0(race, '.msm.idu.susceptibility.rr.', trate.parameter.times[i])]
-            set.element.functional.form.interaction.alphas(model.settings,
-                                                           element.name = "idu.trates",
-                                                           alpha.name = alpha.name,
-                                                           value = param.value,
-                                                           applies.to.dimension.values = list(sex.to= 'msm',
-                                                                                              race.to = race))
-            
-            set.element.functional.form.interaction.alphas(model.settings,
-                                                           element.name = "msm.trates",
-                                                           alpha.name = alpha.name,
-                                                           value = param.value,
-                                                           applies.to.dimension.values = list(risk.to = idu.states,
-                                                                                              race.to = race))
-        }
+      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
+                                                                    alpha.name = paste0('rate.', trate.alpha.times[i]),
+                                                                    values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
+                                                                    applies.to.dimension.values = 'msm',
+                                                                    dimension = 'sex.to')
+      
+      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.trates',
+                                                                    alpha.name = paste0('rate.', trate.alpha.times[i]),
+                                                                    values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
+                                                                    applies.to.dimension.values = idu.states,
+                                                                    dimension = 'risk.to')
         
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
                                                                       alpha.name = paste0('rate.', trate.alpha.times[i]),
