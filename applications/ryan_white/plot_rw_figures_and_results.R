@@ -697,7 +697,7 @@ iqr_support_loss = quantile(rw_survey_final$q3_support_loss, probs = c(0.25, 0.7
 output_file = "prelim_results/results_filled_in.txt"
 
 # Open the file for appending
-sink(output_file, append = TRUE)
+sink(output_file, append = F)
 cat("\n")
 
 # Print formatted summary
@@ -963,7 +963,7 @@ CI_diag_increase_tempRW = quantile(diag_increase_tempRW, probs = c(0.025, 0.975)
 # === PRINT RESULTS === #
 
 # Open the file for appending
-sink(output_file, append = F)
+sink(output_file, append = T)
 cat("\n")
 
 cat(sprintf("\nOur projections show that the increased infections from 2025 through 2030 fell principally on adults under 35 years old – an %.1f%% (%.1f to %.1f%%) increase across all 31 cities – and on Black and Hispanic populations – an increase of %.1f%% (%.1f to %.1f%%) among Black and %.1f%% (%.1f to %.1f%%) among Hispanic city residents.\n",
@@ -1424,7 +1424,7 @@ bottom_20_mean_incidence = adap_suppression_results %>%
 # === Format Output for Report === #
 
 # Open the file for appending
-sink(output_file, append = F)
+sink(output_file, append = T)
 cat("\n")
 cat(sprintf(
   "\nIn our probabilistic sensitivity analyses, the three most influential parameters were %s, %s, and %s, 
