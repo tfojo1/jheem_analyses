@@ -275,21 +275,10 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     # take the OR of borrowing needles from table 2 of 
     # https://pubmed.ncbi.nlm.nih.gov/9489050/
     # as an RR
-    black.msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    black.msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    black.msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    black.msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    
-    hispanic.msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    hispanic.msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    hispanic.msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    hispanic.msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    
-    other.msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    other.msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    other.msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-    other.msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
-
+    msm.idu.susceptibility.rr.peak = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    msm.idu.susceptibility.rr.0 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    msm.idu.susceptibility.rr.1 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
+    msm.idu.susceptibility.rr.2 = Lognormal.Distribution(log(3.3), 0.5*log(4)),
 
     #-- Age Susceptibility --#
     
@@ -1228,25 +1217,11 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     
     female.vs.heterosexual.male.idu.susceptibility = 'female.vs.heterosexual.male.idu.susceptibility.rr',
     
-    black.msm.idu.transmission = c(
-      'black.msm.idu.susceptibility.rr.peak',
-      'black.msm.idu.susceptibility.rr.0',
-      'black.msm.idu.susceptibility.rr.1',
-      'black.msm.idu.susceptibility.rr.2'
-    ),
-    
-    other.msm.idu.transmission = c(
-      'other.msm.idu.susceptibility.rr.peak',
-      'other.msm.idu.susceptibility.rr.0',
-      'other.msm.idu.susceptibility.rr.1',
-      'other.msm.idu.susceptibility.rr.2'
-    ),
-    
-    hispanic.msm.idu.transmission = c(
-      'hispanic.msm.idu.susceptibility.rr.peak',
-      'hispanic.msm.idu.susceptibility.rr.0',
-      'hispanic.msm.idu.susceptibility.rr.1',
-      'hispanic.msm.idu.susceptibility.rr.2'
+    msm.idu.transmission = c(
+      'msm.idu.susceptibility.rr.peak',
+      'msm.idu.susceptibility.rr.0',
+      'msm.idu.susceptibility.rr.1',
+      'msm.idu.susceptibility.rr.2'
     ),
 
     idu.age.susceptibility.01 = c(

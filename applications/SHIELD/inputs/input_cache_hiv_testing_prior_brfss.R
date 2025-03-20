@@ -1,13 +1,13 @@
 library(dplyr) 
 library(reshape2)
+library(ggplot2)
 
 source("../jheem_analyses/applications/SHIELD/shield_specification.R")
 
 # CLEANING DATA -----
-clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
+clean.brfss.data <- function(specification.metadata) {
   load("../jheem_analyses/cached/brfss.subset.RData")
   df <- as.data.frame(appended)
-  
   rm(appended)
   
   # MSM: We calculated this variable. 
@@ -35,10 +35,6 @@ clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
     filter(year < 2020 | year > 2022) %>% 
     dplyr::select(year:race, msm, tested.past.year, weighting.var)
   
-  
-  # Shield's specification metadata
-  specification.metadata <- get.specification.metadata(version = version,
-                                                       location = location)
   
   # AGE: BRFSS has 14 age categories, whereas Shield has 11 specified categories for age.
   # Based on the Shield ages between 18-24 should be divided into: 15-19 and 20-24 age groups. 
@@ -134,38 +130,31 @@ clean.brfss.data <- function(version = 'shield', location = 'C.12580') {
   
 }
 
-
-
 # MODEL FITTING ----
 # get.testing.intercepts.and.slopes(...) function fits a logistic regression model to the data and returns 
 # a list containing two items: a multidimensional array of intercepts (the predicted log-odds when year = 0) 
 # and slopes (the change in log-odds per one unit change in year) for each combination of demographic strata.
-get.testing.intercepts.and.slopes <- function(version,
-                                              location,
-                                              model = "two.way",
-                                              df ) {
-  # or fully.interacted or one.way
-  # df <- clean.brfss.data(version, location)
-  specification.metadata <- get.specification.metadata(version = version,
-                                                       location = location)
+get.testing.intercepts.and.slopes <- function(df, 
+                                              specification.metadata,
+                                              selected.model ) {
   
-  if (model == "two.way") {
+  if (selected.model == "two.way") {
     fit <- glm(tested.past.year ~ age + sex + race + year + 
                  age:sex + age:race + sex:race + year:age + year:sex + year:race,
                data = df,family = "binomial", weights = df$weighting.var)
-  } else if (model == "three.way.interacted") {
+  } else if (selected.model == "three.way.interacted") {
     fit <- glm(tested.past.year ~ age + sex + race + year +
                  age:sex + age:race + sex:race + year:age + year:sex + year:race +
                  year:age:sex+ year:age:race +year:sex:race + age:sex:race,
                data = df,family = "binomial", weights = df$weighting.var)
-  } else if (model == "fully.interacted") {
+  } else if (selected.model == "fully.interacted") {
     fit <- glm(tested.past.year ~ age + sex + race + year +
                  age:sex + age:race + sex:race + 
                  year:age + year:sex + year:race + 
                  year:age:sex + year:age:race + year:sex:race + age:sex:race + 
                  year:age:sex:race,
                data = df,family = "binomial", weights = df$weighting.var)
-  } else if (model == "one.way") {
+  } else if (selected.model == "one.way") {
     fit <- glm(tested.past.year ~ age + sex + race + year + 
                  year:age + year:sex + year:race,
                data = df,family = "binomial", weights = df$weighting.var)
@@ -202,140 +191,133 @@ get.testing.intercepts.and.slopes <- function(version,
   #'Log-odds of -1.27 means the odds of testing in the past year are about 0.280 to 1, or the event is about 28% as likely to happen as it is to not happen.
   # The probability of testing in the past year for this baseline group (before adjusting for other predictors) is about 21.9%.
   list(intercepts = intercepts,
-       slopes = slopes,
-       fit = fit )
+       slopes = slopes )
 }
 
 
-# TESTING THE MODELS ----
-if (1==2) {
-  version = 'shield' 
-  location = 'C.12580'
+# CHECKING MODEL PERFORMANCE ----
+checking.model.performance<- function(df, specification.metadata, selected.model) {
+  print(paste("checking model performance for ", selected.model, " model ...."))
   anchor.year= 2010
   proj.years <- 2010:2035
+  #
+  print(paste0("Testing the ", selected.model, " model..."))
   
-  lapply(c("one.way", "two.way", "three.way.interacted", "fully.interacted"), function(selected.model) {
-    print(paste0("Testing the ", selected.model, " model..."))
-    #
-    df <- clean.brfss.data(version, location)
-    specification.metadata = get.specification.metadata(version=version,
-                                                        location=location)
-    
-    age_levels_model  <- levels(df$age)
-    race_levels_model <- levels(df$race)
-    sex_levels_model  <- levels(df$sex)
-    dim.names <- list(age = age_levels_model,
-                      race = race_levels_model,
-                      sex = sex_levels_model)
-    
-    testing.prior <- get.testing.intercepts.and.slopes(version = version, 
-                                                       location = location, 
-                                                       model = selected.model, 
-                                                       df)
-    aic <- AIC(testing.prior$fit);print(aic)
-    
-    testing.functional.form <- create.logistic.linear.functional.form(
-      intercept = testing.prior$intercepts,
-      slope = testing.prior$slopes,
-      anchor.year = anchor.year,
-      parameters.are.on.logit.scale = TRUE
-    )
-    
-    # Projected values
-    values <- testing.functional.form$project(proj.years)
-    values <- array(unlist(values),
-                    dim = c(sapply(dim.names, length), length(proj.years)),
-                    dimnames = c(dim.names, list(year = proj.years)))
-    
-    # Data means
-    brfss_means <- sapply((unique(df$year)), function(year) {
-      sapply(dim.names$sex, function(sex) {
-        sapply(dim.names$race, function(race) {
-          sapply(dim.names$age, function(age) {
-            mean(df$tested.past.year[df$year == year & df$sex == sex & df$race == race & df$age == age])
-          })
+  age_levels_model  <- levels(df$age)
+  race_levels_model <- levels(df$race)
+  sex_levels_model  <- levels(df$sex)
+  dim.names <- list(age = age_levels_model,
+                    race = race_levels_model,
+                    sex = sex_levels_model)
+  
+  testing.prior <- get.testing.intercepts.and.slopes(df = df,
+                                                     specification.metadata = specification.metadata,
+                                                     selected.model)
+  print("Model is fitted")
+  testing.functional.form <- create.logistic.linear.functional.form(
+    intercept = testing.prior$intercepts,
+    slope = testing.prior$slopes,
+    anchor.year = anchor.year,
+    parameters.are.on.logit.scale = TRUE
+  )
+  
+  # Projected values
+  values <- testing.functional.form$project(proj.years)
+  values <- array(unlist(values),
+                  dim = c(sapply(dim.names, length), length(proj.years)),
+                  dimnames = c(dim.names, list(year = proj.years)))
+  
+  # Data means: weighted mean
+  brfss_means <- sapply((unique(df$year)), function(year) {
+    sapply(dim.names$sex, function(sex) {
+      sapply(dim.names$race, function(race) {
+        sapply(dim.names$age, function(age) {
+          weighted.mean(df$tested.past.year[df$year == year & df$sex == sex & df$race == race & df$age == age],w=df$weighting.var[df$year == year & df$sex == sex & df$race == race & df$age == age])
         })
       })
     })
-    dim(brfss_means) = c(sapply(dim.names, length), length(2014:2019))
-    dimnames(brfss_means) = c(dim.names, list(year = 2014:2019))
-    df_brfss <- as_tibble(as.data.frame.table(brfss_means, responseName = "value")) 
-    
-    print("Begin Plotting....")
-    plots_age <-  ggplot() +
-      geom_line(data = reshape2::melt(apply(values, c("age","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = age)) +
-      geom_point(data = reshape2::melt(apply(brfss_means, c("age","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = age)) +
-      ylim(0, 1) +
-      ggtitle(paste("Testing Projection vs. BRFSS (Age) -", selected.model,"-AIC = ",aic)) +
-      theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
-    
-    plots_race <-  ggplot() +
-      geom_line(data = reshape2::melt(apply(values, c("race","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = race)) +
-      geom_point(data = reshape2::melt(apply(brfss_means, c("race","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = race)) +
-      ylim(0, 1) +
-      ggtitle(paste("Testing Projection vs. BRFSS (Race) -", selected.model)) +
-      theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
-    
-    plots_sex <-  ggplot() +
-      geom_line(data = reshape2::melt(apply(values, c("sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
-      geom_point(data = reshape2::melt(apply(brfss_means, c("sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
-      ylim(0, 1) +
-      ggtitle(paste("Testing Projection vs. BRFSS (Sex) -", selected.model)) +
-      theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
-    
-    plots_race_sex <-  ggplot() +
-      geom_line(data = reshape2::melt(apply(values, c( "race","sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
-      geom_point(data = reshape2::melt(apply(brfss_means, c("race","sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
-      facet_wrap(~race) +
-      ylim(0, 1) +
-      ggtitle(paste("Testing Projection vs. BRFSS (Sex & Race) -", selected.model)) +
-      theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
-    
-    plots_age_sex <-  ggplot() +
-      geom_line(data = reshape2::melt(apply(values, c( "age","sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
-      geom_point(data = reshape2::melt(apply(brfss_means, c("age","sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
-      facet_wrap(~age) +
-      ylim(0, 1) +
-      ggtitle(paste("Testing Projection vs. BRFSS (Sex & Age) -", selected.model)) +
-      theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
-    
-    plots_age_race<-  ggplot() +
-      geom_line(data = reshape2::melt(apply(values, c( "age","race","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = race)) +
-      geom_point(data = reshape2::melt(apply(brfss_means, c("age","race","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = race)) +
-      facet_wrap(~age) +
-      ylim(0, 1) +
-      ggtitle(paste("Testing Projection vs. BRFSS (Race & Age) -", selected.model)) +
-      theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
-    
-    PLOTS<-list(plots_age, plots_race,plots_sex,plots_race_sex,plots_age_sex,plots_age_race)
-    PLOTS.Names<-list("plots_age", "plots_race","plots_sex","plots_race_sex","plots_age_sex","plots_age_race")
-    lapply(1:length(PLOTS),function(x){
-      ggsave(filename = paste0("prelim_results/testing_prior_",selected.model,"_",PLOTS.Names[x],".jpeg"),
-             plot = PLOTS[[x]], 
-             width = 10, height = 10, dpi = 300)
-      print(paste0("Saved ", paste0("prelim_results/testing_prior_",selected.model,"_",PLOTS.Names[x],".jpeg")))
-    })
-    
   })
+  dim(brfss_means) = c(sapply(dim.names, length), length(2014:2019))
+  dimnames(brfss_means) = c(dim.names, list(year = 2014:2019))
+  df_brfss <- as_tibble(as.data.frame.table(brfss_means, responseName = "value")) 
   
+  print("Begin Plotting....")
+  plots_age <-  ggplot() +
+    geom_line(data = reshape2::melt(apply(values, c("age","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = age)) +
+    geom_point(data = reshape2::melt(apply(brfss_means, c("age","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = age)) +
+    ylim(0, 1) +
+    ggtitle(paste("Testing Projection vs. BRFSS (Age) -", selected.model)) +
+    theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
+  
+  plots_race <-  ggplot() +
+    geom_line(data = reshape2::melt(apply(values, c("race","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = race)) +
+    geom_point(data = reshape2::melt(apply(brfss_means, c("race","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = race)) +
+    ylim(0, 1) +
+    ggtitle(paste("Testing Projection vs. BRFSS (Race) -", selected.model)) +
+    theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
+  
+  plots_sex <-  ggplot() +
+    geom_line(data = reshape2::melt(apply(values, c("sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
+    geom_point(data = reshape2::melt(apply(brfss_means, c("sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
+    ylim(0, 1) +
+    ggtitle(paste("Testing Projection vs. BRFSS (Sex) -", selected.model)) +
+    theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
+  
+  plots_race_sex <-  ggplot() +
+    geom_line(data = reshape2::melt(apply(values, c( "race","sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
+    geom_point(data = reshape2::melt(apply(brfss_means, c("race","sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
+    facet_wrap(~race) +
+    ylim(0, 1) +
+    ggtitle(paste("Testing Projection vs. BRFSS (Sex & Race) -", selected.model)) +
+    theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
+  
+  plots_age_sex <-  ggplot() +
+    geom_line(data = reshape2::melt(apply(values, c( "age","sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
+    geom_point(data = reshape2::melt(apply(brfss_means, c("age","sex","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = sex)) +
+    facet_wrap(~age) +
+    ylim(0, 1) +
+    ggtitle(paste("Testing Projection vs. BRFSS (Sex & Age) -", selected.model)) +
+    theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
+  
+  plots_age_race<-  ggplot() +
+    geom_line(data = reshape2::melt(apply(values, c( "age","race","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = race)) +
+    geom_point(data = reshape2::melt(apply(brfss_means, c("age","race","year"),mean)), aes(x = as.numeric(as.character(year)), y = value, color = race)) +
+    facet_wrap(~age) +
+    ylim(0, 1) +
+    ggtitle(paste("Testing Projection vs. BRFSS (Race & Age) -", selected.model)) +
+    theme(plot.title = element_text(hjust = 0.5, size = 15))+xlab("Year") + ylab("Proportion")  
+  
+  PLOTS<-list(plots_age, plots_race,plots_sex,plots_race_sex,plots_age_sex,plots_age_race)
+  PLOTS.Names<-list("plots_age", "plots_race","plots_sex","plots_race_sex","plots_age_sex","plots_age_race")
+  lapply(1:length(PLOTS),function(x){
+    ggsave(filename = paste0("prelim_results/testing_prior_",selected.model,"_",PLOTS.Names[x],".jpeg"),
+           plot = PLOTS[[x]], 
+           width = 10, height = 10, dpi = 300)
+    print(paste0("Saved ", paste0("prelim_results/testing_prior_",selected.model,"_",PLOTS.Names[x],".jpeg")))
+  })
+  print("All plots are saved")
 }
 
 
 
 # CASHING FINAL MODELS ----
-version = 'shield'
-location = 'C.12580'
+# creates a specification metadata for shield that includes all the necessary information on dimensions
+specification.metadata <- get.specification.metadata(version = 'shield', location = 'US')
+
+# reading and cleaning the BRFSS data:
+df <- clean.brfss.data(specification.metadata)
+
+## Checking performances: fitting each model takes a long time
+checking.model.performance(df,specification.metadata,selected.model = "two.way")
+checking.model.performance(df,specification.metadata,"three.way.interacted")
+checking.model.performance(df,specification.metadata,"fully.interacted")
+
+#fitting the final model 
 selected.model="three.way.interacted"
-# selected.model="one.way"
-df <- clean.brfss.data(version, location)
-
-
-testing.prior <- get.testing.intercepts.and.slopes(version = version,
-                                                   location = location,
-                                                   model = selected.model,
-                                                   df )
-#'@Andrew: any idea why this object is so big? I know that we have a lot of coefficient, but I still wouldnt expect it to be this big. 
-#'
+print("final model is selected as three.way.interacted ....")
+testing.prior <- get.testing.intercepts.and.slopes(df = df,
+                                                   specification.metadata = specification.metadata,
+                                                   selected.model = selected.model)
 cache.object.for.version(object = testing.prior,
                          name = "hiv.testing.prior",
                          version = 'shield',

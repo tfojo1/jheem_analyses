@@ -1,11 +1,11 @@
-LOCATION.INDEX = 1#23
+LOCATION.INDEX = 28
 
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-#LOCATION.LIST = setdiff(MSAS.OF.INTEREST, c('C.17140','C.44180','C.12580'))
-LOCATION.LIST = c(MIAMI.MSA, BALTIMORE.MSA, NYC.MSA, ATLANTA.MSA, HOUSTON.MSA, CHICAGO.MSA)
+LOCATION.LIST = setdiff(MSAS.OF.INTEREST, c('C.17140','C.44180','C.12580'))
 LOCATION = LOCATION.LIST[LOCATION.INDEX]
+
 print(paste0("Running for ", LOCATION, " - ", locations::get.location.name(LOCATION)))
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANSMISSION, # 2
@@ -13,29 +13,35 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.EHE.FINAL # 4
                              )[3]
 
+RESUME.FIRST = F
+
 #CALIBRATION.CODE.TO.RUN = CALIBRATION.CODES.TO.RUN
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)
 {   
-    simset = NULL
-
-    gc()
+    if (!RESUME.FIRST || CALIBRATION.CODES.TO.RUN[1] != CALIBRATION.CODE.TO.RUN)
+    {
+        simset = NULL
     
-    set.seed(12345)
-    
-    print(paste0("Setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
-    
-    clear.calibration.cache(version='ehe',
-                            location=LOCATION,
-                            calibration.code = CALIBRATION.CODE.TO.RUN,
-                            allow.remove.incomplete = T)
-    
-    set.up.calibration(version='ehe',
-                       location=LOCATION,
-                       calibration.code = CALIBRATION.CODE.TO.RUN,
-                       cache.frequency = 250)  
-    
-    print(paste0("DONE setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
+        gc()
+        
+        set.seed(12345)
+        
+        print(paste0("Setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
+        
+        clear.calibration.cache(version='ehe',
+                                location=LOCATION,
+                                calibration.code = CALIBRATION.CODE.TO.RUN,
+                                allow.remove.incomplete = T)
+        
+        set.up.calibration(version='ehe',
+                           location=LOCATION,
+                           calibration.code = CALIBRATION.CODE.TO.RUN,
+                           cache.frequency = 250)  
+        
+        print(paste0("DONE setting up ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
+    }
+  
     start.time = Sys.time()
     
     print(ggplot2::qplot(1,1) + 

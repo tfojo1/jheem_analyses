@@ -257,12 +257,13 @@ total.diagnosis.likelihood.instructions =
 
 ##** PRENATAL CARE COVERAGE ** ----#'@Todd: the function to capture incompleteness index
 # prp.prenatal.care.first.trimester
+msa.variance= 0.0032 #input_prenatal_msa_variance.R
 prenatal.care.first.trimester.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.first.trimester",  
                                        outcome.for.sim = "prp.prenatal.care.first.trimester",
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1),
-                                       from.year = 2010,
+                                       from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, 
                                        error.variance.type = 'cv')
@@ -271,7 +272,7 @@ prenatal.care.second.trimester.likelihood.instructions =
                                        outcome.for.sim = "prp.prenatal.care.second.trimester",
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1),
-                                       from.year = 2010,
+                                       from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05,  
                                        error.variance.type = 'cv')
@@ -280,7 +281,7 @@ prenatal.care.third.trimester.likelihood.instructions =
                                        outcome.for.sim = "prp.prenatal.care.third.trimester",
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1),
-                                       from.year = 2010,
+                                       from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, 
                                        error.variance.type = 'cv')

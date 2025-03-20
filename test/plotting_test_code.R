@@ -48,6 +48,12 @@ simplot(simset$last.sim(),
 
 simplot(simset$last.sim(),
         simset,
+        facet.by = "risk", split.by = "sex", # race, risk, sex; 1- and 2-way 
+        outcomes = c("new"), 
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(simset$last.sim(),
+        simset,
         facet.by = "age", split.by = "sex", # race, risk, sex; 1- and 2-way 
         outcomes = c("new"), 
         dimension.values = list(year = 1980:2030)) 
@@ -61,6 +67,12 @@ simplot(simset$last.sim(),
 simplot(simset$last.sim(),
         simset,
         facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
+        outcomes = c("diagnosed.prevalence"), 
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(simset$last.sim(),
+        simset,
+        facet.by = "risk", split.by = "sex", # race, risk, sex; 1- and 2-way 
         outcomes = c("diagnosed.prevalence"), 
         dimension.values = list(year = 1980:2030)) 
 

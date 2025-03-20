@@ -1,4 +1,4 @@
-#' @details The maximum allowed file size is 5 MB.
+#' @details The maximum allowed file size is 10 MB.
 cache.object.for.version <- function(object, name, version, overwrite=F)
 {
     error.prefix = "Error caching object for version: "
@@ -12,9 +12,9 @@ cache.object.for.version <- function(object, name, version, overwrite=F)
     
     # We have to check file size AFTER saving the file
     save(object, file=FILE.PATH)
-    if (file.size(FILE.PATH) > 5e6) {
+    if (file.size(FILE.PATH) > 1e7) {
         file.remove(FILE.PATH)
-        stop(paste0("Cannot 'cache.object.for.version': file size would exceed limit of 5 MB"))
+        stop(paste0("Cannot 'cache.object.for.version': file size would exceed limit of 10 MB"))
     }
 }
 
