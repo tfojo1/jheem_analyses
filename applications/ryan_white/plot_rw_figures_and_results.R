@@ -1,10 +1,10 @@
 # Install necessary libraries if they are not already installed
-packages <- c("ggplot2", "tidyverse", "broom", "ks", "ggpubr", 
+packages = c("ggplot2", "tidyverse", "broom", "ks", "ggpubr", 
               "gridExtra", "gt", "sf", "usmap", "flextable", "officer",
               "scales")
 
 # Check if each package is installed, and install missing ones
-install_if_missing <- function(pkg) {
+install_if_missing = function(pkg) {
   if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dependencies = TRUE)
     library(pkg, character.only = TRUE)
@@ -47,25 +47,25 @@ suppressMessages({
 
 # Load data
 rw_survey = read.csv("../jheem_analyses/applications/ryan_white/rw_survey.csv")
-file_path <- "../jheem_analyses/applications/ryan_white/rw_survey_174.csv"
-df <- read.csv(file_path, stringsAsFactors = FALSE)
+file_path = "../jheem_analyses/applications/ryan_white/rw_survey_174.csv"
+df = read.csv(file_path, stringsAsFactors = FALSE)
 colnames(df) = colnames(rw_survey) 
 
 # Identify columns that contain "Checked"/"Unchecked" values
-binary_cols <- sapply(df, function(col) all(col %in% c("Checked", "Unchecked", NA)))
+binary_cols = sapply(df, function(col) all(col %in% c("Checked", "Unchecked", NA)))
 
 # Convert "Checked" to 1 and "Unchecked" to 0
-df[binary_cols] <- lapply(df[binary_cols], function(col) ifelse(col == "Checked", 1, 0))
+df[binary_cols] = lapply(df[binary_cols], function(col) ifelse(col == "Checked", 1, 0))
 
 # Save the cleaned dataset
 write.csv(df, "../jheem_analyses/applications/ryan_white/rw_survey.csv", row.names = FALSE)
 
-colnames(rw_survey) <- gsub("^X\\.|\\.$", "", colnames(rw_survey))  # Remove unwanted prefixes/suffixes
-colnames(rw_survey) <- gsub("\\.+", "_", colnames(rw_survey))  # Replace multiple dots with underscores
+colnames(rw_survey) = gsub("^X\\.|\\.$", "", colnames(rw_survey))  # Remove unwanted prefixes/suffixes
+colnames(rw_survey) = gsub("\\.+", "_", colnames(rw_survey))  # Replace multiple dots with underscores
 #=========== Plot original distribution =======================================#
 
 # Reshape the data from wide to long format
-rw_survey_long <- rw_survey %>%
+rw_survey_long = rw_survey %>%
   dplyr::select(q1_adap_loss, q2_oahs_loss, q3_support_loss) %>%  # Select columns to plot
   pivot_longer(cols = everything(), names_to = "variable", values_to = "value")
 
@@ -81,72 +81,72 @@ ggplot(rw_survey_long, aes(x = value, fill = variable, color = variable)) +
   theme_minimal()
 #=========== Transformation divergence computed ===============================#
 
-compute_kl_divergence <- function(P_samples, Q_samples) {
+compute_kl_divergence = function(P_samples, Q_samples) {
   # Fit KDE with added regularization
-  H_P <- Hpi(x = P_samples) + diag(ncol(P_samples)) * 1e-6
-  H_Q <- Hpi(x = Q_samples) + diag(ncol(Q_samples)) * 1e-6
+  H_P = Hpi(x = P_samples) + diag(ncol(P_samples)) * 1e-6
+  H_Q = Hpi(x = Q_samples) + diag(ncol(Q_samples)) * 1e-6
   
-  P_kde <- kde(x = P_samples, H = H_P)
-  Q_kde <- kde(x = Q_samples, H = H_Q)
+  P_kde = kde(x = P_samples, H = H_P)
+  Q_kde = kde(x = Q_samples, H = H_Q)
   
   # Evaluate densities at P sample points
-  P_density <- predict(P_kde, x = P_samples)
-  Q_density <- predict(Q_kde, x = P_samples)
+  P_density = predict(P_kde, x = P_samples)
+  Q_density = predict(Q_kde, x = P_samples)
   
   # Avoid log(0) and numerical instability
-  epsilon <- 1e-10
-  P_density <- pmax(P_density, epsilon)
-  Q_density <- pmax(Q_density, epsilon)
+  epsilon = 1e-10
+  P_density = pmax(P_density, epsilon)
+  Q_density = pmax(Q_density, epsilon)
   
   # Compute KL divergence
-  KL_div <- sum(P_density * log(P_density / Q_density)) / length(P_density)
+  KL_div = sum(P_density * log(P_density / Q_density)) / length(P_density)
   
   # Ensure KL is non-negative
   return(max(KL_div, 0))
 }
 
-compare_kl_divergence <- function(n, rw_survey) {
+compare_kl_divergence = function(n, rw_survey) {
   # Extract relevant columns and remove rows with NA values
-  X <- rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
-  X <- X[complete.cases(X), ] / 100
-  X <- as.matrix(X)
+  X = rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
+  X = X[complete.cases(X), ] / 100
+  X = as.matrix(X)
   
   # Ensure values are strictly within (0,1)
-  epsilon <- 1e-6
-  X <- pmax(pmin(X, 1 - epsilon), epsilon)
+  epsilon = 1e-6
+  X = pmax(pmin(X, 1 - epsilon), epsilon)
   
   # Get number of rows in X
-  num_rows <- nrow(X)
+  num_rows = nrow(X)
   
   # --- 1. Apply Transformations ---
-  arcsin_X <- asin(sqrt(X))
-  logit_X  <- log(X / (1 - X))
-  probit_X <- qnorm(X)
+  arcsin_X = asin(sqrt(X))
+  logit_X  = log(X / (1 - X))
+  probit_X = qnorm(X)
   
   # --- 2. Fit KDE in Transformed Space ---
-  kde_arcsin <- kde(x = arcsin_X)
-  kde_logit  <- kde(x = logit_X)
-  kde_probit <- kde(x = probit_X)
-  kde_original <- kde(x = X)
+  kde_arcsin = kde(x = arcsin_X)
+  kde_logit  = kde(x = logit_X)
+  kde_probit = kde(x = probit_X)
+  kde_original = kde(x = X)
   
   # --- 3. Sample 'n' Points from KDE ---
-  sampled_arcsin <- rkde(n, kde_arcsin)
-  sampled_logit  <- rkde(n, kde_logit)
-  sampled_probit <- rkde(n, kde_probit)
+  sampled_arcsin = rkde(n, kde_arcsin)
+  sampled_logit  = rkde(n, kde_logit)
+  sampled_probit = rkde(n, kde_probit)
   
   # --- 4. Back-Transform to Original Scale ---
-  sampled_arcsin <- (sin(sampled_arcsin))^2
-  sampled_logit  <- exp(sampled_logit) / (1 + exp(sampled_logit))
-  sampled_probit <- pnorm(sampled_probit)
+  sampled_arcsin = (sin(sampled_arcsin))^2
+  sampled_logit  = exp(sampled_logit) / (1 + exp(sampled_logit))
+  sampled_probit = pnorm(sampled_probit)
   
   # --- 5. Bootstrap Sampling (FIXED) ---
-  sampled_bootstrap <- X[sample(1:num_rows, size = n, replace = TRUE), ]
+  sampled_bootstrap = X[sample(1:num_rows, size = n, replace = TRUE), ]
   
   # --- 6. Compute KL Divergence ---
-  kl_arcsin <- compute_kl_divergence(X, sampled_arcsin)
-  kl_logit  <- compute_kl_divergence(X, sampled_logit)
-  kl_probit <- compute_kl_divergence(X, sampled_probit)
-  kl_bootstrap <- compute_kl_divergence(X, sampled_bootstrap)  # Corrected baseline comparison
+  kl_arcsin = compute_kl_divergence(X, sampled_arcsin)
+  kl_logit  = compute_kl_divergence(X, sampled_logit)
+  kl_probit = compute_kl_divergence(X, sampled_probit)
+  kl_bootstrap = compute_kl_divergence(X, sampled_bootstrap)  # Corrected baseline comparison
   
   # Return KL divergence values
   return(data.frame(
@@ -157,66 +157,66 @@ compare_kl_divergence <- function(n, rw_survey) {
 
 
 # Function to apply transformations, fit KDE, sample, and plot pairwise comparisons
-plot_pairwise_transformations_vs_original <- function(n, rw_survey) {
+plot_pairwise_transformations_vs_original = function(n, rw_survey) {
   # Extract relevant columns and remove rows with NA values
-  X <- rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
-  X <- X[complete.cases(X), ] / 100  # Convert percentages to proportions
-  X <- as.matrix(X)
+  X = rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
+  X = X[complete.cases(X), ] / 100  # Convert percentages to proportions
+  X = as.matrix(X)
   
   # Ensure values are strictly within (0,1)
-  epsilon <- 1e-6
-  X <- pmax(pmin(X, 1 - epsilon), epsilon)
+  epsilon = 1e-6
+  X = pmax(pmin(X, 1 - epsilon), epsilon)
   
   # --- 1. Apply Transformations ---
-  arcsin_X <- asin(sqrt(X))   # Arcsin-Sqrt transformation
-  logit_X  <- log(X / (1 - X)) # Logit transformation
-  probit_X <- qnorm(X)         # Inverse CDF (Probit)
+  arcsin_X = asin(sqrt(X))   # Arcsin-Sqrt transformation
+  logit_X  = log(X / (1 - X)) # Logit transformation
+  probit_X = qnorm(X)         # Inverse CDF (Probit)
   
   # --- 2. Fit KDE in Transformed Space ---
-  kde_arcsin <- kde(x = arcsin_X)
-  kde_logit  <- kde(x = logit_X)
-  kde_probit <- kde(x = probit_X)
+  kde_arcsin = kde(x = arcsin_X)
+  kde_logit  = kde(x = logit_X)
+  kde_probit = kde(x = probit_X)
   
   # --- 3. Sample 'n' Points from KDE ---
-  sampled_arcsin <- rkde(n, kde_arcsin)
-  sampled_logit  <- rkde(n, kde_logit)
-  sampled_probit <- rkde(n, kde_probit)
+  sampled_arcsin = rkde(n, kde_arcsin)
+  sampled_logit  = rkde(n, kde_logit)
+  sampled_probit = rkde(n, kde_probit)
   
   # --- 4. Back-Transform to Original Scale ---
-  sampled_arcsin <- (sin(sampled_arcsin))^2
-  sampled_logit  <- exp(sampled_logit) / (1 + exp(sampled_logit))
-  sampled_probit <- pnorm(sampled_probit)
+  sampled_arcsin = (sin(sampled_arcsin))^2
+  sampled_logit  = exp(sampled_logit) / (1 + exp(sampled_logit))
+  sampled_probit = pnorm(sampled_probit)
   
   # --- 5. Bootstrap Sampling ---
-  sampled_bootstrap <- X[sample(1:nrow(X), size = n, replace = TRUE), ]
+  sampled_bootstrap = X[sample(1:nrow(X), size = n, replace = TRUE), ]
   
   # --- 6. Store Transformations in a List ---
-  transformations <- list(
+  transformations = list(
     "Arcsin-Sqrt" = sampled_arcsin,
     "Logit" = sampled_logit,
     "Probit" = sampled_probit,
     "Bootstrap" = sampled_bootstrap
   )
   
-  variables <- c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")
+  variables = c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")
   
   # --- 7. Generate KDE Plots for Each Transformation and Each Variable ---
-  plot_list <- list()
+  plot_list = list()
   for (trans_name in names(transformations)) {
-    sampled_data <- transformations[[trans_name]]
+    sampled_data = transformations[[trans_name]]
     
     for (i in 1:3) {
       # Extract variable data
-      original_var <- X[, i]
-      transformed_var <- sampled_data[, i]
+      original_var = X[, i]
+      transformed_var = sampled_data[, i]
       
       # Convert to long format for ggplot
-      original_df <- data.frame(Value = original_var, Type = "Original")
-      transformed_df <- data.frame(Value = transformed_var, Type = trans_name)
-      combined_df <- rbind(original_df, transformed_df)
+      original_df = data.frame(Value = original_var, Type = "Original")
+      transformed_df = data.frame(Value = transformed_var, Type = trans_name)
+      combined_df = rbind(original_df, transformed_df)
       
       # Generate KDE plot
-      p <- ggplot(combined_df, aes(x = Value, fill = Type)) +
+      p = ggplot(combined_df, aes(x = Value, fill = Type)) +
         geom_density(alpha = 0.5) +
         theme_minimal() +
         labs(title = paste("Original vs.", trans_name, "\nVariable:", variables[i]),
@@ -224,25 +224,25 @@ plot_pairwise_transformations_vs_original <- function(n, rw_survey) {
         theme(legend.position = "right")
       
       # Store plot in list
-      plot_list[[paste(trans_name, variables[i], sep = "_")]] <- p
+      plot_list[[paste(trans_name, variables[i], sep = "_")]] = p
     }
   }
   
   # --- 8. Arrange all plots in a grid ---
-  combined_plot <- ggarrange(plotlist = plot_list, ncol = 3, nrow = 4)
+  combined_plot = ggarrange(plotlist = plot_list, ncol = 3, nrow = 4)
   
   return(combined_plot)
 }
 
 # Run function and plot
-compare_plot <- plot_pairwise_transformations_vs_original(1000, rw_survey)
+compare_plot = plot_pairwise_transformations_vs_original(1000, rw_survey)
 compare_kl_divergence(1000, rw_survey)
 print(compare_plot)
 
 #=========== Logistic regression of RW support loss ==========================#
 
 # Define Medicaid expansion status and Census region for each state
-state_info <- tribble(
+state_info = tribble(
   ~state,              ~medicaid_expansion, ~census_region,
   "Alabama",           "No",                "South",
   "Alaska",            "Yes",               "West",
@@ -297,22 +297,22 @@ state_info <- tribble(
   "Wyoming",           "No",                "West"
 )
 
-rw_survey_clean <- rw_survey %>%
+rw_survey_clean = rw_survey %>%
   rename_with(~ gsub("^X\\.choice\\.|\\.$", "", .)) %>% # Clean state column names
   dplyr::select(-c("choice_I_dont_know","choice_I_dont_know_1", "choice_I_dont_know_2","choice_I_dont_know_3"))
 
 # Convert from wide to long format for state choices
-rw_survey_long <- rw_survey_clean %>%
+rw_survey_long = rw_survey_clean %>%
   pivot_longer(cols = starts_with("choice_"), names_to = "state", values_to = "selected") %>%
   filter(selected == 1) %>%  # Keep only selected states
   dplyr::select(-selected) %>%  # Remove redundant column
   mutate(state = gsub("^choice_", "", state)) 
 
 # Merge with Medicaid expansion and Census region data
-rw_survey_final <- rw_survey_long %>%
+rw_survey_final = rw_survey_long %>%
   left_join(state_info, by = "state")
 
-rw_survey_final <- rw_survey_final %>%
+rw_survey_final = rw_survey_final %>%
   mutate(
     medicaid_expansion = as.factor(medicaid_expansion),  # Yes/No
     q4_rural_percentage = q4_rural_percentage / 100, 
@@ -332,48 +332,48 @@ rw_survey_final <- rw_survey_final %>%
 
 
 # Logistic regression for Medicaid expansion (Yes/No)
-medicaid_model <- glm(medicaid_expansion ~ q1_adap_loss + q2_oahs_loss + q3_support_loss,
+medicaid_model = glm(medicaid_expansion ~ q1_adap_loss + q2_oahs_loss + q3_support_loss,
                       data = rw_survey_final, family = binomial)
 summary(medicaid_model)
 
 # Logistic regression for each Census Region separately
-midwest_model <- glm(census_Midwest ~ q1_adap_loss + q2_oahs_loss + q3_support_loss, 
+midwest_model = glm(census_Midwest ~ q1_adap_loss + q2_oahs_loss + q3_support_loss, 
                      data = rw_survey_final, family = binomial)
 
-northeast_model <- glm(census_Northeast ~ q1_adap_loss + q2_oahs_loss + q3_support_loss, 
+northeast_model = glm(census_Northeast ~ q1_adap_loss + q2_oahs_loss + q3_support_loss, 
                        data = rw_survey_final, family = binomial)
 
-south_model <- glm(census_South ~ q1_adap_loss + q2_oahs_loss + q3_support_loss, 
+south_model = glm(census_South ~ q1_adap_loss + q2_oahs_loss + q3_support_loss, 
                    data = rw_survey_final, family = binomial)
 
-west_model <- glm(census_West ~ q1_adap_loss + q2_oahs_loss + q3_support_loss, 
+west_model = glm(census_West ~ q1_adap_loss + q2_oahs_loss + q3_support_loss, 
                   data = rw_survey_final, family = binomial)
 
 # Logistic regression for Rural region
-rural_model <- glm(rural_region ~ q1_adap_loss + q2_oahs_loss + q3_support_loss,
+rural_model = glm(rural_region ~ q1_adap_loss + q2_oahs_loss + q3_support_loss,
                    data = rw_survey_final, family = binomial)
 summary(rural_model)
 
 
 # Function to extract OR, CIs, and p-values
-extract_model_data <- function(model, outcome_name) {
+extract_model_data = function(model, outcome_name) {
   tidy(model, exponentiate = TRUE, conf.int = TRUE) %>%
     mutate(outcome = outcome_name)
 }
 
 # Extract results for each model
-medicaid_results <- extract_model_data(medicaid_model, "Medicaid Expansion")
-midwest_results <- extract_model_data(midwest_model, "Midwest")
-northeast_results <- extract_model_data(northeast_model, "Northeast")
-south_results <- extract_model_data(south_model, "South")
-west_results <- extract_model_data(west_model, "West")
-rural_results <- extract_model_data(rural_model, "Rural Region") 
+medicaid_results = extract_model_data(medicaid_model, "Medicaid Expansion")
+midwest_results = extract_model_data(midwest_model, "Midwest")
+northeast_results = extract_model_data(northeast_model, "Northeast")
+south_results = extract_model_data(south_model, "South")
+west_results = extract_model_data(west_model, "West")
+rural_results = extract_model_data(rural_model, "Rural Region") 
 
 # Combine results
-model_results <- bind_rows(medicaid_results, rural_results, midwest_results, northeast_results, south_results, west_results)
+model_results = bind_rows(medicaid_results, rural_results, midwest_results, northeast_results, south_results, west_results)
 
 # Clean variable names for plotting
-model_results <- model_results %>%
+model_results = model_results %>%
   rename(Odds_Ratio = estimate, Lower_CI = conf.low, Upper_CI = conf.high) %>%
   filter(term != "(Intercept)")
 
@@ -394,46 +394,46 @@ forest = ggplot(model_results, aes(x = term, y = Odds_Ratio, ymin = Lower_CI, ym
 
 #============================Figure 2==========================================#
 
-plot_arcsin_sqrt_vs_original <- function(n, rw_survey) {
+plot_arcsin_sqrt_vs_original = function(n, rw_survey) {
   # Extract relevant columns and remove rows with NA values
-  X <- rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
-  X <- X[complete.cases(X), ] / 100  # Convert percentages to proportions
-  X <- as.matrix(X)
+  X = rw_survey[, c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")]
+  X = X[complete.cases(X), ] / 100  # Convert percentages to proportions
+  X = as.matrix(X)
   
   # Ensure values are strictly within (0,1)
-  epsilon <- 1e-6
-  X <- pmax(pmin(X, 1 - epsilon), epsilon)
+  epsilon = 1e-6
+  X = pmax(pmin(X, 1 - epsilon), epsilon)
   
   # --- 1. Apply Arcsin-Sqrt Transformation ---
-  arcsin_X <- asin(sqrt(X))
+  arcsin_X = asin(sqrt(X))
   
   # --- 2. Fit KDE in Transformed Space ---
-  kde_arcsin <- kde(x = arcsin_X)
+  kde_arcsin = kde(x = arcsin_X)
   
   # --- 3. Sample 'n' Points from KDE ---
-  sampled_arcsin <- rkde(n, kde_arcsin)
+  sampled_arcsin = rkde(n, kde_arcsin)
   
   # --- 4. Back-Transform to Original Scale ---
-  sampled_arcsin <- ((sin(sampled_arcsin))^2)
+  sampled_arcsin = ((sin(sampled_arcsin))^2)
   
   # --- 5. Generate Density Plots for Each Variable ---
-  variables <- c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")
-  plot_list <- list()
+  variables = c("q1_adap_loss", "q2_oahs_loss", "q3_support_loss")
+  plot_list = list()
   
   for (i in 1:3) {
-    original_var <- X[, i]*100
-    transformed_var <- sampled_arcsin[, i]*100
+    original_var = X[, i]*100
+    transformed_var = sampled_arcsin[, i]*100
     
     # Convert to long format for ggplot
-    original_df <- data.frame(Value = original_var, Type = "Original")
-    transformed_df <- data.frame(Value = transformed_var, Type = "Arcsin-Sqrt")
-    combined_df <- rbind(original_df, transformed_df)
+    original_df = data.frame(Value = original_var, Type = "Original")
+    transformed_df = data.frame(Value = transformed_var, Type = "Arcsin-Sqrt")
+    combined_df = rbind(original_df, transformed_df)
     
     # Clean variable name: remove "q#", replace underscores with spaces     
-    clean_variable <-  gsub("_", " ", gsub("q[0-9]", "", variables[i]))  
+    clean_variable =  gsub("_", " ", gsub("q[0-9]", "", variables[i]))  
     
     # Generate the histogram for the original and density for the transformed     
-    p <- ggplot() +       
+    p = ggplot() +       
       geom_histogram(data = original_df, aes(x = Value, fill = Type),                       
                      bins = 30, alpha = 0.5, position = "identity") +       
       geom_density(data = transformed_df, aes(x = Value, color = Type, y = ..count..),                     
@@ -445,16 +445,16 @@ plot_arcsin_sqrt_vs_original <- function(n, rw_survey) {
       scale_color_manual(values = c("Arcsin-Sqrt" = "red"))  # Customize line color          
     
     # Store each plot in list
-    plot_list[[variables[i]]] <- p  
+    plot_list[[variables[i]]] = p  
   }
   
   return(plot_list)
 }
 # Run function
-figures_1_3 <- plot_arcsin_sqrt_vs_original(1000, rw_survey)
+figures_1_3 = plot_arcsin_sqrt_vs_original(1000, rw_survey)
 
 ######################
-rw_survey_long <- rw_survey %>%
+rw_survey_long = rw_survey %>%
   dplyr::select(q4_rural_percentage) %>%  # Select columns to plot
   pivot_longer(cols = everything(), names_to = "variable", values_to = "value")
 
@@ -472,7 +472,7 @@ rural
 
 #######################
 # First, arrange the top 4 plots in a 2x2 grid
-top_grid <- ggarrange(
+top_grid = ggarrange(
   figures_1_3[["q1_adap_loss"]], 
   figures_1_3[["q2_oahs_loss"]], 
   figures_1_3[["q3_support_loss"]], 
@@ -482,7 +482,7 @@ top_grid <- ggarrange(
 )
 
 # Now, center the forest plot beneath the top grid
-figure_2 <- ggarrange(
+figure_2 = ggarrange(
   top_grid, 
   forest, 
   ncol = 1, 
@@ -499,7 +499,7 @@ ggsave("prelim_results/figure_2_rw.png", plot = figure_2, width = 10, height = 1
 #=======================Supp. Analyses=========================================#
 
 # Categorize the data and count occurrences
-rw_survey_pie <- rw_survey %>%
+rw_survey_pie = rw_survey %>%
   mutate(category = ifelse(q4_rural_percentage > 50, "Above 50%", "Below 50%")) %>%
   count(category) %>%
   mutate(label = paste0(n))  # Create labels for counts
@@ -516,7 +516,7 @@ ggplot(rw_survey_pie, aes(x = "", y = n, fill = category)) +
 
 
 # Categorize the data and count occurrences
-rw_survey_pie <- rw_survey_final %>%
+rw_survey_pie = rw_survey_final %>%
   mutate(category = ifelse(medicaid_expansion == "Yes", "Medicaid expansion", "Non medicaid expansion")) %>%
   count(category) %>%
   mutate(label = paste0(n))  # Create labels for counts
@@ -549,7 +549,7 @@ mediciad_summary = rw_survey_final %>%
     Q2 = median(q2_oahs_loss, na.rm = TRUE),
     Q3 = median(q3_support_loss, na.rm = TRUE)
   ) 
-rural_summary <- rw_survey %>%
+rural_summary = rw_survey %>%
   filter(!is.na(q4_rural_percentage)) %>%  # Remove NA values first
   mutate(Group = ifelse(q4_rural_percentage >= 50, "Rural ≥ 50%", "Rural < 50%")) %>%
   group_by(Group) %>%
@@ -597,18 +597,18 @@ library(sf)
 library(usmap)
 
 # Aggregate the number of respondents per state
-state_counts <- rw_survey_final %>%
+state_counts = rw_survey_final %>%
   count(state, name = "respondents")
 
 # Get US states shapefile
-us_states <- us_map("states")
+us_states = us_map("states")
 
 # Merge state respondent counts with shapefile
-us_states <- us_states %>%
+us_states = us_states %>%
   left_join(state_counts, by = c("full" = "state"))
 
 # Replace NA with 0 for states with no respondents
-us_states$respondents[is.na(us_states$respondents)] <- 0
+us_states$respondents[is.na(us_states$respondents)] = 0
 
 # Plot the USA choropleth map
 usa_map = plot_usmap(data = state_counts, values = "respondents", regions = "states") +
@@ -619,7 +619,7 @@ usa_map = plot_usmap(data = state_counts, values = "respondents", regions = "sta
 
 
 # Aggregate the number of respondents per state
-state_counts <- rw_survey_final %>%
+state_counts = rw_survey_final %>%
   count(state, name = "respondents") %>%
   arrange(desc(respondents))  # Sort states by respondent count
 
@@ -644,57 +644,57 @@ print(combined_plot)
 #=======================In-text paragraph 1====================================#
 
 # Compute IQR as a range (Q1 - Q3)
-q1_rural <- quantile(rw_survey_final$q4_rural_percentage, probs = 0.25, na.rm = TRUE)
-q3_rural <- quantile(rw_survey_final$q4_rural_percentage, probs = 0.75, na.rm = TRUE)
+q1_rural = quantile(rw_survey_final$q4_rural_percentage, probs = 0.25, na.rm = TRUE)
+q3_rural = quantile(rw_survey_final$q4_rural_percentage, probs = 0.75, na.rm = TRUE)
 
-q1_adap_loss <- quantile(rw_survey_final$q1_adap_loss, probs = 0.25, na.rm = TRUE)
-q3_adap_loss <- quantile(rw_survey_final$q1_adap_loss, probs = 0.75, na.rm = TRUE)
+q1_adap_loss = quantile(rw_survey_final$q1_adap_loss, probs = 0.25, na.rm = TRUE)
+q3_adap_loss = quantile(rw_survey_final$q1_adap_loss, probs = 0.75, na.rm = TRUE)
 
-q1_oahs_loss <- quantile(rw_survey_final$q2_oahs_loss, probs = 0.25, na.rm = TRUE)
-q3_oahs_loss <- quantile(rw_survey_final$q2_oahs_loss, probs = 0.75, na.rm = TRUE)
+q1_oahs_loss = quantile(rw_survey_final$q2_oahs_loss, probs = 0.25, na.rm = TRUE)
+q3_oahs_loss = quantile(rw_survey_final$q2_oahs_loss, probs = 0.75, na.rm = TRUE)
 
-q1_support_loss <- quantile(rw_survey_final$q3_support_loss, probs = 0.25, na.rm = TRUE)
-q3_support_loss <- quantile(rw_survey_final$q3_support_loss, probs = 0.75, na.rm = TRUE)
+q1_support_loss = quantile(rw_survey_final$q3_support_loss, probs = 0.25, na.rm = TRUE)
+q3_support_loss = quantile(rw_survey_final$q3_support_loss, probs = 0.75, na.rm = TRUE)
 
 
 # Count unique Medicaid expansion and non-expansion states
-medicaid_expansion_states <- rw_survey_final %>%
+medicaid_expansion_states = rw_survey_final %>%
   filter(medicaid_expansion == "Yes") %>%
   distinct(state) %>%
   nrow()
 
-non_medicaid_expansion_states <- rw_survey_final %>%
+non_medicaid_expansion_states = rw_survey_final %>%
   filter(medicaid_expansion == "No") %>%
   distinct(state) %>%
   nrow()
 
 # Extract values dynamically from the dataset
-num_respondents <- length(unique(rw_survey_final$Record_ID))
-num_states <- length(unique(rw_survey_final$state))
-medicaid_expansion_states <- rw_survey_final %>%
+num_respondents = length(unique(rw_survey_final$Record_ID))
+num_states = length(unique(rw_survey_final$state))
+medicaid_expansion_states = rw_survey_final %>%
   filter(medicaid_expansion == "Yes") %>%
   distinct(state) %>%
   nrow()
-non_medicaid_expansion_states <- rw_survey_final %>%
+non_medicaid_expansion_states = rw_survey_final %>%
   filter(medicaid_expansion == "No") %>%
   distinct(state) %>%
   nrow()
 # Rural proportion
-median_rural <- median(rw_survey_final$q4_rural_percentage, na.rm = TRUE)
-iqr_rural <- quantile(rw_survey_final$q4_rural_percentage, probs = c(0.25, 0.75), na.rm = TRUE)
+median_rural = median(rw_survey_final$q4_rural_percentage, na.rm = TRUE)
+iqr_rural = quantile(rw_survey_final$q4_rural_percentage, probs = c(0.25, 0.75), na.rm = TRUE)
 
 # Expected losses in viral suppression
-median_adap_loss <- median(rw_survey_final$q1_adap_loss, na.rm = TRUE)
-iqr_adap_loss <- quantile(rw_survey_final$q1_adap_loss, probs = c(0.25, 0.75), na.rm = TRUE)
+median_adap_loss = median(rw_survey_final$q1_adap_loss, na.rm = TRUE)
+iqr_adap_loss = quantile(rw_survey_final$q1_adap_loss, probs = c(0.25, 0.75), na.rm = TRUE)
 
-median_oahs_loss <- median(rw_survey_final$q2_oahs_loss, na.rm = TRUE)
-iqr_oahs_loss <- quantile(rw_survey_final$q2_oahs_loss, probs = c(0.25, 0.75), na.rm = TRUE)
+median_oahs_loss = median(rw_survey_final$q2_oahs_loss, na.rm = TRUE)
+iqr_oahs_loss = quantile(rw_survey_final$q2_oahs_loss, probs = c(0.25, 0.75), na.rm = TRUE)
 
-median_support_loss <- median(rw_survey_final$q3_support_loss, na.rm = TRUE)
-iqr_support_loss <- quantile(rw_survey_final$q3_support_loss, probs = c(0.25, 0.75), na.rm = TRUE)
+median_support_loss = median(rw_survey_final$q3_support_loss, na.rm = TRUE)
+iqr_support_loss = quantile(rw_survey_final$q3_support_loss, probs = c(0.25, 0.75), na.rm = TRUE)
 
 
-output_file <- "prelim_results/results_filled_in.txt"
+output_file = "prelim_results/results_filled_in.txt"
 
 # Open the file for appending
 sink(output_file, append = TRUE)
@@ -743,9 +743,9 @@ simset.templose = load.simulation.set("Q:/simulations/rw/full.with.covid2-100/C.
 PLOT.YEARS.INT = 2015:2035
 
 
-new_legend_labels <- c("Continuation", "Cessation or Interruption")
+new_legend_labels = c("Continuation", "Cessation or Interruption")
 # Generate the plots
-cessation_incidence <- simplot(simset.noint, simset.lose, c('incidence'), 
+cessation_incidence = simplot(simset.noint, simset.lose, c('incidence'), 
                                dimension.values = list(year = PLOT.YEARS.INT), 
                                summary.type = 'mean.and.interval') +   
   ggplot2::theme_bw() + 
@@ -755,7 +755,7 @@ cessation_incidence <- simplot(simset.noint, simset.lose, c('incidence'),
                         values = c("solid", "dashed"), 
                         labels = new_legend_labels)
 
-cessation_new <- simplot(simset.noint, simset.lose, c('new'), 
+cessation_new = simplot(simset.noint, simset.lose, c('new'), 
                          dimension.values = list(year = PLOT.YEARS.INT), 
                          summary.type = 'mean.and.interval') +   
   ggplot2::theme_bw() + 
@@ -765,7 +765,7 @@ cessation_new <- simplot(simset.noint, simset.lose, c('new'),
                         values = c("solid", "dashed"), 
                         labels = new_legend_labels)
 
-interruption_incidence <- simplot(simset.noint, simset.templose, c('incidence'), 
+interruption_incidence = simplot(simset.noint, simset.templose, c('incidence'), 
                                   dimension.values = list(year = PLOT.YEARS.INT), 
                                   summary.type = 'mean.and.interval') +   
   ggplot2::theme_bw() + 
@@ -774,7 +774,7 @@ interruption_incidence <- simplot(simset.noint, simset.templose, c('incidence'),
                         values = c("solid", "dashed"), 
                         labels = new_legend_labels)
 
-interruption_new <- simplot(simset.noint, simset.templose, c('new'), 
+interruption_new = simplot(simset.noint, simset.templose, c('new'), 
                             dimension.values = list(year = PLOT.YEARS.INT), 
                             summary.type = 'mean.and.interval') +   
   ggplot2::theme_bw() + 
@@ -785,7 +785,7 @@ interruption_new <- simplot(simset.noint, simset.templose, c('new'),
 
 
 # Arrange plots with panel labels and section labels
-p <- ggarrange(cessation_incidence, cessation_new, 
+p = ggarrange(cessation_incidence, cessation_new, 
                interruption_incidence, interruption_new,
                ncol = 2, nrow = 2, 
                align = "hv",
@@ -794,7 +794,7 @@ p <- ggarrange(cessation_incidence, cessation_new,
                label.x = 0.05, label.y = 1.02)  # Adjust position of labels
 
 # Add scenario labels for Cessation and Interruption
-final_plot <- p
+final_plot = p
   
   
 # Print final figure
@@ -989,48 +989,48 @@ rel.total.infections.averted.temploseRW.by.city
 dimnames(rel.total.infections.averted.temploseRW.by.city)[[2]] = get.location.name(dimnames(rel.total.infections.averted.temploseRW.by.city)[[2]])
 
 # Convert both arrays to data frames
-df_indefinite <- as.data.frame(as.table(rel.total.infections.averted.loseRW.by.city)) 
-df_temporary <- as.data.frame(as.table(rel.total.infections.averted.temploseRW.by.city))
+df_indefinite = as.data.frame(as.table(rel.total.infections.averted.loseRW.by.city)) 
+df_temporary = as.data.frame(as.table(rel.total.infections.averted.temploseRW.by.city))
 
 # Rename columns
-colnames(df_indefinite) <- c("Simulation", "MSA", "Relative_Increase")
-colnames(df_temporary) <- c("Simulation", "MSA", "Relative_Increase")
+colnames(df_indefinite) = c("Simulation", "MSA", "Relative_Increase")
+colnames(df_temporary) = c("Simulation", "MSA", "Relative_Increase")
 
 # Add a column indicating cessation type
-df_indefinite$Cessation_Type <- "Cessation"
-df_temporary$Cessation_Type <- "Interruption"
+df_indefinite$Cessation_Type = "Cessation"
+df_temporary$Cessation_Type = "Interruption"
 
 # Combine the two datasets
-df_combined <- bind_rows(df_indefinite, df_temporary)
+df_combined = bind_rows(df_indefinite, df_temporary)
 
-blank_MSAs <- c(
+blank_MSAs = c(
   "Memphis, TN-MS-AR",
   "Washington-Arlington-Alexandria, DC-VA-MD-WV"
 )
 
 # Filter out the blank MSAs
-df_combined <- df_combined %>%
+df_combined = df_combined %>%
   filter(!(MSA %in% blank_MSAs))
 
 # Compute median increase for sorting
-median_increase <- df_combined %>%
+median_increase = df_combined %>%
   group_by(MSA) %>%
   summarise(Median_Increase = median(Relative_Increase, na.rm = TRUE)) %>%
   arrange(Median_Increase)
 
 # Convert City to a factor to ensure correct ordering in the plot
-df_combined$MSA <- factor(df_combined$MSA, levels = median_increase$MSA)
+df_combined$MSA = factor(df_combined$MSA, levels = median_increase$MSA)
 
 # Compute national medians for each cessation type
-national_medians <- df_combined %>%
+national_medians = df_combined %>%
   group_by(Cessation_Type) %>%
   summarise(National_Median = median(Relative_Increase, na.rm = TRUE) * 100,
             MAD = mad(Relative_Increase, na.rm = TRUE) * 100)
 
 # Merge shading data back into the main dataframe
-df_combined <- left_join(df_combined, national_medians, by = "Cessation_Type")
+df_combined = left_join(df_combined, national_medians, by = "Cessation_Type")
 
-df_national <- df_combined %>%
+df_national = df_combined %>%
   group_by(Cessation_Type) %>%
   summarise(Relative_Increase = list(Relative_Increase)) %>%
   unnest(cols = Relative_Increase) %>%
@@ -1061,63 +1061,63 @@ ggsave("prelim_results/figure_4_rw.png", plot = figure_4, width = 10, height = 1
 #=========================Table 1==============================================#
 
 # Define relevant years and interventions
-YEARS <- as.character(2025:2030)
-LOCATIONS <- dimnames(total.incidence)$location
-INTERVENTIONS <- dimnames(full.results)$intervention
+YEARS = as.character(2025:2030)
+LOCATIONS = dimnames(total.incidence)$location
+INTERVENTIONS = dimnames(full.results)$intervention
 
 # Identify intervention indices
-intervention_noint <- which(INTERVENTIONS == "noint")         # Continuation of RWHAP
-intervention_loseRW <- which(INTERVENTIONS == "loseRW")       # Cessation of RWHAP
-intervention_tempRW <- which(INTERVENTIONS == "temploseRW")   # Interruption of RWHAP
+intervention_noint = which(INTERVENTIONS == "noint")         # Continuation of RWHAP
+intervention_loseRW = which(INTERVENTIONS == "loseRW")       # Cessation of RWHAP
+intervention_tempRW = which(INTERVENTIONS == "temploseRW")   # Interruption of RWHAP
 
 # Aggregate incidence across selected years (sum over years), keeping (location, sim)
-inc_noint <- apply(total.incidence[YEARS, , , intervention_noint, drop = FALSE], 
+inc_noint = apply(total.incidence[YEARS, , , intervention_noint, drop = FALSE], 
                    MARGIN = c('sim','location'), # (location, sim)
                    FUN = sum, na.rm = TRUE)
 
-averted_loseRW <- apply(total.incidence[YEARS, , , intervention_loseRW, drop = FALSE] - total.incidence[YEARS, , , intervention_noint, drop = FALSE], 
+averted_loseRW = apply(total.incidence[YEARS, , , intervention_loseRW, drop = FALSE] - total.incidence[YEARS, , , intervention_noint, drop = FALSE], 
                     MARGIN = c('sim','location'), 
                     FUN = sum, na.rm = TRUE)
 
-averted_tempRW <- apply(total.incidence[YEARS, , , intervention_tempRW, drop = FALSE] - total.incidence[YEARS, , , intervention_noint, drop = FALSE], 
+averted_tempRW = apply(total.incidence[YEARS, , , intervention_tempRW, drop = FALSE] - total.incidence[YEARS, , , intervention_noint, drop = FALSE], 
                     MARGIN = c('sim','location'), 
                     FUN = sum, na.rm = TRUE)
 
 
 # Compute relative percent reduction
-rel_averted_loseRW <- (averted_loseRW / inc_noint) * 100
-rel_averted_tempRW <- (averted_tempRW / inc_noint) * 100
+rel_averted_loseRW = (averted_loseRW / inc_noint) * 100
+rel_averted_tempRW = (averted_tempRW / inc_noint) * 100
 
 # Function to compute median and credible intervals (2.5%, 97.5%)
-compute_ci <- function(data) { 
+compute_ci = function(data) { 
   apply(data, 2, function(x) quantile(x, probs = c(0.025, 0.975), na.rm = TRUE)) 
 }
 
 # Compute median values (across sims)
-med_noint <- apply(inc_noint, 2, median, na.rm = TRUE)
+med_noint = apply(inc_noint, 2, median, na.rm = TRUE)
 
-med_averted_loseRW <- apply(averted_loseRW, 2, median, na.rm = TRUE)
-med_averted_tempRW <- apply(averted_tempRW, 2, median, na.rm = TRUE)
+med_averted_loseRW = apply(averted_loseRW, 2, median, na.rm = TRUE)
+med_averted_tempRW = apply(averted_tempRW, 2, median, na.rm = TRUE)
 
-med_rel_averted_loseRW <- apply(rel_averted_loseRW, 2, median, na.rm = TRUE)
-med_rel_averted_tempRW <- apply(rel_averted_tempRW, 2, median, na.rm = TRUE)
+med_rel_averted_loseRW = apply(rel_averted_loseRW, 2, median, na.rm = TRUE)
+med_rel_averted_tempRW = apply(rel_averted_tempRW, 2, median, na.rm = TRUE)
 
 # Compute 95% credible intervals (across sims)
-ci_noint <- compute_ci(inc_noint)
+ci_noint = compute_ci(inc_noint)
 
-ci_averted_loseRW <- compute_ci(averted_loseRW)
-ci_averted_tempRW <- compute_ci(averted_tempRW)
+ci_averted_loseRW = compute_ci(averted_loseRW)
+ci_averted_tempRW = compute_ci(averted_tempRW)
 
-ci_rel_averted_loseRW <- compute_ci(rel_averted_loseRW)
-ci_rel_averted_tempRW <- compute_ci(rel_averted_tempRW)
+ci_rel_averted_loseRW = compute_ci(rel_averted_loseRW)
+ci_rel_averted_tempRW = compute_ci(rel_averted_tempRW)
 
 # Function to format credible intervals into strings
-format_ci <- function(median_vals, ci_vals) { 
+format_ci = function(median_vals, ci_vals) { 
   sprintf("%.0f (%.0f - %.0f)", median_vals, ci_vals[1, ], ci_vals[2, ]) 
 }
 
 # Format data for table
-table_data <- data.frame(
+table_data = data.frame(
   Location = dimnames(inc_noint)$location,
   `Incident Infections (95% CI) - Continuation` = format_ci(med_noint, ci_noint),
   `Infections Averted (95% CI) - Cessation` = format_ci(med_averted_loseRW, ci_averted_loseRW),
@@ -1130,20 +1130,20 @@ table_data <- data.frame(
 dim(table_data)  # Should be (31, 6)
 
 # Ensure column names are formatted properly by replacing dots with spaces
-colnames(table_data) <- gsub("\\s+", "_", gsub("^X\\s*", "", gsub("\\.+", " ", colnames(table_data))))
+colnames(table_data) = gsub("\\s+", "_", gsub("^X\\s*", "", gsub("\\.+", " ", colnames(table_data))))
 
 # Apply extraction to numeric column for coloring
-table_data$Relative_Infections_Averted_Num <- table_data$Relative_Infections_Averted_Num <- as.numeric(gsub("\\s*\\(.*?\\)", "", table_data$Relative_Infections_Averted_95_CI_Cessation))
+table_data$Relative_Infections_Averted_Num = table_data$Relative_Infections_Averted_Num = as.numeric(gsub("\\s*\\(.*?\\)", "", table_data$Relative_Infections_Averted_95_CI_Cessation))
 
 # Normalize the values between 0 and 1 for coloring
-table_data$Color_Scale <- rescale(table_data$Relative_Infections_Averted_Num, to = c(0, 1))
+table_data$Color_Scale = rescale(table_data$Relative_Infections_Averted_Num, to = c(0, 1))
 
 # Order by num column
-table_data <- table_data %>% arrange(desc(!is.na(Relative_Infections_Averted_Num)), desc(Relative_Infections_Averted_Num))
+table_data = table_data %>% arrange(desc(!is.na(Relative_Infections_Averted_Num)), desc(Relative_Infections_Averted_Num))
 
 
 # Define color scale function
-color_map <- function(values) {
+color_map = function(values) {
   sapply(values, function(value) {
     if (is.na(value) | is.nan(value) | is.infinite(value)) {
       return("#FFFF99")  # Bright Yellow for NA values
@@ -1154,7 +1154,7 @@ color_map <- function(values) {
 }
 
 # Generate the flextable with color formatting
-ft_table <- flextable(table_data %>% select(-Relative_Infections_Averted_Num, -Color_Scale)) %>%
+ft_table = flextable(table_data %>% select(-Relative_Infections_Averted_Num, -Color_Scale)) %>%
   set_header_labels(
     Location = "Location",
     Incident_Infections_95_CI_Continuation = "Incident Infections (95% CI)",
@@ -1266,7 +1266,7 @@ for (loc_idx in seq_along(locations)) {
 
 
 # Defined the parameter list from RYAN.WHITE.PARAMETERS.PRIOR
-rw_parameters_list <- c(
+rw_parameters_list = c(
   "non.adap.or", "non.adap.msm.or", "non.adap.msm.idu.or", "non.adap.idu.male.or",
   "non.adap.idu.female.or", "non.adap.heterosexual.male.or", "non.adap.heterosexual.female.or",
   "non.adap.black.or", "non.adap.hispanic.or", "non.adap.other.or",
@@ -1326,7 +1326,7 @@ selected_parameters = filtered_prcc_results %>%
   pull(parameter) 
 
 # Initialize results storage
-comparison_results <- data.frame(parameter = character(), 
+comparison_results = data.frame(parameter = character(), 
                                  location = character(), 
                                  group = character(), 
                                  median_incidence = numeric(), 
@@ -1339,36 +1339,36 @@ for (param in selected_parameters) {
   for (loc in dimnames(relative_incidence)$location) {  
     
     # Extract values for the parameter and corresponding HIV incidence
-    param_values <- Parameter_shift[param, , loc]  # Parameter values across simulations
-    inc_values <- relative_incidence[, loc]  # Corresponding HIV incidence across simulations
+    param_values = Parameter_shift[param, , loc]  # Parameter values across simulations
+    inc_values = relative_incidence[, loc]  # Corresponding HIV incidence across simulations
     
     # Ensure there are no NA values before ranking
-    ranked_idx <- order(param_values, decreasing = TRUE, na.last = NA)  # Descending order
-    num_simulations <- length(ranked_idx)
+    ranked_idx = order(param_values, decreasing = TRUE, na.last = NA)  # Descending order
+    num_simulations = length(ranked_idx)
     
     # Ensure we have enough simulations to select a top/bottom 20%
-    top_20_idx <- ranked_idx[1:floor(num_simulations * 0.2)]  # Highest parameter values
-    bottom_20_idx <- ranked_idx[(num_simulations - floor(num_simulations * 0.2) + 1):num_simulations]  # Lowest parameter values
+    top_20_idx = ranked_idx[1:floor(num_simulations * 0.2)]  # Highest parameter values
+    bottom_20_idx = ranked_idx[(num_simulations - floor(num_simulations * 0.2) + 1):num_simulations]  # Lowest parameter values
     
     # Compute median of top 20% incidence values
-    median_top_20 <- median(inc_values[top_20_idx], na.rm = TRUE)
-    median_bottom_20 <- median(inc_values[bottom_20_idx], na.rm = TRUE)
+    median_top_20 = median(inc_values[top_20_idx], na.rm = TRUE)
+    median_bottom_20 = median(inc_values[bottom_20_idx], na.rm = TRUE)
     
     # Store results
-    comparison_results <- rbind(comparison_results, 
+    comparison_results = rbind(comparison_results, 
                                 data.frame(parameter = param, location = loc, group = "Top 20%", median_incidence = median_top_20),
                                 data.frame(parameter = param, location = loc, group = "Bottom 20%", median_incidence = median_bottom_20))
   }
 }
 
-prcc_plot_build <- ggplot_build(PRCC)
-extracted_order <- prcc_plot_build$layout$panel_params[[1]]$y$get_labels()
+prcc_plot_build = ggplot_build(PRCC)
+extracted_order = prcc_plot_build$layout$panel_params[[1]]$y$get_labels()
 
-comparison_results <- comparison_results %>%
+comparison_results = comparison_results %>%
   mutate(parameter = factor(parameter, levels = extracted_order))
 
 # Create box plot
-difference <- ggplot(comparison_results, aes(x = median_incidence*100, y = parameter, fill = group)) +
+difference = ggplot(comparison_results, aes(x = median_incidence*100, y = parameter, fill = group)) +
   geom_boxplot(alpha = 0.6, outlier.shape = NA) +  # Boxplot without outliers
   geom_vline(xintercept = 50, linetype = "dashed", color = "black", size = 1) +
   scale_fill_manual(values = c("Top 20%" = "blue", "Bottom 20%" = "orange")) +
@@ -1390,7 +1390,7 @@ ggsave("prelim_results/figure_5_rw.png", plot = figure_5, width = 10, height = 1
 #=======================In-text paragraph 7====================================#
 
 # === Identify the Three Most Influential Parameters === #
-top_3_params <- prcc_results %>%
+top_3_params = prcc_results %>%
   filter(parameter %in% rw_parameters_list) %>%
   group_by(parameter) %>%
   summarize(median_PRCC = median(abs(PRCC), na.rm = TRUE)) %>%
@@ -1399,7 +1399,7 @@ top_3_params <- prcc_results %>%
   pull(parameter)
 
 # Extract the corresponding median PRCC values
-top_3_prcc_values <- prcc_results %>%
+top_3_prcc_values = prcc_results %>%
   filter(parameter %in% top_3_params) %>%
   group_by(parameter) %>%
   summarize(median_PRCC = median(abs(PRCC), na.rm = TRUE)) %>%
@@ -1407,16 +1407,16 @@ top_3_prcc_values <- prcc_results %>%
 
 # === Compute Relative Increase in Infections for ADAP Suppression Loss === #
 # Filter for ADAP-related suppression loss parameter
-adap_suppression_results <- comparison_results %>%
+adap_suppression_results = comparison_results %>%
   filter(grepl("adap", parameter, ignore.case = TRUE))
 
 # Compute the mean relative increase in infections for top & bottom 20%
-top_20_mean_incidence <- adap_suppression_results %>%
+top_20_mean_incidence = adap_suppression_results %>%
   filter(group == "Top 20%") %>%
   summarize(mean_incidence = mean(median_incidence, na.rm = TRUE)) %>%
   pull(mean_incidence) * 100  # Convert to percentage
 
-bottom_20_mean_incidence <- adap_suppression_results %>%
+bottom_20_mean_incidence = adap_suppression_results %>%
   filter(group == "Bottom 20%") %>%
   summarize(mean_incidence = mean(median_incidence, na.rm = TRUE)) %>%
   pull(mean_incidence) * 100  # Convert to percentage
@@ -1424,7 +1424,7 @@ bottom_20_mean_incidence <- adap_suppression_results %>%
 # === Format Output for Report === #
 
 # Open the file for appending
-sink(output_file, append = TRUE)
+sink(output_file, append = F)
 cat("\n")
 cat(sprintf(
   "\nIn our probabilistic sensitivity analyses, the three most influential parameters were %s, %s, and %s, 
