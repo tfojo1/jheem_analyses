@@ -182,5 +182,14 @@ put.msa.data.as.new.source(outcome = 'early.syphilis.diagnoses',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
 
+put.msa.data.as.new.source(outcome = 'unknown.duration.or.late.syphilis.diagnoses',
+                           from.source.name = 'cdc.sti',
+                           to.source.name = 'cdc.aggregated.county',
+                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           data.manager = syphilis.manager)
+
 #Save:
 save(syphilis.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section2.rdata")

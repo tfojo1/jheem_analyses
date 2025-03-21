@@ -1,3 +1,10 @@
+#CASHED FOLDER:
+# https://livejohnshopkins-my.sharepoint.com/personal/tfojo1_jh_edu/_layouts/15/onedrive.aspx?e=5%3A940bf48ba6e0498495fea5596e3dc8e7&sharingv2=true&fromShare=true&at=9&CID=425e54af%2De78b%2D4d53%2D8df4%2D6abb10af6339&id=%2Fpersonal%2Ftfojo1%5Fjh%5Fedu%2FDocuments%2FJHEEM2&FolderCTID=0x012000E74D427C3A55BC45A1C18C850CDA2DB4&view=0
+# Excel Sheet:
+# https://livejohnshopkins-my.sharepoint.com/:x:/g/personal/zdansky1_jh_edu/EVrQ-OpGqlVIpBi_KE0P6v4B2rTpIvYcyUtLz9e1NH_oig?e=kd8bjH&wdLOR=c06087FCD-0041-804E-BB9F-F582185054BC
+# Website
+# https://jheem.shinyapps.io/EndingHIV/
+
 cat('*** Running Shiled_specification.R ***\n')
 DEFAULT.START.YEAR=1960 # simulation start year
 DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. #the same year that we use for estimating proportion MSM
@@ -5,30 +12,15 @@ DEFAULT.AGING.YEAR=2007 # differential aging starts in 2007
 DEFAULT.MIGRATION.YEAR=2007 # migration
 DEFAULT.STI.SCREENING.YEAR=1980 # year to start the STI screenings
 
-#CASHED FOLDER:
-# https://livejohnshopkins-my.sharepoint.com/personal/tfojo1_jh_edu/_layouts/15/onedrive.aspx?e=5%3A940bf48ba6e0498495fea5596e3dc8e7&sharingv2=true&fromShare=true&at=9&CID=425e54af%2De78b%2D4d53%2D8df4%2D6abb10af6339&id=%2Fpersonal%2Ftfojo1%5Fjh%5Fedu%2FDocuments%2FJHEEM2&FolderCTID=0x012000E74D427C3A55BC45A1C18C850CDA2DB4&view=0
-# Excel Sheet:
-# https://livejohnshopkins-my.sharepoint.com/:x:/g/personal/zdansky1_jh_edu/EVrQ-OpGqlVIpBi_KE0P6v4B2rTpIvYcyUtLz9e1NH_oig?e=kd8bjH&wdLOR=c06087FCD-0041-804E-BB9F-F582185054BC
-# https://jheem.shinyapps.io/EndingHIV/
 
-# > specification.metadata=get.specification.metadata('shield','C.12580')
-# > specification.metadata=get.specification.metadata('shield','US')
-
+# Caching required objects: 
 # HIV testing priors from BRFSS
-# source("applications/SHIELD/inputs/input_hiv_testing_prior_brfss.R")
+# source("applications/SHIELD/inputs/input_cache_hiv_testing_prior_brfss.R")
 # PRENATAL care coverage estiamtes from Wonder 
-# source("applications/SHIELD/inputs/input_")
+# source("applications/SHIELD/inputs/input_cache_prenatal_prior_from_wonder.R")
 
-
-# NEXT STEPS:
-# Develop a functional form for fertility 
-# likelihoods 
 
 # Working directory is set to the main JHEEM_Analysis folder:
-# JHEEM.DIR='~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/'
-# SHIELD.DIR='~/OneDrive - Johns Hopkins/JHEEM/Simulation/code/jheem_analyses/applications/SHIELD/'
-# setwd(JHEEM.DIR)
-# setwd('../../')
 source('applications/SHIELD/shield_source_code.R')
 ##--------------------------------------------------------------------------------------------------------------#
 #** INITIAL SET-UP --#----

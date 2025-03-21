@@ -1047,7 +1047,7 @@ get.hiv.testing.functional.form = function(specification.metadata){
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
 get.prp.prenatal.care.functional.form = function(specification.metadata,trimester){
   # cashed object from input_prenatal_prior_wonder
-  prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.prior.trimester",trimester),
+   prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.care.initiation.",trimester,".trimester.prior"),
                                                       version = specification.metadata$version)
 
   prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #helps counteract max value below a bit
@@ -1059,13 +1059,13 @@ get.prp.prenatal.care.functional.form = function(specification.metadata,trimeste
 }
 
 get.prp.prenatal.care.functional.form.first.trimester<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,1)
+  get.prp.prenatal.care.functional.form(specification.metadata,"first")
   }
 get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,2)
+  get.prp.prenatal.care.functional.form(specification.metadata,"second")
   }
 get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second<-function(specification.metadata){
-  get.prp.prenatal.care.functional.form(specification.metadata,3)
+  get.prp.prenatal.care.functional.form(specification.metadata,"third")
   }
 
 #-- SYPHILIS TO HIV TESTING FUNCTIONAL FORM --# -----
