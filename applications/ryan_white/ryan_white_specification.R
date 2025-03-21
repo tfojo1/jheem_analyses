@@ -100,9 +100,9 @@ register.model.quantity(RW.SPECIFICATION,
                         name = 'proportion.pwh.with.rw.without.adap.or.oahs',
                         value = expression(proportion.pwh.with.non.adap.rw * (1-proportion.non.adap.rw.with.adap) * (1-proportion.non.adap.rw.with.oahs)))
 
-# register.model.quantity(RW.SPECIFICATION,
-#                         name = 'proportion.pwh.with.rw',
-#                         value = expression(proportion.pwh.with.adap + proportion.pwh.with.oahs.without.adap + proportion.pwh.with.rw.without.adap.or.oahs))
+register.model.quantity(RW.SPECIFICATION,
+                        name = 'proportion.pwh.with.rw',
+                        value = expression(proportion.pwh.with.adap + proportion.pwh.with.oahs.without.adap + proportion.pwh.with.rw.without.adap.or.oahs))
 
 
 ##-------------------------------------------------------------##
@@ -163,12 +163,28 @@ register.model.quantity(RW.SPECIFICATION,
 ##-- OUTCOMES --##
 ##--------------##
 
+
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'rw.clients',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Ryan White Clients',
+                                                                    description = "Number of Individuals Receiving any Ryan White Services",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.with.rw',
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = NULL,
+                         save = T)
+
 track.integrated.outcome(RW.SPECIFICATION,
                          name = 'non.adap.clients',
                          outcome.metadata = create.outcome.metadata(display.name = 'Non-ADAP Clients',
                                                                     description = "Number of Individuals Receiving any non-ADAP Ryan White Services",
                                                                     scale = 'non.negative.number',
-                                                                    axis.name = 'Cases',
+                                                                    axis.name = 'Clients',
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'infected',
@@ -183,7 +199,7 @@ track.integrated.outcome(RW.SPECIFICATION,
                          outcome.metadata = create.outcome.metadata(display.name = 'ADAP Clients',
                                                                     description = "Number of Individuals Receiving AIDS Drug Assistance Program through Ryan White",
                                                                     scale = 'non.negative.number',
-                                                                    axis.name = 'Cases',
+                                                                    axis.name = 'Clients',
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'infected',
@@ -198,7 +214,7 @@ track.integrated.outcome(RW.SPECIFICATION,
                          outcome.metadata = create.outcome.metadata(display.name = 'OAHS Clients',
                                                                     description = "Number of Individuals Receiving any Outpatient Ambulatory Health Services through Ryan White",
                                                                     scale = 'non.negative.number',
-                                                                    axis.name = 'Cases',
+                                                                    axis.name = 'Clients',
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'infected',
