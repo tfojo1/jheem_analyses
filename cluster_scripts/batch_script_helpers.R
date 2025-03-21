@@ -2,8 +2,10 @@
 # JHEEM_DIR = file.path("/scratch4/pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses")
 USER = 'azalesak'
 JHEEM_DIR = file.path("/scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
-OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs")
+OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs2")
 MODULE.LOAD.COMMANDS = c('source cluster_scripts/rockfish_module_loads.sh')
+EHE.SPEC <- "applications/ehe/ehe_specification.R"
+EHE.REG <- "applications/ehe/calibration_runs/ehe_register_calibrations.R"
 
 make.sbatch.script <- function(filename,
                                mem='16GB',
@@ -60,11 +62,12 @@ make.setup.scripts <- function(locations,
                                dir='cluster_scripts/setup_scripts',
                                partition='parallel',
                                account='tfojo1',
-                               mem='16G')
+                               mem='16G',
+                               time.hours=12)
 {
     # Create output directories for each location
     for (location in locations) {
-        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code, extension=".out"))
+        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code, extension=".out"))
         if (!dir.exists(output_path))
             dir.create(output_path, recursive=TRUE)
             
@@ -79,7 +82,7 @@ make.setup.scripts <- function(locations,
                            output = output_path,
                            job.name = paste0('S_', location),
                            partition = partition,
-                           time.hours = 12,
+                           time.hours = time.hours,
                            account=account,
                            commands= paste("Rscript cluster_scripts/set_up_calibration.R", version, location, calibration.code, specification.path, register.calibration.path))
     }
@@ -95,7 +98,8 @@ make.run.scripts <- function(locations,
                              dir='cluster_scripts/run_scripts',
                              partition="parallel",
                              account='tfojo1',
-                             mem='16G')
+                             mem='16G',
+                             time.hours=36)
 {
     for (location in locations) {
         # Create output directories for each location/chain combination
@@ -117,7 +121,7 @@ make.run.scripts <- function(locations,
                                mem=mem,
                                output = output_path,
                                partition=partition,
-                               time.hours = 36, #Todd's said 7*24 but this made it hard to queue
+                               time.hours = time.hours,
                                account=account,
                                commands = paste("Rscript cluster_scripts/run_calibration.R", version, location, calibration.code, chain, specification.path, register.calibration.path))
         }
@@ -298,4 +302,14 @@ get.run.filename <- function(calibration.code, chain, extension=".bat") {
 
 get.multiphase.filename <- function(calibration.codes, chain, extension=".bat") {
     paste0("multiphase_", paste(calibration.codes, collapse="__"), chain, extension)
+}
+
+## FOR ANDREW EHE APPLICATIONS
+make.all.scripts <- function() {
+    for (code in c('pop.ehe', 'trans.ehe', 'full.ehe')) {
+        make.setup.scripts(MSAS.OF.INTEREST, 'ehe', code, EHE.SPEC, EHE.REG)
+        make.run.scripts(MSAS.OF.INTEREST, 'ehe', code, 1, EHE.SPEC, EHE.REG)
+    }
+    make.setup.scripts(MSAS.OF.INTEREST, 'ehe', 'final.ehe', EHE.SPEC, EHE.REG)
+    make.run.scripts(MSAS.OF.INTEREST, 'ehe', 'final.ehe', 1:4, EHE.SPEC, EHE.REG)
 }
