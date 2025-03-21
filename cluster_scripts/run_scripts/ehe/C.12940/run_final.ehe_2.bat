@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=R_C.12940_2
 #SBATCH --mem=16G
-#SBATCH --output=/scratch4/pkasaie1/azalesak/jheem/code/jheem_analyses/cluster_scripts/outputs/ehe/C.12940/run_final.ehe_4.out
+#SBATCH --output=/scratch4/pkasaie1/azalesak/jheem/code/jheem_analyses/cluster_scripts/outputs2/ehe/C.12940/run_final.ehe_4.out
 #SBATCH --time=36:00:00
 #SBATCH --partition=parallel
 #SBATCH --account=tfojo1
