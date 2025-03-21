@@ -85,7 +85,10 @@ dx.prev.adjusted.one <- dx.prev.adjusted.one %>%
   add_row(year = "2018", location = 'C.33340', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
   add_row(year = "2016", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
   add_row(year = "2015", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
-  add_row(year = "2014", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)
+  add_row(year = "2014", location = 'C.47900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
+  #Manually Removing Diagnosed Prevalence data for Sacramento 2015 or before for source = aggregated county
+  add_row(year = "2015", location = 'C.40900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)%>%
+  add_row(year = "2014", location = 'C.40900', source ='cdc.surveillance.reports', ontology = 'cdc.msa.reports', adjudication = TRUE)
 
 run.outlier.process(outcome= 'diagnosed.prevalence',
                     stratifications= list(c()),
@@ -140,6 +143,18 @@ dx.prev.adjusted.three <- run.outlier.process(outcome= 'diagnosed.prevalence',
   filter(source == "cdc.aggregated.county")
 
 dx.prev.adjusted.three$adjudication <- c(T)
+
+#Manually Removing Diagnosed Prevlaence data for Sacramento 2015 or before for source = aggregated county
+dx.prev.adjusted.three <- dx.prev.adjusted.three %>%
+add_row(year = "2015", location = 'C.40900', source ='cdc.aggregated.county', ontology = 'cdc', adjudication = TRUE)%>%
+add_row(year = "2014", location = 'C.40900', source ='cdc.aggregated.county', ontology = 'cdc', adjudication = TRUE)%>%
+add_row(year = "2013", location = 'C.40900', source ='cdc.aggregated.county', ontology = 'cdc', adjudication = TRUE)%>%
+add_row(year = "2012", location = 'C.40900', source ='cdc.aggregated.county', ontology = 'cdc', adjudication = TRUE)%>%
+add_row(year = "2011", location = 'C.40900', source ='cdc.aggregated.county', ontology = 'cdc', adjudication = TRUE)%>%
+add_row(year = "2010", location = 'C.40900', source ='cdc.aggregated.county', ontology = 'cdc', adjudication = TRUE)%>%
+add_row(year = "2009", location = 'C.40900', source ='cdc.aggregated.county', ontology = 'cdc', adjudication = TRUE)%>%
+add_row(year = "2008", location = 'C.40900', source ='cdc.aggregated.county', ontology = 'cdc', adjudication = TRUE)
+
 
 #Combine with the other identified diagnosed.prevalence outliers from above: 
 all.dx.prev.agg.county = rbind(dx.prev.adjusted.three, dx.prev.agg.county.remove)
