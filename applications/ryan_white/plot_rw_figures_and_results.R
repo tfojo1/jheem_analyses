@@ -1,7 +1,7 @@
 # Install necessary libraries if they are not already installed
 packages = c("ggplot2", "tidyverse", "broom", "ks", "ggpubr", 
               "gridExtra", "gt", "sf", "usmap", "flextable", "officer",
-              "scales")
+              "scales", "sensitivity", "ppcor")
 
 # Check if each package is installed, and install missing ones
 install_if_missing = function(pkg) {
@@ -27,6 +27,8 @@ library(usmap)
 library(scales)
 library(flextable)
 library(officer)
+library(sensitivity)
+library(ppcor)
 
 
 # Suppress warnings and messages globally
@@ -1209,61 +1211,22 @@ interventions = dimnames(full.results.sub)$intervention
 # Subset only "loseRW" intervention
 intervention_idx = which(interventions == "loseRW")
 
-# Extract incidence data 
+# Extract incidence data  
 incidence_int = apply(full.results.sub[YEARS.TO.CONSIDER, , , , , , "incidence", , intervention_idx, drop = F], c('sim', 'location'), sum, na.rm=T)
 incidence_noint = apply(full.results.sub[YEARS.TO.CONSIDER, , , , , , "incidence", , "noint", drop = F], c('sim', 'location'), sum, na.rm=T)
 
 # Compute relative incidence per location
 relative_incidence = ifelse(incidence_noint == 0, 0, (incidence_int - incidence_noint) / incidence_noint) # Same array shape
 
-dimnames(relative_incidence)
-
+# Extract relevant parameters
 loseRW_parameters = all.parameters[,,,intervention_idx, drop = T]
 Noint_parameters = all.parameters[,,,"noint", drop = T]
 Parameter_shift = (loseRW_parameters %>% replace(is.na(.), 0)) - 
   (Noint_parameters %>% replace(is.na(.), 0))
 
-# Extract relevant dimension names
+# Extract dimension names
 locations = dimnames(relative_incidence)$location
-parameters = dimnames(Parameter_shift)$parameter
-
-# Initialize a results storage data frame
-prcc_results = data.frame(parameter = character(), location = character(), PRCC = numeric())
-
-# Compute PRCC per location
-for (loc_idx in seq_along(locations)) {
-  loc_name = locations[loc_idx]
-  
-  # Extract relative incidence for this location
-  rel_inc_vec = relative_incidence[, loc_idx]  # Vector of 100 simulations
-  
-  # Skip if all values are NA or constant
-  if (all(is.na(rel_inc_vec)) || length(unique(rel_inc_vec)) < 2) next
-  
-  # Residualize relative incidence
-  res_incidence = residuals(lm(rel_inc_vec ~ 1, na.action = na.exclude))
-  
-  for (param_idx in seq_along(parameters)) {
-    param_name = parameters[param_idx]
-    
-    # Extract the parameter values for this location across simulations
-    param_vec = loseRW_parameters[param_idx, , loc_idx]  # Vector of 100 simulations
-    
-    # Skip if all values are NA or constant
-    if (all(is.na(param_vec)) || length(unique(param_vec)) < 2) next
-    
-    # Residualize the parameter
-    res_param = residuals(lm(param_vec ~ 1, na.action = na.exclude))
-    
-    # Compute Spearman correlation (PRCC)
-    prcc_value = cor(res_param, res_incidence, method = "spearman", use = "complete.obs")
-    
-    # Store result
-    prcc_results = rbind(prcc_results, data.frame(parameter = param_name, location = loc_name, PRCC = prcc_value))
-  }
-}
-
-
+parameters = dimnames(Parameter_shift)$parameter 
 
 # Defined the parameter list from RYAN.WHITE.PARAMETERS.PRIOR
 rw_parameters_list = c(
@@ -1288,12 +1251,55 @@ rw_parameters_list = c(
   "rw.suppression.age4.or", "rw.suppression.age5.or",
   "rw.suppression.black.slope.or", "rw.suppression.hispanic.slope.or", "rw.suppression.other.slope.or",
   "adap.vs.oahs.suppression.or", "non.oahs.vs.oahs.suppression.or", "lose.adap.effect",
-  "lose.oahs.effect","lose.rw.support.effect" 
+  "lose.oahs.effect","lose.rw.support.effect"
 )
+
+# Initialize a results storage data frame
+prcc_results = data.frame(parameter = character(), location = character(), PRCC = numeric())
+
+# Compute PRCC per location using pcor
+for (loc_idx in seq_along(locations)) {
+  loc_name = locations[loc_idx]
+  
+  # Extract relative incidence for this location
+  rel_inc_vec = relative_incidence[, loc_idx]  # Vector of 100 simulations
+  
+  # Skip if all values are NA or constant
+  if (all(is.na(rel_inc_vec)) || length(unique(rel_inc_vec)) < 2) next
+  
+  # Create a dataframe of parameter values for this location
+  param_df = as.data.frame(t(loseRW_parameters[, , loc_idx]))  # Convert 2D matrix to data frame
+  
+  # Filter to only include parameters in the filtered list
+  param_df = param_df[, intersect(parameters, rw_parameters_list), drop = FALSE]
+  
+  # Remove fully missing columns
+  param_df = param_df[, colSums(!is.na(param_df)) > 0, drop = FALSE]
+  
+  # Ensure at least two predictors for valid partial correlation analysis
+  if (ncol(param_df) > 1) {
+    # Combine rel_inc_vec with parameter data
+    prcc_input = cbind(rel_inc_vec, param_df)
+    
+    # Compute PRCC using pcor
+    prcc_matrix = pcor(prcc_input, method = "spearman")$estimate
+    
+    # Extract PRCC values (first row, excluding first column)
+    prcc_values = prcc_matrix[1, -1]  
+    param_names = colnames(prcc_input)[-1]  # Exclude first column (rel_inc_vec)
+    
+    # Store results in one step
+    prcc_results = rbind(prcc_results, data.frame(
+      parameter = param_names, 
+      location = loc_name, 
+      PRCC = prcc_values, 
+      stringsAsFactors = FALSE
+    ))
+  }
+}
 
 # Compute median PRCC per parameter across all locations
 top_10_params = prcc_results %>%
-  filter(parameter %in% rw_parameters_list) %>%
   group_by(parameter) %>%
   summarize(median_PRCC = median(abs(PRCC), na.rm = TRUE)) %>%
   arrange(desc(median_PRCC)) %>%
@@ -1305,15 +1311,14 @@ filtered_prcc_results = prcc_results %>%
   filter(parameter %in% top_10_params) %>%
   mutate(parameter = as.character(parameter))
 
-
 # Plot results using ggplot2
 PRCC = ggplot(filtered_prcc_results, aes(x = PRCC, y = reorder(parameter, PRCC))) +
-  geom_boxplot( fill = "#619CFF") +
+  geom_boxplot(fill = "#619CFF") +
   geom_vline(xintercept = 0, linetype = "dashed", color = "black", size = 1) +  # Dashed line at 0
   theme_minimal() +
   labs(
     x = "Partial Rank Correlation Coefficient (PRCC)",
-    y = "Parameter",
+    y = "Parameter"
   )
 
 PRCC
@@ -1381,11 +1386,12 @@ difference = ggplot(comparison_results, aes(x = median_incidence*100, y = parame
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 difference
 
-figure_5 = ggpubr::ggarrange(PRCC, difference,
+figure_supp = ggpubr::ggarrange(PRCC, difference,
                   ncol = 1, nrow = 2,labels = c("A", "B"), 
                   common.legend = F)
 
-ggsave("prelim_results/figure_5_rw.png", plot = figure_5, width = 10, height = 10, dpi = 300)
+ggsave("prelim_results/figure_5_old_rw.png", plot = figure_supp , width = 10, height = 10, dpi = 300)
+
 
 #=======================In-text paragraph 7====================================#
 
@@ -1441,5 +1447,266 @@ cat(sprintf(
 cat("\n")
 sink()
 
+ 
+
+
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+#==========================Covariate Analysis==================================#
+################################################################################
+################################################################################
+################################################################################
+################################################################################
+
+#=======================New figure 5 ==========================================#
+
+# Load required libraries
+library(ggplot2)
+
+# Define years for the analysis
+years_to_consider = as.character(2025:2030)
+
+# Extract intervention indices
+intervention_noint = which(dimnames(full.results)$intervention == "noint")  # Continuation scenario
+intervention_loseRW = which(dimnames(full.results)$intervention == "loseRW")  # Cessation scenario
+
+# **Step 1: Compute relative increase in infections per city**
+# Sum over years, then take mean across simulations
+incidence_noint = apply(
+  apply(full.results[years_to_consider, , , , , , "incidence", , intervention_noint, drop = FALSE],
+        c("sim", "location"), sum, na.rm = TRUE),
+  "location", mean, na.rm = TRUE
+)
+
+incidence_loseRW = apply(
+  apply(full.results[years_to_consider, , , , , , "incidence", , intervention_loseRW, drop = FALSE],
+        c("sim", "location"), sum, na.rm = TRUE),
+  "location", mean, na.rm = TRUE
+)
+
+# Compute rel_increase correctly: sum over years, mean across simulations
+incidence_noint_summed = apply(
+  full.results[years_to_consider, , , , , , "incidence", , intervention_noint, drop = FALSE],
+  c("sim", "location"), sum, na.rm = TRUE
+)
+
+incidence_loseRW_summed = apply(
+  full.results[years_to_consider, , , , , , "incidence", , intervention_loseRW, drop = FALSE],
+  c("sim", "location"), sum, na.rm = TRUE
+)
+
+rel_increase = apply(
+  (incidence_loseRW_summed - incidence_noint_summed) / incidence_noint_summed,
+  "location", mean, na.rm = TRUE
+)
+
+
+names(incidence_loseRW) = get.location.name(names(incidence_loseRW))
+names(incidence_noint) = get.location.name(names(incidence_noint))
+names(rel_increase) = get.location.name(names(rel_increase))
+
+
+
+# **Step 2: Compute PWH service fractions**
+# ADAP: sum first, then divide, then average across sims
+frac_ADAP = apply(
+  apply(full.results[years_to_consider, , , , , , "adap.clients", , intervention_loseRW, drop = FALSE], 
+        c("sim", "location"), sum, na.rm = TRUE) /
+    apply(full.results[years_to_consider, , , , , , "diagnosed.prevalence", , intervention_loseRW, drop = FALSE], 
+          c("sim", "location"), sum, na.rm = TRUE),
+  "location", mean, na.rm = TRUE
+)
+
+# OAHS: sum first, then divide, then average across sims
+frac_OAHS = apply(
+  apply(full.results[years_to_consider, , , , , , "oahs.clients", , intervention_loseRW, drop = FALSE], 
+        c("sim", "location"), sum, na.rm = TRUE) /
+    apply(full.results[years_to_consider, , , , , , "diagnosed.prevalence", , intervention_loseRW, drop = FALSE], 
+          c("sim", "location"), sum, na.rm = TRUE),
+  "location", mean, na.rm = TRUE
+)
+
+# non-ADAP: sum first, then divide, then average across sims
+frac_non_ADAP = apply(
+  apply(full.results[years_to_consider, , , , , , "non.adap.clients", , intervention_loseRW, drop = FALSE], 
+        c("sim", "location"), sum, na.rm = TRUE) /
+    apply(full.results[years_to_consider, , , , , , "diagnosed.prevalence", , intervention_loseRW, drop = FALSE], 
+          c("sim", "location"), sum, na.rm = TRUE),
+  "location", mean, na.rm = TRUE
+)
+
+frac_suppressed = apply(
+  apply(
+    full.results[years_to_consider, , , , , , "adap.suppression", , intervention_loseRW, drop = FALSE] +
+      full.results[years_to_consider, , , , , , "oahs.suppression", , intervention_loseRW, drop = FALSE],
+    c("sim", "location"), sum, na.rm = TRUE
+  ) /
+    apply(
+      full.results[years_to_consider, , , , , , "diagnosed.prevalence", , intervention_loseRW, drop = FALSE],
+      c("sim", "location"), sum, na.rm = TRUE
+    ),
+  "location", mean, na.rm = TRUE
+)
+
+
+frac_suppressed_int = apply(
+  (full.results["2025", , , , , , "adap.suppression", , intervention_loseRW, drop = FALSE] +
+     full.results["2025", , , , , , "oahs.suppression", , intervention_loseRW, drop = FALSE]) /
+    full.results["2025", , , , , , "diagnosed.prevalence", , intervention_loseRW, drop = FALSE],
+  "location", mean, na.rm = TRUE
+)
+
+
+# **Step 4: Load Medicaid expansion status**
+# Assuming a preloaded named vector `medicaid_expansion` where city names match `dimnames(full.results)$location`
+
+# Define Medicaid Expansion (2/3 Rule)
+medicaid_expansion_lookup = c(
+  "New York-Newark-Jersey City, NY-NJ-PA" = 1,  
+  "Miami-Fort Lauderdale-Pompano Beach, FL" = 0,  
+  "Los Angeles-Long Beach-Anaheim, CA" = 1,
+  "Atlanta-Sandy Springs-Alpharetta, GA" = 0,
+  "Houston-The Woodlands-Sugar Land, TX" = 0,
+  "Dallas-Fort Worth-Arlington, TX" = 0,
+  "Chicago-Naperville-Elgin, IL-IN-WI" = 1,  # 2/3 expanded
+  "Washington-Arlington-Alexandria, DC-VA-MD-WV" = 1,
+  "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD" = 1,
+  "Orlando-Kissimmee-Sanford, FL" = 0,
+  "San Francisco-Oakland-Berkeley, CA" = 1,
+  "Phoenix-Mesa-Chandler, AZ" = 0,
+  "Tampa-St. Petersburg-Clearwater, FL" = 0,
+  "Riverside-San Bernardino-Ontario, CA" = 1,
+  "Detroit-Warren-Dearborn, MI" = 1,
+  "Baltimore-Columbia-Towson, MD" = 1,
+  "Las Vegas-Henderson-Paradise, NV" = 1,
+  "Boston-Cambridge-Newton, MA-NH" = 1,
+  "San Diego-Chula Vista-Carlsbad, CA" = 1,
+  "Charlotte-Concord-Gastonia, NC-SC" = 0,
+  "San Antonio-New Braunfels, TX" = 0,
+  "Jacksonville, FL" = 0,
+  "New Orleans-Metairie, LA" = 1,
+  "Memphis, TN-MS-AR" = 0,  # 1/3 expanded
+  "Seattle-Tacoma-Bellevue, WA" = 1,
+  "Austin-Round Rock-Georgetown, TX" = 0,
+  "Indianapolis-Carmel-Anderson, IN" = 1,
+  "Columbus, OH" = 1,
+  "Baton Rouge, LA" = 1,
+  "Sacramento-Roseville-Folsom, CA" = 1,
+  "Cleveland-Elyria, OH" = 1
+)
+
+medicaid_expansion_status = sapply(names(rel_increase), function(city) {
+  if (city %in% names(medicaid_expansion_lookup)) {
+    return(medicaid_expansion_lookup[city])
+  } else {
+    return(NA)
+  }
+})
+
+# **Step 5: Compute PRCCs using pcor**
+param_df = data.frame(
+  frac_ADAP = frac_ADAP,
+  frac_OAHS = frac_OAHS,
+  frac_non_ADAP = frac_non_ADAP,
+  frac_suppressed = frac_suppressed_int,
+  medicaid = as.numeric(medicaid_expansion_status),
+  incidence  = incidence_noint  
+)
+
+input_df = cbind(rel_increase, param_df)
+input_df = na.omit(input_df)
+
+
+###########
+
+corrplot(cor(input_df,method ="spearman"), type = "lower", diag = F)
+corrplot(pcor(input_df,method ="spearman")$estimate,  type = "lower", diag = F)
+
+X = input_df[, c("frac_ADAP", "frac_OAHS", "frac_non_ADAP", "frac_suppressed", "medicaid")]
+Y = input_df$rel_increase
+
+prcc_results = pcc(X = X, y = Y, rank = TRUE, nboot = 1000)
+
+print(prcc_results$PRCC)
+
+# Extract PRCC values and convert to data frame
+# Create summary table
+prcc_table = data.frame(
+  Variable = rownames(prcc_results$PRCC),
+  PRCC = round(prcc_results$PRCC[, "original"], 3),
+  CI = paste0("[", round(prcc_results$PRCC[, "min. c.i."], 2), ", ",
+              round(prcc_results$PRCC[, "max. c.i."], 2), "]")
+)
+
+# Optional: Add significance stars based on CI excluding 0
+prcc_table$Significance = ifelse(
+  prcc_results$PRCC[, "min. c.i."] > 0 | prcc_results$PRCC[, "max. c.i."] < 0,
+  "*", ""
+)
+
+# Create PRCC table using ggtexttable
+prcc_ggtable = ggtexttable(prcc_table, rows = NULL, theme = ttheme("light"))
+
+# Define base theme
+base_theme = theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        plot.title = element_text(face = "bold", size = 12))
+
+# Panel A: Suppression
+p1 = ggplot(input_df, aes(x = rel_increase * 100, y = frac_suppressed * 100,
+                           color = factor(medicaid), size = incidence)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "Mean Relative Increase in Incidence (%)",
+       y = "Mean % Suppressed (2025)",
+       color = "Medicaid Expansion", size = "Incidence") +
+  base_theme
+
+# Panel B: ADAP
+p2 = ggplot(input_df, aes(x = rel_increase * 100, y = frac_ADAP * 100,
+                           color = factor(medicaid), size = incidence)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "Mean Relative Increase in Incidence (%)",
+       y = "Mean % PWH Receiving ADAP",
+       color = "Medicaid Expansion", size = "Incidence") +
+  base_theme
+
+# Panel C: OAHS
+p3 = ggplot(input_df, aes(x = rel_increase * 100, y = frac_OAHS * 100,
+                           color = factor(medicaid), size = incidence)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "Mean Relative Increase in Incidence (%)",
+       y = "Mean % PWH Receiving OAHS",
+       color = "Medicaid Expansion", size = "Incidence") +
+  base_theme
+
+# Panel D: Non-ADAP
+p4 = ggplot(input_df, aes(x = rel_increase * 100, y = frac_non_ADAP * 100,
+                           color = factor(medicaid), size = incidence)) +
+  geom_point(alpha = 0.8) +
+  labs(x = "Mean Relative Increase in Incidence (%)",
+       y = "Mean % PWH Receiving Non-ADAP Services",
+       color = "Medicaid Expansion", size = "Incidence"
+       ) +
+  base_theme
+
+# Panel E: Table of PRCCs
+p5 = prcc_ggtable
+
+
+
+# Top row: Panels A–D
+scatterplots = ggarrange(p1, p2, p3, p4,
+                     labels = c("A", "B", "C", "D"),
+                     ncol = 2, nrow = 2,
+                     common.legend = TRUE, legend = "bottom")
+
+ggsave("prelim_results/new_figure_5.png", plot = scatterplots, width = 10, height = 10, dpi = 300)
+ggsave("prelim_results/PRCC_stats_new_fig_5.png", plot = p5, width = 5, height = 5, dpi = 300)
+
+
   })
 })
+
+print("Script has run, check prelim_results folder")
