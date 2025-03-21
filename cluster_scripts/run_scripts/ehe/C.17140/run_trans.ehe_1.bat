@@ -8,4 +8,4 @@
 #SBATCH --account=tfojo1
 
 source cluster_scripts/rockfish_module_loads.sh
-Rscript cluster_scripts/run_calibration.R ehe C.17140 trans.ehe 1 applications/ehe/ehe_specification.R applications/ehe/calibration_runs/ehe_register_calibrations.R
+Rscript cluster_scripts/run_calibration.R ehe C.17140 trans.ehe 1 applications/EHE/ehe_specification.R applications/EHE/calibration_runs/ehe_register_calibrations.R
