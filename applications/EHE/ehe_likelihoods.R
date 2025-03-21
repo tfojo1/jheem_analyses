@@ -462,6 +462,22 @@ non.age.aids.diagnoses.likelihood.instructions.trans =
                                        equalize.weight.by.year = T
   )
 
+non.age.aids.diagnoses.4x.likelihood.instructions.trans =
+  create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
+                                       outcome.for.sim = "aids.diagnoses",
+                                       dimensions = c("sex","race","risk"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 1985,
+                                       to.year = 1993,
+                                       correlation.different.years = 0.3,
+                                       #observation.correlation.form = 'compound.symmetry',
+                                       observation.correlation.form = 'autoregressive.1',
+                                       error.variance.term = DIAGNOSES.ERROR.TERM,
+                                       error.variance.type = 'cv',
+                                       weights = (4*TRANSMISSION.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
 non.age.aids.diagnoses.likelihood.instructions.full =
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                        outcome.for.sim = "aids.diagnoses",
@@ -1272,6 +1288,19 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
                                hiv.mortality.likelihood.instructions.trans#,
                                #weight = TRANSMISSION.WEIGHT
 
+  )
+
+transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids = 
+  join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
+                               race.risk.prevalence.likelihood.instructions, 
+                               non.age.aids.diagnoses.4x.likelihood.instructions.trans,
+                               population.likelihood.instructions.trans,
+                               heroin.likelihood.instructions.trans,
+                               cocaine.likelihood.instructions.trans,
+                               aids.deaths.likelihood.instructions.trans,
+                               hiv.mortality.likelihood.instructions.trans#,
+                               #weight = TRANSMISSION.WEIGHT
+                               
   )
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
