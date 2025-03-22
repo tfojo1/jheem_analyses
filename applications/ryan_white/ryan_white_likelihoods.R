@@ -319,9 +319,9 @@ get.adap.proportion.of.diagnosed.bias <- function(version, location,
     in.state.out.of.msa.adap.clients = state.adap.clients[years,use.state.mask,drop=F] - msa.portion.in.state.adap.clients
     in.state.out.of.msa.diagnosed.pwh = state.diagnosed.pwh[years,use.state.mask,drop=F] - msa.portion.in.state.diagnosed.pwh[years,use.state.mask,drop=F]
     in.state.out.of.msa.adap.proportion.of.diagnosed = in.state.out.of.msa.adap.clients / in.state.out.of.msa.diagnosed.pwh
-    
-    p.bias.by.year.state = in.state.out.of.msa.adap.proportion.of.diagnosed - msa.adap.proportion
 
+    p.bias.by.year.state = in.state.out.of.msa.adap.proportion.of.diagnosed - msa.adap.proportion
+    p.bias.by.year.state[in.state.out.of.msa.diagnosed.pwh==0] = 0
     if (multiply.by.p.suppressed)
         p.bias.by.year.state = p.bias.by.year.state * state.p.suppressed.adap[non.na.mask,use.state.mask,drop=F];
     

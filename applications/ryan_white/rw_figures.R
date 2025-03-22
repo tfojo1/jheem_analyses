@@ -3,12 +3,11 @@ source('applications/ryan_white/ryan_white_main.R')
 library(ggplot2)
 
 loc = 'C.26420'
-calibration.code = 'full.with.covid2'
-calibration.n.sim = 100
-simset.baseline = retrieve.simulation.set('rw', loc, calibration.code, calibration.n.sim)
-simset.noint = retrieve.simulation.set('rw', loc, calibration.code, calibration.n.sim, 'noint')
-simset.lose = retrieve.simulation.set('rw', loc, calibration.code, calibration.n.sim, 'loseRW')
-simset.templose = retrieve.simulation.set('rw', loc, calibration.code, calibration.n.sim, 'temploseRW')
+simset.baseline = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM)
+simset.noint = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM, 'noint')
+simset.end = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM, 'rw.end')
+simset.b.intr = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM, 'rw.b.intr')
+simset.p.intr = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM, 'rw.p.intr')
 
 PLOT.YEARS = 2010:2030
 

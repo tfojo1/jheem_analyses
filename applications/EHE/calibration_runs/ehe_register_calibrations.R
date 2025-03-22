@@ -122,6 +122,8 @@ par.aliases.transmission = list(
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions,
+                          special.case.likelihood.instructions = list(
+                            C.31080=transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
@@ -154,7 +156,6 @@ register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
 #-- REGISTER FULL CALIBRATION WITH COVID-RELATED --#
 register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
                           likelihood.instructions = FULL.likelihood.instructions.32x.new.prev,
-#                          special.case.likelihood.instructions = list(C.33100=FULL.likelihood.instructions.32x.new.prev),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -169,7 +170,8 @@ register.calibration.info(CALIBRATION.CODE.FULL.PLUS.COVID,
 #-- REGISTER FINAL CALIBRATION --#
 register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
                           likelihood.instructions = FULL.likelihood.instructions.8x.new.prev,
-                          special.case.likelihood.instructions = list(C.33100=FULL.likelihood.instructions.32x.new.prev),
+                          special.case.likelihood.instructions = 
+                            list(C.33100=FULL.likelihood.instructions.32x.new.prev),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
