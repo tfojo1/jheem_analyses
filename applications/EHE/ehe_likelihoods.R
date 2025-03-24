@@ -623,12 +623,13 @@ suppression.likelihood.instructions =
   create.location.based.ifelse.likelihood.instructions(
     suppression.basic.likelihood.instructions,
     suppression.nested.likelihood.instructions,
-    locations.list = list(c(RIVERSIDE.MSA,
+    locations.list = list(c(locations::get.all.for.type("state"),
+                            RIVERSIDE.MSA,
                             MIAMI.MSA,
                             LA.MSA,
                             VEGAS.MSA,
-                            SAN.DIEGO.MSA)) # first list - first instructions; anything not in first list will use second instructions
-                        
+                            SAN.DIEGO.MSA)) # anything not in this list will use second instructions
+    
   )
 
 #-- AIDS DEATHS  ----
@@ -749,11 +750,12 @@ awareness.likelihood.instructions =
   create.location.based.ifelse.likelihood.instructions(
     awareness.basic.likelihood.instructions,
     awareness.nested.likelihood.instructions,
-    locations.list = list(c(RIVERSIDE.MSA,
+    locations.list = list(c(locations::get.all.for.type("state"),
+                            RIVERSIDE.MSA,
                             MIAMI.MSA,
                             LA.MSA,
                             VEGAS.MSA,
-                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
+                            SAN.DIEGO.MSA))  # anything not in this list will use second instructions
   )
 
 #-- HEROIN  ----
@@ -808,9 +810,10 @@ heroin.likelihood.instructions.trans =
   create.location.based.ifelse.likelihood.instructions(
     heroin.basic.likelihood.instructions.trans,
     heroin.nested.likelihood.instructions.trans,
-    locations.list = list(c(LA.MSA,
+    locations.list = list(c(locations::get.all.for.type("state"),
+                            LA.MSA,
                             VEGAS.MSA,
-                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
+                            SAN.DIEGO.MSA))  # anything not in this list will use second instructions
   )
 
 heroin.basic.likelihood.instructions.full = 
@@ -864,9 +867,10 @@ heroin.likelihood.instructions.full =
   create.location.based.ifelse.likelihood.instructions(
     heroin.basic.likelihood.instructions.full,
     heroin.nested.likelihood.instructions.full,
-    locations.list = list(c(LA.MSA,
+    locations.list = list(c(locations::get.all.for.type("state"),
+                            LA.MSA,
                             VEGAS.MSA,
-                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
+                            SAN.DIEGO.MSA))  # anything not in this list will use second instructions
   )
 
 #-- COCAINE  ----
@@ -921,10 +925,11 @@ cocaine.likelihood.instructions.trans =
   create.location.based.ifelse.likelihood.instructions(
     cocaine.basic.likelihood.instructions.trans,
     cocaine.nested.likelihood.instructions.trans,
-    locations.list = list(c(LA.MSA,
+    locations.list = list(c(locations::get.all.for.type("state"),
+                            LA.MSA,
                             VEGAS.MSA,
-                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
-)
+                            SAN.DIEGO.MSA)) # anything not in this list will use second instructions
+  )
 
 cocaine.basic.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "cocaine",
@@ -977,13 +982,30 @@ cocaine.likelihood.instructions.full =
   create.location.based.ifelse.likelihood.instructions(
     cocaine.basic.likelihood.instructions.full,
     cocaine.nested.likelihood.instructions.full,
-    locations.list = list(c(LA.MSA,
+    locations.list = list(c(locations::get.all.for.type("state"),
+                            LA.MSA,
                             VEGAS.MSA,
-                            SAN.DIEGO.MSA))  # first list - first instructions; anything not in first list will use second instructions
+                            SAN.DIEGO.MSA))  # anything not in this list will use second instructions
   )
 
 #-- PROPORTION TESTED ----
-proportion.tested.likelihood.instructions =
+proportion.tested.basic.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "proportion.tested",
+                                       outcome.for.sim = "testing",
+                                       
+                                       dimensions = c("age","sex","race","risk"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2010,
+                                       
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = NULL,
+                                       error.variance.type = 'data.variance', # sd or data.variance 
+                                       
+                                       weights = (1*FULL.WEIGHT),
+                                       equalize.weight.by.year = T
+  )
+
+proportion.tested.nested.likelihood.instructions =
   create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested",
                                                    outcome.for.sim = "testing",
                                                    denominator.outcome.for.data = "adult.population",
@@ -1011,6 +1033,13 @@ proportion.tested.likelihood.instructions =
                                                    
                                                    weights = (1*FULL.WEIGHT),
                                                    equalize.weight.by.year = T
+  )
+
+proportion.tested.likelihood.instructions = 
+  create.location.based.ifelse.likelihood.instructions(
+    proportion.tested.basic.likelihood.instructions,
+    proportion.tested.nested.likelihood.instructions,
+    locations.list = list(c(locations::get.all.for.type("state")))  # anything not in this list will use second instructions
   )
 
 #-- HIV TEST POSITIVITY ----
