@@ -109,12 +109,13 @@ data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillan
 data.manager$register.parent.source('NNDSS', full.name = 'National Notifiable Disease Surveillance System', short.name= "NNDSS") #parent
 data.manager$register.parent.source('DHHS', full.name = 'U.S. Department of Health and Human Services', short.name= "DHHS") #parent
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
+data.manager$register.parent.source('LHD', full.name = 'Local Health Department', short.name= "LHD")
 
 data.manager$register.source('cdc.sti', parent.source= "NNDSS", full.name = "Atlas Plus STI Data", short.name='cdc.sti')
 data.manager$register.source('cdc.aggregated.county', parent.source= "NHSS", full.name = 'CDC Aggregated County', short.name = 'cdc aggd county') #Note this is for the aggregated county data being used to represent MSAs
 data.manager$register.source('cdc.sti.surveillance.reports', parent.source= "DHHS", full.name = "CDC Sexually Transmitted Disease Surveillance", short.name='cdc.sti.surveillance.reports')
 data.manager$register.source('cdc_wonder', parent.source= "NCHS", full.name = "CDC Wonder", short.name='cdc_wonder')
-
+data.manager$register.source('lhd', parent.source= "LHD", full.name = "Local Health Department", short.name='lhd')
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -155,6 +156,7 @@ source('data_processing/syphilis.manager/cdc.sti.surveillance.reports.processing
 source('data_processing/syphilis.manager/cdc.pdf.reports.1997.2003.R') #This pulls syphilis data from the 1990s
 source('data_processing/syphilis.manager/cdc.pdf.reports.1941.2022.R') #These replace the US totals for certain years above, they are more recent. This pulls one table from a 2022 report that reports cases back to 1941
 source('data_processing/syphilis.manager/syphilis.deaths.R')
+source('data_processing/syphilis.manager/local.health.department.syphilis.data.R')
 
 # Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
