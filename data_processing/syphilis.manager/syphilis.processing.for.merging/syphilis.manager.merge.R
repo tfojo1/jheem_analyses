@@ -20,14 +20,19 @@ section4 = load.data.manager(name="syphilis.manager_section1", file="Q:/data_man
 section3$import.data(section1) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
 section3$import.data(section2)
 section3$import.data(section4)
+
+syphilis.manager = section3
+
+#Source code to create proportion of congenital syphilis births:
+source('data_processing/syphilis.manager/proportion.of.congenital.syphilis.births.R')
  
 #SAVE Final, Complete Syphilis Manager to Cached
-save(section3, file="../../cached/syphilis.manager.rdata")
+save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
 
 #SAVE Final, Complete Syphilis Manager to Q Drive
-save(section3, file="Q:/data_managers/syphilis.manager.rdata")
+save(syphilis.manager, file="Q:/data_managers/syphilis.manager.rdata")
 
 #SAVE Final, Complete Syphilis Manager, Archive a dated version to the Q Drive#
 timestamp <- Sys.Date()
 filename <- paste0("Q:/data_managers/Archive/syphilis.manager_", timestamp, ".rdata")
-save(section3, file=filename)
+save(syphilis.manager, file=filename)
