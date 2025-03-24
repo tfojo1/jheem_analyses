@@ -1542,7 +1542,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 ##---- Prenatal Care Coverage ----
 register.model.element(SHIELD.SPECIFICATION,
                        name='prp.prenatal.care.first.trimester',
-                       scale='proportion',
+                       scale='proportion', 
                        get.functional.form.function = get.prp.prenatal.care.functional.form.first.trimester,
                        functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
 
@@ -1591,7 +1591,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.third.trimester'])
 # assuming rr.congenital.syphilis.no.prenatal.care =1
 
-##---- Prenatal.care.coverage.by trimester ----
+##---- Prenatal.care.coverage.by trimester ---- 
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.first.trimester',
                          value.to.integrate = "prp.prenatal.care.first.trimester", #the number of births are also time varying but here we are approximating
@@ -1605,7 +1605,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'proportion'),
                          keep.dimensions = c('location','age','race'),
                          corresponding.data.outcome ="prenatal.care.initiation.first.trimester",
-                         save=T)
+save=T)
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.second.trimester',
                          value.to.integrate = "prp.prenatal.care.second.trimester",

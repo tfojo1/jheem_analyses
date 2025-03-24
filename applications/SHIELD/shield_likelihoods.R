@@ -14,7 +14,7 @@
 w1=lapply(2010:2019, function(year){
   total.weight = 0.95^(year-2010)
   create.likelihood.weights(total.weight,dimension.values = list(year=year))
-  })
+})
 w2=lapply(2020:2023, function(year){
   total.weight = 0.95^(year-2020)
   create.likelihood.weights(total.weight,dimension.values = list(year=year))
@@ -210,16 +210,20 @@ cns.diagnosis.likelihood.instructions =
                                        error.variance.type = 'cv'
   )
 ##---- Congenital ----
-congenital.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "congenital.syphilis", #fix type
-                                       outcome.for.sim = "diagnosis.congenital",
-                                       dimensions = c("age","race","sex"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2010,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
-                                       error.variance.type = 'cv'
-  )
+#poportion of state level births that are complicated by congenital syphilis 
+# 1) using CDC reported state level targtest
+# 2) estimating MSA level diagnoses from local health department and estiamteign proporiton of MSA level births 
+#'@TODD: to add the nested likelihood for prop of births with congenital 
+# congenital.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "congenital.syphilis", #fix type
+#                                        outcome.for.sim = "diagnosis.congenital",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 2010,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv'
+#   )
 
 
 ##---- Total ----
@@ -255,36 +259,30 @@ total.diagnosis.likelihood.instructions =
 
 
 
-##** PRENATAL CARE COVERAGE ** ----#'@Todd: the function to capture incompleteness index
-# prp.prenatal.care.first.trimester
-msa.variance= 0.0032 #input_prenatal_msa_variance.R
+##** PRENATAL CARE COVERAGE ** ----
+#'@ANDREW:
+# source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
+msa.variance= 0.0032 #estimated for all 33 msa combined
 prenatal.care.first.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.first.trimester",  
+  create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.first.trimester",
                                        outcome.for.sim = "prp.prenatal.care.first.trimester",
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1),
                                        from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
-                                       error.variance.type = 'cv')
-prenatal.care.second.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.second.trimester",  
-                                       outcome.for.sim = "prp.prenatal.care.second.trimester",
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 2016,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05,  
-                                       error.variance.type = 'cv')
-prenatal.care.third.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.third.trimester",  
-                                       outcome.for.sim = "prp.prenatal.care.third.trimester",
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 2016,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
-                                       error.variance.type = 'cv')
+                                       error.variance.term = function(data,details){
+                                         # browser()
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,'C.12580']
+                                         msa.variance=(1-mean(w))^2 * msa.variance 
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+                                       error.variance.type = 'function.sd')
+prenatal.care.first.trimester.likelihood.instructions$instantiate.likelihood('shield','C.12580')
+# prenatal.care.second.trimester.likelihood.instructions
+# prenatal.care.third.trimester.likelihood.instructions
+
+
 ##** HIV TESTS ** ----
 hiv.testing.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv", 
@@ -295,7 +293,7 @@ hiv.testing.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, 
                                        error.variance.type = 'cv'
-                                       )
+  )
 
 #-- FULL LIKELIHOODS --# ----
 likelihood.instructions.demographics =  join.likelihood.instructions(

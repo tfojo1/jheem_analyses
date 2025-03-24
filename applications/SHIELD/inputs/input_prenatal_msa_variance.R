@@ -13,9 +13,9 @@ print(length(msas))
 
 
 m=lapply(c(1:length(msas)),function(x){
-   print(x)
+   # print(x)
    msa=msas[x]
-   print(paste("msa= ",msa," completeness= ",mean(completeness[,msa])))
+   # print(paste("msa= ",msa," completeness= ",mean(completeness[,msa])))
   msa.est= SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location[,msa]
   
   counties = locations::get.contained.locations(msa, 'county');counties
@@ -37,8 +37,8 @@ m=lapply(c(1:length(msas)),function(x){
   # return(c("msa"=msa,"counties"=length(counties.subset), "completeness"= mean(completeness[,msa]),"variance"=var))
 })
 m=do.call(rbind,m)
-dim(m) 
-head(m)
+# dim(m) 
+# head(m)
 var=mean((m[,"msa.est"]-m[,"counties.est"])^2)
 print(var)
-qplot(m[,"msa.est"],m[,"counties.est"],geom="point") 
+# qplot(m[,"msa.est"],m[,"counties.est"],geom="point") 

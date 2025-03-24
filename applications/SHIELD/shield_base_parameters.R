@@ -229,6 +229,10 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.conta
 
 
 # TBD: *** MISCLASSIFICATION ERROR **** ## -----
+#Misclassification error '@PK
+# source("applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
+percent.misclassified.el.as.llu=9.6
+percent.misclassified.llu.as.el =  27.2
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
                                       0.25,0.25*lb, 0.25*hb) #'@Rayn
 
@@ -251,8 +255,8 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immedi
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
                                       1.91,1.91*lb, 1.91*hb) #
 
-#Misclassification error '@PK
-# source("applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
+
+
 
 ## ********** -----
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
