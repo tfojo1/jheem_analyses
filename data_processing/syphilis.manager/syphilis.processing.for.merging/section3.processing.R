@@ -329,5 +329,17 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
                            override.insufficent.denom.data.constraints = T,
                            data.manager = syphilis.manager)
 
+put.msa.data.as.new.source(outcome = 'prenatal.screening.denominator',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           source.for.denominator = 'cdc.wonder.natality',
+                           ontology.for.denominator = 'cdc.fertility',
+                           details.for.new.data = 'estimated from county data',
+                           override.insufficent.denom.data.constraints = T,
+                           data.manager = syphilis.manager)
+
 #Save:
 save(syphilis.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section3.rdata")
