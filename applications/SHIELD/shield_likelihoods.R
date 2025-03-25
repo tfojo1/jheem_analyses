@@ -61,11 +61,12 @@ population.likelihood.instructions =
 
 #** DEATHS **  ----
 # CalibTarget: deaths: 2001-2020 by agegroup,sex, race, ethnicty for the US model 
-# SURVEILLANCE.MANAGER$data$deaths$estimate$census.aggregated.population$census$year__location
+# dimnames(SURVEILLANCE.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)
 deaths.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "deaths", #fix type
                                        outcome.for.sim = "deaths",
-                                       levels.of.stratification = c(0), 
+                                       dimensions = c("age","sex","race"),
+                                       levels.of.stratification = c(0,1,2), 
                                        from.year = 2010, 
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
@@ -78,7 +79,7 @@ deaths.likelihood.instructions =
 # CalibTarget: Fertility.rate: 2007-2023 agegroup race ethnicty 
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
 fertility.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "fertility.rate",  
+  create.basic.likelihood.instructions(outcome.for.data = "fertility.rate", #fix type
                                        outcome.for.sim = "fertility.rate",
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g
@@ -90,12 +91,12 @@ fertility.likelihood.instructions =
 
 #** MIGRATION **  ----
 #*#data is available for 6 overlapping 5-year period (2011-2015, 2012-2016, ....)
-#*#one way stratifiation (by age, by race, by sex) is only available for 2011-2015
+#*#one way stratifiation is only for 2011-2015
 immigration.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.data = "immigration", 
                                        outcome.for.sim = "immigration",
                                        dimensions = c('age','race','sex'), 
-                                       levels.of.stratification = c(0,1),
+                                       levels.of.stratification = c(0,1,2),
                                        from.year = 2011, 
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary ???
@@ -197,18 +198,17 @@ late.diagnosis.likelihood.instructions =
                                        error.variance.term = 0.05, 
                                        error.variance.type = 'cv'
   )
-
-##---- Total ----
-total.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "all.syphilis.cases",  
-                                       outcome.for.sim = "diagnosis.total",
+##---- CNS ----
+cns.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 
+                                       outcome.for.sim = "diagnosis.cns",
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2),
-                                       from.year = 1941,
+                                       from.year = 2000,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, 
-                                       error.variance.type = 'cv')
-
+                                       error.variance.type = 'cv'
+  )
 ##---- Congenital ----
 #poportion of state level births that are complicated by congenital syphilis 
 # 1) using CDC reported state level targtest
@@ -224,26 +224,61 @@ total.diagnosis.likelihood.instructions =
 #                                        error.variance.term = 0.05, 
 #                                        error.variance.type = 'cv'
 #   )
+
+
+##---- Total ----
+total.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "all.syphilis.cases",  
+                                       outcome.for.sim = "diagnosis.total",
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 1941,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv')
+##---- Primary ----
+# primary.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "primary.syphilis",  
+#                                        outcome.for.sim = "diagnosis.primary",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 1941,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv')
+##---- Secondary ----
+# secondary.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "secondary.syphilis",  
+#                                        outcome.for.sim = "secondary.total",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 1941,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv')
+
+
+
 ##** PRENATAL CARE COVERAGE ** ----
 #'@ANDREW:
 # source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
-# msa.variance= 0.0032 #estimated for all 33 msa combined
-# prenatal.care.first.trimester.likelihood.instructions =
-#   create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.first.trimester",
-#                                        outcome.for.sim = "prp.prenatal.care.first.trimester",
-#                                        dimensions = c("age","race"),
-#                                        levels.of.stratification = c(0,1),
-#                                        from.year = 2016,
-#                                        observation.correlation.form = 'compound.symmetry',
-#                                        error.variance.term = function(data,details){
-#                                          # browser()
-#                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,'C.12580']
-#                                          msa.variance=(1-mean(w))^2 * msa.variance 
-#                                          var= (data* (0.05))^2+msa.variance
-#                                          return(sqrt(var))
-#                                        },
-# error.variance.type = 'function.sd')
-# prenatal.care.first.trimester.likelihood.instructions$instantiate.likelihood('shield','C.12580')
+msa.variance= 0.0032 #estimated for all 33 msa combined
+prenatal.care.first.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.first.trimester",
+                                       outcome.for.sim = "prp.prenatal.care.first.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details){
+                                         # browser()
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,'C.12580']
+                                         msa.variance=(1-mean(w))^2 * msa.variance 
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+                                       error.variance.type = 'function.sd')
+prenatal.care.first.trimester.likelihood.instructions$instantiate.likelihood('shield','C.12580')
 # prenatal.care.second.trimester.likelihood.instructions
 # prenatal.care.third.trimester.likelihood.instructions
 
@@ -260,41 +295,6 @@ hiv.testing.likelihood.instructions =
                                        error.variance.type = 'cv'
   )
 
-##--OPTIONAL:CNS ----
-cns.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 
-                                       outcome.for.sim = "diagnosis.cns",
-                                       dimensions = c("age","race","sex"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2000,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
-                                       error.variance.type = 'cv'
-  )
-##--OPTIONAL:Primary ----
-# primary.diagnosis.likelihood.instructions =
-#   create.basic.likelihood.instructions(outcome.for.data = "primary.syphilis",  
-#                                        outcome.for.sim = "diagnosis.primary",
-#                                        dimensions = c("age","race","sex"),
-#                                        levels.of.stratification = c(0,1,2),
-#                                        from.year = 1941,
-#                                        observation.correlation.form = 'compound.symmetry',
-#                                        error.variance.term = 0.05, 
-#                                        error.variance.type = 'cv')
-##--OPTIONAL: Secondary ----
-# secondary.diagnosis.likelihood.instructions =
-#   create.basic.likelihood.instructions(outcome.for.data = "secondary.syphilis",  
-#                                        outcome.for.sim = "secondary.total",
-#                                        dimensions = c("age","race","sex"),
-#                                        levels.of.stratification = c(0,1,2),
-#                                        from.year = 1941,
-#                                        observation.correlation.form = 'compound.symmetry',
-#                                        error.variance.term = 0.05, 
-#                                        error.variance.type = 'cv')
-
-
-
-
 #-- FULL LIKELIHOODS --# ----
 likelihood.instructions.demographics =  join.likelihood.instructions(
   population.likelihood.instructions ,
@@ -304,20 +304,19 @@ likelihood.instructions.demographics =  join.likelihood.instructions(
   immigration.likelihood.instructions,
   emmigration.likelihood.instructions,
   
+  prenatal.first.trimester.likelihood.instructions,
+  prenatal.second.trimester.likelihood.instructions,
+  prenatal.third.trimester.likelihood.instructions,
+  no.prenatal.likelihood.instructions,
+  
+  hiv.testing.likelihood.instructions,
+  
   ps.diagnosis.likelihood.instructions,
   early.diagnosis.likelihood.instructions,
   late.diagnosis.likelihood.instructions,
+  cns.diagnosis.likelihood.instructions,
+  congenital.diagnosis.likelihood.instructions,
   total.diagnosis.likelihood.instructions,
-  
-  # congenital.diagnosis.likelihood.instructions,
-  
-  # prenatal.first.trimester.likelihood.instructions,
-  # prenatal.second.trimester.likelihood.instructions,
-  # prenatal.third.trimester.likelihood.instructions,
-  # no.prenatal.likelihood.instructions,
-  
-  hiv.testing.likelihood.instructions
-  
 )
 #manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"US")

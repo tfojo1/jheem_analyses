@@ -151,7 +151,7 @@ register.initial.population(SHIELD.SPECIFICATION,
                             value = 'n.initial.population.uninfected')
 
 ##---- Fix Strata Sizes----
-#Set Whether to Fix Strata Sizes During a Time Period # a simplifying assumption to avoid modeling population demographic dynamics before year X
+#'@title Set Whether to Fix Strata Sizes During a Time Period # a simplifying assumption to avoid modeling population demographic dynamics before year X
 # 2007 earliest year for complete census data. we fix strata to 2010
 register.fixed.model.strata(SHIELD.SPECIFICATION,
                             applies.after.time = -Inf,
@@ -367,6 +367,8 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming th
 # use the log scale: exponentiate the values # log scale for the knots,
 # we define this as a spline with 2 knots, but we have no rpior about their values. they will change in calibration
 # Future Expnasions: msm.trate.by.race #add more alphas #if we assume the multiplier by black vs other remain the sma over time we only ned 2
+
+#'@PK: to review
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.msm',
                        functional.form = create.natural.spline.functional.form(knot.times = c(time0=1990, time1=2000, time2=2010,time3=2020),
@@ -389,7 +391,7 @@ register.model.element(SHIELD.SPECIFICATION,
                                                                               knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                               min=0,
                                                                               knot.link = 'log',link='identity') ,
-                       functional.form.from.time = 1980,  
+                       functional.form.from.time = 1980, #0 or -Inf #@TODD
                        scale='rate')
 
 ##---- Sexual Contact: By AGE ----
@@ -891,9 +893,15 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         scale = 'rate',
                         value = expression(rate.testing.hiv * multiplier.syphilis.screening.to.hiv.tests))
 
-##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
+##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN----
 # prop of pregnant women receiving 'successful' prenatal screening 
 # How to model treatment failures that still result in congenital syphilis? 
+
+#'@Todd: we should link these to prob by trimester below, correct? 
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                        name = 'prp.adequate.prenatal.care.base',
+#                        scale = 'rate',
+#                        value = expression(1-prp.no.prenatal.care))  
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.received.prenatal.care',
                         scale = 'proportion',
@@ -1034,8 +1042,10 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         value = expression(rate.screening * prp.treated.immediately.following.screening +
                                                rate.testing.symptomatic * prp.treated.immediately.following.testing.symptomatic +
                                                rate.infected.contacts.diagnosed.treated 
+                                           #'@Todd: shouldnt we add rate of diagnosis/treatment for pregnant women through prenatal care here? 
                                              ))
-# Adding prenatal:
+
+# Adding prenatal
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.treated.immediately.post.diagnosis',
                                apply.function = 'add',
@@ -1157,6 +1167,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 )
 
 ##---- Deaths ----
+#'@Todd: do we need to record syphilis deaths?
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name='deaths',
                       outcome.metadata = create.outcome.metadata(display.name = 'Total Deaths',
@@ -1183,7 +1194,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  axis.name = 'Number Immigrating',
                                                                  units = 'individuals'),
                       dynamic.quantity.name = 'births',
-                      corresponding.data.outcome = 'adult.immigration', 
+                      corresponding.data.outcome = 'adult.immigration', #'@Zoe: need to make sure we have this for the national model
                       include.tags = "immigration",
                       keep.dimensions = c('location','age','race','sex'))
 
@@ -1195,7 +1206,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  axis.name = 'Number Emigrating',
                                                                  units = 'individuals'),
                       dynamic.quantity.name = 'mortality',
-                      corresponding.data.outcome = 'adult.emigration', 
+                      corresponding.data.outcome = 'adult.emigration', #'@Zoe: need to make sure we have this for the national model
                       include.tags = "emigration",
                       keep.dimensions = c('location','age','race','sex'))
 
@@ -1292,13 +1303,15 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 )
 ##---- Syphilis Diagnosies ----
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'fraction.el.misclassified.ll',
+                       'fraction.el.misclassified.ll',
                        scale = 'proportion',
+                       dimensions = c("race"),#@Todd: The dimensions for quantity 'fraction.el.misclassified.ll' include 'continuum' and 'stage'. However these dimensions are not present in the outcome dim.names inferred from the other outcomes
                        value = SHIELD_BASE_PARAMETER_VALUES['fraction.el.misclassified.ll'],
 )  
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'fraction.ll.misclassified.el',
+                       'fraction.ll.misclassified.el',
                        scale = 'proportion',
+                       dimensions = c("race"),#@Todd: The dimensions for quantity 'fraction.el.misclassified.ll' include 'continuum' and 'stage'. However these dimensions are not present in the outcome dim.names inferred from the other outcomes
                        value = SHIELD_BASE_PARAMETER_VALUES['fraction.ll.misclassified.el'],
 )  
 track.dynamic.outcome(SHIELD.SPECIFICATION,
@@ -1532,13 +1545,13 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale='proportion', 
                        get.functional.form.function = get.prp.prenatal.care.functional.form.first.trimester,
                        functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
-#
+
 register.model.element(SHIELD.SPECIFICATION,
                        name='prp.prenatal.care.second.trimester.of.those.not.screened.first',
                        scale='proportion',
                        get.functional.form.function = get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first,
                        functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
-#
+
 register.model.element(SHIELD.SPECIFICATION,
                        name='prp.prenatal.care.third.trimester.of.those.not.screened.first.second',
                        scale='proportion',
@@ -1550,11 +1563,11 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         scale='proportion',
                         value=expression((1-prp.prenatal.care.first.trimester) * prp.prenatal.care.second.trimester.of.those.not.screened.first))
 #
+
 register.model.quantity(SHIELD.SPECIFICATION,
                         name='prp.prenatal.care.third.trimester',
                         scale='proportion',
                         value=expression((1-prp.prenatal.care.first.trimester -prp.prenatal.care.second.trimester) * prp.prenatal.care.third.trimester.of.those.not.screened.first.second))
-#
 register.model.quantity(SHIELD.SPECIFICATION,
                         name='prp.no.prenatal.care',
                         scale='proportion',
@@ -1591,7 +1604,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'proportion',
                                                                     singular.unit = 'proportion'),
                          keep.dimensions = c('location','age','race'),
-                         corresponding.data.outcome ="prp.prenatal.care.first.trimester'",
+                         corresponding.data.outcome ="prenatal.care.initiation.first.trimester",
 save=T)
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.second.trimester',
@@ -1605,7 +1618,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'proportion',
                                                                     singular.unit = 'proportion'),
                          keep.dimensions = c('location','age','race'),
-                         corresponding.data.outcome ="prp.prenatal.care.second.trimester'",
+                         corresponding.data.outcome ="prenatal.care.initiation.second.trimester",
                          save=T)                  
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.third.trimester',
@@ -1619,7 +1632,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'proportion',
                                                                     singular.unit = 'proportion'),
                          keep.dimensions = c('location','age','race'),
-                         corresponding.data.outcome ="prp.prenatal.care.third.trimester'",
+                         corresponding.data.outcome ="prenatal.care.initiation.third.trimester",
                          save=T)  
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.no.prenatal.care',
@@ -1671,7 +1684,7 @@ cat('*** Shield_specification.R completed! ***\n')
 #next steps ----
 #'@PK: do we want to model miscarriages due to untreated syphilis? 
 #'@PK: do we want to model deaths among infants born with congenital syphilis?
-#'@PK: should we include population size before 2010 (we dont have city level data)
+#'@PK: should we include population sie before 2010 (we dont have city level data)
 #'
 #'
 #'Zoe working on prenatal care data by MSA + completeness index
@@ -1687,6 +1700,3 @@ cat('*** Shield_specification.R completed! ***\n')
 #'@Ryan: adding misclassification error 
 #'
 #'@Todd: we have modeled prenatal care coverage for congenital syphilis diagnosis, but we havent counted those new diagnosis and treatments that result for mothers 
-#'
-#'syphilis deaths?
-#'Emigration from US total 

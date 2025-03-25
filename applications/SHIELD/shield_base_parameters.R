@@ -228,15 +228,16 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.conta
                                       citation = "syphilis_natural_history.docx")
 
 
-#*** MISCLASSIFICATION ERROR **** ## -----
+# TBD: *** MISCLASSIFICATION ERROR **** ## -----
+#Misclassification error '@PK
 # source("applications/SHIELD/inputs/input_syphilis_misclassification_error.R")
-percent.misclassified.el.as.llu=0.096
-percent.misclassified.llu.as.el =  0.272
+percent.misclassified.el.as.llu=9.6
+percent.misclassified.llu.as.el =  27.2
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
-                                      percent.misclassified.el.as.llu,percent.misclassified.el.as.llu*lb, percent.misclassified.el.as.llu*hb)
+                                      0.25,0.25*lb, 0.25*hb) #'@Rayn
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
-                                      percent.misclassified.llu.as.el,percent.misclassified.llu.as.el*lb, percent.misclassified.llu.as.el*hb)
+                                      0.25,0.25*lb, 0.25*hb) #'@Rayn
 
 
 # TBD: *** PROP OF IMMEDIATE TREATMENTS By TESTING ROUTE ---- ##----
