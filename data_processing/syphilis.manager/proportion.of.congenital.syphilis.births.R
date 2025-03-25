@@ -7,6 +7,49 @@
 #For MSA data, the proportion = (# MSA level congenital syphilis births from LHD data) / (# MSA level births)
 
 
+# First add birth data (this is from CDC Wonder, by county, state, --------
+
+DATA.DIR.BIRTHS="../../data_raw/syphilis.manager/births.for.congenital.syphilis.proportion"
+
+births.files <- Sys.glob(paste0(DATA.DIR.BIRTHS, '/*.xlsx'))
+
+birth.data <- lapply(births.files, function(x){
+  list(filename=x, data=read_excel(x))
+})
+
+birth.data.clean = lapply(birth.data, function(file){
+  
+  data=file[["data"]]
+  filename = file[["filename"]]
+  
+  data <- data %>%
+    mutate(year = as.character(year))%>%
+    filter(LHD.Value != "Not Available")%>%
+    mutate(value = as.numeric(LHD.Value))%>%
+    filter(outcome != "cns.syphilis.diagnoses")%>%  #removing these for now
+    filter(outcome != "primary.syphilis.diagnoses")%>%
+    filter(outcome != "secondary.syphilis.diagnoses")
+  
+  data = as.data.frame(data)
+  
+  list(filename, data) 
+  
+})
+
+lhd.data.clean.put = lapply(lhd.data.clean, `[[`, 2)  
+
+for (data in lhd.data.clean.put) {
+  
+  data.manager$put.long.form(
+    data = data,
+    ontology.name = 'cdc.sti',
+    source = 'lhd',
+    dimension.values = list(),
+    url = 'na',
+    details = 'Data pulled from Local Health Department websites')
+}
+
+
 # Register New Outcomes and Sources ---------------------------------------
 data.manager$register.outcome(
   'proportion.of.congenital.syphilis.births', 
