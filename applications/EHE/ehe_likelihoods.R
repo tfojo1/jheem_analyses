@@ -85,7 +85,7 @@ EHE.PARTITIONING.FUNCTION = function(arr, version='ehe', location)
 
 #-- POPULATION  ----
 
-population.error.sd.fn = function(data, details=attr(data, 'details'))
+population.error.sd.fn = function(data, details=attr(data, 'details'), version, location)
 {
     # Massage the data a big
     melted.data = reshape2::melt(data)
