@@ -165,7 +165,7 @@ no.prenatal.likelihood.instructions =
 # we have modeled the misclassification of EL/LL diagnosis in the model and here we only fit to reported (biased) data
 ##---- PS ----
 ps.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "ps.syphilis",  
+  create.basic.likelihood.instructions(outcome.for.data = "ps.syphilis.diagnoses",  
                                        outcome.for.sim = "diagnosis.primary.secondary",  
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2), 
@@ -177,7 +177,7 @@ ps.diagnosis.likelihood.instructions =
 ##---- EARLY ----
 #MISCLASSIFICATION ERROR 
 early.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "early.syphilis", 
+  create.basic.likelihood.instructions(outcome.for.data = "early.syphilis.diagnoses", 
                                        outcome.for.sim = "diagnosis.el.misclassified",
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2,3),
@@ -186,9 +186,9 @@ early.diagnosis.likelihood.instructions =
                                        error.variance.term = 0.05, 
                                        error.variance.type = 'cv'
   )
-##---- Late/Unknown ----
+##---- Late/Unknown ---- 
 late.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "unknown.duration.or.late.syphilis", 
+  create.basic.likelihood.instructions(outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                        outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2,3),
@@ -200,7 +200,7 @@ late.diagnosis.likelihood.instructions =
 
 ##---- Total ----
 total.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "all.syphilis.cases",  
+  create.basic.likelihood.instructions(outcome.for.data = "total.syphilis.diagnoses",  
                                        outcome.for.sim = "diagnosis.total",
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2),
@@ -215,7 +215,7 @@ total.diagnosis.likelihood.instructions =
 # 2) estimating MSA level diagnoses from local health department and estiamteign proporiton of MSA level births 
 #'@TODD: to add the nested likelihood for prop of births with congenital 
 # congenital.diagnosis.likelihood.instructions =
-#   create.basic.likelihood.instructions(outcome.for.data = "congenital.syphilis", #fix type
+#   create.basic.likelihood.instructions(outcome.for.data = "congenital.syphilis.diagnoses", #fix type
 #                                        outcome.for.sim = "diagnosis.congenital",
 #                                        dimensions = c("age","race","sex"),
 #                                        levels.of.stratification = c(0,1,2),
@@ -225,8 +225,7 @@ total.diagnosis.likelihood.instructions =
 #                                        error.variance.type = 'cv'
 #   )
 ##** PRENATAL CARE COVERAGE ** ----
-#'@ANDREW:
-# source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
+### source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
 # msa.variance= 0.0032 #estimated for all 33 msa combined
 # prenatal.care.first.trimester.likelihood.instructions =
 #   create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.first.trimester",
@@ -235,10 +234,10 @@ total.diagnosis.likelihood.instructions =
 #                                        levels.of.stratification = c(0,1),
 #                                        from.year = 2016,
 #                                        observation.correlation.form = 'compound.symmetry',
-#                                        error.variance.term = function(data,details){
+#                                        error.variance.term = function(data,details,version, location){
 #                                          # browser()
-#                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,'C.12580']
-#                                          msa.variance=(1-mean(w))^2 * msa.variance 
+#                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+#                                          msa.variance=(1-mean(w))^2 * msa.variance
 #                                          var= (data* (0.05))^2+msa.variance
 #                                          return(sqrt(var))
 #                                        },
@@ -261,16 +260,16 @@ hiv.testing.likelihood.instructions =
   )
 
 ##--OPTIONAL:CNS ----
-cns.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 
-                                       outcome.for.sim = "diagnosis.cns",
-                                       dimensions = c("age","race","sex"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2000,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
-                                       error.variance.type = 'cv'
-  )
+# cns.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 
+#                                        outcome.for.sim = "diagnosis.cns",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 2000,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv'
+#   )
 ##--OPTIONAL:Primary ----
 # primary.diagnosis.likelihood.instructions =
 #   create.basic.likelihood.instructions(outcome.for.data = "primary.syphilis",  

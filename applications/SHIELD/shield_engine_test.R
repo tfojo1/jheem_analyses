@@ -15,6 +15,10 @@ specification.metadata=get.specification.metadata('shield',location)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
+# sim2 = engine$run(params)
+# engine1 = create.jheem.engine(version = 'shield', location = location, end.year = 2025)
+# sim3 = engine1$run(params)
+
 #POPUATION ----
 #fitting to age-race-sex-specific estimates starting in 2010, and assuming fix strata before then 
 simplot(sim,"population" )
@@ -28,24 +32,38 @@ simplot(sim,"population" ,split.by = 'race')
 simplot(sim, "deaths") 
 
 
-# FERTILITY RATE
+# FERTILITY RATE ----
 # Calibrating to age-race specific data over time
-# SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity[,'C.12580',,,]
+simplot(sim, 'fertility.rate')
 simplot(sim, 'fertility.rate',facet.by = 'age',split.by = 'race')
-#'@Andrew: why cant we see the data on the plot?  
+#'@Andrew: why cant we see the data on the plot? see the dimensions below  
+# dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity[,'C.12580',,,])
 
-#MIGRATION ---
+#MIGRATION ----
 # calibarted to data by year, by age, by race, by sex 
-# SURVEILLANCE.MANAGER$data$immigration$estimate$census.population$census.immigration$year__location[,'C.12580']
 simplot(sim, 'immigration')
 simplot(sim, 'immigration',split.by = 'sex')
 simplot(sim, 'immigration',split.by = 'race')
 #'@Andrew: why cant we see the data on the plot? 
+# SURVEILLANCE.MANAGER$data$immigration$estimate$census.population$census.immigration$year__location[,'C.12580']
 
-# SURVEILLANCE.MANAGER$data$emigration$estimate$census.population$census.immigration$year__location[,'C.12580']
 simplot(sim, 'emigration')
 simplot(sim, 'emigration',split.by = 'sex')
 simplot(sim, 'emigration',split.by = 'race')
+#'@Andrew: why cant we see the data on the plot? 
+# SURVEILLANCE.MANAGER$data$emigration$estimate$census.population$census.immigration$year__location[,'C.12580']
+
+# SYPHILIS DIAGNOSES ----
+simplot(sim, 'diagnosis.total')
+#'@Andrew: why cant we see the data on the plot? 
+# SURVEILLANCE.MANAGER$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[,'C.12580']
+
+simplot(sim, 'diagnosis.ps')
+#'@Andrew: why cant we see the data on the plot? 
+# SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,'C.12580']
+
+simplot(sim, 'diagnosis.el.misclassified')
+simplot(sim, 'diagnosis.late.misclassified')
 #'@Andrew: why cant we see the data on the plot? 
 
 # PRENATAL CARE COVERAGE
@@ -54,13 +72,22 @@ simplot(sim, 'prp.prenatal.care.first.trimester')
 simplot(sim, 'prp.prenatal.care.first.trimester',split.by = 'age')
 simplot(sim, 'prp.prenatal.care.first.trimester',split.by = 'race')
 simplot(sim, 'prp.prenatal.care.first.trimester',facet.by = 'age',split.by = 'race')
-#'@Andrew: why cant we see the RACE data on the plot? 
-#'# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__race__ethnicity[,"C.12580",,]
+#'@Andrew: why cant we see the data on the plots? 
+#SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__race__ethnicity[,"C.12580",,]
+# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,'C.12580',]
 
 simplot(sim, 'prp.prenatal.care.second.trimester')
 simplot(sim, 'prp.prenatal.care.second.trimester',split.by = 'age')
 simplot(sim, 'prp.prenatal.care.second.trimester',split.by = 'race')
 simplot(sim, 'prp.prenatal.care.second.trimester',facet.by = 'age',split.by = 'race')
+#'@Andrew: why cant we see the RACE data on the plot? 
+#'# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__race__ethnicity[,"C.12580",,]
+
+simplot(sim, 'prp.prenatal.care.third.trimester')
+#'@Andrew: why cant we see the RACE data on the plot? 
+#'# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__race__ethnicity[,"C.12580",,]
+
+simplot(sim, 'prp.no.prenatal.care')
 #'@Andrew: why cant we see the RACE data on the plot? 
 #'# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__race__ethnicity[,"C.12580",,]
 

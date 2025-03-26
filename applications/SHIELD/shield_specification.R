@@ -6,6 +6,11 @@
 # https://jheem.shinyapps.io/EndingHIV/
 
 cat('*** Running Shiled_specification.R ***\n')
+
+# Working directory is set to the main JHEEM_Analysis folder:
+source('applications/SHIELD/shield_source_code.R')
+
+# setting up global values:
 DEFAULT.START.YEAR=1960 # simulation start year
 DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. #the same year that we use for estimating proportion MSM
 DEFAULT.AGING.YEAR=2007 # differential aging starts in 2007
@@ -20,10 +25,8 @@ DEFAULT.STI.SCREENING.YEAR=1980 # year to start the STI screenings
 # source("applications/SHIELD/inputs/input_cache_prenatal_prior_from_wonder.R")
 
 
-# Working directory is set to the main JHEEM_Analysis folder:
-source('applications/SHIELD/shield_source_code.R')
 ##--------------------------------------------------------------------------------------------------------------#
-#** INITIAL SET-UP --#----
+#*** INITIAL SET-UP *** ----
 SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                   iteration=1,
                                                   description = 'The initial SHIELD version, set up to model national epidemic',
@@ -55,7 +58,7 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
 )
 
 
-#** INITIAL POPULATION --#----
+#*** INITIAL POPULATION *** ----
 # Specify the initial compartment sizes  
 # step1: defines an empty quantity
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -160,7 +163,7 @@ register.fixed.model.strata(SHIELD.SPECIFICATION,
                             dimensions.to.fix = c('location','age','race','sex')
 )
 
-#** BIRTHS --# ----
+#*** BIRTHS *** ----
 # we model births based on women's fertility rates
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fertility.rate',
@@ -201,7 +204,7 @@ register.natality(specification = SHIELD.SPECIFICATION,
                   all.births.into.compartments = list(profile='susceptible',age= 1),
                   tag = 'births')
 
-#** MORTALITY --# ----
+#*** MORTALITY *** ----
 ##---- General Mortality ----
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.general.mortality',
@@ -211,52 +214,52 @@ register.mortality(SHIELD.SPECIFICATION,
                    tag = 'general.mortality',
                    groups = c('infected','uninfected'),
                    mortality.rate.value = 'rate.general.mortality')
-##---- Syphilis Mortality ----
-register.model.element.values(SHIELD.SPECIFICATION,
-                              'rate.syphilis.mortality.primary'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.primary'],
-                              'rate.syphilis.mortality.secondary'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.secondary'],
-                              'rate.syphilis.mortality.early.latent'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.early.latent'],
-                              'rate.syphilis.mortality.late.latent'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.late.latent'],
-                              'rate.syphilis.mortality.tertiary'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.tertiary'],
-                              'rate.syphilis.mortality.cns'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.cns'],
-                              scale = 'rate')
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.syphilis.mortality',
-                        scale = 'rate',
-                        value = 0)
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(stage='primary'),  
-                               name = 'rate.syphilis.mortality',
-                               value = 'rate.syphilis.mortality.primary')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(stage='secondary'),
-                               name = 'rate.syphilis.mortality',
-                               value = 'rate.syphilis.mortality.secondary')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(stage='early.latent'),
-                               name = 'rate.syphilis.mortality',
-                               value = 'rate.syphilis.mortality.early.latent')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(stage='late.latent'),
-                               name = 'rate.syphilis.mortality',
-                               value = 'rate.syphilis.mortality.late.latent')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(stage='tertiary'),
-                               name = 'rate.syphilis.mortality',
-                               value = 'rate.syphilis.mortality.tertiary')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               applies.to = list(stage='cns'),
-                               name = 'rate.syphilis.mortality',
-                               value = 'rate.syphilis.mortality.cns')
-# register mortality:
-register.mortality(SHIELD.SPECIFICATION,
-                   tag = 'syphilis.mortality',
-                   groups = c('infected'), 
-                   mortality.rate.value = 'rate.syphilis.mortality')
+# ##---- Syphilis Mortality ----
+# register.model.element.values(SHIELD.SPECIFICATION,
+#                               'rate.syphilis.mortality.primary'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.primary'],
+#                               'rate.syphilis.mortality.secondary'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.secondary'],
+#                               'rate.syphilis.mortality.early.latent'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.early.latent'],
+#                               'rate.syphilis.mortality.late.latent'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.late.latent'],
+#                               'rate.syphilis.mortality.tertiary'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.tertiary'],
+#                               'rate.syphilis.mortality.cns'=SHIELD_BASE_PARAMETER_VALUES['rate.syphilis.mortality.cns'],
+#                               scale = 'rate')
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = 'rate.syphilis.mortality',
+#                         scale = 'rate',
+#                         value = 0)
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                applies.to = list(stage='primary'),  
+#                                name = 'rate.syphilis.mortality',
+#                                value = 'rate.syphilis.mortality.primary')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                applies.to = list(stage='secondary'),
+#                                name = 'rate.syphilis.mortality',
+#                                value = 'rate.syphilis.mortality.secondary')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                applies.to = list(stage='early.latent'),
+#                                name = 'rate.syphilis.mortality',
+#                                value = 'rate.syphilis.mortality.early.latent')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                applies.to = list(stage='late.latent'),
+#                                name = 'rate.syphilis.mortality',
+#                                value = 'rate.syphilis.mortality.late.latent')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                applies.to = list(stage='tertiary'),
+#                                name = 'rate.syphilis.mortality',
+#                                value = 'rate.syphilis.mortality.tertiary')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                applies.to = list(stage='cns'),
+#                                name = 'rate.syphilis.mortality',
+#                                value = 'rate.syphilis.mortality.cns')
+# # register mortality:
+# register.mortality(SHIELD.SPECIFICATION,
+#                    tag = 'syphilis.mortality',
+#                    groups = c('infected'), 
+#                    mortality.rate.value = 'rate.syphilis.mortality')
 
 
 
-#** AGING --## ----
+#*** AGING *** ----
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.general.aging',
                        scale = 'rate',
@@ -267,7 +270,7 @@ register.aging(SHIELD.SPECIFICATION,
                groups = c('uninfected','infected'),
                aging.rate.value = 'rate.general.aging')
 
-#** MIGRATION --# ----
+#*** MIGRATION *** ----
 # immigration/emigration doesn't depend on disease state. It is used to fit the population size but doesn't change the prevalence of the disease
 # The MSA priors comes from census reports - This data more represent movements between MSA and not the immigration from other countries
 # total immigration/population: prior is some fraction of this distributed equally by age and race
@@ -311,7 +314,7 @@ register.mortality(SHIELD.SPECIFICATION,
                    groups = c("uninfected","infected"), 
                    tag = "emigration")
 
-#** TRANSMISSION --# ----
+#*** TRANSMISSION *** ----
 # Transmission has 4 elements: 1.susceptibility, 2.transmissibility, 3.contact, 4.new infection proportion (where does new infection go to? e.g., infected PrEP, infected not on PrEP)
 # e.g., model a flat transmission rate that applies to all groups
 #each parameter requires a prior distribution
@@ -620,7 +623,7 @@ register.model.element(SHIELD.SPECIFICATION,
 
 
 
-#** SYPHILIS NATURAL HISTORY --# ----
+#*** SYPHILIS NATURAL HISTORY *** ----
 ##---- Stage Transitions ----
 ###----- Primary > Secondary > EL-----
 register.model.element(SHIELD.SPECIFICATION,
@@ -772,7 +775,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(sex='female'),
                                value = 'rate.late.latent.to.cns.female')
 
-#** CONTINUUM TRANSISION --# ----
+#*** CONTINUUM TRANSISION *** ----
 ##---- 1-SYMPTHOMATIC TESTING ----
 # proportions that are symptomatic during primary and secondary stages:
 register.model.element.values(SHIELD.SPECIFICATION,
@@ -1014,10 +1017,10 @@ register.model.quantity(SHIELD.SPECIFICATION,
 
 
 
-##** Treatment --#----
+#*** TREATMENT *** --#----
 # a proportion will receive immediate treatment, another group will be delayed
 # we need to sepearete this for each testing because the tratment is different
-###---- Immediate Treatments ----
+##---- Immediate Treatments ----
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.treated.immediately.following.screening',
                        scale = 'proportion',
@@ -1041,7 +1044,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                apply.function = 'add',
                                applies.to = list(sex='female',age=FERTILE.AGES),
                                value= expression(rate.prenatal.care ))
-### Remission ---- 
+##---- Remission ---- 
 # this has 2 components: those diagnosed and immediately treated (including contacts who were diagnosed/treated) 
 # and 2) those contacts who were empirically treated (but not diagnosed)
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -1063,7 +1066,7 @@ register.remission(SHIELD.SPECIFICATION,
                    remission.proportions.value = 'remission.prp',
                    tag = 'treatment.immediate.emperical')
 
-###---- Delayed Treatments ----
+##---- Delayed Treatments ----
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.treatment.delayed.post.diagnosis',
                         value = expression(rate.screening * (1- prp.treated.immediately.following.screening )+
@@ -1092,7 +1095,78 @@ register.remission(SHIELD.SPECIFICATION,
                    tag = 'treatment.delayed.postDiagnosis' )
 
 
-#** OUTPUTS --#----
+#*** CONGENITAL SYPHILIS *** ----
+##---- Vertical transmission By Stage ----
+register.model.element(SHIELD.SPECIFICATION,
+                       name='prob.vertical.transmission.mothers.early.syphilis',
+                       scale='proportion',
+                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.early.syphilis']) 
+register.model.element(SHIELD.SPECIFICATION,
+                       name='prob.vertical.transmission.mothers.late.syphilis',
+                       scale='proportion',
+                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.late.syphilis'])  
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='prob.vertical.transmission.by.stage',
+                        scale='proportion',
+                        value='prob.vertical.transmission.mothers.late.syphilis')
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prob.vertical.transmission.by.stage',
+                               applies.to = list(stage=c('primary','secondary','early.latent')),
+                               value='prob.vertical.transmission.mothers.early.syphilis')
+
+##---- Prenatal Care Coverage ----
+register.model.element(SHIELD.SPECIFICATION,
+                       name='prp.prenatal.care.first.trimester',
+                       scale='proportion', 
+                       get.functional.form.function = get.prp.prenatal.care.functional.form.first.trimester,
+                       functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
+#
+register.model.element(SHIELD.SPECIFICATION,
+                       name='prp.prenatal.care.second.trimester.of.those.not.screened.first',
+                       scale='proportion',
+                       get.functional.form.function = get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first,
+                       functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
+#
+register.model.element(SHIELD.SPECIFICATION,
+                       name='prp.prenatal.care.third.trimester.of.those.not.screened.first.second',
+                       scale='proportion',
+                       get.functional.form.function = get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second,
+                       functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
+#
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='prp.prenatal.care.second.trimester',
+                        scale='proportion',
+                        value=expression((1-prp.prenatal.care.first.trimester) * prp.prenatal.care.second.trimester.of.those.not.screened.first))
+#
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='prp.prenatal.care.third.trimester',
+                        scale='proportion',
+                        value=expression((1-prp.prenatal.care.first.trimester -prp.prenatal.care.second.trimester) * prp.prenatal.care.third.trimester.of.those.not.screened.first.second))
+#
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='prp.no.prenatal.care',
+                        scale='proportion',
+                        value=expression(1- prp.prenatal.care.first.trimester -prp.prenatal.care.second.trimester -prp.prenatal.care.third.trimester))
+##---- Risk Ratios for Congenital Syphilis Based on Prenatal Care ----
+register.model.element(SHIELD.SPECIFICATION,
+                       name='rr.congenital.syphilis.no.prenatal.care', 
+                       scale='ratio',
+                       value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.no.prenatal.care'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name='rr.congenital.syphilis.prenatal.care.first.trimester', 
+                       scale='ratio',
+                       value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.first.trimester'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name='rr.congenital.syphilis.prenatal.care.second.trimester',
+                       scale='ratio',
+                       value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.second.trimester'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name='rr.congenital.syphilis.prenatal.care.third.trimester',
+                       scale='ratio',
+                       value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.third.trimester'])
+# assuming rr.congenital.syphilis.no.prenatal.care =1
+
+#*** OUTPUTS *** --#----
 ##--------------------------------------------------------------------------------------------------------------#
 # !!!for dynamic transitions that change over time (e.g., testing), the anchor points are coded at the begginign of the year 
 # (e.g., if transmission changes from 2000 to 2020, these dates represent jan first of those years)
@@ -1290,7 +1364,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'incidence.from', # use of '.from' helps us track where individuals are coming from (differentiate new vs re-infections)
                       keep.dimensions = c('location','age','race','sex','profile')
 )
-##---- Syphilis Diagnosies ----
+##---- Syphilis Diagnosis ----
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.el.misclassified.ll',
                        scale = 'proportion',
@@ -1314,7 +1388,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       corresponding.data.outcome = 'total.syphilis.diagnoses'  ,
                       keep.dimensions = c('location','age','race','sex','stage')
 )
-### Primary/Secondary diagnoses ----
+### Primary & Secondary diagnoses ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.primary',
                          value = expression(diagnosis.total),
@@ -1343,6 +1417,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'secondary.syphilis.diagnoses' ,
                          keep.dimensions = c('location','age','race','sex')
 )
+# <used in calibration>
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.ps',
                          value = expression(diagnosis.total),
@@ -1388,6 +1463,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', #<just for comparison>
                          keep.dimensions = c('location','age','race','sex')
 )
 # Early Latent Syphilis: True Estimate 
@@ -1402,7 +1478,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'early.syphilis.diagnoses',
+                         corresponding.data.outcome = 'early.syphilis.diagnoses',#<just for comparison>
                          keep.dimensions = c('location','age','race','sex')
 )
 ### Late Latent Syphilis: True Estimate 
@@ -1417,10 +1493,11 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', 
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',  #<just for comparison>
                          keep.dimensions = c('location','age','race','sex')
 )
 # Early Latent Syphilis: Misclassified Estimate reported
+# <used in calibration>
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.el.misclassified',
                          value = expression(diagnosis.el.true *(1-fraction.el.misclassified.ll) + 
@@ -1449,7 +1526,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#these also include tertiary, cns and unknown duration
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#<just for comparison>
                          keep.dimensions = c('location','age','race','sex')
 )
 
@@ -1465,11 +1542,12 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#these also include tertiary, cns and unknown duration
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#<just for comparison>
                          keep.dimensions = c('location','age','race','sex')
 )
 
 # Late Syphilis (including LL, Tertirary and CNS):Misclassified Estimate reported
+# <used in calibration>
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.late.misclassified',
                          value = expression(diagnosis.ll.misclassified + diagnosis.tertiary  + diagnosis.cns),
@@ -1508,76 +1586,6 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well
 )
 
-##---- Vertical transmission By Stage ----
-register.model.element(SHIELD.SPECIFICATION,
-                       name='prob.vertical.transmission.mothers.early.syphilis',
-                       scale='proportion',
-                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.early.syphilis']) 
-register.model.element(SHIELD.SPECIFICATION,
-                       name='prob.vertical.transmission.mothers.late.syphilis',
-                       scale='proportion',
-                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.late.syphilis'])  
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name='prob.vertical.transmission.by.stage',
-                        scale='proportion',
-                        value='prob.vertical.transmission.mothers.late.syphilis')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name='prob.vertical.transmission.by.stage',
-                               applies.to = list(stage=c('primary','secondary','early.latent')),
-                               value='prob.vertical.transmission.mothers.early.syphilis')
-
-##---- Prenatal Care Coverage ----
-register.model.element(SHIELD.SPECIFICATION,
-                       name='prp.prenatal.care.first.trimester',
-                       scale='proportion', 
-                       get.functional.form.function = get.prp.prenatal.care.functional.form.first.trimester,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
-#
-register.model.element(SHIELD.SPECIFICATION,
-                       name='prp.prenatal.care.second.trimester.of.those.not.screened.first',
-                       scale='proportion',
-                       get.functional.form.function = get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
-#
-register.model.element(SHIELD.SPECIFICATION,
-                       name='prp.prenatal.care.third.trimester.of.those.not.screened.first.second',
-                       scale='proportion',
-                       get.functional.form.function = get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.YEAR)
-#
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name='prp.prenatal.care.second.trimester',
-                        scale='proportion',
-                        value=expression((1-prp.prenatal.care.first.trimester) * prp.prenatal.care.second.trimester.of.those.not.screened.first))
-#
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name='prp.prenatal.care.third.trimester',
-                        scale='proportion',
-                        value=expression((1-prp.prenatal.care.first.trimester -prp.prenatal.care.second.trimester) * prp.prenatal.care.third.trimester.of.those.not.screened.first.second))
-#
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name='prp.no.prenatal.care',
-                        scale='proportion',
-                        value=expression(1- prp.prenatal.care.first.trimester -prp.prenatal.care.second.trimester -prp.prenatal.care.third.trimester))
-##---- Risk Ratios for Congenital Syphilis Based on Prenatal Care ----
-register.model.element(SHIELD.SPECIFICATION,
-                       name='rr.congenital.syphilis.no.prenatal.care', 
-                       scale='ratio',
-                       value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.no.prenatal.care'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name='rr.congenital.syphilis.prenatal.care.first.trimester', 
-                       scale='ratio',
-                       value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.first.trimester'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name='rr.congenital.syphilis.prenatal.care.second.trimester',
-                       scale='ratio',
-                       value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.second.trimester'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name='rr.congenital.syphilis.prenatal.care.third.trimester',
-                       scale='ratio',
-                       value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.third.trimester'])
-# assuming rr.congenital.syphilis.no.prenatal.care =1
-
 ##---- Prenatal.care.coverage.by trimester ---- 
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.first.trimester',
@@ -1591,7 +1599,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'proportion',
                                                                     singular.unit = 'proportion'),
                          keep.dimensions = c('location','age','race'),
-                         corresponding.data.outcome ="prp.prenatal.care.first.trimester'",
+                         corresponding.data.outcome ="prenatal.care.initiation.first.trimester'",
 save=T)
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.second.trimester',
@@ -1605,7 +1613,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'proportion',
                                                                     singular.unit = 'proportion'),
                          keep.dimensions = c('location','age','race'),
-                         corresponding.data.outcome ="prp.prenatal.care.second.trimester'",
+                         corresponding.data.outcome ="prenatal.care.initiation.second.trimester'",
                          save=T)                  
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.third.trimester',
@@ -1619,7 +1627,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'proportion',
                                                                     singular.unit = 'proportion'),
                          keep.dimensions = c('location','age','race'),
-                         corresponding.data.outcome ="prp.prenatal.care.third.trimester'",
+                         corresponding.data.outcome ="prenatal.care.initiation.third.trimester'",
                          save=T)  
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.no.prenatal.care',
@@ -1669,24 +1677,13 @@ cat('*** Shield_specification.R completed! ***\n')
 
 
 #next steps ----
-#'@PK: do we want to model miscarriages due to untreated syphilis? 
-#'@PK: do we want to model deaths among infants born with congenital syphilis?
-#'@PK: should we include population size before 2010 (we dont have city level data)
-#'
-#'
-#'Zoe working on prenatal care data by MSA + completeness index
-# Completeness Index = population for all counties with birth data/population of all the counties in the MSA
-## we narrow popualtion to females in child bearing ages 
-#'@Todd: adding the completeness index to the likelihood of prenata coverage for MSAs
+# miscarriages due to untreated syphilis
+# deaths among infants born with congenital syphilis?
 
-#'Zoe adding CDC atlas data on syphilis diagnossi by stage (in progress)
-
-#'Zoe: looking for data on immigration at the national level : among those lived outside of a state, what proportion lived outside of country
-#'we dont have data on emigration at the national level , so we set those priors similar to immigration 
-
-#'@Ryan: adding misclassification error 
-#'
 #'@Todd: we have modeled prenatal care coverage for congenital syphilis diagnosis, but we havent counted those new diagnosis and treatments that result for mothers 
 #'
 #'syphilis deaths?
 #'Emigration from US total 
+#'
+#'
+#'@Todd: how can we adjust the population size before 2010?

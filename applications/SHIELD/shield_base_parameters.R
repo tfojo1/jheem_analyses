@@ -26,12 +26,16 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
 # ci's are not used
 # citation numbers are oubmed ID, they're for our own records'
 
+lb.prev=.5; hb.prev=1.5 # added uncertainty (reflecting uncertainty in fraction.reported)
+
+
+
 # *** INITIAL POPULATION INFECTED ---- ## ----
 # See input_syphilis_prev_1940.R
 # proportion of initial population infected with untreated syphilis (prevalence) in 1940
 # Due to unavailability of data, we etiamte this based on fraction of population diagnosed with non.congenital syphilis 
 # and adjust that for fraction.reported (set to 50%) to account for cases that are undiagnosed 
-lb.prev=.5; hb.prev=1.5 # added uncertainty (reflecting uncertainty in fraction.reported)
+
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.initial.population.infected.syphilis',
                                       0.007,0.007*lb.prev,0.007*hb.prev,
                                       citation = "input_syphilis_prev_1940.R")
@@ -52,21 +56,6 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.po
                                       0.1334603, 0.1334603*lb, 0.1334603*hb,
                                       citation = "input_syphilis_prev_1940.R")
 
-
-# *** SYPHILIS MORTALITY ---- ## ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.primary',
-                                      0,0,0) # TBD
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.secondary',
-                                      0,0,0) # TBD
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.early.latent',
-                                      0,0,0) # TBD
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.late.latent',
-                                      0,0,0) # TBD
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.tertiary',
-                                      0,0,0) # TBD
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.syphilis.mortality.cns',
-                                      0,0,0) # TBD
-
 # *** TRANSMISSION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
                                       1,1,1)  #TBD
@@ -74,11 +63,11 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.seconda
 ## ---- MIXING BY SEXUAL ORIENTATION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'oe.female.pairings.with.msm', #observed to estimated ratio of contacts for females with male who are msm
-                                      0.0895, 0.0895*lb, 0.0895*hb, #'@Todd: I'm not sure what the CI should be here?
+                                      0.0895, 0.0895*lb, 0.0895*hb,  
                                       citation='Pathela 2006')
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.heterosexual_male.pairings.with.male',
-                                      0.004,0.004*lb, 0.004*hb, #'@Todd: I'm not sure what the CI should be here?
+                                      0.004,0.004*lb, 0.004*hb,  
                                       citation='JHEEM assumption')
 
 ## ---- SEXUAL CONTACT BY RACE ---- ## ----
@@ -94,19 +83,19 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'oe.sexual.byrace.oo
 ## ---- SEXUAL TRANSMISSION RATES ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.sexual.transmission',
                                       4.75, 2.4, 7.1,
-                                      citation=26362321) #'@PK: check pubmed IDs
+                                      citation=26362321)  
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'female.to.male.sexual.transmission',
                                       3.75, 1.8, 5.6,
-                                      citation=26362321)#''@PK: check pubmed IDs
+                                      citation=26362321) 
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.male.sexual.transmission',
                                       5, 2.5, 7.5,
-                                      citation=26362321)#''@PK: check pubmed IDs
+                                      citation=26362321) 
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.female',
                                       0.18, 0.18*5, 0.18*2,
-                                      citation=9525438)#''@PK: check pubmed IDs
+                                      citation=9525438) 
 
 # *** CONGENITAL SYPHILIS ---- ##----
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
