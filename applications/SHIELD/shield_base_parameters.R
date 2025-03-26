@@ -243,9 +243,6 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immedi
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
                                       1.91,1.91*lb, 1.91*hb) #
 
-
-
-
 ## ********** -----
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
 

@@ -13,6 +13,7 @@ location= "C.12580" #Baltimore MSA
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
+# params['global.transmission.rate']=2
 sim = engine$run(params)
 
 # sim2 = engine$run(params)
@@ -24,8 +25,8 @@ sim = engine$run(params)
 simplot(sim,"population" )
 simplot(sim,"population" ,split.by = 'sex')
 simplot(sim,"population" ,split.by = 'race')
-#'@Todd: we are over-estimating popualtion size in years prior to 2010. how can we adjust the fix strata assumption to decline pre-2010? 
-#'@Zoe: can we find any stratified data on popualtion sizes before 2010?
+#'@Todd: we are over-estimating population size in years prior to 2010. how can we adjust the fix strata assumption to decline pre-2010? 
+#'@Zoe: can we find any stratified data on population sizes before 2010?
 
 # DEATHS ----
 #we only fit to total deaths starting in 2010
@@ -36,7 +37,7 @@ simplot(sim, "deaths")
 # Calibrating to age-race specific data over time
 simplot(sim, 'fertility.rate')
 simplot(sim, 'fertility.rate',facet.by = 'age',split.by = 'race')
-#'@Andrew: why cant we see the data on the plot? see the dimensions below  
+#'@Zoe: can you please add the denominator data at the MSA level? <female.population.denominator.for.fertility.rate>
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity[,'C.12580',,,])
 
 #MIGRATION ----
@@ -44,6 +45,7 @@ simplot(sim, 'fertility.rate',facet.by = 'age',split.by = 'race')
 simplot(sim, 'immigration')
 simplot(sim, 'immigration',split.by = 'sex')
 simplot(sim, 'immigration',split.by = 'race')
+
 #'@Andrew: why cant we see the data on the plot? 
 # SURVEILLANCE.MANAGER$data$immigration$estimate$census.population$census.immigration$year__location[,'C.12580']
 
@@ -96,45 +98,33 @@ simplot(sim,"diagnosis.ps")  #'@Andrew: no data points are shown on the plot
 # SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[,'C.12580']
 
 simplot(sim,"diagnosis.el")
-
-# =======
-# simplot(sim,"diagnosis.primary.secondary")  #@Andrew: no data points are shown on the plot
-# # SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[,'C.12580']
+ 
+# #By 1 factor
+# # simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
+# # simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
+# # simplot(sim,"population", facet.by = "race", dimension.values = list(year = 2000:2030))
+# # By 2 factors
+# simplot(sim,"population",
+#         facet.by = "age", split.by ="race", dimension.values = list(year = 2009:2030))
+# simplot(sim,"population", 
+#         facet.by = "age", split.by ="sex", dimension.values = list(year = 2000:2030))
 # 
-# >>>>>>> 0f232e8b2865756b50bbf952045f952d3565994d
-simplot(sim,"trt.initiation")
-simplot(sim,"births.from" )
-simplot(sim,"deaths" )
-simplot(sim,"immigration" ) #@Andrew: no data points are shown on the plot
-simplot(sim,"emigration" )#@Andrew: no data points are shown on the plot
-simplot(sim,"diagnosis.congenital")
-
-#By 1 factor
-# simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
-# simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
-# simplot(sim,"population", facet.by = "race", dimension.values = list(year = 2000:2030))
-# By 2 factors
-simplot(sim,"population",
-        facet.by = "age", split.by ="race", dimension.values = list(year = 2009:2030))
-simplot(sim,"population", 
-        facet.by = "age", split.by ="sex", dimension.values = list(year = 2000:2030))
-
-simplot(sim,"fertility.rate")
-simplot(sim,"fertility.rate",
-        facet.by = "age", split.by = "race")
-
-simplot(sim,"deaths")
-simplot(sim,"deaths",
-        dimension.values = list(year = 2000:2030))
-
-# we dont have data: 
-simplot(sim,
-        outcomes = c("births.from"), 
-        facet.by = "age", split.by = "race", 
-        dimension.values = list(year = 2000:2030)) 
-
-
-SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,]
-apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,],c('ethnicity'),sum)
-apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex['2010','US',,,,],
-      c('ethnicity'),sum)
+# simplot(sim,"fertility.rate")
+# simplot(sim,"fertility.rate",
+#         facet.by = "age", split.by = "race")
+# 
+# simplot(sim,"deaths")
+# simplot(sim,"deaths",
+#         dimension.values = list(year = 2000:2030))
+# 
+# # we dont have data: 
+# simplot(sim,
+#         outcomes = c("births.from"), 
+#         facet.by = "age", split.by = "race", 
+#         dimension.values = list(year = 2000:2030)) 
+# 
+# 
+# SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,]
+# apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,],c('ethnicity'),sum)
+# apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex['2010','US',,,,],
+#       c('ethnicity'),sum)

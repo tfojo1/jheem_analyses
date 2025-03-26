@@ -211,7 +211,7 @@ total.diagnosis.likelihood.instructions =
 
 ##---- Congenital ----
 #poportion of state level births that are complicated by congenital syphilis 
-# 1) using CDC reported state level targtest
+# 1) using CDC reported state level targets
 # 2) estimating MSA level diagnoses from local health department and estiamteign proporiton of MSA level births 
 #'@TODD: to add the nested likelihood for prop of births with congenital 
 # congenital.diagnosis.likelihood.instructions =
@@ -226,26 +226,53 @@ total.diagnosis.likelihood.instructions =
 #   )
 ##** PRENATAL CARE COVERAGE ** ----
 ### source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
-# msa.variance= 0.0032 #estimated for all 33 msa combined
-# prenatal.care.first.trimester.likelihood.instructions =
-#   create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.first.trimester",
-#                                        outcome.for.sim = "prp.prenatal.care.first.trimester",
-#                                        dimensions = c("age","race"),
-#                                        levels.of.stratification = c(0,1),
-#                                        from.year = 2016,
-#                                        observation.correlation.form = 'compound.symmetry',
-#                                        error.variance.term = function(data,details,version, location){
-#                                          # browser()
-#                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-#                                          msa.variance=(1-mean(w))^2 * msa.variance
-#                                          var= (data* (0.05))^2+msa.variance
-#                                          return(sqrt(var))
-#                                        },
-# error.variance.type = 'function.sd')
+msa.variance= 0.0032 #estimated for all 33 msa combined
+prenatal.care.first.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.first.trimester",
+                                       outcome.for.sim = "prp.prenatal.care.first.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details,version, location){
+                                         # browser()
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * msa.variance
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+error.variance.type = 'function.sd')
 # prenatal.care.first.trimester.likelihood.instructions$instantiate.likelihood('shield','C.12580')
-# prenatal.care.second.trimester.likelihood.instructions
-# prenatal.care.third.trimester.likelihood.instructions
-
+prenatal.care.second.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.second.trimester",
+                                       outcome.for.sim = "prp.prenatal.care.second.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details,version, location){
+                                         # browser()
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.second.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * msa.variance
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+                                       error.variance.type = 'function.sd')
+prenatal.care.third.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.third.trimester",
+                                       outcome.for.sim = "prp.prenatal.care.third.trimester",
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details,version, location){
+                                         # browser()
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.third.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * msa.variance
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+                                       error.variance.type = 'function.sd')
 
 ##** HIV TESTS ** ----
 hiv.testing.likelihood.instructions =
@@ -313,7 +340,7 @@ likelihood.instructions.demographics =  join.likelihood.instructions(
   # prenatal.first.trimester.likelihood.instructions,
   # prenatal.second.trimester.likelihood.instructions,
   # prenatal.third.trimester.likelihood.instructions,
-  # no.prenatal.likelihood.instructions,
+  # # no.prenatal.likelihood.instructions,
   
   hiv.testing.likelihood.instructions
   

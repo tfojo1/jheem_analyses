@@ -98,7 +98,7 @@ if (!exists('CENSUS.MANAGER') ){
 # Syphilis SURVEILLANCE.MANAGER ----
 # includes all the data used for calibration and plotting
 # county-, MSA- and US- level aggregation
-if (is.null(get.default.data.manager()) ){ #if it's in memory, it wont reload it
+if (!exists('SURVEILLANCE.MANAGER') ){
   print("Reading Syphilis survillance manager ...")
   SURVEILLANCE.MANAGER = load.data.manager.from.cache('syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
   # SURVEILLANCE.MANAGER$last.modified.date

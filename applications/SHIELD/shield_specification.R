@@ -1257,7 +1257,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  axis.name = 'Number Immigrating',
                                                                  units = 'individuals'),
                       dynamic.quantity.name = 'births',
-                      corresponding.data.outcome = 'adult.immigration', 
+                      corresponding.data.outcome = 'immigration', 
                       include.tags = "immigration",
                       keep.dimensions = c('location','age','race','sex'))
 
@@ -1269,7 +1269,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  axis.name = 'Number Emigrating',
                                                                  units = 'individuals'),
                       dynamic.quantity.name = 'mortality',
-                      corresponding.data.outcome = 'adult.emigration', 
+                      corresponding.data.outcome = 'emigration', 
                       include.tags = "emigration",
                       keep.dimensions = c('location','age','race','sex'))
 
