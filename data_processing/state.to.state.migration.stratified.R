@@ -21,6 +21,9 @@ state.stratified.migration.data.clean = lapply(state.stratified.migration.data, 
   data=file[["data"]]
   filename = file[["filename"]]
   
+  data <- data %>%
+    mutate(across(-c(Label), as.numeric))
+  
 data <- data %>%
   rename(strata = `Label`)%>%
   select(strata, contains("Total Estimate"), contains("Moved; from different  state Estimate"))%>%
@@ -34,10 +37,10 @@ data <- data %>%
   mutate(state = gsub( " Total Estimate", "", state))%>%
   mutate(metric = ifelse(grepl(" Total Estimate",text),'population','proportion'))%>%
   select(-text)%>%
-  filter(strata == "1 to 4 years" | strata == "5 to 17 years" | strata == "18 to 24 years" | strata == "25 to 34 years" | strata == "35 to 44 years"| strata == "45 to 54 years" | strata == "55 to 64 years" 
-         | strata == "65 to 74 years" | strata == "75 years and over" 
+  filter(strata == "1 to 4 years" | strata == "5 to 17 years" | strata == "18 to 24 years" | strata == "25 to 34 years" | strata == "35 to 44 years"| strata == "45 to 54 years" | strata == "55 to 64 years"
+         | strata == "65 to 74 years" | strata == "75 years and over"
          | strata == 'Male'| strata == 'Female'
-         | strata == 'White' | strata == 'Black or African American' | strata == 'American Indian and Alaska Native' | strata == 'Asian' | strata == 'Native Hawaiian and Other Pacific Islander' 
+         | strata == 'White' | strata == 'Black or African American' | strata == 'American Indian and Alaska Native' | strata == 'Asian' | strata == 'Native Hawaiian and Other Pacific Islander'
          | strata == 'Some other race'| strata == 'Two or more races')%>%
   filter(state != "Total Estimate")%>%
   filter(!is.na(state))%>%
@@ -72,7 +75,8 @@ state.immigration.age = lapply(state.stratified.migration.data.clean, function(f
     filter(population.strata == "1 to 4 years" | population.strata == "5 to 17 years" | population.strata == "18 to 24 years" | population.strata == "25 to 34 years" | population.strata == "35 to 44 years"| population.strata == "45 to 54 years" | population.strata == "55 to 64 years" 
            | population.strata == "65 to 74 years" | population.strata == "75 years and over")%>%
     rename(age = population.strata)%>%
-    mutate(age = ifelse(age == "75 years and over", "75+ years", age))
+    mutate(age = ifelse(age == "75 years and over", "75+ years", age))%>%
+    mutate(age = gsub(" to ", "-", age))
   
 data = as.data.frame(data)
 list(filename, data) 
