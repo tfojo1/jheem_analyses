@@ -11,15 +11,20 @@
 #     c('C.40900', 'C.17460')
 # )[[7]]
 
-LOCATIONS.TO.ATI = DC.MSA
+
+#LOCATIONS.TO.ATI = SACRAMENTO.MSA
+RESUME.FIRST = F
+RERUN = T
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-RESUME.FIRST = F
+print("Loading temporary data manager backup")
+SURVEILLANCE.MANAGER= load.data.manager(file='../../cached/bk_surv.Rdata', set.as.default = T)
+LOCATIONS.TO.ATI = RW.LOCATIONS[23 + 0:8]
 
 for (loc in LOCATIONS.TO.ATI)
 {
-    if (!RESUME.FIRST || loc != LOCATIONS.TO.ATI[1])
+    if ((!RESUME.FIRST || loc != LOCATIONS.TO.ATI[1]) && !RERUN)
     {
         print(paste0("RW: ASSEMBLING AND BURNING SIMSET FOR '", loc, "'..."))
         ehe.simset = assemble.simulations.from.calibration('ehe', location=loc, calibration.code = CALIBRATION.CODE)
@@ -31,6 +36,15 @@ for (loc in LOCATIONS.TO.ATI)
         rw.simset = fit.rw.simset(ehe.simset, verbose=VERBOSE, track.mcmc = F)
         rw.simset$save()
         print(paste0("RW: ...DONE TRANSMUTING"))
+    }
+    else
+        rw.simset = retrieve.simulation.set('rw', location=loc, calibration.code = CALIBRATION.CODE, n.sim=N.SIM)
+    
+    if (RERUN)
+    {
+        print(paste0("RW: RERUNNING SIMSET FOR '", loc, "'..."))
+        rw.simset = rerun.simulations(rw.simset)
+        rw.simset$save()
     }
     
     print(paste0("RW: RUNNING ", length(RW.INTERVENTION.CODES), " INTERVENTIONS for '", loc, "'..."))

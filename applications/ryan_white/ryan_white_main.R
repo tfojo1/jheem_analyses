@@ -1,4 +1,6 @@
 
+
+
 source('../jheem_analyses/applications/ryan_white/ryan_white_specification.R')
 RW.DATA.MANAGER = load.data.manager('../../cached/ryan.white.data.manager.rdata', set.as.default = F)
 
@@ -24,3 +26,30 @@ RW.INT.RUN.FROM.YEAR = 2025
 RW.INT.KEEP.TO.YEAR = RW.INT.RUN.TO.YEAR
 RW.NOINT.KEEP.FROM.YEAR = 2010
 RW.INT.KEEP.FROM.YEAR = 2024
+
+# Other medicaid stuff
+
+city.main.state = sapply(RW.LOCATIONS, function(loc){
+  
+  name = locations::get.location.name(loc)
+  
+  split = strsplit(name, ', ')
+  states.str = split[[1]][length(split[[1]])]
+  states = strsplit(states.str, "-")[[1]]
+  
+  states[1]
+})
+
+city.main.state.medicaid.expansion = unlist(sapply(city.main.state, function(st){
+  
+  state_info$medicaid_expansion[state_info$state==gsub(" ", "_", locations::get.location.name(st))]=='Yes'
+  
+}))
+
+RW.MEDICAID.EXPANSION.CITIES = names(city.main.state.medicaid.expansion)[city.main.state.medicaid.expansion]
+RW.MEDICAID.NONEXPANSION.CITIES = names(city.main.state.medicaid.expansion)[!city.main.state.medicaid.expansion]
+
+
+RW.PALETTE = ggsci::pal_jama()(7)
+
+ggplot2::qplot(1:length(RW.PALETTE), 1:length(RW.PALETTE), geom='point', size=20, color=RW.PALETTE) + ggplot2::geom_point(size=20)

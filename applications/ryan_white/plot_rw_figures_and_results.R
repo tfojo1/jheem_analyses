@@ -979,10 +979,10 @@ cat("\n")
 sink()
 #========================== Figure 4 ==========================================#
 
-abs.total.infections.averted.loseRW.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'loseRW',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+abs.total.infections.averted.loseRW.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.end',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 rel.total.infections.averted.loseRW.by.city = abs.total.infections.averted.loseRW.by.city  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 
-abs.total.infections.averted.temploseRW.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'temploseRW',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+abs.total.infections.averted.temploseRW.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.b.intr',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 rel.total.infections.averted.temploseRW.by.city = abs.total.infections.averted.temploseRW.by.city  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 
 rel.total.infections.averted.loseRW.by.city

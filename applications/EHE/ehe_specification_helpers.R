@@ -993,10 +993,23 @@ get.immigration.rates <- function(location, specification.metadata, population.y
   
   # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
 
-  immigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
-                                                location = location,
-                                                year = "2011-2015") / 5 # because it's 5-year aggregate data     
-
+  if (get.location.type(location)=='CBSA')
+  {
+      immigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
+                                                    location = location,
+                                                    year = "2011-2015",
+                                                    from.ontology.names = 'census.immigration'
+                                                    ) / 5 # because it's 5-year aggregate data     
+  }
+  else
+  {
+      immigration.numbers = sum(SURVEILLANCE.MANAGER$pull(outcome = "immigration",
+                                                      location = location,
+                                                      year = as.character(2011:2015),
+                                                      from.ontology.names = 'census'
+      )) / 5 # because it's 5-year aggregate data    
+  }
+  
   population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
                                            location = location,
                                            year = as.character(c(2011:2015)))) 
@@ -1029,9 +1042,21 @@ get.emigration.rates.functional.form <- function(location, specification.metadat
 get.emigration.rates <- function(location, specification.metadata, population.years=DEFAULT.POPULATION.YEARS){
   
   # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
-  emigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
-                                                 location = location,
-                                                 year = "2011-2015") / 5 # because it's 5-year aggregate data 
+  if (get.location.type(location)=='CBSA')
+  {
+      emigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
+                                                     location = location,
+                                                     year = "2011-2015",
+                                                     from.ontology.names = 'census.immigration') / 5 # because it's 5-year aggregate data 
+  }
+  else
+  {
+    emigration.numbers = sum(SURVEILLANCE.MANAGER$pull(outcome = "emigration",
+                                                   location = location,
+                                                        year = as.character(2011:2015),
+                                                        from.ontology.names = 'census'
+    )) / 5 # because it's 5-year aggregate data    
+  }
     
     population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
                                                 location = location,

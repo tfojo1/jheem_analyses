@@ -1,6 +1,7 @@
 
 
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
+source('../jheem_analyses/applications/ryan_white/ryan_white_specification_helpers.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_parameters.R')
 
 source('../jheem_analyses/applications/ryan_white/process_rw_data_for_priors.R')
@@ -136,19 +137,56 @@ register.model.quantity(RW.SPECIFICATION,
 ##---------------------------------------##
 
 register.model.element(RW.SPECIFICATION,
+                       name = 'fraction.medicaid.expansion',
+                       scale = 'proportion',
+                       get.value.function = get.fraction.medicaid.expansion)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'adap.suppression.expansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'oahs.suppression.expansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'rw.support.suppression.expansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'adap.suppression.nonexpansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'oahs.suppression.nonexpansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'rw.support.suppression.nonexpansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+
+register.model.quantity(RW.SPECIFICATION,
                        name = 'adap.suppression.effect',
                        scale = 'proportion',
-                       value = 1)
+                       value = expression(adap.suppression.expansion.effect * fraction.medicaid.expansion + adap.suppression.nonexpansion.effect * (1-fraction.medicaid.expansion)))
 
-register.model.element(RW.SPECIFICATION,
+register.model.quantity(RW.SPECIFICATION,
                        name = 'oahs.suppression.effect',
                        scale = 'proportion',
-                       value = 1)
+                       value = expression(oahs.suppression.expansion.effect * fraction.medicaid.expansion + oahs.suppression.nonexpansion.effect * (1-fraction.medicaid.expansion)))
 
-register.model.element(RW.SPECIFICATION,
+register.model.quantity(RW.SPECIFICATION,
                        name = 'rw.support.suppression.effect',
                        scale = 'proportion',
-                       value = 1)
+                       value = expression(rw.support.suppression.expansion.effect * fraction.medicaid.expansion + rw.support.suppression.nonexpansion.effect * (1-fraction.medicaid.expansion)))
 
 
 register.model.quantity(RW.SPECIFICATION,
