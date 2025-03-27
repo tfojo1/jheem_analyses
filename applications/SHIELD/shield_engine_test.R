@@ -6,9 +6,37 @@
 
 ##################
 source('applications/SHIELD/shield_specification.R')
-
+version= 'shield'
 location= "C.12580" #Baltimore MSA
-# location= "US" #National
+
+
+# TEST the likelihoods ----
+source('applications/SHIELD/shield_likelihoods.R')
+likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
+
+
+# get.ontology.error.debug.info()
+so=get.ontology.error.debug.info()[[2]]
+do=get.ontology.error.debug.info()[[1]]
+get.mappings.to.align.ontologies(so,do)
+get.mappings.to.align.ontologies(ontology(sex=so$sex),ontology(sex=do$sex))
+get.mappings.to.align.ontologies(ontology(age=so$age),ontology(age=do$age))
+get.mappings.to.align.ontologies(ontology(race=so$race),ontology(race=do$race))
+get.mappings.to.align.ontologies(ontology(ethnicity=so$ethnicity),ontology(ethnicity=do$ethnicity))
+get.mappings.to.align.ontologies(ontology(year=so$year),ontology(year=do$year))
+get.mappings.to.align.ontologies(ontology(location=so$location),ontology(location=do$location))
+
+# SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,location]
+# $mapping.from.1
+# [1] "A basic ontology mapping ('shield.to.census.sex') over dimension 'sex'"
+# 
+# $mapping.from.2
+# [1] "An identity ('no-change') ontology mapping"
+# > get.mappings.to.align.ontologies(ontology(age=a$age),ontology(age=b$age))
+# NULL
+
+# examine.recent.failed.ontology.mapping()
+
 
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)

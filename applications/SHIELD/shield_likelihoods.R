@@ -26,8 +26,9 @@ w=c(w1,w2)
 # so for example we need to calibrate prop aware in Baltimiore to data from MD and building 
 # some uncertainty to account for similarities between those locations
 population.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "population", 
-                                       outcome.for.sim = "population",
+  create.basic.likelihood.instructions(outcome.for.sim = "population",
+                                       outcome.for.data = "population", 
+                                       
                                        dimensions = c("age","sex","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g., age race)
                                        from.year = 2010, # the year calibration starts (population size and demographics are fix to 2007)
@@ -63,8 +64,8 @@ population.likelihood.instructions =
 # CalibTarget: deaths: 2001-2020 by agegroup,sex, race, ethnicty for the US model 
 # SURVEILLANCE.MANAGER$data$deaths$estimate$census.aggregated.population$census$year__location
 deaths.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "deaths", #fix type
-                                       outcome.for.sim = "deaths",
+  create.basic.likelihood.instructions(outcome.for.sim = "deaths",
+                                       outcome.for.data = "deaths", #fix type
                                        levels.of.stratification = c(0), 
                                        from.year = 2010, 
                                        observation.correlation.form = 'compound.symmetry',
@@ -78,8 +79,9 @@ deaths.likelihood.instructions =
 # CalibTarget: Fertility.rate: 2007-2023 agegroup race ethnicty 
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
 fertility.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "fertility.rate",  
-                                       outcome.for.sim = "fertility.rate",
+  create.basic.likelihood.instructions(outcome.for.sim = "fertility.rate",
+                                       outcome.for.data = "fertility.rate",  
+                                       
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g
                                        from.year = 2010,  #data available from 2007-2023
@@ -92,8 +94,9 @@ fertility.likelihood.instructions =
 #*#data is available for 6 overlapping 5-year period (2011-2015, 2012-2016, ....)
 #*#one way stratifiation (by age, by race, by sex) is only available for 2011-2015
 immigration.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "immigration", 
-                                       outcome.for.sim = "immigration",
+  create.basic.likelihood.instructions(outcome.for.sim = "immigration",
+                                       outcome.for.data = "immigration", 
+                                       
                                        dimensions = c('age','race','sex'), 
                                        levels.of.stratification = c(0,1),
                                        from.year = 2011, 
@@ -105,8 +108,9 @@ immigration.likelihood.instructions =
   )
 
 emigration.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "emigration", 
-                                       outcome.for.sim = "emigration",
+  create.basic.likelihood.instructions( outcome.for.sim = "emigration",
+                                        outcome.for.data = "emigration", 
+                                      
                                        dimensions = c("age","race"), 
                                        levels.of.stratification = c(0,1,2),
                                        from.year = 2011, 
@@ -117,56 +121,14 @@ emigration.likelihood.instructions =
                                        equalize.weight.by.year = T
   )
 
-#---- PRENATAL CARE COVERAGE -----: 
-# we have 4 Categories representing a multinomial likelihood . 
-# for now we are modeling 4 independant likelihoods. This may overpenalize deviations from a single bin because we are not accounting for the correlation between the 4 categories.)
-# Error estimate: @zoe: what proportion of prenatals were unknown at the national level? we can use that to inform this error here 
-prenatal.first.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.first.trimester", 
-                                       outcome.for.sim = "prenatal.care.initiation.first.trimester",
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2010,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, #5% error relative to the estimated value 
-                                       error.variance.type = 'cv'
-  )
-prenatal.second.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.second.trimester", 
-                                       outcome.for.sim = "prenatal.care.initiation.second.trimester",
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2010,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05,  
-                                       error.variance.type = 'cv'
-  )
-prenatal.third.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prp.prenatal.care.third.trimester", 
-                                       outcome.for.sim = "prenatal.care.initiation.third.trimester",
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2010,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05,  
-                                       error.variance.type = 'cv'
-  )
-no.prenatal.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prp.no.prenatal.care", 
-                                       outcome.for.sim = "no.prenatal.care",
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2010,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05,  
-                                       error.variance.type = 'cv'
-  )
+
 #** SYPHILIS DIAGNOSIS ** ----
 # we have modeled the misclassification of EL/LL diagnosis in the model and here we only fit to reported (biased) data
 ##---- PS ----
 ps.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "ps.syphilis.diagnoses",  
-                                       outcome.for.sim = "diagnosis.primary.secondary",  
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps",  
+                                       outcome.for.data = "ps.syphilis.diagnoses",  
+                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2000,
@@ -177,8 +139,9 @@ ps.diagnosis.likelihood.instructions =
 ##---- EARLY ----
 #MISCLASSIFICATION ERROR 
 early.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "early.syphilis.diagnoses", 
-                                       outcome.for.sim = "diagnosis.el.misclassified",
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
+                                       outcome.for.data = "early.syphilis.diagnoses", 
+                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2,3),
                                        from.year = 2000,
@@ -188,8 +151,9 @@ early.diagnosis.likelihood.instructions =
   )
 ##---- Late/Unknown ---- 
 late.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                       outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                       outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2,3),
                                        from.year = 2000,
@@ -200,8 +164,9 @@ late.diagnosis.likelihood.instructions =
 
 ##---- Total ----
 total.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "total.syphilis.diagnoses",  
-                                       outcome.for.sim = "diagnosis.total",
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
+                                       outcome.for.data = "total.syphilis.diagnoses",  
+                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2),
                                        from.year = 1941,
@@ -225,11 +190,15 @@ total.diagnosis.likelihood.instructions =
 #                                        error.variance.type = 'cv'
 #   )
 ##** PRENATAL CARE COVERAGE ** ----
+# we have 4 Categories representing a multinomial likelihood . 
+# for now we are modeling 4 independant likelihoods. This may overpenalize deviations from a single bin because we are not accounting for the correlation between the 4 categories.)
+# Error estimate: @zoe: what proportion of prenatals were unknown at the national level? we can use that to inform this error here 
 ### source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
 msa.variance= 0.0032 #estimated for all 33 msa combined
 prenatal.care.first.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.first.trimester",
-                                       outcome.for.sim = "prp.prenatal.care.first.trimester",
+  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.first.trimester",
+                                       outcome.for.data = "prenatal.care.initiation.first.trimester",
+                                       
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1),
                                        from.year = 2016,
@@ -242,10 +211,10 @@ prenatal.care.first.trimester.likelihood.instructions =
                                          return(sqrt(var))
                                        },
 error.variance.type = 'function.sd')
-# prenatal.care.first.trimester.likelihood.instructions$instantiate.likelihood('shield','C.12580')
 prenatal.care.second.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.second.trimester",
-                                       outcome.for.sim = "prp.prenatal.care.second.trimester",
+  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.second.trimester",
+                                       outcome.for.data = "prenatal.care.initiation.second.trimester",
+                                       
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1),
                                        from.year = 2016,
@@ -258,9 +227,11 @@ prenatal.care.second.trimester.likelihood.instructions =
                                          return(sqrt(var))
                                        },
                                        error.variance.type = 'function.sd')
+
 prenatal.care.third.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "prenatal.care.initiation.third.trimester",
-                                       outcome.for.sim = "prp.prenatal.care.third.trimester",
+  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.third.trimester",
+                                       outcome.for.data = "prenatal.care.initiation.third.trimester",
+                                       
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1),
                                        from.year = 2016,
@@ -273,11 +244,28 @@ prenatal.care.third.trimester.likelihood.instructions =
                                          return(sqrt(var))
                                        },
                                        error.variance.type = 'function.sd')
+no.prenatal.care.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "prp.no.prenatal.care",
+                                       outcome.for.data = "no.prenatal.care",
+                                       
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details,version, location){
+                                         # browser()
+                                         w=SURVEILLANCE.MANAGER$data$no.prenatal.care$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * msa.variance
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+                                       error.variance.type = 'function.sd')
 
 ##** HIV TESTS ** ----
 hiv.testing.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv", 
-                                       outcome.for.sim = "hiv.testing",
+  create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
+                                       outcome.for.data = "proportion.tested.for.hiv", 
+                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2),
                                        from.year = 2014,
@@ -285,6 +273,33 @@ hiv.testing.likelihood.instructions =
                                        error.variance.term = 0.05, 
                                        error.variance.type = 'cv'
   )
+
+
+
+
+#-- FULL LIKELIHOODS --# ----
+likelihood.instructions.all =  join.likelihood.instructions(
+  population.likelihood.instructions ,
+  deaths.likelihood.instructions,
+  fertility.likelihood.instructions,
+  
+  immigration.likelihood.instructions,
+  emigration.likelihood.instructions,
+  
+  ps.diagnosis.likelihood.instructions,
+  early.diagnosis.likelihood.instructions,
+  late.diagnosis.likelihood.instructions,
+  total.diagnosis.likelihood.instructions,
+  
+  prenatal.first.trimester.likelihood.instructions,
+  prenatal.second.trimester.likelihood.instructions,
+  prenatal.third.trimester.likelihood.instructions,
+  no.prenatal.likelihood.instructions,
+  
+  hiv.testing.likelihood.instructions
+  
+)
+
 
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
@@ -319,32 +334,6 @@ hiv.testing.likelihood.instructions =
 #                                        error.variance.type = 'cv')
 
 
-
-
-#-- FULL LIKELIHOODS --# ----
-likelihood.instructions.demographics =  join.likelihood.instructions(
-  population.likelihood.instructions ,
-  deaths.likelihood.instructions,
-  fertility.likelihood.instructions,
-  
-  immigration.likelihood.instructions,
-  emmigration.likelihood.instructions,
-  
-  ps.diagnosis.likelihood.instructions,
-  early.diagnosis.likelihood.instructions,
-  late.diagnosis.likelihood.instructions,
-  total.diagnosis.likelihood.instructions,
-  
-  # congenital.diagnosis.likelihood.instructions,
-  
-  # prenatal.first.trimester.likelihood.instructions,
-  # prenatal.second.trimester.likelihood.instructions,
-  # prenatal.third.trimester.likelihood.instructions,
-  # # no.prenatal.likelihood.instructions,
-  
-  hiv.testing.likelihood.instructions
-  
-)
 #manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"US")
 # lik=deaths.likelihood.instructions$instantiate.likelihood('shield',"US")

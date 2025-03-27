@@ -1375,6 +1375,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['fraction.ll.misclassified.el'],
 )  
+### TOTAL diagnoses ----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'diagnosis.total',
                       outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals with a Diagnosis of Non-Congenital Syphilis in the Past Year',
