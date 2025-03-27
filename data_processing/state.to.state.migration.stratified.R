@@ -119,18 +119,22 @@ state.immigration.race = lapply(state.stratified.migration.data.clean, function(
 # some other race
 # two or more races
 
-state.immigration.race.put = lapply(state.immigration.race, `[[`, 2)  
 
-for (data in state.immigration.race.put) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'census.immigration.state.to.state', 
-    source = 'census.population',
-    dimension.values.to.distribute = list(race=c('some other race', 'two or more races')),
-    url = 'https://data.census.gov/table?q=state+migration&g=040XX00US02',
-    details = 'Census State to State Migration Flows')
-}
+# WE NEED TO DECIDE HOW TO HANDLE RACE ------------------------------------
+
+
+# state.immigration.race.put = lapply(state.immigration.race, `[[`, 2)  
+# 
+# for (data in state.immigration.race.put) {
+#   
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'census.immigration.state.to.state', 
+#     source = 'census.population',
+#     dimension.values.to.distribute = list(race=c('some other race', 'two or more races')),
+#     url = 'https://data.census.gov/table?q=state+migration&g=040XX00US02',
+#     details = 'Census State to State Migration Flows')
+# }
 
 state.immigration.sex.put = lapply(state.immigration.sex, `[[`, 2)  
 
