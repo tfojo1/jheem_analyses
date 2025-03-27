@@ -175,12 +175,24 @@ data.manager$register.ontology(
     location= NULL,
     age=c('13-24', '25+')))
 
+data.manager$register.ontology(
+  'census.immigration.state.to.state',
+  ont = ontology(
+    year= NULL,
+    location= NULL,
+    age = c("1 to 4 years", "5 to 17 years", "18 to 24 years", "25 to 34 years", "35 to 44 years", "45 to 54 years", "55 to 64 years", "65 to 74 years", "75+ years"),
+    race=c("white", "black or african american", "american indian and alaska native", "asian", "native Hawaiian and other pacific islander"),
+    sex=c('male','female'),
+    incomplete.dimensions = c("year", "location")
+  ))
+
 
 #Codes:
 source('data_processing/immigration_new.R')
 source('data_processing/immigration_age_calculations_new.R')
 source('data_processing/nsduh_processing_new.R') #NSDUH processing
 source('data_processing/state.to.state.migration.R')
+source('data_processing/state.to.state.migration.stratified.R')
 
 #Aggregate Outcomes:
 
