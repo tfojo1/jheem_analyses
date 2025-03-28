@@ -65,7 +65,17 @@ adult.immigration.by.age <- adult.immigration.by.age  %>%
 
 # ADULT IMMIGRATION BY STATE - RACE ----------------------------------------
 #state.immigration.race
-#need to determine how we are going to use these racial groups#
+
+race.state.to.state = lapply(state.immigration.race, `[[`, 2) #This is the race level state to state migration data
+race.state.to.state <- bind_rows(race.state.to.state, .id = "column_label") 
+
+adult.immgration.by.race = left_join(race.state.to.state, adult.prop.df, by=c("location", "year"))
+
+adult.immgration.by.race <- adult.immgration.by.race %>%
+    mutate(value_new = round(value * Freq))%>%
+    mutate(outcome = 'adult.immigration')%>%
+    select(outcome, year, location, race, value_new)%>%
+    rename(value = value_new)
 
 
 # Put adult.immigration (total, sex, age) ---------------------------------

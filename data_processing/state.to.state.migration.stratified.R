@@ -40,8 +40,8 @@ data <- data %>%
   filter(strata == "1 to 4 years" | strata == "5 to 17 years" | strata == "18 to 24 years" | strata == "25 to 34 years" | strata == "35 to 44 years"| strata == "45 to 54 years" | strata == "55 to 64 years"
          | strata == "65 to 74 years" | strata == "75 years and over"
          | strata == 'Male'| strata == 'Female'
-         | strata == 'White' | strata == 'Black or African American' | strata == 'American Indian and Alaska Native' | strata == 'Asian' | strata == 'Native Hawaiian and Other Pacific Islander'
-         | strata == 'Some other race'| strata == 'Two or more races')%>%
+         | strata == 'Black or African American' | strata == 'American Indian and Alaska Native' | strata == 'Asian' | strata == 'Native Hawaiian and Other Pacific Islander'
+         | strata == 'Some other race' | strata == 'Hispanic or Latino origin (of any race)' | strata == 'White alone, not Hispanic or Latino')%>%
   filter(state != "Total Estimate")%>%
   filter(!is.na(state))%>%
   filter(state != "")
@@ -104,8 +104,8 @@ state.immigration.race = lapply(state.stratified.migration.data.clean, function(
   filename = file[[1]]
   
   data <- data%>%
-    filter( population.strata == 'White' | population.strata == 'Black or African American' | population.strata == 'American Indian and Alaska Native' | population.strata == 'Asian' | population.strata == 'Native Hawaiian and Other Pacific Islander' 
-  | population.strata == 'Some other race'| population.strata == 'Two or more races')%>%
+    filter(  population.strata == 'Black or African American' | population.strata == 'American Indian and Alaska Native' | population.strata == 'Asian' | population.strata == 'Native Hawaiian and Other Pacific Islander'
+            | population.strata == 'Some other race' | population.strata == 'Hispanic or Latino origin (of any race)' | population.strata == 'White alone, not Hispanic or Latino')%>%
     rename(race = population.strata)%>%
     mutate(race = tolower(race))
   
@@ -113,29 +113,10 @@ state.immigration.race = lapply(state.stratified.migration.data.clean, function(
   list(filename, data) 
 })
 
+##DO NOT PUT RACE - it will be reconfigured in a later code
+
 
 # PUT ---------------------------------------------------------------------
-# re-distribute these two races -------------------------------------------
-# some other race
-# two or more races
-
-
-# WE NEED TO DECIDE HOW TO HANDLE RACE ------------------------------------
-
-
-# state.immigration.race.put = lapply(state.immigration.race, `[[`, 2)  
-# 
-# for (data in state.immigration.race.put) {
-#   
-#   data.manager$put.long.form(
-#     data = data,
-#     ontology.name = 'census.immigration.state.to.state', 
-#     source = 'census.population',
-#     dimension.values.to.distribute = list(race=c('some other race', 'two or more races')),
-#     url = 'https://data.census.gov/table?q=state+migration&g=040XX00US02',
-#     details = 'Census State to State Migration Flows')
-# }
-
 state.immigration.sex.put = lapply(state.immigration.sex, `[[`, 2)  
 
 for (data in state.immigration.sex.put) {

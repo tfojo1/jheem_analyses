@@ -192,7 +192,7 @@ data.manager$register.ontology(
     year= NULL,
     location= NULL,
     age = c("13-17 years", "18-24 years", "25-34 years", "35-44 years", "45-54 years", "55-64 years", "65-74 years", "75+ years"),
-    race=c("white", "black or african american", "american indian and alaska native", "asian", "native hawaiian and other pacific islander"),
+    race=c("white non hispanic", "asian non hispanic", "hispanic", "american indian and alaska native non hispanic", "native hawaiian and pacific islander non hispanic", 'black non hispanic', 'other race non hispanic'),
     sex=c('male','female'),
     incomplete.dimensions = c("year", "location")
   ))
