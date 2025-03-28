@@ -355,7 +355,7 @@ national.age.group = lapply(national.stratified.one, function(file){
     mutate(location = "US")%>%
     mutate(outcome = 'ps.syphilis.diagnoses')%>%
     filter(age != 'Total')%>%
-    mutate(age = if_else(age == '10-14 years', "0-10 years", age))%>% #Decided 2-12 to change this ontology to make it align with 0-10 ontology for other syphilis data
+    mutate(age = if_else(age == '10-14 years', "0-14 years", age))%>% #Decided 2-12 to change this ontology to make it align with 0-10 ontology for other syphilis data
     select(outcome, location, value, age)
 
   #Pull the most recent report of a particular year. Ex. 2003 Report has the most recent values for 1999:
