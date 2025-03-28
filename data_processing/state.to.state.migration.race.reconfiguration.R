@@ -105,5 +105,51 @@ data.manager$put.long.form(
 
 
 # ADULT.IMMIGRATION BY RACE -----------------------------------------------
-adult.immgration.by.race
+#adult.immgration.by.race 
+#This is a data frme created in the adult.state.to.state.migration code
+
+adult.immigration.by.race <- as.data.frame(adult.immgration.by.race)
+
+#Then reconfigure to make the future calculation easier:
+adult.race.df <- adult.immigration.by.race%>%
+    pivot_wider(names_from = 'race',
+                values_from = 'value')%>%
+    rename('hispanic' = 'hispanic or latino origin (of any race)')%>%
+    rename('black' = 'black or african american')%>%
+    rename('white NH' =  'white alone, not hispanic or latino')
+
+
+#Now apply the race calculation formulas:
+adult.state.immigration.combo.reconfigured <- adult.race.df%>%
+    mutate(black.nh = round(`black`-(sqrt(prop.black.hisp*prop.hisp.black*`hispanic`*`black`))))%>%
+    mutate(american.indian.nh = round(`american indian and alaska native`-(sqrt(prop.american.indian.hisp*prop.hisp.american.indian*`hispanic`*`american indian and alaska native`))))%>%
+    mutate(asian.nh = round(`asian`-(sqrt(prop.asian.hisp*prop.hisp.asian*`hispanic`*`asian`))))%>%
+    mutate(native.hawaiian.nh = round(`native hawaiian and other pacific islander`-(sqrt(prop.native.hawaiian.hisp*prop.hisp.native.hawaiian*`hispanic`*`native hawaiian and other pacific islander`))))%>%
+    mutate(other.nh = round(`some other race`-(sqrt(prop.other.hisp*prop.hisp.other*`hispanic`*`some other race`))))
+
+adult.reconfigured.race.put <- adult.state.immigration.combo.reconfigured%>%
+    select(year, location, outcome, hispanic, `white NH`, black.nh, american.indian.nh, native.hawaiian.nh, other.nh, asian.nh)%>%
+    pivot_longer(cols = c("hispanic", `white NH`, "black.nh", "american.indian.nh", "native.hawaiian.nh", "other.nh", "asian.nh"),
+                 names_to = "race",
+                 values_to = "value")%>%
+    mutate(race.new = case_when(race == "white NH"~ "white non hispanic",
+                                race == "asian.nh"~ "asian non hispanic",
+                                race == "hispanic"~ "hispanic",
+                                race == "american.indian.nh" ~"american indian and alaska native non hispanic",
+                                race == "native.hawaiian.nh"~"native hawaiian and pacific islander non hispanic",
+                                race == "other.nh"~"other race non hispanic",
+                                race == "black.nh"~ "black non hispanic"))%>%
+    select(-race)%>%
+    rename(race = race.new)%>%
+    mutate(value = as.numeric(value))
+
+adult.reconfigured.race.put = as.data.frame(adult.reconfigured.race.put)
+
+data.manager$put.long.form(
+    data = adult.reconfigured.race.put,
+    ontology.name = 'census.immigration.state.to.state.adults', 
+    source = 'census.population',
+    dimension.values = list(),
+    url = 'https://data.census.gov/table?q=state+migration&g=040XX00US02',
+    details = 'Census State to State Migration Flows')
 

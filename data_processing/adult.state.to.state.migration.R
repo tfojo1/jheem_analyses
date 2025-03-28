@@ -77,6 +77,8 @@ adult.immgration.by.race <- adult.immgration.by.race %>%
     select(outcome, year, location, race, value_new)%>%
     rename(value = value_new)
 
+#Do not put this race data bc it needs to be re-configured which will happen in the 'state.to.state.race.reconfiguration' code
+
 
 # Put adult.immigration (total, sex, age) ---------------------------------
 adult.immigration.state.to.state = list(adult.immigration.by.age,
