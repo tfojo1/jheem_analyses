@@ -275,16 +275,6 @@ put.msa.data.as.new.source(outcome = 'population',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
 
-put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertility.rate',
-                           from.source.name = 'cdc.wonder.natality',
-                           to.source.name = 'cdc.wonder.aggregated.population',
-                           to.locations =  MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           override.insufficent.denom.data.constraints = T, #checked completeness data
-                           data.manager = syphilis.manager)
-
 # Source Code to Calculate Fertility Rate by MSA 
 source('data_processing/syphilis.manager/fertility.rate.msa.R')
 
@@ -351,6 +341,16 @@ put.msa.data.as.new.source(outcome = 'prenatal.screening.denominator',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
                            override.insufficent.denom.data.constraints = T,
+                           data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertility.rate',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           override.insufficent.denom.data.constraints = T, #checked completeness data
                            data.manager = syphilis.manager)
 
 #Save:
