@@ -129,6 +129,15 @@ data.manager$register.outcome(
     units = '%',
     description = "Prenatal Care Initiation First Trimester - Completeness"), denominator.outcome = 'population')
 
+data.manager$register.outcome(
+    'completeness.female.population.denominator.for.fertility.rate', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Completeness of Female Population- Denominator for Fertility Rate',
+        axis.name = 'Completeness of Female Population- Denominator for Fertility Rate',
+        units = '%',
+        description = "Completeness of Female Population Age 15-44 - - Denominator for Fertility Rate"), denominator.outcome = 'population')
+
 #Register Sources:
 data.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
@@ -229,6 +238,7 @@ source('data_processing/syphilis.manager/national_immigration.R')
 source('data_processing/syphilis.manager/prenatal.care.cdc.wonder.R')
 source('data_processing/syphilis.manager/prenatal.screening.denominator.R')
 
+
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
 source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
@@ -272,6 +282,7 @@ put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertilit
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
+                           override.insufficent.denom.data.constraints = T, #checked completeness data
                            data.manager = syphilis.manager)
 
 # Source Code to Calculate Fertility Rate by MSA 
@@ -279,6 +290,7 @@ source('data_processing/syphilis.manager/fertility.rate.msa.R')
 
 #Source code for prenatal data completes (needs to come after the population aggregation to mSA)
 source('data_processing/syphilis.manager/prenatal.completeness.R')
+source('data_processing/syphilis.manager/female.population.completeness.R')
 
 # Aggregate Prenatal Care to MSA ------------------------------------------
 put.msa.data.as.new.source(outcome = 'no.prenatal.care',
