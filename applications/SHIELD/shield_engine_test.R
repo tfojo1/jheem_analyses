@@ -14,17 +14,36 @@ location= "C.12580" #Baltimore MSA
 source('applications/SHIELD/shield_likelihoods.R')
 likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
 
+#'@Zoe:
+#1- female.population.denominator.for.fertility.rate <some MSA's are missing>: aggregate data for all MSAs regardeless of missing counties
+# double check the calculation for fertility rate
+#2- for immigration and emigration : to restratify the data for age to comply with SHIELD agegroups 
+#
+#3- prenatal care proportions: what is triggering all the NA's?
+
+#4-proportion of births with congenital syphilis: collecting ddata from HDR for congenital syphilis 
+
+#5- estimating error for syphilis diagnosis using HDR (differences in CDC estiamtes and health department reports)
+
 
 # get.ontology.error.debug.info()
 so=get.ontology.error.debug.info()[[2]]
 do=get.ontology.error.debug.info()[[1]]
-get.mappings.to.align.ontologies(so,do)
+examine.get.mappings.to.align.ontologies(so,do)
+
 get.mappings.to.align.ontologies(ontology(sex=so$sex),ontology(sex=do$sex))
 get.mappings.to.align.ontologies(ontology(age=so$age),ontology(age=do$age))
 get.mappings.to.align.ontologies(ontology(race=so$race),ontology(race=do$race))
 get.mappings.to.align.ontologies(ontology(ethnicity=so$ethnicity),ontology(ethnicity=do$ethnicity))
 get.mappings.to.align.ontologies(ontology(year=so$year),ontology(year=do$year))
 get.mappings.to.align.ontologies(ontology(location=so$location),ontology(location=do$location))
+
+# #prenatal care: there are missign values in the MSA aggregated data
+# SURVEILLANCE.MANAGER$data$no.prenatal.care$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.second.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.third.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+
 
 # SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,location]
 # $mapping.from.1

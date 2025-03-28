@@ -189,12 +189,45 @@ total.diagnosis.likelihood.instructions =
 #                                        error.variance.term = 0.05, 
 #                                        error.variance.type = 'cv'
 #   )
+
+# congenital.nested.likelihood.instructions.trans =
+#   create.nested.proportion.likelihood.instructions( outcome.for.sim = "proportion.births.congenital",
+#                                                     outcome.for.data = "proportion.births.congenital",
+# 
+#                                                    denominator.outcome.for.data = 'births.from', #should be avialable at the county level <births.numerator.for.fertility.rate>
+# 
+#                                                    location.types = c('STATE',"CBSA"), #CBSA is MSA level
+#                                                    minimum.geographic.resolution.type = 'COUNTY',
+# 
+#                                                    dimensions = character(),
+#                                                    levels.of.stratification = c(0),
+#                                                    from.year = 2008,
+# 
+#                                                    p.bias.inside.location = 0,
+#                                                    p.bias.outside.location = cocaine.bias.estimates$out.mean, #to be calculated using Todd's code 
+#                                                    p.bias.sd.inside.location = cocaine.bias.estimates$out.sd,
+#                                                    p.bias.sd.outside.location = cocaine.bias.estimates$out.sd,
+# 
+#                                                    within.location.p.error.correlation = 0.5,#correlation from one year to other in the bias 
+#                                                    within.location.n.error.correlation = 0.5,
+# 
+#                                                    observation.correlation.form = 'compound.symmetry',
+#                                                    p.error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
+#                                                    p.error.variance.type = "cv",
+# 
+#                                                    partitioning.function = EHE.PARTITIONING.FUNCTION,
+# 
+#                                                    weights = (1*TRANSMISSION.WEIGHT),
+#                                                    equalize.weight.by.year = T
+#   )
+
+
 ##** PRENATAL CARE COVERAGE ** ----
 # we have 4 Categories representing a multinomial likelihood . 
 # for now we are modeling 4 independant likelihoods. This may overpenalize deviations from a single bin because we are not accounting for the correlation between the 4 categories.)
 # Error estimate: @zoe: what proportion of prenatals were unknown at the national level? we can use that to inform this error here 
 ### source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
-msa.variance= 0.0032 #estimated for all 33 msa combined
+ave.msa.variance= 0.0032 #estimated for all 33 msa combined
 prenatal.care.first.trimester.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.first.trimester",
                                        outcome.for.data = "prenatal.care.initiation.first.trimester",
@@ -206,7 +239,8 @@ prenatal.care.first.trimester.likelihood.instructions =
                                        error.variance.term = function(data,details,version, location){
                                          # browser()
                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-                                         msa.variance=(1-mean(w))^2 * msa.variance
+                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
+                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
@@ -220,11 +254,13 @@ prenatal.care.second.trimester.likelihood.instructions =
                                        from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = function(data,details,version, location){
-                                         # browser()
-                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.second.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-                                         msa.variance=(1-mean(w))^2 * msa.variance
-                                         var= (data* (0.05))^2+msa.variance
-                                         return(sqrt(var))
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
+                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+                                         var= (data* (0.05))^2+msa.variance 
+                                         sd=sqrt(var)
+                                         
+                                         return(sd)
                                        },
                                        error.variance.type = 'function.sd')
 
@@ -237,9 +273,9 @@ prenatal.care.third.trimester.likelihood.instructions =
                                        from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = function(data,details,version, location){
-                                         # browser()
-                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.third.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-                                         msa.variance=(1-mean(w))^2 * msa.variance
+                                                                                  w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
+                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
@@ -253,9 +289,9 @@ no.prenatal.care.likelihood.instructions =
                                        from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = function(data,details,version, location){
-                                         # browser()
-                                         w=SURVEILLANCE.MANAGER$data$no.prenatal.care$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
                                          msa.variance=(1-mean(w))^2 * msa.variance
+                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
@@ -281,20 +317,20 @@ hiv.testing.likelihood.instructions =
 likelihood.instructions.all =  join.likelihood.instructions(
   population.likelihood.instructions ,
   deaths.likelihood.instructions,
-  fertility.likelihood.instructions,
-  
-  immigration.likelihood.instructions,
-  emigration.likelihood.instructions,
-  
-  ps.diagnosis.likelihood.instructions,
-  early.diagnosis.likelihood.instructions,
-  late.diagnosis.likelihood.instructions,
-  total.diagnosis.likelihood.instructions,
-  
-  prenatal.first.trimester.likelihood.instructions,
-  prenatal.second.trimester.likelihood.instructions,
-  prenatal.third.trimester.likelihood.instructions,
-  no.prenatal.likelihood.instructions,
+  # fertility.likelihood.instructions,
+  # 
+  # immigration.likelihood.instructions,
+  # emigration.likelihood.instructions,
+  # 
+  # ps.diagnosis.likelihood.instructions,
+  # early.diagnosis.likelihood.instructions,
+  # late.diagnosis.likelihood.instructions,
+  # total.diagnosis.likelihood.instructions,
+  # 
+  prenatal.care.first.trimester.likelihood.instructions,
+  prenatal.care.second.trimester.likelihood.instructions,
+  prenatal.care.third.trimester.likelihood.instructions,
+  no.prenatal.care.likelihood.instructions,
   
   hiv.testing.likelihood.instructions
   

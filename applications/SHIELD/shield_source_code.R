@@ -1,33 +1,3 @@
-#'@Andrew: Here are the steps that I took to find the issue with deSolve. 
-# rm(list = ls()) #cleaning my environment
-# Use gc() to Clean Up Memory
-# gc()
-# Check for Residual Packages or Functions: Even though you've cleared the environment, some packages might not have been unloaded correctly. You can explicitly unload packages using the detach function before trying to reload them
-# detach("package:deSolve", unload = TRUE)
-# Then, try reloading the package again: library(deSolve)
-#'@ Andrew: I can not detack desolve. there is an error triggered by the jheem2 
-#'‘deSolve’ namespace cannot be unloaded:
-# namespace ‘deSolve’ is imported by ‘jheem2’ so cannot be unloaded 
-
-
-# sessionInfo() #I'm using deSolve_1.35
-
-# trying a very simple call to deSolve (like the ode function) to ensure the package is working:
-# library(deSolve)
-# test_ode <- function(t, y, parms) {
-#   list(c(y[1]))
-# }
-# out <- ode(y = 1, times = seq(0, 10, by = 1), func = test_ode, parms = NULL)
-# print(out)
-#'@Andrew: even though I did all of that, the deSolve doesnt run, the error is pointing to a problem with the internal C functions that deSolve relies on.
-# Error in .C("unlock_solver") : 
-#   "unlock_solver" not resolved from current namespace (deSolve)
-
-#list all current objects: 
- # objects()
-
-
-
 cat("*** Running Shield_source_code.R ***\n")
 NEW.SOURCE=T
 USE.JHEEM2.PACKAGE=T
@@ -44,12 +14,14 @@ USE.JHEEM2.PACKAGE=T
   }
 
 source('../jheem_analyses/commoncode/cache_manager.R')
-
+#option1: using the package 
 if (USE.JHEEM2.PACKAGE){
   print("Using JHEEM2 package ... ")
-  update.jheem2.package # will need to check the version and reinstall as needed 
+  update.jheem2.package() # will need to check the version and reinstall as needed 
   library(jheem2)
-  } # option2: sourcing the code directly:
+  print(check.jheem2.version())
+  } 
+  # option2: sourcing the code directly:
 if (!USE.JHEEM2.PACKAGE){
   # devtools::install_github('tfojo1/jheem2')
   print("Using JHEEM2 source code ...")
