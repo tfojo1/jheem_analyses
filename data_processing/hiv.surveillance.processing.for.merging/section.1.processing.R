@@ -206,6 +206,7 @@ source('data_processing/state.to.state.migration.R') #This is total level state 
 source('data_processing/state.to.state.migration.stratified.R') #This is stratified state to state migration
 source('data_processing/adult.state.to.state.migration.R') #This is adult.immigration (total; stratified) and adult.emigration (estimated from stratfieds immigration for total only)
 source('data_processing/state.to.state.migration.race.reconfiguration.R') #This restructures the racial groups
+source('data_processing/state.level.total.deaths.R') #This adds state level total deaths from the Census
 
 #Aggregate Outcomes:
 
