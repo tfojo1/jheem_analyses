@@ -205,6 +205,7 @@ source('data_processing/nsduh_processing_new.R') #NSDUH processing
 source('data_processing/state.to.state.migration.R') #This is total level state to state migration
 source('data_processing/state.to.state.migration.stratified.R') #This is stratified state to state migration
 source('data_processing/adult.state.to.state.migration.R') #This is adult.immigration (total; stratified) and adult.emigration (estimated from stratfieds immigration for total only)
+source('data_processing/state.to.state.migration.race.reconfiguration.R') #This restructures the racial groups
 
 #Aggregate Outcomes:
 

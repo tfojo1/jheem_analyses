@@ -20,8 +20,10 @@ prop.hisp.black <- 0.052
 #Proportion of AI who are Hispanic: 0.448
 #Proportion of Hispanic who are AI: 0.031
 
-prop.american.indian.hisp <- 0.448
-prop.hisp.american.indian <- 0.031
+#Decided to assume that all American Indian and Alaska Native are NH (because applying the calculation resulted in negative values)
+
+# prop.american.indian.hisp <- 0.448
+# prop.hisp.american.indian <- 0.031
 
 #ASIAN
 #Proportion of Asian who are Hispanic:  0.032 
@@ -59,7 +61,8 @@ race.df <- state.immigration.race%>%
                 values_from = 'value')%>%
     rename('hispanic' = 'hispanic or latino origin (of any race)')%>%
     rename('black' = 'black or african american')%>%
-    rename('white NH' =  'white alone, not hispanic or latino')
+    rename('white NH' =  'white alone, not hispanic or latino')%>%
+    rename(american.indian.nh = `american indian and alaska native`)
 
 #You're going to need a total immigration value by state for the calculation; pull that from the data manager:
 #total.imm.df = as.data.frame.table(surveillance.manager$data$immigration$estimate$census.population$census$year__location)%>% rename(total.immigration.value = Freq)
@@ -68,12 +71,13 @@ race.df <- state.immigration.race%>%
 #state.immigration.combo <- merge(race.df, total.imm.df, by=c("location", "year"))
 
 #Now apply the race calculation formulas:
+#Decided to assume that all American Indian and Alaska Native are NH (because applying the calculation resulted in negative values)
 state.immigration.combo.reconfigured <- race.df%>%
     mutate(black.nh = round(`black`-(sqrt(prop.black.hisp*prop.hisp.black*`hispanic`*`black`))))%>%
-    mutate(american.indian.nh = round(`american indian and alaska native`-(sqrt(prop.american.indian.hisp*prop.hisp.american.indian*`hispanic`*`american indian and alaska native`))))%>%
+    #mutate(american.indian.nh = round(`american indian and alaska native`-(sqrt(prop.american.indian.hisp*prop.hisp.american.indian*`hispanic`*`american indian and alaska native`))))%>%
     mutate(asian.nh = round(`asian`-(sqrt(prop.asian.hisp*prop.hisp.asian*`hispanic`*`asian`))))%>%
     mutate(native.hawaiian.nh = round(`native hawaiian and other pacific islander`-(sqrt(prop.native.hawaiian.hisp*prop.hisp.native.hawaiian*`hispanic`*`native hawaiian and other pacific islander`))))%>%
-    mutate(other.nh = round(`some other race`-(sqrt(prop.other.hisp*prop.hisp.other*`hispanic`*`some other race`))))
+    mutate(other.nh = round(`some other race`-(sqrt(prop.black.hisp*prop.hisp.black*`hispanic`*`some other race`))))
     
 reconfigured.race.put <- state.immigration.combo.reconfigured%>%
     select(year, location, outcome, hispanic, `white NH`, black.nh, american.indian.nh, native.hawaiian.nh, other.nh, asian.nh)%>%
@@ -116,16 +120,18 @@ adult.race.df <- adult.immigration.by.race%>%
                 values_from = 'value')%>%
     rename('hispanic' = 'hispanic or latino origin (of any race)')%>%
     rename('black' = 'black or african american')%>%
-    rename('white NH' =  'white alone, not hispanic or latino')
+    rename('white NH' =  'white alone, not hispanic or latino')%>%
+    rename(american.indian.nh = `american indian and alaska native`)
 
 
 #Now apply the race calculation formulas:
+#Decided to assume that all American Indian and Alaska Native are NH (because applying the calculation resulted in negative values)
 adult.state.immigration.combo.reconfigured <- adult.race.df%>%
     mutate(black.nh = round(`black`-(sqrt(prop.black.hisp*prop.hisp.black*`hispanic`*`black`))))%>%
-    mutate(american.indian.nh = round(`american indian and alaska native`-(sqrt(prop.american.indian.hisp*prop.hisp.american.indian*`hispanic`*`american indian and alaska native`))))%>%
+    #mutate(american.indian.nh = round(`american indian and alaska native`-(sqrt(prop.american.indian.hisp*prop.hisp.american.indian*`hispanic`*`american indian and alaska native`))))%>%
     mutate(asian.nh = round(`asian`-(sqrt(prop.asian.hisp*prop.hisp.asian*`hispanic`*`asian`))))%>%
     mutate(native.hawaiian.nh = round(`native hawaiian and other pacific islander`-(sqrt(prop.native.hawaiian.hisp*prop.hisp.native.hawaiian*`hispanic`*`native hawaiian and other pacific islander`))))%>%
-    mutate(other.nh = round(`some other race`-(sqrt(prop.other.hisp*prop.hisp.other*`hispanic`*`some other race`))))
+    mutate(other.nh = round(`some other race`-(sqrt(prop.black.hisp*prop.hisp.black*`hispanic`*`some other race`))))
 
 adult.reconfigured.race.put <- adult.state.immigration.combo.reconfigured%>%
     select(year, location, outcome, hispanic, `white NH`, black.nh, american.indian.nh, native.hawaiian.nh, other.nh, asian.nh)%>%
