@@ -56,43 +56,22 @@ get.mappings.to.align.ontologies(ontology(location=so$location),ontology(locatio
 
 # examine.recent.failed.ontology.mapping()
 
-
-# TEST the likelihoods ----
-likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
-
-
-# get.ontology.error.debug.info()
-so=get.ontology.error.debug.info()[[2]]
-do=get.ontology.error.debug.info()[[1]]
-get.mappings.to.align.ontologies(so,do)
-get.mappings.to.align.ontologies(ontology(sex=so$sex),ontology(sex=do$sex))
-get.mappings.to.align.ontologies(ontology(age=so$age),ontology(age=do$age))
-get.mappings.to.align.ontologies(ontology(race=so$race),ontology(race=do$race))
-get.mappings.to.align.ontologies(ontology(ethnicity=so$ethnicity),ontology(ethnicity=do$ethnicity))
-get.mappings.to.align.ontologies(ontology(year=so$year),ontology(year=do$year))
-get.mappings.to.align.ontologies(ontology(location=so$location),ontology(location=do$location))
-
-# SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,location]
-# $mapping.from.1
-# [1] "A basic ontology mapping ('shield.to.census.sex') over dimension 'sex'"
-# 
-# $mapping.from.2
-# [1] "An identity ('no-change') ontology mapping"
-# > get.mappings.to.align.ontologies(ontology(age=a$age),ontology(age=b$age))
-# NULL
-
-# examine.recent.failed.ontology.mapping()
-
-
+############## 
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 # params['global.transmission.rate']=2
 sim = engine$run(params)
+sim2 = engine$run(params)
 
-# sim2 = engine$run(params)
-# engine1 = create.jheem.engine(version = 'shield', location = location, end.year = 2025)
-# sim3 = engine1$run(params)
+likelihood.all$compute(sim)
+likelihood.temp<- likelihood.instructions.all$sub.instructions[[7]]$instantiate.likelihood('shield',location,verbose = T)
+likelihood.temp$compute(sim)
+# prenatal.care.second.trimester.likelihood.instructions,
+# prenatal.care.third.trimester.likelihood.instructions,
+# no.prenatal.care.likelihood.instructions,
+
+# save(sim,file = "~/Downloads/shield_test_sim.RData")
 
 #POPUATION ----
 #fitting to age-race-sex-specific estimates starting in 2010, and assuming fix strata before then 

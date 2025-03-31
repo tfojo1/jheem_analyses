@@ -203,23 +203,39 @@ total.diagnosis.likelihood.instructions =
 #                                                    levels.of.stratification = c(0),
 #                                                    from.year = 2008,
 # 
-#                                                    p.bias.inside.location = 0,
-#                                                    p.bias.outside.location = cocaine.bias.estimates$out.mean, #to be calculated using Todd's code 
-#                                                    p.bias.sd.inside.location = cocaine.bias.estimates$out.sd,
-#                                                    p.bias.sd.outside.location = cocaine.bias.estimates$out.sd,
+#                                                    # p.bias.inside.location = 0,
+#                                                    # p.bias.outside.location = cocaine.bias.estimates$out.mean, #to be calculated using Todd's code
+#                                                    # p.bias.sd.inside.location = cocaine.bias.estimates$out.sd,
+#                                                    # p.bias.sd.outside.location = cocaine.bias.estimates$out.sd,
 # 
-#                                                    within.location.p.error.correlation = 0.5,#correlation from one year to other in the bias 
-#                                                    within.location.n.error.correlation = 0.5,
+#                                                    within.location.p.error.correlation = 0.5, #Default assumption #correlation from one year to other in the bias in the city and outside the city
+#                                                    within.location.n.error.correlation = 0.5, #Default assumption #ratio of births outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+#                                                    #
 # 
 #                                                    observation.correlation.form = 'compound.symmetry',
 #                                                    p.error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
 #                                                    p.error.variance.type = "cv",
 # 
-#                                                    partitioning.function = EHE.PARTITIONING.FUNCTION,
+#                                                    partitioning.function = EHE.PARTITIONING.FUNCTION,# we use for unknown outcomes (e.g., number of IDUs by age race in Baltimore) (not needed here)
 # 
 #                                                    weights = (1*TRANSMISSION.WEIGHT),
 #                                                    equalize.weight.by.year = T
 #   )
+
+# congenital.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+#                                                   dimensions = c("age","race" ),
+#                                                   levels.of.stratification = c(0,1),
+#                                                   outcome.for.p = "proportion.births.congenital",
+#                                                   outcome.for.n = "births",
+#                                                   sub.location.type = NULL, #if you had MSA level data
+#                                                   super.location.type = "STATE",
+#                                                   main.location.type = "CBSA"
+#                                                   # main.location.type.p.source = "cdc.aggregated.proportion", #specific source of data that should be used here
+#                                                   # main.location.type.n.source = "cdc.hiv" 
+#                                                   )
+# cache.object.for.version(object = suppression.bias.estimates, 
+#                          name = "suppression.bias.estimates", 
+                         # version = 'ehe', overwrite=T)  
 
 
 ##** PRENATAL CARE COVERAGE ** ----
