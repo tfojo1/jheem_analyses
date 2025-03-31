@@ -126,6 +126,24 @@ register.ontology.mapping('census.to.jheem.race',
                                            c('white', 'hispanic', 'hispanic'),
                                            c('white', 'not hispanic', 'other')))
 
+register.ontology.mapping('census.immigration.to.jheem.race',
+                          from.dimensions = 'race',
+                          to.dimensions = 'race',
+                          mappings = rbind(c('hispanic or latino', 'hispanic'),
+                                           c('black', 'black'),
+                                           c('other', 'other'))) # needed?
+
+register.ontology.mapping('census.state.immigration.to.jheem.race',
+                          from.dimensions = c('race'),
+                          to.dimensions = 'race',
+                          mappings = rbind(c('white non hispanic', 'other'),
+                                           c('asian non hispanic', 'other'),
+                                           c('hispanic', 'hispanic'),
+                                           c('american indian and alaska native non hispanic', 'other'),
+                                           c('native hawaiian and pacific islander non hispanic', 'other'),
+                                           c('black non hispanic', 'black'),
+                                           c('other race non hispanic', 'other')))
+
 
 #-----------------#
 #-- FROM WONDER --#
@@ -142,13 +160,6 @@ register.ontology.mapping('wonder.to.jheem.race',
                                            c('black or african american', 'not hispanic or latino', 'black'),
                                            c('white', 'hispanic or latino', 'hispanic'),
                                            c('white', 'not hispanic or latino', 'other')))
-
-register.ontology.mapping('census.immigration.to.jheem.race',
-                          from.dimensions = 'race',
-                          to.dimensions = 'race',
-                          mappings = rbind(c('hispanic or latino', 'hispanic'),
-                                           c('black', 'black'),
-                                           c('other', 'other'))) # needed?
 
 #-----------------#
 #-- FROM NHANES --#
