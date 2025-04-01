@@ -94,7 +94,9 @@ data.manager$register.outcome(
 data.manager$register.parent.source('NHSS', full.name = 'National HIV Surveillance System', short.name= "NHSS") #parent
 
 data.manager$register.source('cdc.surveillance.reports', parent.source= "NHSS", full.name = "CDC HIV Surveillance Report", short.name='cdc.surveillance.reports') #child
-data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids') #child
+data.manager$register.source('cdc.aids', parent.source= "NHSS", full.name = "CDC Wonder AIDS Public Information Data", short.name='cdc.aids') #child (This is CDC Wonder)
+data.manager$register.source('cdc.atlas.plus.aids', parent.source= "NHSS", full.name = "CDC Atlas Plus AIDS Data", short.name='cdc.atlas.plus.aids') #child
+
 
 #Register Ontologies:
 
@@ -132,9 +134,21 @@ data.manager$register.ontology(
     incomplete.dimensions = c("year", "location")
   ))
 
+data.manager$register.ontology(
+    'cdc.new',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('13-24 years', '25-34 years', '35-44 years', '45-54 years','55-64 years', "65+ years"),
+        race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
+        sex=c('male','female'),
+        risk=c('msm','idu','msm_idu','heterosexual','other')
+    ))
+
 #Codes:
 source('data_processing/aids_data_1981_2001.R') #CDC Wonder AIDS data from 1981-2001
 source('data_processing/msa_reports_processing.R') #Source in CDC MSA PDF Reports data and cleaning
+source('data_processing/aids.diagnoses.atlas.plus.00.07.R')
 
 #Aggregate Outcomes:#None
 
