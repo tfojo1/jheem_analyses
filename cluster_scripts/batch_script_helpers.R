@@ -172,6 +172,40 @@ make.multiphase.scripts <- function(locations,
     }
 }
 
+make.assemble.scripts <- function(locations,
+                                  version='ehe',
+                                  calibration.code,
+                                  burn.keep=0,
+                                  thin.keep=1000,
+                                  specification.path="../jheem_analyses/applications/EHE/ehe_specification.R",
+                                  register.calibration.path="../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R",
+                                  dir="cluster_scripts/assemble_scripts",
+                                  partition="parallel",
+                                  account="tfojo1",
+                                  cpus.per.task=2)
+{
+    for (location in locations) {
+        output_path <- file.path(OUTPUT.DIR, version, location, get.assemble.filename(calibration.code, extension=".out"))
+        if (!dir.exists(output_path))
+            dir.create(output_path, recursive=TRUE)
+        
+        # Create script directories
+        script_path <- file.path(dir, version, location)
+        if (!dir.exists(script_path))
+            dir.create(script_path, recursive=TRUE)
+        
+        # Create the batch script
+        make.sbatch.script(filename=file.path(dir, version, location, get.assemble.filename(calibration.code)),
+                           cpus.per.task=cpus.per.task,
+                           output = output_path,
+                           job.name = paste0('S_', location),
+                           partition = partition,
+                           time.hours = 2,
+                           account=account,
+                           commands= paste("Rscript cluster_scripts/assemble_calibration.R", version, location, calibration.code, specification.path, register.calibration.path))
+    }
+}
+
 # MASTER SCRIPTS ----
 
 make.setup.master.script <- function(name.for.script,
@@ -249,6 +283,31 @@ make.multiphase.master.script <- function(name.for.script,
     sink()
 }
 
+make.assemble.master.script <- function(name.for.script,
+                                        locations,
+                                        version='ehe',
+                                        calibration.code,
+                                        specification.path="../jheem_analyses/applications/EHE/ehe_specification.R",
+                                        register.calibration.path="../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R",
+                                        master.dir="cluster_scripts/master_scripts/assemble",
+                                        dir="cluster_scripts/assemble_scripts",
+                                        overwrite=F) {
+    # Create master directory if it doesn't exist
+    if (!dir.exists(master.dir))
+        dir.create(master.dir, recursive=TRUE)
+    
+    error.prefix = "Cannot make.assemble.master.script': "
+    filename.with.extension = paste0(name.for.script, ".bat")
+    if (file.exists(file.path(master.dir, filename.with.extension)) && !overwrite)
+        stop(paste0(error.prefix, "there is already a '", filename.with.extension, "' at this location. Use 'overwrite=T' to proceed anyway"))
+    sink(file.path(master.dir, filename.with.extension))
+    cat("#!/bin/bash\n\n")
+    for (location in locations) {
+        cat("sbatch ", file.path(dir, version, location, get.assemble.filename(calibration.code)), "\n", sep="")
+    }
+    sink()
+}
+
 #' @description Make a script to assemble and process calibration simsets from multiple locations
 #' @details This doesn't create one job per location but rather calls the assemble
 #' on all locations in single job, because the run time is short and we don't want
@@ -306,6 +365,10 @@ get.run.filename <- function(calibration.code, chain, extension=".bat") {
 
 get.multiphase.filename <- function(calibration.codes, chain, extension=".bat") {
     paste0("multiphase_", paste(calibration.codes, collapse="__"), chain, extension)
+}
+
+get.assemble.filename <- function(calibration.code, extension=".bat") {
+    paste0("assemble_", calibration.code, extension)
 }
 
 ## FOR ANDREW EHE APPLICATIONS
