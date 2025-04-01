@@ -19,6 +19,7 @@ write.shaded.table <- function(tab,
                                upper.threshold.colors=NULL,
                                na.value=NULL,
                                na.color=NULL,
+                               text.colors = NULL,
                                allow.na=!is.null(na.color),
                                write.row.names=T,
                                write.col.names=T)
@@ -49,6 +50,7 @@ write.shaded.table <- function(tab,
                          colors=colors,
                          file=file,
                          na=na.value,
+                         text.colors = text.colors,
                          row.names=write.row.names,
                          col.names=write.col.names)
 }
@@ -220,6 +222,7 @@ assign.pretty.colors <- function(color.by=tab,
 do.write.shaded.xlsx <- function(x,
                                  colors,
                                  file,
+                                 text.colors = NULL,
                                  row.names=T,
                                  col.names=T,
                                  na='NA')
@@ -270,9 +273,19 @@ do.write.shaded.xlsx <- function(x,
                 else                
                     setCellValue(cell, x[i,j])
                 
-                cell.style <- CellStyle(wb) +
-                    Fill(backgroundColor=colors[i,j], foregroundColor=colors[i,j],
-                         pattern="SOLID_FOREGROUND") 
+                if (is.null(text.colors))
+                {
+                    cell.style <- CellStyle(wb) +
+                        Fill(backgroundColor=colors[i,j], foregroundColor=colors[i,j],
+                             pattern="SOLID_FOREGROUND") 
+                }
+                else
+                {
+                    cell.style <- CellStyle(wb,
+                                            fill = Fill(backgroundColor = colors[i,j], foregroundColor=colors[i,j],
+                                                        pattern="SOLID_FOREGROUND"),
+                                            font = Font(wb, color = text.colors[i,j]))
+                }
                 setCellStyle(cell, cell.style) 
             }
         }
@@ -451,6 +464,7 @@ OLD.write.shaded.table <- function(x = table.v2,
     do.write.shaded.xlsx(x=labels,
                          colors=colors,
                          file=file,
+                         text.colors = text.colors,
                          na=NULL,
                          row.names=write.row.names,
                          col.names=write.col.names)

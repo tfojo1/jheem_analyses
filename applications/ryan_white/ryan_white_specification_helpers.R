@@ -62,6 +62,15 @@ state_info <- tibble::tribble(
 STATE.MEDICAID.EXPANSION = state_info$medicaid_expansion=='Yes'
 names(STATE.MEDICAID.EXPANSION) = state_info$state
 
+states.name.plus = gsub(" ", "_", get.location.name(locations::get.all.for.type('STATE')))
+names(states.name.plus) = locations::get.all.for.type('STATE')
+states.name.plus = states.name.plus[sapply(states.name.plus, function(name){
+    any(name==names(STATE.MEDICAID.EXPANSION))
+})]
+
+MEDICAID.EXPANSION.STATES = names(states.name.plus)[STATE.MEDICAID.EXPANSION[states.name.plus]]
+MEDICAID.NONEXPANSION.STATES = names(states.name.plus)[!STATE.MEDICAID.EXPANSION[states.name.plus]]
+
 
 get.fraction.medicaid.expansion <- function(location)
 {

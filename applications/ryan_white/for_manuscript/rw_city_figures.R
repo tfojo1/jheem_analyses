@@ -170,7 +170,15 @@ PLOT.DATA.MANAGER$put(data = SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.su
 
 
 # CESSATION: INCIDENCE
-plot = simplot(simset.noint, simset.end, c('incidence'), dimension.values = list(year=PLOT.YEARS.INT), summary.type = 'mean.and.interval', data.manager=PLOT.DATA.MANAGER) +
+end.style.manager = create.style.manager(
+  color.sim.by = 'simset',
+  linetype.sim.by = 'stratum',
+  sim.palette = c(RW.BASELINE.COLOR, RW.BASELINE.COLOR),
+  data.palette = RW.DATA.COLOR
+)
+
+plot = simplot(simset.noint, simset.end, c('incidence'), dimension.values = list(year=PLOT.YEARS.INT), summary.type = 'mean.and.interval',
+               data.manager=PLOT.DATA.MANAGER, style.manager = end.style.manager) +
   ylim(0, y.max.inc) + ylab("Infections") + xlab("Year") +
   PLOT.THEME + PLOT.GUIDES + REMOVE.FACET.STRIP + ggtitle(NULL) + 
   geom_vline(xintercept = 2024.5, linetype='dotted'); plot

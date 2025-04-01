@@ -522,10 +522,19 @@ get.best.guess.msm.proportions <- function(location,
     males[males==0] = 1
     
     # Estimate a proportion msm for each race
+    if (length(states)==1 && states=='AL')
+        states.for.p.msm = 'MS'
+    else
+        states.for.p.msm = states
     raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
                                                            keep.dimensions = c('year','location','race'),
-                                                           dimension.values = list(location = states,
+                                                           dimension.values = list(location = states.for.p.msm,
                                                                                    sex = 'male'))
+    
+    if (is.null(raw.proportion.msm.by.race))
+        stop(paste0("There were no data on proportion.msm for state(s) ",
+                    collapse.with.and("'", states.for.p.msm, "'")))
+    
     raw.proportion.msm.by.race = apply(raw.proportion.msm.by.race, 'race', mean, na.rm=T)
     
     proportions.msm.by.race = c(

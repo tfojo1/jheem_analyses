@@ -1,10 +1,4 @@
 
-if (1==2)
-{
-  files = list.files("Q:results/ryan_white/", full.names = T)
-  load(files[length(files)])
-}
-
 #total.dx = apply(full.results[,,,,,,'new',,], c('year','sim','location','intervention'), sum, na.rm=T)
 
 YEARS.TO.CONSIDER = as.character(2025:2030)
@@ -49,6 +43,18 @@ print(paste0("2035 Incidence if Ryan White Continues: ",
 print("")
 print("CESSATION: ")
 
+
+total.suppression = apply(full.results[YEARS.TO.CONSIDER,,,,,,'suppression',,], c('year','sim','intervention'), sum) / apply(full.results[YEARS.TO.CONSIDER,,,,,,'diagnosed.prevalence',,], c('year','sim','intervention'), sum)
+print(paste0("Total Suppression pre-drop in 2025: ",
+             round(100*mean(total.suppression['2025',,'noint'])), '%',
+             " [", round(100*quantile(total.suppression['2025',,'noint'], probs=.025)),
+             " - ", round(100*quantile(total.suppression['2025',,'noint'], probs=.975)),
+             "%]"))
+print(paste0("Total Suppression post-drop in 2026: ",
+             round(100*mean(total.suppression['2026',,'rw.end'])), '%',
+             " [", round(100*quantile(total.suppression['2026',,'rw.end'], probs=.025)),
+             " - ", round(100*quantile(total.suppression['2026',,'rw.end'], probs=.975)),
+             "%]"))
 
 abs.delta.cessation.tot.inf.noint1 = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.end',drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
 rel.delta.cessation.tot.inf.noint1 = abs.delta.cessation.tot.inf.noint1 / tot.inf.noint1
@@ -126,7 +132,7 @@ print(paste0("Medicaid Expansion Relative Increase in Infections 2025-2030 if Ry
              format(round(quantile(ratio.inf.expansion, probs=.975, na.rm=T)*100), big.mark=','),
              "%]"))
 
-print(paste0("Medicaid NON-Expansion vs Expansion Relative Increase in Infections 2025-2030 if Ryan White Ends Indefinitely: ", 
+print(paste0("Medicaid NON-Expansion vs Expansion Relative Increase in Infections 2025-2030 if Ryan White Ends Indefinitely: delta = +", 
              format(round(mean(ratio.inf.nonexpansion-ratio.inf.expansion, na.rm=T)*100), big.mark=','),
              "% [",
              format(round(quantile(ratio.inf.nonexpansion-ratio.inf.expansion, probs=.025, na.rm=T)*100), big.mark=','),
@@ -293,6 +299,28 @@ mean.ci.rel.delta.cessation.race.inf.noint1 = cbind(
   lower = apply(rel.delta.cessation.race.inf.noint1, 1, quantile, probs=0.025),
   upper = apply(rel.delta.cessation.race.inf.noint1, 1, quantile, probs=0.975)
 )
+
+print(paste0("Relative Increase in Infections 2025-2030 for Black residents in Cessation: ", 
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['black',1]*100), big.mark=','),
+             "% [",
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['black',2]*100), big.mark=','),
+             " - ",
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['black',3]*100), big.mark=','),
+             "%]"))
+print(paste0("Relative Increase in Infections 2025-2030 for Hispanic residents in Cessation: ", 
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['hispanic',1]*100), big.mark=','),
+             "% [",
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['hispanic',2]*100), big.mark=','),
+             " - ",
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['hispanic',3]*100), big.mark=','),
+             "%]"))
+print(paste0("Relative Increase in Infections 2025-2030 for Other residents in Cessation: ", 
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['other',1]*100), big.mark=','),
+             "% [",
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['other',2]*100), big.mark=','),
+             " - ",
+             format(round(mean.ci.rel.delta.cessation.race.inf.noint1['other',3]*100), big.mark=','),
+             "%]"))
 
 incidence.by.age = apply(full.results[YEARS.TO.CONSIDER,,,,,,'incidence',,], c('age','sim','location','intervention'), sum)
 
