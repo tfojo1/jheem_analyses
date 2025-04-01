@@ -8,8 +8,9 @@ EHE.SPEC <- "applications/EHE/ehe_specification.R"
 EHE.REG <- "applications/EHE/calibration_runs/ehe_register_calibrations.R"
 
 make.sbatch.script <- function(filename,
-                               mem='16GB',
+                               mem=NULL,
                                mem.per.cpu=NULL,
+                               cpus.per.task=NULL,
                                time.hours=NULL,
                                output=NULL,
                                job.name=NULL,
@@ -29,6 +30,9 @@ make.sbatch.script <- function(filename,
     
     if (!is.null(mem.per.cpu))
         cat("#SBATCH --mem-per-cpu=", mem.per.cpu, '\n', sep='')
+    
+    if (!is.null(cpus.per.task))
+        cat("#SBATCH --cpus-per-task=", cpus.per.task, '\n', sep='')
     
     if (!is.null(output))
         cat("#SBATCH --output=", output, '\n', sep='')
