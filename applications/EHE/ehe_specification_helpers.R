@@ -810,7 +810,8 @@ get.location.mortality.rates.functional.form = function(location, specification.
 
 get.location.mortality.rates <- function(location,
                                          specification.metadata,
-                                         year.ranges = c('2001-2010','2011-2020'))
+                                         year.ranges = c('2001-2010','2011-2020'),
+                                         backup.locations = c(AL='TN', MS='TN'))
   
 {
 #    states = locations::get.overlapping.locations(location, "state")
@@ -870,7 +871,32 @@ get.location.mortality.rates <- function(location,
     }
     
     if (any(rv==0))
-        stop("getting zero's in the calculated mortality rates from get.location.mortality.rates()")
+    {
+        backup.loc = backup.locations[location]
+        if (is.na(backup.loc))
+        {
+            stop("getting zero's in the calculated mortality rates from get.location.mortality.rates()")
+        }
+        else
+        {
+            backup.rates = get.location.mortality.rates(location = backup.loc,
+                                                        specification.metadata = specification.metadata,
+                                                        year.ranges = year.ranges)
+            
+            for (sex in dimnames(rv)$sex)
+            {
+                for (race in dimnames(rv)$race)
+                {
+                    if (any(rv[,race,sex]==0))
+                        rv[,race,sex] = backup.rates[,race,sex]
+                }
+            }
+            
+            if (any(rv==0))
+                stop("getting zero's in the calculated mortality rates from get.location.mortality.rates(), even AFTER applying a backup location")
+        }
+    }
+
     
     rv
 }
