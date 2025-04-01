@@ -1,6 +1,7 @@
 #This code processes death data from the Census.  This is total deaths (not hiv/aids specific)
 #Adding this on 3-31-25 to the HIV Surveillance manager bc we need state level data
-#This has state elvel deaths from 2010-2023
+#This has state level deaths from 2010-2023
+#Removing 2010 data because it doesn't represent a full year
 
 DATA.DIR.STATE.DEATHS="../../data_raw/population/deaths.state.level.10.23"
 
@@ -42,7 +43,8 @@ state.death.data.clean = lapply(state.death.data, function(file){
         mutate(location = state.abb[match(`NAME`, state.name)])%>%
         mutate(location = ifelse(`NAME` == "Puerto Rico", "PR", location))%>%
         mutate(location = ifelse(`NAME` == "District of Columbia", "DC", location))%>%
-        mutate(outcome = 'deaths')
+        mutate(outcome = 'deaths')%>%
+        filter(year != "2010")
     
     data = as.data.frame(data)
     list(filename, data) 
