@@ -1,10 +1,35 @@
 #GONORRHEA RATIOS
 #Pull aggregated gc data from surveillance manager.
+states = locations::get.all.for.type("STATE")
 
-gonorrhea.total = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.aggregated.county$cdc.sti$year__location, stringsAsFactors = FALSE)
-gonorrhea.sex = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.aggregated.county$cdc.sti$year__location__sex, stringsAsFactors = FALSE)
+gonorrhea.msa = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.aggregated.county$cdc.sti$year__location, stringsAsFactors = FALSE)
+gonorrhea.state = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.sti$cdc.sti$year__location, stringsAsFactors = FALSE)%>% filter(location %in% states)
+
+gonorrhea.total = rbind(gonorrhea.msa, gonorrhea.state)
+
 gonorrhea.age = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.aggregated.county$cdc.sti$year__location__age, stringsAsFactors = FALSE)
 gonorrhea.race = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.aggregated.county$cdc.sti$year__location__race, stringsAsFactors = FALSE)
+
+##
+
+gonorrhea.msa.age = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.aggregated.county$cdc.sti$year__location__age, stringsAsFactors = FALSE)
+gonorrhea.state.age = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.sti$cdc.sti$year__location__age, stringsAsFactors = FALSE)%>% filter(location %in% states)
+
+gonorrhea.age = rbind(gonorrhea.msa.age, gonorrhea.state.age)
+
+##
+
+gonorrhea.msa.sex = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.aggregated.county$cdc.sti$year__location__sex, stringsAsFactors = FALSE)
+gonorrhea.state.sex = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.sti$cdc.sti$year__location__sex, stringsAsFactors = FALSE)%>% filter(location %in% states)
+
+gonorrhea.sex = rbind(gonorrhea.msa.sex, gonorrhea.state.sex)
+
+##
+
+gonorrhea.msa.race = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.aggregated.county$cdc.sti$year__location__race, stringsAsFactors = FALSE)
+gonorrhea.state.race = as.data.frame.table(surveillance.manager$data$gonorrhea$estimate$cdc.sti$cdc.sti$year__location__race, stringsAsFactors = FALSE)%>% filter(location %in% states)
+
+gonorrhea.race = rbind(gonorrhea.msa.race, gonorrhea.state.race)
 
 gonorrhea.data.list = list(
   "gc.total" = gonorrhea.total, 
@@ -103,10 +128,35 @@ for (data in gc.ratio.put) {
 #syphilis RATIOS
 #Pull aggregated syph data from surveillance manager.
 
-syphilis.total = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location, stringsAsFactors = FALSE)
-syphilis.sex = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location__sex, stringsAsFactors = FALSE)
+syphilis.msa = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location, stringsAsFactors = FALSE)
+syphilis.state = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location, stringsAsFactors = FALSE)%>% filter(location %in% states)
+
+syphilis.total = rbind(syphilis.msa, syphilis.state)
+
 syphilis.age = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location__age, stringsAsFactors = FALSE)
 syphilis.race = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location__race, stringsAsFactors = FALSE)
+
+##
+
+syphilis.msa.age = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location__age, stringsAsFactors = FALSE)
+syphilis.state.age = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location__age, stringsAsFactors = FALSE)%>% filter(location %in% states)
+
+syphilis.age = rbind(syphilis.msa.age, syphilis.state.age)
+
+##
+
+syphilis.msa.sex = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location__sex, stringsAsFactors = FALSE)
+syphilis.state.sex = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location__sex, stringsAsFactors = FALSE)%>% filter(location %in% states)
+
+syphilis.sex = rbind(syphilis.msa.sex, syphilis.state.sex)
+
+##
+
+syphilis.msa.race = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location__race, stringsAsFactors = FALSE)
+syphilis.state.race = as.data.frame.table(surveillance.manager$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location__race, stringsAsFactors = FALSE)%>% filter(location %in% states)
+
+syphilis.race = rbind(syphilis.msa.race, syphilis.state.race)
+
 
 syphilis.data.list = list(
   "syph.total" = syphilis.total, 
