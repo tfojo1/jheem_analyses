@@ -202,7 +202,7 @@ make.assemble.scripts <- function(locations,
                            partition = partition,
                            time.hours = 2,
                            account=account,
-                           commands= paste("Rscript cluster_scripts/assemble_calibration.R", version, location, calibration.code, specification.path, register.calibration.path))
+                           commands= paste("Rscript cluster_scripts/assemble_calibration.R", version, location, calibration.code, burn.keep, thin.keep, specification.path, register.calibration.path))
     }
 }
 
