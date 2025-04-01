@@ -337,7 +337,7 @@ aids.diagnoses.source.two<- run.outlier.process(outcome= 'aids.diagnoses',
                           filter(source == "cdc.surveillance.reports")
 
 
-aids.diagnoses.source.two$adjudication <- c(F, F, T, T, F, T, F, T, T, T, T, T, T, T, T, T, T, T, T, T, T)
+aids.diagnoses.source.two$adjudication <- c(F, F, T, T, F, T, F, T, T, T, T, T, T, T, T, T, T, T, T, T, T, F, T, T, T, T)
 
 run.outlier.process(outcome= 'aids.diagnoses',
                     stratifications= list(c()),
