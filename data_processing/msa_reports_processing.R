@@ -531,8 +531,15 @@ data.list.msa_sex_age.clean = lapply(data.list.msa_sex_age, function(file){
 data.list.msa_2009.clean = lapply(data.list.msa_2009, function(file){
   
   data=file[["data"]] 
-  filename = file[["filename"]] 
+  filename = file[["filename"]]
   
+  if(grepl("state", filename)){
+     data$location = state.abb[match(data$state, state.name)]
+     data$location = ifelse(data$state == "District of Columbia", "DC", data$location)
+  }
+  
+  if(grepl("cbsa", filename)){ #using cbsa bc msa is in the filename 2x so it causes an error
+      
   data$division= ifelse(grepl("Division", data$msa), "1", "0") #Remove MSA = division
   data= subset(data, data$division != "1")
   
@@ -593,6 +600,7 @@ gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa))))))))))))))))))))))))))
   data= subset(data, data$msa != "San Juan-Bayamon, PR")
  ##############################################################################
   data$location = as.character(locations::get.cbsa.for.msa.name(data$msa))
+  }
   
   #Removing locations that do not work- they are just variations of those listed above#
   # data$check_loc = locations::is.location.valid(data$location)
