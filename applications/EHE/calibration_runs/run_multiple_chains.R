@@ -1,7 +1,7 @@
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = CINCINATTI.MSA
+LOCATION = NYC.MSA
 CALIBRATION.CODE.TO.RUN = CALIBRATION.CODE.EHE.FINAL 
 CHAIN = 4
 
