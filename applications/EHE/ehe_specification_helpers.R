@@ -814,91 +814,126 @@ get.location.mortality.rates <- function(location,
                                          backup.locations = c(AL='TN', MS='TN'))
   
 {
-#    states = locations::get.overlapping.locations(location, "state")
-    counties = locations::get.contained.locations(location, 'county')
-    states = unique(locations::get.containing.locations(counties, 'state'))
-    
-    # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
-    deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', location = states, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
-    
-    if (is.null(deaths))
-      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
-    
-    # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
-    population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
-    
-    if (is.null(population))
-      stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
-    
-    population[is.na(deaths)] = NA
-    
-    # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
-    # then divide the two
-    target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
-
-    rates.by.state.numerator = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T)
-    rates.by.state.denominator = map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
-    
-    rates.by.state = rates.by.state.numerator / rates.by.state.denominator
-    rates.by.state[rates.by.state.numerator==0 & rates.by.state.denominator==0] = 0
-
-    if (any(is.na(rates.by.state)))
-      stop("getting NA values in rates.by.state in get.location.mortality.rates()")
-    
-    if (length(states)==1)
-        rv = rates.by.state[1,,,]
+    if (get.location.type(location)=='state')
+    {
+        counties = locations::get.contained.locations(location, 'county')
+        deaths = CENSUS.MANAGER$pull(outcome = 'state.deaths', location = location, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+        
+        if (is.null(deaths))
+            stop("Error in get.location.mortality.rates() - unable to pull any state.deaths data for the requested years")
+        
+        # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
+        population = CENSUS.MANAGER$pull(outcome = 'state.deaths.denominator', location = location, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex'))
+        # 
+        # parsed.year.ranges = parse.year.ranges(year.ranges)
+        # years.for.year.ranges = unlist(lapply(1:length(year.ranges), function(i){as.numeric(parsed.year.ranges$start[i]):as.numeric(parsed.year.ranges$end[i])}))
+        # population = CENSUS.MANAGER$pull('population', location = counties, year= years.for.year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex'))
+        # 
+        if (is.null(population))
+            stop("Error in get.location.mortality.rates() - unable to pull any state.deaths.denominator data for the requested years")
+        
+        population[is.na(deaths)] = NA
+        deaths[is.na(population)] = NA
+        
+        # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
+        # then divide the two
+        target.dim.names = specification.metadata$dim.names[c('age','race','sex')]
+        mapped.deaths = map.value.ontology(value = deaths, target.dim.names = target.dim.names)
+        mapped.population = map.value.ontology(value = population, target.dim.names = target.dim.names)
+        
+        rv = mapped.deaths / mapped.population
+        if (any(rv==0))
+            stop("getting zero's in the calculated mortality rates from get.location.mortality.rates() for state")
+        
+        rv
+    }
     else
     {
-        county.populations = CENSUS.MANAGER$pull(outcome = 'population',
-                                                 dimension.values = list(location=counties,
-                                                                         year=year.ranges),
-                                                 from.ontology.names = 'census')
+        counties = locations::get.contained.locations(location, 'county')
+        states = unique(locations::get.containing.locations(counties, 'state'))
         
-        if (is.null(county.populations))
-            stop("Error in get.location.mortality.rates(): cannot get populations for the component counties")
-        county.populations = apply(county.populations,
-                                   'location', mean, na.rm=T)
-        total.population = sum(county.populations, na.rm=T)
+        # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
+        deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', location = states, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
         
-        state.weights = sapply(states, function(st){
-            counties.in.state.and.loc = intersect(counties,
-                                                  locations::get.contained.locations(st, 'county'))
-            
-            sum(county.populations[counties.in.state.and.loc], na.rm=T)/total.population
-        })
+        if (is.null(deaths))
+          stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths data for the requested years")
         
-        rv = apply(state.weights * rates.by.state, c('age','race','sex'), sum)
-    }
+        # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
+        population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', location = states, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+        
+        if (is.null(population))
+          stop("Error in get.location.mortality.rates() - unable to pull any metro.deaths.denominator data for the requested years")
+        
+        population[is.na(deaths)] = NA
+        
+        # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
+        # then divide the two
+        target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
     
-    if (any(rv==0))
-    {
-        backup.loc = backup.locations[location]
-        if (is.na(backup.loc))
-        {
-            stop("getting zero's in the calculated mortality rates from get.location.mortality.rates()")
-        }
+        rates.by.state.numerator = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T)
+        rates.by.state.denominator = map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
+        
+        rates.by.state = rates.by.state.numerator / rates.by.state.denominator
+        rates.by.state[rates.by.state.numerator==0 & rates.by.state.denominator==0] = 0
+    
+        if (any(is.na(rates.by.state)))
+          stop("getting NA values in rates.by.state in get.location.mortality.rates()")
+        
+        if (length(states)==1)
+            rv = rates.by.state[1,,,]
         else
         {
-            backup.rates = get.location.mortality.rates(location = backup.loc,
-                                                        specification.metadata = specification.metadata,
-                                                        year.ranges = year.ranges)
+            county.populations = CENSUS.MANAGER$pull(outcome = 'population',
+                                                     dimension.values = list(location=counties,
+                                                                             year=year.ranges),
+                                                     from.ontology.names = 'census')
             
-            for (sex in dimnames(rv)$sex)
-            {
-                for (race in dimnames(rv)$race)
-                {
-                    if (any(rv[,race,sex]==0))
-                        rv[,race,sex] = backup.rates[,race,sex]
-                }
-            }
+            if (is.null(county.populations))
+                stop("Error in get.location.mortality.rates(): cannot get populations for the component counties")
+            county.populations = apply(county.populations,
+                                       'location', mean, na.rm=T)
+            total.population = sum(county.populations, na.rm=T)
             
-            if (any(rv==0))
-                stop("getting zero's in the calculated mortality rates from get.location.mortality.rates(), even AFTER applying a backup location")
+            state.weights = sapply(states, function(st){
+                counties.in.state.and.loc = intersect(counties,
+                                                      locations::get.contained.locations(st, 'county'))
+                
+                sum(county.populations[counties.in.state.and.loc], na.rm=T)/total.population
+            })
+            
+            rv = apply(state.weights * rates.by.state, c('age','race','sex'), sum)
         }
-    }
-
+        
+        if (any(rv==0))
+        {
+            backup.loc = backup.locations[location]
+            if (is.na(backup.loc))
+            {
+                stop("getting zero's in the calculated mortality rates from get.location.mortality.rates()")
+            }
+            else
+            {
+                backup.rates = get.location.mortality.rates(location = backup.loc,
+                                                            specification.metadata = specification.metadata,
+                                                            year.ranges = year.ranges)
+                
+                for (sex in dimnames(rv)$sex)
+                {
+                    for (race in dimnames(rv)$race)
+                    {
+                        if (any(rv[,race,sex]==0))
+                            rv[,race,sex] = backup.rates[,race,sex]
+                    }
+                }
+                
+                if (any(rv==0))
+                    stop("getting zero's in the calculated mortality rates from get.location.mortality.rates(), even AFTER applying a backup location")
+            }
+        }
     
-    rv
+        
+        rv
+    }
 }
 
 
