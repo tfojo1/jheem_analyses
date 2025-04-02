@@ -190,6 +190,8 @@ data.list.county = lapply(data.list.county.pop, function(file){
   
   data$year = as.character(data$year) 
   
+  data = subset(data, data$location != "51515") #Removing county we took out of locations package
+  
   data= as.data.frame(data)
   
   list(filename, data) #what to return# 
