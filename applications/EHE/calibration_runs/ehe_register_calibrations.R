@@ -7,6 +7,10 @@ CALIBRATION.CODE.POPULATION = 'pop.ehe'
 CALIBRATION.CODE.TRANSMISSION = 'trans.ehe'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.ehe'
 CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
+
+CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
+CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
+CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
 N.ITER.POP = 25000
 N.ITER.TRANS = 25000
@@ -172,6 +176,53 @@ register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
                           likelihood.instructions = FULL.likelihood.instructions.8x.new.prev,
                           special.case.likelihood.instructions = 
                             list(C.33100=FULL.likelihood.instructions.32x.new.prev),
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FINAL, 
+                          thin = 500, 
+                          n.chains = 4,
+                          n.burn = ifelse(RUNNING.ON.DESKTOP, 0, floor(N.ITER.FINAL/2)),
+                          is.preliminary = F,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.PLUS.COVID),
+                          description = "FULL RUN"
+)
+
+## STATE-LEVEL TRANS, FULL, AND FINAL - REMOVED AIDS DEATHS ## 
+# state-level trans calibration - removed AIDS deaths 
+register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
+                          likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions.state,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = c(par.names.transmission), 
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = N.ITER.TRANS,
+                          thin = 50, 
+                          #fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get transmission parameters in the general vicinity",
+                          preceding.calibration.codes = CALIBRATION.CODE.POPULATION
+)
+
+# state-level full calibration - removed AIDS deaths 
+register.calibration.info(CALIBRATION.CODE.FULL.STATE,
+                          likelihood.instructions = FULL.likelihood.instructions.32x.new.prev.state,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          description = "Full with covid likelihoods"
+)
+
+# state-level final calibration - removed AIDS deaths 
+register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
+                          likelihood.instructions = FULL.likelihood.instructions.8x.new.prev.state,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 

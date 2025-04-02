@@ -1332,6 +1332,19 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids =
                                
   )
 
+# state-level transmission calibration - removed AIDS deaths 
+transmission.pop.idu.aware.aids.testing.likelihood.instructions.state = 
+    join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
+                                 race.risk.prevalence.likelihood.instructions, 
+                                 non.age.aids.diagnoses.likelihood.instructions.trans,
+                                 population.likelihood.instructions.trans,
+                                 heroin.likelihood.instructions.trans,
+                                 cocaine.likelihood.instructions.trans,
+                                 hiv.mortality.likelihood.instructions.trans#,
+                                 #weight = TRANSMISSION.WEIGHT
+                                 
+    )
+
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
 FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
@@ -1373,6 +1386,46 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   ps.syphilis.year.on.year.change.likelihood.instructions
 )
 
+# state-level full calibration - removed AIDS deaths 
+FULL.likelihood.instructions.32x.new.prev.state = join.likelihood.instructions(
+    # POPULATION LIKELIHOODS
+    population.likelihood.instructions.full, 
+    immigration.likelihood.instructions.full, 
+    emigration.likelihood.instructions.full,
+    
+    # TRANSMISSION LIKELIHOODS
+    total.new.diagnoses.16x.cv.expv.likelihood.instructions,
+    new.diagnoses.halfx.cv.expv.likelihood.instructions,
+    total.prevalence.16x.cv.expv.likelihood.instructions,
+    prevalence.halfx.cv.and.exp.v.likelihood.instructions,
+    
+    # MORTALITY LIKELIHOODS
+    hiv.mortality.likelihood.instructions.full,
+    general.mortality.likelihood.instructions.full,
+    
+    # AIDS DIAGNOSES LIKELIHOOD
+    non.age.aids.diagnoses.likelihood.instructions.full,
+    
+    # CONTINUUM LIKELIHOODS
+    proportion.tested.likelihood.instructions,
+    hiv.test.positivity.likelihood.instructions, 
+    awareness.likelihood.instructions,
+    suppression.likelihood.instructions,
+    
+    # PREP LIKELIHOODS
+    prep.uptake.likelihood.instructions,
+    prep.indications.likelihood.instructions,
+    
+    # IDU LIKELIHOODS
+    heroin.likelihood.instructions.full,
+    cocaine.likelihood.instructions.full,
+    
+    # COVID LIKELIHOODS
+    number.of.tests.year.on.year.change.likelihood.instructions,
+    gonorrhea.year.on.year.change.likelihood.instructions,
+    ps.syphilis.year.on.year.change.likelihood.instructions
+)
+
 
 FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
@@ -1412,4 +1465,44 @@ FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   number.of.tests.year.on.year.change.likelihood.instructions,
   gonorrhea.year.on.year.change.likelihood.instructions,
   ps.syphilis.year.on.year.change.likelihood.instructions
+)
+
+# state-level final calibration - removed AIDS deaths 
+FULL.likelihood.instructions.8x.new.prev.state = join.likelihood.instructions(
+    # POPULATION LIKELIHOODS
+    population.likelihood.instructions.full, 
+    immigration.likelihood.instructions.full, 
+    emigration.likelihood.instructions.full,
+    
+    # TRANSMISSION LIKELIHOODS
+    total.new.diagnoses.4x.cv.expv.likelihood.instructions,
+    new.diagnoses.7.8x.cv.expv.likelihood.instructions,
+    total.prevalence.4x.cv.expv.likelihood.instructions,
+    prevalence.7.8x.cv.and.exp.v.likelihood.instructions,
+    
+    # MORTALITY LIKELIHOODS
+    hiv.mortality.likelihood.instructions.full,
+    general.mortality.likelihood.instructions.full,
+    
+    # AIDS DIAGNOSES LIKELIHOOD
+    non.age.aids.diagnoses.likelihood.instructions.full,
+    
+    # CONTINUUM LIKELIHOODS
+    proportion.tested.likelihood.instructions,
+    hiv.test.positivity.likelihood.instructions, 
+    awareness.likelihood.instructions,
+    suppression.likelihood.instructions,
+    
+    # PREP LIKELIHOODS
+    prep.uptake.likelihood.instructions,
+    prep.indications.likelihood.instructions,
+    
+    # IDU LIKELIHOODS
+    heroin.likelihood.instructions.full,
+    cocaine.likelihood.instructions.full,
+    
+    # COVID LIKELIHOODS
+    number.of.tests.year.on.year.change.likelihood.instructions,
+    gonorrhea.year.on.year.change.likelihood.instructions,
+    ps.syphilis.year.on.year.change.likelihood.instructions
 )
