@@ -292,7 +292,7 @@ put.msa.data.as.new.source(outcome = 'no.prenatal.care',
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
-                           override.insufficent.denom.data.constraints = T,
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.first.trimester',
@@ -304,7 +304,7 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.first.trimester',
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
-                           override.insufficent.denom.data.constraints = T,
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.second.trimester',
@@ -316,7 +316,7 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.second.trimester'
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
-                           override.insufficent.denom.data.constraints = T,
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
@@ -328,7 +328,7 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
-                           override.insufficent.denom.data.constraints = T,
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.screening.denominator',
@@ -340,7 +340,7 @@ put.msa.data.as.new.source(outcome = 'prenatal.screening.denominator',
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
-                           override.insufficent.denom.data.constraints = T,
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertility.rate',
@@ -350,7 +350,7 @@ put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertilit
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           override.insufficent.denom.data.constraints = T, #checked completeness data
+                           aggregate.counts.with.whatever.we.have = T, #checked completeness data
                            data.manager = syphilis.manager)
 
 #Save:
