@@ -1,22 +1,13 @@
-
-# Assume LOCATION is already set
-# LOCATIONS.TO.ATI = list(
-#     c('C.35620', 'C.12060', 'C.26420'),
-#     c('C.19100', 'C.16980', 'C.47900'),
-#     c('C.37980', 'C.36740', 'C.41860'),
-#     c('C.38060', 'C.45300', 'C.12580'),
-#     c('C.27260', 'C.35380', 'C.32820'),
-#     c('C.42660', 'C.12420', 'C.26900'),
-#     c('C.18140', 'C.12940'),
-#     c('C.40900', 'C.17460')
-# )[[7]]
+ATI.INDICES = 5
 
 
 RESUME.FIRST = F
 RERUN = F
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
-LOCATIONS.TO.ATI = SACRAMENTO.MSA
+LOCATIONS.TO.ATI = setdiff(MSAS.OF.INTEREST,
+                           c(ST.LOUIS.MSA, CINCINATTI.MSA,
+                             NYC.MSA, MIAMI.MSA, SF.MSA, BOSTON.MSA, SACRAMENTO.MSA, SAN.DIEGO.MSA))[ATI.INDICES]
 
 for (loc in LOCATIONS.TO.ATI)
 {
