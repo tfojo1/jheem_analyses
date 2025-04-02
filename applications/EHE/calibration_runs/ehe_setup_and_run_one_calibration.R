@@ -15,7 +15,7 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANS.STATE, # 5
                              CALIBRATION.CODE.FULL.STATE, # 6
                              CALIBRATION.CODE.EHE.FINAL.STATE # 7
-                             )[1,5,6]
+                             )[c(1,5,6)]
 
 RESUME.FIRST = F
 
