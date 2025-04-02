@@ -94,7 +94,7 @@ state.death.denominator = lapply(state.death.data, function(file){
     data$sex = tolower(data$Sex)
     
     #Remove suppressed death values
-    data = subset(data, data$Population != "Suppressed")
+    data = subset(data, data$Population != "Not Applicable")
     data$value = as.numeric(data$'Population')
     
     data$age = data$`Five-Year Age Groups`
