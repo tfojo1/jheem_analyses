@@ -1,4 +1,4 @@
-ATI.INDICES = 5
+ATI.INDICES = 8
 
 
 RESUME.FIRST = F
@@ -11,6 +11,10 @@ LOCATIONS.TO.ATI = setdiff(MSAS.OF.INTEREST,
 
 for (loc in LOCATIONS.TO.ATI)
 {
+    print(ggplot2::qplot(1,1) + 
+              ggplot2::ggtitle(paste0(loc, " - ", 
+                                      locations::get.location.name(loc), " - Ryan White")))
+    
     if ((!RESUME.FIRST || loc != LOCATIONS.TO.ATI[1]) && !RERUN)
     {
         ehe.simset = retrieve.simulation.set('ehe', location=loc, calibration.code = CALIBRATION.CODE, n.sim = N.SIM)
