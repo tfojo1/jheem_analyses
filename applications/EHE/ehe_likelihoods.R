@@ -142,6 +142,31 @@ population.likelihood.instructions.pop =
                                        equalize.weight.by.year = F
   )
 
+# state-level: downweighted (1/4) for pop only
+population.likelihood.instructions.pop.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
+                                         outcome.for.sim = "population",
+                                         dimensions = c("age","sex","race"),
+                                         levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
+                                         from.year = 2010,
+                                         correlation.different.years = 0.5, # this is the default
+                                         correlation.different.strata = 0.1, # this is the default
+                                         correlation.different.sources = 0.3, # default
+                                         correlation.same.source.different.details = 0.3, # default
+                                         
+                                         observation.correlation.form = 'autoregressive.1', 
+                                         
+                                         error.variance.term = population.error.sd.fn,
+                                         error.variance.type = 'function.sd',
+                                         
+                                         weights = (0.25*POPULATION.WEIGHT),
+                                         
+                                         # if there are more datapoints for certain years, this will normalize
+                                         # e.g., if there are a few years with only the totals 
+                                         # before the stratifications are available
+                                         equalize.weight.by.year = F
+    )
+
 population.likelihood.instructions.trans = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.population", 
                                        outcome.for.sim = "population",
@@ -182,6 +207,20 @@ immigration.likelihood.instructions.pop =
                                        equalize.weight.by.year = T
   )
 
+# state-level: downweighted (1/4) for pop only
+immigration.likelihood.instructions.pop.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
+                                         outcome.for.sim = "immigration",
+                                         dimensions = c("age","race"), 
+                                         levels.of.stratification = c(0,1),
+                                         from.year = 2011, 
+                                         observation.correlation.form = 'compound.symmetry',
+                                         error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                         error.variance.type = 'cv',
+                                         weights = (0.25*POPULATION.WEIGHT),
+                                         equalize.weight.by.year = T
+    )
+
 immigration.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.immigration", 
                                        outcome.for.sim = "immigration",
@@ -208,6 +247,20 @@ emigration.likelihood.instructions.pop =
                                        weights = (1*POPULATION.WEIGHT),
                                        equalize.weight.by.year = T
   )
+
+# state-level: downweighted (1/4) for pop only
+emigration.likelihood.instructions.pop.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
+                                         outcome.for.sim = "emigration",
+                                         dimensions = c("age","race"), 
+                                         levels.of.stratification = c(0,1),
+                                         from.year = 2011, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                         error.variance.type = 'cv',
+                                         weights = (0.25*POPULATION.WEIGHT),
+                                         equalize.weight.by.year = T
+    )
 
 emigration.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "adult.emigration", 
@@ -462,7 +515,7 @@ non.age.aids.diagnoses.likelihood.instructions.trans =
                                        equalize.weight.by.year = T
   )
 
-# state-level aids diagnoses - through 2000
+# state-level aids diagnoses - through 2000; 4x weight for trans only 
 non.age.aids.diagnoses.likelihood.instructions.trans.state = 
     create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                          outcome.for.sim = "aids.diagnoses",
@@ -475,7 +528,7 @@ non.age.aids.diagnoses.likelihood.instructions.trans.state =
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = DIAGNOSES.ERROR.TERM,
                                          error.variance.type = 'cv',
-                                         weights = (1*TRANSMISSION.WEIGHT),
+                                         weights = (4*TRANSMISSION.WEIGHT),
                                          equalize.weight.by.year = T
     )
 
@@ -590,6 +643,21 @@ general.mortality.likelihood.instructions.pop =
                                        weights = (POPULATION.WEIGHT), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
+
+# state-level: downweighted (1/4) for pop only
+general.mortality.likelihood.instructions.pop.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "deaths",
+                                         outcome.for.sim = "total.mortality", 
+                                         dimensions = character(),
+                                         levels.of.stratification = c(0), 
+                                         from.year = 2007, 
+                                         to.year = 2019,
+                                         observation.correlation.form = 'compound.symmetry',
+                                         error.variance.term = 0.03, # look into source and see if they have estimate 
+                                         error.variance.type = 'cv',
+                                         weights = (0.25*POPULATION.WEIGHT), # see prev_new_aware_weighting.R 
+                                         equalize.weight.by.year = T
+    )
 
 general.mortality.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "deaths",
@@ -1341,6 +1409,17 @@ joint.pop.migration.total.trans.likelihood.instructions =
                                #weight = POPULATION.WEIGHT
                                ) 
 
+# state-level: downweighted pop/imm/em/deaths by 1/4x
+joint.pop.migration.total.trans.likelihood.instructions.state = 
+    join.likelihood.instructions(population.likelihood.instructions.pop.state,
+                                 immigration.likelihood.instructions.pop.state, 
+                                 emigration.likelihood.instructions.pop.state,
+                                 general.mortality.likelihood.instructions.pop.state,
+                                 total.prevalence.likelihood.instructions, 
+                                 total.new.diagnoses.likelihood.instructions #,
+                                 #weight = POPULATION.WEIGHT
+    ) 
+
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
 transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
   join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
@@ -1369,11 +1448,11 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids =
                                
   )
 
-# state-level transmission calibration - removed AIDS deaths; AIDS diagnoses are through 2000
+# state-level transmission calibration - removed AIDS deaths; AIDS diagnoses are through 2000 and 4x for trans only 
 transmission.pop.idu.aware.aids.testing.likelihood.instructions.state = 
     join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
                                  race.risk.prevalence.likelihood.instructions, 
-                                 non.age.aids.diagnoses.likelihood.instructions.trans.state, # state-level: through 2000
+                                 non.age.aids.diagnoses.likelihood.instructions.trans.state, # state-level: through 2000; 4x for trans only
                                  population.likelihood.instructions.trans,
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,

@@ -8,6 +8,7 @@ CALIBRATION.CODE.TRANSMISSION = 'trans.ehe'
 CALIBRATION.CODE.FULL.PLUS.COVID = 'full.ehe'
 CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
 
+CALIBRATION.CODE.POP.STATE = 'pop.ehe.state'
 CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
@@ -27,25 +28,26 @@ par.names.pop = c(
     "global.trate"#,
 )
 
+par.aliases.population = list(
+    
+    trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
+    trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
+    trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
+    trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.2', EHE.PARAMETERS.PRIOR@var.names)])
+)
+
 register.calibration.info(CALIBRATION.CODE.POPULATION,
                           likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions, # added race/risk transmission targets 10/21
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = par.names.pop,
+                          parameter.aliases = par.aliases.population, # added for state-level 4/3
                           n.iter = N.ITER.POP,
                           thin = 50, 
                           fixed.initial.parameter.values = c(global.trate=0.13), 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get population parameters in the general vicinity"
-)
-
-par.aliases.population = list(
-  
-  trates.peak = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.peak', EHE.PARAMETERS.PRIOR@var.names)]),
-  trates.0 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.0', EHE.PARAMETERS.PRIOR@var.names)]),
-  trates.1 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.1', EHE.PARAMETERS.PRIOR@var.names)]),
-  trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('trate\\.2', EHE.PARAMETERS.PRIOR@var.names)])
 )
 
 #-- REGISTER TRANSMISSION CALIBRATION  --#
@@ -189,7 +191,23 @@ register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
                           description = "FULL RUN"
 )
 
-## STATE-LEVEL TRANS, FULL, AND FINAL - REMOVED AIDS DEATHS ## 
+## STATE-LEVEL POP, TRANS, FULL, AND FINAL - REMOVED AIDS DEATHS, downweighted some likelihoods ## 
+
+# state-level some likelihoods downweighted by 1/4x
+register.calibration.info(CALIBRATION.CODE.POP.STATE,
+                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions.state, 
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = par.names.pop,
+                          parameter.aliases = par.aliases.population, # added for state-level 4/3
+                          n.iter = N.ITER.POP,
+                          thin = 50, 
+                          fixed.initial.parameter.values = c(global.trate=0.13), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get population parameters in the general vicinity"
+)
+
 # state-level trans calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions.state,
@@ -203,7 +221,7 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POPULATION
+                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
 )
 
 # state-level full calibration - removed AIDS deaths 
