@@ -352,7 +352,7 @@ put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertilit
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           aggregate.counts.with.whatever.we.have = T, #checked completeness data
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'births.numerator.for.fertility.rate',
@@ -362,7 +362,7 @@ put.msa.data.as.new.source(outcome = 'births.numerator.for.fertility.rate',
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           aggregate.counts.with.whatever.we.have = T, #checked completeness data
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
 #Save:
