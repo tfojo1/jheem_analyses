@@ -1,4 +1,6 @@
 
+library(ggplot2)
+
 PLOT.DIR = file.path('../../results/ryan_white/figure_survey_results/')
 PLOT.HEIGHT = 1.7
 PLOT.WIDTH = 2
@@ -39,8 +41,8 @@ medicaid.nonexpansion.mask = rowSums(rw_survey[,non.expansion.col.names]) > 0
 
 print(paste0(nrow(rw_survey), " respondents from ",
              sum(state.counts>0)-1, " unique states + Washington DC"))
-print(paste0(sum(state.counts[MEDICAID.EXPANSION.STATES]>0), " from Medicaid expansion states"))
-print(paste0(sum(state.counts[MEDICAID.NONEXPANSION.STATES]>0), " from Medicaid NON-expansion states"))
+print(paste0(sum(medicaid.expansion.mask), " from ", sum(state.counts[MEDICAID.EXPANSION.STATES]>0)-1, " Medicaid expansion states + Washington DC"))
+print(paste0(sum(medicaid.nonexpansion.mask), " from ", sum(state.counts[MEDICAID.NONEXPANSION.STATES]>0), " Medicaid NON-expansion states"))
 
 print(paste0("The median proportion from rural states was ", median(rw_survey$q4_rural_percentage, na.rm=T)))
 
@@ -119,8 +121,8 @@ rownames(mean.and.ci.table) = dimnames(survey.summary)$service
 print(mean.and.ci.table)
 
 print("N Respondents by question: ")
-print(paste0(names(n.responses), ": ", n.responses, collapse=', '))
 n.responses = colSums(!is.na(rw_survey[,c(4,6,8)]))
+print(paste0(names(n.responses), ": ", n.responses, collapse=', '))
 
 N.BINS = 15
 

@@ -14,8 +14,10 @@ mean.excess.incidence.end.vs.noint = apply(excess.incidence.end.vs.noint, 'locat
 
 delta.new.baseline = (total.new[BASELINE.YEAR,,,'noint'] - total.new[PRE.BASELINE.YEAR,,,'noint']) / total.new[PRE.BASELINE.YEAR,,,'noint']
 
-total.suppression = apply(full.results[,,,,,,'suppression',,], c('year','sim','location','intervention'), sum, na.rm=T) /
-  apply(full.results[,,,,,,'diagnosed.prevalence',,], c('year','sim','location','intervention'), sum, na.rm=T)
+#total.suppression = apply(full.results[,,,,,,'suppression',,], c('year','sim','location','intervention'), sum, na.rm=T) /
+#  apply(full.results[,,,,,,'diagnosed.prevalence',,], c('year','sim','location','intervention'), sum, na.rm=T)
+
+total.suppression = total.results[,,'suppression',,] / total.results[,,'diagnosed.prevalence',,]
 
 delta.suppression.baseline = (total.suppression[BASELINE.YEAR,,,'noint'] - total.suppression[PRE.BASELINE.YEAR,,,'noint']) / total.suppression[PRE.BASELINE.YEAR,,,'noint']
 
@@ -33,7 +35,7 @@ PLOT.DPI = 600
 PLOT.DEVICE = 'png'
 
 
-baseline.total.results = apply(full.results[BASELINE.YEAR,,,,,,,,'noint'], c('sim','outcome','location'), sum, na.rm=T)
+baseline.total.results = total.results[BASELINE.YEAR,,,,'noint'] # apply(full.results[BASELINE.YEAR,,,,,,,,'noint'], c('sim','outcome','location'), sum, na.rm=T)
 baseline.total.results[,'oahs.suppression',] = baseline.total.results[,'oahs.suppression',] /  baseline.total.results[,'oahs.clients',]
 baseline.total.results[,'adap.suppression',] = baseline.total.results[,'adap.suppression',] /  baseline.total.results[,'adap.clients',]
 for (outcome.to.div in c('suppression','rw.clients','non.adap.clients','oahs.clients','adap.clients'))
@@ -41,7 +43,7 @@ for (outcome.to.div in c('suppression','rw.clients','non.adap.clients','oahs.cli
 baseline.totals.by.city = apply(baseline.total.results, c('outcome','location'), mean, na.rm=T)
 
 
-total.prevalence = apply(full.results[BASELINE.YEAR,,,,,,'diagnosed.prevalence',,'noint'], c('sim','location'), sum)
+total.prevalence = apply(total.results[BASELINE.YEAR,,'diagnosed.prevalence',,'noint'], c('sim', 'location'), sum) #apply(full.results[BASELINE.YEAR,,,,,,'diagnosed.prevalence',,'noint'], c('sim','location'), sum)
 
 df.city.summ = cbind(data.frame(
   location = names(mean.excess.incidence.end.vs.noint),

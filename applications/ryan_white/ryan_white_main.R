@@ -17,6 +17,7 @@ VERBOSE = T
 CALIBRATION.CODE = 'final.ehe'
 N.SIM = 1000
 FORCE.REDO = T
+N.CHUNKS = 20
 
 RW.INTERVENTION.CODES = c('noint', 'rw.end', 'rw.b.intr', 'rw.p.intr')
 

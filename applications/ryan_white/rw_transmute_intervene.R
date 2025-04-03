@@ -1,13 +1,14 @@
-ATI.INDICES = 8
-
+ATI.INDICES = 19
+LOCATIONS.TO.ATI = 'C.32820'
 
 RESUME.FIRST = F
 RERUN = F
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
-LOCATIONS.TO.ATI = setdiff(MSAS.OF.INTEREST,
-                           c(ST.LOUIS.MSA, CINCINATTI.MSA,
-                             NYC.MSA, MIAMI.MSA, SF.MSA, BOSTON.MSA, SACRAMENTO.MSA, SAN.DIEGO.MSA))[ATI.INDICES]
+# LOCATIONS.TO.ATI = setdiff(MSAS.OF.INTEREST,
+#                            c(ST.LOUIS.MSA, CINCINATTI.MSA,
+#                              NYC.MSA, MIAMI.MSA, SF.MSA, BOSTON.MSA, SACRAMENTO.MSA, SAN.DIEGO.MSA))[ATI.INDICES]
+
 
 for (loc in LOCATIONS.TO.ATI)
 {

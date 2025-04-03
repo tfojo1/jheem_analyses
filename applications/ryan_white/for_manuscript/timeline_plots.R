@@ -29,7 +29,9 @@ make.time.plot <- function(locations,
 {
     alpha = (1-ci.coverage)/2
   
-    sim.data = apply(full.results[as.character(years),,,,,,outcome,locations,,drop=F],
+    # sim.data = apply(full.results[as.character(years),,,,,,outcome,locations,,drop=F],
+    #                  c('year','sim','intervention'), sum)
+    sim.data = apply(total.results[as.character(years),,outcome,locations,,drop=F],
                      c('year','sim','intervention'), sum)
     
     y.max = max(sim.data, na.rm=T)
