@@ -462,6 +462,24 @@ non.age.aids.diagnoses.likelihood.instructions.trans =
                                        equalize.weight.by.year = T
   )
 
+# state-level aids diagnoses - through 2000
+non.age.aids.diagnoses.likelihood.instructions.trans.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
+                                         outcome.for.sim = "aids.diagnoses",
+                                         dimensions = c("sex","race","risk"),
+                                         levels.of.stratification = c(0,1),
+                                         from.year = 1985,
+                                         to.year = 2000, # to 2000 for states because not as much data 
+                                         correlation.different.years = 0.3,
+                                         #observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = DIAGNOSES.ERROR.TERM,
+                                         error.variance.type = 'cv',
+                                         weights = (1*TRANSMISSION.WEIGHT),
+                                         equalize.weight.by.year = T
+    )
+
+# special case for C.31080
 non.age.aids.diagnoses.4x.likelihood.instructions.trans =
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                        outcome.for.sim = "aids.diagnoses",
@@ -494,6 +512,24 @@ non.age.aids.diagnoses.likelihood.instructions.full =
                                        equalize.weight.by.year = T
   )
 
+# state-level aids diagnoses - through 2000
+non.age.aids.diagnoses.likelihood.instructions.full.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
+                                         outcome.for.sim = "aids.diagnoses",
+                                         dimensions = c("sex","race","risk"),
+                                         levels.of.stratification = c(0,1),
+                                         from.year = 1985,
+                                         to.year = 2000, # to 2000 for states because not as much data 
+                                         correlation.different.years = 0.3,
+                                         #observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = DIAGNOSES.ERROR.TERM,
+                                         error.variance.type = 'cv',
+                                         weights = (1*FULL.WEIGHT),
+                                         equalize.weight.by.year = T
+    )
+
+# not used? 
 non.age.aids.diagnoses.cv.and.exp.v.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                        outcome.for.sim = "aids.diagnoses",
@@ -1319,6 +1355,7 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions =
 
   )
 
+# special case for C.31080
 transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids = 
   join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
                                race.risk.prevalence.likelihood.instructions, 
@@ -1332,11 +1369,11 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids =
                                
   )
 
-# state-level transmission calibration - removed AIDS deaths 
+# state-level transmission calibration - removed AIDS deaths; AIDS diagnoses are through 2000
 transmission.pop.idu.aware.aids.testing.likelihood.instructions.state = 
     join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions, 
                                  race.risk.prevalence.likelihood.instructions, 
-                                 non.age.aids.diagnoses.likelihood.instructions.trans,
+                                 non.age.aids.diagnoses.likelihood.instructions.trans.state, # state-level: through 2000
                                  population.likelihood.instructions.trans,
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,
@@ -1386,7 +1423,7 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   ps.syphilis.year.on.year.change.likelihood.instructions
 )
 
-# state-level full calibration - removed AIDS deaths 
+# state-level full calibration - removed AIDS deaths; AIDS diagnoses are through 2000
 FULL.likelihood.instructions.32x.new.prev.state = join.likelihood.instructions(
     # POPULATION LIKELIHOODS
     population.likelihood.instructions.full, 
@@ -1404,7 +1441,7 @@ FULL.likelihood.instructions.32x.new.prev.state = join.likelihood.instructions(
     general.mortality.likelihood.instructions.full,
     
     # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.likelihood.instructions.full,
+    non.age.aids.diagnoses.likelihood.instructions.full.state, # state-level: through 2000
     
     # CONTINUUM LIKELIHOODS
     proportion.tested.likelihood.instructions,
@@ -1467,7 +1504,7 @@ FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   ps.syphilis.year.on.year.change.likelihood.instructions
 )
 
-# state-level final calibration - removed AIDS deaths 
+# state-level final calibration - removed AIDS deaths; AIDS diagnoses are through 2000
 FULL.likelihood.instructions.8x.new.prev.state = join.likelihood.instructions(
     # POPULATION LIKELIHOODS
     population.likelihood.instructions.full, 
@@ -1485,7 +1522,7 @@ FULL.likelihood.instructions.8x.new.prev.state = join.likelihood.instructions(
     general.mortality.likelihood.instructions.full,
     
     # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.likelihood.instructions.full,
+    non.age.aids.diagnoses.likelihood.instructions.full.state, # state-level: through 2000
     
     # CONTINUUM LIKELIHOODS
     proportion.tested.likelihood.instructions,
