@@ -458,7 +458,7 @@ national.age.race.sex = lapply(national.stratified.one, function(file){
     mutate(location = "US") %>%
     rename(age = `Age Group`)%>%
     filter(age != "Total")%>%
-    mutate(age = if_else(age == '10-14 years', "0-10 years", age))%>% #Decided 2-12 to change this ontology to make it align with 0-10 ontology for other syphilis data
+    mutate(age = if_else(age == '10-14 years', "0-14 years", age))%>% #Decided 2-12 to change this ontology to make it align with 0-10 ontology for other syphilis data
     mutate(race = case_when(race == "White, NH " ~ "white, non hispanic",
                             race == "Black, NH " ~ "black, non hispanic",
                             race == "Hispanic " ~ "hispanic",
