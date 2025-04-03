@@ -253,6 +253,7 @@ data.manager$register.ontology(
 source('data_processing/atlas_plus_hiv_processing.R')
 source('data_processing/aids_vu_processing.R')
 source('data_processing/cdc_test_count_processing.R')
+source('data_processing/tests.per.population.R') 
 source('data_processing/lhd_msa_processing.R')
 source('data_processing/state_retention.R')
 source('data_processing/older.suppression.data.R') #Older National Level Suppression Data from Todd's PDFs
