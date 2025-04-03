@@ -608,9 +608,12 @@ gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa))))))))))))))))))))))))))
 
   ##add year section##
   if(grepl("1993 new 1992", filename)){
+     data$diagnoses_1992 =  data$new_no_1992
+      
     data$diagnoses_1993 = data$new_no_1993
     data$prevalence_1992 = data$prev_total
 
+    data$diagnoses_1992 = as.numeric(gsub(",",'', data$diagnoses_1992))
     data$diagnoses_1993 = as.numeric(gsub(",",'', data$diagnoses_1993))
     data$prevalence_1992 = as.numeric(gsub(",",'', data$prevalence_1992))
     data$type = "aids"
@@ -742,14 +745,14 @@ gsub("Louisiville, KY-IN", "Louisville, KY",  data$msa))))))))))))))))))))))))))
   }
 
  data <- data %>%
-   select(location,(one_of("diagnoses_1993", "diagnoses_1994", "diagnoses_1995","diagnoses_1996", "diagnoses_1997", "diagnoses_1998", "diagnoses_1999",
+   select(location,(one_of("diagnoses_1992", "diagnoses_1993", "diagnoses_1994", "diagnoses_1995","diagnoses_1996", "diagnoses_1997", "diagnoses_1998", "diagnoses_1999",
                                   "diagnoses_2000", "diagnoses_2001", "diagnoses_2002", "diagnoses_2003", "diagnoses_2004", "diagnoses_2005",
                                   "diagnoses_2006", "diagnoses_2007", "diagnoses_2008", "diagnoses_2009", "prevalence_1992", "prevalence_1993", "prevalence_1994", "prevalence_1995",
                                   "prevalence_1996", "prevalence_1997", "prevalence_1998", "prevalence_1999", "prevalence_2000", "prevalence_2001", "prevalence_2002",
                                   "prevalence_2003", "prevalence_2004", "prevalence_2005","prevalence_2006", "prevalence_2007", "prevalence_2008")))
 
      data <- data %>%
-       pivot_longer(cols=c(one_of("diagnoses_1993", "diagnoses_1994", "diagnoses_1995","diagnoses_1996", "diagnoses_1997", "diagnoses_1998", "diagnoses_1999",
+       pivot_longer(cols=c(one_of("diagnoses_1992", "diagnoses_1993", "diagnoses_1994", "diagnoses_1995","diagnoses_1996", "diagnoses_1997", "diagnoses_1998", "diagnoses_1999",
                                  "diagnoses_2000", "diagnoses_2001", "diagnoses_2002", "diagnoses_2003", "diagnoses_2004", "diagnoses_2005",
                                  "diagnoses_2006", "diagnoses_2007", "diagnoses_2008", "diagnoses_2009", "prevalence_1992", "prevalence_1993", "prevalence_1994", "prevalence_1995",
                                  "prevalence_1996", "prevalence_1997", "prevalence_1998", "prevalence_1999", "prevalence_2000", "prevalence_2001", "prevalence_2002",
