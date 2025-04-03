@@ -343,7 +343,19 @@ put.msa.data.as.new.source(outcome = 'prenatal.screening.denominator',
                            aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
+#The code 'fertility.rate.msa' sources another code 'aggregate.county.to.msa' which aggregates the fertility rate to MSA by aggregating
+#the numerator and denominator and calculating a rate.  But it doesn't put the aggregated numerator or denominator so I'm adding that here.
 put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertility.rate',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T, #checked completeness data
+                           data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'births.numerator.for.fertility.rate',
                            from.source.name = 'cdc.wonder.natality',
                            to.source.name = 'cdc.wonder.aggregated.population',
                            to.locations =  MSAS.OF.INTEREST,
