@@ -216,7 +216,7 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE,
                           thin = 200, 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANSMISSION),
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE),
                           description = "Full with covid likelihoods"
 )
 
@@ -232,6 +232,6 @@ register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
                           n.burn = ifelse(RUNNING.ON.DESKTOP, 0, floor(N.ITER.FINAL/2)),
                           is.preliminary = F,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.PLUS.COVID),
+                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.STATE),
                           description = "FULL RUN"
 )
