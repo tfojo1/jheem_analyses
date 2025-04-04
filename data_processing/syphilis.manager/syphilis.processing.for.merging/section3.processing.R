@@ -283,6 +283,19 @@ source('data_processing/syphilis.manager/prenatal.completeness.R')
 source('data_processing/syphilis.manager/female.population.completeness.R')
 
 # Aggregate Prenatal Care to MSA ------------------------------------------
+
+put.msa.data.as.new.source(outcome = 'prenatal.screening.denominator',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           source.for.denominator = 'cdc.wonder.natality',
+                           ontology.for.denominator = 'cdc.fertility',
+                           details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T,
+                           data.manager = syphilis.manager)
+
 put.msa.data.as.new.source(outcome = 'no.prenatal.care',
                            from.source.name = 'cdc.wonder.natality',
                            to.source.name = 'cdc.wonder.aggregated.population',
@@ -320,18 +333,6 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.second.trimester'
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
-                           from.source.name = 'cdc.wonder.natality',
-                           to.source.name = 'cdc.wonder.aggregated.population',
-                           to.locations =  MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           source.for.denominator = 'cdc.wonder.natality',
-                           ontology.for.denominator = 'cdc.fertility',
-                           details.for.new.data = 'estimated from county data',
-                           aggregate.counts.with.whatever.we.have = T,
-                           data.manager = syphilis.manager)
-
-put.msa.data.as.new.source(outcome = 'prenatal.screening.denominator',
                            from.source.name = 'cdc.wonder.natality',
                            to.source.name = 'cdc.wonder.aggregated.population',
                            to.locations =  MSAS.OF.INTEREST,

@@ -112,7 +112,7 @@ all.msa.congenital.data = left_join(msa.congenital, msa.births, by = c("location
 
 all.msa.congenital.data <- all.msa.congenital.data %>%
     mutate(value = msa.congenital.cases/count.msa.births)%>%
-    mutate(outcome = 'births.denominator.for.congenital.syphilis.proportion')
+    mutate(outcome = 'proportion.of.congenital.syphilis.births')
 
 
 # Data Processing, pull existing data (For State Level, numerator)  ---------------------------------------------------------------
@@ -125,7 +125,7 @@ all.state.congenital.data = left_join(state.congenital, state.births, by = c("lo
 
 all.state.congenital.data <- all.state.congenital.data %>%
     mutate(value = state.congenital.cases/count.state.births)%>%
-    mutate(outcome = 'births.denominator.for.congenital.syphilis.proportion')
+    mutate(outcome = 'proportion.of.congenital.syphilis.births')
 
 
 # Put ---------------------------------------------------------------------
