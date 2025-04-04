@@ -331,19 +331,19 @@ hiv.testing.likelihood.instructions =
 
 #-- FULL LIKELIHOODS --# ----
 likelihood.instructions.all =  join.likelihood.instructions(
-  # population.likelihood.instructions ,
-  # deaths.likelihood.instructions,
-  # fertility.likelihood.instructions,
+  population.likelihood.instructions ,
+  deaths.likelihood.instructions,
+  fertility.likelihood.instructions,
+
+  immigration.likelihood.instructions,
+  emigration.likelihood.instructions,
+
+  ps.diagnosis.likelihood.instructions,
+  early.diagnosis.likelihood.instructions,
+  late.diagnosis.likelihood.instructions,
+  total.diagnosis.likelihood.instructions,
   # 
-  # immigration.likelihood.instructions,
-  # emigration.likelihood.instructions,
-  # 
-  # ps.diagnosis.likelihood.instructions,
-  # early.diagnosis.likelihood.instructions,
-  # late.diagnosis.likelihood.instructions,
-  # total.diagnosis.likelihood.instructions,
-  # 
-  # prenatal.care.first.trimester.likelihood.instructions,
+  prenatal.care.first.trimester.likelihood.instructions,
   prenatal.care.second.trimester.likelihood.instructions,
   prenatal.care.third.trimester.likelihood.instructions,
   no.prenatal.care.likelihood.instructions,

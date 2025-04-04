@@ -45,6 +45,14 @@ dimnames(SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.sur
 #                                             Error mapping ontologies for outcome 'unknown.duration.or.late.syphilis.diagnoses': did you remember to register your mappings for ontology 'cdc.pdf.report'?
 
 
+# [1] "Instantiating sub 'jheem.basic.likelihood.instructions' for 'prp.prenatal.care.first.trimester'..."
+# Error in initialize(...) : 
+#     Error initializing likelihood for 'prp.prenatal.care.first.trimester': No data found for any stratifications
+# > 
+dimnames(SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location)
+#MSA's are missing
+
+
 # make a run:
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)
