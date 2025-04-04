@@ -28,6 +28,10 @@ RW.INT.KEEP.TO.YEAR = RW.INT.RUN.TO.YEAR
 RW.NOINT.KEEP.FROM.YEAR = 2010
 RW.INT.KEEP.FROM.YEAR = 2024
 
+RW.N.SIM.FOR.WEB = 80
+RW.WEB.FROM.YEAR = 2010
+RW.WEB.TO.YEAR = 2035
+
 # Other medicaid stuff
 
 city.main.state = sapply(RW.LOCATIONS, function(loc){

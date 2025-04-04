@@ -49,6 +49,12 @@ EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
                                                    prior.idu.states = 'IDU_in_remission',
                                                    never.idu.states = 'never_IDU',
                                                    idu.states = c('active_IDU','IDU_in_remission')
+                                               ),
+                                               
+                                               labels = c(
+                                                   msm = 'MSM',
+                                                   idu = 'PWID',
+                                                   msm_idu = 'MSM/PWID'
                                                )
                                                )
 

@@ -3,7 +3,7 @@ print("Sourcing code prior to extracting from interventions")
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-LOCATIONS = c("C.12580", "C.33100")#RW.LOCATIONS
+LOCATIONS = RW.LOCATIONS
 FORCE.OVERWRITE = FORCE.REDO
 
 

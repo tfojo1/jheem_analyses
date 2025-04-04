@@ -92,19 +92,22 @@ base.df.label$city.name = RW.CITY.SHORT.NAMES[base.df.label$location]
 
 
 # Ryan White Clients
-df.label = base.df.label[c(HOUSTON.MSA, AUSTIN.MSA, RIVERSIDE.MSA, COLUMBUS.MSA),]
+df.label = base.df.label[c(HOUSTON.MSA, BALTIMORE.MSA, RIVERSIDE.MSA, COLUMBUS.MSA),]
 df.label$x = df.label$rw.clients - 0.05
-df.label$y = df.label$excess + 0.05
+df.label$y = df.label$excess + 0.02
+df.label$y[1] = df.label$excess[1] + 0.11
+#df.label$x[2] = df.label$rw.clients[2] - 0.04
+df.label$y[2] = df.label$excess[2] + 0 - 0.065
 df.label$x[3] = df.label$rw.clients[3] + 0.05
-df.label$y[3] = df.label$excess[3] - 0.08
-df.label$x[4] = df.label$rw.clients[4] - 0.035
-df.label$y[4] = df.label$excess[4] - 0.20
+df.label$y[3] = df.label$excess[3] - 0.03
+df.label$x[4] = df.label$rw.clients[4] - 0.045
+df.label$y[4] = df.label$excess[4] - 0.25
 df.label$name = paste0(df.label$city.name, " ")
 
 df.prcc = data.frame(
-  value = paste0("PRCC: ", round(prccs.est['rw.clients'],2)),
-  x = 1,
-  y = 1
+  value = paste0("PRCC: ", format(round(prccs.est['rw.clients'],2), nsmall = 2)),
+  x = 0,
+  y = 1.15
 )
 
 plot = ggplot() + 
@@ -115,18 +118,18 @@ plot = ggplot() +
   xlab("Proportion of HIV+ Residents\nReceiving Ryan White Services in 2025") + 
   THEME + CITY.SIZE.SCALE + CITY.COLOR +
   geom_segment(data = df.label, aes(x, y, xend=rw.clients, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+  scale_y_continuous(labels = scales::percent, limits = c(0,1.15)) +
   scale_x_continuous(labels = scales::percent, limits = c(0,1)) +
     geom_label(data=df.prcc,
                aes(x, y, label=value), size=PRCC.SIZE,
-               vjust = 0.5, hjust = 1, show.legend = F) +
-    geom_text(data=df.label[1:2,], 
+               vjust = 0.5, hjust = 0, show.legend = F) +
+    geom_text(data=df.label[1,], 
               aes(x, y, label=name), size=LABEL.SIZE,
               vjust = 0, hjust=1, show.legend = F) +
     geom_text(data=df.label[3,], 
               aes(x, y, label=name), size=LABEL.SIZE,
               vjust = 1, hjust=0, show.legend = F) +
-    geom_text(data=df.label[4,], 
+    geom_text(data=df.label[c(2,4),], 
               aes(x, y, label=name), size=LABEL.SIZE,
             vjust = 1, hjust=1, show.legend = F); print(plot)
 
@@ -135,22 +138,23 @@ ggsave(plot = plot,
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 # Total Suppression
-df.label = base.df.label[c(HOUSTON.MSA, AUSTIN.MSA, RIVERSIDE.MSA, SEATTLE.MSA, CHICAGO.MSA),]
+df.label = base.df.label[c(HOUSTON.MSA, BALTIMORE.MSA, RIVERSIDE.MSA, SEATTLE.MSA, SAN.DIEGO.MSA),]
 df.label$x = df.label$suppression - 0.015
 df.label$y = df.label$excess + 0.05
-df.label$y[1] = df.label$excess[1] + 0.035
-df.label$x[1] = df.label$suppression[1] - 0.007
+df.label$y[1] = df.label$excess[1] + 0.07
+df.label$x[1] = df.label$suppression[1] - 0.02
+df.label$y[2] = df.label$excess[2] - 0.08
 df.label$x[3] = df.label$suppression[3] + 0.015
 df.label$y[3] = df.label$excess[3] - 0.03
-df.label$y[4] = df.label$excess[4] + 0.1
-df.label$x[5] = df.label$suppression[5] + 0.0125
-df.label$y[5] = df.label$excess[5] - 0.03
-df.label$name = paste0(df.label$city.name, " ")
+df.label$y[4] = df.label$excess[4] - 0.1
+df.label$x[5] = df.label$suppression[5] + .1 #0.0125
+df.label$y[5] = df.label$excess[5] - 0.09
+df.label$name = paste0(df.label$city.name, "")
 
 df.prcc = data.frame(
   value = paste0("PRCC: ", round(prccs.est['suppression'],2)),
-  x = 0.65,
-  y = 1
+  x = 0.6,
+  y = 1.15
 )
 
 plot = ggplot() + 
@@ -161,17 +165,29 @@ plot = ggplot() +
   xlab("Proportion of All HIV+ Residents\nVirally Suppressed in 2025") + 
   THEME + CITY.SIZE.SCALE + CITY.COLOR +
   geom_segment(data = df.label, aes(x, y, xend=suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
-  scale_x_continuous(labels = scales::percent, limits = c(0.65,0.9)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.15)) +
+  scale_x_continuous(labels = scales::percent, limits = c(0.6,0.9)) +
   geom_label(data=df.prcc,
             aes(x, y, label=value), size=PRCC.SIZE,
             vjust = 0.5, hjust = 0, show.legend = F) +
-  geom_text(data=df.label[-c(3,5),], 
-            aes(x, y, label=name), size=LABEL.SIZE,
-            vjust = 0, hjust=1, show.legend = F) +
-  geom_text(data=df.label[c(3,5),], 
-            aes(x, y, label=name), size=LABEL.SIZE,
-            vjust = 1, hjust=0, show.legend = F); print(plot)
+    geom_text(data=df.label[c(1),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              nudge_y = 0.015,
+              vjust = 0, hjust=0.5, show.legend = F) +
+    geom_text(data=df.label[c(2),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              vjust = 1, hjust=1, show.legend = F) +
+    geom_text(data=df.label[c(4),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              nudge_y = -0.005,
+              vjust = 1, hjust=0.5, show.legend = F) +
+    geom_text(data=df.label[c(3),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              vjust = 1, hjust=0, show.legend = F) +
+    geom_text(data=df.label[c(5),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              nudge_y = -0.005,
+              vjust = 1, hjust=0.5, show.legend = F); print(plot)
 
 ggsave(plot = plot, 
        filename=file.path(PLOT.DIR, "excess_vs_suppression.png"),
@@ -179,7 +195,7 @@ ggsave(plot = plot,
 
 
 # ADAP Suppression
-df.label = base.df.label[c(HOUSTON.MSA, AUSTIN.MSA, RIVERSIDE.MSA),]
+df.label = base.df.label[c(HOUSTON.MSA, BALTIMORE.MSA, RIVERSIDE.MSA),]
 df.label$x = df.label$adap.suppression - 0.015
 df.label$y = df.label$excess + 0.03
 df.label$name = paste0(df.label$city.name, " ")
@@ -199,7 +215,7 @@ plot = ggplot() +
   xlab("Proportion of AIDS Drug Assistance\nClients Virally Suppressed in 2025") + 
   THEME + CITY.SIZE.SCALE + CITY.COLOR +
   geom_segment(data = df.label, aes(x, y, xend=adap.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
   scale_x_continuous(labels = scales::percent, limits = c(0.72,0.95)) +
   geom_label(data=df.prcc,
             aes(x, y, label=value), size=PRCC.SIZE,
@@ -216,7 +232,7 @@ ggsave(plot = plot,
 
 
 # OAHS Suppression
-df.label = base.df.label[c(HOUSTON.MSA, AUSTIN.MSA, RIVERSIDE.MSA),]
+df.label = base.df.label[c(HOUSTON.MSA, BALTIMORE.MSA, RIVERSIDE.MSA),]
 df.label$x = df.label$oahs.suppression - 0.005
 df.label$y = df.label$excess + 0.05
 df.label$name = paste0(df.label$city.name, " ")
@@ -235,7 +251,7 @@ plot = ggplot() +
   xlab("Proportion of Outpatient Ambulatory\nClients Virally Suppressed in 2025") + 
   THEME + CITY.SIZE.SCALE + CITY.COLOR +
   geom_segment(data = df.label, aes(x, y, xend=oahs.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
-  scale_y_continuous(labels = scales::percent, limits = c(0,1)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
   scale_x_continuous(labels = scales::percent, limits = c(0.84,0.94)) +
   geom_label(data=df.prcc,
             aes(x, y, label=value), size=PRCC.SIZE,

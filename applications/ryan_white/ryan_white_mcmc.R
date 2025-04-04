@@ -180,9 +180,9 @@ set.up.fit.rw.simset <- function(location,
         print("All done - saving")
     
     n.sim = simset$n.sim
-    sim.index.breaks = floor(seq(1,n.sim,length=n.chunks+1))
+    sim.index.breaks = floor(seq(0,n.sim,length=n.chunks+1))
     sim.indices.for.chunk = lapply(1:n.chunks, function(chunk){
-        sim.index.breaks[chunk]:sim.index.breaks[chunk+1]
+        (sim.index.breaks[chunk]+1):sim.index.breaks[chunk+1]
     })
     
     rw.control = list(
@@ -221,6 +221,7 @@ fit.rw.simset.chunk <- function(location,
     if (!file.exists(control.filename))
         stop(paste0("No RW control has been set up at ", control.filename))
     
+    load(control.filename)
     
     # Load the simset
     simset = retrieve.simulation.set(version = 'ehe', location = location, calibration.code = calibration.code, n.sim = n.sim)
@@ -287,8 +288,10 @@ fit.rw.simset.chunk <- function(location,
                     {
                         look.back.i.sims.for.parameters = look.back.i.sims.for.parameters + 1
                         look.back.to.sim.i = i - look.back.i.sims.for.parameters
-                        if (look.back.i.sims.for.parameters > 1)
-                            mcmc.settings$start.values = sim.list[[look.back.to.sim.i]]$params[names(mcmc.settings$start.values)]
+                        if (look.back.i.sims.for.parameters > sim.indices[1])
+                            mcmc.settings$start.values = chunk.sims[[look.back.to.sim.i]]$params[names(mcmc.settings$start.values)]
+                        else
+                            break
                         
                         # Run the first sim and make sure the likelihood evaluates
                         sim = rw.control$transmute.simulation(mcmc.settings$start.values)
@@ -405,7 +408,18 @@ assemble.rw.simset <- function(location,
     
     if (verbose)
         print(paste0("All done loading chunks. Rerunning and packaging up"))
-    transmuted.simset = join.simulation.sets(sim.list)
+    
+# print("Applying fix for including duplicate sims")    
+# bk = sims.list
+# sims.list = lapply(sims.list, function(sim){
+#     if (sim$n.sim>50)
+#         sim[2:51]
+#     else
+#         sim
+# })
+
+    
+    transmuted.simset = join.simulation.sets(sims.list)
     
     rerun.simset = rerun.simulations(transmuted.simset, verbose=verbose)
     

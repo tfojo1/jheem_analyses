@@ -347,6 +347,39 @@ track.integrated.outcome(RW.SPECIFICATION,
                          corresponding.data.outcome = 'adap.suppressed.proportion.of.diagnosed',
                          save = T)
 
+##-- ADD THE WEB SUB-VERSION --##
+
+add.sub.version(RW.SPECIFICATION, 
+                sub.version = 'w',
+                description = "Web Tool version of Ryan White model",
+                inherit.outcomes = F,
+                can.seed.new.engine = T)
+
+# General Outcomes
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = 'w',
+                           outcome.names = c(
+                               'new',
+                               'diagnosed.prevalence',
+                               'incidence',
+                               'prep.uptake',
+                               'suppression','testing',
+                               'awareness'))
+
+#Ryan White Outcomes
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = 'w',
+                           outcome.names = c(
+                               'rw.clients',
+                               'non.adap.clients',
+                               'adap.clients',
+                               'oahs.clients',
+                               'adap.proportion',
+                               'oahs.suppression',
+                               'adap.suppression'))
+
+##-- REGISTER IT! --##
+
 register.model.specification(RW.SPECIFICATION)
 register.set.parameters.for.version('rw',
                                     parameter.names = RYAN.WHITE.PARAMETERS.PRIOR@var.names,

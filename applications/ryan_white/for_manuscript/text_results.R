@@ -67,7 +67,7 @@ print(paste0("Absolute Increase in Infections 2025-2030 if Ryan White Ends Indef
              format(round(quantile(abs.delta.cessation.tot.inf.noint1, probs=.975, na.rm=T)), big.mark=','),
              "]"))
 
-print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Brief Interruption: ", 
+print(paste0("Relative Increase in Infections 2025-2030 if Ryan White Ends Indefinitely: ", 
              format(round(mean(rel.delta.cessation.tot.inf.noint1, na.rm=T)*100), big.mark=','),
              "% [",
              format(round(quantile(rel.delta.cessation.tot.inf.noint1, probs=.025, na.rm=T)*100), big.mark=','),
@@ -340,8 +340,8 @@ mean.ci.rel.delta.cessation.age.inf.noint1 = cbind(
 #incidence.not.age1 = apply(full.results[YEARS.TO.CONSIDER,-1,,,,,'incidence',,], c('sim','location','intervention'), sum)
 incidence.not.age1 = apply(incidence.by.age[YEARS.TO.CONSIDER,-1,,,], c('age','sim','location','intervention'), sum)
 
-inf.not.age1.noint1 = apply(incidence.not.age1[,,'noint',drop=F], c('sim'), sum, na.rm=T)
-abs.delta.cessation.not.age1.inf.noint1 = apply(incidence.not.age1[,,'rw.end',drop=F], c('sim'), sum, na.rm=T) - inf.not.age1.noint1
+inf.not.age1.noint1 = apply(incidence.not.age1[,,,'noint',drop=F], c('sim'), sum, na.rm=T)
+abs.delta.cessation.not.age1.inf.noint1 = apply(incidence.not.age1[,,,'rw.end',drop=F], c('sim'), sum, na.rm=T) - inf.not.age1.noint1
 rel.delta.cessation.not.age1.inf.noint1 = abs.delta.cessation.not.age1.inf.noint1 / inf.not.age1.noint1
 
 print(paste0("Relative Increase in Infections 2025-2030 FOR AGE 1 in Cessation: ", 
