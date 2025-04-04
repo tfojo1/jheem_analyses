@@ -1,8 +1,9 @@
 
 # Establish boundary values -----------------------------------------------
 
-hiv.test.locations.of.interest <- c("NJ", "NY", "PA" ,"FL", "CA" ,"GA" ,"TX" ,"IL" ,"IN", "WI" ,"MD", "VA", "WV" ,"DC", "DE", "AZ", "MI", "NV" ,"MA",
-                                    "NH", "NC" ,"SC", "LA", "AR" ,"MS", "TN", "WA", "KY", "OH" ,"MO", "C.12060", "C.12580", "C.16980" 
+hiv.test.locations.of.interest <- c("AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT",
+                                    "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV" ,"WI", "WY", "DC",
+                                    "C.12060", "C.12580", "C.16980" 
                                     ,"C.26420", "C.31080", "C.35620", "C.37980" ,"C.41860") #states for which we have adult pop + msas for which we have hiv.tests
 
 hiv.tests.years.of.interest <- c("2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021") #all the years for which we have hiv.test data

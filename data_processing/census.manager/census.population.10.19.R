@@ -395,9 +395,12 @@ population.race.eth.sex.age= as.data.frame(population.race.eth.sex.age)
 # Remove Problem Locations ------------------------------------------------
 #Note: Removing these in August 2024, they are counties from Alaska and Connecticut that existed after 2022
 #Removing them because they create NA values for prior years which then prevent the calculation of the restratify.age.groups function
-problem.locations = c("02063", "02066", "02261", "09001", "09003", "09005", "09007", "09009", "09011", 
-                      "09013", "09015", "09110", "09120", "09130", "09140", "09150", "09160", "09170", 
-                      "09180", "09190")
+
+# problem.locations = c("02063", "02066", "02261", "09001", "09003", "09005", "09007", "09009", "09011", 
+#                       "09013", "09015", "09110", "09120", "09130", "09140", "09150", "09160", "09170", 
+#                       "09180", "09190")
+
+problem.locations = c("02063", "02066", "02261")
 
 stratified.10.19.data = lapply(stratified.10.19.data, function(x) filter(x, !location %in% problem.locations))
 

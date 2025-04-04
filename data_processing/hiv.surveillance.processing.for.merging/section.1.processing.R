@@ -230,6 +230,7 @@ put.msa.data.as.new.source(outcome = 'adult.population',
                            to.locations =  all.states,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'STATE',
+                           aggregate.counts.with.whatever.we.have = T,
                            details.for.new.data = 'estimated from county data',
                            data.manager = surveillance.manager)
 
