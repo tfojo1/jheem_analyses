@@ -12,7 +12,7 @@ make.time.plot <- function(locations,
                             intervention.colors = c('noint'=RW.BASELINE.COLOR,
                                                     'rw.end'=RW.END.COLOR,
                                                     'rw.b.intr'=RW.B.INTR.COLOR,
-                                                    'rw.p.inter'=RW.P.INTR.COLOR),
+                                                    'rw.p.intr'=RW.P.INTR.COLOR),
                             intervention.labels = c('noint'='Continuation',
                                                     'rw.end'='Cessation',
                                                     'rw.b.intr'='Brief Interruption',
@@ -53,17 +53,20 @@ make.time.plot <- function(locations,
       apply(sim.data[as.character(label.years),,intervention.codes[1],drop=F], 'sim', sum)
     rel.delta = abs.delta / apply(sim.data[as.character(label.years),,intervention.codes[1],drop=F], 'sim', sum)
     
-    label.x.year = min(label.years)-1
+    label.x.year = min(label.years)
     label.xend.year1 = ceiling((max(years) + label.x.year+1) / 2) + 1
     label.xend.year2 = label.years[order(sim.means[as.character(label.years),2], decreasing=T)[1]]
     label.xend.year = min(label.xend.year1, label.xend.year2)
     df.label = data.frame(
       #abs.value = paste0(format(round(mean(abs.delta)), big.mark=','))
-      label = paste0(round(100*mean(rel.delta)), '% [',
-                     round(100*quantile(rel.delta, probs=alpha)), "-",
-                     round(100*quantile(rel.delta, probs=1-alpha)), "%]\nmore ",
+      # label = paste0(round(100*mean(rel.delta)), '% [',
+      #                round(100*quantile(rel.delta, probs=alpha)), "-",
+      #                round(100*quantile(rel.delta, probs=1-alpha)), "%]\nmore ",
+      #                text.label),
+        label = paste0(format(round(mean(abs.delta)), big.mark=','), ' [',
+                       format(round(quantile(abs.delta, probs=alpha)), big.mark=','), "-",
+                       format(round(quantile(abs.delta, probs=1-alpha)), big.mark=','), "]\nmore ",
                      text.label),
-      
       x = label.x.year,
       y = (y.max + sim.means[as.character(label.x.year),1]) / 2,
       xend = label.xend.year,
@@ -74,7 +77,7 @@ make.time.plot <- function(locations,
       geom_ribbon(data=sim.df, 
                   aes(year, estimate, ymin=lower, ymax=upper,
                       color=intervention, fill=intervention),
-                  alpha=0.2, linewidth = 0.02) +
+                  alpha=0.25, linewidth = 0.02) +
       geom_line(data=sim.df, 
                 aes(year, estimate, ymin=lower, ymax=upper,
                     color=intervention, fill=intervention),
@@ -107,19 +110,19 @@ make.time.plot <- function(locations,
 plot = make.time.plot(location=HOUSTON.MSA, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'houston_inc_end.png'),
+       filename=file.path(PLOT.DIR, '1A_houston_inc_end.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=HOUSTON.MSA, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'houston_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, '1C_houston_inc_b.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=HOUSTON.MSA, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'houston_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, '1B_houston_inc_p.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -127,19 +130,19 @@ ggsave(plot = plot,
 plot = make.time.plot(location=RW.MEDICAID.EXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'expansion_inc_end.png'),
+       filename=file.path(PLOT.DIR, '4A_expansion_inc_end.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.EXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'expansion_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, '4C_expansion_inc_b.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.EXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'expansion_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, '4B_expansion_inc_p.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -147,19 +150,19 @@ ggsave(plot = plot,
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'nonexpansion_inc_end.png'),
+       filename=file.path(PLOT.DIR, '3A_nonexpansion_inc_end.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'nonexpansion_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, '3C_nonexpansion_inc_b.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'nonexpansion_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, '3B_nonexpansion_inc_p.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -167,19 +170,19 @@ ggsave(plot = plot,
 plot = make.time.plot(location=RW.LOCATIONS, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'all_inc_end.png'),
+       filename=file.path(PLOT.DIR, '5A_all_inc_end.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.LOCATIONS, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'all_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, '5C_all_inc_b.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.LOCATIONS, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'all_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, '5B_all_inc_p.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -189,18 +192,18 @@ texas.msas = RW.LOCATIONS[city.main.state=='TX']
 plot = make.time.plot(location=texas.msas, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'texas_inc_end.png'),
+       filename=file.path(PLOT.DIR, '2A_texas_inc_end.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=texas.msas, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'texas_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, '2C_texas_inc_b.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=texas.msas, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'texas_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, '2B_texas_inc_p.intr.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 

@@ -77,9 +77,12 @@ cat(paste0("The top 4 PRCCs for city variation are:\n",
            "\n"))
 
 
-CITY.SIZE.SCALE = scale_size(range = c(1,4))
-CITY.COLOR = scale_fill_manual(values = c("Non-Expansion State" = RW.NONEXP.COLOR,
-                                "Expansion State" = RW.EXP.COLOR))
+CITY.SIZE.SCALE = scale_size(range = c(1,4), guide = NULL)
+CITY.COLOR = scale_fill_manual(name = NULL,
+                               values = c("Non-Expansion State" = RW.NONEXP.COLOR,
+                                "Expansion State" = RW.EXP.COLOR),
+                               labels = c("Non-Expansion State" = "Non-Expansion States",
+                                          "Expansion State" = "Expansion States"))
 THEME =  theme_bw(base_size = 10)
 SEGMENT.SIZE = 0.25
 LABEL.SIZE = 3
@@ -147,7 +150,7 @@ df.label$y[2] = df.label$excess[2] - 0.08
 df.label$x[3] = df.label$suppression[3] + 0.015
 df.label$y[3] = df.label$excess[3] - 0.03
 df.label$y[4] = df.label$excess[4] - 0.1
-df.label$x[5] = df.label$suppression[5] + .1 #0.0125
+df.label$x[5] = df.label$suppression[5] + 0.0125
 df.label$y[5] = df.label$excess[5] - 0.09
 df.label$name = paste0(df.label$city.name, "")
 
@@ -193,6 +196,43 @@ ggsave(plot = plot,
        filename=file.path(PLOT.DIR, "excess_vs_suppression.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
+plot = ggplot() + 
+    geom_point(data=df.city.summ, 
+               aes(suppression, excess, size=new, fill=medicaid),
+               shape=21, show.legend = T) + 
+    ylab(NULL) +
+    xlab(NULL) + 
+    THEME + CITY.SIZE.SCALE + CITY.COLOR +
+    geom_segment(data = df.label, aes(x, y, xend=suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.15)) +
+    scale_x_continuous(labels = scales::percent, limits = c(0.6,0.9)) +
+    geom_label(data=df.prcc,
+               aes(x, y, label=value), size=PRCC.SIZE,
+               vjust = 0.5, hjust = 0, show.legend = F) +
+    geom_text(data=df.label[c(1),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              nudge_y = 0.015,
+              vjust = 0, hjust=0.5, show.legend = F) +
+    geom_text(data=df.label[c(2),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              vjust = 1, hjust=1, show.legend = F) +
+    geom_text(data=df.label[c(4),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              nudge_y = -0.005,
+              vjust = 1, hjust=0.5, show.legend = F) +
+    geom_text(data=df.label[c(3),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              vjust = 1, hjust=0, show.legend = F) +
+    geom_text(data=df.label[c(5),], 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              nudge_y = -0.005,
+              vjust = 1, hjust=0.5, show.legend = F) +
+    theme_bw(base_size = 10*1.2) + theme(legend.position = 'bottom') +
+    guides(fill = guide_legend(override.aes = list(size = 7)));plot
+
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, "dummy_for_legend.png"),
+       height = PLOT.HEIGHT/2, width = PLOT.WIDTH*2, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 # ADAP Suppression
 df.label = base.df.label[c(HOUSTON.MSA, BALTIMORE.MSA, RIVERSIDE.MSA),]

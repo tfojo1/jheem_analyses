@@ -151,7 +151,7 @@ plot = ggplot(df.for.hist, aes(x=q2_oahs_loss, fill=medicaid, group=medicaid)) +
     theme_bw(base_size = PLOT.TEXT.SIZE) + theme(legend.position = 'bottom') + 
     scale_x_continuous(labels=scales::percent, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
     ylim(0,Y.LIM) + 
-    ylab(NULL); plot
+    ylab(NULL); print(plot)
 #    ylab("Number of Respondents"); plot
 
 
@@ -168,7 +168,7 @@ plot = ggplot(df.for.hist, aes(x=q3_support_loss, fill=medicaid, group=medicaid)
     theme_bw(base_size = PLOT.TEXT.SIZE) + theme(legend.position = 'bottom') + 
     scale_x_continuous(labels=scales::percent, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
     ylim(0,Y.LIM) + 
-    ylab(NULL); plot
+    ylab(NULL); print(plot)
 #    ylab("Number of Respondents"); plot
 
 
@@ -184,7 +184,7 @@ plot = ggplot(df.for.hist, aes(x=q3_support_loss, fill=medicaid, group=medicaid)
                       name=NULL) +
     theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
     scale_x_continuous(labels=scales::percent, name="Estimated Proportion Who\nWould Lose Suppression") +
-    ylab(NULL); plot
+    ylab(NULL); print(plot)
 
 ggsave(plot = plot, 
        filename=file.path(PLOT.DIR, "dummy_for_legend.png"),

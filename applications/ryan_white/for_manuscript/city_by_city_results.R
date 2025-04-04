@@ -314,13 +314,16 @@ color.by = cbind(
     rep(mean.ci.rel.total.infections.averted.p.intr.by.city[,1], each=2)
 )
 
-text.color = matrix(RW.EXP.COLOR, nrow=nrow(color.by), ncol=ncol(color.by))
+text.color = matrix(RW.EXP.LABEL.COLOR, nrow=nrow(color.by), ncol=ncol(color.by))
 nonexp.mask = sapply(names(city.plus.total.names), function(city){
     any(city == RW.MEDICAID.NONEXPANSION.CITIES)
 })
 nonexp.mask['nonexp'] = T
-text.color[2*(1:length(city.plus.total.names)),][nonexp.mask,] = RW.NONEXP.COLOR
-text.color[2*(1:length(city.plus.total.names))-1,][nonexp.mask,] = RW.NONEXP.COLOR
+total.mask = names(city.plus.total.names) == 'total'
+text.color[2*(1:length(city.plus.total.names)),][nonexp.mask,] = RW.NONEXP.LABEL.COLOR
+text.color[2*(1:length(city.plus.total.names))-1,][nonexp.mask,] = RW.NONEXP.LABEL.COLOR
+text.color[2*(1:length(city.plus.total.names)),][total.mask,] = RW.TOTAL.LABEL.COLOR
+text.color[2*(1:length(city.plus.total.names))-1,][total.mask,] = paste0(RW.TOTAL.LABEL.COLOR,'FF')
 text.color[,-1] = '#FFFFFFFF'
 
 
@@ -355,7 +358,13 @@ boxplot.df.b.intr$Scenario = '1.b.intr'
 boxplot.df.b.intr$location = city.plus.total.names
 boxplot.df.b.intr$loc.code = names(city.plus.total.names)
 
+boxplot.df.spacer = boxplot.df.end
+boxplot.df.spacer$mean = boxplot.df.spacer$lower = boxplot.df.spacer$upper = boxplot.df.spacer$iqr.lower = boxplot.df.spacer$iqr.upper = NA
+boxplot.df.spacer$Scenario = '0.spacer'
+boxplot.df.spacer = boxplot.df.spacer[boxplot.df.spacer$loc.code!='total',]
+
 boxplot.df = rbind(
+  boxplot.df.spacer,
   boxplot.df.end,
   boxplot.df.p.intr,
   boxplot.df.b.intr
@@ -373,11 +382,16 @@ nonexp.mask = sapply(boxplot.df$loc.code, function(city){
     any(city==RW.MEDICAID.NONEXPANSION.CITIES)
 })
 nonexp.mask[boxplot.df$loc.code=='nonexp'] = T
+total.mask = boxplot.df$loc.code == 'total'
+total.and.subtotal.mask = total.mask | boxplot.df$loc.code == 'exp' | boxplot.df$loc.code == 'nonexp'
 
-location.colors = rep(RW.EXP.COLOR, length(boxplot.df$location))
-location.colors[nonexp.mask] = RW.NONEXP.COLOR
+location.colors = rep(RW.EXP.LABEL.COLOR, length(boxplot.df$location))
+location.colors[nonexp.mask] = RW.NONEXP.LABEL.COLOR
 location.face = rep('plain', length(boxplot.df$location))
-location.face[nonexp.mask] = 'bold'
+
+location.colors[total.mask] = RW.TOTAL.LABEL.COLOR
+location.face[total.and.subtotal.mask] = 'bold'
+
 
 plot = ggplot() + 
   geom_boxplot(data = boxplot.df,

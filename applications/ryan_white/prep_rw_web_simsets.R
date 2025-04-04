@@ -1,16 +1,22 @@
 
+#LOCATION.INDICES = 28 + 1:4
+#LOCATION.INDICES = LOCATION.INDICES[-1]
+print(paste0("LOCATION INDICES = ", paste0(LOCATION.INDICES, collapse=', ')))
+
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 #source('../jheem_analyses/applications/ryan_white/ryan_white_interventions.R')
 
-LOCATIONS.TO.PREP = RW.LOCATIONS
-INTERVENTION.CODES.TO.PREP = RW.INTERVENTION.CODES[1:8]
+
+LOCATIONS.TO.PREP = RW.LOCATIONS[LOCATION.INDICES[LOCATION.INDICES<=length(RW.LOCATIONS)]]
+INTERVENTION.CODES.TO.PREP = RW.INTERVENTION.CODES
 
 start.time = as.numeric(Sys.time())
-print(paste0("Making web simsets for ", length(locations), ", ", length(INTERVENTION.CODES.TO.PREP), " interventions per location"))
+print(paste0("Making web simsets for **", length(LOCATIONS.TO.PREP), "** locations, ", length(INTERVENTION.CODES.TO.PREP), " interventions per location"))
+print(paste0("   (", RW.N.SIM.FOR.WEB, " simulations per simset, running from ", RW.WEB.FROM.YEAR, " to ", RW.WEB.TO.YEAR, ")"))
 
 for (loc in LOCATIONS.TO.PREP)
 {
-    print(paste0("Prepping ", length(INTERVENTION.CODES.TO.PREP), " simsets for ",))
+    print(paste0("Prepping ", length(INTERVENTION.CODES.TO.PREP), " simsets for ", loc, " (", get.location.name(loc), ")"))
     for (int.code in INTERVENTION.CODES.TO.PREP)
     {
         print(paste0("  - ", int.code))
@@ -23,12 +29,12 @@ for (loc in LOCATIONS.TO.PREP)
                                        sub.version = 'w',
                                        from.year = RW.WEB.FROM.YEAR,
                                        to.year = RW.WEB.TO.YEAR, 
-                                       verbose = T)
+                                       verbose = F)
         
         web.simset$save()
     }
     
-    run.time.seconds = as.numeric(Sys.time) - start.time
+    run.time.seconds = as.numeric(Sys.time()) - start.time
     run.time.minutes = run.time.seconds / 60
     run.time.hours = run.time.minutes / 60
     

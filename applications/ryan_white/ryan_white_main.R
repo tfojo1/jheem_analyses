@@ -54,27 +54,63 @@ city.main.state.medicaid.expansion = unlist(sapply(city.main.state, function(st)
 RW.MEDICAID.EXPANSION.CITIES = names(city.main.state.medicaid.expansion)[city.main.state.medicaid.expansion]
 RW.MEDICAID.NONEXPANSION.CITIES = names(city.main.state.medicaid.expansion)[!city.main.state.medicaid.expansion]
 
+shade.darker <- function(color, delta)
+{
+    rgb.val = pmax(0, pmin(255, col2rgb(color) + delta))
+    dim(rgb.val) = c(3, length(color))
+    rgb(rgb.val[1,], rgb.val[2,], rgb.val[3,], maxColorValue = 255)
+}
 
-RW.PALETTE = ggsci::pal_jama()(7)
-RW.DATA.COLOR = RW.PALETTE[1]
-RW.BASELINE.COLOR = RW.PALETTE[2]
-RW.END.COLOR = RW.PALETTE[4]
-RW.B.INTR.COLOR = RW.PALETTE[5]
-RW.P.INTR.COLOR = RW.PALETTE[3]
+RW.PALETTE.RAW = ggsci::pal_jama()(7)
+RW.DATA.COLOR = RW.PALETTE.RAW[1]
+RW.BASELINE.COLOR = RW.PALETTE.RAW[3]
+RW.END.COLOR = RW.PALETTE.RAW[4]
+RW.B.INTR.COLOR = RW.PALETTE.RAW[5]
+RW.P.INTR.COLOR = RW.PALETTE.RAW[2]
+RW.NONEXP.COLOR = RW.PALETTE.RAW[2]
+RW.NONEXP.LABEL.COLOR = shade.darker(RW.NONEXP.COLOR,-80)
+RW.EXP.COLOR = RW.PALETTE.RAW[6]
+RW.EXP.LABEL.COLOR = shade.darker(RW.EXP.COLOR,-40)
+RW.TOTAL.LABEL.COLOR = "#000000"
+
+RW.PALETTE = c(
+    data = RW.DATA.COLOR,
+    baseline = RW.BASELINE.COLOR,
+    end = RW.END.COLOR,
+    b.intr = RW.B.INTR.COLOR,
+    p.intr = RW.P.INTR.COLOR,
+    nonexp = RW.NONEXP.COLOR,
+    exp = RW.EXP.COLOR,
+    nonexp_label = RW.NONEXP.LABEL.COLOR,
+    exp_label = RW.EXP.LABEL.COLOR,
+    total_label = RW.TOTAL.LABEL.COLOR
+)
 
 
-RW.PALETTE = ggsci::pal_aaas()(7)
-RW.DATA.COLOR = RW.PALETTE[4]
-RW.BASELINE.COLOR = RW.PALETTE[1]
-RW.END.COLOR = RW.PALETTE[6]
-RW.B.INTR.COLOR = RW.PALETTE[3]
-RW.P.INTR.COLOR = RW.PALETTE[5]
-RW.NONEXP.COLOR = RW.PALETTE[4]
-RW.EXP.COLOR = RW.PALETTE[5]
+# RW.PALETTE = ggsci::pal_aaas()(10)
+# RW.DATA.COLOR = RW.PALETTE[4]
+# RW.BASELINE.COLOR = RW.PALETTE[1]
+# RW.END.COLOR = RW.PALETTE[6]
+# RW.B.INTR.COLOR = RW.PALETTE[3]
+# RW.P.INTR.COLOR = RW.PALETTE[5]
+# RW.NONEXP.COLOR = RW.PALETTE[4]
+# RW.EXP.COLOR = RW.PALETTE[5]
 
-color = RW.PALETTE; names(color) = RW.PALETTE
-ggplot2::qplot(1:length(RW.PALETTE), 1:length(RW.PALETTE), geom='point', size=20, color=RW.PALETTE) + ggplot2::geom_point(size=20) +
+
+# RW.PALETTE = ggsci::pal_nejm()(8)
+# RW.PALETTE = ggsci::pal_bmj()(9)
+# RW.PALETTE = ggsci::pal_lancet()(9)
+# RW.PALETTE = ggsci::pal_frontiers()(10)
+# RW.PALETTE = ggsci::pal_jco()(10)
+# RW.PALETTE = ggsci::pal_uchicago()(9)
+
+color = RW.PALETTE.RAW; names(color) = RW.PALETTE.RAW
+ggplot2::qplot(1:length(RW.PALETTE.RAW), 1:length(RW.PALETTE.RAW), geom='point', size=20, color=RW.PALETTE.RAW) + ggplot2::geom_point(size=20) +
   ggplot2::scale_color_manual(values = color)
+
+ggplot2::qplot(1:length(RW.PALETTE), 1:length(RW.PALETTE), geom='point', size=20, color=names(RW.PALETTE)) + ggplot2::geom_point(size=20) +
+    ggplot2::scale_color_manual(values = RW.PALETTE)
+
 
 
 RW.CITY.SHORT.NAMES = c(
