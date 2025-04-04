@@ -110,15 +110,15 @@ immigration.likelihood.instructions =
 emigration.likelihood.instructions = 
   create.basic.likelihood.instructions( outcome.for.sim = "emigration",
                                         outcome.for.data = "emigration", 
-                                      
-                                       dimensions = c("age","race"), 
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2011, 
-                                       observation.correlation.form = 'compound.symmetry', 
-                                       error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
-                                       error.variance.type = 'cv',
-                                       weights = 1,
-                                       equalize.weight.by.year = T
+                                        
+                                        dimensions = c("age","race"), 
+                                        levels.of.stratification = c(0,1,2),
+                                        from.year = 2011, 
+                                        observation.correlation.form = 'compound.symmetry', 
+                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                        error.variance.type = 'cv',
+                                        weights = 1,
+                                        equalize.weight.by.year = T
   )
 
 
@@ -235,7 +235,7 @@ total.diagnosis.likelihood.instructions =
 #                                                   )
 # cache.object.for.version(object = suppression.bias.estimates, 
 #                          name = "suppression.bias.estimates", 
-                         # version = 'ehe', overwrite=T)  
+# version = 'ehe', overwrite=T)  
 
 
 ##** PRENATAL CARE COVERAGE ** ----
@@ -260,7 +260,7 @@ prenatal.care.first.trimester.likelihood.instructions =
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
-error.variance.type = 'function.sd')
+                                       error.variance.type = 'function.sd')
 prenatal.care.second.trimester.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.second.trimester",
                                        outcome.for.data = "prenatal.care.initiation.second.trimester",
@@ -289,7 +289,7 @@ prenatal.care.third.trimester.likelihood.instructions =
                                        from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = function(data,details,version, location){
-                                                                                  w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
                                          msa.variance=(1-mean(w))^2 * ave.msa.variance
                                          data[is.na(data)]<-0 #'@Andrew: to take out after the update 
                                          var= (data* (0.05))^2+msa.variance
@@ -305,8 +305,8 @@ no.prenatal.care.likelihood.instructions =
                                        from.year = 2016,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = function(data,details,version, location){
-                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-                                         msa.variance=(1-mean(w))^2 * msa.variance
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
                                          data[is.na(data)]<-0 #'@Andrew: to take out after the update 
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
@@ -331,8 +331,8 @@ hiv.testing.likelihood.instructions =
 
 #-- FULL LIKELIHOODS --# ----
 likelihood.instructions.all =  join.likelihood.instructions(
-  population.likelihood.instructions ,
-  deaths.likelihood.instructions,
+  # population.likelihood.instructions ,
+  # deaths.likelihood.instructions,
   # fertility.likelihood.instructions,
   # 
   # immigration.likelihood.instructions,
@@ -343,7 +343,7 @@ likelihood.instructions.all =  join.likelihood.instructions(
   # late.diagnosis.likelihood.instructions,
   # total.diagnosis.likelihood.instructions,
   # 
-  prenatal.care.first.trimester.likelihood.instructions,
+  # prenatal.care.first.trimester.likelihood.instructions,
   prenatal.care.second.trimester.likelihood.instructions,
   prenatal.care.third.trimester.likelihood.instructions,
   no.prenatal.care.likelihood.instructions,

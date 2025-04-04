@@ -5,73 +5,68 @@
 # https://jheem.shinyapps.io/EndingHIV/
 
 ##################
+
+#'@Zoe:
+#1- female.population.denominator.for.fertility.rate <some MSA's are missing>: aggregate data for all MSAs regardless of missing counties
+# double check the calculation for fertility rate
+#2- for immigration and emigration : to restratify the data for age to comply with SHIELD age-groups 
+#
+#3- prenatal care proportions: what is triggering all the NA's?
+#
+#4- proportion of births with congenital syphilis: collecting data from HDR for congenital syphilis 
+#
+#5- estimating error for syphilis diagnosis using HDR (differences in CDC estimates and health department reports)
+
+
 source('applications/SHIELD/shield_specification.R')
 version= 'shield'
 location= "C.12580" #Baltimore MSA
 
-
 # TEST the likelihoods ----
 source('applications/SHIELD/shield_likelihoods.R')
+
+# instantiate all likelihoods
 likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
 
-#'@Zoe:
-#1- female.population.denominator.for.fertility.rate <some MSA's are missing>: aggregate data for all MSAs regardeless of missing counties
-# double check the calculation for fertility rate
-#2- for immigration and emigration : to restratify the data for age to comply with SHIELD agegroups 
-#
-#3- prenatal care proportions: what is triggering all the NA's?
+# [1] "Instantiating sub 'jheem.basic.likelihood.instructions' for 'fertility.rate'..."
+# Error in initialize(...) : 
+    # Error initializing likelihood for 'fertility.rate': No data found for any stratifications
+examine.recent.failed.ontology.mapping()
+dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
+dimnames(SURVEILLANCE.MANAGER$data$female.population.denominator.for.fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
 
-#4-proportion of births with congenital syphilis: collecting ddata from HDR for congenital syphilis 
+# "Instantiating sub 'jheem.basic.likelihood.instructions' for 'diagnosis.el.misclassified'..."
+# Error in private$get.universal.ontology(outcome = outcome, sources = sources,  : 
+#                                             Error mapping ontologies for outcome 'early.syphilis.diagnoses': did you remember to register your mappings for ontology 'cdc.pdf.report'?
+dimnames(SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)
 
-#5- estimating error for syphilis diagnosis using HDR (differences in CDC estiamtes and health department reports)
-
-
-# get.ontology.error.debug.info()
-so=get.ontology.error.debug.info()[[2]]
-do=get.ontology.error.debug.info()[[1]]
-examine.get.mappings.to.align.ontologies(so,do)
-
-get.mappings.to.align.ontologies(ontology(sex=so$sex),ontology(sex=do$sex))
-get.mappings.to.align.ontologies(ontology(age=so$age),ontology(age=do$age))
-get.mappings.to.align.ontologies(ontology(race=so$race),ontology(race=do$race))
-get.mappings.to.align.ontologies(ontology(ethnicity=so$ethnicity),ontology(ethnicity=do$ethnicity))
-get.mappings.to.align.ontologies(ontology(year=so$year),ontology(year=do$year))
-get.mappings.to.align.ontologies(ontology(location=so$location),ontology(location=do$location))
-
-# #prenatal care: there are missign values in the MSA aggregated data
-# SURVEILLANCE.MANAGER$data$no.prenatal.care$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
-# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
-# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.second.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
-# SURVEILLANCE.MANAGER$data$prenatal.care.initiation.third.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+# [1] "Instantiating sub 'jheem.basic.likelihood.instructions' for 'diagnosis.late.misclassified'..."
+# Error in private$get.universal.ontology(outcome = outcome, sources = sources,  : 
+#                                             Error mapping ontologies for outcome 'unknown.duration.or.late.syphilis.diagnoses': did you remember to register your mappings for ontology 'cdc.pdf.report'?
 
 
-# SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,location]
-# $mapping.from.1
-# [1] "A basic ontology mapping ('shield.to.census.sex') over dimension 'sex'"
-# 
-# $mapping.from.2
-# [1] "An identity ('no-change') ontology mapping"
-# > get.mappings.to.align.ontologies(ontology(age=a$age),ontology(age=b$age))
-# NULL
-
-# examine.recent.failed.ontology.mapping()
-
-############## 
+# make a run:
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 # params['global.transmission.rate']=2
 sim = engine$run(params)
-sim2 = engine$run(params)
+#
 
-likelihood.all$compute(sim)
-likelihood.temp<- likelihood.instructions.all$sub.instructions[[7]]$instantiate.likelihood('shield',location,verbose = T)
-likelihood.temp$compute(sim)
-# prenatal.care.second.trimester.likelihood.instructions,
-# prenatal.care.third.trimester.likelihood.instructions,
-# no.prenatal.care.likelihood.instructions,
 
+# compute all likelihoods
+# likelihood.all$compute(sim)
+# # compute one at a time
+# lapply(1:7,function(x){
+#     print(x)
+#     likelihood.temp<- likelihood.instructions.all$sub.instructions[[x]]$instantiate.likelihood('shield',location,verbose = T)
+#     likelihood.temp$compute(sim)
+# })
 # save(sim,file = "~/Downloads/shield_test_sim.RData")
+
+####
+sim2 = engine$run(params)
+prod(sim$population==sim2$population)
 
 #POPUATION ----
 #fitting to age-race-sex-specific estimates starting in 2010, and assuming fix strata before then 
@@ -151,7 +146,7 @@ simplot(sim,"diagnosis.ps")  #'@Andrew: no data points are shown on the plot
 # SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.aggregated.county$cdc.sti$year__location[,'C.12580']
 
 simplot(sim,"diagnosis.el")
- 
+
 # #By 1 factor
 # # simplot(sim,"population", facet.by = "sex", dimension.values = list(year = 2000:2030))
 # # simplot(sim,"population", facet.by = "age", dimension.values = list(year = 2000:2030))
@@ -181,3 +176,39 @@ simplot(sim,"diagnosis.el")
 # apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__race__ethnicity['2010','US',,],c('ethnicity'),sum)
 # apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex['2010','US',,,,],
 #       c('ethnicity'),sum)
+
+
+
+if (1==2){
+    get.ontology.error.debug.info()
+    so=get.ontology.error.debug.info()[[2]]
+    do=get.ontology.error.debug.info()[[1]]
+    examine.get.mappings.to.align.ontologies(so,do)
+    
+    get.mappings.to.align.ontologies(ontology(sex=so$sex),ontology(sex=do$sex))
+    get.mappings.to.align.ontologies(ontology(age=so$age),ontology(age=do$age))
+    get.mappings.to.align.ontologies(ontology(race=so$race),ontology(race=do$race))
+    get.mappings.to.align.ontologies(ontology(ethnicity=so$ethnicity),ontology(ethnicity=do$ethnicity))
+    get.mappings.to.align.ontologies(ontology(year=so$year),ontology(year=do$year))
+    get.mappings.to.align.ontologies(ontology(location=so$location),ontology(location=do$location))
+    
+    # #prenatal care: there are missign values in the MSA aggregated data
+    # SURVEILLANCE.MANAGER$data$no.prenatal.care$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.second.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.third.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+    
+    
+    # SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,location]
+    # $mapping.from.1
+    # [1] "A basic ontology mapping ('shield.to.census.sex') over dimension 'sex'"
+    # 
+    # $mapping.from.2
+    # [1] "An identity ('no-change') ontology mapping"
+    # > get.mappings.to.align.ontologies(ontology(age=a$age),ontology(age=b$age))
+    # NULL
+    
+    dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
+    dimnames(SURVEILLANCE.MANAGER$data$female.population.denominator.for.fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
+    examine.recent.failed.ontology.mapping()
+}
