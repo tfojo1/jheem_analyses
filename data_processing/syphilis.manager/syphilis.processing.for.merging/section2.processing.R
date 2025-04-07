@@ -133,7 +133,7 @@ data.manager$register.ontology(  #Create a separate ontology for early syphilis
   ont = ontology(
     year= NULL,
     location= NULL,
-    age=c('0-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years', "Unknown"),
+    age=c('0-14 years', '15-24 years', '25-34 years', '35-44 years', '45-54 years', '55-64 years', '65+ years'),
     race=c('american indian/alaska native', 'asian', 'black/african american', 'hispanic/latino', 'native hawaiian/other pacific islander', 'white'),
     sex=c('male','female'),
     risk=c('msm','idu','msm_idu','heterosexual','other')
