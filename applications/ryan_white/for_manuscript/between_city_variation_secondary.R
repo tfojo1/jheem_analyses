@@ -51,18 +51,29 @@ df.city.summ = cbind(data.frame(
   medicaid = 'Non-Expansion State',
   delta.new = apply(delta.new.baseline, 'location', mean, na.rm=T),
   delta.suppression = apply(delta.suppression.baseline, 'location', mean, na.rm=T),
-  sexual.transmission = apply(total.sexual.transmission[BASELINE.YEAR,,,'noint'] / total.prevalence, 'location', mean, na.rm=T) 
+  sexual.transmission = apply(total.sexual.transmission[BASELINE.YEAR,,,'noint'] / total.prevalence, 'location', mean, na.rm=T)
 #  sexual.transmission = apply(total.sexual.transmission[BASELINE.YEAR,,,'noint'] / total.pop[BASELINE.YEAR,,,'noint'], 'location', mean, na.rm=T) 
 ),
 as.data.frame(t(baseline.totals.by.city)))
 df.city.summ$medicaid[city.main.state.medicaid.expansion] = "Expansion State"
 df.city.summ$name = get.location.name(rownames(df.city.summ))
+df.city.summ$new.per.pop = df.city.summ$new / df.city.summ$population
+df.city.summ$new.per.prev = df.city.summ$new / df.city.summ$diagnosed.prevalence
 
 
 
-
-pcc.df = df.city.summ[,c('rw.clients','adap.clients','oahs.clients','suppression','oahs.suppression','adap.suppression','new','sexual.transmission','medicaid','excess')]
-pcc.df = df.city.summ[,c('rw.clients','suppression','oahs.suppression','adap.suppression','new','sexual.transmission','medicaid','excess')]
+pcc.df = df.city.summ[,c('rw.clients',
+                   #      'adap.clients',
+                #         'oahs.clients',
+                         'suppression',
+                 #        'oahs.suppression',
+                  #       'adap.suppression',
+                         'new.per.pop',
+                         'new.per.prev',
+#                         'sexual.transmission',
+                         'medicaid',
+                         'excess')]
+#pcc.df = df.city.summ[,c('rw.clients','suppression','oahs.suppression','adap.suppression','new','sexual.transmission','medicaid','excess')]
 prccs = epiR::epi.prcc(pcc.df); prccs[order(abs(prccs$est), decreasing = T),]
 prccs.est = prccs$est
 names(prccs.est) = prccs$var
