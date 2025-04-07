@@ -3,6 +3,9 @@
 *.Ruserdata
 *.csv
 
+# local testing
+local_testing
+
 # Project-specific
 cached
 prelim_results
