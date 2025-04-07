@@ -129,7 +129,7 @@ data.manager$register.ontology(
     risk=c('msm','idu','msm_idu','heterosexual','other')
   ))
 data.manager$register.ontology(  #Create a separate ontology for early syphilis
-  'cdc.syphilis',
+  'cdc.sti.two',
   ont = ontology(
     year= NULL,
     location= NULL,
