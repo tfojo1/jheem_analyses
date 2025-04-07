@@ -44,7 +44,8 @@ state.death.data.clean = lapply(state.death.data, function(file){
         mutate(location = ifelse(`NAME` == "Puerto Rico", "PR", location))%>%
         mutate(location = ifelse(`NAME` == "District of Columbia", "DC", location))%>%
         mutate(outcome = 'deaths')%>%
-        filter(year != "2010")
+        filter(year != "2010")%>% #Both 2010 and 2020 are not full years of data
+        filter(year != "2020")
     
     data = as.data.frame(data)
     list(filename, data) 

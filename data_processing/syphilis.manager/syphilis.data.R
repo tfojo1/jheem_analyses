@@ -168,7 +168,7 @@ for (data in early.syphilis.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc.syphilis',
+    ontology.name = 'cdc.sti.two',
     source = 'cdc.sti',
     dimension.values.to.distribute = list(race=c('multiracial', 'unknown')),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
