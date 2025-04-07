@@ -1452,6 +1452,27 @@ future.change.penalty.likelihood.instructions =
                                         compute.function = future.change.penalty.fn)
 
 
+#-- INCIDENCE FUTURE CHANGE - going to penalize sharp rises in incidence among any stratum --#
+
+# NEW.FOLD.CHANGE.14.19 = SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2019',,,,,] / SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2014',,,,,]
+# P.NEW.FOLD.CHANGE.GT.3 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 3)
+P.NEW.FOLD.CHANGE.GT.3 = 0.02778896
+
+future.incidence.change.likelihood.instructions = 
+    create.custom.likelihood.instructions(
+        name = 'furure.incidence.change',
+        compute.function = function(sim, log=T){
+            
+            fold.change.inc = as.numeric(sim$get('incidence', year=2030, keep.dimensions=c('age','race','sex','risk'))) / as.numeric(sim$get('incidence', year=2025, keep.dimensions=c('age','race','sex','risk')))
+            n.fold.change.gt.3 = sum(fold.change.inc>3)
+            n.fold.change.lte.3 = sum(fold.change.inc<=3)
+            rv = sum(log(P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.gt.3 + log(1-P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.lte.3)
+            
+            if (!log)
+                exp(rv)
+            else
+                rv
+        })
 
 
 
