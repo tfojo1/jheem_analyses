@@ -572,7 +572,7 @@ non.age.aids.diagnoses.likelihood.instructions.trans =
                                        equalize.weight.by.year = T
   )
 
-# state-level aids diagnoses - through 2000; 4x weight for trans only 
+# state-level aids diagnoses - through 2000; 18x weight
 non.age.aids.diagnoses.likelihood.instructions.trans.state = 
     create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                          outcome.for.sim = "aids.diagnoses",
@@ -585,7 +585,7 @@ non.age.aids.diagnoses.likelihood.instructions.trans.state =
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = DIAGNOSES.ERROR.TERM,
                                          error.variance.type = 'cv',
-                                         weights = (4*TRANSMISSION.WEIGHT),
+                                         weights = (18*TRANSMISSION.WEIGHT),
                                          equalize.weight.by.year = T
     )
 
@@ -622,7 +622,7 @@ non.age.aids.diagnoses.likelihood.instructions.full =
                                        equalize.weight.by.year = T
   )
 
-# state-level aids diagnoses - through 2000
+# state-level aids diagnoses - through 2000; 18x weight
 non.age.aids.diagnoses.likelihood.instructions.full.state = 
     create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                          outcome.for.sim = "aids.diagnoses",
@@ -635,7 +635,7 @@ non.age.aids.diagnoses.likelihood.instructions.full.state =
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = DIAGNOSES.ERROR.TERM,
                                          error.variance.type = 'cv',
-                                         weights = (1*FULL.WEIGHT),
+                                         weights = (18*FULL.WEIGHT),
                                          equalize.weight.by.year = T
     )
 
@@ -1529,14 +1529,14 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids =
                                
   )
 
-# state-level transmission calibration - removed AIDS deaths; AIDS diagnoses are through 2000 and 4x for trans only 
+# state-level transmission calibration - removed AIDS deaths; AIDS diagnoses are through 2000 and 18x for trans only 
 # changed some of the weighting for state-level; will apply it later when we rerun city-level
 transmission.pop.idu.aware.aids.testing.likelihood.instructions.state = 
     join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
                                  race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
                                  total.new.diagnoses.8x.cv.expv.likelihood.instructions,
                                  total.prevalence.8x.cv.expv.likelihood.instructions,
-                                 non.age.aids.diagnoses.likelihood.instructions.trans.state, # state-level: through 2000; 4x for trans only
+                                 non.age.aids.diagnoses.likelihood.instructions.trans.state, # state-level: through 2000; 18x 
                                  population.likelihood.instructions.trans,
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,
