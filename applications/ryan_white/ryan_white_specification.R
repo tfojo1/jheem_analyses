@@ -353,30 +353,57 @@ add.sub.version(RW.SPECIFICATION,
                 sub.version = 'w',
                 description = "Web Tool version of Ryan White model",
                 inherit.outcomes = F,
+                can.seed.new.engine = F)
+
+add.sub.version(RW.SPECIFICATION, 
+                sub.version = 'ws',
+                description = "Seed for Custom Scenarios for Web Tool version of Ryan White model",
+                inherit.outcomes = F,
                 can.seed.new.engine = T)
+
 
 # General Outcomes
 track.sub.version.outcomes(RW.SPECIFICATION,
-                           sub.versions = 'w',
+                           sub.versions = c('w','ws'),
+                           outcome.names = 'awareness',
+                           keep.dimensions = character())
+
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
                            outcome.names = c(
                                'new',
                                'diagnosed.prevalence',
                                'incidence',
-                               'prep.uptake',
-                               'suppression','testing',
-                               'awareness'))
+                               'suppression'))
+
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = c(
+                               'testing',
+                               'prep.uptake'),
+                           keep.dimensions = c('age','race','sex'))
 
 #Ryan White Outcomes
 track.sub.version.outcomes(RW.SPECIFICATION,
-                           sub.versions = 'w',
+                           sub.versions = c('w','ws'),
                            outcome.names = c(
                                'rw.clients',
                                'non.adap.clients',
                                'adap.clients',
                                'oahs.clients',
-                               'adap.proportion',
-                               'oahs.suppression',
-                               'adap.suppression'))
+                               'adap.proportion'),
+                           keep.dimensions = c('age','race','sex'))
+
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = 'oahs.suppression',
+                           keep.dimensions = c('age','race'))
+
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = 'adap.suppression',
+                           keep.dimensions = character())
+
 
 ##-- REGISTER IT! --##
 
