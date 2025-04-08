@@ -197,6 +197,17 @@ data.manager$register.ontology(
     incomplete.dimensions = c("year", "location")
   ))
 
+data.manager$register.ontology(
+    'census.immigration.national',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
+                "65-69 years", "70-74 years", "75+ years"),
+        race=c('black', 'hispanic', 'other'),
+        sex=c('male','female'),
+        incomplete.dimensions = c("year", "location")
+    ))
 
 #Codes:
 source('data_processing/immigration_new.R')
@@ -207,6 +218,7 @@ source('data_processing/state.to.state.migration.stratified.R') #This is stratif
 source('data_processing/adult.state.to.state.migration.R') #This is adult.immigration (total; stratified) and adult.emigration (estimated from stratfieds immigration for total only)
 source('data_processing/state.to.state.migration.race.reconfiguration.R') #This restructures the racial groups
 source('data_processing/state.level.total.deaths.R') #This adds state level total deaths from the Census
+source('data_processing/national.immigration.R')#this code puts national immigration data which is used in the syphilis manager
 
 #Aggregate Outcomes:
 

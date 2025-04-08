@@ -210,8 +210,8 @@ data.manager$register.ontology(
   ont = ontology(
     year= c("2006-2010", "2011-2015", "2016-2020"),
     location= NULL,
-    age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
-            "65-69 years", "70-74 years", "75+ years"),
+    age = c('0-14 years', '15-19 years',  '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+                '40-44 years', '45-49 years', '50-54 years', '55-64 years', '65+ years'),
     race=c("hispanic or latino", "black", 'other'),
     sex=c('male','female'),
     incomplete.dimensions = c("year", "location")
@@ -222,9 +222,9 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
-            "65-69 years", "70-74 years", "75+ years"),
-    race=c('black', 'hispanic', 'other'),
+    age = c('0-14 years', '15-19 years',  '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+                '40-44 years', '45-49 years', '50-54 years', '55-64 years', '65+ years'),
+     race=c('black', 'hispanic', 'other'),
     sex=c('male','female'),
     incomplete.dimensions = c("year", "location")
   ))
@@ -235,6 +235,7 @@ source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/msa_immigration.R')
 source('data_processing/syphilis.manager/national_immigration.R')
+source('data_processing/syphilis.manager/restratify.immigration.age.R') #This code restratifies the age groups from census data to match SHIELD
 source('data_processing/syphilis.manager/prenatal.care.cdc.wonder.R')
 source('data_processing/syphilis.manager/prenatal.screening.denominator.R')
 

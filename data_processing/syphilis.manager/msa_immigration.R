@@ -404,6 +404,13 @@ movement_data[[length(movement_data)+1]]<-imm_combo_black_nh #adding the black n
 
 movement_data[[length(movement_data)+1]]<-em_combo_black_nh
 
+
+# Removing age so it can be redistributed ---------------------------------
+movement_data = movement_data[-1]
+movement_data = movement_data[-10]
+
+
+
 for (data in movement_data) {
   
   data.manager$put.long.form(
