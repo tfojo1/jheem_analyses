@@ -28,30 +28,20 @@ source('applications/SHIELD/shield_likelihoods.R')
 # instantiate all likelihoods
 likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
 
-# [1] "Instantiating sub 'jheem.basic.likelihood.instructions' for 'fertility.rate'..."
-# Error in initialize(...) : 
-    # Error initializing likelihood for 'fertility.rate': No data found for any stratifications
-examine.recent.failed.ontology.mapping()
-dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
-dimnames(SURVEILLANCE.MANAGER$data$female.population.denominator.for.fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
+
 
 # "Instantiating sub 'jheem.basic.likelihood.instructions' for 'diagnosis.el.misclassified'..."
-# Error in private$get.universal.ontology(outcome = outcome, sources = sources,  : 
-#                                             Error mapping ontologies for outcome 'early.syphilis.diagnoses': did you remember to register your mappings for ontology 'cdc.pdf.report'?
-dimnames(SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)
-
-# [1] "Instantiating sub 'jheem.basic.likelihood.instructions' for 'diagnosis.late.misclassified'..."
-# Error in private$get.universal.ontology(outcome = outcome, sources = sources,  : 
-#                                             Error mapping ontologies for outcome 'unknown.duration.or.late.syphilis.diagnoses': did you remember to register your mappings for ontology 'cdc.pdf.report'?
-
+# x=get.ontology.error.debug.info()
+# examine.get.mappings.to.align.ontologies(x$onts.i,x$uni)
+# examine.recent.failed.ontology.mapping()
+#' @Zoe: to remove the 'unknown' age group 
 
 # [1] "Instantiating sub 'jheem.basic.likelihood.instructions' for 'prp.prenatal.care.first.trimester'..."
-# Error in initialize(...) : 
-#     Error initializing likelihood for 'prp.prenatal.care.first.trimester': No data found for any stratifications
-# > 
-dimnames(SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location)
-#MSA's are missing
+#' dimnames(SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location)
+#' #'@Andrew to modify the code to aggregate counties for proportion data 
+# dimnames(SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location)
 
+#'@Zoe: immigration/emigration 
 
 # make a run:
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
@@ -63,7 +53,8 @@ sim = engine$run(params)
 
 
 # compute all likelihoods
-# likelihood.all$compute(sim)
+likelihood.all$compute(sim)
+
 # # compute one at a time
 # lapply(1:7,function(x){
 #     print(x)
@@ -73,8 +64,8 @@ sim = engine$run(params)
 # save(sim,file = "~/Downloads/shield_test_sim.RData")
 
 ####
-sim2 = engine$run(params)
-prod(sim$population==sim2$population)
+# sim2 = engine$run(params)
+# prod(sim$population==sim2$population)
 
 #POPUATION ----
 #fitting to age-race-sex-specific estimates starting in 2010, and assuming fix strata before then 

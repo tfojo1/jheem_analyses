@@ -342,12 +342,12 @@ likelihood.instructions.all =  join.likelihood.instructions(
   early.diagnosis.likelihood.instructions,
   late.diagnosis.likelihood.instructions,
   total.diagnosis.likelihood.instructions,
-  # 
+
   prenatal.care.first.trimester.likelihood.instructions,
   prenatal.care.second.trimester.likelihood.instructions,
   prenatal.care.third.trimester.likelihood.instructions,
   no.prenatal.care.likelihood.instructions,
-  
+
   hiv.testing.likelihood.instructions
   
 )
