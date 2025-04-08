@@ -59,3 +59,13 @@ sync.cached.data.manager("ryan.white.data.manager.rdata",
                          allow.flag = T)
 
 get.data.manager.cache.metadata()
+
+
+# ryan white webtool data manager -----------------------------------------
+
+
+sync.cached.data.manager("ryan.white.web.data.manager.rdata",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EcCBfRFYvqZIhJCzNDtsOB8B8Ew48XRToSBmfb4SfW1ZBg?e=Gexrn9",
+                         allow.flag = T)
+
+get.data.manager.cache.metadata()
