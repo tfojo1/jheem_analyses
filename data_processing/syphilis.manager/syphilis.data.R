@@ -170,7 +170,7 @@ for (data in early.syphilis.put) {
     data = data,
     ontology.name = 'cdc.sti.two',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('multiracial', 'unknown')),
+    dimension.values.to.distribute = list(race=c('multiracial', 'unknown'), age=('Unknown')),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }
