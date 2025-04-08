@@ -1540,8 +1540,8 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.state =
                                  population.likelihood.instructions.trans,
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,
-                                 hiv.mortality.likelihood.instructions.trans#,
-                                 #future.incidence.change.likelihood.instructions
+                                 hiv.mortality.likelihood.instructions.trans,
+                                 future.incidence.change.likelihood.instructions
                                  #weight = TRANSMISSION.WEIGHT
                                  
     )
