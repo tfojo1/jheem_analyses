@@ -6,8 +6,6 @@ NEW.SOURCE=T
 USE.JHEEM2.PACKAGE=T
 
 
-
-
 #pulling JHEEM_ANALYSIS # Load the git2r package ----
   cat("Checking JHEEM_ANALYSIS repository status.... \n")
   repo_path <- "../jheem_analyses//"  

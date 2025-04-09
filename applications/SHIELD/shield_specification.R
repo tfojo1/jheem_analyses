@@ -1668,7 +1668,7 @@ register.calibrated.parameters.for.version('shield',
                                            distribution = SHIELD.FULL.PARAMETERS.PRIOR,
                                            apply.function = SHIELD.APPLY.PARAMETERS.FN,
                                            sampling.blocks = SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS,
-                                           calibrate.to.year = 2025,
+                                           calibrate.to.year = 2030,
                                            join.with.previous.version = F)
 print('Calibration parameters registered for DEMOGRAPHIC model')
 
