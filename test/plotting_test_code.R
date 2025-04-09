@@ -12,7 +12,7 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum") # this i
 # Need to have this file locally
 #load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")
 
-simset = retrieve.simulation.set('ehe',BOSTON.MSA,'final.ehe',n.sim = 1000)
+#simset = retrieve.simulation.set('ehe',ST.LOUIS.MSA,'final.ehe',n.sim = 1000)
 
 ## --- ANDREW TO LOOK AT ---- ## 
 
