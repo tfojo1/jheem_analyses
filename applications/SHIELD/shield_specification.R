@@ -11,7 +11,7 @@ cat('*** Running Shiled_specification.R ***\n')
 source('applications/SHIELD/shield_source_code.R')
 
 # setting up global values:
-DEFAULT.START.YEAR=1960 # simulation start year
+DEFAULT.START.YEAR=1940 # simulation start year
 DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. #the same year that we use for estimating proportion MSM
 DEFAULT.AGING.YEAR=2007 # differential aging starts in 2007
 DEFAULT.MIGRATION.YEAR=2007 # migration

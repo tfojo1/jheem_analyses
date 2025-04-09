@@ -5,19 +5,6 @@
 # https://jheem.shinyapps.io/EndingHIV/
 
 ##################
-
-#'@Zoe:
-#1- female.population.denominator.for.fertility.rate <some MSA's are missing>: aggregate data for all MSAs regardless of missing counties
-# double check the calculation for fertility rate
-#2- for immigration and emigration : to restratify the data for age to comply with SHIELD age-groups 
-#
-#3- prenatal care proportions: what is triggering all the NA's?
-#
-#4- proportion of births with congenital syphilis: collecting data from HDR for congenital syphilis 
-#
-#5- estimating error for syphilis diagnosis using HDR (differences in CDC estimates and health department reports)
-
-
 source('applications/SHIELD/shield_specification.R')
 version= 'shield'
 location= "C.12580" #Baltimore MSA
@@ -28,53 +15,24 @@ source('applications/SHIELD/shield_likelihoods.R')
 # instantiate all likelihoods
 likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
 
-
-
-# "Instantiating sub 'jheem.basic.likelihood.instructions' for 'diagnosis.el.misclassified'..."
-# x=get.ontology.error.debug.info()
-# examine.get.mappings.to.align.ontologies(x$onts.i,x$uni)
-# examine.recent.failed.ontology.mapping()
-#' @Zoe: to remove the 'unknown' age group 
-
-# [1] "Instantiating sub 'jheem.basic.likelihood.instructions' for 'prp.prenatal.care.first.trimester'..."
-#' dimnames(SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location)
-#' #'@Andrew to modify the code to aggregate counties for proportion data 
-# dimnames(SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location)
-
-#'@Zoe: immigration/emigration 
-
 # make a run:
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
-# params['global.transmission.rate']=2
+params['global.transmission.rate']=2
 sim = engine$run(params)
-#
 
 
-# compute all likelihoods
-likelihood.all$compute(sim)
-
-# # compute one at a time
-# lapply(1:7,function(x){
-#     print(x)
-#     likelihood.temp<- likelihood.instructions.all$sub.instructions[[x]]$instantiate.likelihood('shield',location,verbose = T)
-#     likelihood.temp$compute(sim)
-# })
-# save(sim,file = "~/Downloads/shield_test_sim.RData")
-
-####
-# sim2 = engine$run(params)
-# prod(sim$population==sim2$population)
+# compute all likelihoods   
+# likelihood.all$compute.piecewise(sim)
+    
 
 #POPUATION ----
 #fitting to age-race-sex-specific estimates starting in 2010, and assuming fix strata before then 
 simplot(sim,"population" )
 simplot(sim,"population" ,split.by = 'sex')
 simplot(sim,"population" ,split.by = 'race')
-#'@Todd: we are over-estimating population size in years prior to 2010. how can we adjust the fix strata assumption to decline pre-2010? 
-#'@Zoe: can we find any stratified data on population sizes before 2010?
-
+ 
 # DEATHS ----
 #we only fit to total deaths starting in 2010
 simplot(sim, "deaths") 
@@ -92,28 +50,23 @@ simplot(sim, 'fertility.rate',facet.by = 'age',split.by = 'race')
 simplot(sim, 'immigration')
 simplot(sim, 'immigration',split.by = 'sex')
 simplot(sim, 'immigration',split.by = 'race')
-
-#'@Andrew: why cant we see the data on the plot? 
-# SURVEILLANCE.MANAGER$data$immigration$estimate$census.population$census.immigration$year__location[,'C.12580']
-
+ 
 simplot(sim, 'emigration')
 simplot(sim, 'emigration',split.by = 'sex')
 simplot(sim, 'emigration',split.by = 'race')
-#'@Andrew: why cant we see the data on the plot? 
-# SURVEILLANCE.MANAGER$data$emigration$estimate$census.population$census.immigration$year__location[,'C.12580']
-
+ 
 # SYPHILIS DIAGNOSES ----
 simplot(sim, 'diagnosis.total')
-#'@Andrew: why cant we see the data on the plot? 
-# SURVEILLANCE.MANAGER$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[,'C.12580']
-
+ 
 simplot(sim, 'diagnosis.ps')
-#'@Andrew: why cant we see the data on the plot? 
-# SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,'C.12580']
+simplot.data.only('diagnosis.ps',location)
+lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood(version,location )
+lik$compute(sim,debug = T)
+# sd= coef.variation * mean
 
+ 
 simplot(sim, 'diagnosis.el.misclassified')
 simplot(sim, 'diagnosis.late.misclassified')
-#'@Andrew: why cant we see the data on the plot? 
 
 # PRENATAL CARE COVERAGE
 # calibrated to data by age, race, age-race over time
@@ -211,3 +164,7 @@ if (1==2){
     dimnames(SURVEILLANCE.MANAGER$data$female.population.denominator.for.fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
     examine.recent.failed.ontology.mapping()
 }
+# "Instantiating sub 'jheem.basic.likelihood.instructions' for 'diagnosis.el.misclassified'..."
+# x=get.ontology.error.debug.info()
+# examine.get.mappings.to.align.ontologies(x$onts.i,x$uni)
+# examine.recent.failed.ontology.mapping()

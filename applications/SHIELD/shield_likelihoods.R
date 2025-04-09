@@ -126,15 +126,16 @@ emigration.likelihood.instructions =
 # we have modeled the misclassification of EL/LL diagnosis in the model and here we only fit to reported (biased) data
 ##---- PS ----
 ps.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps",  
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                        outcome.for.data = "ps.syphilis.diagnoses",  
-                                       
+                                          
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2000,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, 
-                                       error.variance.type = 'cv'
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1
   )
 ##---- EARLY ----
 #MISCLASSIFICATION ERROR 
@@ -147,7 +148,8 @@ early.diagnosis.likelihood.instructions =
                                        from.year = 2000,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, 
-                                       error.variance.type = 'cv'
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1
   )
 ##---- Late/Unknown ---- 
 late.diagnosis.likelihood.instructions =
@@ -159,7 +161,8 @@ late.diagnosis.likelihood.instructions =
                                        from.year = 2000,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, 
-                                       error.variance.type = 'cv'
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1
   )
 
 ##---- Total ----
@@ -172,7 +175,9 @@ total.diagnosis.likelihood.instructions =
                                        from.year = 1941,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, 
-                                       error.variance.type = 'cv')
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1 #
+                                       )
 
 ##---- Congenital ----
 #poportion of state level births that are complicated by congenital syphilis 
@@ -351,7 +356,13 @@ likelihood.instructions.all =  join.likelihood.instructions(
   hiv.testing.likelihood.instructions
   
 )
-
+likelihood.instructions.demographics=join.likelihood.instructions(
+  population.likelihood.instructions ,
+  deaths.likelihood.instructions,
+  fertility.likelihood.instructions,
+  
+  immigration.likelihood.instructions,
+  emigration.likelihood.instructions)
 
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
