@@ -199,7 +199,6 @@ register.calibration.info(CALIBRATION.CODE.POP.STATE,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = par.names.pop,
-                          parameter.aliases = par.aliases.population, # added for state-level 4/3
                           n.iter = N.ITER.POP,
                           thin = 50, 
                           fixed.initial.parameter.values = c(global.trate=0.13), 
@@ -208,7 +207,7 @@ register.calibration.info(CALIBRATION.CODE.POP.STATE,
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
-# state-level trans calibration - removed AIDS deaths 
+# state-level trans calibration - removed AIDS deaths; AIDS diagnoses to 1994; HIV mortality to 1/16 weight
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions.state,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -223,6 +222,7 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           description = "A quick run to get transmission parameters in the general vicinity",
                           preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
 )
+
 
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,

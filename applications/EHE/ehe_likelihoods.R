@@ -572,20 +572,20 @@ non.age.aids.diagnoses.likelihood.instructions.trans =
                                        equalize.weight.by.year = T
   )
 
-# state-level aids diagnoses - through 2000; 18x weight
+# state-level aids diagnoses - through 1994
 non.age.aids.diagnoses.likelihood.instructions.trans.state = 
     create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                          outcome.for.sim = "aids.diagnoses",
                                          dimensions = c("sex","race","risk"),
                                          levels.of.stratification = c(0,1),
                                          from.year = 1985,
-                                         to.year = 2000, # to 2000 for states because not as much data 
+                                         to.year = 1994, 
                                          correlation.different.years = 0.3,
                                          #observation.correlation.form = 'compound.symmetry',
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = DIAGNOSES.ERROR.TERM,
                                          error.variance.type = 'cv',
-                                         weights = (18*TRANSMISSION.WEIGHT),
+                                         weights = (1*TRANSMISSION.WEIGHT),
                                          equalize.weight.by.year = T
     )
 
@@ -622,20 +622,20 @@ non.age.aids.diagnoses.likelihood.instructions.full =
                                        equalize.weight.by.year = T
   )
 
-# state-level aids diagnoses - through 2000; 18x weight
+# state-level aids diagnoses - through 1994
 non.age.aids.diagnoses.likelihood.instructions.full.state = 
     create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
                                          outcome.for.sim = "aids.diagnoses",
                                          dimensions = c("sex","race","risk"),
                                          levels.of.stratification = c(0,1),
                                          from.year = 1985,
-                                         to.year = 2000, # to 2000 for states because not as much data 
+                                         to.year = 1994, # to 1994
                                          correlation.different.years = 0.3,
                                          #observation.correlation.form = 'compound.symmetry',
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = DIAGNOSES.ERROR.TERM,
                                          error.variance.type = 'cv',
-                                         weights = (18*FULL.WEIGHT),
+                                         weights = (1*FULL.WEIGHT),
                                          equalize.weight.by.year = T
     )
 
@@ -671,6 +671,19 @@ hiv.mortality.likelihood.instructions.trans =
                                        weights = (1*TRANSMISSION.WEIGHT),
                                        equalize.weight.by.year = T
   )
+
+hiv.mortality.likelihood.instructions.trans.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
+                                         outcome.for.sim = "hiv.mortality", 
+                                         dimensions = c("sex"),
+                                         levels.of.stratification = c(0,1), 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry',
+                                         error.variance.term = PREVALENCE.ERROR.TERM, 
+                                         error.variance.type = 'cv',
+                                         weights = ((1/16)*TRANSMISSION.WEIGHT),
+                                         equalize.weight.by.year = T
+    )
 
 hiv.mortality.likelihood.instructions.full = 
   create.basic.likelihood.instructions(outcome.for.data = "hiv.deaths",
@@ -1536,15 +1549,16 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.state =
                                  race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
                                  total.new.diagnoses.8x.cv.expv.likelihood.instructions,
                                  total.prevalence.8x.cv.expv.likelihood.instructions,
-                                 non.age.aids.diagnoses.likelihood.instructions.trans.state, # state-level: through 2000; 18x 
+                                 non.age.aids.diagnoses.likelihood.instructions.trans.state, # state-level: through 1994
                                  population.likelihood.instructions.trans,
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,
-                                 hiv.mortality.likelihood.instructions.trans,
+                                 hiv.mortality.likelihood.instructions.trans.state, # 1/16 weight
                                  future.incidence.change.likelihood.instructions
                                  #weight = TRANSMISSION.WEIGHT
                                  
     )
+
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
 FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
