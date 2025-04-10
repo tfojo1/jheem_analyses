@@ -87,21 +87,21 @@ prev_ratio_inst <- create.basic.likelihood.instructions.with.specified.outcome(o
                                                         outcome.value = 3.1,
                                                         from.year = 2014, ## check
                                                         to.year = 2020, ## check
-                                                        error.variance.term = 0.03, ## To do: calculate from data CI
+                                                        error.variance.term = 0.03, 
                                                         error.variance.type = 'sd') 
 # % PWH w dep on TX
 hiv_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'proportion.HIV.depressed.treated',
                                                         outcome.value = 0.184, 
                                                         from.year = 2013, ## check
                                                         to.year = 2020, ## check
-                                                        error.variance.term = 0.03, ## To do: calculate from data CI
+                                                        error.variance.term = 0.03, 
                                                         error.variance.type = 'sd') 
 # % general pop w dep on Tx
 pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'proportion.gen.depressed.treated',
                                                        outcome.value = 0.65, 
                                                        from.year = 2018, ## check 
                                                        to.year = 2021, ## check
-                                                       error.variance.term = 0.03, ## To do: calculate from data CI
+                                                       error.variance.term = 0.03,
                                                        error.variance.type = 'sd') 
 
 
@@ -115,6 +115,9 @@ pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(ou
 # will yield 4 numbers, estimate and SD for being being inside/outside of MSA                                  
 # look at Melissa's code for this to get a sense of what to do // in EHE folder, ehe_bias_estimates_cache.R & ehe_likelihoods.R
 
-dep_likelihood_full <- join.likelihood.instructions(FULL.likelihood.instructions.with.covid, proportionDep_likelihood_inst, 
-                                                    prev_ratio_inst, hiv_depTx_inst, pop_depTx_inst)
+dep_likelihood_full <- join.likelihood.instructions(FULL.likelihood.instructions.with.covid, 
+                                                    proportionDep_likelihood_inst, 
+                                                    prev_ratio_inst, 
+                                                    hiv_depTx_inst, 
+                                                    pop_depTx_inst)
 
