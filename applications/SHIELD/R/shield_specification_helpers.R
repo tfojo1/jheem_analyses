@@ -1153,7 +1153,7 @@ get.emigration.rates <- function(location, specification.metadata, population.ye
                                                  location = location,
                                                  year = "2011-2015") / 5 # because it's 5-year aggregate data 
   
-  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "population",
                                               location = location,
                                               year = as.character(c(2011:2015)))) 
   

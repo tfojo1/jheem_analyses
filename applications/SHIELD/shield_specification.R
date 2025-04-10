@@ -310,7 +310,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'rate')
 # We use the mortality mechanism to model emigrations, but shouldnt count them in deaths
 register.mortality(SHIELD.SPECIFICATION,
-                   mortality.rate.value = "rate.immigration",
+                   mortality.rate.value = "rate.emigration",
                    groups = c("uninfected","infected"), 
                    tag = "emigration")
 
