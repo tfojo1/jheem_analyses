@@ -1,22 +1,20 @@
 #Use this code to merge the different saved sections of the census manager into a complete version
 
-# PROCESS -----------------------------------------------------------------
-source('data_processing/syphilis.manager/syphilis.processing.for.merging/section1.processing.R')
-source('data_processing/syphilis.manager/syphilis.processing.for.merging/section2.processing.R')
-source('data_processing/syphilis.manager/syphilis.processing.for.merging/section3.processing.R')
-source('data_processing/syphilis.manager/syphilis.processing.for.merging/section4.processing.R')
+# RUN ALL OF THESE SECTION TO RE-CREATE THE SYPHILIS MANAGER ENTIRELY -----------------------------------------------------------------
+# source('data_processing/syphilis.manager/syphilis.processing.for.merging/section1.processing.R')
+# source('data_processing/syphilis.manager/syphilis.processing.for.merging/section2.processing.R')
+# source('data_processing/syphilis.manager/syphilis.processing.for.merging/section3.processing.R')
+# source('data_processing/syphilis.manager/syphilis.processing.for.merging/section4.processing.R')
 
 # MERGE -------------------------------------------------------------------
 
-#LOAD the saved sections of the syphilis manager
+#LOAD the saved sections of the syphilis manager (after you've made the changes to a particular section)
 section1 = load.data.manager(name="syphilis.manager_section1", file="Q:/data_managers/data.manager.merge/syphilis.manager_section1.rdata")
 section2 = load.data.manager(name="syphilis.manager_section2", file="Q:/data_managers/data.manager.merge/syphilis.manager_section2.rdata")
 section3 = load.data.manager(name="syphilis.manager_section3", file="Q:/data_managers/data.manager.merge/syphilis.manager_section3.rdata")
 section4 = load.data.manager(name="syphilis.manager_section1", file="Q:/data_managers/data.manager.merge/syphilis.manager_section4.rdata")
 
-#You'll need to figure out which is the largest#
-
-#MERGE 
+#MERGE the Sections
 section3$import.data(section1) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
 section3$import.data(section2)
 section3$import.data(section4)
