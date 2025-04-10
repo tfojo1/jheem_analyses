@@ -1430,7 +1430,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         corresponding.data.outcome = 'ps.syphilis.diagnses' ,
+                         corresponding.data.outcome = 'ps.syphilis.diagnoses' ,
                          keep.dimensions = c('location','age','race','sex')
 )
 
