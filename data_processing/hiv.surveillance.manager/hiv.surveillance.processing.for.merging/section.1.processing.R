@@ -210,15 +210,15 @@ data.manager$register.ontology(
     ))
 
 #Codes:
-source('data_processing/immigration_new.R')
-source('data_processing/immigration_age_calculations_new.R')
-source('data_processing/nsduh_processing_new.R') #NSDUH processing
-source('data_processing/state.to.state.migration.R') #This is total level state to state migration
-source('data_processing/state.to.state.migration.stratified.R') #This is stratified state to state migration
-source('data_processing/adult.state.to.state.migration.R') #This is adult.immigration (total; stratified) and adult.emigration (estimated from stratfieds immigration for total only)
-source('data_processing/state.to.state.migration.race.reconfiguration.R') #This restructures the racial groups
-source('data_processing/state.level.total.deaths.R') #This adds state level total deaths from the Census
-source('data_processing/national.immigration.R')#this code puts national immigration data which is used in the syphilis manager
+source('data_processing/hiv.surveillance.manager/immigration_new.R')
+source('data_processing/hiv.surveillance.manager/immigration_age_calculations_new.R')
+source('data_processing/hiv.surveillance.manager/nsduh_processing_new.R') #NSDUH processing
+source('data_processing/hiv.surveillance.manager/state.to.state.migration.R') #This is total level state to state migration
+source('data_processing/hiv.surveillance.manager/state.to.state.migration.stratified.R') #This is stratified state to state migration
+source('data_processing/hiv.surveillance.manager/adult.state.to.state.migration.R') #This is adult.immigration (total; stratified) and adult.emigration (estimated from stratfieds immigration for total only)
+source('data_processing/hiv.surveillance.manager/state.to.state.migration.race.reconfiguration.R') #This restructures the racial groups
+source('data_processing/hiv.surveillance.manager/state.level.total.deaths.R') #This adds state level total deaths from the Census
+source('data_processing/hiv.surveillance.manager/national.immigration.R')#this code puts national immigration data which is used in the syphilis manager
 
 #Aggregate Outcomes:
 
@@ -226,7 +226,7 @@ census.manager = load.data.manager("../../cached/census.manager.rdata")
 
 source('data_processing/put_msa_data_without_estimation_script.R') #Creates adult.population for single year ages
 source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
-source('data_processing/adult.population.10.23.R') #creates adult population for 2010-2023, stratified data
+source('data_processing/hiv.surveillance.manager/adult.population.10.23.R') #creates adult population for 2010-2023, stratified data
 source('../jheem2/R/HELPERS_array_helpers.R')
 source('commoncode/locations_of_interest.R')
 source('commoncode/additional_locations_of_interest.R')

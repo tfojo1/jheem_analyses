@@ -146,9 +146,9 @@ data.manager$register.ontology(
     ))
 
 #Codes:
-source('data_processing/aids_data_1981_2001.R') #CDC Wonder AIDS data from 1981-2001
-source('data_processing/msa_reports_processing.R') #Source in CDC MSA PDF Reports data and cleaning
-source('data_processing/aids.diagnoses.atlas.plus.00.07.R')
+source('data_processing/hiv.surveillance.manager/aids_data_1981_2001.R') #CDC Wonder AIDS data from 1981-2001
+source('data_processing/hiv.surveillance.manager/msa_reports_processing.R') #Source in CDC MSA PDF Reports data and cleaning
+source('data_processing/hiv.surveillance.manager/aids.diagnoses.atlas.plus.00.07.R')
 
 #Aggregate Outcomes:#None
 

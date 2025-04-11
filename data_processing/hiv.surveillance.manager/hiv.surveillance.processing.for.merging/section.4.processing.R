@@ -113,7 +113,7 @@ data.manager$register.ontology(   #Create a separate ontology for early syphilis
 
 
 #Codes:
-source('data_processing/sti_processing.R') #STI data
+source('data_processing/hiv.surveillance.manager/sti_processing.R') #STI data
 
 #Aggregate Outcomes:
 source('data_processing/put_msa_data_as_new_source_script.R') #Sources function to aggregate county data to MSA
@@ -141,7 +141,7 @@ put.msa.data.as.new.source(outcome = 'ps.syphilis',
                            data.manager = surveillance.manager)
 
 
-source('data_processing/sti_ratio_calculation.R') #Calculates STI Ratio data
+source('data_processing/hiv.surveillance.manager/sti_ratio_calculation.R') #Calculates STI Ratio data
 
 #Save:
 save(surveillance.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section4.rdata")

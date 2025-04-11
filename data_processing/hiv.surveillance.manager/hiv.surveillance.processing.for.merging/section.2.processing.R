@@ -250,13 +250,13 @@ data.manager$register.ontology(
   ))
 
 #Codes:
-source('data_processing/atlas_plus_hiv_processing.R')
-source('data_processing/aids_vu_processing.R')
-source('data_processing/cdc_test_count_processing.R')
-source('data_processing/lhd_msa_processing.R')
-source('data_processing/state_retention.R')
-source('data_processing/older.suppression.data.R') #Older National Level Suppression Data from Todd's PDFs
-source('data_processing/national_data.R') #National Atlas Plus data on diagnosis and prevalence
+source('data_processing/hiv.surveillance.manager/atlas_plus_hiv_processing.R')
+source('data_processing/hiv.surveillance.manager/aids_vu_processing.R')
+source('data_processing/hiv.surveillance.manager/cdc_test_count_processing.R')
+source('data_processing/hiv.surveillance.manager/lhd_msa_processing.R')
+source('data_processing/hiv.surveillance.manager/state_retention.R')
+source('data_processing/hiv.surveillance.manager/older.suppression.data.R') #Older National Level Suppression Data from Todd's PDFs
+source('data_processing/hiv.surveillance.manager/national_data.R') #National Atlas Plus data on diagnosis and prevalence
  
 #Aggregate Outcomes:
 
@@ -348,7 +348,7 @@ put.msa.data.as.new.source(outcome = 'suppression',
 
 #Update for 2-11-25: Andrew/Todd requested the Coefficient of Variance for Awareness to be aggregated from County to MSA for Riverside C.40140 only since we have data for both counties
 #Later this was requested for other MSAs, I added them here:
-source('data_processing/aggregating.coefficient.of.variance.R')
+source('data_processing/hiv.surveillance.manager/aggregating.coefficient.of.variance.R')
 
 
 #Save:

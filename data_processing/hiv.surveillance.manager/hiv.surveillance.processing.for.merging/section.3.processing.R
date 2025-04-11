@@ -90,10 +90,10 @@ data.manager$register.ontology(
   ))
 
 #Codes:
-source('data_processing/brfss_state_weighted.R') #Source BRFSS testing data
-source('data_processing/brfss_msa_weighted.R') #Source BRFSS testing data
-source('data_processing/msm.R') #Source msm
-source('data_processing/brfss_unweighted_denominators.R') #Source BRFSS Unweighted Denominator values
+source('data_processing/hiv.surveillance.manager/brfss_state_weighted.R') #Source BRFSS testing data
+source('data_processing/hiv.surveillance.manager/brfss_msa_weighted.R') #Source BRFSS testing data
+source('data_processing/hiv.surveillance.manager/msm.R') #Source msm
+source('data_processing/hiv.surveillance.manager/brfss_unweighted_denominators.R') #Source BRFSS Unweighted Denominator values
 
 #Save:
 save(data.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section3.rdata")
