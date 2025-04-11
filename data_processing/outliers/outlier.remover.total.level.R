@@ -11,7 +11,7 @@
 
 #library(jheem2)
 #surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
-source('data_processing/outlier_finder.R')
+source('data_processing/hiv.surveillance.manager/outlier_finder.R')
 
 options(error=NULL)
 

@@ -1,5 +1,5 @@
 ###Source in File that reads .csvs and removes headers
-source('data_processing/fix_cdc_headers.R')
+source('data_processing/hiv.surveillance.manager/fix_cdc_headers.R')
 
 ################################################################################
 ###Define the 'mappings' for Atlas plus data###

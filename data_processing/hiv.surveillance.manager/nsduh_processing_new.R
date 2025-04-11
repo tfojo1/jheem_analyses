@@ -111,7 +111,7 @@ nsduh.region.total = lapply(nsduh.clean, function(file){
 })
 
 #Bring in file made up of census data to use to create new age groupings
-load("data_processing/age_regroup_substate_region.RData")
+load("data_processing/hiv.surveillance.manager/age_regroup_substate_region.RData")
 
 nsduh.region.age.13.24= lapply(nsduh.clean, function(file){
 
@@ -251,7 +251,7 @@ nsduh.state.total = lapply(nsduh.clean, function(file){
 })
 
 #Bring in file made up of census data to use to create new age groupings
-load("data_processing/age_regroup_state.RData")
+load("data_processing/hiv.surveillance.manager/age_regroup_state.RData")
 
 nsduh.state.age.13.24= lapply(nsduh.clean, function(file){
   

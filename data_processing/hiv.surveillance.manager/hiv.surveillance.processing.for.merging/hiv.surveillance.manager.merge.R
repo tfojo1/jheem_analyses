@@ -25,7 +25,7 @@ section1$import.data(section5)
 surveillance.manager = section1
 
 # Run this code- it uses both HIV data and adult.population ---------------
-source('data_processing/tests.per.population.R') # Source code to create hiv.tests.per.population 
+source('data_processing/hiv.surveillance.manager/tests.per.population.R') # Source code to create hiv.tests.per.population 
 
 # Remove outliers ---------------------------------------------------------
 save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
