@@ -25,6 +25,13 @@ simset = assemble.simulations.from.calibration(version = 'shield',
                                                 location = LOCATION,
                                                 calibration.code = CALIBRATION.CODE.TO.RUN,
                                                 allow.incomplete = T);
+simset$n.sim
+
+simplot(simset$first.sim(),simset$last.sim(),
+        outcomes = c("incidence"), 
+        dimension.values = list(year = 1940:2030))
+        # dimension.values = list(year = 2000:2030))
+
 
 simplot(simset$first.sim(),simset$last.sim(),
         outcomes = c("population"), 

@@ -13,18 +13,20 @@ location= "C.12580" #Baltimore MSA
 source('applications/SHIELD/shield_likelihoods.R')
 
 # instantiate all likelihoods
-likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
+# likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
 
 # make a run:
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
-params['global.transmission.rate']=4
+params['global.transmission.rate']=3.52
 sim = engine$run(params)
 
 # compute all likelihoods   
 # likelihood.all$compute.piecewise(sim)
-    
+simplot(sim, 'diagnosis.total')
+
+
 
 #POPUATION ----
 #fitting to age-race-sex-specific estimates starting in 2010, and assuming fix strata before then 
