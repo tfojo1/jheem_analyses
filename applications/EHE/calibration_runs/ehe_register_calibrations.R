@@ -9,7 +9,10 @@ CALIBRATION.CODE.FULL.PLUS.COVID = 'full.ehe'
 CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
 
 CALIBRATION.CODE.POP.STATE = 'pop.ehe.state'
+CALIBRATION.CODE.POP.STATE.2 = 'pop.ehe.state.2' # includes total aids diagnoses 
 CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
+CALIBRATION.CODE.TRANS.STATE.2 = 'trans.ehe.state.2' # follows after pop2
+CALIBRATION.CODE.TRANS.STATE.3 = 'trans.ehe.state.3' # removed aids diagnoses/hiv mortality; follows after normal pop
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
@@ -208,6 +211,21 @@ register.calibration.info(CALIBRATION.CODE.POP.STATE,
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
+# with total AIDS diagnoses 
+register.calibration.info(CALIBRATION.CODE.POP.STATE.2,
+                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions.state.with.aids, 
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = par.names.pop,
+                          parameter.aliases = par.aliases.population,
+                          n.iter = N.ITER.POP,
+                          thin = 50, 
+                          fixed.initial.parameter.values = c(global.trate=0.13), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get population parameters in the general vicinity"
+)
+
 # state-level trans calibration - removed AIDS deaths; AIDS diagnoses to 1994; HIV mortality to 1/16 weight
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions.state,
@@ -224,6 +242,37 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
 )
 
+# same as usual trans calibration but will run after pop.state.2 that includes total aids diagnoses in it
+register.calibration.info(CALIBRATION.CODE.TRANS.STATE.2,
+                          likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions.state,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = c(par.names.transmission), 
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = N.ITER.TRANS,
+                          thin = 50, 
+                          #fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get transmission parameters in the general vicinity",
+                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.2
+)
+
+# removed aids diagnoses and hiv mortality, runs from normal pop calibration 
+register.calibration.info(CALIBRATION.CODE.TRANS.STATE.3,
+                          likelihood.instructions = transmission.pop.idu.likelihood.instructions.state,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = c(par.names.transmission), 
+                          parameter.aliases = par.aliases.transmission,
+                          n.iter = N.ITER.TRANS,
+                          thin = 50, 
+                          #fixed.initial.parameter.values = c(global.trate=0.1), 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          description = "A quick run to get transmission parameters in the general vicinity",
+                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
+)
 
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,

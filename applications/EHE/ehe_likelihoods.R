@@ -589,6 +589,23 @@ non.age.aids.diagnoses.likelihood.instructions.trans.state =
                                          equalize.weight.by.year = T
     )
 
+# total aids diagnoses - for adding to state population calibration (testing this out 4/11)
+total.aids.diagnoses.likelihood.instructions = 
+    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
+                                         outcome.for.sim = "aids.diagnoses",
+                                         dimensions = character(),
+                                         levels.of.stratification = 0, 
+                                         from.year = 1985,
+                                         to.year = 1994, 
+                                         correlation.different.years = 0.3,
+                                         #observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = DIAGNOSES.ERROR.TERM,
+                                         error.variance.type = 'cv',
+                                         weights = (1*TRANSMISSION.WEIGHT),
+                                         equalize.weight.by.year = T
+    )
+
 # special case for C.31080
 non.age.aids.diagnoses.4x.likelihood.instructions.trans =
   create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
@@ -665,6 +682,7 @@ hiv.mortality.likelihood.instructions.trans =
                                        dimensions = c("sex"),
                                        levels.of.stratification = c(0,1), 
                                        from.year = 2008, 
+                                       to.year = 2019, # added 4/11
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = PREVALENCE.ERROR.TERM, 
                                        error.variance.type = 'cv',
@@ -678,6 +696,7 @@ hiv.mortality.likelihood.instructions.trans.state =
                                          dimensions = c("sex"),
                                          levels.of.stratification = c(0,1), 
                                          from.year = 2008, 
+                                         to.year = 2019, # added 4/11
                                          observation.correlation.form = 'compound.symmetry',
                                          error.variance.term = PREVALENCE.ERROR.TERM, 
                                          error.variance.type = 'cv',
@@ -691,6 +710,7 @@ hiv.mortality.likelihood.instructions.full =
                                        dimensions = c("sex"),
                                        levels.of.stratification = c(0,1), 
                                        from.year = 2008, 
+                                       to.year = 2019, # added 4/11
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = PREVALENCE.ERROR.TERM, 
                                        error.variance.type = 'cv',
@@ -1511,6 +1531,17 @@ joint.pop.migration.total.trans.likelihood.instructions.state =
                                  #weight = POPULATION.WEIGHT
     ) 
 
+joint.pop.migration.total.trans.likelihood.instructions.state.with.aids = 
+    join.likelihood.instructions(population.likelihood.instructions.pop.state,
+                                 immigration.likelihood.instructions.pop.state, 
+                                 emigration.likelihood.instructions.pop.state,
+                                 general.mortality.likelihood.instructions.pop.state,
+                                 total.prevalence.likelihood.instructions, 
+                                 total.new.diagnoses.likelihood.instructions,
+                                 total.aids.diagnoses.likelihood.instructions
+                                 #weight = POPULATION.WEIGHT
+    ) 
+
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
 # changed some of the weighting for state-level; will apply it later when we rerun city-level
 transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
@@ -1558,6 +1589,21 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.state =
                                  #weight = TRANSMISSION.WEIGHT
                                  
     )
+
+# testing out removing aids diagnoses and hiv mortality
+transmission.pop.idu.likelihood.instructions.state = 
+    join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
+                                 race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
+                                 total.new.diagnoses.8x.cv.expv.likelihood.instructions,
+                                 total.prevalence.8x.cv.expv.likelihood.instructions,
+                                 population.likelihood.instructions.trans,
+                                 heroin.likelihood.instructions.trans,
+                                 cocaine.likelihood.instructions.trans,
+                                 future.incidence.change.likelihood.instructions
+                                 #weight = TRANSMISSION.WEIGHT
+                                 
+    )
+
 
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
