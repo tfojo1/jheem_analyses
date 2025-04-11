@@ -5,11 +5,12 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 
 ################################################################################################
 CALIBRATION.NAME = 'pop.demog.shield'
-N.ITER = 10
+N.ITER = 15000
 # which subset of parameters should we use for calibration?
 PARAMETER.NAMES = c(
   POPULATION.PARAMETERS.PRIOR@var.names,
-  AGING.PARAMETERS.PRIOR@var.names
+  AGING.PARAMETERS.PRIOR@var.names,
+  'global.transmission.rate'
 )
 LIKELIHOOD.INSTRUCTIONS= likelihood.instructions.demographics
 
@@ -20,8 +21,8 @@ register.calibration.info(CALIBRATION.NAME,
                           parameter.names = PARAMETER.NAMES, # can include a subset of parameters
                           n.iter = N.ITER,
                           thin = 50, 
-                          # fixed.initial.parameter.values = c(global.trate=0), #if there is a previous calibration, it will take values from there.othwise median of priors 
-                          is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
+                          fixed.initial.parameter.values = c(global.transmission.rate=3),
+                           is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
                           max.run.time.seconds = 10, 
                           description = "A quick run to get population parameters in the general vicinity"
 )

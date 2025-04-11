@@ -100,7 +100,8 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
   ## Transmission
-  global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #directly used in specification (will need sth uch larger) 
+  global.transmission.rate = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)), #directly used in specification (will need sth uch larger) 
+  #
   transmission.rate.multiplier.msm0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),

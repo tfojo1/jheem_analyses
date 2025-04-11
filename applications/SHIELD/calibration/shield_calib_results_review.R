@@ -6,31 +6,25 @@ location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager = create.style.manager(color.data.by = "source")
 stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
-# LOCATION='C.12580' #BALTIMORE.MSA
-LOCATION='US'
-CALIBRATION.CODE.TO.RUN='pop.demog.shield.us'
+LOCATION='C.12580' #BALTIMORE.MSA
+CALIBRATION.CODE.TO.RUN='pop.demog.shield'
 # DATE=Sys.Date()
-DATE="2024-12-17"
+DATE="2025-04-11"
 #I removed aging out of 64year group
 
 # completed mcmc? 
 # Reading from file:
-load(paste0("../jheem_analyses/prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",DATE,"_",LOCATION,".Rdata"))
-simset=simset;simset
-
-# # incomplete chain:
-# # # reading from ongoing calibration: doesnt require a date
-# simset1 = assemble.simulations.from.calibration(version = 'shield',
-#                                                 location = LOCATION,
-#                                                 calibration.code = CALIBRATION.CODE.TO.RUN,
-#                                                 allow.incomplete = T);
-# simset=simset1
-
-
-
-# strip the fertility likelihoods
-# local vs nationa issue?
-
+# load(paste0("../jheem_analyses/prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",DATE,"_",LOCATION,".Rdata"))
+# simset=simset;simset
+# 
+# # # incomplete chain:
+# # # # reading from ongoing calibration: doesnt require a date
+# get.calibration.progress('shield',LOCATION,CALIBRATION.CODE.TO.RUN) # shows %done of the ongoing run
+# reading the incomplete run:
+simset = assemble.simulations.from.calibration(version = 'shield',
+                                                location = LOCATION,
+                                                calibration.code = CALIBRATION.CODE.TO.RUN,
+                                                allow.incomplete = T);
 
 simplot(simset$first.sim(),simset$last.sim(),
         outcomes = c("population"), 

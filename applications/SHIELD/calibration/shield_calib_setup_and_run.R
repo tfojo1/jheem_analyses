@@ -35,7 +35,7 @@ print("Cashe is cleared")
 set.up.calibration(version='shield',
                    location=LOCATION,
                    calibration.code = CALIBRATION.NAME,
-                   cache.frequency = 10 #how often write the results to disk 
+                   cache.frequency = 100 #how often write the results to disk 
 )  
 print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 
@@ -77,4 +77,4 @@ simset = assemble.simulations.from.calibration(version = 'shield',
 # 
 filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
 save(simset,file=filename)
-print(pate0("Simet was saved on disk as:   ", filename))
+print(paste0("Simet was saved on disk as:   ", filename))

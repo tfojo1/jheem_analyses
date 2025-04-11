@@ -19,11 +19,11 @@ likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',loc
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
 specification.metadata=get.specification.metadata('shield',location)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
-# params['global.transmission.rate']=2
+params['global.transmission.rate']=4
 sim = engine$run(params)
 
 # compute all likelihoods   
-likelihood.all$compute.piecewise(sim)
+# likelihood.all$compute.piecewise(sim)
     
 
 #POPUATION ----
