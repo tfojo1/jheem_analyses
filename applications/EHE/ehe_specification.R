@@ -2011,6 +2011,25 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       exclude.tags = "emigration",
                       keep.dimensions = c('location','sex'))
 
+register.model.element(EHE.SPECIFICATION,
+                       name = 'p.ndi.missed.deaths',
+                       scale = 'proportion',
+                       value = 458 / (1926 + 12219))
+    # 458 / (1926 + 12219) #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2773949/
+    # 458 in NDI alone)
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'biased.hiv.mortality',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Mortality in PWH per NDI',
+                                                                    description = "Number of People with Diagnosed HIV who Died of Any Cause in the Past Year (as Recorded by NDI)",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Deaths',
+                                                                    units = 'deaths',
+                                                                    singular.unit = 'death'),
+                         value = expression(hiv.mortality * (1-p.ndi.missed.deaths)),
+                         force.dim.names.to.keep.dimensions = T,
+                         keep.dimensions = c('location','sex'))
+
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'diagnosed.prevalence',
                          outcome.metadata = create.outcome.metadata(display.name = 'Prevalence (of Diagnosed PWH)',

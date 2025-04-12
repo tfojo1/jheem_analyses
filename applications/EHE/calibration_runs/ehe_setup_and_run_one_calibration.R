@@ -1,10 +1,11 @@
-LOCATION.INDEX = 28
+LOCATION = "CA" # LOCATION.LIST[LOCATION.INDEX]
+print(LOCATION)
 
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
 LOCATION.LIST = setdiff(MSAS.OF.INTEREST, c('C.17140','C.44180','C.12580'))
-LOCATION = "CA" # LOCATION.LIST[LOCATION.INDEX]
+
 
 print(paste0("Running for ", LOCATION, " - ", locations::get.location.name(LOCATION)))
 CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
@@ -15,7 +16,8 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.TRANS.STATE, # 5
                              CALIBRATION.CODE.FULL.STATE, # 6
                              CALIBRATION.CODE.EHE.FINAL.STATE # 7
-                             )[c(1,5,6)]
+                             )[5]
+CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POP.STATE.4, CALIBRATION.CODE.TRANS.STATE.4)
 
 RESUME.FIRST = F
 
