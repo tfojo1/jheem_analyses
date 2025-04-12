@@ -2145,7 +2145,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       corresponding.data.outcome = 'deaths',
                       groups = NULL,
                       exclude.tags = "emigration",
-                      keep.dimensions = character())
+                      keep.dimensions = 'location')
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'number.injecting.drugs',
