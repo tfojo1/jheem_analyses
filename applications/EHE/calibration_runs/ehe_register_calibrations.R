@@ -18,6 +18,8 @@ CALIBRATION.CODE.TRANS.STATE.3 = 'trans.ehe.state.3' # removed aids diagnoses/hi
 CALIBRATION.CODE.TRANS.STATE.4 = 'trans.ehe.state.4' # removed aids diagnoses/hiv mortality; follows after normal pop
 CALIBRATION.CODE.TRANS.STATE.5 = 'trans.ehe.state.5' # removed aids diagnoses/hiv mortality; follows after normal pop
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
+CALIBRATION.CODE.FULL.STATE.4 = 'full.ehe.state.4'
+CALIBRATION.CODE.FULL.STATE.5 = 'full.ehe.state.5'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
 N.ITER.POP = 25000
@@ -318,7 +320,7 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE.4,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.2
+                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.4
 )
 
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE.5,
@@ -333,7 +335,7 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE.5,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.2
+                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.5
 )
 
 # state-level full calibration - removed AIDS deaths 
@@ -347,6 +349,32 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE),
+                          description = "Full with covid likelihoods"
+)
+
+register.calibration.info(CALIBRATION.CODE.FULL.STATE.4,
+                          likelihood.instructions = FULL.likelihood.instructions.32x.new.prev.state,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE.4),
+                          description = "Full with covid likelihoods"
+)
+
+register.calibration.info(CALIBRATION.CODE.FULL.STATE.5,
+                          likelihood.instructions = FULL.likelihood.instructions.32x.new.prev.state,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE.5),
                           description = "Full with covid likelihoods"
 )
 
