@@ -1,5 +1,5 @@
 # Total Level Data --------------------------------------------------------
-DATA.DIR.RYAN.WHITE="../../data_raw/ryan.white.pdf.tables/total"
+DATA.DIR.RYAN.WHITE="Q:/data_raw/ryan.white.pdf.tables/total"
 
 pdf.reports <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE, '/*.csv'))
 
@@ -143,7 +143,7 @@ for (data in ryan.white.totals.put) {
 
 
 # Stratified Level Data - STATE ---------------------------------------------------
-DATA.DIR.RYAN.WHITE.STRATIFIED="../../data_raw/ryan.white.pdf.tables/stratified.state"
+DATA.DIR.RYAN.WHITE.STRATIFIED="Q:/data_raw/ryan.white.pdf.tables/stratified.state"
 
 pdf.reports.stratified <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.STRATIFIED, '/*.csv'))
 
@@ -301,7 +301,7 @@ for (data in ryan.white.stratified.put) {
 }
 
 # Stratified Level Data - MSA ---------------------------------------------------
-DATA.DIR.RYAN.WHITE.STRATIFIED.MSA="../../data_raw/ryan.white.pdf.tables/stratified.msa"
+DATA.DIR.RYAN.WHITE.STRATIFIED.MSA="Q:/data_raw/ryan.white.pdf.tables/stratified.msa"
 
 pdf.reports.stratified.msa <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.STRATIFIED.MSA, '/*.csv'))
 

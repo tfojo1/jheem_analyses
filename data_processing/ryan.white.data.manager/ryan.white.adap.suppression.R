@@ -4,7 +4,7 @@
 #source = nastad.adap
 
 
-DATA.DIR.RYAN.WHITE.NASTAD="../../data_raw/ryan.white.pdf.tables/viral.suppression/nastad"
+DATA.DIR.RYAN.WHITE.NASTAD="Q:/data_raw/ryan.white.pdf.tables/viral.suppression/nastad"
 
 nastad.files <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.NASTAD, '/*.csv'))
 
