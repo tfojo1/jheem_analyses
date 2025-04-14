@@ -9,17 +9,8 @@ CALIBRATION.CODE.FULL.PLUS.COVID = 'full.ehe'
 CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
 
 CALIBRATION.CODE.POP.STATE = 'pop.ehe.state'
-CALIBRATION.CODE.POP.STATE.2 = 'pop.ehe.state.2' # includes total aids diagnoses 
-CALIBRATION.CODE.POP.STATE.4 = 'pop.ehe.state.4' # includes total aids diagnoses 
-CALIBRATION.CODE.POP.STATE.5 = 'pop.ehe.state.5' # includes total aids diagnoses 
 CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
-CALIBRATION.CODE.TRANS.STATE.2 = 'trans.ehe.state.2' # follows after pop2
-CALIBRATION.CODE.TRANS.STATE.3 = 'trans.ehe.state.3' # removed aids diagnoses/hiv mortality; follows after normal pop
-CALIBRATION.CODE.TRANS.STATE.4 = 'trans.ehe.state.4' # removed aids diagnoses/hiv mortality; follows after normal pop
-CALIBRATION.CODE.TRANS.STATE.5 = 'trans.ehe.state.5' # removed aids diagnoses/hiv mortality; follows after normal pop
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
-CALIBRATION.CODE.FULL.STATE.4 = 'full.ehe.state.4'
-CALIBRATION.CODE.FULL.STATE.5 = 'full.ehe.state.5'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
 N.ITER.POP = 25000
@@ -200,11 +191,9 @@ register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
                           description = "FULL RUN"
 )
 
-## STATE-LEVEL POP, TRANS, FULL, AND FINAL - REMOVED AIDS DEATHS, downweighted some likelihoods ## 
-
-# state-level some likelihoods downweighted by 1/4x
+## STATE-LEVEL POP, TRANS, FULL, AND FINAL
 register.calibration.info(CALIBRATION.CODE.POP.STATE,
-                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions.state, 
+                          likelihood.instructions = pop.state.likelihood.instructions, 
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = par.names.pop,
@@ -217,52 +206,8 @@ register.calibration.info(CALIBRATION.CODE.POP.STATE,
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
-# with total AIDS diagnoses 
-register.calibration.info(CALIBRATION.CODE.POP.STATE.2,
-                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions.state.with.aids, 
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = par.names.pop,
-                          parameter.aliases = par.aliases.population,
-                          n.iter = N.ITER.POP,
-                          thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.13), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get population parameters in the general vicinity"
-)
-
-register.calibration.info(CALIBRATION.CODE.POP.STATE.4,
-                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions.state.with.aids.expv, 
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = par.names.pop,
-                          parameter.aliases = par.aliases.population,
-                          n.iter = N.ITER.POP,
-                          thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.13), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get population parameters in the general vicinity"
-)
-
-register.calibration.info(CALIBRATION.CODE.POP.STATE.5,
-                          likelihood.instructions = joint.pop.migration.total.trans.likelihood.instructions.state.with.aids4x.expv, 
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = par.names.pop,
-                          parameter.aliases = par.aliases.population,
-                          n.iter = N.ITER.POP,
-                          thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.13), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get population parameters in the general vicinity"
-)
-
-# state-level trans calibration - removed AIDS deaths; AIDS diagnoses to 1994; HIV mortality to 1/16 weight
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
-                          likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions.state,
+                          likelihood.instructions = trans.state.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
@@ -276,71 +221,10 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
 )
 
-# same as usual trans calibration but will run after pop.state.2 that includes total aids diagnoses in it
-register.calibration.info(CALIBRATION.CODE.TRANS.STATE.2,
-                          likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions.state,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = c(par.names.transmission), 
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = N.ITER.TRANS,
-                          thin = 50, 
-                          #fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.2
-)
-
-# removed aids diagnoses and hiv mortality, runs from normal pop calibration 
-register.calibration.info(CALIBRATION.CODE.TRANS.STATE.3,
-                          likelihood.instructions = transmission.pop.idu.likelihood.instructions.state,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = c(par.names.transmission), 
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = N.ITER.TRANS,
-                          thin = 50, 
-                          #fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
-)
-
-register.calibration.info(CALIBRATION.CODE.TRANS.STATE.4,
-                          likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions.state.expv,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = c(par.names.transmission), 
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = N.ITER.TRANS,
-                          thin = 50, 
-                          #fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.4
-)
-
-register.calibration.info(CALIBRATION.CODE.TRANS.STATE.5,
-                          likelihood.instructions = transmission.pop.idu.aware.aids4x.testing.likelihood.instructions.state.expv,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = c(par.names.transmission), 
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = N.ITER.TRANS,
-                          thin = 50, 
-                          #fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.5
-)
 
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,
-                          likelihood.instructions = FULL.likelihood.instructions.32x.new.prev.state,
+                          likelihood.instructions = full.state.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -352,33 +236,8 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE,
                           description = "Full with covid likelihoods"
 )
 
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.4,
-                          likelihood.instructions = FULL.likelihood.instructions.32x.new.prev.state,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
-                          thin = 200, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE.4),
-                          description = "Full with covid likelihoods"
-)
 
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.5,
-                          likelihood.instructions = FULL.likelihood.instructions.32x.new.prev.state,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
-                          thin = 200, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE.5),
-                          description = "Full with covid likelihoods"
-)
-
-# state-level final calibration - removed AIDS deaths 
+# state-level final calibration 
 register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
                           likelihood.instructions = FULL.likelihood.instructions.8x.new.prev.state,
                           data.manager = SURVEILLANCE.MANAGER,

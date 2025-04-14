@@ -1629,29 +1629,8 @@ joint.pop.migration.total.trans.likelihood.instructions =
                                #weight = POPULATION.WEIGHT
                                ) 
 
-# state-level: downweighted pop/imm/em/deaths by 1/8x
-joint.pop.migration.total.trans.likelihood.instructions.state = 
-    join.likelihood.instructions(population.likelihood.instructions.pop.state,
-                                 immigration.likelihood.instructions.pop.state, 
-                                 emigration.likelihood.instructions.pop.state,
-                                 general.mortality.likelihood.instructions.pop.state,
-                                 total.prevalence.likelihood.instructions, 
-                                 total.new.diagnoses.likelihood.instructions #,
-                                 #weight = POPULATION.WEIGHT
-    ) 
-
-joint.pop.migration.total.trans.likelihood.instructions.state.with.aids = 
-    join.likelihood.instructions(population.likelihood.instructions.pop.state,
-                                 immigration.likelihood.instructions.pop.state, 
-                                 emigration.likelihood.instructions.pop.state,
-                                 general.mortality.likelihood.instructions.pop.state,
-                                 total.prevalence.likelihood.instructions, 
-                                 total.new.diagnoses.likelihood.instructions,
-                                 total.aids.diagnoses.likelihood.instructions
-                                 #weight = POPULATION.WEIGHT
-    ) 
-
-joint.pop.migration.total.trans.likelihood.instructions.state.with.aids.expv = 
+# state-level pop likelihood
+pop.state.likelihood.instructions = 
     join.likelihood.instructions(population.likelihood.instructions.pop.state,
                                  immigration.likelihood.instructions.pop.state, 
                                  emigration.likelihood.instructions.pop.state,
@@ -1662,19 +1641,8 @@ joint.pop.migration.total.trans.likelihood.instructions.state.with.aids.expv =
                                  #weight = POPULATION.WEIGHT
     ) 
 
-joint.pop.migration.total.trans.likelihood.instructions.state.with.aids4x.expv = 
-    join.likelihood.instructions(population.likelihood.instructions.pop.state,
-                                 immigration.likelihood.instructions.pop.state, 
-                                 emigration.likelihood.instructions.pop.state,
-                                 general.mortality.likelihood.instructions.pop.state,
-                                 total.prevalence.cv.expv.likelihood.instructions, 
-                                 total.new.diagnoses.cv.expv.likelihood.instructions,
-                                 total.aids.diagnoses.4x.cv.expv.likelihood.instructions
-                                 #weight = POPULATION.WEIGHT
-    ) 
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
-# changed some of the weighting for state-level; will apply it later when we rerun city-level
 transmission.pop.idu.aware.aids.testing.likelihood.instructions = 
   join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
                                race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
@@ -1704,24 +1672,8 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids =
                                
   )
 
-# state-level transmission calibration - removed AIDS deaths; AIDS diagnoses are through 2000 and 18x for trans only 
-# changed some of the weighting for state-level; will apply it later when we rerun city-level
-transmission.pop.idu.aware.aids.testing.likelihood.instructions.state = 
-    join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
-                                 race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
-                                 total.new.diagnoses.8x.cv.expv.likelihood.instructions,
-                                 total.prevalence.8x.cv.expv.likelihood.instructions,
-                                 non.age.aids.diagnoses.likelihood.instructions.trans.state, # state-level: through 1994
-                                 population.likelihood.instructions.trans,
-                                 heroin.likelihood.instructions.trans,
-                                 cocaine.likelihood.instructions.trans,
-                                 hiv.mortality.likelihood.instructions.trans.state, # 1/16 weight
-                                 future.incidence.change.likelihood.instructions
-                                 #weight = TRANSMISSION.WEIGHT
-                                 
-    )
-
-transmission.pop.idu.aware.aids.testing.likelihood.instructions.state.expv = 
+# state-level transmission calibration 
+trans.state.likelihood.instructions = 
     join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
                                  race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
                                  total.new.diagnoses.8x.cv.expv.likelihood.instructions,
@@ -1735,35 +1687,6 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.state.expv =
                                  #weight = TRANSMISSION.WEIGHT
                                  
     )
-
-transmission.pop.idu.aware.aids4x.testing.likelihood.instructions.state.expv = 
-    join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
-                                 race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
-                                 total.new.diagnoses.8x.cv.expv.likelihood.instructions,
-                                 total.prevalence.8x.cv.expv.likelihood.instructions,
-                                 non.age.aids.diagnoses.4x.cv.expv.likelihood.instructions.full.state, # state-level: through 1994
-                                 population.likelihood.instructions.trans,
-                                 heroin.likelihood.instructions.trans,
-                                 cocaine.likelihood.instructions.trans,
-                                 biased.hiv.mortality.likelihood.instructions.full,
-                                 future.incidence.change.likelihood.instructions
-                                 #weight = TRANSMISSION.WEIGHT
-                                 
-    )
-# testing out removing aids diagnoses and hiv mortality
-transmission.pop.idu.likelihood.instructions.state = 
-    join.likelihood.instructions(race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions, 
-                                 race.risk.halfx.cv.expv.prevalence.likelihood.instructions, 
-                                 total.new.diagnoses.8x.cv.expv.likelihood.instructions,
-                                 total.prevalence.8x.cv.expv.likelihood.instructions,
-                                 population.likelihood.instructions.trans,
-                                 heroin.likelihood.instructions.trans,
-                                 cocaine.likelihood.instructions.trans,
-                                 future.incidence.change.likelihood.instructions
-                                 #weight = TRANSMISSION.WEIGHT
-                                 
-    )
-
 
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
@@ -1807,48 +1730,8 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   ps.syphilis.year.on.year.change.likelihood.instructions
 )
 
-# state-level full calibration - removed AIDS deaths; AIDS diagnoses are through 2000
-FULL.likelihood.instructions.32x.new.prev.state = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    population.likelihood.instructions.full, 
-    immigration.likelihood.instructions.full, 
-    emigration.likelihood.instructions.full,
-    
-    # TRANSMISSION LIKELIHOODS
-    total.new.diagnoses.16x.cv.expv.likelihood.instructions,
-    new.diagnoses.halfx.cv.expv.likelihood.instructions,
-    total.prevalence.16x.cv.expv.likelihood.instructions,
-    prevalence.halfx.cv.and.exp.v.likelihood.instructions,
-    
-    # MORTALITY LIKELIHOODS
-    hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.likelihood.instructions.full.state, # state-level: through 2000
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.likelihood.instructions,
-    hiv.test.positivity.likelihood.instructions, 
-    awareness.likelihood.instructions,
-    suppression.likelihood.instructions,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.likelihood.instructions.full,
-    cocaine.likelihood.instructions.full,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions
-)
-
-# state-level full calibration - removed AIDS deaths; AIDS diagnoses are through 2000
-FULL.likelihood.instructions.32x.new.prev.state.expv = join.likelihood.instructions(
+# state-level full calibration 
+full.state.likelihood.instructions = join.likelihood.instructions(
     # POPULATION LIKELIHOODS
     population.likelihood.instructions.full, 
     immigration.likelihood.instructions.full, 
