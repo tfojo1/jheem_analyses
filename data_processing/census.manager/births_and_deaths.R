@@ -4,7 +4,7 @@
 ################################################################################
                         ###BIRTH DATA###
 ################################################################################
-DATA.DIR.BIRTH="../../data_raw/births_deaths/births"
+DATA.DIR.BIRTH="Q:/data_raw/births_deaths/births"
 
 birth_files <- list.files(DATA.DIR.BIRTH, pattern = ".txt", full.names = "TRUE")
 
@@ -171,7 +171,7 @@ for (data in births_denom ) {
 #Note outcome = metro.deaths
 ################################################################################
 
-DATA.DIR.DEATH="../../data_raw/births_deaths/deaths"
+DATA.DIR.DEATH="Q:/data_raw/births_deaths/deaths"
 
 death_files <- list.files(DATA.DIR.DEATH, pattern = ".txt", full.names = "TRUE")
 
@@ -306,7 +306,7 @@ for (data in deaths_denom ) {
 ################################################################################
 #Read in National Level Birth Data
 ################################################################################
-DATA.DIR.BIRTH.NATIONAL="../../data_raw/births_deaths/births/national"
+DATA.DIR.BIRTH.NATIONAL="Q:/data_raw/births_deaths/births/national"
 
 birth_files_national <- list.files(DATA.DIR.BIRTH.NATIONAL, pattern = ".txt", full.names = "TRUE")
 

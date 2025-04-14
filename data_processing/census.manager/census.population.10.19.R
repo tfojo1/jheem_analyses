@@ -4,7 +4,7 @@
 #census_sas_files 2005-2017 data for the surveillance manager. Everything will be kept in the census
 #manager and this will just be an addition.
 
-DATA.DIR.POP.10.19 = "../../data_raw/population/county_stratified_10.19"
+DATA.DIR.POP.10.19 = "Q:/data_raw/population/county_stratified_10.19"
 
 pop.10.19 <- Sys.glob(paste0(DATA.DIR.POP.10.19, '/*.csv'))
 
