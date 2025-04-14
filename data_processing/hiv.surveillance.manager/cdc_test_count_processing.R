@@ -5,7 +5,7 @@
 ################################################################################
                   ###Read in CDC HIV Test Data###
 ################################################################################
-DATA.DIR.TESTS="../../data_raw/tests"
+DATA.DIR.TESTS="Q:/data_raw/tests"
 
 test_files <- Sys.glob(paste0(DATA.DIR.TESTS, '/*.xlsx'))
                             

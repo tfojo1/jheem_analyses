@@ -6,7 +6,7 @@
 ################################################################################
 ###Read in NSDUH Data###
 ################################################################################ 
-DATA.DIR.NSDUH="../../data_raw/nsduh"
+DATA.DIR.NSDUH="Q:/data_raw/nsduh"
 
 nsduh_files <- Sys.glob(paste0(DATA.DIR.NSDUH, '/*.csv'))
 

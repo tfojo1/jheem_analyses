@@ -4,14 +4,14 @@
 ################################################################################
                 ###Read in MSA Scraped PDF Files### 
 ################################################################################
-DATA.DIR.MSA.TOTAL="../../data_raw/msa_surveillance_reports/total"
-DATA.DIR.MSA.DEATHS="../../data_raw/msa_surveillance_reports/deaths"
-DATA.DIR.MSA.SEX="../../data_raw/msa_surveillance_reports/sex"
-DATA.DIR.MSA.SEX.AGE="../../data_raw/msa_surveillance_reports/sex_age"
-DATA.DIR.MSA.SEX.RACE="../../data_raw/msa_surveillance_reports/sex_race"
-DATA.DIR.MSA.SEX.RISK="../../data_raw/msa_surveillance_reports/sex_risk"
-DATA.DIR.MSA.RACE.RISK="../../data_raw/msa_surveillance_reports/race_risk"
-DATA.DIR.MSA.BEFORE="../../data_raw/msa_surveillance_reports/before"
+DATA.DIR.MSA.TOTAL="Q:/data_raw/msa_surveillance_reports/total"
+DATA.DIR.MSA.DEATHS="Q:/data_raw/msa_surveillance_reports/deaths"
+DATA.DIR.MSA.SEX="Q:/data_raw/msa_surveillance_reports/sex"
+DATA.DIR.MSA.SEX.AGE="Q:/data_raw/msa_surveillance_reports/sex_age"
+DATA.DIR.MSA.SEX.RACE="Q:/data_raw/msa_surveillance_reports/sex_race"
+DATA.DIR.MSA.SEX.RISK="Q:/data_raw/msa_surveillance_reports/sex_risk"
+DATA.DIR.MSA.RACE.RISK="Q:/data_raw/msa_surveillance_reports/race_risk"
+DATA.DIR.MSA.BEFORE="Q:/data_raw/msa_surveillance_reports/before"
 
 msa_total <- Sys.glob(paste0(DATA.DIR.MSA.TOTAL, '/*.csv'))
 msa_deaths <- Sys.glob(paste0(DATA.DIR.MSA.DEATHS, '/*.csv'))

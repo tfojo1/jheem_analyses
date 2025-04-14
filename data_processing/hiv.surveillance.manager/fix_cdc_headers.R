@@ -9,13 +9,13 @@
 
 #library(jheem2)
 
-DATA.DIR.DIAGNOSES="../../data_raw/diagnoses"
-DATA.DIR.DEATHS="../../data_raw/deaths"
-DATA.DIR.PREVALENCE="../../data_raw/prevalence"
-DATA.DIR.SLE="../../data_raw/sle"
-DATA.DIR.NATIONAL.SUPPRESSION="../../data_raw/sle/national_suppression"
-DATA.DIR.KNOWLEDGE="../../data_raw/knowledge"
-DATA.DIR.ATLAS.PREP="../../data_raw/prep/atlas_plus"
+DATA.DIR.DIAGNOSES="Q:/data_raw/diagnoses"
+DATA.DIR.DEATHS="Q:/data_raw/deaths"
+DATA.DIR.PREVALENCE="Q:/data_raw/prevalence"
+DATA.DIR.SLE="Q:/data_raw/sle"
+DATA.DIR.NATIONAL.SUPPRESSION="Q:/data_raw/sle/national_suppression"
+DATA.DIR.KNOWLEDGE="Q:/data_raw/knowledge"
+DATA.DIR.ATLAS.PREP="Q:/data_raw/prep/atlas_plus"
 
 #---HIV Diagnoses---#
 diagnoses_files <- Sys.glob(paste0(DATA.DIR.DIAGNOSES, '/*.csv'))

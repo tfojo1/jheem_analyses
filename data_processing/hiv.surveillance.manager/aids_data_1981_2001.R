@@ -1,7 +1,7 @@
 ################################################################################
 #1980-2001 AIDS diagnoses data by vital status
 ################################################################################
-DATA.DIR.AIDS="../../data_raw/aids_diagnoses"
+DATA.DIR.AIDS="Q:/data_raw/aids_diagnoses"
 
 aids.files <- list.files(DATA.DIR.AIDS, pattern = ".txt", full.names = "TRUE")
 
@@ -200,7 +200,7 @@ aids.data.clean = lapply(data.list.aids, function(file){
 ##############################################################################
 #Adding in aids.deaths (this will require a second ontology)
 ##############################################################################
-DATA.DIR.AIDS.DEATHS="../../data_raw/aids_diagnoses/aids.deaths"
+DATA.DIR.AIDS.DEATHS="Q:/data_raw/aids_diagnoses/aids.deaths"
 
 aids.deaths.files <- list.files(DATA.DIR.AIDS.DEATHS, pattern = ".txt", full.names = "TRUE")
 

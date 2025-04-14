@@ -1,6 +1,6 @@
 #This code processing state to state migration data from the Census.
 
-DATA.DIR.IMM.STATE="../../data_raw/movement/state.to.state"
+DATA.DIR.IMM.STATE="Q:/data_raw/movement/state.to.state"
 
 state.imm.files <- Sys.glob(paste0(DATA.DIR.IMM.STATE, '/*.xlsx'))
 
@@ -116,7 +116,7 @@ for (data in state.emm.data.clean.put) {
 
 
 # 2005-2009 (Separate processing because format of files is different --------
-DATA.DIR.IMM.05.09="../../data_raw/movement/state.to.state/2005.2009"
+DATA.DIR.IMM.05.09="Q:/data_raw/movement/state.to.state/2005.2009"
 
 state.imm.files.05.09 <- Sys.glob(paste0(DATA.DIR.IMM.05.09, '/*.xlsx'))
 

@@ -4,7 +4,7 @@
 ###Read in BRFSS .xpt files
 ################################################################################
 
-DATA.DIR.BRFSS.STATE="../../data_raw/brfss/brfss_state"
+DATA.DIR.BRFSS.STATE="Q:/data_raw/brfss/brfss_state"
 
 brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.names = "TRUE")
 

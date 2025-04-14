@@ -5,7 +5,7 @@
                   ###Read in Aids Vu PrEP Excel Datasets###
 ################################################################################
 
-DATA.DIR.PREP="../../data_raw/prep/aidsvu"
+DATA.DIR.PREP="Q:/data_raw/prep/aidsvu"
 
 prep_files <- Sys.glob(paste0(DATA.DIR.PREP, '/*.xlsx'))
 data.list.prep <- lapply(prep_files, function(x){

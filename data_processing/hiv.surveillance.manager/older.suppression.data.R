@@ -1,7 +1,7 @@
 
 # Upload ------------------------------------------------------------------
 
-DATA.DIR.OLDER.SUPPRESSION="../../data_raw/sle/older.suppression.data"
+DATA.DIR.OLDER.SUPPRESSION="Q:/data_raw/sle/older.suppression.data"
 
 older.suppression.files <- Sys.glob(paste0(DATA.DIR.OLDER.SUPPRESSION, '/*.csv'))
 
