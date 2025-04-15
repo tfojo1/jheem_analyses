@@ -61,3 +61,18 @@ make.combined.assemble.script(paste0("example_assemble_script_",version,"_",cali
                               register.calibration.path=register.calibration.path,
                               overwrite = overwrite)
 
+####
+# after this code is complete, you can run the "master" bash scripts:
+# source cluster_scripts/master_scripts/setup/<name of script>
+
+# to run the code:
+# source cluster_scripts/master_scripts/run/<name of script>
+
+#to assemble 
+# source cluster_scripts/master_scripts/assemble/<name of script>
+
+
+
+# code to check the progress with the bash script:
+# percentage.cache.complete(version, calibration code, locations, chain(s))
+# A package function (found in "jheem2/R/CALIBRATION_MAIN.R")
