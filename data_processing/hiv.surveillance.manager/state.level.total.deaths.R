@@ -3,7 +3,7 @@
 #This has state level deaths from 2010-2023
 #Removing 2010 data because it doesn't represent a full year
 
-DATA.DIR.STATE.DEATHS="../../data_raw/population/deaths.state.level.10.23"
+DATA.DIR.STATE.DEATHS="Q:/data_raw/population/deaths.state.level.10.23"
 
 state.death.files <- Sys.glob(paste0(DATA.DIR.STATE.DEATHS, '/*.csv'))
 

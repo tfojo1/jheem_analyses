@@ -1,7 +1,7 @@
 #Table 28a from Ryan White Reports (denominator will be non.adap)
 
 # Viral Suppression Data --------------------------------------------------------
-DATA.DIR.RYAN.WHITE.SUPPRESSION="../../data_raw/ryan.white.pdf.tables/viral.suppression/state"
+DATA.DIR.RYAN.WHITE.SUPPRESSION="Q:/data_raw/ryan.white.pdf.tables/viral.suppression/state"
 
 ryan.white.suppression.files <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.SUPPRESSION, '/*.csv'))
 
@@ -92,7 +92,7 @@ for (data in ryan.white.suppression.clean.put) {
 
 # Viral Suppression - MSA Level -------------------------------------------
 #For the MSA, because they need to be regrouped, I'm going to put the N values and sum and then calculate a new proportion
-DATA.DIR.RYAN.WHITE.SUPPRESSION.MSA="../../data_raw/ryan.white.pdf.tables/viral.suppression/msa"
+DATA.DIR.RYAN.WHITE.SUPPRESSION.MSA="Q:/data_raw/ryan.white.pdf.tables/viral.suppression/msa"
 
 ryan.white.suppression.files.msa <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.SUPPRESSION.MSA, '/*.csv'))
 
@@ -232,7 +232,7 @@ for (data in ryan.white.suppression.clean.msa.put) {
 
 
 # STATE - stratified ------------------------------------------------------
-DATA.DIR.RYAN.WHITE.SUPPRESSION.STATE.STRATA="../../data_raw/ryan.white.pdf.tables/viral.suppression/stratified/state"
+DATA.DIR.RYAN.WHITE.SUPPRESSION.STATE.STRATA="Q:/data_raw/ryan.white.pdf.tables/viral.suppression/stratified/state"
 
 ryan.white.suppression.files.state.strata <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.SUPPRESSION.STATE.STRATA, '/*.csv'))
 
@@ -316,7 +316,7 @@ for (data in state.stratified.suppression.clean.put) {
 }
 
 # MSA- stratified ---------------------------------------------------------
-DATA.DIR.RYAN.WHITE.SUPPRESSION.MSA.STRATA="../../data_raw/ryan.white.pdf.tables/viral.suppression/stratified/msa"
+DATA.DIR.RYAN.WHITE.SUPPRESSION.MSA.STRATA="Q:/data_raw/ryan.white.pdf.tables/viral.suppression/stratified/msa"
 
 ryan.white.suppression.files.msa.strata <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.SUPPRESSION.MSA.STRATA, '/*.csv'))
 

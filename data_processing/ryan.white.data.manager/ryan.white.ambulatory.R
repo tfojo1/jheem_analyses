@@ -3,7 +3,7 @@
 #Renaming the outcome 'oahs.clients' rather than 'ambulatory.care.past.year'
 
 # Ambulatory (suppression total N) Data Total --------------------------------------------------------
-DATA.DIR.RYAN.WHITE.AMBULATORY="../../data_raw/ryan.white.pdf.tables/ambulatory"
+DATA.DIR.RYAN.WHITE.AMBULATORY="Q:/data_raw/ryan.white.pdf.tables/ambulatory"
 
 ambulatory.files <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.AMBULATORY, '/*.csv'))
 
@@ -138,7 +138,7 @@ for (data in ryan.white.ambulatory.clean.put) {
 
 # Stratified Ambulatory ---------------------------------------------------
 
-DATA.DIR.RYAN.WHITE.AMBULATORY.STRATA="../../data_raw/ryan.white.pdf.tables/ambulatory/stratified"
+DATA.DIR.RYAN.WHITE.AMBULATORY.STRATA="Q:/data_raw/ryan.white.pdf.tables/ambulatory/stratified"
 
 ambulatory.files.stratified <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.AMBULATORY.STRATA, '/*.csv'))
 

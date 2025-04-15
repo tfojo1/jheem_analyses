@@ -5,7 +5,7 @@
           ###State Retention Data
 ################################################################################ 
 
-DATA.DIR.RETENTION="../../data_raw/retention"
+DATA.DIR.RETENTION="Q:/data_raw/retention"
 
 retention_files <- Sys.glob(paste0(DATA.DIR.RETENTION, '/*.xlsx'))
 

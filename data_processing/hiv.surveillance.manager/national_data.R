@@ -1,5 +1,5 @@
 ##Read in National Atlas Plus Data##
-DATA.DIR.NATIONAL="../../data_raw/national"
+DATA.DIR.NATIONAL="Q:/data_raw/national"
 national_files <- Sys.glob(paste0(DATA.DIR.NATIONAL, '/*.csv'))
 data.list.national <- lapply(national_files, function(x){
   skip=10

@@ -1,7 +1,7 @@
 #This code processing data for the following outcomes: diagnosed.prevalence; adap.proportion.of.diagnosed; adap.suppressed.proportion.of.diagnosed
 
 # DIAGNOSED.PREVALENCE ------------------------------------------------------
-DATA.DIR.PREVALENCE="../../data_raw/prevalence"
+DATA.DIR.PREVALENCE="Q:/data_raw/prevalence"
 prevalence_files <- Sys.glob(paste0(DATA.DIR.PREVALENCE, '/*.csv'))
 data.list.prevalence <- lapply(prevalence_files, function(x){
   skip=10

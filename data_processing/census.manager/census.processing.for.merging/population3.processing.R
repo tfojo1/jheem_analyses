@@ -63,7 +63,7 @@ census.manager$register.ontology(
 #Codes:
 
 
-DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county_00.23"
+DATA.DIR.CENSUS.COUNTY="Q:/data_raw/population/county_00.23"
 
 census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
 
@@ -230,7 +230,7 @@ data.list.county.deaths.21.23 = lapply(data.list.county, function(file){
 #This data used to be with the population estimates but once we updated the data
 #For the 2010-2019 intercensal estimates, the data is separate
 ################################################################################
-DATA.DIR.CENSUS.DEATHS="../../data_raw/population/deaths_10_19"
+DATA.DIR.CENSUS.DEATHS="Q:/data_raw/population/deaths_10_19"
 
 deaths_10_19_files <- Sys.glob(paste0(DATA.DIR.CENSUS.DEATHS, '/*.csv'))
 

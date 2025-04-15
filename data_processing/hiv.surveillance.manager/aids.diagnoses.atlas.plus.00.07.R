@@ -4,7 +4,7 @@
 
 #outcome = aids.diagnoses
 
-DATA.DIR.ATLAS.AIDS.CLASS="../../data_raw/aids_diagnoses/atlas.plus"
+DATA.DIR.ATLAS.AIDS.CLASS= "Q:/data_raw/aids_diagnoses/atlas.plus"
 
 aids.class.files <- Sys.glob(paste0(DATA.DIR.ATLAS.AIDS.CLASS, '/*.csv'))
 

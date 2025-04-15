@@ -4,7 +4,7 @@
 
 #This is for immigration (not adult.immigration)
 
-DATA.DIR.IMM.STATE.STRATIFIED="../../data_raw/movement/state.to.state/stratified"
+DATA.DIR.IMM.STATE.STRATIFIED="Q:/data_raw/movement/state.to.state/stratified"
 
 state.stratified.migration <- Sys.glob(paste0(DATA.DIR.IMM.STATE.STRATIFIED, '/*.xlsx'))
 

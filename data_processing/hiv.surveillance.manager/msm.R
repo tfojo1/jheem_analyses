@@ -230,7 +230,7 @@ for (data in msm.state.age) {
 ###############################################################################
             ##Emory MSM Data by County for 2013#
 ###############################################################################
-DATA.DIR.MSM="../../data_raw/emory"
+DATA.DIR.MSM="Q:/data_raw/emory"
 
 emory_files <- Sys.glob(paste0(DATA.DIR.MSM, '/*.csv'))
 

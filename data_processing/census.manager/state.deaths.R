@@ -8,7 +8,7 @@
 #ontology = metro.deaths
 #source = cdc_wonder
 
-DATA.DIR.STATE.DEATH="../../data_raw/births_deaths/deaths/state.deaths"
+DATA.DIR.STATE.DEATH="Q:/data_raw/births_deaths/deaths/state.deaths"
 
 state_death_files <- Sys.glob(paste0(DATA.DIR.STATE.DEATH, '/*.xlsx'))
 

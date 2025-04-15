@@ -6,7 +6,7 @@
 ################################################################################
                   ###Read in MSA LHD Data###
 ################################################################################
-DATA.DIR.LHD="../../data_raw/lhd_msa"
+DATA.DIR.LHD="Q:/data_raw/lhd_msa"
 
 lhd_files <- Sys.glob(paste0(DATA.DIR.LHD, '/*.xlsx'))
 
@@ -358,7 +358,7 @@ for (data in lhd_san_antonio) {
 #Did manual search for awareness and prevalence at LHD level
 #Only found data for Baltimore
 
-DATA.DIR.LHD.AWARE="../../data_raw/lhd_msa/awareness"
+DATA.DIR.LHD.AWARE="Q:/data_raw/lhd_msa/awareness"
 
 awareness_lhd_files <- Sys.glob(paste0(DATA.DIR.LHD.AWARE, '/*.xlsx'))
 
