@@ -2,7 +2,7 @@
 # JHEEM_DIR = file.path("/scratch4/pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses")
 USER =  Sys.getenv("USER")
 JHEEM_DIR = file.path("scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
-OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs3")
+OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs2")
 MODULE.LOAD.COMMANDS = c('source cluster_scripts/rockfish_module_loads.sh')
 EHE.SPEC <- "applications/EHE/ehe_specification.R"
 EHE.REG <- "applications/EHE/calibration_runs/ehe_register_calibrations.R"
