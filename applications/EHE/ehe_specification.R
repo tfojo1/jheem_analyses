@@ -393,7 +393,7 @@ register.model.quantity(EHE.SPECIFICATION,
 #-------------#
 #-- Testing --# ----
 #-------------#
-TESTING.RAMP1.YEAR = 1995
+TESTING.RAMP1.YEAR = 1990
 #TESTING.RAMP2.YEAR = 2005
 TESTING.LAST.ZERO.YEAR = 1982
 RAMP.YEARLY.INCREASE = 1.5
