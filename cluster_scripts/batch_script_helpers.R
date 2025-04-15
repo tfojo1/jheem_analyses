@@ -67,7 +67,7 @@ make.setup.scripts <- function(locations,
                                partition='parallel',
                                account='tfojo1',
                                mem='16G',
-                               time.hours=12)
+                               time.hours=1)
 {
     # Create output directories for each location
     for (location in locations) {
