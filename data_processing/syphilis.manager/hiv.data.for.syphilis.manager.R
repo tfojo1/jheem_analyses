@@ -10,11 +10,11 @@
 
 # READ in HIV data --------------------------------------------------------
 
-DATA.DIR.DIAGNOSES="../../data_raw/diagnoses"
-DATA.DIR.PREVALENCE="../../data_raw/prevalence"
-DATA.DIR.SLE="../../data_raw/sle"
-DATA.DIR.NATIONAL.SUPPRESSION="../../data_raw/sle/national_suppression"
-DATA.DIR.KNOWLEDGE="../../data_raw/knowledge" #This is used for total prevalence
+DATA.DIR.DIAGNOSES="Q:/data_raw/diagnoses"
+DATA.DIR.PREVALENCE="Q:/data_raw/prevalence"
+DATA.DIR.SLE="Q:/data_raw/sle"
+DATA.DIR.NATIONAL.SUPPRESSION="Q:/data_raw/sle/national_suppression"
+DATA.DIR.KNOWLEDGE="Q:/data_raw/knowledge" #This is used for total prevalence
 
 #---HIV Diagnoses---#
 diagnoses_files <- Sys.glob(paste0(DATA.DIR.DIAGNOSES, '/*.csv'))

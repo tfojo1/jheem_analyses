@@ -4,7 +4,7 @@
 
 # Read in -----------------------------------------------------------------
 
-DATA.DIR.2022.TABLE="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/2022.table"
+DATA.DIR.2022.TABLE="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/2022.table"
 
 table.2022 <- Sys.glob(paste0(DATA.DIR.2022.TABLE, '/*.xlsx'))
 

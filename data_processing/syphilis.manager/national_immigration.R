@@ -1,7 +1,7 @@
 
 # TOTAL -------------------------------------------------------------------
 
-DATA.DIR.NAT.IMM="../../data_raw/syphilis.manager/national.immigration"
+DATA.DIR.NAT.IMM="Q:/data_raw/syphilis.manager/national.immigration"
 
 national.immigration.files <- Sys.glob(paste0(DATA.DIR.NAT.IMM, '/*.xlsx'))
 
@@ -35,7 +35,7 @@ for (data in national.total.put) {
 
 
 # SEX ---------------------------------------------------------------------
-DATA.DIR.IMM.SEX="../../data_raw/syphilis.manager/national.immigration/sex"
+DATA.DIR.IMM.SEX="Q:/data_raw/syphilis.manager/national.immigration/sex"
 
 nat.imm.sex <- Sys.glob(paste0(DATA.DIR.IMM.SEX, '/*.xlsx'))
 
@@ -139,7 +139,7 @@ for (data in national.sex.put) {
 # -------------------------------------------------------------------------
 
 
-DATA.DIR.IMM.race="../../data_raw/syphilis.manager/national.immigration/race"
+DATA.DIR.IMM.race="Q:/data_raw/syphilis.manager/national.immigration/race"
 
 nat.imm.race <- Sys.glob(paste0(DATA.DIR.IMM.race, '/*.xlsx'))
 

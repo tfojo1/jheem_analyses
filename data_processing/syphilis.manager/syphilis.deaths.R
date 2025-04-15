@@ -1,4 +1,4 @@
-DATA.DIR.SYPHILIS.DEATHS="../../data_raw/syphilis.manager/cdc.wonder.syphilis.deaths"
+DATA.DIR.SYPHILIS.DEATHS="Q:/data_raw/syphilis.manager/cdc.wonder.syphilis.deaths"
 
 syphilis.deaths.files <- list.files(DATA.DIR.SYPHILIS.DEATHS, pattern = ".txt", full.names = "TRUE")
 
