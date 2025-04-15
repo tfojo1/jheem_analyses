@@ -1638,8 +1638,7 @@ pop.state.likelihood.instructions =
                                  general.mortality.likelihood.instructions.pop.state,
                                  total.prevalence.cv.expv.likelihood.instructions, 
                                  total.new.diagnoses.cv.expv.likelihood.instructions,
-                                 total.aids.diagnoses.cv.expv.likelihood.instructions,
-                                 state.aids.diagnoses.proportions.instructions
+                                 total.aids.diagnoses.cv.expv.likelihood.instructions
                                  #weight = POPULATION.WEIGHT
     ) 
 
@@ -1685,8 +1684,8 @@ trans.state.likelihood.instructions =
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,
                                  biased.hiv.mortality.likelihood.instructions.full,
-                                 future.incidence.change.likelihood.instructions,
-                                 state.aids.diagnoses.proportions.instructions
+                                 future.incidence.change.likelihood.instructions
+                                 #state.aids.diagnoses.proportions.instructions
                                  #weight = TRANSMISSION.WEIGHT
                                  
     )
