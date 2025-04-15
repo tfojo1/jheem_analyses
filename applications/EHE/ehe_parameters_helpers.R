@@ -103,7 +103,7 @@ create.four.knot.transmission.prior.distribution <- function(r1.log.mean,
                                                          '.',
                                                          route,
                                                          '.trate.',
-                                                         c(0,1,2,'peak'))
+                                                         c('peak',0,1,2))
   )
 }
 
