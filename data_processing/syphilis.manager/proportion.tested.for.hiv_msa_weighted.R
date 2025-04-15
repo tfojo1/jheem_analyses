@@ -4,7 +4,7 @@
 ###Read in BRFSS .xpt files
 ################################################################################
 
-DATA.DIR.BRFSS.MSA="../../data_raw/brfss/brfss_msa"
+DATA.DIR.BRFSS.MSA="Q:/data_raw/brfss/brfss_msa"
 
 brfss_file_msa<- list.files(DATA.DIR.BRFSS.MSA, pattern = ".xpt", full.names = "TRUE")
 

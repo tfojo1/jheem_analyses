@@ -3,7 +3,7 @@
 #I'm removing any LHDs that did not report what counties make up their data points
 #I'm combining primary and secondary syphilis into ps.syphilis
 
-DATA.DIR.LHD="../../data_raw/syphilis.manager/lhd"
+DATA.DIR.LHD="Q:/data_raw/syphilis.manager/lhd"
 
 lhd.files <- Sys.glob(paste0(DATA.DIR.LHD, '/*.xlsx'))
 

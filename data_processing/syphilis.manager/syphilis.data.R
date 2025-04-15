@@ -1,6 +1,6 @@
 
 #  Syphilis (2000-2022) -----------------------------------
-DATA.DIR.SYPHILIS="../../data_raw/syphilis.manager/syphilis"
+DATA.DIR.SYPHILIS="Q:/data_raw/syphilis.manager/syphilis"
 syphilis_files <- Sys.glob(paste0(DATA.DIR.SYPHILIS, '/*.csv'))
 syphilis.data <- lapply(syphilis_files, function(x){
   skip=7
@@ -93,7 +93,7 @@ for (data in syphilis.clean.put) {
 
 # Clean + Put Early Syphilis because age categories are different ---------
 
-DATA.DIR.SYPHILIS.EARLY="../../data_raw/syphilis.manager/syphilis/early.syphilis"
+DATA.DIR.SYPHILIS.EARLY="Q:/data_raw/syphilis.manager/syphilis/early.syphilis"
 syphilis_files_early <- Sys.glob(paste0(DATA.DIR.SYPHILIS.EARLY, '/*.csv'))
 syphilis.data.early <- lapply(syphilis_files_early, function(x){
   skip=7

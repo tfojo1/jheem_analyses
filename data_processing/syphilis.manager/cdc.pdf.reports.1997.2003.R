@@ -4,7 +4,7 @@
 
 # National- Total Level Data ----------------------------------------------
 
-DATA.DIR.PDF.REPORTS="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.totals"
+DATA.DIR.PDF.REPORTS="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.totals"
 
 pdf.reports <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS, '/*.csv'))
 
@@ -97,7 +97,7 @@ for (data in national.totals.put) {
 
 # MSA - Total Level Data --------------------------------------------------
 
-DATA.DIR.PDF.REPORTS.MSA="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.totals"
+DATA.DIR.PDF.REPORTS.MSA="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.totals"
 
 pdf.reports.msa <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS.MSA, '/*.csv'))
 
@@ -210,7 +210,7 @@ for (data in msa.totals.put) {
 }
 
 # MSA - Stratified Data ---------------------------------------------------
-DATA.DIR.PDF.REPORTS.MSA.STRATIFIED="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.stratified"
+DATA.DIR.PDF.REPORTS.MSA.STRATIFIED="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.stratified"
 
 pdf.reports.msa.strata <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS.MSA.STRATIFIED, '/*.csv'))
 
@@ -332,7 +332,7 @@ for (data in stratified.msa.put) {
 
 # National- Stratified Data ----------------------------------------------
 
-DATA.DIR.PDF.REPORTS.NATIONAL.STRAT="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/ps.syphilis_national_age_sex_race"
+DATA.DIR.PDF.REPORTS.NATIONAL.STRAT="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/ps.syphilis_national_age_sex_race"
 
 national.stratified.reports <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS.NATIONAL.STRAT, '/*.xlsx'))
 
@@ -537,7 +537,7 @@ for (data in national.age.race.sex.put) {
 
 
 # National - Sex Alone ----------------------------------------------------
-DATA.DIR.PDF.REPORTS.NATIONAL.SEX="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/ps.syphilis_national_sex"
+DATA.DIR.PDF.REPORTS.NATIONAL.SEX="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/ps.syphilis_national_sex"
 
 national.sex.files <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS.NATIONAL.SEX, '/*.csv'))
 
@@ -630,7 +630,7 @@ for (data in national.sex.clean.put) {
 
 # National Level Neurosyphilis --------------------------------------------
 #Reports for neurosyphilis are from the current year of report (not reported retrospectively like the other outcomes)
-DATA.DIR.NEURO="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/neurosyphilis"
+DATA.DIR.NEURO="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/neurosyphilis"
 
 pdf.reports.neuro <- Sys.glob(paste0(DATA.DIR.NEURO, '/*.csv'))
 

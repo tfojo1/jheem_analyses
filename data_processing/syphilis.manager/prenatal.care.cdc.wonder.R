@@ -1,6 +1,6 @@
 #This code processing prenatal care data from CDC Wonder
 
-DATA.DIR.PRENATAL="../../data_raw/syphilis.manager/prenatal.care.cdc.wonder/total"
+DATA.DIR.PRENATAL="Q:/data_raw/syphilis.manager/prenatal.care.cdc.wonder/total"
 
 cdc.prenatal.files <- list.files(DATA.DIR.PRENATAL, pattern = ".txt", full.names = "TRUE")
 
@@ -63,7 +63,7 @@ for (data in total.prenatal.put) {
 }
 
 #Stratified by Age Only
-DATA.DIR.PRENATAL.AGE="../../data_raw/syphilis.manager/prenatal.care.cdc.wonder/age"
+DATA.DIR.PRENATAL.AGE="Q:/data_raw/syphilis.manager/prenatal.care.cdc.wonder/age"
 
 prenatal.age.files <- Sys.glob(paste0(DATA.DIR.PRENATAL.AGE, '/*.csv'))
 
@@ -131,7 +131,7 @@ for (data in prenatal.age.data.clean.put) {
 
 #Stratified by Race/eth Only
 #Note the data I pulled only includes age 15-44
-DATA.DIR.PRENATAL.RACE="../../data_raw/syphilis.manager/prenatal.care.cdc.wonder/race.eth"
+DATA.DIR.PRENATAL.RACE="Q:/data_raw/syphilis.manager/prenatal.care.cdc.wonder/race.eth"
 
 prenatal.race.files <- Sys.glob(paste0(DATA.DIR.PRENATAL.RACE, '/*.csv'))
 
@@ -211,7 +211,7 @@ for (data in prenatal.race.data.clean.put) {
 }
 
 #Stratified by race, eth, age
-DATA.DIR.PRENATAL.THREE="../../data_raw/syphilis.manager/prenatal.care.cdc.wonder/age.race.eth"
+DATA.DIR.PRENATAL.THREE="Q:/data_raw/syphilis.manager/prenatal.care.cdc.wonder/age.race.eth"
 
 prenatal.race.files.three <- Sys.glob(paste0(DATA.DIR.PRENATAL.THREE, '/*.csv'))
 
