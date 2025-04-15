@@ -1,4 +1,4 @@
-JHEEM_DIR = file.path("~/scr4-pkasaie1/", Sys.getenv("USER"), "jheem/code/jheem_analyses/")
+JHEEM_DIR = file.path("~/scr4_pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses/")
 print(JHEEM_DIR)
 setwd(JHEEM_DIR)  # Set working directory to ensure consistent paths
 
