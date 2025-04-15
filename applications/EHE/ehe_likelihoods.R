@@ -1,4 +1,5 @@
 source('../jheem_analyses/commoncode/locations_of_interest.R')
+source('../jheem_analyses/applications/EHE/ehe_aids_proportions_likelihood.R')
 # LIKELIHOODS INCLUDED: 
 # population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
@@ -1684,6 +1685,7 @@ trans.state.likelihood.instructions =
                                  cocaine.likelihood.instructions.trans,
                                  biased.hiv.mortality.likelihood.instructions.full,
                                  future.incidence.change.likelihood.instructions
+                                 #state.aids.diagnoses.proportions.instructions
                                  #weight = TRANSMISSION.WEIGHT
                                  
     )
