@@ -1680,11 +1680,13 @@ cat('*** Shield_specification.R completed! ***\n')
 #next steps ----
 # miscarriages due to untreated syphilis
 # deaths among infants born with congenital syphilis?
+# syphilis deaths (tertiary)
+# Emigration from US total 
 
 #'@Todd: we have modeled prenatal care coverage for congenital syphilis diagnosis, but we havent counted those new diagnosis and treatments that result for mothers 
-#'
-#'syphilis deaths?
-#'Emigration from US total 
-#'
-#'
 #'@Todd: how can we adjust the population size before 2010?
+#'@Todd: removing excess compartments/outcomes to speed up
+#'
+#'
+#'@PK: check parameterization: prop immediate diagnosis
+#'@PK: check parameterization: prop symptomatic women 
