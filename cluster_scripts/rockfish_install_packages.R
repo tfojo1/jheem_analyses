@@ -3,8 +3,8 @@
 
 ENV = Sys.getenv("R_LIBS_USER")
 INSTALLED.PACKAGES = rownames(installed.packages(lib.loc=ENV))
-CRAN.PACKAGES = c("ggmap", "httr2", "ggnewscale")
-GITHUB.PACKAGES = c("tfojo1/distributions", "tfojo1/Bayesian.simulations", "tfojo1/locations", "thk686/odeintr")
+CRAN.PACKAGES = c("ggmap", "httr2", "ggnewscale","deSolve")
+GITHUB.PACKAGES = c("tfojo1/distributions", "tfojo1/Bayesian.simulations", "tfojo1/locations")
 
 print("Installing required packages")
 
@@ -24,3 +24,7 @@ for (package.url in setdiff(GITHUB.PACKAGES, INSTALLED.PACKAGES)) {
 }
 
 print("Finished")
+
+devtools::install_github("tfojo1/distributions", lib=Sys.getenv("R_LIBS_USER"))
+#if receving an error, it could be the devtool:
+# install.packages("devtools", lib=Sys.getenv("R_LIBS_USER"))
