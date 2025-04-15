@@ -20,11 +20,12 @@ make.setup.scripts(MY_LOCATIONS,
                    register.calibration.path=register.calibration.path) 
 
 # makes the master scripts that calls individual scripts for every location specified above 
-make.setup.master.script(paste0("example_setup_script_",version,"_",calibration.code),
+make.setup.master.script(paste0(version,"_master_setup_",calibration.code),
                          locations=MY_LOCATIONS,
                          version=version,
                          calibration.code=calibration.code,
                          overwrite = overwrite)
+print(paste0("created ", version,"_master_setup_",calibration.code))
 
 
 ###### Run #####
@@ -38,12 +39,13 @@ make.run.scripts(MY_LOCATIONS,
                  specification.path=specification.path,
                  register.calibration.path=register.calibration.path,
                  chains=chains)
-make.run.master.script(paste0("example_run_script_",version,"_",calibration.code),
+make.run.master.script(paste0( version,"_master_run_",calibration.code),
                        locations=MY_LOCATIONS,
                        version=version,
                        calibration.code=calibration.code,
                        chains=chains,
                        overwrite = overwrite)
+print(paste0("created ",version,"_master_run_",calibration.code))
 
 ###### Assemble #####
 # make a script that will assemble the calibration
@@ -52,7 +54,7 @@ burn.keep <-  0 # get rid of first 1-XX%
 #this will take place on top of thinining that is set up in the calib-register 
 thin.keep <- 0 #e.g., 0.2=keep 1 out of every 5
 
-make.combined.assemble.script(paste0("example_assemble_script_",version,"_",calibration.code),
+make.combined.assemble.script(paste0(version,"_master_assemble_",calibration.code),
                               locations=MY_LOCATIONS,
                               version=version,
                               calibration.code=calibration.code,
@@ -61,6 +63,9 @@ make.combined.assemble.script(paste0("example_assemble_script_",version,"_",cali
                               specification.path=specification.path,
                               register.calibration.path=register.calibration.path,
                               overwrite = overwrite)
+print(paste0("created ",version,"_master_assemble_",calibration.code))
+
+
 
 ####
 # after this code is complete, you can run the "master" bash scripts:

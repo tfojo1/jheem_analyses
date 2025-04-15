@@ -22,7 +22,7 @@ source('../jheem_analyses/commoncode/cache_manager.R')
 if (USE.JHEEM2.PACKAGE){
   print("Using JHEEM2 package ... ")
   # update.jheem2.package() #will need to check the version and reinstall as needed 
-  library(jheem2)
+  # library(jheem2)
   print(check.jheem2.version())
   } 
   # option2: sourcing the code directly:
