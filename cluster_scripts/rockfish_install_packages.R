@@ -25,6 +25,6 @@ for (package.url in setdiff(GITHUB.PACKAGES, INSTALLED.PACKAGES)) {
 
 print("Finished")
 
-devtools::install_github("tfojo1/distributions", lib=Sys.getenv("R_LIBS_USER"))
+# devtools::install_github("tfojo1/distributions", lib=Sys.getenv("R_LIBS_USER"))
 #if receving an error, it could be the devtool:
 # install.packages("devtools", lib=Sys.getenv("R_LIBS_USER"))
