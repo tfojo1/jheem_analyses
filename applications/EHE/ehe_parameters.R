@@ -6,8 +6,8 @@
 ##------------------------------------##
 
 MSM.BASE.TRATE.MEAN = 1
-HET.BASE.TRATE.MEAN = .25 # from https://www.shelbytnhealth.com/DocumentCenter/View/608/Subsequent-HIV-Disease-Risk-Following-Syphilis-Diagnosis-in-a-Southern-MSM-Population-PDF?bidId=
-IDU.BASE.TRATE.MEAN = 12
+HET.BASE.TRATE.MEAN = .5 # 2 x from https://www.shelbytnhealth.com/DocumentCenter/View/608/Subsequent-HIV-Disease-Risk-Following-Syphilis-Diagnosis-in-a-Southern-MSM-Population-PDF?bidId=
+IDU.BASE.TRATE.MEAN = MSM.BASE.TRATE.MEAN * 3.1 / 4.7 # IDU and MSM peak trates are equal
 BASE.TRATE.CV = 20
 
 TRATE.RR.1.2.SPAN = 2#1.5
