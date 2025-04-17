@@ -8,7 +8,7 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 LOCATION='C.12580' #BALTIMORE.MSA
 CALIBRATION.CODE.TO.RUN='pop.demog.shield'
 # DATE=Sys.Date()
-DATE="2025-04-12"
+DATE="2025-04-16"
 
 # COMPLETE MCMC:Reading from file:
 load(paste0("../jheem_analyses/prelim_results/",CALIBRATION.CODE.TO.RUN,"_simset_",DATE,"_",LOCATION,".Rdata"))
@@ -60,11 +60,24 @@ simplot(
         dimension.values = list(year = 2000:2030)) 
 
 simplot(
+    # simset$first.sim(),
+    simset$last.sim(),
+    facet.by = "age",
+    outcomes = c("population"), 
+    dimension.values = list(year = 2000:2030)) 
+
+simplot(
         # simset$first.sim(),
         simset,
         outcomes = c("population"), 
         facet.by = "sex", split.by = "race", 
         dimension.values = list(year = 2000:2030)) 
+
+simplot(
+    simset$first.sim(),
+    outcomes = c("population"), 
+    facet.by = "sex", split.by = "race", 
+    dimension.values = list(year = 2000:2030)) 
 
 simplot(
         # simset$first.sim(),
@@ -80,12 +93,15 @@ simplot(
         outcomes = c("deaths"), 
         dimension.values = list(year = 1940:2030)) 
 
+# Deaths raw data is not showing stratified outcomes
 simplot(
         # simset$first.sim(),
         simset$last.sim(),
         split.by = "race", facet.by = "age",
         outcomes = c("deaths"), 
         dimension.values = list(year = 1940:2030)) 
+
+simplot.data.only(outcomes = c("deaths"), locations = 'C.12580')
 
 #Fertility
 simplot( simset$last.sim(),
@@ -105,6 +121,14 @@ simplot( simset$first.sim(),simset$last.sim(),
          split.by = "race", facet.by = "age",
          dimension.values = list(year = 2000:2030)) 
 
+
+#immigration
+
+simplot( simset$last.sim(),
+         split.by = "race",
+         outcomes = c("immigration"), 
+         dimension.values = list(year = 2000:2030)) 
+
 #is the chain mixing well?  Rhat: ratio of the parameter variance in all chains/average within chain variance
 #theoretically in the steady state, it should be close to 1
 simset$get.mcmc.mixing.statistic()
@@ -120,8 +144,8 @@ lik$compare.sims(simset$subset(2), simset$last.sim(), log = T) #ratio of last on
 
 
 
-save.simulation.set(simset$last.sim(), 
-                    "~/Downloads/last.sim.for.Ryan.Rdata")
+#save.simulation.set(simset$last.sim(), 
+#                    "~/Downloads/last.sim.for.Ryan.Rdata")
 
 
 #'@Ryan: to manually twick the parameters to find a better trajectory
@@ -131,3 +155,65 @@ save.simulation.set(simset$last.sim(),
 # params= simset$last.sim()$params
 # params['']try access the params manually and improve 
 # comparing likelihhoods
+
+# Issues needing correction: 1) Fertility rate too high for hispanic population.
+# 2) Mortality rate is ~50% higher than needs be.
+# 3) Population growth is flat (most important)
+
+# I will start with the fertility rates 
+
+# Extract the last simulation
+sim = simset$last.sim()
+
+# Modify the parameters
+params = sim$params
+#params['hispanic.fertility.rate.multiplier'] = 0.9
+
+params['other.fertility.rate.multiplier'] = 1.1
+
+#params["black.general.mortality.rate.multiplier"]   = 0.85
+#params["hispanic.general.mortality.rate.multiplier"] = 0.85
+#params["other.general.mortality.rate.multiplier"]   = 0.85
+#params["male.general.mortality.rate.multiplier"]     = 0.85
+#params["female.general.mortality.rate.multiplier"]   = 0.85
+
+
+# Assign the params to modified simulation
+engine = create.jheem.engine(version = 'shield', location = 'C.12580', end.year = 2030)
+
+sim.new = engine$run(params)
+
+#plot for fertility rate
+simplot( simset$last.sim(),
+         sim.new,
+         split.by = "race",
+         facet.by = "age",
+         outcomes = c("population"), 
+         dimension.values = list(year = 2000:2030)) 
+
+#plot for mortality
+simplot(
+    sim.new$last.sim(),
+    outcomes = c("deaths"), 
+    dimension.values = list(year = 1940:2030)) 
+
+
+#plot for population growth
+simplot(simset$last.sim(),
+        outcomes = c("population"), 
+        # dimension.values = list(year = 1940:2030))
+        dimension.values = list(year = 2000:2030))
+
+
+SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[,"C.12580"]
+
+
+rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity[,"C.12580",,])
+
+rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__age__race__ethnicity__sex[,"C.12580",,,,])
+
+
+lik = likelihood.instructions.demographics$instantiate.likelihood("shield", "C.12580")
+lik$compare.sims(simset$last.sim(), sim.new, piecewise = F)
+
+

@@ -35,7 +35,7 @@ This might look like this:
 
 ![](master_script_screenshot.png)
 
-### Run this master script from the command line of an interact session on the cluster
+### Run this master script from the command line on the cluster
 ```
 sbatch cluster_scripts/master_scripts/setup/my_example_setup_script.bat
 ```
@@ -55,7 +55,7 @@ make.run.master.script("my_example_run_script",
                        chains=1)
 ```
 
-### Run this master script from the command line of an interact session on the cluster
+### Run this master script from the command line on the cluster
 ```
 sbatch cluster_scripts/master_scripts/run/my_example_run_script.bat
 ```
@@ -83,7 +83,7 @@ make.combined.assemble.script("my_example_assemble_script",
 sbatch cluster_scripts/assemble_scripts/my_example_assemble_script.bat
 ```
 
-### Export the assembled simsets using SCP in the terminal of your local desktop
+### Export the assembled simsets using SCP in the terminal of your local desktop... or just click the download button if you have a GUI
 ```
 scp azalesak@rfdtn1.rockfish.jhu.edu:/scratch4/pkasaie1/azalesak/jheem/files/run_results/init.pop.ehe_simset_2024-12-16_C.12580.Rdata my_local_path/init.pop.ehe_simset_2024-12-16_C.12580.Rdata
 scp azalesak@rfdtn1.rockfish.jhu.edu:/scratch4/pkasaie1/azalesak/jheem/files/run_results/init.pop.ehe_simset_2024-12-16_C.12060.Rdata my_local_path/init.pop.ehe_simset_2024-12-16_C.12060.Rdata

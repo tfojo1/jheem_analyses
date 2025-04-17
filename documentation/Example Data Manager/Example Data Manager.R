@@ -28,7 +28,6 @@ data.manager$register.outcome(
 
 data.manager$register.parent.source('my.parent.source', full.name = 'Parent Source for Your Data', short.name= "my.parent.source")
 data.manager$register.source('child.source', parent.source= "my.parent.source", full.name = "Full Name of the Source", short.name='child.source') 
-data.manager$register.source('my.aggregated.data.source', parent.source= "my.parent.source", full.name = "My Aggregated Data", short.name='my.aggregated.data.source') #We'll create this source to represent data we will aggregate from state to national
 
 # Register Your Ontologies ------------------------------------------------
 

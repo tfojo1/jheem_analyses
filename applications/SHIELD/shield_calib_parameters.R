@@ -25,7 +25,16 @@ POPULATION.PARAMETERS.PRIOR=join.distributions(
   other.general.mortality.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   # Mortality rates by sex:
   male.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-  female.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2))
+  female.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)),
+  # Immigration coeffecients:
+  black.immigration.rate.multiplier.1= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  hispanic.immigration.rate.multiplier.1= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  other.immigration.rate.multiplier.1= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  
+  black.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  hispanic.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  other.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+  
 )
 ## AGING.PARAMETERS.PRIOR ----
 AGING.PARAMETERS.PRIOR=join.distributions( 
@@ -190,6 +199,36 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  dimension = "age",
                                                  applies.to.dimension.values = fertile.ages)
   
+  ## Immigration rates by race/age to time1/time2 knots----
+  #when we have a function with knots, we use alpha.name = time (taking one at a time)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "rate.immigration",
+                                                 alpha.name = "time.1",
+                                                 values = parameters[paste0(races,".immigration.rate.multiplier.1")],
+                                                 dimension = "race",
+                                                 applies.to.dimension.values = races)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "rate.immigration",
+                                                 alpha.name = "time.2",
+                                                 values = parameters[paste0(races,".immigration.rate.multiplier.2")],
+                                                 dimension = "race",
+                                                 applies.to.dimension.values = races)
+  
+  ## Emigration rates by race/age to time1/time2 knots----
+  #when we have a function with knots, we use alpha.name = time (taking one at a time)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "rate.emigration",
+                                                 alpha.name = "time.1",
+                                                 values = 1/parameters[paste0(races,".immigration.rate.multiplier.1")],
+                                                 dimension = "race",
+                                                 applies.to.dimension.values = races)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "rate.emigration",
+                                                 alpha.name = "time.2",
+                                                 values = 1/parameters[paste0(races,".immigration.rate.multiplier.2")],
+                                                 dimension = "race",
+                                                 applies.to.dimension.values = races)
+  
   
   ## Mortality rates by race----
   races=model.settings$specification.metadata$dim.names$race
@@ -256,7 +295,13 @@ SHIELD.POPULATION.SAMPLING.BLOCKS = list(
                             "other.general.mortality.rate.multiplier"),
   
   moratlity.rates.by.sex=c("male.general.mortality.rate.multiplier",
-                           "female.general.mortality.rate.multiplier")
+                           "female.general.mortality.rate.multiplier"),
+  black.immigration = c("black.immigration.rate.multiplier.1",
+                        "black.immigration.rate.multiplier.2" ),
+  hispanic.immigration = c("hispanic.immigration.rate.multiplier.1",
+                           "hispanic.immigration.rate.multiplier.2" ),
+  other.immigration = c("other.immigration.rate.multiplier.1",
+                           "other.immigration.rate.multiplier.2" )
 )
 ## SHIELD.AGING.SAMPLING.BLOCKS ---- 
 SHIELD.AGING.SAMPLING.BLOCKS = list(
