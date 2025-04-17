@@ -19,10 +19,6 @@ if (nchar(system.file(package='deSolve'))==0)
 if (nchar(system.file(package='plotly'))==0)
     install.packages('plotly')
 
-# Try Installing JHEEM2 directly
-if (nchar(system.file(package='jheem2'))==0)
-    devtools::install_github('tfojo1/jheem2')
-
 
 # Our Custom Packages
 if (nchar(system.file(package='distributions'))==0)
@@ -32,6 +28,10 @@ if (nchar(system.file(package='bayesian.simulations'))==0)
 if (nchar(system.file(package='locations'))==0)
     devtools::install_github('tfojo1/locations')
 
+
+# Try Installing JHEEM2 directly
+if (nchar(system.file(package='jheem2'))==0)
+    devtools::install_github('tfojo1/jheem2')
 
 # Other Github passages
 # if (nchar(system.file(package='odeintr'))==0)
