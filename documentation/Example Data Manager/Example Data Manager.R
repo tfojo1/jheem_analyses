@@ -84,20 +84,6 @@ data.manager$put.long.form(
     details = 'This is Example Data from Atlas Plus')
 }
 
-# Aggregate the State Data to National Level ------------------------------
-# source('data_processing/put_msa_data_as_new_source_script.R') #Source the code with the aggregation function
-# source('../jheem2/R/HELPERS_array_helpers.R') #Necessary array helpers
-# 
-# united.states.only = locations::get.contained.locations("US", "STATE")
-# 
-# put.msa.data.as.new.source(outcome = 'tb.cases',
-#                            from.source.name = 'child.source',
-#                            to.source.name = 'my.aggregated.data.source',
-#                            to.locations =  which.states.are.in.the.US,
-#                            geographic.type.from = 'STATE',
-#                            geographic.type.to = 'US',
-#                            details.for.new.data = 'national data estimated from state level data',
-#                            data.manager = data.manager)
 
 # Save your data manager (use the Q drive typically) --------------------------------
 
