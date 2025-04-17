@@ -1,20 +1,28 @@
 
-# Try Installing JHEEM2 directly
-if (nchar(system.file(package='jheem2'))==0)
-    devtools::install_github('tfojo1/jheem2')
+
+if (nchar(system.file(package='devtools'))==0)
+    install.packages('devtools')
 
 # CRAN Packages required for our custom packages
 if (nchar(system.file(package='ggmap'))==0)
-  install.packages('ggmap')
+    install.packages('ggmap')
 
 if (nchar(system.file(package='ggnewscale'))==0)
-  install.packages('ggnewscale')
+    install.packages('ggnewscale')
 
 if (nchar(system.file(package='httr2'))==0)
     install.packages('httr2')
 
 if (nchar(system.file(package='deSolve'))==0)
-  install.packages("deSolve")
+    install.packages("deSolve")
+
+if (nchar(system.file(package='plotly'))==0)
+    install.packages('plotly')
+
+# Try Installing JHEEM2 directly
+if (nchar(system.file(package='jheem2'))==0)
+    devtools::install_github('tfojo1/jheem2')
+
 
 # Our Custom Packages
 if (nchar(system.file(package='distributions'))==0)
