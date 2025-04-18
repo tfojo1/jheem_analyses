@@ -11,12 +11,12 @@
 #     c('C.40900', 'C.17460')
 # )[[7]]
 
+source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-LOCATIONS.TO.ATI = SACRAMENTO.MSA
+LOCATIONS.TO.ATI = RW.LOCATIONS # SACRAMENTO.MSA
 RESUME.FIRST = F
 RERUN = T
 
-source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
 for (loc in LOCATIONS.TO.ATI)
 {
