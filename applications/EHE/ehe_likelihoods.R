@@ -1790,7 +1790,10 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   # COVID LIKELIHOODS
   number.of.tests.year.on.year.change.likelihood.instructions,
   gonorrhea.year.on.year.change.likelihood.instructions,
-  ps.syphilis.year.on.year.change.likelihood.instructions
+  ps.syphilis.year.on.year.change.likelihood.instructions,
+  
+  # FUTURE INCIDENCE PENALTY
+  future.incidence.change.likelihood.instructions
 )
 
 # state-level full calibration 
@@ -1830,7 +1833,10 @@ full.state.likelihood.instructions = join.likelihood.instructions(
     # COVID LIKELIHOODS
     number.of.tests.year.on.year.change.likelihood.instructions,
     gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions
+    ps.syphilis.year.on.year.change.likelihood.instructions,
+    
+    # FUTURE INCIDENCE PENALTY
+    future.incidence.change.likelihood.instructions
 )
 
 full.state.plus.aids.prop.likelihood.instructions = join.likelihood.instructions(
@@ -1875,7 +1881,10 @@ full.state.overweighted.aids.likelihood.instructions = join.likelihood.instructi
     # COVID LIKELIHOODS
     number.of.tests.year.on.year.change.likelihood.instructions,
     gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions
+    ps.syphilis.year.on.year.change.likelihood.instructions,
+    
+    # FUTURE INCIDENCE PENALTY
+    future.incidence.change.likelihood.instructions
 )
 
 full.state.likelihood.instructions.5 = join.likelihood.instructions(
