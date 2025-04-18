@@ -2,6 +2,7 @@ library(jheem2)
 library(tidyverse)
 library(readxl)
 library(tools)
+library(locations)
 
 ###############################################################################
 
@@ -307,7 +308,7 @@ put.msa.data.as.new.source(outcome = 'no.prenatal.care',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
                            aggregate.counts.with.whatever.we.have = T,
-                           override.insufficent.denom.data.constraints = T,
+                           override.insufficient.denom.data.constraints = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.first.trimester',
@@ -320,7 +321,7 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.first.trimester',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
                            aggregate.counts.with.whatever.we.have = T,
-                           override.insufficent.denom.data.constraints = T,
+                           override.insufficient.denom.data.constraints = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.second.trimester',
@@ -333,7 +334,7 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.second.trimester'
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
                            aggregate.counts.with.whatever.we.have = T,
-                           override.insufficent.denom.data.constraints = T,
+                           override.insufficient.denom.data.constraints = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
@@ -346,7 +347,7 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
                            aggregate.counts.with.whatever.we.have = T,
-                           override.insufficent.denom.data.constraints = T,
+                           override.insufficient.denom.data.constraints = T,
                            data.manager = syphilis.manager)
 
 #The code 'fertility.rate.msa' sources another code 'aggregate.county.to.msa' which aggregates the fertility rate to MSA by aggregating
