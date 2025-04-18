@@ -1,8 +1,48 @@
 
+min.aids.diagnoses.penalty.instructions = create.custom.likelihood.instructions(
+    name = 'min.aids.diagnoses',
+    
+    compute.function = function(sim, data, log=T)
+    {
+        if (log)
+        {
+            penalty = -Inf
+            score = 0
+        }
+        else
+        {
+            penalty = 0
+            score = 1
+        }
+        
+        if (any(sim$params[data$trate0.param.names] > sim$params[data$peak.trate.param.names]))
+            penalty
+        else
+            score
+    },
+    
+    get.data.function = function(version, location)
+    {
+        YEARS = as.character(1992:1996)
+        MIN.FRAC = rep(3/4)
+        names(MIN.FRAC) = YEARS
+        MIN.FRAC['1993'] = 0.5
+        
+        aids.dx = SURVEILLANCE.MANAGER$pull('aids.diagnoses',
+                                            location = location,
+                                            keep.dimensions = c('year','location'))
+        aids.dx = rowMeans(aids.dx, na.rm=T)
+        
+        list(
+            peak.trate.param.names = sort(peak.trate.param.names),
+            trate0.param.names = sort(trate0.param.names)
+        )
+    }
+)
 
 
 state.aids.diagnoses.proportions.instructions = create.custom.likelihood.instructions(
-    name = 'aids.diagnoses.proportions',
+    name = 'aids.diagnoses.stratified.proportions',
     
     compute.function = function(sim, data, log=T)
     {
@@ -194,8 +234,126 @@ state.aids.diagnoses.proportions.instructions = create.custom.likelihood.instruc
     }
 )
 
-# lik = state.aids.diagnoses.proportions.instructions$instantiate.likelihood('ehe','FL')
-# lik$compute(sim)
+
+state.aids.diagnoses.ratio.instructions = create.custom.likelihood.instructions(
+    name = 'aids.diagnoses.total.ratio',
+    
+    compute.function = function(sim, data, log=T)
+    {
+        sim.aids = sim$get('aids.diagnoses', 
+                                year = c(data$rel.to.year, data$years),
+                                keep.dimensions = c('year'))
+        
+        sim.aids.ratios = sim.aids[data$years,1] / sim.aids[data$rel.to.year,1]
+        
+        print(cbind(sim=sim.aids.ratios, obs=data$obs.aids.dx.ratio))
+        d = dnorm(data$obs.aids.dx.ratio, mean=sim.aids.ratios, sd=data$sds, log=log)
+
+        # RETURN
+        if (log)
+            sum(d)
+        else
+            prod(d)
+        
+    },
+    
+    get.data.function = function(version, location)
+    {
+        REL.TO.YEAR = as.character(1985)
+        YEARS = as.character(1988:1993)
+        GAP.AFTER.REL.TO = as.numeric(YEARS[1]) - as.numeric(REL.TO.YEAR)
+        
+        spec.meta = get.specification.metadata(version, location)
+        sim.meta = get.simulation.metadata(version, location, from.year = 1970, to.year = 2030)
+        
+        if (get.location.type(location)!='STATE')
+            stop("This custom likelihood only works for states")
+        
+        msas = get.overlapping.locations(location, 'CBSA')
+        
+        # Pull MSA aids
+        msa.aids.dx = SURVEILLANCE.MANAGER$pull('aids.diagnoses',
+                                                location = msas,
+                                                source='cdc.aids',
+                                                keep.dimensions = c('year','location'))
+        aggregate.msa.aids.dx = apply(msa.aids.dx, c('year'), sum, na.rm=T)
+        ratios.msa.aids.dx = aggregate.msa.aids.dx /aggregate.msa.aids.dx['1985']
+        
+        
+        # Pull state aids dx
+        state.aids.dx = SURVEILLANCE.MANAGER$pull('aids.diagnoses',
+                                                     location = location,
+                                                     keep.dimensions = c('year','location'))
+        
+        
+        state.aids.dx = rowMeans(state.aids.dx, na.rm=T)
+        overlapping.years = intersect(names(state.aids.dx), names(aggregate.msa.aids.dx))
+        
+        rel.errors = ( aggregate.msa.aids.dx[overlapping.years[-1-0:GAP.AFTER.REL.TO] ] / aggregate.msa.aids.dx[ overlapping.years[1] ] -
+                          state.aids.dx[ overlapping.years[-1-0:GAP.AFTER.REL.TO] ] / state.aids.dx[ overlapping.years[1] ] ) /
+            (state.aids.dx[ overlapping.years[-1-0:GAP.AFTER.REL.TO] ] / state.aids.dx[ overlapping.years[1] ])
+        
+        # df = data.frame(
+        #     var = rel.errors^2,
+        #     delta = (GAP.AFTER.REL.TO):(length(overlapping.years)-2)
+        # )
+        # fit = lm(var ~ delta, data=df)
+        
+        cv = sqrt(mean(rel.errors^2))
+        
+        # Package up
+        
+        data = new.env()
+        data$obs.aids.dx.ratio = ratios.msa.aids.dx[YEARS]
+        data$years = YEARS
+        data$rel.to.year = REL.TO.YEAR
+        data$sds = data$obs.aids.dx.ratio * cv
+
+        # Return
+        data
+    }
+)
+
+trate.peak.penalty.likelihood.instructions = create.custom.likelihood.instructions(
+    name = 'aids.diagnoses.total.ratio',
+    
+    compute.function = function(sim, data, log=T)
+    {
+        if (log)
+        {
+            penalty = -Inf
+            score = 0
+        }
+        else
+        {
+            penalty = 0
+            score = 1
+        }
+        
+        if (any(sim$params[data$trate0.param.names] > sim$params[data$peak.trate.param.names]))
+            penalty
+        else
+            score
+    },
+    
+    get.data.function = function(version, location)
+    {
+        param.names = get.parameter.names.for.version(version, 'calibrated')
+        peak.trate.param.names = param.names[grepl('trate.*peak', param.names)]
+        trate0.param.names = param.names[grepl('trate.*0', param.names)]
+        
+        list(
+            peak.trate.param.names = sort(peak.trate.param.names),
+            trate0.param.names = sort(trate0.param.names)
+        )
+    }
+)
+
+
+prop.lik = state.aids.diagnoses.ratio.instructions$instantiate.likelihood('ehe','FL')
+
+ # lik = state.aids.diagnoses.ratio.instructions$instantiate.likelihood('ehe','FL')
+ # lik$compute(sim)
 
 # 
 # states = c('AL','LA','FL','TX','GA','CA','NY','MO','IL','MS')
