@@ -1,4 +1,4 @@
-LOCATION = "CA" # LOCATION.LIST[LOCATION.INDEX]
+LOCATION = "MO" # LOCATION.LIST[LOCATION.INDEX]
 print(LOCATION)
 
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
@@ -13,11 +13,11 @@ CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POPULATION, # 1
                              CALIBRATION.CODE.FULL.PLUS.COVID, # 3
                              CALIBRATION.CODE.EHE.FINAL, # 4
                              # STATE-SPECIFIC trans, full, and final 
-                             CALIBRATION.CODE.TRANS.STATE, # 5
-                             CALIBRATION.CODE.FULL.STATE, # 6
-                             CALIBRATION.CODE.EHE.FINAL.STATE # 7
-                             )[5]
-CALIBRATION.CODES.TO.RUN = c(CALIBRATION.CODE.POP.STATE.4, CALIBRATION.CODE.TRANS.STATE.4)
+                             CALIBRATION.CODE.POP.STATE, # 5
+                             CALIBRATION.CODE.TRANS.STATE, # 6
+                             CALIBRATION.CODE.FULL.STATE, # 7
+                             CALIBRATION.CODE.EHE.FINAL.STATE # 8
+                             )[5:7]
 
 RESUME.FIRST = F
 
