@@ -2090,58 +2090,8 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   future.incidence.change.likelihood.instructions
 )
 
-# state-level full calibration 
+# state-level full calibration (used to be version 7, called full.state.weighted.likelihood.instructions)
 full.state.likelihood.instructions = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    population.likelihood.instructions.full, 
-    immigration.likelihood.instructions.full, 
-    emigration.likelihood.instructions.full,
-    
-    # TRANSMISSION LIKELIHOODS
-    total.new.diagnoses.16x.cv.expv.likelihood.instructions,
-    new.diagnoses.2x.one.way.cv.expv.likelihood.instructions,
-    new.diagnoses.halfx.cv.expv.likelihood.instructions,
-    
-    total.prevalence.16x.cv.expv.likelihood.instructions,
-    prevalence.2x.one.way.cv.and.exp.v.likelihood.instructions,
-    prevalence.halfx.cv.and.exp.v.likelihood.instructions,
-    
-    # MORTALITY LIKELIHOODS
-    biased.hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.16x.likelihood.instructions,
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.likelihood.instructions,
-    hiv.test.positivity.likelihood.instructions, 
-    awareness.likelihood.instructions,
-    suppression.likelihood.instructions,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.likelihood.instructions.full,
-    cocaine.likelihood.instructions.full,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions,
-    
-    # FUTURE INCIDENCE PENALTY
-    future.incidence.change.likelihood.instructions
-)
-
-full.state.plus.aids.prop.likelihood.instructions = join.likelihood.instructions(
-    full.state.likelihood.instructions,
-    state.aids.diagnoses.proportions.instructions
-)
-
-full.state.weighted.likelihood.instructions = join.likelihood.instructions(
     # POPULATION LIKELIHOODS
     join.likelihood.instructions(
         population.likelihood.instructions.full, 
@@ -2156,7 +2106,7 @@ full.state.weighted.likelihood.instructions = join.likelihood.instructions(
     total.new.diagnoses.24x.cv.likelihood.instructions,
     new.diagnoses.1.5x.one.way.cv.likelihood.instructions,
     new.diagnoses.halfx.cv.likelihood.instructions,
-
+    
     total.prevalence.24x.cv.likelihood.instructions,
     prevalence.1.5x.one.way.cv.likelihood.instructions,
     prevalence.halfx.cv.likelihood.instructions,
@@ -2191,56 +2141,61 @@ full.state.weighted.likelihood.instructions = join.likelihood.instructions(
     future.incidence.change.likelihood.instructions
 )
 
-full.state.weighted.likelihood.instructions.2 = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    join.likelihood.instructions(
-        population.likelihood.instructions.full, 
-        additional.weights = 1/16),
-    
-    join.likelihood.instructions(
-        immigration.likelihood.instructions.full, 
-        emigration.likelihood.instructions.full,
-        additional.weights = 1/4),
-    
-    # TRANSMISSION LIKELIHOODS
-    total.new.diagnoses.24x.cv.likelihood.instructions.state,
-    new.diagnoses.1.5x.one.way.cv.likelihood.instructions.state,
-    new.diagnoses.halfx.cv.likelihood.instructions.state,
-    
-    total.prevalence.24x.cv.likelihood.instructions.state,
-    prevalence.1.5x.one.way.cv.likelihood.instructions.state,
-    prevalence.halfx.cv.likelihood.instructions.state,
-    
-    # MORTALITY LIKELIHOODS
-    biased.hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.16x.likelihood.instructions.state,
-    # state.aids.diagnoses.proportions.instructions,
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.likelihood.instructions,
-    hiv.test.positivity.likelihood.instructions, 
-    awareness.likelihood.instructions,
-    suppression.likelihood.instructions,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.likelihood.instructions.full,
-    cocaine.likelihood.instructions.full,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions,
-    
-    # FUTURE INCIDENCE PENALTY
-    future.incidence.change.likelihood.instructions
-)
+# full.state.plus.aids.prop.likelihood.instructions = join.likelihood.instructions(
+#     full.state.likelihood.instructions,
+#     state.aids.diagnoses.proportions.instructions
+# )
+
+# full.state.weighted.likelihood.instructions.2 = join.likelihood.instructions(
+#     # POPULATION LIKELIHOODS
+#     join.likelihood.instructions(
+#         population.likelihood.instructions.full, 
+#         additional.weights = 1/16),
+#     
+#     join.likelihood.instructions(
+#         immigration.likelihood.instructions.full, 
+#         emigration.likelihood.instructions.full,
+#         additional.weights = 1/4),
+#     
+#     # TRANSMISSION LIKELIHOODS
+#     total.new.diagnoses.24x.cv.likelihood.instructions.state,
+#     new.diagnoses.1.5x.one.way.cv.likelihood.instructions.state,
+#     new.diagnoses.halfx.cv.likelihood.instructions.state,
+#     
+#     total.prevalence.24x.cv.likelihood.instructions.state,
+#     prevalence.1.5x.one.way.cv.likelihood.instructions.state,
+#     prevalence.halfx.cv.likelihood.instructions.state,
+#     
+#     # MORTALITY LIKELIHOODS
+#     biased.hiv.mortality.likelihood.instructions.full,
+#     general.mortality.likelihood.instructions.full,
+#     
+#     # AIDS DIAGNOSES LIKELIHOOD
+#     non.age.aids.diagnoses.16x.likelihood.instructions.state,
+#     # state.aids.diagnoses.proportions.instructions,
+#     
+#     # CONTINUUM LIKELIHOODS
+#     proportion.tested.likelihood.instructions,
+#     hiv.test.positivity.likelihood.instructions, 
+#     awareness.likelihood.instructions,
+#     suppression.likelihood.instructions,
+#     
+#     # PREP LIKELIHOODS
+#     prep.uptake.likelihood.instructions,
+#     prep.indications.likelihood.instructions,
+#     
+#     # IDU LIKELIHOODS
+#     heroin.likelihood.instructions.full,
+#     cocaine.likelihood.instructions.full,
+#     
+#     # COVID LIKELIHOODS
+#     number.of.tests.year.on.year.change.likelihood.instructions,
+#     gonorrhea.year.on.year.change.likelihood.instructions,
+#     ps.syphilis.year.on.year.change.likelihood.instructions,
+#     
+#     # FUTURE INCIDENCE PENALTY
+#     future.incidence.change.likelihood.instructions
+# )
 
 FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
