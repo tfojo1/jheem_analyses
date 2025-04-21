@@ -458,13 +458,18 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     #products of 
     # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
     # 2) ratio of condomless vaginal sex (male vs female)
-    male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
-    
+    black.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
+    hispanic.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
+    other.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
+
     #idu by sex from table 9 and 10 from
     #  https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf
     # RR of prob of daily use (heroin) * prob of needle sharing
-    female.vs.heterosexual.male.idu.susceptibility.rr = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
-    
+    female.vs.heterosexual.male.idu.susceptibility.rr.peak = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
+    female.vs.heterosexual.male.idu.susceptibility.rr.0 = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
+    female.vs.heterosexual.male.idu.susceptibility.rr.1 = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
+    female.vs.heterosexual.male.idu.susceptibility.rr.2 = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
+
     #-- HIV Testing --#
     
     # Testing by Risk
@@ -618,8 +623,11 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     other.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
     msm.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
 
-    idu.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
-    idu.relapse.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    idu.remission.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
+    idu.remission.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
+
+    idu.relapse.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
+    idu.relapse.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
 
     idu.mortality.0 = Lognormal.Distribution(log(0.0166), 0.1322), 
     idu.mortality.1 = Lognormal.Distribution(log(0.0166), 0.1322), 
@@ -1167,7 +1175,10 @@ BASE.HIV.SAMPLING.BLOCKS = list(
 
     heterosexual.fraction.trate.change.after.t2 = 'heterosexual.fraction.trate.change.after.t2',
     
-    male.vs.female.heterosexual.rr = 'male.vs.female.heterosexual.rr',
+    male.vs.female.heterosexual.rr = c(
+        'black.male.vs.female.heterosexual.rr',
+        'hispanic.male.vs.female.heterosexual.rr',
+        'other.male.vs.female.heterosexual.rr'),
 
     heterosexual.age.susceptibility.01 = c(
       'age1.heterosexual.susceptibility.rr.01',
@@ -1219,8 +1230,13 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     
     idu.fraction.trate.change.after.t2 = 'idu.fraction.trate.change.after.t2',
     
-    female.vs.heterosexual.male.idu.susceptibility = 'female.vs.heterosexual.male.idu.susceptibility.rr',
-    
+    female.vs.heterosexual.male.idu.susceptibility = c(
+        'female.vs.heterosexual.male.idu.susceptibility.rr.peak',
+        'female.vs.heterosexual.male.idu.susceptibility.rr.0',
+        'female.vs.heterosexual.male.idu.susceptibility.rr.1',
+        'female.vs.heterosexual.male.idu.susceptibility.rr.2'
+    ),
+
     msm.idu.transmission = c(
       'msm.idu.susceptibility.rr.peak',
       'msm.idu.susceptibility.rr.0',
@@ -1274,8 +1290,10 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'age5.incident.idu.multiplier'
     ),
     
-    other.idu.transitions = c('idu.remission.multiplier',
-                              'idu.relapse.multiplier'),
+    other.idu.transitions = c('idu.remission.multiplier.1',
+                              'idu.remission.multiplier.2',
+                              'idu.relapse.multiplier.1',
+                              'idu.relapse.multiplier.2'),
     
     diagnosed.transmission = c('diagnosed.transmission.rr',
                                'global.trate'),

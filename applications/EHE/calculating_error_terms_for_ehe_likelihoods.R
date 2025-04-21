@@ -179,12 +179,16 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
   }
   else if (output=='cv')
   {
-    cv = sqrt(sum(e^2/x^2)/n) 
-    log.l = sum(dnorm(e, mean=0, sd=cv*x, log=T))
-    
-    print(paste0("With CV = ", cv, ", log L = ", log.l))
-    
-    cv
+        mask = x != 0
+        e = e[mask]
+        x = x[mask]
+          
+        cv = sqrt(sum(e^2/x^2)/n) 
+        log.l = sum(dnorm(e, mean=0, sd=cv*x, log=T))
+        
+        print(paste0("With CV = ", cv, ", log L = ", log.l))
+        
+        cv
   }
   else if (output=='cv.sqrt')
   {

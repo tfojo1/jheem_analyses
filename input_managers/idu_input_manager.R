@@ -329,8 +329,7 @@ get.idu.relapse.rates <- function(specification.metadata)
 ##------------------------------##
 get.incident.idu.model <- function(specification.metadata,
                                    static,
-                                   knot.times=c("time0" = 1980,
-                                                "time1" = 2000,
+                                   knot.times=c("time1" = 2000,
                                                 "time2" = 2016)) # if I add a spline time, fix parameter_mapping and prior
 {
   rates = get.idu.incidence.rates(specification.metadata = specification.metadata)
@@ -354,7 +353,7 @@ get.incident.idu.model <- function(specification.metadata,
 
 get.idu.remission.model <- function(specification.metadata,
                                     static,
-                                    knot.times=c("time0" = 2000,
+                                    knot.times=c("time1" = 2000,
                                                  "time2" = 2016))
 {
   rates = get.idu.remission.rates(specification.metadata = specification.metadata)
@@ -378,7 +377,7 @@ get.idu.remission.model <- function(specification.metadata,
 
 get.idu.relapse.model <- function(specification.metadata,
                                   static,
-                                  knot.times=c("time0" = 2000,
+                                  knot.times=c("time1" = 2000,
                                                "time2" = 2016))
 {
   rates = get.idu.relapse.rates(specification.metadata = specification.metadata)

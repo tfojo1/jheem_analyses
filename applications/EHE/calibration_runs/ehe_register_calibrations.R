@@ -11,12 +11,12 @@ CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
 CALIBRATION.CODE.POP.STATE = 'pop.ehe.state'
 CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
-CALIBRATION.CODE.FULL.STATE.2 = 'full.ehe.state.2'
-CALIBRATION.CODE.FULL.STATE.4 = 'full.ehe.state.4'
+CALIBRATION.CODE.FULL.STATE.7 = 'full.ehe.state.7'
+CALIBRATION.CODE.FULL.STATE.8 = 'full.ehe.state.8'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
-N.ITER.POP = 25000
-N.ITER.TRANS = 25000
+N.ITER.POP = 20000
+N.ITER.TRANS = 20000
 N.ITER.FULL = 50000
 N.ITER.FINAL = 250000
 
@@ -60,9 +60,13 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                                           grepl('needle\\.sharing.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('incident\\.idu', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('idu\\.initial\\.prevalence', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('remission', EHE.PARAMETERS.PRIOR@var.names) |
+                                                          grepl('relapse', EHE.PARAMETERS.PRIOR@var.names) | 
+                                                          grepl('idu.mortality', EHE.PARAMETERS.PRIOR@var.names) |
                                                           grepl('fraction\\.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
                                                           grepl('oe', EHE.PARAMETERS.PRIOR@var.names) | 
-                                                          grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) 
+                                                          grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names)  |
+                                                          grepl('male\\.vs\\.female\\.heterosexual\\.rr', EHE.PARAMETERS.PRIOR@var.names)
                                             # grepl('susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) |   
                                             # grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
                                                           ]
@@ -72,20 +76,9 @@ par.names.transmission = c(par.names.transmission,
                            "unsuppressed.hiv.mortality.0",
                            "unsuppressed.hiv.mortality.1",
                            "hiv.general.mortality.multiplier",
-                           # 'msm.testing.ramp.1.or',
-                           # 'msm.testing.ramp.2.or',
-                           # 'heterosexual.testing.ramp.1.or',
-                           # 'heterosexual.testing.ramp.2.or',
-                           # 'idu.testing.ramp.1.or',
-                           # 'idu.testing.ramp.2.or',
-                           'idu.remission.multiplier',
-                           'idu.relapse.multiplier',
                            'aids.to.new.diagnoses.ratio.peak',
                            'aids.to.new.diagnoses.ratio.0',
-                           'aids.to.new.diagnoses.ratio.1',
-                           'idu.mortality.0',
-                           'idu.mortality.1',
-                           'idu.mortality.2'
+                           'aids.to.new.diagnoses.ratio.1'
 )
 
 par.aliases.transmission = list(
@@ -237,8 +230,10 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE,
                           description = "Full with covid likelihoods"
 )
 
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.4,
-                          likelihood.instructions = full.state.overweighted.aids.likelihood.instructions,
+
+# state-level full calibration - removed AIDS deaths 
+register.calibration.info(CALIBRATION.CODE.FULL.STATE.7,
+                          likelihood.instructions = full.state.weighted.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -250,21 +245,8 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE.4,
                           description = "Full with covid likelihoods"
 )
 
-register.calibration.info('full.from.pop',
-                          likelihood.instructions = full.state.likelihood.instructions,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
-                          thin = 200, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.POP.STATE),
-                          description = "Full with covid likelihoods"
-)
-
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
-                          likelihood.instructions = full.state.plus.aids.prop.likelihood.instructions,
+register.calibration.info(CALIBRATION.CODE.FULL.STATE.8,
+                          likelihood.instructions = full.state.weighted.likelihood.instructions.2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -273,7 +255,7 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE),
-                          description = "Full with covid likelihoods plus aids proportions"
+                          description = "Full with covid likelihoods"
 )
 
 # state-level final calibration 

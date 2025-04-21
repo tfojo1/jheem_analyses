@@ -40,18 +40,55 @@ register.model.quantity(CDCT.SPECIFICATION,
 
 track.integrated.outcome(CDCT.SPECIFICATION,
                          name = 'cdc.funded.tests.in.uninfected',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Number of HIV Tests Among Uninfected',
-                                                                    description = "Number of HIV Tests Done Among Uninfected in the Past Year",
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'uninfected',
+                         multiply.by = 'cdc.funded.general.population.testing',
+                         keep.dimensions = c('location'),
+                         save = F)
+
+track.integrated.outcome(CDCT.SPECIFICATION,
+                         name = 'cumulative.fraction.diagnoses.from.cdc',
+                         outcome.metadata = NULL,
+                         scale = 'proportion',
+                         value.to.integrate = 'fraction.diagnoses.from.cdc',
+                         denominator.outcome = 'new',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = F)
+
+track.cumulative.outcome(CDCT.SPECIFICATION,
+                         name = 'cdc.funded.diagnoses',
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         value = expression(new * cumulative.fraction.diagnoses.from.cdc),
+                         keep.dimensions = c('location'),
+                         save = F)
+
+track.cumulative.outcome(CDCT.SPECIFICATION,
+                         name = 'cdc.funded.tests',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Number of CDC-Funded HIV Tests',
+                                                                    description = "Number of CDC-Funded cleaHIV Tests Done in the Past Year",
                                                                     scale = 'non.negative.number',
                                                                     axis.name = 'Tests',
                                                                     units = 'tests',
                                                                     singular.unit = 'test'),
                          scale = 'non.negative.number',
-                         value.to.integrate = 'uninfected',
-                         multiply.by = 'cdc.funded.general.population.testing',
-                         save = F)
+                         value = expression(cdc.funded.diagnoses + cdc.funded.tests.in.uninfected),
+                         keep.dimensions = c('location'))
 
-
+track.cumulative.outcome(CDCT.SPECIFICATION,
+                         name = 'cdc.hiv.test.positivity',
+                         corresponding.data.outcome = 'cdc.hiv.test.positivity',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of CDC-funded HIV Tests that are Positive',
+                                                                    description = "Proportion of CDC-funded HIV Tests that are Positive",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion positive',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = 'cdc.funded.diagnoses',
+                         value.is.numerator = T,
+                         denominator.outcome = 'cdc.funded.tests',
+                         keep.dimensions = 'location')
 
 ##-- REGISTER IT! --##
 
