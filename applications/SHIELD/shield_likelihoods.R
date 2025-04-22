@@ -28,7 +28,7 @@ w=c(w1,w2)
 population.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.sim = "population",
                                        outcome.for.data = "population", 
-                                       
+                                       na.rm =T,
                                        dimensions = c("age","sex","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g., age race)
                                        from.year = 2010, # the year calibration starts (population size and demographics are fix to 2007)
@@ -70,9 +70,10 @@ deaths.likelihood.instructions =
                                        from.year = 2010, 
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
-                                       error.variance.type = 'cv'
+                                       error.variance.type = 'cv',
                                        # weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R
                                        # equalize.weight.by.year = T
+                                       na.rm =T
   )
 
 #** FETILITY RATE **  ----
@@ -87,7 +88,8 @@ fertility.likelihood.instructions =
                                        from.year = 2010,  #data available from 2007-2023
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
-                                       error.variance.type = 'cv'
+                                       error.variance.type = 'cv',
+                                       na.rm =T
   )
 
 #** MIGRATION **  ----
@@ -100,11 +102,13 @@ immigration.likelihood.instructions =
                                        dimensions = c('age','race','sex'), 
                                        levels.of.stratification = c(0,1),
                                        from.year = 2011, 
+                                       to.year=2020,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary ???
                                        error.variance.type = 'cv',
                                        weights = 1,
-                                       equalize.weight.by.year = T
+                                       equalize.weight.by.year = T,
+                                       na.rm =T
   )
 
 emigration.likelihood.instructions = 
@@ -114,11 +118,13 @@ emigration.likelihood.instructions =
                                         dimensions = c("age","race"), 
                                         levels.of.stratification = c(0,1,2),
                                         from.year = 2011, 
+                                        to.year=2020,
                                         observation.correlation.form = 'compound.symmetry', 
                                         error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                         error.variance.type = 'cv',
                                         weights = 1,
-                                        equalize.weight.by.year = T
+                                        equalize.weight.by.year = T,
+                                        na.rm =T
   )
 
 
