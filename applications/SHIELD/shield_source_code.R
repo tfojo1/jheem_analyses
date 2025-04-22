@@ -1,7 +1,7 @@
 cat("*** Running Shield_source_code.R ***\n")
 # detach("package:jheem2", character.only = TRUE, unload = TRUE)
 
-rm(list = ls())
+# rm(list = ls())
 NEW.SOURCE=T
 USE.JHEEM2.PACKAGE=T
 
@@ -54,8 +54,6 @@ source('../jheem_analyses/commoncode/file_paths.R')
 library(reshape2)
 library(locations)
 library(distributions)
-
- 
 
 #
 set.jheem.root.directory(ROOT.DIR)
