@@ -134,7 +134,7 @@ emigration.likelihood.instructions =
 ps.diagnosis.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                        outcome.for.data = "ps.syphilis.diagnoses",  
-                                          
+                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 2000,
@@ -183,7 +183,7 @@ total.diagnosis.likelihood.instructions =
                                        error.variance.term = 0.05, 
                                        error.variance.type = 'cv',
                                        minimum.error.sd = 1 #
-                                       )
+  )
 
 ##---- Congenital ----
 #poportion of state level births that are complicated by congenital syphilis 
@@ -345,25 +345,25 @@ likelihood.instructions.all =  join.likelihood.instructions(
   population.likelihood.instructions ,
   deaths.likelihood.instructions,
   fertility.likelihood.instructions,
-
+  
   immigration.likelihood.instructions,
   emigration.likelihood.instructions,
-
+  
   ps.diagnosis.likelihood.instructions,
   early.diagnosis.likelihood.instructions,
   late.diagnosis.likelihood.instructions,
   total.diagnosis.likelihood.instructions,
-
+  
   prenatal.care.first.trimester.likelihood.instructions,
   prenatal.care.second.trimester.likelihood.instructions,
   prenatal.care.third.trimester.likelihood.instructions,
   no.prenatal.care.likelihood.instructions,
-
+  
   hiv.testing.likelihood.instructions
   
 )
 likelihood.instructions.demographics=join.likelihood.instructions(
-  population.likelihood.instructions ,
+  population.likelihood.instructions,
   deaths.likelihood.instructions,
   fertility.likelihood.instructions,
   

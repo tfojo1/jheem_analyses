@@ -23,7 +23,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 #
 LOCATION='C.12580'
 set.seed(00000)
-CALIBRATION.NAME = 'pop.demog.shield.pk1' 
+CALIBRATION.NAME = 'pop.demog.pk.wEmigration' 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
 # clear.calibration.cache(version='shield',
@@ -47,7 +47,7 @@ mcmc = run.calibration(version = 'shield',
                        location = LOCATION,
                        calibration.code = CALIBRATION.NAME,
                        chains = 1,
-                       update.frequency = 20,
+                       update.frequency = 50,
                        update.detail = 'med')
 end.time = Sys.time()
 run.time = as.numeric(end.time) - as.numeric(start.time)
@@ -57,15 +57,11 @@ print(paste0("DONE RUNNING MCMC: Took ",
              " simulations (",
              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
 
-# Save sim
-# sim = mcmc@simulations[[length(mcmc@simulations)]]
-# save(sim,file=paste0("prelim_results/",CALIBRATION.NAME,"_",Sys.Date(),"_",LOCATION,".Rdata"))
-
 # Save simset
 simset = assemble.simulations.from.calibration(version = 'shield',
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
-
-/100
+filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+save(simset,file=filename)
 print(paste0("Simet was saved on disk as:   ", filename))
