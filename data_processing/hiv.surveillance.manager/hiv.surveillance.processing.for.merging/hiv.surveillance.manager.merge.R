@@ -1,11 +1,11 @@
 #Use this code to merge the different saved sections of the HIV surveillance manager into a complete version
 
 # PROCESS -----------------------------------------------------------------
-source('data_processing/hiv.surveillance.processing.for.merging/section.1.processing.R')
-source('data_processing/hiv.surveillance.processing.for.merging/section.2.processing.R')
-source('data_processing/hiv.surveillance.processing.for.merging/section.3.processing.R')
-source('data_processing/hiv.surveillance.processing.for.merging/section.4.processing.R')
-source('data_processing/hiv.surveillance.processing.for.merging/section.5.processing.R')
+# source('data_processing/hiv.surveillance.processing.for.merging/section.1.processing.R')
+# source('data_processing/hiv.surveillance.processing.for.merging/section.2.processing.R')
+# source('data_processing/hiv.surveillance.processing.for.merging/section.3.processing.R')
+# source('data_processing/hiv.surveillance.processing.for.merging/section.4.processing.R')
+# source('data_processing/hiv.surveillance.processing.for.merging/section.5.processing.R')
 
 # MERGE -------------------------------------------------------------------
 
