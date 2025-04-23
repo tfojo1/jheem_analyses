@@ -260,7 +260,9 @@ population.race.eth.sex <- county_agegr_sex_race_eth_10.19%>%
                           combined.race == "NHBA" ~ "black",
                           combined.race == "NHIA" ~ "american indian and alaska native",
                           combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
-                          combined.race == "NHWA" ~ "white"))%>%
+                          combined.race == "NHWA" ~ "white",
+                          combined.race == "HTOM" ~ "two or more races",
+                          combined.race == "NHTOM" ~ "two or more races"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
