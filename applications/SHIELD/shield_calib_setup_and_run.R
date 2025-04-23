@@ -17,20 +17,20 @@
 ##----
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-source('../jheem_analyses/applications/SHIELD/calibration/shield_calib_register.R')
+source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
 #
 LOCATION='C.12580'
 set.seed(00000)
-CALIBRATION.NAME = 'pop.demog.shield' 
+CALIBRATION.NAME = 'pop.demog.shield.pk1' 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
-clear.calibration.cache(version='shield',
-                        location=LOCATION,
-                        calibration.code = CALIBRATION.NAME,
-                        allow.remove.incomplete = T)
-print("Cashe is cleared")
+# clear.calibration.cache(version='shield',
+#                         location=LOCATION,
+#                         calibration.code = CALIBRATION.NAME,
+#                         allow.remove.incomplete = T)
+# print("Cashe is cleared")
 #
 set.up.calibration(version='shield',
                    location=LOCATION,
@@ -42,11 +42,6 @@ print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.locati
 
 # Run calibration ----
 start.time = Sys.time()
-print(ggplot2::qplot(1,1) + 
-        ggplot2::ggtitle(paste0(LOCATION, " - ", 
-                                locations::get.location.name(LOCATION), " - ",
-                                CALIBRATION.NAME)))
-
 print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
 mcmc = run.calibration(version = 'shield',
                        location = LOCATION,
@@ -71,10 +66,6 @@ simset = assemble.simulations.from.calibration(version = 'shield',
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
-# 
-# simset = simset$burn(keep = 0.5)
-# simset = simset$thin(keep = 50)
-# 
-filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
-save(simset,file=filename)
+
+/100
 print(paste0("Simet was saved on disk as:   ", filename))

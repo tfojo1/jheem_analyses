@@ -6,9 +6,9 @@ source.style.manager = create.style.manager(color.data.by = "source")
 stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
 LOCATION='C.12580' #BALTIMORE.MSA
-CALIBRATION.CODE.TO.RUN='pop.demog.shield'
+CALIBRATION.CODE.TO.RUN='pop.demog.shield.pk'
 # DATE=Sys.Date()
-DATE="2025-04-18"
+DATE="2025-04-22"
 
 #sumamry: 
 #04.14: PK: I removed initially infected popualtion to speed up the sims #check base_params prp.of.initial.population.infected.syphilis=0
@@ -32,8 +32,11 @@ if(1==2){
                                                        location = LOCATION,
                                                        calibration.code = CALIBRATION.CODE.TO.RUN,
                                                        allow.incomplete = T);
+      
 }
 simset=simset;simset
+# filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+# save(simset,file=filename)
 
 # REVIEW-----
 simset$n.sim
