@@ -1,38 +1,41 @@
 #EHE Intervention Effects on Racial Disparities in HIV Incidence
 #Code to run interventions and output results.
 
+#devtools::install_github("tfojo1/jheem2")
+#devtools::install_github("tfojo1/locations")
+#devtools::install_github("tfojo1/distributions")
+
 library(dplyr)
 library(tidyverse)
 library(tidycensus)
 library(jheem2)
 
-#devtools::install_github("tfojo1/jheem2")
-#devtools::install_github("tfojo1/locations")
-#devtools::install_github("tfojo1/distributions")
-
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
 ### Load simsets and plot baseline incidence through 2025
-load_simset <- function(date, msa){
-  load(paste("../jheem_analyses/applications/ehe_disparities/simset_",date,"_C.",msa,".Rdata",sep=""))
-  simset$save()
-  apply(simset$get(outcomes='incidence',keep.dimensions='year')/simset$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-  simplot(simset,'incidence', split.by='race')
-}
+#load_simset <- function(date, msa){
+#  load(paste("../jheem_analyses/applications/ehe_disparities/simset_",date,"_C.",msa,".Rdata",sep=""))
+#  simset$save()
+#  apply(simset$get(outcomes='incidence',keep.dimensions='year')/simset$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+#  simplot(simset,'incidence', split.by='race')
+#}
 
-load_simset(date="2025_01-31", msa="12060") #Atlanta
-load_simset(date="2025_01-31", msa="12580") #Baltimore
-load_simset(date="2025_01-31", msa="16980") #Chicago
-load_simset(date="2025_01-31", msa="26420") #Houston
-load_simset(date="2025_01-31", msa="35620") #NYC
+#load_simset(date="2025_01-31", msa="12060") #Atlanta
+#load_simset(date="2025_01-31", msa="12580") #Baltimore
+#load_simset(date="2025_01-31", msa="16980") #Chicago
+#load_simset(date="2025_01-31", msa="26420") #Houston
+#load_simset(date="2025_01-31", msa="35620") #NYC
 
-CALIBRATION.CODE="full.with.covid2"
-LOCATIONS=c("C.12060","C.12580","C.26420","C.35620") #,"C.16980"
+source("../jheem_analyses/commoncode/locations_of_interest.R")
+
+CALIBRATION.CODE="final.ehe"
+LOCATIONS=MSAS.OF.INTEREST[1:4] #run in parallel (total=33)
 INTERVENTIONS=c("noint", "fullint")
+NSIM=1000
 
 ### Run a set of interventions and select relevant results
 collection=create.simset.collection(version="ehe", calibration.code = CALIBRATION.CODE, 
-                                    locations = LOCATIONS, interventions = INTERVENTIONS, n.sim=100)
+                                    locations = LOCATIONS, interventions = INTERVENTIONS, n.sim = NSIM)
 
 collection$run(2025, 2035, verbose=TRUE, stop.for.errors=T, overwrite.prior=F)
 
@@ -250,7 +253,8 @@ file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.1
 load(file)
 int=simset
 apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(int,'incidence', split.by='race')
+simplot(int,'incidence', split.by='race', summary.type = 'median.and.interval')
+
 
 #Baltimore
 #no intervention
@@ -258,14 +262,14 @@ file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.1
 load(file)
 noint=simset
 apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(noint,'incidence', split.by='race')
+simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
 
 #full intervention (through 2030)
 file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.12580',intervention.code='fullint',sub.version=NULL,n.sim=100)
 load(file)
 int=simset
 apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(int,'incidence', split.by='race')
+simplot(int,'incidence', split.by='race', summary.type = 'median.and.interval')
 
 #Houston
 #no intervention
@@ -273,14 +277,14 @@ file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.2
 load(file)
 noint=simset
 apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(noint,'incidence', split.by='race')
+simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
 
 #full intervention (through 2030)
 file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.26420',intervention.code='fullint',sub.version=NULL,n.sim=100)
 load(file)
 int=simset
 apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(int,'incidence', split.by='race')
+simplot(int,'incidence', split.by='race', summary.type = 'median.and.interval')
 
 #New York
 #no intervention
@@ -288,11 +292,11 @@ file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.3
 load(file)
 noint=simset
 apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(noint,'incidence', split.by='race')
+simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
 
 #full intervention (through 2030)
 file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.35620',intervention.code='fullint',sub.version=NULL,n.sim=100)
 load(file)
 int=simset
 apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(int,'incidence', split.by='race')
+simplot(int,'incidence', split.by='race', summary.type = 'median.and.interval')
