@@ -55,10 +55,10 @@ simplot(
         simset$last.sim(),
         # facet.by = "age",
         # facet.by = "sex",
-        # facet.by = "race",
+        facet.by = "race",
         split.by = "race", facet.by = 'age',
-        # facet.by = "sex", split.by = "race",
-        # facet.by = "sex", split.by = "age", 
+        #facet.by = "sex", split.by = "race",
+         #facet.by = "sex", split.by = "age", 
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
 
@@ -103,30 +103,33 @@ simset$traceplot("mortality")
 simset$traceplot("fertility")
 
 # MANUAL SIM TEST ----
-# params=simset$last.sim()$params
-# # engine=create.jheem.engine('shield','C.12580',end.year = 2030)
-# sim1=engine$run(params)
-# 
-# params['other.fertility.rate.multiplier']=.8
-# sim2=engine$run(params)
+ params=simset$last.sim()$params
+ engine=create.jheem.engine('shield','C.12580',end.year = 2030)
+ sim1=engine$run(params)
+ 
+ params['age64.other.aging.rate.multiplier.2']=1
+ sim2=engine$run(params)
 
+source("applications/SHIELD/debug_likelihoods.R")
 #instantiate added likelihoods:
 lik=likelihood.instructions.demographics$instantiate.likelihood('shield','C.12580')
 lik.sex.race=population.likelihood.instructions.2way.sex.race$instantiate.likelihood('shield','C.12580')
 lik.sex.age=population.likelihood.instructions.2way.sex.age$instantiate.likelihood('shield','C.12580')
 lik.age.race=population.likelihood.instructions.2way.age.race$instantiate.likelihood('shield','C.12580')
+lik.age = population.likelihood.instructions.1way.age$instantiate.likelihood('shield','C.12580')
 #compute and compare:
 lik.age.race$compare.sims(sim1, sim2,piecewise = T)
 lik.sex.age$compare.sims(sim1, sim2,piecewise = T)
-lik.sex.race$compare.sims(sim1, sim2,piecewise = T)
+lik.sex.race$compare.sims(sim1, sim2, piecewise = T)
+lik.age$compare.sims(sim1, sim2, piecewise = T, log = T) #sim2/sim1
 
 simplot(
   # simset$first.sim(),
   sim1,
-  # sim2,
+  sim2,
   # facet.by = "age",
   # facet.by = "sex",
-  facet.by = "age",split.by="race",
+   facet.by = "age",split.by="race",
   # facet.by = "age",split.by="sex",
   # facet.by = "race",
   outcomes = c("population"), 
