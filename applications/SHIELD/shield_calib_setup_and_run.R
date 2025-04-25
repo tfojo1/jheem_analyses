@@ -23,7 +23,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 #
 LOCATION='C.12580'
 set.seed(00000)
-CALIBRATION.NAME = 'pop.demog.pk.wEmigration' 
+CALIBRATION.NAME = 'pop.demog.2' 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
 # clear.calibration.cache(version='shield',
