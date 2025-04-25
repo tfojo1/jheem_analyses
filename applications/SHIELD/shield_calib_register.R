@@ -5,7 +5,8 @@ N.ITER=15000
 #04.14: PK: I removed initial infected population to speed up the sims #check base_params prp.of.initial.population.infected.syphilis=0
 #04.18: Ryan added immigration parameters
 #04.23: <pop.demog.1> we found discrepancies in the population size, Zoe is working on a fix
-#04.25: <pop.demog.2> Zoe has update the Surveillance data by race for the population. Running the calibration with 6 immegration parameters. 
+#04.25: <pop.demog.2> Zoe has update the Surveillance data by race for the population. Running the calibration with 6 immegration parameters, 
+#04.25: <pop.demog.wEmigration> same chain run with 6 parameters by Ryan
 
 
 register.calibration.info('pop.demog.2', 
