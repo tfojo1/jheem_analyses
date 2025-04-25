@@ -3,7 +3,7 @@
 # PrEP Data from Atlas Plus -----------------------------------------------
 
 #Atlas Plus Prep data
-DATA.DIR.ATLAS.PREP="../../data_raw/prep/atlas_plus"
+DATA.DIR.ATLAS.PREP="Q:/data_raw/prep/atlas_plus"
 
 #---PrEP Data from Atlas Plus---#
 atlas_prep_files <- Sys.glob(paste0(DATA.DIR.ATLAS.PREP, '/*.csv'))
@@ -189,7 +189,7 @@ for (data in indications_all) {
 ###Read in Aids Vu PrEP Excel Datasets###
 ################################################################################
 
-DATA.DIR.PREP="../../data_raw/prep/aidsvu"
+DATA.DIR.PREP="Q:/data_raw/prep/aidsvu"
 
 prep_files <- Sys.glob(paste0(DATA.DIR.PREP, '/*.xlsx'))
 data.list.prep <- lapply(prep_files, function(x){

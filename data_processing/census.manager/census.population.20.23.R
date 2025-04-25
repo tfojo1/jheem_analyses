@@ -8,7 +8,7 @@
 #For ethnicity: total NH male + NH female (NH_MALE, NH_FEMALE); 
 #then Hispanic male + Hispanic female (H-MALE, H_FEMALE)
 
-DATA.DIR.POP.20.23 = "../../data_raw/population/county_20.23"
+DATA.DIR.POP.20.23 = "Q:/data_raw/population/county_20.23"
 
 pop.20.23 <- Sys.glob(paste0(DATA.DIR.POP.20.23, '/*.csv'))
 
@@ -30,7 +30,8 @@ census.race.mappings.20.23 = c('WA' = 'white',
                            'BA' = 'black',
                            'IA'= 'american indian and alaska native',
                            'AA' = 'asian',
-                           'NA' = 'native hawaiian and other pacific islander')
+                           'NA' = 'native hawaiian and other pacific islander', 
+                           'TOM' = 'two or more races')
 census.eth.mappings.20.23 = c(  'H' = 'hispanic',
                            'NH' = 'not hispanic')
 census.age.mappings.20.23 = c('1' = '0-4 years', 
@@ -108,14 +109,14 @@ census.age.mappings.two.20.23 = c('UNDER5' = '0-4 years',
 
 population.race.20.23 <- county_agegr_sex_race_eth.20.23%>%
   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
-         NA_MALE, NA_FEMALE)%>%
+         NA_MALE, NA_FEMALE, TOM_MALE, TOM_FEMALE)%>%
   filter(YEAR != "1")%>% #remove the april population estimate
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
   mutate(location = paste(STATE, COUNTY, sep=""))%>%
   filter(AGEGRP == "0")%>% #only selecting the total here
   pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
-                             "NA_MALE", "NA_FEMALE")), 
+                             "NA_MALE", "NA_FEMALE", "TOM_MALE", "TOM_FEMALE")), 
                names_to = c("race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -183,13 +184,13 @@ population.ethnicity.20.23= as.data.frame(population.ethnicity.20.23)
 
 population.race.age.20.23 <- county_agegr_sex_race_eth.20.23%>%
   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
-         NA_MALE, NA_FEMALE)%>%
+         NA_MALE, NA_FEMALE, TOM_FEMALE, TOM_MALE)%>%
   filter(YEAR != "1")%>% #remove the april population estimate
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
   mutate(location = paste(STATE, COUNTY, sep=""))%>%
   pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
-                             "NA_MALE", "NA_FEMALE")), 
+                             "NA_MALE", "NA_FEMALE", "TOM_MALE", "TOM_FEMALE")), 
                names_to = c("race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -267,7 +268,8 @@ population.race.eth.sex.20.23 <- county_agegr_sex_race_eth.20.23%>%
          HAA_MALE, HAA_FEMALE, NHAA_MALE, NHAA_FEMALE,
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
-         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE, 
+         NHTOM_MALE, NHTOM_FEMALE, HTOM_MALE, HTOM_FEMALE)%>%
   filter(YEAR != "1")%>% #remove the april population estimate
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
@@ -277,7 +279,8 @@ population.race.eth.sex.20.23 <- county_agegr_sex_race_eth.20.23%>%
                              "HAA_MALE", "HAA_FEMALE", "NHAA_MALE", "NHAA_FEMALE",
                              "HBA_MALE", "HBA_FEMALE", "NHBA_MALE", "NHBA_FEMALE",
                              "HWA_MALE", "HWA_FEMALE", "NHWA_MALE", "NHWA_FEMALE",
-                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE")), 
+                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE",
+                             "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE")), 
                names_to = c("combined.race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -291,7 +294,9 @@ population.race.eth.sex.20.23 <- county_agegr_sex_race_eth.20.23%>%
                           combined.race == "NHBA" ~ "black",
                           combined.race == "NHIA" ~ "american indian and alaska native",
                           combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
-                          combined.race == "NHWA" ~ "white"))%>%
+                          combined.race == "NHWA" ~ "white",
+                          combined.race == "HTOM" ~ "two or more races",
+                          combined.race == "NHTOM" ~ "two or more races"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.20.23[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
@@ -309,7 +314,8 @@ population.age.race.eth.20.23 <- county_agegr_sex_race_eth.20.23%>%
          HAA_MALE, HAA_FEMALE, NHAA_MALE, NHAA_FEMALE,
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
-         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE,
+         NHTOM_MALE, NHTOM_FEMALE, HTOM_MALE, HTOM_FEMALE)%>%
   filter(YEAR != "1")%>% #remove the april population estimate
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
@@ -319,7 +325,8 @@ population.age.race.eth.20.23 <- county_agegr_sex_race_eth.20.23%>%
                              "HAA_MALE", "HAA_FEMALE", "NHAA_MALE", "NHAA_FEMALE",
                              "HBA_MALE", "HBA_FEMALE", "NHBA_MALE", "NHBA_FEMALE",
                              "HWA_MALE", "HWA_FEMALE", "NHWA_MALE", "NHWA_FEMALE",
-                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE")), 
+                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE",
+                             "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE")), 
                names_to = c("combined.race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -333,7 +340,9 @@ population.age.race.eth.20.23 <- county_agegr_sex_race_eth.20.23%>%
                           combined.race == "NHBA" ~ "black",
                           combined.race == "NHIA" ~ "american indian and alaska native",
                           combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
-                          combined.race == "NHWA" ~ "white"))%>%
+                          combined.race == "NHWA" ~ "white",
+                          combined.race == "HTOM" ~ "two or more races",
+                          combined.race == "NHTOM" ~ "two or more races"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.20.23[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
@@ -369,7 +378,8 @@ population.race.eth.sex.age.20.23 <- county_agegr_sex_race_eth.20.23%>%
          HAA_MALE, HAA_FEMALE, NHAA_MALE, NHAA_FEMALE,
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
-         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE,
+         NHTOM_MALE, NHTOM_FEMALE, HTOM_MALE, HTOM_FEMALE)%>%
   filter(YEAR != "1")%>% #remove the april population estimate
   mutate(STATE = str_pad(STATE, width=2, side="left", pad="0"))%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
@@ -379,7 +389,8 @@ population.race.eth.sex.age.20.23 <- county_agegr_sex_race_eth.20.23%>%
                              "HAA_MALE", "HAA_FEMALE", "NHAA_MALE", "NHAA_FEMALE",
                              "HBA_MALE", "HBA_FEMALE", "NHBA_MALE", "NHBA_FEMALE",
                              "HWA_MALE", "HWA_FEMALE", "NHWA_MALE", "NHWA_FEMALE",
-                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE")), 
+                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE",
+                             "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE")), 
                names_to = c("combined.race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -393,7 +404,9 @@ population.race.eth.sex.age.20.23 <- county_agegr_sex_race_eth.20.23%>%
                           combined.race == "NHBA" ~ "black",
                           combined.race == "NHIA" ~ "american indian and alaska native",
                           combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
-                          combined.race == "NHWA" ~ "white"))%>%
+                          combined.race == "NHWA" ~ "white",
+                          combined.race == "HTOM" ~ "two or more races",
+                          combined.race == "NHTOM" ~ "two or more races"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.20.23[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
@@ -439,7 +452,7 @@ for (data in stratified.20.23.data) {
     data = data,
     ontology.name = 'stratified.census',
     source = 'census.population',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('two or more races')),
     url = 'www.census.gov',
     details = 'Census Reporting')
 }
@@ -448,7 +461,7 @@ for (data in stratified.20.23.data) {
 ##############################################################################
 #ADDING A SECTION FOR SINGLE YEAR AGES TO ASSESS HOW WE WANT TO DO THINGS
 ##############################################################################
-DATA.DIR.POP.20.23.AGE = "../../data_raw/population/county_20.23/single_year_ages"
+DATA.DIR.POP.20.23.AGE = "Q:/data_raw/population/county_20.23/single_year_ages"
 
 pop.20.23.single.year.age <- Sys.glob(paste0(DATA.DIR.POP.20.23.AGE, '/*.csv'))
 

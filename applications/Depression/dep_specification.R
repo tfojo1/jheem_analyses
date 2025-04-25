@@ -363,6 +363,7 @@ track.integrated.outcome(DEP.SPECIFICATION,
                          value.to.integrate = 'infected',
                          multiply.by = 'depression.proportion.tx',
                          keep.dimensions = c('location','age','race','sex','risk'),
+                         subset.dimension.values = list(depression='depressed'),
                          save = T)
 
 track.cumulative.outcome(DEP.SPECIFICATION,

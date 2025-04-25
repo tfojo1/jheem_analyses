@@ -1,9 +1,0 @@
-[1] "Loading Source Files..."
-*** Running Shiled_specification.R ***
-*** Running Shield_source_code.R ***
-Checking JHEEM_ANALYSIS repository status.... 
-Already up to date.
-Error in eval(ei, envir) : 
-  No 'cached' directory exists - you need to get this from Todd's One-Drive
-Calls: source ... eval -> eval -> source -> withVisible -> eval -> eval
-Execution halted

@@ -1,36 +1,28 @@
 # Rockfish Setup and Usage Instructions
 Andrew Zalesak
 
-December 19, 2024
+Updated April 16th, 2025
 
 ## Documentation
 Rockfish has decent documentation on its website, although it didn’t answer a few of the questions I had. The main User Guide is [here](https://www.arch.jhu.edu/guide/) and some other information can be found under the “Support” tab. The Rockfish tech support are kind and helpful and can be contacted at help@rockfish.jhu.edu with questions.
 
+I **STRONGLY** recommend that you use a Graphical User Interface (GUI) for accessing the cluster instead of just the terminal, because you will find searching your directories and uploading/downloading files *VASTLY* easier that way. Examples include MobaXterm and VSCode.
+
 ## Setup
 
 ### 1. Join Rockfish
-Make sure you’ve got a Rockfish account and are on Parastu’s allocation (pkasaie1). If so, you can log in on a Windows PowerShell (or other shell) using `ssh -X <username>@login.rockfish.jhu.edu` and then supplying your Rockfish-specific password. This will start you on a Login Node, which is good for setting up file organization but shouldn’t be used for running R. You’ll want to be familiar with basic Unix commands to move between directories (`cd`) and view contents (`ls`).
+Make sure you’ve got a Rockfish account and are on Parastu’s allocation (pkasaie1). If so, you can log in on a Windows PowerShell (or your favorite GUI -- see above) using `ssh <username>@login.rockfish.jhu.edu` and then supplying your Rockfish-specific password. This will start you on a Login Node, which is good for setting up file organization but shouldn’t be used for running R. You’ll want to be familiar with basic Unix commands to move between directories (`cd`) and view contents (`ls`).
 
 ###	2. Set up directories
-My home directory shows a sub-directory called `scr4_pkasaie1`, which stands for “Parastu’s Scratch 4” directory. Under this directory, I have a directory called `azalesak` (my Rockfish username), and then below that have the same structure we typically use on the team: `jheem` with two directories `code` and `files`. `files` will be where calibration data is written to. `code` will be where our code repositories like `jheem_analyses` will reside. Make these directories with `mkdir <directory_name>` and remove them with `rmdir <directory_name>` if you need. Do not create directories for any repositories yet, because we will create those automatically by cloning from Github.
+In your command line, run the following: `mkdir -p $HOME/src4_pkasaie1/$USER/jheem/{code,files}` to create the directory structure we all use, but specific to your user's subdirectory of `src4_pkasaie1`. Note that "src4_pkasaie1" is a shortcut for `scratch4/pkasaie1`.
 
 ### 3. Clone repositories
-Follow the instructions [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) for cloning a repository using the “SSH” method to clone the `jheem_analyses` repository from Github (https://github.com/tfojo1/jheem_analyses). I can’t recall exactly what I did, but it probably required setting up an SSH key as described here. Note that to use Git operations on Rockfish, you may have to load the `git` module, using the terminal command `module load git`. Our goal is to have everything on Rockfish using jheem2 in package form, but if that’s not available yet, then you’ll want to clone the jheem2 repository from Github as well (https://github.com/tfojo1/jheem2)
+Navigate to your newly created directory "code" with `cd $HOME/src4_pkasaie1/$USER/jheem/code`. Follow the instructions [here](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) for cloning a repository using the “SSH” method to clone the `jheem_analyses` repository from Github (https://github.com/tfojo1/jheem_analyses). I can’t recall exactly what I did, but it probably required setting up an SSH key as described here. Note that to use Git operations on Rockfish, you may have to load the `git` module, using the terminal command `module load git`. Our goal is to have everything on Rockfish using jheem2 in package form, but if that’s not available yet, then you’ll want to clone the jheem2 repository from Github as well (https://github.com/tfojo1/jheem2)
 
 ### 4. Install R packages
-Since installing R packages involves running R, you should be doing this on an Interact Node. You can request and switch to this with a command like `interact -t 8:00:00 -n 6`, which in this case is requesting six cores for eight hours. We want to install these packages, which are dependencies of our jheem2 package and some helpers in jheem_analyses.
+Before you install, make sure you have the R modules loaded by typing `source cluster_scripts/Rockfish_module_loads.sh` from your `jheem_analyses` directory. Then, install the needed packages with `Rscript cluster_scripts/rockfish_install_packages.R`. If any installations fail, you should be able to see which ones they are and then reach out to me to solve any issues.
 
-- ggmap
-- ggnewscale
-- httr2
-- tfojo1/distributions
-- tfojo1/Bayesian.simulations
-- tfojo1/locations
-- thk686/odeintr
-
-Before you install, make sure you have the R modules loaded by typing `source cluster_scripts/Rockfish_module_loads.sh` from your `jheem_analyses` directory. Then, install the packages with `Rscript cluster_scripts/install_packages.R`. If any installations fail, you should be able to see which ones they are and then reach out to me to solve any issues.
-
-### 5. Import required objects through SCP
+### 5. Import required objects through drag-and-drop... or SCP if you don't have a GUI
 There are several R data objects that most JHEEM model specifications use that are not transferred through Git, like data managers. Since these objects are not terribly large (at most around 100 MB), they can be imported easily from your local desktop to Rockfish with the `scp` command. Although we’ve written code to automatically download certain data managers from the Internet, I used SCP to bring these in on my first attempt since I was already doing so for some other cached objects. The full list of the required non-Git-controlled objects, as far as I know, is:
 
 - census.manager.rdata
@@ -40,6 +32,8 @@ There are several R data objects that most JHEEM model specifications use that a
 - national.surveillance.Rdata
 - surveillance.manager.rdata
 - syphilis.manager.rdata
+
+*Note that if you have a nice GUI (see above), you can just drag and drop these files straight onto the cluster and avoid using SCP commands entirely!*
 
 To put these in using SCP, use your PowerShell from outside of Rockfish (quit Rockfish using `exit` as many times as needed). You’ll want to know the path on your own computer to where you’ve stored these objects, and you’ll want to know where you’re going to put them on Rockfish. The rough syntax for SCP file transfer is `scp <path_to_local_object> <rockfish_address>:<rockfish_file_path>`. I recommend using `cd` or similar on your desktop to get straight to where these files are located, so that the `<path_to_local_object>` can just be the file name, like `census.manager.rdata`. The `<rockfish_address>` is going to be your Rockfish username followed by an “@” sign and then the address of the Rockfish data transfer node, which is `rfdtn1.rockfish.jhu.edu`. The destination file is going to look a little different from how it is when you’re in Rockfish, because some of the directories you see, like `scr4_pkasaie1`, are actually symbolic links to places like `scratch4/pkasaie1`. For me to import a `census.manager.rdata` object that I’ve navigated to locally into my Rockfish directory `HOME/scr4_pkasaie1/azalesak/jheem/code/jheem_analyses/cached`, I would use the following full SCP command:
 

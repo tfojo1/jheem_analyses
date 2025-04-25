@@ -1,6 +1,7 @@
 
 
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
+source('../jheem_analyses/applications/ryan_white/ryan_white_specification_helpers.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_parameters.R')
 
 source('../jheem_analyses/applications/ryan_white/process_rw_data_for_priors.R')
@@ -100,9 +101,9 @@ register.model.quantity(RW.SPECIFICATION,
                         name = 'proportion.pwh.with.rw.without.adap.or.oahs',
                         value = expression(proportion.pwh.with.non.adap.rw * (1-proportion.non.adap.rw.with.adap) * (1-proportion.non.adap.rw.with.oahs)))
 
-# register.model.quantity(RW.SPECIFICATION,
-#                         name = 'proportion.pwh.with.rw',
-#                         value = expression(proportion.pwh.with.adap + proportion.pwh.with.oahs.without.adap + proportion.pwh.with.rw.without.adap.or.oahs))
+register.model.quantity(RW.SPECIFICATION,
+                        name = 'proportion.pwh.with.rw',
+                        value = expression(proportion.pwh.with.adap + proportion.pwh.with.oahs.without.adap + proportion.pwh.with.rw.without.adap.or.oahs))
 
 
 ##-------------------------------------------------------------##
@@ -136,19 +137,56 @@ register.model.quantity(RW.SPECIFICATION,
 ##---------------------------------------##
 
 register.model.element(RW.SPECIFICATION,
+                       name = 'fraction.medicaid.expansion',
+                       scale = 'proportion',
+                       get.value.function = get.fraction.medicaid.expansion)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'adap.suppression.expansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'oahs.suppression.expansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'rw.support.suppression.expansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'adap.suppression.nonexpansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'oahs.suppression.nonexpansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+register.model.element(RW.SPECIFICATION,
+                       name = 'rw.support.suppression.nonexpansion.effect',
+                       scale = 'proportion',
+                       value = 1)
+
+
+register.model.quantity(RW.SPECIFICATION,
                        name = 'adap.suppression.effect',
                        scale = 'proportion',
-                       value = 1)
+                       value = expression(adap.suppression.expansion.effect * fraction.medicaid.expansion + adap.suppression.nonexpansion.effect * (1-fraction.medicaid.expansion)))
 
-register.model.element(RW.SPECIFICATION,
+register.model.quantity(RW.SPECIFICATION,
                        name = 'oahs.suppression.effect',
                        scale = 'proportion',
-                       value = 1)
+                       value = expression(oahs.suppression.expansion.effect * fraction.medicaid.expansion + oahs.suppression.nonexpansion.effect * (1-fraction.medicaid.expansion)))
 
-register.model.element(RW.SPECIFICATION,
+register.model.quantity(RW.SPECIFICATION,
                        name = 'rw.support.suppression.effect',
                        scale = 'proportion',
-                       value = 1)
+                       value = expression(rw.support.suppression.expansion.effect * fraction.medicaid.expansion + rw.support.suppression.nonexpansion.effect * (1-fraction.medicaid.expansion)))
 
 
 register.model.quantity(RW.SPECIFICATION,
@@ -163,12 +201,28 @@ register.model.quantity(RW.SPECIFICATION,
 ##-- OUTCOMES --##
 ##--------------##
 
+
 track.integrated.outcome(RW.SPECIFICATION,
-                         name = 'non.adap.clients',
+                         name = 'rw.clients',
                          outcome.metadata = create.outcome.metadata(display.name = 'Ryan White Clients',
                                                                     description = "Number of Individuals Receiving any Ryan White Services",
                                                                     scale = 'non.negative.number',
-                                                                    axis.name = 'Cases',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.with.rw',
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = NULL,
+                         save = T)
+
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'non.adap.clients',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Non-ADAP Clients',
+                                                                    description = "Number of Individuals Receiving any non-ADAP Ryan White Services",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Clients',
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'infected',
@@ -180,10 +234,10 @@ track.integrated.outcome(RW.SPECIFICATION,
 
 track.integrated.outcome(RW.SPECIFICATION,
                          name = 'adap.clients',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Ryan White Clients',
-                                                                    description = "Number of Individuals Receiving any Ryan White Services",
+                         outcome.metadata = create.outcome.metadata(display.name = 'ADAP Clients',
+                                                                    description = "Number of Individuals Receiving AIDS Drug Assistance Program through Ryan White",
                                                                     scale = 'non.negative.number',
-                                                                    axis.name = 'Cases',
+                                                                    axis.name = 'Clients',
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'infected',
@@ -195,10 +249,10 @@ track.integrated.outcome(RW.SPECIFICATION,
 
 track.integrated.outcome(RW.SPECIFICATION,
                          name = 'oahs.clients',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Ryan White Clients',
-                                                                    description = "Number of Individuals Receiving any Ryan White Services",
+                         outcome.metadata = create.outcome.metadata(display.name = 'OAHS Clients',
+                                                                    description = "Number of Individuals Receiving any Outpatient Ambulatory Health Services through Ryan White",
                                                                     scale = 'non.negative.number',
-                                                                    axis.name = 'Cases',
+                                                                    axis.name = 'Clients',
                                                                     units = 'people',
                                                                     singular.unit = 'person'),
                          value.to.integrate = 'infected',
@@ -225,10 +279,26 @@ track.integrated.outcome(RW.SPECIFICATION,
                          corresponding.data.outcome = 'adap.proportion',
                          save = T)
 
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'adap.proportion.of.diagnosed',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of PWH on ADAP',
+                                                                    description = "Proportion of People with Diagnosed HIV Receiving any AIDs Drug Assistance Program Services",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.with.adap',
+                         denominator.outcome = 'diagnosed.prevalence',
+                         value.is.numerator = T,
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location','age','race','sex'),
+                         corresponding.data.outcome = 'adap.proportion.of.diagnosed',
+                         save = T)
 
 track.integrated.outcome(RW.SPECIFICATION,
                          name = 'oahs.suppression',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Ryan White OAHS Clients Suppressed',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Suppression Among OAHS Clients',
                                                                     description = "Proportion of Ryan White Outpatient Ambulatory Health Services Clients who are Virally Suppressed",
                                                                     scale = 'proportion',
                                                                     axis.name = 'Proportion',
@@ -240,13 +310,13 @@ track.integrated.outcome(RW.SPECIFICATION,
                          value.is.numerator = T,
                          subset.dimension.values = list(continuum='diagnosed.states'),
                          keep.dimensions = c('location','age','race','sex','risk'),
-                         corresponding.data.outcome = 'non.adap.viral.suppression',
+                         corresponding.data.outcome = 'oahs.suppression',
                          save = T)
 
 track.integrated.outcome(RW.SPECIFICATION,
                          name = 'adap.suppression',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of ADAP Suppressed',
-                                                                    description = "Proportion of Ryan White ADAP Clients who are Virally Suppressed",
+                         outcome.metadata = create.outcome.metadata(display.name = 'Suppression Among ADAP Clients',
+                                                                    description = "Proportion of Ryan White AIDS Drug Assistance Program Clients who are Virally Suppressed",
                                                                     scale = 'proportion',
                                                                     axis.name = 'Proportion',
                                                                     units = '%',
@@ -257,8 +327,85 @@ track.integrated.outcome(RW.SPECIFICATION,
                          value.is.numerator = T,
                          subset.dimension.values = list(continuum='diagnosed.states'),
                          keep.dimensions = c('location','age','race','sex','risk'),
-                         corresponding.data.outcome = 'non.adap.viral.suppression',
+                         corresponding.data.outcome = 'adap.suppression',
                          save = T)
+
+track.integrated.outcome(RW.SPECIFICATION,
+                         name = 'adap.suppressed.proportion.of.diagnosed',
+                         outcome.metadata = create.outcome.metadata(display.name = 'ADAP Receipt + Suppression Among PWH',
+                                                                    description = "Proportion of People with Diagnosed HIV Receiving any AIDs Drug Assistance Program Services AND are Virally Suppressed",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value.to.integrate = 'infected',
+                         multiply.by = 'proportion.pwh.who.are.suppressed.with.adap',
+                         denominator.outcome = 'diagnosed.prevalence',
+                         value.is.numerator = T,
+                         subset.dimension.values = list(continuum='diagnosed.states'),
+                         keep.dimensions = c('location'),
+                         corresponding.data.outcome = 'adap.suppressed.proportion.of.diagnosed',
+                         save = T)
+
+##-- ADD THE WEB SUB-VERSION --##
+
+add.sub.version(RW.SPECIFICATION, 
+                sub.version = 'w',
+                description = "Web Tool version of Ryan White model",
+                inherit.outcomes = F,
+                can.seed.new.engine = F)
+
+add.sub.version(RW.SPECIFICATION, 
+                sub.version = 'ws',
+                description = "Seed for Custom Scenarios for Web Tool version of Ryan White model",
+                inherit.outcomes = F,
+                can.seed.new.engine = T)
+
+
+# General Outcomes
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = 'awareness',
+                           keep.dimensions = character())
+
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = c(
+                               'new',
+                               'diagnosed.prevalence',
+                               'incidence',
+                               'suppression'))
+
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = c(
+                               'testing',
+                               'prep.uptake'),
+                           keep.dimensions = c('age','race','sex'))
+
+#Ryan White Outcomes
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = c(
+                               'rw.clients',
+                               'non.adap.clients',
+                               'adap.clients',
+                               'oahs.clients',
+                               'adap.proportion'),
+                           keep.dimensions = c('age','race','sex'))
+
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = 'oahs.suppression',
+                           keep.dimensions = c('age','race'))
+
+track.sub.version.outcomes(RW.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = 'adap.suppression',
+                           keep.dimensions = character())
+
+
+##-- REGISTER IT! --##
 
 register.model.specification(RW.SPECIFICATION)
 register.set.parameters.for.version('rw',

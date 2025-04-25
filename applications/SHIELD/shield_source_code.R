@@ -1,9 +1,12 @@
 cat("*** Running Shield_source_code.R ***\n")
+# detach("package:jheem2", character.only = TRUE, unload = TRUE)
+
+# rm(list = ls())
 NEW.SOURCE=T
+USE.JHEEM2.PACKAGE=T
 
 
 #pulling JHEEM_ANALYSIS # Load the git2r package ----
-if (NEW.SOURCE) {
   cat("Checking JHEEM_ANALYSIS repository status.... \n")
   repo_path <- "../jheem_analyses//"  
   # Check if the repository exists at the specified path
@@ -13,19 +16,31 @@ if (NEW.SOURCE) {
   } else {
     cat("Can not pull from JHEEM_ANALYSIS: ", repo_path, "\n")
   }
-}
 
 source('../jheem_analyses/commoncode/cache_manager.R')
+#option1: using the package 
+if (USE.JHEEM2.PACKAGE){
+  print("Using JHEEM2 package ... ")
+  update.jheem2.package() #will need to check the version and reinstall as needed
+  library(jheem2)
+  print(check.jheem2.version())
+  } 
+  # option2: sourcing the code directly:
+if (!USE.JHEEM2.PACKAGE){
+  # devtools::install_github('tfojo1/jheem2')
+  print("Using JHEEM2 source code ...")
+  cat("Checking JHEEM2 repository status.... \n")
+    repo_path <- "../jheem2/"
+    if (dir.exists(repo_path)) {# Check if the repository exists at the specified path
+      system(paste("cd", repo_path, "&& git pull"))# Run the Git pull command to update the repository
+    } else {
+      cat("Can not pull from JHEEM2: ", repo_path, "\n")
+    }
+  source('../jheem2/R/tests/source_jheem2_package.R')
+}
 
-# option1: using JHEEM package
-# devtools::install_github('tfojo1/jheem2')
-
-# will need to check the version and reinstall as needed @Andrew
-update.jheem2.package() #this updates the jheem2 if needed
-library(jheem2)
+ 
 clear.all.managers()
-# option2: sourcing the code directly:
-# source('../jheem2/R/tests/source_jheem2_package.R')
 
 # Common code from JHEEM ----
 source('../jheem_analyses/commoncode/target_populations.R')
@@ -39,20 +54,6 @@ source('../jheem_analyses/commoncode/file_paths.R')
 library(reshape2)
 library(locations)
 library(distributions)
-
-# #pulling JHEEM2 # Load the git2r package ----
-# if (NEW.SOURCE) {
-#   cat("Checking JHEEM2 repository status.... \n")
-#   repo_path <- "../jheem2/"  
-#   # Check if the repository exists at the specified path
-#   if (dir.exists(repo_path)) {
-#     # Run the Git pull command to update the repository
-#     system(paste("cd", repo_path, "&& git pull"))
-#   } else {
-#     cat("Can not pull from JHEEM2: ", repo_path, "\n")
-#   }
-# }
-
 
 #
 set.jheem.root.directory(ROOT.DIR)
@@ -71,7 +72,7 @@ if (!exists('CENSUS.MANAGER') ){
 # Syphilis SURVEILLANCE.MANAGER ----
 # includes all the data used for calibration and plotting
 # county-, MSA- and US- level aggregation
-if (is.null(get.default.data.manager()) ){ #if it's in memory, it wont reload it
+if (!exists('SURVEILLANCE.MANAGER') ){
   print("Reading Syphilis survillance manager ...")
   SURVEILLANCE.MANAGER = load.data.manager.from.cache('syphilis.manager.rdata',set.as.default = T) #plotting function will use this data manager for outcomes
   # SURVEILLANCE.MANAGER$last.modified.date

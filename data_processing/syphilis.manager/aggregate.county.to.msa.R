@@ -2,8 +2,8 @@
 my.msas = get.all.for.type("CBSA")
 
 # Using data only for the one source/ontology/stratification we care about
-all.births.data = syphilis.manager$data$births$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity
-all.female.pop.data = syphilis.manager$data$female.population$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity
+all.births.data = syphilis.manager$data$births.numerator.for.fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity
+all.female.pop.data = syphilis.manager$data$female.population.denominator.for.fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity
 
 # This may grab non-county locations, but it won't matter for how we use it
 counties.present.in.both.datasets = intersect(dimnames(all.births.data)$location,

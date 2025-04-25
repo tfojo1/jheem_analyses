@@ -8,27 +8,27 @@
 
 
 # LIKELIHOODS INCLUDED: 
-
 #the census runs population count every 10 years, in 2010, and 2020.
 # the values reported between these years are extrapolated based on the previous census data.
 # so we have more faith in those years and less int he ones between decades
 w1=lapply(2010:2019, function(year){
   total.weight = 0.95^(year-2010)
   create.likelihood.weights(total.weight,dimension.values = list(year=year))
-  })
+})
 w2=lapply(2020:2023, function(year){
   total.weight = 0.95^(year-2020)
   create.likelihood.weights(total.weight,dimension.values = list(year=year))
 })
 w=c(w1,w2)
-#-- POPULATION SIZES ----
+#** POPULATION SIZES ** ----
 # Basic likelihood: where we have data at the location level desired
 # sometimes we dont have the calibration data for the location of interest. 
 # so for example we need to calibrate prop aware in Baltimiore to data from MD and building 
 # some uncertainty to account for similarities between those locations
 population.likelihood.instructions = 
-  create.basic.likelihood.instructions(outcome.for.data = "population", 
-                                       outcome.for.sim = "population",
+  create.basic.likelihood.instructions(outcome.for.sim = "population",
+                                       outcome.for.data = "population", 
+                                       na.rm =T,
                                        dimensions = c("age","sex","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g., age race)
                                        from.year = 2010, # the year calibration starts (population size and demographics are fix to 2007)
@@ -60,81 +60,366 @@ population.likelihood.instructions =
                                        # equalize.weight.by.year = F Default is TRUE
   )
 
-#-- DEATHS  ----
+#** DEATHS **  ----
 # CalibTarget: deaths: 2001-2020 by agegroup,sex, race, ethnicty for the US model 
-# dimnames(SURVEILLANCE.MANAGER$data$deaths$estimate$cdc_wonder$census.cdc.wonder.births.deaths$year__location__age__race__ethnicity__sex)
-
+# SURVEILLANCE.MANAGER$data$deaths$estimate$census.aggregated.population$census$year__location
 deaths.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "deaths", #fix type
-                                       outcome.for.sim = "deaths",
-                                       dimensions = c("age","sex","race"),
-                                       levels.of.stratification = c(0,1,2), 
+  create.basic.likelihood.instructions(outcome.for.sim = "deaths",
+                                       outcome.for.data = "deaths", #fix type
+                                       levels.of.stratification = c(0), 
                                        from.year = 2010, 
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
-                                       error.variance.type = 'cv'
+                                       error.variance.type = 'cv',
                                        # weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R
                                        # equalize.weight.by.year = T
+                                       na.rm =T
   )
 
-#-- FETILITY RATE  ----
+#** FETILITY RATE **  ----
 # CalibTarget: Fertility.rate: 2007-2023 agegroup race ethnicty 
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
-
 fertility.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "fertility.rate", #fix type
-                                       outcome.for.sim = "fertility.rate",
+  create.basic.likelihood.instructions(outcome.for.sim = "fertility.rate",
+                                       outcome.for.data = "fertility.rate",  
+                                       
                                        dimensions = c("age","race"),
                                        levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g
                                        from.year = 2010,  #data available from 2007-2023
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.015, # in absence of data I am assuming the population level
-                                       error.variance.type = 'cv'
+                                       error.variance.type = 'cv',
+                                       na.rm =T
+  )
+
+#** MIGRATION **  ----
+#*#data is available for 6 overlapping 5-year period (2011-2015, 2012-2016, ....)
+#*#one way stratifiation (by age, by race, by sex) is only available for 2011-2015
+immigration.likelihood.instructions = 
+  create.basic.likelihood.instructions(outcome.for.sim = "immigration",
+                                       outcome.for.data = "immigration", 
+                                       
+                                       dimensions = c('age','race','sex'), 
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2011, 
+                                       to.year=2020,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary ???
+                                       error.variance.type = 'cv',
+                                       weights = 1,
+                                       equalize.weight.by.year = T,
+                                       na.rm =T
+  )
+
+emigration.likelihood.instructions = 
+  create.basic.likelihood.instructions( outcome.for.sim = "emigration",
+                                        outcome.for.data = "emigration", 
+                                        
+                                        dimensions = c("age","race"), 
+                                        levels.of.stratification = c(0,1,2),
+                                        from.year = 2011, 
+                                        to.year=2020,
+                                        observation.correlation.form = 'compound.symmetry', 
+                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
+                                        error.variance.type = 'cv',
+                                        weights = 1,
+                                        equalize.weight.by.year = T,
+                                        na.rm =T
   )
 
 
-# if we work on proportions that it'll be different 
-
-
-
-
-#-- SYPHILIS DIAGNOSIS ----
-##-- congenital syphilis / PS/ EL/ LL
-
+#** SYPHILIS DIAGNOSIS ** ----
+# we have modeled the misclassification of EL/LL diagnosis in the model and here we only fit to reported (biased) data
+##---- PS ----
 ps.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.data = "ps.syphilis", #fix type
-                                       outcome.for.sim = "diagnosis.primary.secondary", #@Zoe: please add two way stratifications? 
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                       outcome.for.data = "ps.syphilis.diagnoses",  
+                                       
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 2000,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1
+  )
+##---- EARLY ----
+#MISCLASSIFICATION ERROR 
+early.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
+                                       outcome.for.data = "early.syphilis.diagnoses", 
+                                       
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2,3),
+                                       from.year = 2000,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1
+  )
+##---- Late/Unknown ---- 
+late.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                       outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                       
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2,3),
+                                       from.year = 2000,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1
+  )
+
+##---- Total ----
+total.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
+                                       outcome.for.data = "total.syphilis.diagnoses",  
+                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2),
-                                       from.year = 2010,
+                                       from.year = 1941,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, # Zoe will be estimating this based on discrepency between CDC reported numbers and those reported from local health departments
+                                       error.variance.term = 0.05, 
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1 #
+  )
+
+##---- Congenital ----
+#poportion of state level births that are complicated by congenital syphilis 
+# 1) using CDC reported state level targets
+# 2) estimating MSA level diagnoses from local health department and estiamteign proporiton of MSA level births 
+#'@TODD: to add the nested likelihood for prop of births with congenital 
+# congenital.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "congenital.syphilis.diagnoses", #fix type
+#                                        outcome.for.sim = "diagnosis.congenital",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 2010,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv'
+#   )
+
+# congenital.nested.likelihood.instructions.trans =
+#   create.nested.proportion.likelihood.instructions( outcome.for.sim = "proportion.births.congenital",
+#                                                     outcome.for.data = "proportion.births.congenital",
+# 
+#                                                    denominator.outcome.for.data = 'births.from', #should be avialable at the county level <births.numerator.for.fertility.rate>
+# 
+#                                                    location.types = c('STATE',"CBSA"), #CBSA is MSA level
+#                                                    minimum.geographic.resolution.type = 'COUNTY',
+# 
+#                                                    dimensions = character(),
+#                                                    levels.of.stratification = c(0),
+#                                                    from.year = 2008,
+# 
+#                                                    # p.bias.inside.location = 0,
+#                                                    # p.bias.outside.location = cocaine.bias.estimates$out.mean, #to be calculated using Todd's code
+#                                                    # p.bias.sd.inside.location = cocaine.bias.estimates$out.sd,
+#                                                    # p.bias.sd.outside.location = cocaine.bias.estimates$out.sd,
+# 
+#                                                    within.location.p.error.correlation = 0.5, #Default assumption #correlation from one year to other in the bias in the city and outside the city
+#                                                    within.location.n.error.correlation = 0.5, #Default assumption #ratio of births outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+#                                                    #
+# 
+#                                                    observation.correlation.form = 'compound.symmetry',
+#                                                    p.error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
+#                                                    p.error.variance.type = "cv",
+# 
+#                                                    partitioning.function = EHE.PARTITIONING.FUNCTION,# we use for unknown outcomes (e.g., number of IDUs by age race in Baltimore) (not needed here)
+# 
+#                                                    weights = (1*TRANSMISSION.WEIGHT),
+#                                                    equalize.weight.by.year = T
+#   )
+
+# congenital.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+#                                                   dimensions = c("age","race" ),
+#                                                   levels.of.stratification = c(0,1),
+#                                                   outcome.for.p = "proportion.births.congenital",
+#                                                   outcome.for.n = "births",
+#                                                   sub.location.type = NULL, #if you had MSA level data
+#                                                   super.location.type = "STATE",
+#                                                   main.location.type = "CBSA"
+#                                                   # main.location.type.p.source = "cdc.aggregated.proportion", #specific source of data that should be used here
+#                                                   # main.location.type.n.source = "cdc.hiv" 
+#                                                   )
+# cache.object.for.version(object = suppression.bias.estimates, 
+#                          name = "suppression.bias.estimates", 
+# version = 'ehe', overwrite=T)  
+
+
+##** PRENATAL CARE COVERAGE ** ----
+# we have 4 Categories representing a multinomial likelihood . 
+# for now we are modeling 4 independant likelihoods. This may overpenalize deviations from a single bin because we are not accounting for the correlation between the 4 categories.)
+# Error estimate: @zoe: what proportion of prenatals were unknown at the national level? we can use that to inform this error here 
+### source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
+ave.msa.variance= 0.0032 #estimated for all 33 msa combined
+prenatal.care.first.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.first.trimester",
+                                       outcome.for.data = "prenatal.care.initiation.first.trimester",
+                                       
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details,version, location){
+                                         # browser()
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
+                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+                                       error.variance.type = 'function.sd')
+prenatal.care.second.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.second.trimester",
+                                       outcome.for.data = "prenatal.care.initiation.second.trimester",
+                                       
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details,version, location){
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
+                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+                                         var= (data* (0.05))^2+msa.variance 
+                                         sd=sqrt(var)
+                                         
+                                         return(sd)
+                                       },
+                                       error.variance.type = 'function.sd')
+
+prenatal.care.third.trimester.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.third.trimester",
+                                       outcome.for.data = "prenatal.care.initiation.third.trimester",
+                                       
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details,version, location){
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
+                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+                                       error.variance.type = 'function.sd')
+no.prenatal.care.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "prp.no.prenatal.care",
+                                       outcome.for.data = "no.prenatal.care",
+                                       
+                                       dimensions = c("age","race"),
+                                       levels.of.stratification = c(0,1),
+                                       from.year = 2016,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = function(data,details,version, location){
+                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
+                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+                                         var= (data* (0.05))^2+msa.variance
+                                         return(sqrt(var))
+                                       },
+                                       error.variance.type = 'function.sd')
+
+##** HIV TESTS ** ----
+hiv.testing.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
+                                       outcome.for.data = "proportion.tested.for.hiv", 
+                                       
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2014,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, 
                                        error.variance.type = 'cv'
   )
-#
-lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
-
-#dimnames(SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location__sex)
-#this is reported for male/female: no msm 
-
-# can we ssume rates of diagnosis among het-male and female are similar and the rest of new diagnosis among male are msm specific 
-# @Zoe: can you please add a mapping for this? male= msm + het_male
-
-#-- MIGRATION?
-#-- HIV TESTS? 
 
 
 
 
 #-- FULL LIKELIHOODS --# ----
-likelihood.instructions.demographics =  join.likelihood.instructions(
+likelihood.instructions.all =  join.likelihood.instructions(
   population.likelihood.instructions ,
   deaths.likelihood.instructions,
-  fertility.likelihood.instructions
+  fertility.likelihood.instructions,
+  
+  immigration.likelihood.instructions,
+  emigration.likelihood.instructions,
+  
+  ps.diagnosis.likelihood.instructions,
+  early.diagnosis.likelihood.instructions,
+  late.diagnosis.likelihood.instructions,
+  total.diagnosis.likelihood.instructions,
+  
+  prenatal.care.first.trimester.likelihood.instructions,
+  prenatal.care.second.trimester.likelihood.instructions,
+  prenatal.care.third.trimester.likelihood.instructions,
+  no.prenatal.care.likelihood.instructions,
+  
+  hiv.testing.likelihood.instructions
   
 )
+likelihood.instructions.demographics=join.likelihood.instructions(
+  population.likelihood.instructions,
+  deaths.likelihood.instructions,
+  fertility.likelihood.instructions,
+  
+  immigration.likelihood.instructions,
+  emigration.likelihood.instructions)
+
+##--OPTIONAL:CNS ----
+# cns.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 
+#                                        outcome.for.sim = "diagnosis.cns",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 2000,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv'
+#   )
+##--OPTIONAL:Primary ----
+# primary.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "primary.syphilis",  
+#                                        outcome.for.sim = "diagnosis.primary",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 1941,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv')
+##--OPTIONAL: Secondary ----
+# secondary.diagnosis.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.data = "secondary.syphilis",  
+#                                        outcome.for.sim = "secondary.total",
+#                                        dimensions = c("age","race","sex"),
+#                                        levels.of.stratification = c(0,1,2),
+#                                        from.year = 1941,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = 0.05, 
+#                                        error.variance.type = 'cv')
+
+
 #manual setup: 
 # lik=population.likelihood.instructions$instantiate.likelihood('shield',"US")
 # lik=deaths.likelihood.instructions$instantiate.likelihood('shield',"US")
 # lik=fertility.likelihood.instructions$instantiate.likelihood('shield',"US")
 # dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
+
+
+
+# estiamting errors for syphilis stages: # Zoe will be estimating this based on discrepency between CDC reported numbers and those reported from local health departments
+# ps.syphilis: @Zoe: we have 0,1,2 way interactions for this, but for early.syphilis, we also have the 3 way interaction
+# for unknown.duration.or.late.syphilis we only have year__location__age
+# Zoe: what about primary.syphilis and secondary.syphilis estimates? 
+
+
+# lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood('shield',"C.12580")
+#dimnames(SURVEILLANCE.MANAGER$data$ps.syphilis$estimate$cdc.sti$cdc.sti$year__location__sex)
+#this is reported for male/female: no msm 
+
+# can we ssume rates of diagnosis among het-male and female are similar and the rest of new diagnosis among male are msm specific 
+# @Zoe: can you please add a mapping for this? male= msm + het_male

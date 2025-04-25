@@ -1,13 +1,16 @@
 # Get the absolute path to jheem_analyses directory
 # JHEEM_DIR = file.path("/scratch4/pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses")
-USER = 'azalesak'
-JHEEM_DIR = file.path("/scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
-OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs")
+USER =  Sys.getenv("USER")
+JHEEM_DIR = file.path("scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
+OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs2")
 MODULE.LOAD.COMMANDS = c('source cluster_scripts/rockfish_module_loads.sh')
+EHE.SPEC <- "applications/EHE/ehe_specification.R"
+EHE.REG <- "applications/EHE/calibration_runs/ehe_register_calibrations.R"
 
 make.sbatch.script <- function(filename,
-                               mem='16GB',
+                               mem=NULL,
                                mem.per.cpu=NULL,
+                               cpus.per.task=NULL,
                                time.hours=NULL,
                                output=NULL,
                                job.name=NULL,
@@ -27,6 +30,9 @@ make.sbatch.script <- function(filename,
     
     if (!is.null(mem.per.cpu))
         cat("#SBATCH --mem-per-cpu=", mem.per.cpu, '\n', sep='')
+    
+    if (!is.null(cpus.per.task))
+        cat("#SBATCH --cpus-per-task=", cpus.per.task, '\n', sep='')
     
     if (!is.null(output))
         cat("#SBATCH --output=", output, '\n', sep='')
@@ -58,13 +64,14 @@ make.setup.scripts <- function(locations,
                                specification.path,
                                register.calibration.path,
                                dir='cluster_scripts/setup_scripts',
-                               partition='shared',
+                               partition='parallel',
                                account='tfojo1',
-                               mem='16G')
+                               mem='16G',
+                               time.hours=1)
 {
     # Create output directories for each location
     for (location in locations) {
-        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code), get.setup.filename(calibration.code, extension=".out"))
+        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code, extension=".out"))
         if (!dir.exists(output_path))
             dir.create(output_path, recursive=TRUE)
             
@@ -77,8 +84,9 @@ make.setup.scripts <- function(locations,
         make.sbatch.script(filename=file.path(dir, version, location, get.setup.filename(calibration.code)),
                            mem=mem,
                            output = output_path,
+                           job.name = paste0('S_', location),
                            partition = partition,
-                           time.hours = 12,
+                           time.hours = time.hours,
                            account=account,
                            commands= paste("Rscript cluster_scripts/set_up_calibration.R", version, location, calibration.code, specification.path, register.calibration.path))
     }
@@ -92,9 +100,10 @@ make.run.scripts <- function(locations,
                              specification.path,
                              register.calibration.path,
                              dir='cluster_scripts/run_scripts',
-                             partition="shared",
+                             partition="parallel",
                              account='tfojo1',
-                             mem='16G')
+                             mem='16G',
+                             time.hours=36)
 {
     for (location in locations) {
         # Create output directories for each location/chain combination
@@ -112,14 +121,88 @@ make.run.scripts <- function(locations,
         # Create batch scripts for each chain
         for (chain in chains) {
             make.sbatch.script(filename=file.path(dir, version, location, get.run.filename(calibration.code, chain)),
-                               job.name = paste0("run_", version, "_", location, "_", calibration.code, "_", chain),
+                               job.name = paste0("R_", location, "_", chain),
                                mem=mem,
                                output = output_path,
                                partition=partition,
-                               time.hours = 36, #Todd's said 7*24 but this made it hard to queue
+                               time.hours = time.hours,
                                account=account,
                                commands = paste("Rscript cluster_scripts/run_calibration.R", version, location, calibration.code, chain, specification.path, register.calibration.path))
         }
+    }
+}
+
+#' @inheritParams make.setup.scripts
+#' @param calibration.codes A vector of calibration codes in the order they should be attempted
+make.multiphase.scripts <- function(locations,
+                                    version,
+                                    calibration.codes,
+                                    chains=1,
+                                    specification.path,
+                                    register.calibration.path,
+                                    dir='cluster_scripts/multiphase_scripts',
+                                    partition="parallel",
+                                    account="tfojo1",
+                                    mem="16G")
+{
+    for (location in locations) {
+        # Create output directories for each location/chain combination
+        for (chain in chains) {
+            output_path <- file.path(OUTPUT.DIR, version, location, get.multiphase.filename(calibration.codes, chain, extension=".out"))
+            if (!dir.exists(output_path))
+                dir.create(output_path, recursive=TRUE)
+        }
+        
+        # Create script directories
+        script_path <- file.path(dir, version, location)
+        if (!dir.exists(script_path))
+            dir.create(script_path, recursive=TRUE)
+        
+        # Create batch scripts for each chain
+        for (chain in chains) {
+            make.sbatch.script(filename=file.path(dir, version, location, get.multiphase.filename(calibration.codes, chain)),
+                               job.name = paste0("M_", location, "_", chain),
+                               mem=mem,
+                               output = output_path,
+                               partition=partition,
+                               time.hours = 36,
+                               account=account,
+                               commands = paste("Rscript cluster_scripts/do_multiphase_calibration.R", version, location, paste(calibration.codes, collapse="__"), chain, specification.path, register.calibration.path))
+        }
+    }
+}
+
+make.assemble.scripts <- function(locations,
+                                  version='ehe',
+                                  calibration.code,
+                                  burn.keep=0,
+                                  thin.keep=1000,
+                                  specification.path="../jheem_analyses/applications/EHE/ehe_specification.R",
+                                  register.calibration.path="../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R",
+                                  dir="cluster_scripts/assemble_scripts",
+                                  partition="parallel",
+                                  account="tfojo1",
+                                  cpus.per.task=2)
+{
+    for (location in locations) {
+        output_path <- file.path(OUTPUT.DIR, version, location, get.assemble.filename(calibration.code, extension=".out"))
+        if (!dir.exists(output_path))
+            dir.create(output_path, recursive=TRUE)
+        
+        # Create script directories
+        script_path <- file.path(dir, version, location)
+        if (!dir.exists(script_path))
+            dir.create(script_path, recursive=TRUE)
+        
+        # Create the batch script
+        make.sbatch.script(filename=file.path(dir, version, location, get.assemble.filename(calibration.code)),
+                           cpus.per.task=cpus.per.task,
+                           output = output_path,
+                           job.name = paste0('S_', location),
+                           partition = partition,
+                           time.hours = 2,
+                           account=account,
+                           commands= paste("Rscript cluster_scripts/assemble_calibration.R", version, location, calibration.code, burn.keep, thin.keep, specification.path, register.calibration.path))
     }
 }
 
@@ -170,6 +253,57 @@ make.run.master.script <- function(name.for.script,
         for (chain in chains) {
             cat("sbatch ", file.path(dir, version, location, get.run.filename(calibration.code, chain)), "\n", sep="")
         }
+    }
+    sink()
+}
+
+make.multiphase.master.script <- function(name.for.script,
+                                          locations,
+                                          version,
+                                          calibration.codes,
+                                          chains=1:4,
+                                          master.dir="cluster_scripts/master_scripts/multiphase",
+                                          dir="cluster_scripts/multiphase_scripts",
+                                          overwrite=F) {
+    # Create master directory if it doesn't exist
+    if (!dir.exists(master.dir))
+        dir.create(master.dir, recursive=TRUE)
+    
+    error.prefix = "Cannot make.multiphase.master.script': "
+    filename.with.extension = paste0(name.for.script, ".bat")
+    if (file.exists(file.path(master.dir, filename.with.extension)) && !overwrite)
+        stop(paste0(error.prefix, "there is already a '", filename.with.extension, "' at this location. Use 'overwrite=T' to proceed anyway"))
+    sink(file.path(master.dir, filename.with.extension))
+    cat("#!/bin/bash\n\n")
+    for (location in locations) {
+        for (chain in chains) {
+            cat("sbatch ", file.path(dir, version, location, get.multiphase.filename(calibration.codes, chain)), "\n", sep="")
+        }
+    }
+    sink()
+}
+
+make.assemble.master.script <- function(name.for.script,
+                                        locations,
+                                        version='ehe',
+                                        calibration.code,
+                                        specification.path="../jheem_analyses/applications/EHE/ehe_specification.R",
+                                        register.calibration.path="../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R",
+                                        master.dir="cluster_scripts/master_scripts/assemble",
+                                        dir="cluster_scripts/assemble_scripts",
+                                        overwrite=F) {
+    # Create master directory if it doesn't exist
+    if (!dir.exists(master.dir))
+        dir.create(master.dir, recursive=TRUE)
+    
+    error.prefix = "Cannot make.assemble.master.script': "
+    filename.with.extension = paste0(name.for.script, ".bat")
+    if (file.exists(file.path(master.dir, filename.with.extension)) && !overwrite)
+        stop(paste0(error.prefix, "there is already a '", filename.with.extension, "' at this location. Use 'overwrite=T' to proceed anyway"))
+    sink(file.path(master.dir, filename.with.extension))
+    cat("#!/bin/bash\n\n")
+    for (location in locations) {
+        cat("sbatch ", file.path(dir, version, location, get.assemble.filename(calibration.code)), "\n", sep="")
     }
     sink()
 }
@@ -227,4 +361,22 @@ get.setup.filename <- function(calibration.code, extension=".bat") {
 
 get.run.filename <- function(calibration.code, chain, extension=".bat") {
     paste0("run_", calibration.code, "_", chain, extension)
+}
+
+get.multiphase.filename <- function(calibration.codes, chain, extension=".bat") {
+    paste0("multiphase_", paste(calibration.codes, collapse="__"), chain, extension)
+}
+
+get.assemble.filename <- function(calibration.code, extension=".bat") {
+    paste0("assemble_", calibration.code, extension)
+}
+
+## FOR ANDREW EHE APPLICATIONS
+make.all.scripts <- function() {
+    for (code in c('pop.ehe', 'trans.ehe', 'full.ehe')) {
+        make.setup.scripts(MSAS.OF.INTEREST, 'ehe', code, EHE.SPEC, EHE.REG)
+        make.run.scripts(MSAS.OF.INTEREST, 'ehe', code, 1, EHE.SPEC, EHE.REG)
+    }
+    make.setup.scripts(MSAS.OF.INTEREST, 'ehe', 'final.ehe', EHE.SPEC, EHE.REG)
+    make.run.scripts(MSAS.OF.INTEREST, 'ehe', 'final.ehe', 1:4, EHE.SPEC, EHE.REG)
 }

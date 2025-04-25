@@ -1,5 +1,5 @@
 # Total Level Data --------------------------------------------------------
-DATA.DIR.RYAN.WHITE="../../data_raw/ryan.white.pdf.tables/total"
+DATA.DIR.RYAN.WHITE="Q:/data_raw/ryan.white.pdf.tables/total"
 
 pdf.reports <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE, '/*.csv'))
 
@@ -143,7 +143,7 @@ for (data in ryan.white.totals.put) {
 
 
 # Stratified Level Data - STATE ---------------------------------------------------
-DATA.DIR.RYAN.WHITE.STRATIFIED="../../data_raw/ryan.white.pdf.tables/stratified.state"
+DATA.DIR.RYAN.WHITE.STRATIFIED="Q:/data_raw/ryan.white.pdf.tables/stratified.state"
 
 pdf.reports.stratified <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.STRATIFIED, '/*.csv'))
 
@@ -241,6 +241,15 @@ ryan.white.stratified = lapply(ryan.white.pdf.reports.stratified, function(file)
     data$outcome = 'adap.clients'
   }
   
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
+  if(grepl("2018", filename)) {
+    data$year = "2018"
+  }
+  if(grepl("2019", filename)) {
+    data$year = "2019"
+  }
   if(grepl("2020", filename)) {
     data$year = "2020"
   }
@@ -292,7 +301,7 @@ for (data in ryan.white.stratified.put) {
 }
 
 # Stratified Level Data - MSA ---------------------------------------------------
-DATA.DIR.RYAN.WHITE.STRATIFIED.MSA="../../data_raw/ryan.white.pdf.tables/stratified.msa"
+DATA.DIR.RYAN.WHITE.STRATIFIED.MSA="Q:/data_raw/ryan.white.pdf.tables/stratified.msa"
 
 pdf.reports.stratified.msa <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.STRATIFIED.MSA, '/*.csv'))
 
@@ -436,11 +445,26 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
     data$outcome = 'adap.clients'
   }
 
-  if(grepl("2023", filename)) {
-    data$year = "2023"
+  if(grepl("2017", filename)) {
+    data$year = "2017"
+  }
+  if(grepl("2018", filename)) {
+    data$year = "2018"
+  }
+  if(grepl("2019", filename)) {
+    data$year = "2019"
+  }
+  if(grepl("2020", filename)) {
+    data$year = "2020"
+  }
+  if(grepl("2021", filename)) {
+    data$year = "2021"
   }
   if(grepl("2022", filename)) {
     data$year = "2022"
+  }
+  if(grepl("2023", filename)) {
+    data$year = "2023"
   }
 
   # #Group and sum the 'other' risk category for risk_sex
@@ -451,7 +475,6 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
       mutate(risk = ifelse(risk == "perinatal", 'other', risk))%>%
       group_by(year, location, risk)%>%
       mutate(summed.value = sum(value))
-
   }
 
   if(grepl("risk_sex_female", filename)) {
@@ -459,6 +482,14 @@ ryan.white.stratified.msa = lapply(ryan.white.pdf.reports.stratified.msa, functi
   }
   if(grepl("risk_sex_male", filename)) {
     data$sex = 'male'
+  }
+  
+  if(grepl("race.ethnicity", filename)) {
+    
+    #Manually remove Dallas MSA (they did not report data for 2022 by race but Fort Worth did)
+    data<-data%>%
+      mutate(drop_var = ifelse(location == "C.19100" & year == "2022", "1", "0"))%>%
+      filter(drop_var != "1")
   }
 
   data <- data %>%

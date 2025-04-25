@@ -1,7 +1,7 @@
 
 # Mortality Rate data from CDC Wonder -------------------------------------
 
-DATA.DIR.MORTALITY="../../data_raw/mortality.cdc.wonder"
+DATA.DIR.MORTALITY="Q:/data_raw/mortality.cdc.wonder"
 
 mortality.files <- list.files(DATA.DIR.MORTALITY, pattern = ".txt", full.names = "TRUE")
 

@@ -3,7 +3,7 @@
 ##read in immigration/emigration##
 ################################################################################
 
-DATA.DIR.MOVEMENT="../../data_raw/movement"
+DATA.DIR.MOVEMENT="Q:/data_raw/movement"
 
 movement_files <- Sys.glob(paste0(DATA.DIR.MOVEMENT, '/*.xlsx'))
 
@@ -403,6 +403,13 @@ movement_data[[length(movement_data)+1]]<-em_combo_other
 movement_data[[length(movement_data)+1]]<-imm_combo_black_nh #adding the black nh race to the movement data
 
 movement_data[[length(movement_data)+1]]<-em_combo_black_nh
+
+
+# Removing age so it can be redistributed ---------------------------------
+movement_data = movement_data[-1]
+movement_data = movement_data[-10]
+
+
 
 for (data in movement_data) {
   

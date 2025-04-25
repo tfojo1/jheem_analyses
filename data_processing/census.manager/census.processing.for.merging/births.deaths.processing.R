@@ -89,6 +89,24 @@ census.manager$register.outcome(
     units = '%',
     description = "Fertility Rate"), denominator.outcome = 'female.population')
 
+census.manager$register.outcome(
+    'state.deaths.denominator',
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'State Deaths Denominator',
+        axis.name = 'State Deaths Denominator',
+        units = 'deaths',
+        description = "State Deaths Denominator"))
+
+census.manager$register.outcome(
+    'state.deaths',
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'State Deaths',
+        axis.name = 'State Deaths',
+        units = 'deaths',
+        description = "State Deaths"))
+
 #Register Sources:
 census.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census") #parent
 census.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS") #parent
@@ -159,6 +177,7 @@ census.manager$register.ontology(
 source('data_processing/census.manager/births_and_deaths.R') #This pulls birth and death data from CDC Wonder#
 source('data_processing/census.manager/fertility.rate.R') #Fertility rates and female.population
 source('data_processing/census.manager/mortality.cdc.wonder.R') #National Level 'metro' deaths
+source('data_processing/census.manager/state.deaths.R') #This is for 'state.deaths' which mirrors metro.deaths
 
 #Save:
 save(census.manager, file="Q:/data_managers/data.manager.merge/census.manager_births.deaths.rdata")

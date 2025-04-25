@@ -4,7 +4,7 @@
 
 #At first this code is just pulling for county data but at the bottom I add national
 
-surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
+surveillance.manager = load.data.manager(name="surveillance.manager", file="Q:/data_managers/surveillance.manager.rdata")
 
 
 # Source One = BRFSS -----------------------------------------------------
@@ -50,7 +50,8 @@ rename(value = Freq)%>%
   mutate(location = as.character(location))%>%
   mutate(sex = as.character(sex))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "proportion.msm")
+  mutate(outcome = "proportion.msm")%>%
+  filter(location != "51515") #Removed this from the locations package March 2025
 
 
 # Need Two Put Statements because Sources are different -------------------
@@ -81,7 +82,7 @@ for (data in prop.msm.brfss) {
 
 
 # Emory National ----------------------------------------------------------
-  DATA.DIR.MSM="../../data_raw/emory"
+  DATA.DIR.MSM="Q:/data_raw/emory"
   emory_files <- Sys.glob(paste0(DATA.DIR.MSM, '/*.csv'))
   data.list.emory.msm <- lapply(emory_files, function(x){
     list(filename=x, data=read.csv(x, header=TRUE, colClasses=c(COUNTYFP="character", STATEFP= "character")))

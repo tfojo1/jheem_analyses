@@ -1,7 +1,7 @@
 #Note: This is data being pulled from the Census Manager (not exclusively data from the Census)
 
 #Load the census manager to get population data that is clean and processed
-census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
+census.manager = load.data.manager(name="census.manager", file="Q:/data_managers/census.manager.rdata")
 
 # THESE ARE ONTOLOGY = CENSUS.DATA ----------------------------------------
 
@@ -11,7 +11,8 @@ population.total = as.data.frame.table(census.manager$data$population$estimate$c
   mutate(year = as.character(year))%>%
   mutate(location = as.character(location))%>%
   mutate(value = as.numeric(value))%>%
-  mutate(outcome = "population")
+  mutate(outcome = "population")%>%
+  filter(location != "51123" & location != "51515" & location != "51560" & location != "51780" & location != "46131")
 
 #Age 2020-2023 (SINGLE YEAR)
 population.age.20.23 = as.data.frame.table(census.manager$data$population$estimate$census.population$census$year__location__age)%>%

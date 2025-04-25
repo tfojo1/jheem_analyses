@@ -516,8 +516,7 @@ get.general.mortality.rates <- function(location,
 }
 
 
-##-------------------------##
-##-- FOR CONTACT TRACING --##
+##-- CONTACT TRACING: RATE OF CONTACTS PER CASE --## ----
 ##-------------------------##
 
 #' @title Get rate of contacts identified by contact tracing (as a rate per index case)
@@ -576,7 +575,7 @@ get.rate.of.contacts.per.case = function(index.case.diagnosis.rate,
     rv
 }
 
-##-----------##
+
 #-- AGING --# ----
 #' #' @title get.empiric.aging.rates
 #' #' @description  creates a spline function for aging rates
@@ -931,8 +930,6 @@ get.race.population.counts <- function(location,
 ##-------------##
 ##-- Pairing --##
 ##-------------##
-#
-#
 #' @title get.geographically.aggregated.race.oes
 #' @description within.county.race.oes[to,from] is how much more likely someone it is for a person of race to to have a partner of race from, relative to race from's population prevalence
 #' @param location location
@@ -1033,25 +1030,56 @@ oes.to.proportions <- function(oes, population)
 }
 
 
-
+#-- HIV TESTING FUNCTIONAL FORM --# -----
 get.hiv.testing.functional.form = function(specification.metadata){
-  # testing.prior = get.cached.object.for.version(name = "testing.prior",
-  #                                               version = specification.metadata$version) 
-  # 
-  # testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9), #helps counteract max value below a bit
-  #                                                                  slope = testing.prior$slopes,
-  #                                                                  anchor.year = 2010,
-  #                                                                  max = 0.9,
-  #                                                                  parameters.are.on.logit.scale = T)
-  testing.functional.form = create.logistic.linear.functional.form(intercept = log(.25)-log(.75), #'helps counteract max value below a bit'@PK: to revise 
-                                                                   slope = 0,
+  # cashed object from input_hiv_testing_prior_brfss.R
+  testing.prior = get.cached.object.for.version(name = "hiv.testing.prior",
+                                                version = specification.metadata$version)
+
+  hiv.testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9), #helps counteract max value below a bit
+                                                                   slope = testing.prior$slopes,
                                                                    anchor.year = 2010,
                                                                    max = 0.9,
                                                                    parameters.are.on.logit.scale = T)
-  
-  testing.functional.form
+  hiv.testing.functional.form
 }
 
+#-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
+get.prp.prenatal.care.functional.form = function(specification.metadata,trimester){
+  # cashed object from input_prenatal_prior_wonder
+   prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.care.initiation.",trimester,".trimester.prior"),
+                                                      version = specification.metadata$version)
+   #' #'@Todd: this is fix for now but we should find the issue with these additional ages in the specifications
+   # browser()
+   new_ages <- c('0-14 years',"45-49 years", "50-54 years", "55-64 years","65+ years")
+   new_data=matrix(rep(0,15),nrow=5, dimnames = list(age=new_ages, race=c('black','hispanic','other')))
+   dim(new_data)
+   
+   prenatal.care.prior$intercepts <- rbind(prenatal.care.prior$intercepts, new_data)
+   names( dimnames(prenatal.care.prior$intercepts ))=c('age','race')
+   
+   prenatal.care.prior$slopes <- rbind(prenatal.care.prior$slopes,new_data)
+   names( dimnames(prenatal.care.prior$slopes ))=c('age','race')
+  
+   prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #helps counteract max value below a bit
+                                                                         slope = prenatal.care.prior$slopes,
+                                                                         anchor.year = 2010,
+                                                                         max = 0.9,
+                                                                         parameters.are.on.logit.scale = T)
+  prenatal.care.functional.form
+}
+
+get.prp.prenatal.care.functional.form.first.trimester<-function(specification.metadata){
+  get.prp.prenatal.care.functional.form(specification.metadata,"first")
+  }
+get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first<-function(specification.metadata){
+  get.prp.prenatal.care.functional.form(specification.metadata,"second")
+  }
+get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second<-function(specification.metadata){
+  get.prp.prenatal.care.functional.form(specification.metadata,"third")
+  }
+
+#-- SYPHILIS TO HIV TESTING FUNCTIONAL FORM --# -----
 # function to map the ratio of STI tests relative to hiv.tests in the US (for STI screening)
 get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
   #there are 2 scales: the scales that we use to manipulate the knots, and the scales we use to interpolate them 
@@ -1069,7 +1097,6 @@ get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
 
 #'@:Todd: need to add an option for the national model ----
 #-- MIGRATION --# ----
-
 get.immigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.YEAR){
   
   rates = get.immigration.rates(location=location,
@@ -1126,7 +1153,7 @@ get.emigration.rates <- function(location, specification.metadata, population.ye
                                                  location = location,
                                                  year = "2011-2015") / 5 # because it's 5-year aggregate data 
   
-  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "adult.population",
+  population = mean(SURVEILLANCE.MANAGER$pull(outcome = "population",
                                               location = location,
                                               year = as.character(c(2011:2015)))) 
   
@@ -1143,8 +1170,7 @@ get.fraction.over.age <- function(location,
                                   specification.metadata,
                                   age,
                                   denom.age.bracket.index="", #if it has a value, we dont loop over all ages 
-                                  years=DEFAULT.POPULATION.YEARS)
-{
+                                  years=DEFAULT.POPULATION.YEARS){
   counties = locations::get.contained.locations(location, 'COUNTY')
   n.per = prod(sapply(specification.metadata$dim.names[c('race','sex')], length))
   
@@ -1187,47 +1213,3 @@ get.fraction.over.age <- function(location,
   rv
 }
 
-#-- PRENATAL SCREENING --# ----
-# we nest the probabilities to make sure that they dont go above 1 when we vary them
-#'@Zoe: we need the prenatal screening data for the each trimester
-get.prp.prenatal.screening.1st.trimester<-function(location, specification.metadata, population.years=DEFAULT.STI.SCREENING.YEAR){
-  # prp.prenatal.1st.trimester = SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.1st.trimester", 
-  #                                                        location = location,
-  #                                                        year = "2011-2015"
-  
-  prp.prenatal.1st.trimester = 0
-  prp.prenatal.1st.trimester
-}
-
-get.prp.prenatal.screening.2nd.trimester.of.those.not.screened.1st<-function(location, specification.metadata, population.years=DEFAULT.STI.SCREENING.YEAR){
-  # prp.prenatal.2nd.trimester = SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.2nd.trimester", 
-  #                                                        location = location,
-  #                                                        year = "2011-2015"
-  # prp.prenatal.1st.trimester=SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.1st.trimester", 
-  #                                                        location = location,
-  #                                                        year = "2011-2015"
-  prp.prenatal.1st.trimester=0
-  prp.prenatal.2nd.trimester=0
-  # what proportion of those who didnt receive screening in the first timester, receive it in the second one: 
-  prp.prenatal.2nd.trimester.if.not.1st = prp.prenatal.2nd.trimester/(1-prp.prenatal.1st.trimester)
-  prp.prenatal.2nd.trimester.if.not.1st
-}
-
-get.prp.prenatal.screening.3rd.trimester.of.those.not.screened.1st.2nd<-function(location, specification.metadata, population.years=DEFAULT.STI.SCREENING.YEAR){
-  # prp.prenatal.3rd.trimester=SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.3rd.trimester", 
-  #                                                        location = location,
-  #                                                        year = "2011-2015"
-  # prp.prenatal.2nd.trimester = SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.2nd.trimester", 
-  #                                                        location = location,
-  #                                                        year = "2011-2015"
-  # prp.prenatal.1st.trimester=SURVEILLANCE.MANAGER$pull(outcome = "prp.prenatal.1st.trimester", 
-  #                                                        location = location,
-  #                                                        year = "2011-2015"
-  prp.prenatal.3rd.trimester=0
-  prp.prenatal.2nd.trimester=0
-  prp.prenatal.1st.trimester=0
-  
-  # what proportion of those who didnt receive screening in the first timester, receive it in the second one: 
-  prp.prenatal.3rd.trimester.if.not.1st.2nd = prp.prenatal.3rd.trimester/(1-prp.prenatal.1st.trimester-prp.prenatal.2nd.trimester)
-  prp.prenatal.3rd.trimester.if.not.1st.2nd
-}

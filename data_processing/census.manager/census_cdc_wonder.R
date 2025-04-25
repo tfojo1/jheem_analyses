@@ -6,7 +6,7 @@
 ################################################################################
               ###CDC Wonder Single Year Population Files###
 ################################################################################
-DATA.DIR.CDC.WONDER="../../data_raw/cdc_wonder"
+DATA.DIR.CDC.WONDER="Q:/data_raw/cdc_wonder"
 
 cdc_wonder_files <- list.files(DATA.DIR.CDC.WONDER, pattern = ".txt", full.names = "TRUE")
 

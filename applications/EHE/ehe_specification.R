@@ -49,6 +49,12 @@ EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
                                                    prior.idu.states = 'IDU_in_remission',
                                                    never.idu.states = 'never_IDU',
                                                    idu.states = c('active_IDU','IDU_in_remission')
+                                               ),
+                                               
+                                               labels = c(
+                                                   msm = 'MSM',
+                                                   idu = 'PWID',
+                                                   msm_idu = 'MSM/PWID'
                                                )
                                                )
 
@@ -254,7 +260,6 @@ register.model.quantity(EHE.SPECIFICATION,
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'oral.prep.uptake.covid.multiplier',
-                        scale = 'proportion',
                         value = expression((1-(1-max.covid.effect.prep.uptake.reduction) * covid.on *
                                               (1-prep.uptake.transmission.mobility.correlation+
                                                  (prep.uptake.transmission.mobility.correlation*covid.mobility.change))))
@@ -388,7 +393,7 @@ register.model.quantity(EHE.SPECIFICATION,
 #-------------#
 #-- Testing --# ----
 #-------------#
-TESTING.RAMP1.YEAR = 1995
+TESTING.RAMP1.YEAR = 1990
 #TESTING.RAMP2.YEAR = 2005
 TESTING.LAST.ZERO.YEAR = 1982
 RAMP.YEARLY.INCREASE = 1.5
@@ -651,13 +656,15 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'idu.remission',
                        scale = 'rate',
                        get.functional.form.function = get.idu.remission.model,
-                       static=T)
+                       static=F,
+                       functional.form.from.time = 1980)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.relapse',
                        scale = 'rate',
                        get.functional.form.function = get.idu.relapse.model,
-                       static=T)
+                       static=F,,
+                       functional.form.from.time = 1980)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'needle.exchange.remission.rate.ratio',
@@ -796,7 +803,8 @@ register.mortality(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'non.idu.general.mortality',
                        get.functional.form.function = get.location.mortality.rates.functional.form,
-                       scale = 'rate')
+                       scale = 'rate',
+                       functional.form.from.time = 2007)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'hiv.general.mortality.multiplier',
@@ -805,10 +813,28 @@ register.model.element(EHE.SPECIFICATION,
                                                                        value.is.on.transformed.scale = F),
                        scale = 'ratio')
 
+#register.model.element(EHE.SPECIFICATION,
+#                       name = 'idu.mortality.rate',
+#                       value = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
+#                       scale = 'rate')
+
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.mortality.rate',
-                       value = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
+                       functional.form = create.natural.spline.functional.form(
+                           knot.times = c(time0=2000, time1=2010, time2=2020),
+                           knot.values = list(
+                               time0 = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
+                               time1 = EHE_BASE_PARAMETER_VALUES['idu.mortality'],
+                               time2 = EHE_BASE_PARAMETER_VALUES['idu.mortality']
+                           ),
+                           link = 'identity',
+                           knot.link = 'log',
+                           min = 0,
+                           overwrite.knot.values.with.alphas = T
+                       ),
+                       functional.form.from.time = 2000,
                        scale = 'rate')
+
 
 ##------------------------##
 ##------------------------##
@@ -859,11 +885,17 @@ register.model.element(EHE.SPECIFICATION,
 ##----------------------------##
 
 ##-----------------##
-##-- Immigration --## ----
+##-- Immigration --##
 ##-----------------##
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'immigration',
+                       name = 'general.immigration',
+                       get.functional.form.function = get.immigration.rates.functional.form,
+                       functional.form.from.time = 2007,
+                       scale = 'rate')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'hiv.immigration',
                        get.functional.form.function = get.immigration.rates.functional.form,
                        functional.form.from.time = 2007,
                        scale = 'rate')
@@ -875,7 +907,7 @@ register.model.quantity(EHE.SPECIFICATION,
 register.natality(specification = EHE.SPECIFICATION,
                   parent.groups = 'uninfected',
                   child.groups = 'uninfected',
-                  fertility.rate.value = 'immigration',
+                  fertility.rate.value = 'general.immigration',
                   birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
                   parent.child.concordant.dimensions = c('age','race','sex','risk'),
                   all.births.into.compartments = list(),
@@ -884,27 +916,37 @@ register.natality(specification = EHE.SPECIFICATION,
 register.natality(specification = EHE.SPECIFICATION,
                   parent.groups = 'infected',
                   child.groups = 'infected',
-                  fertility.rate.value = 'immigration',
+                  fertility.rate.value = 'hiv.immigration',
                   birth.proportions.value = 'null.proportions', # because we're actually fixing all the strata below 
                   parent.child.concordant.dimensions = c('age','race','sex','risk','continuum'),
                   all.births.into.compartments = list(),
                   tag = "immigration")
 
 ##----------------##
-##-- Emigration --## ----
+##-- Emigration --##
 ##----------------##
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'emigration',
+                       name = 'general.emigration',
+                       get.functional.form.function = get.emigration.rates.functional.form,
+                       functional.form.from.time = 2007,
+                       scale = 'rate')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'hiv.emigration',
                        get.functional.form.function = get.emigration.rates.functional.form,
                        functional.form.from.time = 2007,
                        scale = 'rate')
 
 register.mortality(EHE.SPECIFICATION,
-                   mortality.rate.value = "emigration",
-                   groups = c("uninfected","infected"), 
+                   mortality.rate.value = "general.emigration",
+                   groups = c("uninfected"), 
                    tag = "emigration")
 
+register.mortality(EHE.SPECIFICATION,
+                   mortality.rate.value = "hiv.emigration",
+                   groups = c("infected"), 
+                   tag = "emigration")
 
 
 ##--------------------------------##
@@ -1482,11 +1524,39 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr))
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'male.vs.female.heterosexual.rr',
+                       name = 'black.male.vs.female.heterosexual.rr',
                        value = 3.75/4.75 * 87.4/92,
                        # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
                        # 2) ratio of condomless vaginal sex (male vs female)
                        scale = 'ratio')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'hispanic.male.vs.female.heterosexual.rr',
+                       value = 3.75/4.75 * 87.4/92,
+                       # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
+                       # 2) ratio of condomless vaginal sex (male vs female)
+                       scale = 'ratio')
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'other.male.vs.female.heterosexual.rr',
+                       value = 3.75/4.75 * 87.4/92,
+                       # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
+                       # 2) ratio of condomless vaginal sex (male vs female)
+                       scale = 'ratio')
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'male.vs.female.heterosexual.rr',
+                        value = 'other.male.vs.female.heterosexual.rr')
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'male.vs.female.heterosexual.rr',
+                               applies.to = list(race.to='black'),
+                               value = 'black.male.vs.female.heterosexual.rr')
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'male.vs.female.heterosexual.rr',
+                               applies.to = list(race.to='hispanic'),
+                               value = 'hispanic.male.vs.female.heterosexual.rr')
 
 TRATE.MIN = 1e-05
 register.model.element(EHE.SPECIFICATION,
@@ -1971,6 +2041,25 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       exclude.tags = "emigration",
                       keep.dimensions = c('location','sex'))
 
+register.model.element(EHE.SPECIFICATION,
+                       name = 'p.ndi.missed.deaths',
+                       scale = 'proportion',
+                       value = 458 / (1926 + 12219))
+    # 458 / (1926 + 12219) #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2773949/
+    # 458 in NDI alone)
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'biased.hiv.mortality',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Mortality in PWH per NDI',
+                                                                    description = "Number of People with Diagnosed HIV who Died of Any Cause in the Past Year (as Recorded by NDI)",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Deaths',
+                                                                    units = 'deaths',
+                                                                    singular.unit = 'death'),
+                         value = expression(hiv.mortality * (1-p.ndi.missed.deaths)),
+                         force.dim.names.to.keep.dimensions = T,
+                         keep.dimensions = c('location','sex'))
+
 track.integrated.outcome(EHE.SPECIFICATION,
                          name = 'diagnosed.prevalence',
                          outcome.metadata = create.outcome.metadata(display.name = 'Prevalence (of Diagnosed PWH)',
@@ -2086,7 +2175,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                       corresponding.data.outcome = 'deaths',
                       groups = NULL,
                       exclude.tags = "emigration",
-                      keep.dimensions = character())
+                      keep.dimensions = 'location')
 
 track.cumulative.outcome(EHE.SPECIFICATION,
                          name = 'number.injecting.drugs',

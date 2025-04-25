@@ -63,7 +63,7 @@ census.manager$register.ontology(
 #Codes:
 
 
-DATA.DIR.CENSUS.COUNTY="../../data_raw/population/county_00.23"
+DATA.DIR.CENSUS.COUNTY="Q:/data_raw/population/county_00.23"
 
 census_county_files <- Sys.glob(paste0(DATA.DIR.CENSUS.COUNTY, '/*.csv'))
 
@@ -100,22 +100,17 @@ data.list.county = lapply(data.list.county.pop, function(file){
   
   if(grepl("10.19", filename)) { #Location is calculated differently here because FIPS is not available
     
-    data$state = sub('.*,\\s*', '', data$COUNTY)
-    data$county = gsub(",.*$", "", data$COUNTY)
-    data$location.list = locations::get.location.code(data$county, 'COUNTY')
-    data$state.abb = state.abb[match(data$state,state.name)]
-    
-    data$location.codes = sapply(1:nrow(data), function(i){
-      intersect(unlist(get.location.code(data$county[i], 'COUNTY')), get.contained.locations((data$state.abb[i]), 'COUNTY')
-      )})
-    
-    data$location = as.character(data$location.codes)
-    data$location = ifelse(data$location.list == "11001", '11001', data$location)
-    data$location = ifelse(data$county == "Yellowstone County", '30111', data$location) #Yellowstone county is associated with 30111 and 30113.  It looks like 30113 stopped being used in 1989.
-    data$location.check = locations::is.location.valid(data$location)
-    
-    data <- data %>%
-      filter(location.check == "TRUE")#Manually removing these counties until I know otherwise
+      
+      data = subset(data, data$COUNTY != "0") #this removes states
+      
+      data$state_code_clean= str_pad(data$STATE, width=2, side="left", pad="0")
+      data$county_code_clean= str_pad(data$COUNTY, width=3, side="left", pad="0")
+      
+      #Combine county and county codes into FIPS- change FIPS to 'location'
+      data$FIPS= paste(data$state_code_clean, data$county_code_clean, sep="")
+      
+      data$location = data$FIPS
+      
     
   }
   
@@ -190,6 +185,8 @@ data.list.county = lapply(data.list.county.pop, function(file){
   
   data$year = as.character(data$year) 
   
+  data = subset(data, data$location != "51515") #Removing county we took out of locations package
+  
   data= as.data.frame(data)
   
   list(filename, data) #what to return# 
@@ -228,7 +225,7 @@ data.list.county.deaths.21.23 = lapply(data.list.county, function(file){
 #This data used to be with the population estimates but once we updated the data
 #For the 2010-2019 intercensal estimates, the data is separate
 ################################################################################
-DATA.DIR.CENSUS.DEATHS="../../data_raw/population/deaths_10_19"
+DATA.DIR.CENSUS.DEATHS="Q:/data_raw/population/deaths_10_19"
 
 deaths_10_19_files <- Sys.glob(paste0(DATA.DIR.CENSUS.DEATHS, '/*.csv'))
 

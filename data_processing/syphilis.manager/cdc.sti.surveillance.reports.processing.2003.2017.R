@@ -3,7 +3,7 @@
 
 # Read in excel files -----------------------------------------------------
 
-DATA.DIR.CDC.REPORTS="../../data_raw/syphilis.manager/cdc.syphilis.reports/table.a2.2003.2017"
+DATA.DIR.CDC.REPORTS="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/table.a2.2003.2017"
 
 cdc.reports.files <- Sys.glob(paste0(DATA.DIR.CDC.REPORTS, '/*.xlsx'))
 
@@ -21,7 +21,7 @@ primary.secondary.male= lapply(cdc.reports.raw, function(file){
   filename = file[["filename"]]
   
   data$location = "US"
-  data$year = substr(filename, 54, 57)
+  data$year = str_sub(filename, -9, -6)
   data$sex = 'male'
 
   data <- data %>%
@@ -30,7 +30,9 @@ primary.secondary.male= lapply(cdc.reports.raw, function(file){
     rename(outcome = Disease)%>%
     rename(value = 'Total Male')%>%
     mutate(outcome = tolower(outcome))%>%
-    mutate(outcome = gsub(" ", ".", outcome))
+    mutate(outcome = gsub(" ", ".", outcome))%>%
+    mutate(outcome = paste(outcome, ".diagnoses"))%>%
+    mutate(outcome = gsub(" ", "", outcome))
 
   
 data= as.data.frame(data)
@@ -45,7 +47,7 @@ primary.secondary.female= lapply(cdc.reports.raw, function(file){
   filename = file[["filename"]]
   
   data$location = "US"
-  data$year = substr(filename, 54, 57)
+  data$year = str_sub(filename, -9, -6)
   data$sex = 'female'
   
   data <- data %>%
@@ -54,7 +56,9 @@ primary.secondary.female= lapply(cdc.reports.raw, function(file){
     rename(outcome = Disease)%>%
     rename(value = 'Total Female')%>%
     mutate(outcome = tolower(outcome))%>%
-    mutate(outcome = gsub(" ", ".", outcome))
+    mutate(outcome = gsub(" ", ".", outcome))%>%
+    mutate(outcome = paste(outcome, ".diagnoses"))%>%
+    mutate(outcome = gsub(" ", "", outcome))
   
   
   data= as.data.frame(data)
@@ -69,7 +73,7 @@ primary.secondary.total = lapply(cdc.reports.raw, function(file){
   filename = file[["filename"]]
   
   data$location = "US"
-  data$year = substr(filename, 54, 57)
+  data$year = str_sub(filename, -9, -6)
   
   data <- data %>%
     select(Disease, location, year, `Total Total`)%>%
@@ -77,7 +81,9 @@ primary.secondary.total = lapply(cdc.reports.raw, function(file){
     rename(outcome = Disease)%>%
     rename(value = 'Total Total')%>%
     mutate(outcome = tolower(outcome))%>%
-    mutate(outcome = gsub(" ", ".", outcome))
+    mutate(outcome = gsub(" ", ".", outcome))%>%
+    mutate(outcome = paste(outcome, ".diagnoses"))%>%
+    mutate(outcome = gsub(" ", "", outcome))
   
   
   data= as.data.frame(data)

@@ -5,7 +5,7 @@ options(error=NULL)
 
 # Read in SDH Data --------------------------------------------------------
 
-DATA.DIR.SDH="../../data_raw/syphilis.manager/sdh"
+DATA.DIR.SDH="Q:/data_raw/syphilis.manager/sdh"
 sdh_files <- Sys.glob(paste0(DATA.DIR.SDH, '/*.csv'))
 data.list.sdh <- lapply(sdh_files, function(x){
   skip=7
@@ -101,7 +101,7 @@ for (data in sdh.clean.put) {
 
 # SDH- Rural Area (This has a separate source and is by STATE) ------------
   
-  DATA.DIR.RURAL="../../data_raw/syphilis.manager/sdh/rural.area"
+  DATA.DIR.RURAL="Q:/data_raw/syphilis.manager/sdh/rural.area"
   rural_files <- Sys.glob(paste0(DATA.DIR.RURAL, '/*.csv'))
   rural.data <- lapply(rural_files, function(x){
     skip=7
@@ -191,7 +191,7 @@ for (data in sdh.clean.put) {
 
 # National Level SDH Data -------------------------------------------------
   
-  DATA.DIR.SDH.NATIONAL="../../data_raw/syphilis.manager/sdh/national"
+  DATA.DIR.SDH.NATIONAL="Q:/data_raw/syphilis.manager/sdh/national"
   national_sdh_files <- Sys.glob(paste0(DATA.DIR.SDH.NATIONAL, '/*.csv'))
   national.sdh.data <- lapply(national_sdh_files, function(x){
     skip=7

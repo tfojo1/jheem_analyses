@@ -3,7 +3,7 @@
 
 options(error=NULL)
 
-DATA.DIR.FERTILITY="../../data_raw/syphilis.manager/fertility"
+DATA.DIR.FERTILITY="Q:/data_raw/syphilis.manager/fertility"
 
 fertility.files <- list.files(DATA.DIR.FERTILITY, pattern = ".txt", full.names = "TRUE")
 
@@ -19,7 +19,7 @@ births.county = lapply(data.list.fertility, function(file){
   data=file[["data"]]
   filename = file[["filename"]]
   
-  data$outcome = 'births'
+  data$outcome = 'births.numerator.for.fertility.rate'
   data$year = as.character(data$Year)
   data$age = data$'Age.of.Mother.9'
   data$ethnicity = data$'Mother.s.Hispanic.Origin'
@@ -115,7 +115,7 @@ female.population.county = lapply(births.county, function(file){
    data <- data %>%
      select(-outcome)%>%
      select(year, location, age, race, ethnicity, value)%>%
-     mutate(outcome = 'female.population')
+     mutate(outcome = 'female.population.denominator.for.fertility.rate')
   
    data = as.data.frame(data)
 list(filename, data) 

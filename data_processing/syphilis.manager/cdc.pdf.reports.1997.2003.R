@@ -4,7 +4,7 @@
 
 # National- Total Level Data ----------------------------------------------
 
-DATA.DIR.PDF.REPORTS="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.totals"
+DATA.DIR.PDF.REPORTS="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.totals"
 
 pdf.reports <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS, '/*.csv'))
 
@@ -36,16 +36,16 @@ national.totals = lapply(cdc.pdf.reports, function(file){
     mutate(location = "US")
 
   if(grepl("early.latent", filename)) {
-    data$outcome = 'early.syphilis'
+    data$outcome = 'early.syphilis.diagnoses'
   }
   if(grepl("ps", filename)) {
-    data$outcome = 'ps.syphilis'
+    data$outcome = 'ps.syphilis.diagnoses'
   }
   if(grepl("late.latent", filename)) {
-    data$outcome = 'unknown.duration.or.late.syphilis'
+    data$outcome = 'unknown.duration.or.late.syphilis.diagnoses'
   }
   if(grepl("all.stages", filename)) {
-  data$outcome = 'all.syphilis.cases'
+  data$outcome = 'total.syphilis.diagnoses'
   }
   
   #Pull the most recent report of a particular year. Ex. 2003 Report has the most recent values for 1999:
@@ -97,7 +97,7 @@ for (data in national.totals.put) {
 
 # MSA - Total Level Data --------------------------------------------------
 
-DATA.DIR.PDF.REPORTS.MSA="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.totals"
+DATA.DIR.PDF.REPORTS.MSA="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.totals"
 
 pdf.reports.msa <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS.MSA, '/*.csv'))
 
@@ -125,16 +125,16 @@ msa.totals = lapply(cdc.pdf.reports.msa, function(file){
 
 
   if(grepl("early.latent", filename)) {
-    data$outcome = 'early.syphilis'
+    data$outcome = 'early.syphilis.diagnoses'
   }
   if(grepl("ps", filename)) {
-    data$outcome = 'ps.syphilis'
+    data$outcome = 'ps.syphilis.diagnoses'
   }
   if(grepl("late.latent", filename)) {
-    data$outcome = 'unknown.duration.or.late.syphilis'
+    data$outcome = 'unknown.duration.or.late.syphilis.diagnoses'
   }
   if(grepl("all.stages", filename)) {
-    data$outcome = 'all.syphilis.cases'
+    data$outcome = 'total.syphilis.diagnoses'
   }
 
   #Pull the most recent report of a particular year. Ex. 2003 Report has the most recent values for 1999:
@@ -210,7 +210,7 @@ for (data in msa.totals.put) {
 }
 
 # MSA - Stratified Data ---------------------------------------------------
-DATA.DIR.PDF.REPORTS.MSA.STRATIFIED="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.stratified"
+DATA.DIR.PDF.REPORTS.MSA.STRATIFIED="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.stratified"
 
 pdf.reports.msa.strata <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS.MSA.STRATIFIED, '/*.csv'))
 
@@ -238,16 +238,16 @@ stratified.msa = lapply(stratified.msa.raw, function(file){
   
   
   if(grepl("early.latent", filename)) {
-    data$outcome = 'early.syphilis'
+    data$outcome = 'early.syphilis.diagnoses'
   }
   if(grepl("ps", filename)) {
-    data$outcome = 'ps.syphilis'
+    data$outcome = 'ps.syphilis.diagnoses'
   }
   if(grepl("late.latent", filename)) {
-    data$outcome = 'unknown.duration.or.late.syphilis'
+    data$outcome = 'unknown.duration.or.late.syphilis.diagnoses'
   }
   if(grepl("all.stages", filename)) {
-    data$outcome = 'all.syphilis.cases'
+    data$outcome = 'total.syphilis.diagnoses'
   }
   
   #Pull the most recent report of a particular year. Ex. 2003 Report has the most recent values for 1999:
@@ -332,7 +332,7 @@ for (data in stratified.msa.put) {
 
 # National- Stratified Data ----------------------------------------------
 
-DATA.DIR.PDF.REPORTS.NATIONAL.STRAT="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/ps.syphilis_national_age_sex_race"
+DATA.DIR.PDF.REPORTS.NATIONAL.STRAT="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/ps.syphilis_national_age_sex_race"
 
 national.stratified.reports <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS.NATIONAL.STRAT, '/*.xlsx'))
 
@@ -353,9 +353,9 @@ national.age.group = lapply(national.stratified.one, function(file){
     rename(age = 'Age Group')%>%
     rename(value = Total)%>%
     mutate(location = "US")%>%
-    mutate(outcome = 'ps.syphilis')%>%
+    mutate(outcome = 'ps.syphilis.diagnoses')%>%
     filter(age != 'Total')%>%
-    mutate(age = if_else(age == '10-14 years', "0-10 years", age))%>% #Decided 2-12 to change this ontology to make it align with 0-10 ontology for other syphilis data
+    mutate(age = if_else(age == '10-14 years', "0-14 years", age))%>% #Decided 2-12 to change this ontology to make it align with 0-10 ontology for other syphilis data
     select(outcome, location, value, age)
 
   #Pull the most recent report of a particular year. Ex. 2003 Report has the most recent values for 1999:
@@ -400,7 +400,7 @@ national.race = lapply(national.stratified.one, function(file){
     pivot_longer(cols = contains("Total"),
                  names_to = "race",
                  values_to = "value")%>%
-    mutate(outcome = 'ps.syphilis')%>%
+    mutate(outcome = 'ps.syphilis.diagnoses')%>%
     mutate(location = "US")%>%
     mutate(race = case_when(race == "White, NH Total" ~ "white, non hispanic",
                             race == "Black, NH Total" ~ "black, non hispanic",
@@ -454,11 +454,11 @@ national.age.race.sex = lapply(national.stratified.one, function(file){
     mutate(sex = tolower(word(race, -1)))%>%
     mutate(race = gsub("Male", "", race))%>%
     mutate(race = gsub("Female", "", race))%>%
-    mutate(outcome = 'ps.syphilis')%>%
+    mutate(outcome = 'ps.syphilis.diagnoses')%>%
     mutate(location = "US") %>%
     rename(age = `Age Group`)%>%
     filter(age != "Total")%>%
-    mutate(age = if_else(age == '10-14 years', "0-10 years", age))%>% #Decided 2-12 to change this ontology to make it align with 0-10 ontology for other syphilis data
+    mutate(age = if_else(age == '10-14 years', "0-14 years", age))%>% #Decided 2-12 to change this ontology to make it align with 0-10 ontology for other syphilis data
     mutate(race = case_when(race == "White, NH " ~ "white, non hispanic",
                             race == "Black, NH " ~ "black, non hispanic",
                             race == "Hispanic " ~ "hispanic",
@@ -537,7 +537,7 @@ for (data in national.age.race.sex.put) {
 
 
 # National - Sex Alone ----------------------------------------------------
-DATA.DIR.PDF.REPORTS.NATIONAL.SEX="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/ps.syphilis_national_sex"
+DATA.DIR.PDF.REPORTS.NATIONAL.SEX="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.stratified/ps.syphilis_national_sex"
 
 national.sex.files <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS.NATIONAL.SEX, '/*.csv'))
 
@@ -569,7 +569,7 @@ national.sex.clean = lapply(national.sex, function(file){
     mutate(location = "US")
 
   if(grepl("ps", filename)) {
-    data$outcome = 'ps.syphilis'
+    data$outcome = 'ps.syphilis.diagnoses'
   }
   
   if(grepl("_female", filename)) {
@@ -630,7 +630,7 @@ for (data in national.sex.clean.put) {
 
 # National Level Neurosyphilis --------------------------------------------
 #Reports for neurosyphilis are from the current year of report (not reported retrospectively like the other outcomes)
-DATA.DIR.NEURO="../../data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/neurosyphilis"
+DATA.DIR.NEURO="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/neurosyphilis"
 
 pdf.reports.neuro <- Sys.glob(paste0(DATA.DIR.NEURO, '/*.csv'))
 
@@ -647,7 +647,7 @@ neurosyphilis.clean = lapply(cdc.pdf.reports.neuro, function(file){
     select(disease, `total.total`)%>%
     filter(disease == "Neurosyphilis")%>%
     mutate(location= "US")%>%
-    mutate(outcome = "neurosyphilis")%>%
+    mutate(outcome = "cns.syphilis.diagnoses")%>%
     rename(value = `total.total`)%>%
     mutate(value = as.numeric(value))
   

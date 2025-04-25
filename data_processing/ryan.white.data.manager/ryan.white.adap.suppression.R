@@ -4,7 +4,7 @@
 #source = nastad.adap
 
 
-DATA.DIR.RYAN.WHITE.NASTAD="../../data_raw/ryan.white.pdf.tables/viral.suppression/nastad"
+DATA.DIR.RYAN.WHITE.NASTAD="Q:/data_raw/ryan.white.pdf.tables/viral.suppression/nastad"
 
 nastad.files <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.NASTAD, '/*.csv'))
 
@@ -30,6 +30,12 @@ nastad.suppression.clean = lapply(nastad.suppression, function(file){
     }
   if(grepl("2021", filename)) {
     data$year = "2021"
+  }
+  if(grepl("2020", filename)) {
+    data$year = "2020"
+  }
+  if(grepl("2019", filename)) {
+    data$year = "2019"
   }
   
   data= as.data.frame(data)

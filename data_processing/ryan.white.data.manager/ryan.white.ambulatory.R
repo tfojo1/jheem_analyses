@@ -3,7 +3,7 @@
 #Renaming the outcome 'oahs.clients' rather than 'ambulatory.care.past.year'
 
 # Ambulatory (suppression total N) Data Total --------------------------------------------------------
-DATA.DIR.RYAN.WHITE.AMBULATORY="../../data_raw/ryan.white.pdf.tables/ambulatory"
+DATA.DIR.RYAN.WHITE.AMBULATORY="Q:/data_raw/ryan.white.pdf.tables/ambulatory"
 
 ambulatory.files <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.AMBULATORY, '/*.csv'))
 
@@ -85,12 +85,40 @@ ryan.white.ambulatory.clean = lapply(ryan.white.ambulatory, function(file){
   data$location = as.character(data$location)
   data$year = trimws(data$year)
 
-  ##Check with Todd: the only new year from data from 2022 report is 2018, the other years are reported in 2023 so I'm using those##
-  if(grepl("2022", filename)) {
-    data<-data %>%
+  ##Taking the most recent report of the oldest year:
+  if(grepl("non.adap_2022", filename)) {
+    data <- data %>%
       filter(year == "2018")
   }
-  ##   ##
+  if(grepl("non.adap_2021", filename)) {
+    data <- data %>%
+      filter(year == "2017")
+  }
+  if(grepl("non.adap_2020", filename)) {
+    data <- data %>%
+      filter(year == "2016")
+  }
+  if(grepl("non.adap_2019", filename)) {
+    data <- data %>%
+      filter(year == "2015")
+  }
+  if(grepl("non.adap_2018", filename)) {
+    data <- data %>%
+      filter(year == "2014")
+  }
+  if(grepl("non.adap_2017", filename)) {
+    data <- data %>%
+      filter(year == "2013")
+  }
+  if(grepl("adap.clients_2021", filename)) {
+    data <- data %>%
+      filter(year == "2017")
+  }
+  if(grepl("adap.clients_2020", filename)) {
+    data <- data %>%
+      filter(year == "2016")
+  }
+  ####
   
   data= as.data.frame(data)
   list(filename, data)
@@ -110,7 +138,7 @@ for (data in ryan.white.ambulatory.clean.put) {
 
 # Stratified Ambulatory ---------------------------------------------------
 
-DATA.DIR.RYAN.WHITE.AMBULATORY.STRATA="../../data_raw/ryan.white.pdf.tables/ambulatory/stratified"
+DATA.DIR.RYAN.WHITE.AMBULATORY.STRATA="Q:/data_raw/ryan.white.pdf.tables/ambulatory/stratified"
 
 ambulatory.files.stratified <- Sys.glob(paste0(DATA.DIR.RYAN.WHITE.AMBULATORY.STRATA, '/*.csv'))
 
@@ -190,9 +218,23 @@ ryan.white.ambulatory.stratified.clean = lapply(ryan.white.ambulatory.stratified
   if(grepl("2023", filename)) {
     data$year = "2023"
   }
-  
   if(grepl("2022", filename)) {
     data$year = "2022"
+  }
+  if(grepl("2021", filename)) {
+    data$year = "2021"
+  }
+  if(grepl("2020", filename)) {
+    data$year = "2021"
+  }
+  if(grepl("2019", filename)) {
+    data$year = "2019"
+  }
+  if(grepl("2018", filename)) {
+    data$year = "2018"
+  }
+  if(grepl("2017", filename)) {
+    data$year = "2017"
   }
   
   data$value = as.numeric(gsub(",", "", data$value))
@@ -202,12 +244,21 @@ ryan.white.ambulatory.stratified.clean = lapply(ryan.white.ambulatory.stratified
   if(grepl("race", filename)) {
   data <- data %>%
     group_by(location, race)%>%
-    mutate(summed.value = sum(value, na.rm = T))
+    mutate(summed.value = sum(value, na.rm = T))%>%
+    select(-value)%>%
+    rename(value = summed.value)
+  
+  #Manually remove Dallas MSA (they did not report data for 2022 by race but Fort Worth did)
+  data<-data%>%
+    mutate(drop_var = ifelse(location == "C.19100" & year == "2022", "1", "0"))%>%
+    filter(drop_var != "1")
   }
   if(grepl("age", filename)) {
     data <- data %>%
       group_by(location, age)%>%
-      mutate(summed.value = sum(value, na.rm = T))
+      mutate(summed.value = sum(value, na.rm = T))%>%
+      select(-value)%>%
+      rename(value = summed.value)
   }
   data$location = as.character(data$location)
   

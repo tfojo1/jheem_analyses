@@ -2,6 +2,7 @@ library(jheem2)
 library(tidyverse)
 library(readxl)
 library(tools)
+library(locations)
 
 ###############################################################################
 
@@ -22,22 +23,22 @@ data.manager$register.outcome(
     description = "Populaion Estimate"))
 
 data.manager$register.outcome(
-  'births',
+  'births.numerator.for.fertility.rate',
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Births',
-    axis.name = 'Births',
+    display.name = 'Births- Numerator for Fertility Rate',
+    axis.name = 'Births- Numerator for Fertility Rate',
     units = 'births',
-    description = "Births"))
+    description = "Births- Numerator for Fertility Rate"))
 
 data.manager$register.outcome(
-  'female.population', 
+  'female.population.denominator.for.fertility.rate', 
   metadata = create.outcome.metadata(
     scale = 'non.negative.number',
-    display.name = 'Female Population',
-    axis.name = 'Female Population',
+    display.name = 'Female Population- Denominator for Fertility Rate',
+    axis.name = 'Female Population- Denominator for Fertility Rate',
     units = 'cases',
-    description = "Female Population Age 15-44"))
+    description = "Female Population Age 15-44 - - Denominator for Fertility Rate"))
 
 data.manager$register.outcome(
   'fertility.rate', 
@@ -46,7 +47,7 @@ data.manager$register.outcome(
     display.name = 'Fertility Rate',
     axis.name = 'Fertility Rate',
     units = '%',
-    description = "Fertility Rate"), denominator.outcome = 'female.population') 
+    description = "Fertility Rate"), denominator.outcome = 'female.population.denominator.for.fertility.rate') 
 
 data.manager$register.outcome(
   'deaths',
@@ -120,6 +121,24 @@ data.manager$register.outcome(
     units = '%',
     description = "No Prenatal Care"), denominator.outcome = 'prenatal.screening.denominator')
 
+data.manager$register.outcome(
+  'completeness.prenatal.care.initiation.first.trimester',
+  metadata = create.outcome.metadata(
+    scale = 'proportion',
+    display.name = 'Prenatal Care Initiation First Trimester - Completeness',
+    axis.name = 'Prenatal Care Initiation First Trimester - Completeness',
+    units = '%',
+    description = "Prenatal Care Initiation First Trimester - Completeness"), denominator.outcome = 'population')
+
+data.manager$register.outcome(
+    'completeness.female.population.denominator.for.fertility.rate', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Completeness of Female Population- Denominator for Fertility Rate',
+        axis.name = 'Completeness of Female Population- Denominator for Fertility Rate',
+        units = '%',
+        description = "Completeness of Female Population Age 15-44 - - Denominator for Fertility Rate"), denominator.outcome = 'population')
+
 #Register Sources:
 data.manager$register.parent.source('NVSS', full.name = 'National Vital Statistics System', short.name= "NVSS")
 data.manager$register.parent.source('NCHS', full.name = 'National Center for Health Statistics', short.name= "NCHS")
@@ -192,8 +211,8 @@ data.manager$register.ontology(
   ont = ontology(
     year= c("2006-2010", "2011-2015", "2016-2020"),
     location= NULL,
-    age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
-            "65-69 years", "70-74 years", "75+ years"),
+    age = c('0-14 years', '15-19 years',  '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+                '40-44 years', '45-49 years', '50-54 years', '55-64 years', '65+ years'),
     race=c("hispanic or latino", "black", 'other'),
     sex=c('male','female'),
     incomplete.dimensions = c("year", "location")
@@ -204,9 +223,9 @@ data.manager$register.ontology(
   ont = ontology(
     year= NULL,
     location= NULL,
-    age = c("1-4 years", "5-17 years", "18-19 years", "20-24 years", "25-29 years", "30-34 years", "35-39 years", "40-44 years", "45-49 years", "50-54 years", "55-59 years", "60-64 years",
-            "65-69 years", "70-74 years", "75+ years"),
-    race=c('black', 'hispanic', 'other'),
+    age = c('0-14 years', '15-19 years',  '20-24 years', '25-29 years', '30-34 years', '35-39 years',
+                '40-44 years', '45-49 years', '50-54 years', '55-64 years', '65+ years'),
+     race=c('black', 'hispanic', 'other'),
     sex=c('male','female'),
     incomplete.dimensions = c("year", "location")
   ))
@@ -217,8 +236,10 @@ source('data_processing/syphilis.manager/cached.census.data.R')
 source('data_processing/syphilis.manager/cached.fertility.data.R')
 source('data_processing/syphilis.manager/msa_immigration.R')
 source('data_processing/syphilis.manager/national_immigration.R')
+source('data_processing/syphilis.manager/restratify.immigration.age.R') #This code restratifies the age groups from census data to match SHIELD
 source('data_processing/syphilis.manager/prenatal.care.cdc.wonder.R')
 source('data_processing/syphilis.manager/prenatal.screening.denominator.R')
+
 
 #Aggregate Outcomes to MSA 
 syphilis.manager = data.manager
@@ -256,19 +277,27 @@ put.msa.data.as.new.source(outcome = 'population',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
 
-put.msa.data.as.new.source(outcome = 'female.population',
+# Source Code to Calculate Fertility Rate by MSA 
+source('data_processing/syphilis.manager/fertility.rate.msa.R')
+
+#Source code for prenatal data completes (needs to come after the population aggregation to mSA)
+source('data_processing/syphilis.manager/prenatal.completeness.R')
+source('data_processing/syphilis.manager/female.population.completeness.R')
+
+# Aggregate Prenatal Care to MSA ------------------------------------------
+
+put.msa.data.as.new.source(outcome = 'prenatal.screening.denominator',
                            from.source.name = 'cdc.wonder.natality',
                            to.source.name = 'cdc.wonder.aggregated.population',
                            to.locations =  MSAS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
+                           source.for.denominator = 'cdc.wonder.natality',
+                           ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
-# Source Code to Calculate Fertility Rate by MSA 
-source('data_processing/syphilis.manager/fertility.rate.msa.R')
-
-# Aggregate Prenatal Care to MSA ------------------------------------------
 put.msa.data.as.new.source(outcome = 'no.prenatal.care',
                            from.source.name = 'cdc.wonder.natality',
                            to.source.name = 'cdc.wonder.aggregated.population',
@@ -278,6 +307,8 @@ put.msa.data.as.new.source(outcome = 'no.prenatal.care',
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T,
+                           override.insufficient.denom.data.constraints = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.first.trimester',
@@ -289,6 +320,8 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.first.trimester',
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T,
+                           override.insufficient.denom.data.constraints = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.second.trimester',
@@ -300,6 +333,8 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.second.trimester'
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T,
+                           override.insufficient.denom.data.constraints = T,
                            data.manager = syphilis.manager)
 
 put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
@@ -311,6 +346,30 @@ put.msa.data.as.new.source(outcome = 'prenatal.care.initiation.third.trimester',
                            source.for.denominator = 'cdc.wonder.natality',
                            ontology.for.denominator = 'cdc.fertility',
                            details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T,
+                           override.insufficient.denom.data.constraints = T,
+                           data.manager = syphilis.manager)
+
+#The code 'fertility.rate.msa' sources another code 'aggregate.county.to.msa' which aggregates the fertility rate to MSA by aggregating
+#the numerator and denominator and calculating a rate.  But it doesn't put the aggregated numerator or denominator so I'm adding that here.
+put.msa.data.as.new.source(outcome = 'female.population.denominator.for.fertility.rate',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T,
+                           data.manager = syphilis.manager)
+
+put.msa.data.as.new.source(outcome = 'births.numerator.for.fertility.rate',
+                           from.source.name = 'cdc.wonder.natality',
+                           to.source.name = 'cdc.wonder.aggregated.population',
+                           to.locations =  MSAS.OF.INTEREST,
+                           geographic.type.from = 'COUNTY',
+                           geographic.type.to = 'CBSA',
+                           details.for.new.data = 'estimated from county data',
+                           aggregate.counts.with.whatever.we.have = T,
                            data.manager = syphilis.manager)
 
 #Save:

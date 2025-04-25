@@ -96,13 +96,21 @@ update.data.manager <- function(file) {
 update.jheem2.package <- function(upgrade.dependencies=c("default", "ask", "always", "never")[4]) {
     if (nchar(system.file(package = "jheem2")) == 0) {
         "Package 'jheem2' not found. Installing from Github..."
-        tryCatch({devtools::install_github("tfojo1/jheem2", upgrade = upgrade.dependencies)},
-                 error=function(e) {stop("Installing 'jheem2' from Github failed")})
+        if (Sys.getenv("ON_CLUSTER")=="true")
+            tryCatch({devtools::install_github("tfojo1/jheem2", upgrade = upgrade.dependencies, lib=Sys.getenv("R_LIBS_USER"))},
+                     error=function(e) {stop("Installing 'jheem2' from Github failed")})
+        else
+            tryCatch({devtools::install_github("tfojo1/jheem2", upgrade = upgrade.dependencies)},
+                     error=function(e) {stop("Installing 'jheem2' from Github failed")})
     }
     if (is.package.out.of.date("jheem2")) {
         "Current installation of package 'jheem2' is out of date. Installing from Github..."
         remove.packages("jheem2")
-        tryCatch({devtools::install_github("tfojo1/jheem2", upgrade = upgrade.dependencies)},
+        if (Sys.getenv("ON_CLUSTER")=="true")
+            tryCatch({devtools::install_github("tfojo1/jheem2", upgrade = upgrade.dependencies, lib=Sys.getenv("R_LIBS_USER"))},
+                     error=function(e) {stop("Installing 'jheem2' from Github failed. You may need to restart R and try again, making sure to close all R sessions that may be using the package")})
+        else
+            tryCatch({devtools::install_github("tfojo1/jheem2", upgrade = upgrade.dependencies)},
                  error=function(e) {stop("Installing 'jheem2' from Github failed. You may need to restart R and try again, making sure to close all R sessions that may be using the package")})
     }
     print(paste0("'jheem2' package is up to date with version ", packageVersion("jheem2")))

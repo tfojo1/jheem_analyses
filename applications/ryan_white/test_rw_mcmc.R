@@ -9,7 +9,8 @@ ehe.simset = get(load('../jheem2/debug_sims/baltimore_simset_2025.02.25.Rdata'))
 
 ehe.simset = ehe.simset$thin(keep = 5)
 
-simset = fit.rw.simset(ehe.simset, verbose=T)
+#simset = fit.rw.simset(ehe.simset, verbose=T)
+fitted.sim = fit.rw.simset(ehe.simset$last.sim(), verbose=T)
 
 simplot(simset, 'non.adap.clients', data.manager = RW.DATA.MANAGER)
 simplot(simset, 'oahs.clients', data.manager = RW.DATA.MANAGER)

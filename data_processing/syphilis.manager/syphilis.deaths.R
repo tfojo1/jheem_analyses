@@ -1,4 +1,4 @@
-DATA.DIR.SYPHILIS.DEATHS="../../data_raw/syphilis.manager/cdc.wonder.syphilis.deaths"
+DATA.DIR.SYPHILIS.DEATHS="Q:/data_raw/syphilis.manager/cdc.wonder.syphilis.deaths"
 
 syphilis.deaths.files <- list.files(DATA.DIR.SYPHILIS.DEATHS, pattern = ".txt", full.names = "TRUE")
 
@@ -36,7 +36,7 @@ for (data in syphilis.deaths.clean.put) {
 
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc.syphilis',
+    ontology.name = 'cdc.sti.two',
     source = 'cdc_wonder',
     dimension.values = list(),
     url = 'https://wonder.cdc.gov/mortsql.html',

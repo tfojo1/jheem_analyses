@@ -6,11 +6,13 @@ location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager = create.style.manager(color.data.by = "source") 
 stratum.style.manager = create.style.manager(color.data.by = "stratum") # this is the default right now 
 
-range(simset$get.mcmc.mixing.statistic(NULL))
-cbind(head(simset$get.mcmc.mixing.statistic(NULL),20))
+# range(simset$get.mcmc.mixing.statistic(NULL))
+# cbind(head(simset$get.mcmc.mixing.statistic(NULL),20))
 
 # Need to have this file locally
 #load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")
+
+#simset = retrieve.simulation.set('ehe',ST.LOUIS.MSA,'final.ehe',n.sim = 1000)
 
 ## --- ANDREW TO LOOK AT ---- ## 
 
@@ -48,6 +50,12 @@ simplot(simset$last.sim(),
 
 simplot(simset$last.sim(),
         simset,
+        facet.by = "risk", split.by = "sex", # race, risk, sex; 1- and 2-way 
+        outcomes = c("new"), 
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(simset$last.sim(),
+        simset,
         facet.by = "age", split.by = "sex", # race, risk, sex; 1- and 2-way 
         outcomes = c("new"), 
         dimension.values = list(year = 1980:2030)) 
@@ -61,6 +69,12 @@ simplot(simset$last.sim(),
 simplot(simset$last.sim(),
         simset,
         facet.by = "risk", split.by = "race", # race, risk, sex; 1- and 2-way 
+        outcomes = c("diagnosed.prevalence"), 
+        dimension.values = list(year = 1980:2030)) 
+
+simplot(simset$last.sim(),
+        simset,
+        facet.by = "risk", split.by = "sex", # race, risk, sex; 1- and 2-way 
         outcomes = c("diagnosed.prevalence"), 
         dimension.values = list(year = 1980:2030)) 
 
@@ -84,11 +98,11 @@ simplot(simset$last.sim(),
         dimension.values = list(year = 2000:2030)) 
 
 # must ask for years 1981-2001 
-simplot(simset$last.sim(),
-        simset,
-        outcomes = c("aids.deaths"), 
-        style.manager = location.style.manager,
-        dimension.values = list(year = 1981:2001)) 
+# simplot(simset$last.sim(),
+#         simset,
+#         outcomes = c("aids.deaths"), 
+#         style.manager = location.style.manager,
+#         dimension.values = list(year = 1981:2001)) 
 
 simplot(simset$last.sim(),
         simset,

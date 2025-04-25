@@ -1,6 +1,6 @@
 
 #  Syphilis (2000-2022) -----------------------------------
-DATA.DIR.SYPHILIS="../../data_raw/syphilis.manager/syphilis"
+DATA.DIR.SYPHILIS="Q:/data_raw/syphilis.manager/syphilis"
 syphilis_files <- Sys.glob(paste0(DATA.DIR.SYPHILIS, '/*.csv'))
 syphilis.data <- lapply(syphilis_files, function(x){
   skip=7
@@ -9,10 +9,10 @@ syphilis.data <- lapply(syphilis_files, function(x){
 
 # Mappings ----------------------------------------------------------------
 
-outcome.mappings.syphilis = c('Primary and Secondary Syphilis'='ps.syphilis',
-                              'Early Non-Primary, Non-Secondary Syphilis' = 'early.syphilis',
-                              'Congenital Syphilis' = 'congenital.syphilis',
-                              'Unknown Duration or Late Syphilis' = 'unknown.duration.or.late.syphilis')
+outcome.mappings.syphilis = c('Primary and Secondary Syphilis'='ps.syphilis.diagnoses',
+                              'Early Non-Primary, Non-Secondary Syphilis' = 'early.syphilis.diagnoses',
+                              'Congenital Syphilis' = 'congenital.syphilis.diagnoses',
+                              'Unknown Duration or Late Syphilis' = 'unknown.duration.or.late.syphilis.diagnoses')
 
 syphilis.mappings.age = c('0-14' = '0-14 years',  
                           '15-19' = '15-19 years',
@@ -93,7 +93,7 @@ for (data in syphilis.clean.put) {
 
 # Clean + Put Early Syphilis because age categories are different ---------
 
-DATA.DIR.SYPHILIS.EARLY="../../data_raw/syphilis.manager/syphilis/early.syphilis"
+DATA.DIR.SYPHILIS.EARLY="Q:/data_raw/syphilis.manager/syphilis/early.syphilis"
 syphilis_files_early <- Sys.glob(paste0(DATA.DIR.SYPHILIS.EARLY, '/*.csv'))
 syphilis.data.early <- lapply(syphilis_files_early, function(x){
   skip=7
@@ -168,9 +168,9 @@ for (data in early.syphilis.put) {
   
   data.manager$put.long.form(
     data = data,
-    ontology.name = 'cdc.syphilis',
+    ontology.name = 'cdc.sti.two',
     source = 'cdc.sti',
-    dimension.values.to.distribute = list(race=c('multiracial', 'unknown')),
+    dimension.values.to.distribute = list(race=c('multiracial', 'unknown'), age=('Unknown')),
     url = 'https://gis.cdc.gov/grasp/nchhstpatlas/main.html',
     details = 'CDC Atlas Plus')
 }

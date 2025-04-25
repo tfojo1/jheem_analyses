@@ -1,10 +1,10 @@
 #!/bin/bash
 
-#SBATCH --job-name=run_ehe_C.35380_full.with.covid2_1
+#SBATCH --job-name=R_C.35380_1
 #SBATCH --mem=16G
 #SBATCH --output=/scratch4/pkasaie1/azalesak/jheem/code/jheem_analyses/cluster_scripts/outputs/ehe/C.35380/run_full.with.covid2_1.out
 #SBATCH --time=36:00:00
-#SBATCH --partition=shared
+#SBATCH --partition=parallel
 #SBATCH --account=tfojo1
 
 source cluster_scripts/rockfish_module_loads.sh

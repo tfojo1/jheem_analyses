@@ -4,7 +4,7 @@
 #census_sas_files 2005-2017 data for the surveillance manager. Everything will be kept in the census
 #manager and this will just be an addition.
 
-DATA.DIR.POP.10.19 = "../../data_raw/population/county_stratified_10.19"
+DATA.DIR.POP.10.19 = "Q:/data_raw/population/county_stratified_10.19"
 
 pop.10.19 <- Sys.glob(paste0(DATA.DIR.POP.10.19, '/*.csv'))
 
@@ -31,7 +31,8 @@ census.race.mappings.10.19 = c('WA' = 'white',
                          'BA' = 'black',
                          'IA'= 'american indian and alaska native',
                          'AA' = 'asian',
-                         'NA' = 'native hawaiian and other pacific islander')
+                         'NA' = 'native hawaiian and other pacific islander',
+                         'TOM' = 'two or more races')
 census.eth.mappings.10.19 = c(  'H' = 'hispanic',
                           'NH' = 'not hispanic')
 census.age.mappings.10.19 = c('1' = '0-4 years', 
@@ -56,7 +57,7 @@ census.age.mappings.10.19 = c('1' = '0-4 years',
 #TAKE OUT YEAR = 1, 2
 population.race <- county_agegr_sex_race_eth_10.19%>%
   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
-         NA_MALE, NA_FEMALE)%>%
+         NA_MALE, NA_FEMALE, TOM_MALE, TOM_FEMALE)%>%
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
@@ -65,7 +66,7 @@ population.race <- county_agegr_sex_race_eth_10.19%>%
   mutate(location = paste(STATE, COUNTY, sep=""))%>%
   filter(AGEGRP == "0")%>% #only selecting the total here
   pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
-                             "NA_MALE", "NA_FEMALE")), 
+                             "NA_MALE", "NA_FEMALE", "TOM_MALE", "TOM_FEMALE")), 
                names_to = c("race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -172,7 +173,7 @@ population.sex.age= as.data.frame(population.sex.age)
 # RACE + AGE --------------------------------------------------------------
 population.race.age <- county_agegr_sex_race_eth_10.19%>%
   select(STATE, COUNTY, YEAR, AGEGRP, WA_MALE, WA_FEMALE, BA_MALE, BA_FEMALE, IA_MALE, IA_FEMALE, AA_MALE, AA_FEMALE,
-         NA_MALE, NA_FEMALE)%>%
+         NA_MALE, NA_FEMALE, TOM_MALE, TOM_FEMALE)%>%
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
@@ -180,7 +181,7 @@ population.race.age <- county_agegr_sex_race_eth_10.19%>%
   mutate(COUNTY = str_pad(COUNTY, width=3, side="left", pad="0"))%>%
   mutate(location = paste(STATE, COUNTY, sep=""))%>%
   pivot_longer(cols=c(one_of("WA_MALE", "WA_FEMALE", "BA_MALE", "BA_FEMALE", "IA_MALE", "IA_FEMALE", "AA_MALE", "AA_FEMALE",
-                             "NA_MALE", "NA_FEMALE")),
+                             "NA_MALE", "NA_FEMALE", "TOM_MALE", "TOM_FEMALE")),
                names_to = c("race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -231,7 +232,8 @@ population.race.eth.sex <- county_agegr_sex_race_eth_10.19%>%
          HAA_MALE, HAA_FEMALE, NHAA_MALE, NHAA_FEMALE,
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
-         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE,
+         NHTOM_MALE, NHTOM_FEMALE, HTOM_MALE, HTOM_FEMALE)%>%
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
@@ -243,7 +245,8 @@ population.race.eth.sex <- county_agegr_sex_race_eth_10.19%>%
                              "HAA_MALE", "HAA_FEMALE", "NHAA_MALE", "NHAA_FEMALE",
                              "HBA_MALE", "HBA_FEMALE", "NHBA_MALE", "NHBA_FEMALE",
                              "HWA_MALE", "HWA_FEMALE", "NHWA_MALE", "NHWA_FEMALE",
-                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE")),
+                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE",
+                             "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE")),
                names_to = c("combined.race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -257,7 +260,9 @@ population.race.eth.sex <- county_agegr_sex_race_eth_10.19%>%
                           combined.race == "NHBA" ~ "black",
                           combined.race == "NHIA" ~ "american indian and alaska native",
                           combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
-                          combined.race == "NHWA" ~ "white"))%>%
+                          combined.race == "NHWA" ~ "white",
+                          combined.race == "HTOM" ~ "two or more races",
+                          combined.race == "NHTOM" ~ "two or more races"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
@@ -275,7 +280,8 @@ population.age.race.eth <- county_agegr_sex_race_eth_10.19%>%
          HAA_MALE, HAA_FEMALE, NHAA_MALE, NHAA_FEMALE,
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
-         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE,
+         NHTOM_MALE, NHTOM_FEMALE, HTOM_MALE, HTOM_FEMALE)%>%
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
@@ -287,7 +293,8 @@ population.age.race.eth <- county_agegr_sex_race_eth_10.19%>%
                              "HAA_MALE", "HAA_FEMALE", "NHAA_MALE", "NHAA_FEMALE",
                              "HBA_MALE", "HBA_FEMALE", "NHBA_MALE", "NHBA_FEMALE",
                              "HWA_MALE", "HWA_FEMALE", "NHWA_MALE", "NHWA_FEMALE",
-                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE")),
+                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE",
+                             "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE")),
                names_to = c("combined.race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -301,7 +308,9 @@ population.age.race.eth <- county_agegr_sex_race_eth_10.19%>%
                           combined.race == "NHBA" ~ "black",
                           combined.race == "NHIA" ~ "american indian and alaska native",
                           combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
-                          combined.race == "NHWA" ~ "white"))%>%
+                          combined.race == "NHWA" ~ "white",
+                          combined.race == "HTOM" ~ "two or more races",
+                          combined.race == "NHTOM" ~ "two or more races"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
@@ -337,7 +346,8 @@ population.race.eth.sex.age <- county_agegr_sex_race_eth_10.19%>%
          HAA_MALE, HAA_FEMALE, NHAA_MALE, NHAA_FEMALE,
          HBA_MALE, HBA_FEMALE, NHBA_MALE, NHBA_FEMALE,
          HWA_MALE, HWA_FEMALE, NHWA_MALE, NHWA_FEMALE,
-         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE)%>%
+         HNA_MALE, HNA_FEMALE, NHNA_MALE, NHNA_FEMALE,
+         NHTOM_MALE, NHTOM_FEMALE, HTOM_MALE, HTOM_FEMALE)%>%
   mutate(YEAR = as.character(YEAR))%>%
   filter(YEAR != "1")%>% 
   filter(YEAR != "2")%>% 
@@ -349,7 +359,8 @@ population.race.eth.sex.age <- county_agegr_sex_race_eth_10.19%>%
                              "HAA_MALE", "HAA_FEMALE", "NHAA_MALE", "NHAA_FEMALE",
                              "HBA_MALE", "HBA_FEMALE", "NHBA_MALE", "NHBA_FEMALE",
                              "HWA_MALE", "HWA_FEMALE", "NHWA_MALE", "NHWA_FEMALE",
-                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE")),
+                             "HNA_MALE", "HNA_FEMALE", "NHNA_MALE", "NHNA_FEMALE",
+                             "NHTOM_MALE", "NHTOM_FEMALE", "HTOM_MALE", "HTOM_FEMALE")),
                names_to = c("combined.race", "sex"),
                names_sep = "_",
                values_to = "count.by.sex")%>%
@@ -363,7 +374,9 @@ population.race.eth.sex.age <- county_agegr_sex_race_eth_10.19%>%
                           combined.race == "NHBA" ~ "black",
                           combined.race == "NHIA" ~ "american indian and alaska native",
                           combined.race == "NHNA" ~ "native hawaiian and other pacific islander",
-                          combined.race == "NHWA" ~ "white"))%>%
+                          combined.race == "NHWA" ~ "white",
+                          combined.race == "HTOM" ~ "two or more races",
+                          combined.race == "NHTOM" ~ "two or more races"))%>%
   mutate(sex = tolower(sex))%>%
   mutate(year = as.character(year.mappings.10.19[YEAR]))%>%
   mutate(ethnicity = ifelse(ethniticy.indcator == "N", "not hispanic", 'hispanic'))%>%
@@ -395,9 +408,12 @@ population.race.eth.sex.age= as.data.frame(population.race.eth.sex.age)
 # Remove Problem Locations ------------------------------------------------
 #Note: Removing these in August 2024, they are counties from Alaska and Connecticut that existed after 2022
 #Removing them because they create NA values for prior years which then prevent the calculation of the restratify.age.groups function
-problem.locations = c("02063", "02066", "02261", "09001", "09003", "09005", "09007", "09009", "09011", 
-                      "09013", "09015", "09110", "09120", "09130", "09140", "09150", "09160", "09170", 
-                      "09180", "09190")
+
+# problem.locations = c("02063", "02066", "02261", "09001", "09003", "09005", "09007", "09009", "09011", 
+#                       "09013", "09015", "09110", "09120", "09130", "09140", "09150", "09160", "09170", 
+#                       "09180", "09190")
+
+problem.locations = c("02063", "02066", "02261")
 
 stratified.10.19.data = lapply(stratified.10.19.data, function(x) filter(x, !location %in% problem.locations))
 
@@ -410,7 +426,7 @@ for (data in stratified.10.19.data) {
     data = data,
     ontology.name = 'stratified.census',
     source = 'census.population',
-    dimension.values = list(),
+    dimension.values.to.distribute = list(race=c('two or more races')),
     url = 'www.census.gov',
     details = 'Census Reporting- Stratified 2010-2019 data is from the Vintage 2019')
 }
