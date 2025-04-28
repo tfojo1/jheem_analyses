@@ -132,6 +132,7 @@ par.aliases.transmission = list(
     other.trates.2 = (EHE.PARAMETERS.PRIOR@var.names[grepl('other.*trate\\.2', EHE.PARAMETERS.PRIOR@var.names)])
     
 )
+par.aliases.transmission = par.aliases.transmission[sapply(par.aliases.transmission, length)>0]
 
 register.calibration.info(CALIBRATION.CODE.TRANSMISSION,
                           likelihood.instructions = transmission.pop.idu.aware.aids.testing.likelihood.instructions,
