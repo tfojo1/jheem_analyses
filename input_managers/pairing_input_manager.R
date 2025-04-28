@@ -102,10 +102,10 @@ create.pairing.manager <- function(dir='../jheem_analyses/data_files/pairing')
     
     
     idu.oe.sex.2 = idu.oe.sex.1
-    idu.oe.sex.2['heterosexual_male','heterosexual_male'] = (idu.oe.sex['heterosexual_male','heterosexual_male'] + 1.05) / 2
-    idu.oe.sex.2['female','heterosexual_male'] = (idu.oe.sex['heterosexual_male','heterosexual_male'] + 0.65) / 2
-    idu.oe.sex.2['heterosexual_male','female'] = (idu.oe.sex['heterosexual_male','heterosexual_male'] + 1.27) / 2
-    idu.oe.sex.2['female','female'] = (idu.oe.sex['heterosexual_male','heterosexual_male'] + 1.21) / 2
+    idu.oe.sex.2['heterosexual_male','heterosexual_male'] = (idu.oe.sex.1['heterosexual_male','heterosexual_male'] + 1.05) / 2
+    idu.oe.sex.2['female','heterosexual_male'] = (idu.oe.sex.1['heterosexual_male','heterosexual_male'] + 0.65) / 2
+    idu.oe.sex.2['heterosexual_male','female'] = (idu.oe.sex.1['heterosexual_male','heterosexual_male'] + 1.27) / 2
+    idu.oe.sex.2['female','female'] = (idu.oe.sex.1['heterosexual_male','heterosexual_male'] + 1.21) / 2
     
     rv$idu.oe.sex = (idu.oe.sex.1 + idu.oe.sex.2) / 2
     
