@@ -86,10 +86,14 @@ create.pairing.manager <- function(dir='../jheem_analyses/data_files/pairing')
     sharing['heterosexual_male','female'] = 0.67
     sharing['msm','female'] = 0.15
     
-    counts = c(heterosexual_male=(1103-184),
-               msm=184,
-               female=606)
-    proportions = counts/sum(counts)
+    # ego.counts = c(heterosexual_male=(1103-184),
+    #            msm=184,
+    #            female=606)
+    ego.counts = c(heterosexual_male=272,
+                   msm=76,
+                   female=190)
+    partner.counts = colSums(t(sharing)*ego.counts)
+    proportions = partner.counts/sum(partner.counts)
     
     idu.oe.sex.1 = sharing/proportions
     
