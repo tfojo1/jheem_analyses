@@ -277,7 +277,7 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE.10,
 
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,
-                          likelihood.instructions = full.state.likelihood.instructions,
+                          likelihood.instructions = full.state.weighted.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 

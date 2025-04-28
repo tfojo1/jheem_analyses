@@ -149,12 +149,12 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'active.to.never.idu.ratio',
                        get.value.function = get.active.to.never.idu.ratio,
-                       scale = 'proportion')
+                       scale = 'ratio')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'prior.to.active.idu.ratio',
                        get.value.function = get.prior.to.active.idu.ratio,
-                       scale = 'proportion')
+                       scale = 'ratio')
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'seed.population',
@@ -656,14 +656,14 @@ register.model.element(EHE.SPECIFICATION,
                        name = 'idu.remission',
                        scale = 'rate',
                        get.functional.form.function = get.idu.remission.model,
-                       static=F,
+                       static=T,
                        functional.form.from.time = 1980)
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.relapse',
                        scale = 'rate',
                        get.functional.form.function = get.idu.relapse.model,
-                       static=F,,
+                       static=T,
                        functional.form.from.time = 1980)
 
 register.model.element(EHE.SPECIFICATION,
@@ -1524,39 +1524,11 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr))
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'black.male.vs.female.heterosexual.rr',
+                       name = 'male.vs.female.heterosexual.rr',
                        value = 3.75/4.75 * 87.4/92,
                        # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
                        # 2) ratio of condomless vaginal sex (male vs female)
                        scale = 'ratio')
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'hispanic.male.vs.female.heterosexual.rr',
-                       value = 3.75/4.75 * 87.4/92,
-                       # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
-                       # 2) ratio of condomless vaginal sex (male vs female)
-                       scale = 'ratio')
-
-register.model.element(EHE.SPECIFICATION,
-                       name = 'other.male.vs.female.heterosexual.rr',
-                       value = 3.75/4.75 * 87.4/92,
-                       # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
-                       # 2) ratio of condomless vaginal sex (male vs female)
-                       scale = 'ratio')
-
-register.model.quantity(EHE.SPECIFICATION,
-                        name = 'male.vs.female.heterosexual.rr',
-                        value = 'other.male.vs.female.heterosexual.rr')
-
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'male.vs.female.heterosexual.rr',
-                               applies.to = list(race.to='black'),
-                               value = 'black.male.vs.female.heterosexual.rr')
-
-register.model.quantity.subset(EHE.SPECIFICATION,
-                               name = 'male.vs.female.heterosexual.rr',
-                               applies.to = list(race.to='hispanic'),
-                               value = 'hispanic.male.vs.female.heterosexual.rr')
 
 TRATE.MIN = 1e-05
 register.model.element(EHE.SPECIFICATION,

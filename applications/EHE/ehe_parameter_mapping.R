@@ -423,9 +423,29 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
         
       model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
                                                                     alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                                    values = parameters[paste0('female.vs.heterosexual.male.idu.susceptibility.rr.', trate.parameter.times[i])],
+                                                                    values = parameters['female.idu.susceptibility.rr'],
                                                                     applies.to.dimension.values = 'female',
                                                                     dimension = 'sex.to')
+      
+      set.element.functional.form.interaction.alphas(model.settings,
+                                                     element.name = "heterosexual.trates",
+                                                     alpha.name = paste0('rate.', trate.alpha.times[i]),
+                                                     value = parameters['female.idu.susceptibility.rr'],
+                                                     applies.to.dimension.values = list(sex.to = 'female',
+                                                                                        risk.to = idu.states))
+      
+      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
+                                                                    alpha.name = paste0('rate.', trate.alpha.times[i]),
+                                                                    values = parameters['heterosexual.male.idu.susceptibility.rr'],
+                                                                    applies.to.dimension.values = 'heterosexual_male',
+                                                                    dimension = 'sex.to')
+      
+      set.element.functional.form.interaction.alphas(model.settings,
+                                                     element.name = "heterosexual.trates",
+                                                     alpha.name = paste0('rate.', trate.alpha.times[i]),
+                                                     value = parameters['heterosexual.male.idu.susceptibility.rr'],
+                                                     applies.to.dimension.values = list(sex.to = 'heterosexual_male',
+                                                                                        risk.to = idu.states))
     }
 
     set.element.functional.form.main.effect.alphas(model.settings = model.settings,
@@ -1132,6 +1152,7 @@ set.ehe.idu.from.parameters = function(model.settings,
     specification.metadata = model.settings$specification.metadata
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
+    n.ages = length(ages)
     
     for (time in times)
     {
@@ -1151,34 +1172,37 @@ set.ehe.idu.from.parameters = function(model.settings,
                                                                       applies.to.dimension.values = ages,
                                                                       dimension = 'age')
         
-        # param.name = paste0('young.incident.idu.multiplier.', time)
-        # model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
-        #                                                               alpha.name = alpha.name,
-        #                                                               values = parameters[param.name],
-        #                                                               applies.to.dimension.values = 1, # first age only 
-        #                                                               dimensions = 'age')
-        
         param.name = paste0('msm.incident.idu.multiplier.', time)
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
                                                                       alpha.name = alpha.name,
                                                                       values = parameters[param.name],
                                                                       applies.to.dimension.values = 'msm',
                                                                       dimension = 'sex')
-        
-        
-        
-        
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.remission',
-                                                                      alpha.name = alpha.name,
-                                                                      values = parameters[paste0('idu.remission.multiplier.', time)],
-                                                                      applies.to.dimension.values = 'all',
-                                                                      dimension = 'all')
-        
-        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.relapse',
-                                                                      alpha.name = alpha.name,
-                                                                      values = parameters[paste0('idu.relapse.multiplier.', time)],
-                                                                      applies.to.dimension.values = 'all',
-                                                                      dimension = 'all')
     }
+    
+    
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.remission',
+                                                                  alpha.name = 'value',
+                                                                  values = parameters['idu.remission.multiplier'],
+                                                                  applies.to.dimension.values = 'all',
+                                                                  dimension = 'all')
+    
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.relapse',
+                                                                  alpha.name = 'value',
+                                                                  values = parameters['idu.relapse.multiplier'],
+                                                                  applies.to.dimension.values = 'all',
+                                                                  dimension = 'all')
+    
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.remission',
+                                                                  alpha.name = 'value',
+                                                                  values = 1 / parameters[paste0('age', 1:n.ages, ".idu.relapse.remission.multiplier")],
+                                                                  applies.to.dimension.values = ages,
+                                                                  dimension = 'age')
+    
+    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.relapse',
+                                                                  alpha.name = 'value',
+                                                                  values = parameters[paste0('age', 1:n.ages, ".idu.relapse.remission.multiplier")],
+                                                                  applies.to.dimension.values = ages,
+                                                                  dimension = 'age')
 }
 

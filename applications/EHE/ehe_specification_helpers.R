@@ -1241,33 +1241,42 @@ X.get.location.active.idu.prevalence <- function(location,
 
 get.prior.to.active.idu.ratio <- function(location,
                                           specification.metadata,
-                                          population.year = DEFAULT.POPULATION.YEARS[1])
+                                          population.year = DEFAULT.POPULATION.YEARS[1],
+                                          idu.mortality=0.0166)
 {
-    n.ages = specification.metadata$n.ages
-    
     remission = get.idu.remission.rates(specification.metadata)
     relapse = get.idu.relapse.rates(specification.metadata)
     
-    raw.aging = do.get.empiric.aging.rates(location, specification.metadata, years = population.year)[[1]][,,,'IDU_in_remission']
-
-    target.dim.names = dimnames(raw.aging)
-    target.dim.names[names(dimnames(remission))] = dimnames(remission)
-    target.dim.names[names(dimnames(relapse))] = dimnames(relapse)
+#    (remission + idu.mortality) / relapse
+    remission / relapse / 2
+       
+#    (remission + idu.mortality) / relapse / 2
     
-    aging = array(0, dim=sapply(target.dim.names, length), dimnames=target.dim.names)
-    array.access(aging, age=1:(n.ages-1)) = raw.aging * (1-(0:(n.ages-2))/(n.ages-1))^2
-
-    #array.access(aging, age=1) = array.access(raw.aging, age=1)
-    
-    remission = expand.array(remission, target.dim.names)
-    relapse = expand.array(relapse, target.dim.names)
-    
-    # From first principles, we would get steady state by either:
-    #  active * remission = prior * relapse
-    # But in empirical testing, adding aging in to the denominator 
-    #   in the first age bracket helps us approximate
-    #   the steady solution better, so here it is
-    remission / (relapse + aging)
+    # n.ages = specification.metadata$n.ages
+    # 
+    # remission = get.idu.remission.rates(specification.metadata)
+    # relapse = get.idu.relapse.rates(specification.metadata)
+    # 
+    # raw.aging = do.get.empiric.aging.rates(location, specification.metadata, years = population.year)[[1]][,,,'IDU_in_remission']
+    # 
+    # target.dim.names = dimnames(raw.aging)
+    # target.dim.names[names(dimnames(remission))] = dimnames(remission)
+    # target.dim.names[names(dimnames(relapse))] = dimnames(relapse)
+    # 
+    # aging = array(0, dim=sapply(target.dim.names, length), dimnames=target.dim.names)
+    # array.access(aging, age=1:(n.ages-1)) = raw.aging * (1-(0:(n.ages-2))/(n.ages-1))^2
+    # 
+    # #array.access(aging, age=1) = array.access(raw.aging, age=1)
+    # 
+    # remission = expand.array(remission, target.dim.names)
+    # relapse = expand.array(relapse, target.dim.names)
+    # 
+    # # From first principles, we would get steady state by either:
+    # #  active * remission = prior * relapse
+    # # But in empirical testing, adding aging in to the denominator 
+    # #   in the first age bracket helps us approximate
+    # #   the steady solution better, so here it is
+    # remission / (relapse + aging)
 }
 
 get.active.to.never.idu.ratio <- function(location,

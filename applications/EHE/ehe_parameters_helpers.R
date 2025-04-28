@@ -79,7 +79,8 @@ create.four.knot.transmission.prior.distribution <- function(r1.log.mean,
                                                              rr.peak.to.0.log.mean,
                                                              rr.peak.to.0.log.sd,
                                                              race='black',
-                                                             route=c('msm')
+                                                             route=c('msm'),
+                                                             is.rr = F
 )
 {
   mean = c(r1 = r1.log.mean,
@@ -103,6 +104,7 @@ create.four.knot.transmission.prior.distribution <- function(r1.log.mean,
                                                          '.',
                                                          route,
                                                          '.trate.',
+                                                         ifelse(is.rr, 'rr.',''),
                                                          c('peak',0,1,2))
   )
 }

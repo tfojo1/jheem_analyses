@@ -301,7 +301,30 @@ get.idu.remission.rates <- function(specification.metadata)
   rv 
 }
 
-get.idu.relapse.rates <- function(specification.metadata)
+get.idu.relapse.rates <- function(specification.metadata,
+                                  idu.mortality = 0.0166)
+{
+    remission.rates = get.idu.remission.rates(specification.metadata)
+    active.to.remission.ratios = get.cached.object.for.version('active.to.remission.ratios', version=specification.metadata$version)
+    
+    scaled.active.to.remission.ratio = expand.array(to.expand = active.to.remission.ratios$age,
+                                                    target.dim.names = dimnames(remission.rates))
+    
+    # rv = sapply(dimnames(remission.rates)$sex, function(sex){
+    # #    (remission.rates[,,sex] + idu.mortality) * active.to.remission.ratio.by.sex[sex]
+    # #    remission.rates[,,sex] * active.to.remission.ratio.by.sex[sex]
+    #     (remission.rates[,,sex] + idu.mortality) * active.to.remission.ratio.by.sex[sex] / 2
+    # })
+    # 
+    # dim(rv) = dim(remission.rates)
+    # dimnames(rv) = dimnames(remission.rates)
+    
+    
+    
+    scaled.active.to.remission.ratio * remission.rates / 2
+}
+    
+OLD.get.idu.relapse.rates <- function(specification.metadata)
 {
   
   dim.names = specification.metadata$dim.names[c('age','race','sex')]
@@ -478,4 +501,314 @@ get.idu.by.age.counts <- function(dir, years=2015:2018)
     }
 
     rv
+}
+
+
+read.all.nsduh.last.inj.files <- function(dir='../jheem_analyses/input_managers/idu_data',
+                                          years,
+                                          specification.metadata)
+{
+    # Sex
+    inner.dim.names = NULL
+    arr.sex = sapply(years, function(year){
+        sub.arr = read.nsduh.last.inj.file(file.path(dir, paste0(year, "_inj_sex.csv")),
+                                           covariates = c('sex','ident'),
+                                           specification.metadata = specification.metadata)
+        inner.dim.names <<- dimnames(sub.arr)
+        sub.arr
+    })
+    dim.names = c(inner.dim.names,
+                  list(year=as.character(years)))
+    dim(arr.sex) = sapply(dim.names, length)
+    dimnames(arr.sex) = dim.names
+    
+    # Race
+    inner.dim.names = NULL
+    arr.race = sapply(years, function(year){
+        sub.arr = read.nsduh.last.inj.file(file.path(dir, paste0(year, "_inj_race.csv")),
+                                           covariates = 'race',
+                                           specification.metadata = specification.metadata)
+        inner.dim.names <<- dimnames(sub.arr)
+        sub.arr
+    })
+    dim.names = c(inner.dim.names,
+                  list(year=as.character(years)))
+    
+    dim(arr.race) = sapply(dim.names, length)
+    dimnames(arr.race) = dim.names
+    
+#    Age
+    inner.dim.names = NULL
+    arr.age = sapply(years, function(year){
+        sub.arr = read.nsduh.last.inj.file(file.path(dir, paste0(year, "_inj_age.csv")),
+                                           covariates = 'age',
+                                           specification.metadata = specification.metadata)
+        inner.dim.names <<- dimnames(sub.arr)
+        sub.arr
+    })
+    dim.names = c(inner.dim.names,
+                  list(year=as.character(years)))
+    dim(arr.age) = sapply(dim.names, length)
+    dimnames(arr.age) = dim.names
+
+    # Package and return
+    list(
+        sex = arr.sex,
+        age = arr.age,
+        race = arr.race,
+        years = years
+    )
+}
+
+# https://datatools.samhsa.gov/das
+read.nsduh.last.inj.file <- function(file,
+                                     covariates,
+                                     specification.metadata)
+{
+    NSDUH.AGE.MAPPINGS = c(
+        "Overall" = NA,          
+        # For the first stratification
+        "1 - Respondent is 12 years old" = '12 years',
+        "2 - Respondent is 13 years old" = '13 years',
+        "3 - Respondent is 14 years old" = '14 years',  
+        "4 - Respondent is 15 years old" = '15 years',  
+        "5 - Respondent is 16 years old" = '16 years',  
+        "6 - Respondent is 17 years old" = '17 years',  
+        "7 - Respondent is 18 years old" = '18 years',  
+        "8 - Respondent is 19 years old" = '19 years',  
+        "9 - Respondent is 20 years old" = '20 years',
+        "10 - Respondent is 21 years old" = '21 years',
+        "11 - Respondent is 22 or 23 years old" = '22-23 years',
+        "12 - Respondent is 24 or 25 years old" = '24-25 years',
+        "13 - Respondent is between 26 and 29 years old" = '26-29 years',
+        "14 - Respondent is between 30 and 34 years old" = '30-34 years',
+        "15 - Respondent is between 35 and 49 years old" = '35-49 years',
+        "16 - Respondent is between 50 and 64 years old" = '50-64 years',
+        "17 - Respondent is 65 years old or older" = '65+ years',
+        # For the second age stratificatio
+        "1 - Respondent is 12 or 13 years old" = '12-13 years',
+        "2 - Respondent is 14 or 15 years old" = '14-15 years',
+        "3 - Respondent is 16 or 17 years old" = '16-17 years',
+        "4 - Respondent is between 18 and 20 years old" = '18-20 years',
+        "5 - Respondent is between 21 and 23 years old" = '21-23 years',
+        "6 - Respondent is 24 or 25 years old" = '24-25 years',
+        "7 - Respondent is between 26 and 29 years old" = '26-29 years',
+        "8 - Respondent is between 30 and 34 years old" = '30-34 years',
+        "9 - Respondent is between 35 and 49 years old" = '35-49 years',
+        "10 - Respondent is between 50 and 64 years old" = '50-64 years',
+        "11 - Respondent is 65 years old or older" = '65+ years'
+    )
+    
+    NSDUH.LAST.INJ.MAPPING = c(
+        "Overall" = NA,
+        "1 - Within the past 30 days" = 'lt.30d',
+        "13 - More than 12 months ago LOGICALLY ASSIGNED" = 'gt.12mo',
+        "2 - More than 30 days ago but within the past 12 mos" = '30d.to.12mo',
+        "3 - More than 12 months ago" = 'gt.12mo',
+        "8 - At some point in the past 12 months LOG ASSN" = NA,
+        "81 - NEVER USED COC/HER/STM W/NEEDLE Log assn" = NA,
+        "9 - At some point in the lifetime LOG ASSN" = NA, 
+        "91 - NEVER USED COC/HER/STM WITH A NEEDLE" = NA,
+        "97 - REFUSED" = NA,     
+        "98 - MISSING" = NA
+    )
+    
+    LAST.INJ.CATEGORIES = unique(NSDUH.LAST.INJ.MAPPING[!is.na(NSDUH.LAST.INJ.MAPPING)])
+    
+    NSDUH.SEX.RACE.TO.RACE.MAPPING = c(
+        "Overall" = NA,
+        "1 - Male, White, Not Hisp" = 'white',
+        "2 - Female, White, Not Hisp" = 'white',
+        "3 - Male, Black, Not Hisp" = 'black',
+        "4 - Female, Black, Not Hisp" = 'black',
+        "5 - Male, Hispanic" = 'hispanic',
+        "6 - Female, Hispanic" = 'hispanic',
+        "7 - Male or Female, Other Races" = 'other'
+    )
+    
+    NSDUH.SEX.RACE.TO.SEX.MAPPING = c(
+        "Overall" = NA,
+        "1 - Male, White, Not Hisp" = 'male',
+        "2 - Female, White, Not Hisp" = 'female',
+        "3 - Male, Black, Not Hisp" = 'male',
+        "4 - Female, Black, Not Hisp" = 'female',
+        "5 - Male, Hispanic" = 'male',
+        "6 - Female, Hispanic" = 'female',
+        "7 - Male or Female, Other Races" = NA
+    )
+    
+    NSDUH.IDENT.MAPPING = c(
+        "Overall" = NA,
+        "1 - Heterosexual, that is, straight" = 'heterosexual',
+        "2 - Lesbian or Gay" = 'not_heterosexual',
+        "3 - Bisexual" = 'not_heterosexual',
+        "94 - DON T KNOW" = NA,
+        "97 - REFUSED" = NA,              
+        "99 - LEGITIMATE SKIP" = NA
+    )
+    
+    NSDUH.RACE.MAPPING = c(
+        "Overall" = NA,
+        "1 - NonHisp White" = 'white',
+        "2 - NonHisp Black/Afr Am" = 'black/african american',
+        "3 - NonHisp Native Am/AK Native" = 'american indian/alaska native',
+        "4 - NonHisp Native HI/Other Pac Isl" = 'native hawaiian/other pacific islander',
+        "5 - NonHisp Asian" = 'asian',          
+        "6 - NonHisp more than one race" = NA,
+        "7 - Hispanic" = 'hispanic/latino'
+    )
+    
+    NSDUH.SEX.MAPPING = c(
+        "Overall" = NA,
+        "1 - Male" = 'male',
+        "2 - Female" = 'female'
+    )
+    
+    NSDUH.MAPPINGS = list(
+        last.inj = NSDUH.LAST.INJ.MAPPING,
+        race = NSDUH.RACE.MAPPING,
+        age = NSDUH.AGE.MAPPINGS,
+        sex = NSDUH.SEX.MAPPING,
+        ident = NSDUH.IDENT.MAPPING
+    )
+    
+    raw.data = read.csv(file, stringsAsFactors = F)    
+#    raw.data = raw.data[raw.data$Weighted.Count>0,]
+    
+    mappings.to.use = NSDUH.MAPPINGS[c('last.inj', covariates)]
+    if (any(sapply(mappings.to.use, is.null)))
+    {
+        mask = sapply(mappings.to.use, is.null)
+        stop(paste0("Cannot read NSDUH data: invalid covariate(s): ",
+                    paste0("'", covariates[mask[-1]], "'", collapse=', '),
+                    ". Must be one of ",
+                    paste0("'", names(mappings.to.use), "'", collapse=', ')))
+    }
+    
+    parsed.data = sapply(1:length(mappings.to.use), function(i){
+        mappings.to.use[[i]][ raw.data[,i] ]
+    })
+    
+    keep.mask = !apply(is.na(parsed.data), 1, any)
+    parsed.data = parsed.data[keep.mask,]
+    counts = raw.data$Weighted.Count[keep.mask]
+    
+    dimnames(parsed.data)[[2]] = names(mappings.to.use)
+    
+    if (any(covariates=='sex') && any(covariates=='ident'))
+    {
+        new.sex = rep('female', nrow(parsed.data))
+
+        new.sex[parsed.data[,'sex']=='male' & parsed.data[,'ident']=='heterosexual'] = 'heterosexual_male'
+        new.sex[parsed.data[,'sex']=='male' & parsed.data[,'ident']!='heterosexual'] = 'msm'
+        
+        parsed.data[,'sex'] = new.sex
+        mappings.to.use = mappings.to.use[names(mappings.to.use)!='ident']
+        parsed.data = parsed.data[,names(mappings.to.use)]
+    }
+    
+    dim.names = lapply(1:length(mappings.to.use), function(i){
+        unique(parsed.data[,i])
+#        unique(map[!is.na(map)])
+    })
+    names(dim.names) = names(mappings.to.use)
+    
+    rv = array(0, dim=sapply(dim.names, length), dimnames=dim.names)
+    for (i in 1:nrow(parsed.data))
+    {
+        dv = as.list(parsed.data[i,])
+        names(dv) = names(mappings.to.use)
+        array.access(rv, dimension.values = dv) = counts[i] +
+            array.access(rv, dimension.values = dv)
+    }
+    
+    if (!is.null(specification.metadata))
+    {
+        if (any(names(dim.names)=='age'))
+        {
+            tryCatch({
+                rv = restratify.age.counts(rv,
+                                           desired.age.brackets = specification.metadata$dim.names$age,
+                                           smooth.infinite.age.to = 101)
+            }, error = function(e){
+                browser()
+            })
+        }
+        
+        dims.to.map = setdiff(names(dim.names),
+                              c('last.inj','age'))
+        if (length(dims.to.map)>0)
+        {
+            target.dim.names = dim.names
+            target.dim.names[dims.to.map] = specification.metadata$dim.names[dims.to.map]
+            
+            tryCatch({
+                rv = map.value.ontology(rv, target.dim.names = target.dim.names)
+            }, error = function(e){
+                browser()
+            })
+        }
+    }
+    
+    rv
+}
+
+
+get.active.to.remission.ratio <- function(nsduh.data)
+{
+    rv = array.access(nsduh.data, last.inj='lt.30d') /
+        (array.access(nsduh.data, last.inj='30d.to.12mo') + 
+             array.access(nsduh.data, last.inj='gt.12mo'))
+    
+    dim.names = dimnames(rv)[-1]
+    dim(rv) = sapply(dim.names, length)
+    dimnames(rv) = dim.names
+    
+    rv
+}
+
+if (1==2)
+{
+    source('../jheem_analyses/applications/ehe/ehe_specification.R')
+    spec.meta = get.specification.metadata('ehe','NY')
+    
+    nsduh.data = read.all.nsduh.last.inj.files(dir = '../jheem_analyses/input_managers/idu_data',
+                                               years = c(2015:2019,2022),
+                                               specification.metadata = spec.meta)
+    
+    active.to.remission.ratios = lapply(nsduh.data, function(one.data){
+        if (all(names(dim(one.data))!='last.inj'))
+            one.data
+        else
+            get.active.to.remission.ratio(apply(one.data, 1:2, sum))
+        
+    })
+        
+    cache.object.for.version(object = active.to.remission.ratios,
+                             name ='active.to.remission.ratios',
+                             version = 'ehe')
+    
+    
+    
+    # Exploring the fit
+    get.active.to.remission.ratio(apply(nsduh.data$sex, 1:2, sum))
+    get.active.to.remission.ratio(apply(nsduh.data$race, 1:2, sum))
+    get.active.to.remission.ratio(apply(nsduh.data$age, 1:2, sum))
+    
+    get.active.to.remission.ratio(nsduh.data$sex)[1,,]
+    get.active.to.remission.ratio(nsduh.data$age)[1,,]
+    get.active.to.remission.ratio(nsduh.data$race)[1,,]
+    
+    source('test/engine_test.R')
+    sim$get('population',dimension.values = list(risk='active_IDU'), drop.single.sim.dimension = T) / 
+        sim$get('population',dimension.values = list(risk='IDU_in_remission'), drop.single.sim.dimension = T) 
+    (sim$get('population',dimension.values = list(risk='active_IDU'), keep.dimensions=c('year','age'), drop.single.sim.dimension = T) / 
+            sim$get('population',dimension.values = list(risk='IDU_in_remission'), keep.dimensions=c('year','age'), drop.single.sim.dimension = T))[c('1970','2035'),]
+    # sim$get('population',dimension.values = list(risk='active_IDU'), drop.single.sim.dimension = T) / 
+    #     as.numeric(apply(sim$get('population',dimension.values = list(risk=c('active_IDU', 'IDU_in_remission')), drop.single.sim.dimension = T), 1:2, sum))
+    
+    # sim$get('population',dimension.values = list(risk='active_IDU'), keep.dimensions=c('year','race'), drop.single.sim.dimension = T) / 
+        # as.numeric(apply(sim$get('population',dimension.values = list(risk=c('active_IDU', 'IDU_in_remission')), keep.dimensions=c('year','race'), drop.single.sim.dimension = T), 1:2, sum))
+
+    
 }

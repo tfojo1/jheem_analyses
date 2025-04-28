@@ -6,7 +6,7 @@
 ##------------------------------------##
 
 MSM.BASE.TRATE.MEAN = 1
-HET.BASE.TRATE.MEAN = .5 # 2 x from https://www.shelbytnhealth.com/DocumentCenter/View/608/Subsequent-HIV-Disease-Risk-Following-Syphilis-Diagnosis-in-a-Southern-MSM-Population-PDF?bidId=
+HET.BASE.TRATE.MEAN = .75 # 2 x from https://www.shelbytnhealth.com/DocumentCenter/View/608/Subsequent-HIV-Disease-Risk-Following-Syphilis-Diagnosis-in-a-Southern-MSM-Population-PDF?bidId=
 IDU.BASE.TRATE.MEAN = MSM.BASE.TRATE.MEAN * 3.1 / 4.7 # IDU and MSM peak trates are equal
 BASE.TRATE.CV = 20
 
@@ -458,17 +458,13 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     #products of 
     # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
     # 2) ratio of condomless vaginal sex (male vs female)
-    black.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
-    hispanic.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
-    other.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
+    male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
 
     #idu by sex from table 9 and 10 from
     #  https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf
     # RR of prob of daily use (heroin) * prob of needle sharing
-    female.vs.heterosexual.male.idu.susceptibility.rr.peak = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
-    female.vs.heterosexual.male.idu.susceptibility.rr.0 = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
-    female.vs.heterosexual.male.idu.susceptibility.rr.1 = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
-    female.vs.heterosexual.male.idu.susceptibility.rr.2 = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
+    female.idu.susceptibility.rr = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
+    heterosexual.male.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
 
     #-- HIV Testing --#
     
@@ -608,26 +604,29 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     hispanic.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     other.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
-    age1.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    age2.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    age3.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    age4.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-    age5.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
-
-    # msm.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
     black.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
     hispanic.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
     other.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+
     msm.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
 
-    idu.remission.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
-    idu.remission.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
+    idu.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    idu.relapse.multiplier = Lognormal.Distribution(0, .5*log(2)),
 
-    idu.relapse.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
-    idu.relapse.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
+    age1.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age2.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age3.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age4.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+    age5.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+
+    age1.idu.relapse.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    age2.idu.relapse.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    age3.idu.relapse.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    age4.idu.relapse.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    age5.idu.relapse.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
 
     idu.mortality.0 = Lognormal.Distribution(log(0.0166), 0.1322), 
     idu.mortality.1 = Lognormal.Distribution(log(0.0166), 0.1322), 
@@ -671,8 +670,8 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     oe.female.pairings.with.msm = Lognormal.Distribution(log(0.0895), 0.5*log(2), upper = 1), #Pathela 2006 - see below
     fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.0004), 0.5*log(2), upper=1),
-    oe.never.idu.pairings.with.idu = Lognormal.Distribution(log(0.2), 0.5*log(2), upper=1), #see calculations below
-    
+
+    oe.never.idu.pairings.with.idu = Lognormal.Distribution(log(0.05), 0.5*log(2), upper=1), #see calculations below
     idu.sexual.oe.rr = Lognormal.Distribution(0, 0.2381851), # see idu_sexual_oes.R combined.sd
     
     black.sexual.assortativity.multiplier = Normal.Distribution(1, 0.5, lower=0),
@@ -1133,11 +1132,14 @@ BASE.HIV.SAMPLING.BLOCKS = list(
         'race.needle.sharing.assortativity.multiplier'
     ),
 
-    sexual.pairing = c(
+    sexual.pairing.with.msm = c(
       'oe.female.pairings.with.msm',
-      'fraction.heterosexual.male.pairings.with.male',
-      'oe.never.idu.pairings.with.idu',
-      'idu.sexual.oe.rr'
+      'fraction.heterosexual.male.pairings.with.male'
+    ),
+
+    sexual.pairing.with.idu = c(
+        'oe.never.idu.pairings.with.idu',
+        'idu.sexual.oe.rr'
     ),
 
     age.mixing = 'age.mixing.sd.mult',
@@ -1175,10 +1177,10 @@ BASE.HIV.SAMPLING.BLOCKS = list(
 
     heterosexual.fraction.trate.change.after.t2 = 'heterosexual.fraction.trate.change.after.t2',
     
-    male.vs.female.heterosexual.rr = c(
-        'black.male.vs.female.heterosexual.rr',
-        'hispanic.male.vs.female.heterosexual.rr',
-        'other.male.vs.female.heterosexual.rr'),
+    male.vs.female..rrs = c(
+        'male.vs.female.heterosexual.rr',
+        'female.idu.susceptibility.rr',
+        'heterosexual.male.idu.susceptibility.rr'),
 
     heterosexual.age.susceptibility.01 = c(
       'age1.heterosexual.susceptibility.rr.01',
@@ -1230,13 +1232,6 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     
     idu.fraction.trate.change.after.t2 = 'idu.fraction.trate.change.after.t2',
     
-    female.vs.heterosexual.male.idu.susceptibility = c(
-        'female.vs.heterosexual.male.idu.susceptibility.rr.peak',
-        'female.vs.heterosexual.male.idu.susceptibility.rr.0',
-        'female.vs.heterosexual.male.idu.susceptibility.rr.1',
-        'female.vs.heterosexual.male.idu.susceptibility.rr.2'
-    ),
-
     msm.idu.transmission = c(
       'msm.idu.susceptibility.rr.peak',
       'msm.idu.susceptibility.rr.0',
@@ -1282,18 +1277,29 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'msm.incident.idu.multiplier.1',
       'msm.incident.idu.multiplier.2'),
 
-    age.idu.transitions = c(
+    age1.idu.transitions = c(
       'age1.incident.idu.multiplier',
+      'age1.idu.relapse.remission.multiplier'),
+
+    age2.idu.transitions = c(
       'age2.incident.idu.multiplier',
+      'age2.idu.relapse.remission.multiplier'),
+
+    age3.idu.transitions = c(
       'age3.incident.idu.multiplier',
+      'age3.idu.relapse.remission.multiplier'),
+
+    age4.idu.transitions = c(
       'age4.incident.idu.multiplier',
-      'age5.incident.idu.multiplier'
+      'age4.idu.relapse.remission.multiplier'),
+
+    age5.idu.transitions = c(
+      'age5.incident.idu.multiplier',
+      'age5.idu.relapse.remission.multiplier'
     ),
     
-    other.idu.transitions = c('idu.remission.multiplier.1',
-                              'idu.remission.multiplier.2',
-                              'idu.relapse.multiplier.1',
-                              'idu.relapse.multiplier.2'),
+    other.idu.transitions = c('idu.remission.multiplier',
+                              'idu.relapse.multiplier'),
     
     diagnosed.transmission = c('diagnosed.transmission.rr',
                                'global.trate'),
