@@ -84,7 +84,8 @@ par.names.transmission = c(par.names.transmission,
                            "hiv.general.mortality.multiplier",
                            'aids.to.new.diagnoses.ratio.peak',
                            'aids.to.new.diagnoses.ratio.0',
-                           'aids.to.new.diagnoses.ratio.1'
+                           'aids.to.new.diagnoses.ratio.1',
+                           'idu.sex.assortativity.multiplier'
 )
 
 par.aliases.transmission = list(
