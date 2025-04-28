@@ -10,6 +10,9 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     idu.states = specification.metadata$compartment.aliases$active.idu.states
     non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
     
+    never.idu.states = spec.meta$compartment.aliases$never.idu.states
+    active.and.prior.idu.states = setdiff(specification.metadata$dim.names$risk, never.idu.states)
+    
     races = specification.metadata$dim.names$race
     ages = specification.metadata$dim.names$age
     age.indices = 1:length(ages)
@@ -418,7 +421,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
       model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.trates',
                                                                     alpha.name = paste0('rate.', trate.alpha.times[i]),
                                                                     values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
-                                                                    applies.to.dimension.values = idu.states,
+                                                                    applies.to.dimension.values = active.and.prior.idu.states,
                                                                     dimension = 'risk.to')
         
       model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
@@ -432,7 +435,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                      alpha.name = paste0('rate.', trate.alpha.times[i]),
                                                      value = parameters['female.idu.susceptibility.rr'],
                                                      applies.to.dimension.values = list(sex.to = 'female',
-                                                                                        risk.to = idu.states))
+                                                                                        risk.to = active.and.prior.idu.states))
       
       model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
                                                                     alpha.name = paste0('rate.', trate.alpha.times[i]),
@@ -445,7 +448,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
                                                      alpha.name = paste0('rate.', trate.alpha.times[i]),
                                                      value = parameters['heterosexual.male.idu.susceptibility.rr'],
                                                      applies.to.dimension.values = list(sex.to = 'heterosexual_male',
-                                                                                        risk.to = idu.states))
+                                                                                        risk.to = active.and.prior.idu.states))
     }
 
     set.element.functional.form.main.effect.alphas(model.settings = model.settings,

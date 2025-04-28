@@ -1619,10 +1619,40 @@ register.model.quantity(EHE.SPECIFICATION,
 #-- IDU Contact by Sex --#
 
 register.model.element(EHE.SPECIFICATION,
-                       name = 'idu.transmission.sex.oes',
+                       name = 'base.idu.transmission.sex.oes',
                        scale = 'ratio',
                        value = PAIRING.INPUT.MANAGER$idu.oe.sex,
                        dimensions = c('sex.from','sex.to'))
+
+register.model.element(EHE.SPECIFICATION,
+                       name = 'idu.sex.assortativity.multiplier',
+                       scale = 'ratio',
+                       value = 1)
+
+register.model.quantity(EHE.SPECIFICATION,
+                        name = 'idu.transmission.sex.oes',
+                        value = 'base.idu.transmission.sex.oes')
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'idu.transmission.sex.oes',
+                               applies.to = list(sex.from='female',
+                                                 sex.to='female'),
+                               value = 'idu.sex.assortativity.multiplier',
+                               apply.function = 'multiply')
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'idu.transmission.sex.oes',
+                               applies.to = list(sex.from='msm',
+                                                 sex.to='msm'),
+                               value = 'idu.sex.assortativity.multiplier',
+                               apply.function = 'multiply')
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'idu.transmission.sex.oes',
+                               applies.to = list(sex.from='heterosexual_male',
+                                                 sex.to='heterosexual_male'),
+                               value = 'idu.sex.assortativity.multiplier',
+                               apply.function = 'multiply')
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'idu.contact.by.sex',

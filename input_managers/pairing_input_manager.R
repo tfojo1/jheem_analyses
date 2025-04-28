@@ -91,7 +91,19 @@ create.pairing.manager <- function(dir='../jheem_analyses/data_files/pairing')
                female=606)
     proportions = counts/sum(counts)
     
-    rv$idu.oe.sex = sharing/proportions
+    idu.oe.sex.1 = sharing/proportions
+    
+    # Fold in, from Figure 2
+    # https://www.ncbi.nlm.nih.gov/core/lw/2.0/html/tileshop_pmc/tileshop_pmc_inline.html?title=Click%20on%20image%20to%20zoom&p=PMC3&id=9506686_S0950268818002042_fig2.jpg
+    
+    
+    idu.oe.sex.2 = idu.oe.sex.1
+    idu.oe.sex.2['heterosexual_male','heterosexual_male'] = (idu.oe.sex['heterosexual_male','heterosexual_male'] + 1.05) / 2
+    idu.oe.sex.2['female','heterosexual_male'] = (idu.oe.sex['heterosexual_male','heterosexual_male'] + 0.65) / 2
+    idu.oe.sex.2['heterosexual_male','female'] = (idu.oe.sex['heterosexual_male','heterosexual_male'] + 1.27) / 2
+    idu.oe.sex.2['female','female'] = (idu.oe.sex['heterosexual_male','heterosexual_male'] + 1.21) / 2
+    
+    rv$idu.oe.sex = (idu.oe.sex.1 + idu.oe.sex.2) / 2
     
     ##-- SEXUAL PAIRINGS by SEX --##
     ##     (msm with females)     ##

@@ -6,7 +6,7 @@
 ##------------------------------------##
 
 MSM.BASE.TRATE.MEAN = 1
-HET.BASE.TRATE.MEAN = .75 # 2 x from https://www.shelbytnhealth.com/DocumentCenter/View/608/Subsequent-HIV-Disease-Risk-Following-Syphilis-Diagnosis-in-a-Southern-MSM-Population-PDF?bidId=
+HET.BASE.TRATE.MEAN = 2/3 # 2 x from https://www.shelbytnhealth.com/DocumentCenter/View/608/Subsequent-HIV-Disease-Risk-Following-Syphilis-Diagnosis-in-a-Southern-MSM-Population-PDF?bidId=
 IDU.BASE.TRATE.MEAN = MSM.BASE.TRATE.MEAN * 3.1 / 4.7 # IDU and MSM peak trates are equal
 BASE.TRATE.CV = 20
 
@@ -465,6 +465,7 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     # RR of prob of daily use (heroin) * prob of needle sharing
     female.idu.susceptibility.rr = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
     heterosexual.male.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    idu.sex.assortativity.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
 
     #-- HIV Testing --#
     
@@ -1177,10 +1178,8 @@ BASE.HIV.SAMPLING.BLOCKS = list(
 
     heterosexual.fraction.trate.change.after.t2 = 'heterosexual.fraction.trate.change.after.t2',
     
-    male.vs.female..rrs = c(
-        'male.vs.female.heterosexual.rr',
-        'female.idu.susceptibility.rr',
-        'heterosexual.male.idu.susceptibility.rr'),
+
+    male.vs.female.heterosexual.rr = 'male.vs.female.heterosexual.rr',    
 
     heterosexual.age.susceptibility.01 = c(
       'age1.heterosexual.susceptibility.rr.01',
@@ -1300,10 +1299,17 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     
     other.idu.transitions = c('idu.remission.multiplier',
                               'idu.relapse.multiplier'),
-    
+
+    idu.susceptibility.by.sex = c(
+        'female.idu.susceptibility.rr',
+        'heterosexual.male.idu.susceptibility.rr',
+        'idu.sex.assortativity.multiplier'),
+
+#-- Other Transmission Multipliers --#
+
     diagnosed.transmission = c('diagnosed.transmission.rr',
                                'global.trate'),
-    
+
     acute.transmissibility = c('acute.transmissibility.rr',
                                'global.trate'),
   
