@@ -10,7 +10,7 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     idu.states = specification.metadata$compartment.aliases$active.idu.states
     non.idu.states = setdiff(specification.metadata$dim.names$risk, idu.states)
     
-    never.idu.states = spec.meta$compartment.aliases$never.idu.states
+    never.idu.states = specification.metadata$compartment.aliases$never.idu.states
     active.and.prior.idu.states = setdiff(specification.metadata$dim.names$risk, never.idu.states)
     
     races = specification.metadata$dim.names$race
