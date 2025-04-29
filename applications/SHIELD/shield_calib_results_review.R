@@ -7,9 +7,9 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
 VERSION='shield'
 LOCATION='C.12580' #BALTIMORE.MSA
-CALIBRATION.CODE.TO.RUN='pop.demog.shield.pk1'
+CALIBRATION.CODE.TO.RUN='pop.demog.shield'
 # DATE=Sys.Date()
-DATE="2025-04-23"
+DATE="2025-04-25"
 
 
 # COMPLETE MCMC:Reading from file:
@@ -24,7 +24,7 @@ if(1==2){
 }
 
 # INCOMPLETE CHAIN:reading from ongoing calibration: doesnt require a date
-if(1==2){
+if(1==1){
         get.calibration.progress('shield',LOCATION,CALIBRATION.CODE.TO.RUN) # shows %done of the ongoing run
         simset = assemble.simulations.from.calibration(version = 'shield',
                                                        location = LOCATION,
@@ -41,21 +41,12 @@ simset=simset;simset
 
 # REVIEW-----
 simset$n.sim
-#population (calibrate to c(0,1,2))
-simplot(
-        # simset,
-        simset$first.sim(),simset$last.sim(),
-        outcomes = c("population"), 
-        dimension.values = list(year = 1940:2030)
-        # dimension.values = list(year = 2000:2030)
-)
-
 simplot(
         # simset$first.sim(),
         simset$last.sim(),
         # facet.by = "age",
         # facet.by = "sex",
-        facet.by = "race",
+        # facet.by = "race",
         split.by = "race", facet.by = 'age',
         #facet.by = "sex", split.by = "race",
          #facet.by = "sex", split.by = "age", 
@@ -154,3 +145,9 @@ rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.populati
 rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__age[,'C.12580',])
 rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__age__race__ethnicity[,'C.12580',,,])
 
+
+dnorm(x = 0,0,1)
+dnorm(x = 1,0,1)/dnorm(0,0,1) # 1 sd away is 60% as good as staying on the mean
+dnorm(x = 2,0,1)/dnorm(0,0,1) # 2 sd away is 13% as good as staying on the mean
+
+ 

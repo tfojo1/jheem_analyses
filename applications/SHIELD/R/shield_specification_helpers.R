@@ -27,9 +27,9 @@ DEFAULT.FERTILITY.RATE.YEARS=c(2007:2023)
 get.n.initial.female.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
 {
   get.n.initial.population.for.sex(location,
-                                      specification.metadata = specification.metadata,
-                                      sex = 'female',
-                                      years = years)
+                                   specification.metadata = specification.metadata,
+                                   sex = 'female',
+                                   years = years)
 }
 
 #'
@@ -41,9 +41,9 @@ get.n.initial.female.population <- function(location, specification.metadata, ye
 get.n.initial.male.population <- function(location, specification.metadata, years=DEFAULT.POPULATION.YEARS)
 {
   get.n.initial.population.for.sex(location,
-                                      specification.metadata = specification.metadata,
-                                      sex = 'male',
-                                      years = years)
+                                   specification.metadata = specification.metadata,
+                                   sex = 'male',
+                                   years = years)
 }
 
 #'
@@ -409,8 +409,9 @@ get.fertility.rates.from.census<-function(location, specification.metadata, popu
 #' @return a functional form for mortality rates to be used in the specification
 get.general.mortality.rates.functional.form = function(location, specification.metadata, population.years=DEFAULT.MORTALITY.RATE.YEARS)
 {
+  
   rates = get.general.mortality.rates(location=location,
-                                       specification.metadata = specification.metadata) 
+                                      specification.metadata = specification.metadata) 
   
   create.static.functional.form(value = rates,
                                 link = "log",
@@ -423,22 +424,22 @@ get.general.mortality.rates.functional.form = function(location, specification.m
 #' @param year.ranges year.ranges  
 #' @return returning the mortality rates for each MSA (location) in the correct dimension
 get.general.mortality.rates <- function(location,
-                                         specification.metadata,
-                                         year.ranges = DEFAULT.MORTALITY.RATE.YEARS){
+                                        specification.metadata,
+                                        year.ranges = DEFAULT.MORTALITY.RATE.YEARS){
   # The code is designed for modeling MSAs, where each MSA consists of a collection of counties.
   # County-level mortality data is not fully stratified, but state-level data is available with stratification.
-  # Note: Some MSAs span over multiple states (e.g., Washington DC  ).
+  # Note: Some MSAs span over multiple states (e.g., Washington DC).
   # To estimate the MSA-level mortality rate, we extract the counties within each MSA, map these counties to their corresponding states,
   # and then take a weighted average of the state-level rates to approximate the MSA-level mortality rate.
   
+  #1-For the national model, pull data from all counties and states in the US.
   if (location=='US'){
     counties='US'
     states='US'
-    #
     deaths = CENSUS.MANAGER$pull(outcome = 'deaths',
-                                         location = counties,
-                                         from.ontology.names = "census.cdc.wonder.births.deaths",
-                                         keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
+                                 location = counties,
+                                 from.ontology.names = "census.cdc.wonder.births.deaths",
+                                 keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
     if (is.null(deaths))
       stop("Error in get.general.mortality.rates() - unable to pull any metro.deaths data for the requested years")
     
@@ -454,12 +455,13 @@ get.general.mortality.rates <- function(location,
     target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
     national.mortality.rate = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
       map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
-    # dimnames(national.mortality.rate)
-    return(national.mortality.rate)
     
+    return(national.mortality.rate)
   }else{
+    #2-For MSA models, collect data from all counties and the states that those counties may overlap with
     counties=locations::get.contained.locations(location, 'county') #extract the counties for the given location
     states = unique(locations::get.containing.locations(counties, 'state')) # construct the states: 
+    
     # Pull the deaths - I expect this will be indexed by year, county, race, ethnicity, and sex (not necessarily in that order)
     deaths = CENSUS.MANAGER$pull(outcome = 'metro.deaths', 
                                  location = states, 
@@ -469,7 +471,7 @@ get.general.mortality.rates <- function(location,
     if (is.null(deaths))
       stop("Error in get.general.mortality.rates() - unable to pull any metro.deaths data for the requested years")
     
-    # Pull the population - I expect this will be similarly index by year, county, race, ethnicity, and sex
+    # Pull the death denominator
     population = CENSUS.MANAGER$pull(outcome = 'metro.deaths.denominator', 
                                      location = states, 
                                      year= year.ranges, 
@@ -481,8 +483,8 @@ get.general.mortality.rates <- function(location,
     # Map numerator (deaths) and denominator (population) to the age, race, and sex of the model specification
     # then divide the two
     target.dim.names = c(list(location=states), specification.metadata$dim.names[c('age','race','sex')])
-   
-     rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
+    
+    rates.by.state = map.value.ontology(deaths, target.dim.names=target.dim.names, na.rm = T) / 
       map.value.ontology(population, target.dim.names=target.dim.names, na.rm = T)
     
     if (any(is.na(rates.by.state)))
@@ -492,13 +494,15 @@ get.general.mortality.rates <- function(location,
       rates.by.state[1,,,]
     else
     {
+      #3-If there is more than one state involved, we should weight counties based on proportion of their popualtion in the state
       county.populations = CENSUS.MANAGER$pull(outcome = 'population',
                                                dimension.values = list(location=counties,
                                                                        year=year.ranges),
-                                               from.ontology.names = 'stratified.census')
+                                               from.ontology.names = 'census')
       
       if (is.null(county.populations))
         stop("Error in get.general.mortality.rates(): cannot get populations for the component counties")
+      
       county.populations = apply(county.populations,
                                  'location', mean, na.rm=T)
       total.population = sum(county.populations, na.rm=T)
@@ -529,50 +533,50 @@ get.rate.of.contacts.per.case = function(index.case.diagnosis.rate,
                                          sexual.contact.matrix,
                                          specification.metadata)
 {
- 
-    # From Todd: I believe that the way we have written the specification, index.case.diagnosis.rate and sexual.contact will always have the required dimensions
-    #   but just in case not, I am putting this check here.
-    # Could use array.expand if needed if this ever throws an error
- 
-    expected.contact.matrix.dimensions  = c('age.to','race.to','sex.to','age.from','race.from','sex.from')
-    expected.diagnosis.rate.dimensions = c('age','race','sex','stage')
-    expected.diagnosis.rate.dim.names = specification.metadata$dim.names[expected.diagnosis.rate.dimensions]
-    expected.diagnosis.rate.dim.names$stage = c('primary','secondary','early.latent')
-    
-#    if (length(expected.contact.matrix.dimensions) != length(dim(sexual.contact.matrix)) ||
-#        any(expected.contact.matrix.dimensions != names(dim(sexual.contact.matrix))))
-#      stop(paste0("The sexual.contact.matrix does not have the expected dimensions in the expected order"))
-    
-#    if (length(expected.diagnosis.rate.dimensions) != length(dim(index.case.diagnosis.rate)) ||
-#        any(expected.diagnosis.rate.dimensions != names(dim(index.case.diagnosis.rate))))
-#      stop(paste0("The index.case.diagnosis.rate does not have the expected dimensionsin the expected order"))
- 
-    index.case.diagnosis.rate = expand.array(to.expand = index.case.diagnosis.rate,
-                                             target.dim.names = expected.diagnosis.rate.dim.names)
-    
-    sexual.contact.matrix = expand.array(to.expand = sexual.contact.matrix,
-                                         target.dim.names = specification.metadata$dim.names[expected.contact.matrix.dimensions])
   
-     
-    # Sum up just the stages who will get tracing done
-    # index.case.diagnosis.rate: index cases who gets traced
-    index.cases.who.get.traced = rowSums(index.case.diagnosis.rate[,,,c('primary','secondary','early.latent')], dims = 3)
-    
-    rv = sapply(specification.metadata$dim.names$sex, function(sex){
-      sapply(specification.metadata$dim.names$race, function(race){
-        sapply(specification.metadata$dim.names$age, function(age){
-          
-          sum(index.cases.who.get.traced * as.numeric(sexual.contact.matrix[,,,age,race,sex]))
-          
-        })
+  # From Todd: I believe that the way we have written the specification, index.case.diagnosis.rate and sexual.contact will always have the required dimensions
+  #   but just in case not, I am putting this check here.
+  # Could use array.expand if needed if this ever throws an error
+  
+  expected.contact.matrix.dimensions  = c('age.to','race.to','sex.to','age.from','race.from','sex.from')
+  expected.diagnosis.rate.dimensions = c('age','race','sex','stage')
+  expected.diagnosis.rate.dim.names = specification.metadata$dim.names[expected.diagnosis.rate.dimensions]
+  expected.diagnosis.rate.dim.names$stage = c('primary','secondary','early.latent')
+  
+  #    if (length(expected.contact.matrix.dimensions) != length(dim(sexual.contact.matrix)) ||
+  #        any(expected.contact.matrix.dimensions != names(dim(sexual.contact.matrix))))
+  #      stop(paste0("The sexual.contact.matrix does not have the expected dimensions in the expected order"))
+  
+  #    if (length(expected.diagnosis.rate.dimensions) != length(dim(index.case.diagnosis.rate)) ||
+  #        any(expected.diagnosis.rate.dimensions != names(dim(index.case.diagnosis.rate))))
+  #      stop(paste0("The index.case.diagnosis.rate does not have the expected dimensionsin the expected order"))
+  
+  index.case.diagnosis.rate = expand.array(to.expand = index.case.diagnosis.rate,
+                                           target.dim.names = expected.diagnosis.rate.dim.names)
+  
+  sexual.contact.matrix = expand.array(to.expand = sexual.contact.matrix,
+                                       target.dim.names = specification.metadata$dim.names[expected.contact.matrix.dimensions])
+  
+  
+  # Sum up just the stages who will get tracing done
+  # index.case.diagnosis.rate: index cases who gets traced
+  index.cases.who.get.traced = rowSums(index.case.diagnosis.rate[,,,c('primary','secondary','early.latent')], dims = 3)
+  
+  rv = sapply(specification.metadata$dim.names$sex, function(sex){
+    sapply(specification.metadata$dim.names$race, function(race){
+      sapply(specification.metadata$dim.names$age, function(age){
+        
+        sum(index.cases.who.get.traced * as.numeric(sexual.contact.matrix[,,,age,race,sex]))
+        
       })
     })
-    
-    dim.names = specification.metadata$dim.names[c('age','race','sex')]
-    dim(rv) = vapply(dim.names, length, FUN.VALUE = integer(1))
-    dimnames(rv) = dim.names
-    
-    rv
+  })
+  
+  dim.names = specification.metadata$dim.names[c('age','race','sex')]
+  dim(rv) = vapply(dim.names, length, FUN.VALUE = integer(1))
+  dimnames(rv) = dim.names
+  
+  rv
 }
 
 
@@ -904,7 +908,7 @@ get.race.population.counts <- function(location,
   if(location=='US')
     counties='US'
   else
-  counties = locations::get.contained.locations(location, 'county')
+    counties = locations::get.contained.locations(location, 'county')
   population = CENSUS.MANAGER$pull(outcome='population',
                                    dimension.values = list(location=counties, year=years),
                                    keep.dimensions = c('location','age','race','ethnicity', 'sex'),
@@ -1035,33 +1039,33 @@ get.hiv.testing.functional.form = function(specification.metadata){
   # cashed object from input_hiv_testing_prior_brfss.R
   testing.prior = get.cached.object.for.version(name = "hiv.testing.prior",
                                                 version = specification.metadata$version)
-
+  
   hiv.testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9), #helps counteract max value below a bit
-                                                                   slope = testing.prior$slopes,
-                                                                   anchor.year = 2010,
-                                                                   max = 0.9,
-                                                                   parameters.are.on.logit.scale = T)
+                                                                       slope = testing.prior$slopes,
+                                                                       anchor.year = 2010,
+                                                                       max = 0.9,
+                                                                       parameters.are.on.logit.scale = T)
   hiv.testing.functional.form
 }
 
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
 get.prp.prenatal.care.functional.form = function(specification.metadata,trimester){
   # cashed object from input_prenatal_prior_wonder
-   prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.care.initiation.",trimester,".trimester.prior"),
+  prenatal.care.prior = get.cached.object.for.version(name = paste0("prenatal.care.initiation.",trimester,".trimester.prior"),
                                                       version = specification.metadata$version)
-   #' #'@Todd: this is fix for now but we should find the issue with these additional ages in the specifications
-   # browser()
-   new_ages <- c('0-14 years',"45-49 years", "50-54 years", "55-64 years","65+ years")
-   new_data=matrix(rep(0,15),nrow=5, dimnames = list(age=new_ages, race=c('black','hispanic','other')))
-   dim(new_data)
-   
-   prenatal.care.prior$intercepts <- rbind(prenatal.care.prior$intercepts, new_data)
-   names( dimnames(prenatal.care.prior$intercepts ))=c('age','race')
-   
-   prenatal.care.prior$slopes <- rbind(prenatal.care.prior$slopes,new_data)
-   names( dimnames(prenatal.care.prior$slopes ))=c('age','race')
+  #' #'@Todd: this is fix for now but we should find the issue with these additional ages in the specifications
+  # browser()
+  new_ages <- c('0-14 years',"45-49 years", "50-54 years", "55-64 years","65+ years")
+  new_data=matrix(rep(0,15),nrow=5, dimnames = list(age=new_ages, race=c('black','hispanic','other')))
+  dim(new_data)
   
-   prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #helps counteract max value below a bit
+  prenatal.care.prior$intercepts <- rbind(prenatal.care.prior$intercepts, new_data)
+  names( dimnames(prenatal.care.prior$intercepts ))=c('age','race')
+  
+  prenatal.care.prior$slopes <- rbind(prenatal.care.prior$slopes,new_data)
+  names( dimnames(prenatal.care.prior$slopes ))=c('age','race')
+  
+  prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #helps counteract max value below a bit
                                                                          slope = prenatal.care.prior$slopes,
                                                                          anchor.year = 2010,
                                                                          max = 0.9,
@@ -1071,13 +1075,13 @@ get.prp.prenatal.care.functional.form = function(specification.metadata,trimeste
 
 get.prp.prenatal.care.functional.form.first.trimester<-function(specification.metadata){
   get.prp.prenatal.care.functional.form(specification.metadata,"first")
-  }
+}
 get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first<-function(specification.metadata){
   get.prp.prenatal.care.functional.form(specification.metadata,"second")
-  }
+}
 get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second<-function(specification.metadata){
   get.prp.prenatal.care.functional.form(specification.metadata,"third")
-  }
+}
 
 #-- SYPHILIS TO HIV TESTING FUNCTIONAL FORM --# -----
 # function to map the ratio of STI tests relative to hiv.tests in the US (for STI screening)
@@ -1092,7 +1096,7 @@ get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
                                         knots.are.on.transformed.scale = F,
                                         knot.link = "log",
                                         link = "identity" #it's safer to use linear extrapolation between knots to avoid exponential growth
-                                        )
+  )
 }
 
 #'@:Todd: need to add an option for the national model ----
@@ -1113,10 +1117,10 @@ get.immigration.rates.functional.form <- function(location, specification.metada
 }
 
 get.immigration.rates <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.YEAR){
-    # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
-    # oneway stratification only for one timepoint  (2011-2015) breakdown by age, by race, by sex
+  # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
+  # oneway stratification only for one timepoint  (2011-2015) breakdown by age, by race, by sex
   # (2016-2020) aggregate numbers 
-
+  
   #because of limitations in data, only data from 2011-2015 was used 
   #annual number of immigrants
   immigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
