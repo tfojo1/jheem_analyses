@@ -26,7 +26,7 @@ VERSION='shield'
 LOCATION='C.35620'#NYC
 
 set.seed(00000)
-CALIBRATION.NAME = 'pop.demog.NYC' 
+CALIBRATION.NAME = 'pop.demog.3' 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
 # clear.calibration.cache(version=VERSION,
