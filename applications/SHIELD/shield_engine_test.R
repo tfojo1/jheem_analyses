@@ -10,13 +10,14 @@ source('applications/SHIELD/shield_specification.R')
 version= 'shield'
 # location= "C.12580" #Baltimore MSA
 location='C.35620' 
+#'@MS:How to find the codes
 
 # TEST the likelihoods ----
 source('applications/SHIELD/shield_likelihoods.R')
 
 # instantiate all likelihoods
 # likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
-# likelihood.all<- likelihood.instructions.demographics$instantiate.likelihood('shield',location,verbose = T)
+likelihood.all<- likelihood.instructions.demographics$instantiate.likelihood('shield',location,verbose = T)
 
 # make a run:
 engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
