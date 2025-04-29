@@ -21,21 +21,21 @@ source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
 #
-
-# LOCATION='C.12580'
-LOCATION='C.35620'
+VERSION='shield'
+# LOCATION='C.12580' #Baltimore MSA
+LOCATION='C.35620'#NYC
 
 set.seed(00000)
 CALIBRATION.NAME = 'pop.demog.NYC' 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
-# clear.calibration.cache(version='shield',
+# clear.calibration.cache(version=VERSION,
 #                         location=LOCATION,
 #                         calibration.code = CALIBRATION.NAME,
 #                         allow.remove.incomplete = T)
 # print("Cashe is cleared")
 #
-set.up.calibration(version='shield',
+set.up.calibration(version=VERSION,
                    location=LOCATION,
                    calibration.code = CALIBRATION.NAME,
                    cache.frequency = 100 #how often write the results to disk 
@@ -46,7 +46,7 @@ print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.locati
 # Run calibration ----
 start.time = Sys.time()
 print(paste0("STARTING MCMC RUN OF ", LOCATION, " (", locations::get.location.name(LOCATION), ") AT ", Sys.time()))
-mcmc = run.calibration(version = 'shield',
+mcmc = run.calibration(version = VERSION,
                        location = LOCATION,
                        calibration.code = CALIBRATION.NAME,
                        chains = 1,
@@ -61,7 +61,7 @@ print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
 
 # Save simset
-simset = assemble.simulations.from.calibration(version = 'shield',
+simset = assemble.simulations.from.calibration(version = VERSION,
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
