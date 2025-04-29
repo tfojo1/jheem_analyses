@@ -7,21 +7,21 @@
 ##################
 source('applications/SHIELD/shield_specification.R')
 
-version= 'shield'
-# location= "C.12580" #Baltimore MSA
-location='C.35620' 
+VERSION='shield'
+# LOCATION='C.12580' #Baltimore MSA
+LOCATION='C.35620'#NYC 
 #'@MS:How to find the codes
 
 # TEST the likelihoods ----
 source('applications/SHIELD/shield_likelihoods.R')
 
 # instantiate all likelihoods
-# likelihood.all<- likelihood.instructions.all$instantiate.likelihood('shield',location,verbose = T)
-likelihood.all<- likelihood.instructions.demographics$instantiate.likelihood('shield',location,verbose = T)
+# likelihood.all<- likelihood.instructions.all$instantiate.likelihood(VERSION,LOCATION,verbose = T)
+likelihood.all<- likelihood.instructions.demographics$instantiate.likelihood(VERSION,LOCATION,verbose = T)
 
 # make a run:
-engine = create.jheem.engine(version = 'shield', location = location, end.year = 2030)
-specification.metadata=get.specification.metadata('shield',location)
+engine = create.jheem.engine( VERSION,  LOCATION, end.year = 2030)
+specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
@@ -63,8 +63,8 @@ simplot(sim, 'emigration',split.by = 'race')
 simplot(sim, 'diagnosis.total')
  
 simplot(sim, 'diagnosis.ps')
-simplot.data.only('diagnosis.ps',location)
-lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood(version,location )
+simplot.data.only('diagnosis.ps',LOCATION)
+lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood(version,LOCATION )
 lik$compute(sim,debug = T)
 # sd= coef.variation * mean
 
@@ -149,13 +149,13 @@ if (1==2){
     get.mappings.to.align.ontologies(ontology(location=so$location),ontology(location=do$location))
     
     # #prenatal care: there are missign values in the MSA aggregated data
-    # SURVEILLANCE.MANAGER$data$no.prenatal.care$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
-    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
-    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.second.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
-    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.third.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,location,]
+    # SURVEILLANCE.MANAGER$data$no.prenatal.care$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,LOCATION,]
+    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.first.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,LOCATION,]
+    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.second.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,LOCATION,]
+    # SURVEILLANCE.MANAGER$data$prenatal.care.initiation.third.trimester$estimate$cdc.wonder.aggregated.population$cdc.fertility$year__location__age[,LOCATION,]
     
     
-    # SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,location]
+    # SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location[,LOCATION]
     # $mapping.from.1
     # [1] "A basic ontology mapping ('shield.to.census.sex') over dimension 'sex'"
     # 
