@@ -100,12 +100,17 @@ simset$traceplot("fertility")
  sim1=engine$run(params)
  
 
- params['age49.other.aging.rate.multiplier.1']=0.4365088 
- params['age54.other.aging.rate.multiplier.1']=0.4139026 
- params['age64.other.aging.rate.multiplier.1']=0.3597312
- params['age49.other.aging.rate.multiplier.2']=0.8529033 
- params['age54.other.aging.rate.multiplier.2']=0.8947853
- params['age64.other.aging.rate.multiplier.2']=0.8753311 
+ params["black.fertility.rate.multiplier"]   = 0.8363844
+ params["hispanic.fertility.rate.multiplier"] = 0.6446388
+ params["other.fertility.rate.multiplier"]    = 0.8498888
+ params["age15.19.fertility.rate.multiplier"] = 0.7059593
+ params["age20.24.fertility.rate.multiplier"] = 1.079762
+ params["age25.29.fertility.rate.multiplier"] = 1.135441
+ params["age30.34.fertility.rate.multiplier"] = 1.110618
+ params["age35.39.fertility.rate.multiplier"] = 1.050863
+ params["age40.44.fertility.rate.multiplier"] = 0.6490817
+ 
+
  sim2=engine$run(params)
 
 source("applications/SHIELD/debug_likelihoods.R")
@@ -120,6 +125,7 @@ lik.age.race$compare.sims(sim1, sim2,piecewise = T)
 lik.sex.age$compare.sims(sim1, sim2,piecewise = T)
 lik.sex.race$compare.sims(sim1, sim2, piecewise = T)
 lik.age$compare.sims(sim1, sim2, piecewise = T, log = T) #sim2/sim1
+lik.fert$compare.sims(sim1, sim2, piecewise = T, log = T) 
 
 
 simplot(
@@ -133,6 +139,19 @@ simplot(
   # facet.by = "race",
   outcomes = c("population"), 
   dimension.values = list(year = 2000:2030)) 
+
+
+simplot(
+    # simset$first.sim(),
+    sim1,
+    sim2,
+    # facet.by = "age",
+    # facet.by = "sex",
+     facet.by = "age",split.by="race",
+    # facet.by = "age",split.by="sex",
+    # facet.by = "race",
+    outcomes = c("fertility.rate"), 
+    dimension.values = list(year = 2000:2030))
 
 #there is a jump in 2020: the stratified.census reports agegroups to 2019. then in 2020, we switch to census to use single year ages and there is a big jump
 #single year ages
