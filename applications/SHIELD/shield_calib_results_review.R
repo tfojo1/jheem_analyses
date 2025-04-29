@@ -7,9 +7,9 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
 VERSION='shield'
 LOCATION='C.12580' #BALTIMORE.MSA
-CALIBRATION.CODE.TO.RUN='pop.demog.shield.pk1'
+CALIBRATION.CODE.TO.RUN='pop.demog.shield'
 # DATE=Sys.Date()
-DATE="2025-04-23"
+DATE="2025-04-25"
 
 
 # COMPLETE MCMC:Reading from file:
@@ -55,7 +55,7 @@ simplot(
         simset$last.sim(),
         # facet.by = "age",
         # facet.by = "sex",
-        facet.by = "race",
+        #facet.by = "race",
         split.by = "race", facet.by = 'age',
         #facet.by = "sex", split.by = "race",
          #facet.by = "sex", split.by = "age", 
@@ -107,7 +107,13 @@ simset$traceplot("fertility")
  engine=create.jheem.engine('shield','C.12580',end.year = 2030)
  sim1=engine$run(params)
  
- params['age64.other.aging.rate.multiplier.2']=1
+
+ params['age49.other.aging.rate.multiplier.1']=0.4365088 
+ params['age54.other.aging.rate.multiplier.1']=0.4139026 
+ params['age64.other.aging.rate.multiplier.1']=0.3597312
+ params['age49.other.aging.rate.multiplier.2']=0.8529033 
+ params['age54.other.aging.rate.multiplier.2']=0.8947853
+ params['age64.other.aging.rate.multiplier.2']=0.8753311 
  sim2=engine$run(params)
 
 source("applications/SHIELD/debug_likelihoods.R")
@@ -122,6 +128,7 @@ lik.age.race$compare.sims(sim1, sim2,piecewise = T)
 lik.sex.age$compare.sims(sim1, sim2,piecewise = T)
 lik.sex.race$compare.sims(sim1, sim2, piecewise = T)
 lik.age$compare.sims(sim1, sim2, piecewise = T, log = T) #sim2/sim1
+
 
 simplot(
   # simset$first.sim(),
