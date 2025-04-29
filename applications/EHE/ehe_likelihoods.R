@@ -2037,11 +2037,13 @@ future.incidence.change.likelihood.instructions =
         name = 'future.incidence.change',
         compute.function = function(sim, log=T){
             
-            fold.change.inc = as.numeric(sim$get('incidence', year=2030, keep.dimensions=c('age','race','sex','risk'))) / as.numeric(sim$get('incidence', year=2025, keep.dimensions=c('age','race','sex','risk')))
+            fold.change.inc = sim$get('incidence', year=2025:2030, keep.dimensions=c('year','age','race','sex','risk')) / sim$get('incidence', year=2020:2025, keep.dimensions=c('year','age','race','sex','risk'))
             fold.change.inc[is.na(fold.change.inc)] = 100
+            max.fold.change.inc = apply(fold.change.inc, 2:5, max)
             
-            n.fold.change.gt.3 = sum(fold.change.inc>3)
-            n.fold.change.lte.3 = sum(fold.change.inc<=3)
+            n.fold.change.gt.3 = sum(max.fold.change.inc>3)
+            n.fold.change.lte.3 = length(max.fold.change.inc) - n.fold.change.gt.3
+            
             rv = sum(log(P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.gt.3 + log(1-P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.lte.3)
             
             if (!log)

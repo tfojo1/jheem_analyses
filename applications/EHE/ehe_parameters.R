@@ -463,7 +463,11 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     #idu by sex from table 9 and 10 from
     #  https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf
     # RR of prob of daily use (heroin) * prob of needle sharing
-    female.idu.susceptibility.rr = Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
+    female.idu.susceptibility.rr = Lognormal.Distribution(-0.1504802, 0.5506755), # the mean and sd of log of all data values of new diagnoses of female idu / male idu - all years and locations
+            # z=SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__sex__risk[,,,'idu']
+            # ratio = z[,,'female'] / z[,,'male']
+            # mask = !is.na(ratio) & ratio!=0 & ratio!=Inf
+            #OLD: Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
     heterosexual.male.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
     idu.sex.assortativity.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
 
