@@ -197,10 +197,19 @@ register.model.element(EHE.SPECIFICATION,
                         name = 'other.active.idu.initial.prevalence.ratio',
                         scale = 'ratio',
                         value = 1)
+
 register.model.element(EHE.SPECIFICATION,
-                        name = 'msm.active.idu.initial.prevalence.ratio',
-                        scale = 'ratio',
-                        value = 1)
+                       name = 'female.active.idu.initial.prevalence.ratio',
+                       scale = 'ratio',
+                       value = 1)
+register.model.element(EHE.SPECIFICATION,
+                       name = 'heterosexual.male.active.idu.initial.prevalence.ratio',
+                       scale = 'ratio',
+                       value = 1)
+register.model.element(EHE.SPECIFICATION,
+                       name = 'msm.active.idu.initial.prevalence.ratio',
+                       scale = 'ratio',
+                       value = 1)
 
 register.model.quantity(EHE.SPECIFICATION,
                         name = 'idu.initial.prevalence.ratio',
@@ -208,16 +217,29 @@ register.model.quantity(EHE.SPECIFICATION,
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'idu.initial.prevalence.ratio',
-                               applies.to = list(race='black', sex=c('heterosexual_male','female')),
-                               value = 'black.active.idu.initial.prevalence.ratio')
+                               applies.to = list(race='black', sex=c('heterosexual_male')),
+                               value = expression(black.active.idu.initial.prevalence.ratio*heterosexual.male.active.idu.initial.prevalence.ratio))
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'idu.initial.prevalence.ratio',
-                               applies.to = list(race='hispanic', sex=c('heterosexual_male','female')),
-                               value = 'hispanic.active.idu.initial.prevalence.ratio')
+                               applies.to = list(race='hispanic', sex=c('heterosexual_male')),
+                               value = expression(hispanic.active.idu.initial.prevalence.ratio*heterosexual.male.active.idu.initial.prevalence.ratio))
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'idu.initial.prevalence.ratio',
-                               applies.to = list(race='other', sex=c('heterosexual_male','female')),
-                               value = 'other.active.idu.initial.prevalence.ratio')
+                               applies.to = list(race='other', sex=c('heterosexual_male')),
+                               value = expression(other.active.idu.initial.prevalence.ratio*heterosexual.male.active.idu.initial.prevalence.ratio))
+
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'idu.initial.prevalence.ratio',
+                               applies.to = list(race='black', sex=c('female')),
+                               value = expression(black.active.idu.initial.prevalence.ratio*female.active.idu.initial.prevalence.ratio))
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'idu.initial.prevalence.ratio',
+                               applies.to = list(race='hispanic', sex=c('female')),
+                               value = expression(hispanic.active.idu.initial.prevalence.ratio*female.active.idu.initial.prevalence.ratio))
+register.model.quantity.subset(EHE.SPECIFICATION,
+                               name = 'idu.initial.prevalence.ratio',
+                               applies.to = list(race='other', sex=c('female')),
+                               value = expression(other.active.idu.initial.prevalence.ratio*female.active.idu.initial.prevalence.ratio))
 
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'idu.initial.prevalence.ratio',

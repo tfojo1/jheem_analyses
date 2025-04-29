@@ -15,7 +15,7 @@ if (1==2){
 ##--  HELPER FUNCTIONS --##
 ##-----------------------##
 # initiation helper functions (combining numerators, denominators over 3 years and two data types (heroin and cocaine))
-generate.iniation.numerators = function(data.type,
+generate.initiation.numerators = function(data.type,
                                         year){
   
   file.dir = paste0("../jheem_analyses/data_files/idu_initiation")
@@ -215,7 +215,7 @@ generate.multi.year.estimates.by.data.type = function(data.type,
   denominators = list()
   
   for(year in years){
-    numerators[[year]] = generate.iniation.numerators(data.type = data.type,
+    numerators[[year]] = generate.initiation.numerators(data.type = data.type,
                                                       year = year)
     denominators[[year]] = generate.initiation.denominators(year = year)
   }
@@ -265,6 +265,17 @@ get.idu.incidence.rates <- function(specification.metadata)
   rv = array(rep(weighted.mapped,9), # this is going to fill in assuming that age is the first dimension 
              dim=sapply(dim.names, length),
              dimnames = dim.names)
+  
+  
+  ever.idu.proportions = get.cached.object.for.version('ever.idu.proportions', version=specification.metadata$version)
+  sex.rrs = ever.idu.proportions$sex / ever.idu.proportions$sex['heterosexual_male']
+  
+  
+  rv[,,'female'] = rv[,,'female'] * sex.rrs['female']
+  rv[,,'msm'] = rv[,,'msm'] * sex.rrs['msm']
+  
+  correction.factor = 2 / (sex.rrs['female'] + 1)
+  rv = rv * correction.factor
   
   rv
 }
@@ -602,13 +613,14 @@ read.nsduh.last.inj.file <- function(file,
     NSDUH.LAST.INJ.MAPPING = c(
         "Overall" = NA,
         "1 - Within the past 30 days" = 'lt.30d',
-        "13 - More than 12 months ago LOGICALLY ASSIGNED" = 'gt.12mo',
         "2 - More than 30 days ago but within the past 12 mos" = '30d.to.12mo',
         "3 - More than 12 months ago" = 'gt.12mo',
-        "8 - At some point in the past 12 months LOG ASSN" = NA,
-        "81 - NEVER USED COC/HER/STM W/NEEDLE Log assn" = NA,
-        "9 - At some point in the lifetime LOG ASSN" = NA, 
-        "91 - NEVER USED COC/HER/STM WITH A NEEDLE" = NA,
+        "8 - At some point in the past 12 months LOG ASSN" = 'gt.12mo',
+        "13 - More than 12 months ago LOGICALLY ASSIGNED" = 'gt.12mo',
+        "9 - At some point in the lifetime LOG ASSN" = 'gt.12mo', 
+        "81 - NEVER USED COC/HER/STM W/NEEDLE Log assn" = 'never',
+        "91 - NEVER USED COC/HER/STM WITH A NEEDLE" = 'never',
+        "91 - NEVER USED ANY DRUG WITH A NEEDLE" = 'never',
         "97 - REFUSED" = NA,     
         "98 - MISSING" = NA
     )
@@ -767,6 +779,19 @@ get.active.to.remission.ratio <- function(nsduh.data)
     rv
 }
 
+get.ever.use.proportion <- function(nsduh.data)
+{
+    totals = as.numeric(apply(nsduh.data, setdiff(names(dim(nsduh.data)), 'last.inj'), sum))
+    never = array.access(nsduh.data, last.inj='never')
+    rv = (totals-never)/totals
+    
+    dim.names = dimnames(rv)[-1]
+    dim(rv) = sapply(dim.names, length)
+    dimnames(rv) = dim.names
+    
+    rv
+}
+
 if (1==2)
 {
     source('../jheem_analyses/applications/ehe/ehe_specification.R')
@@ -786,9 +811,22 @@ if (1==2)
         
     cache.object.for.version(object = active.to.remission.ratios,
                              name ='active.to.remission.ratios',
-                             version = 'ehe')
+                             version = 'ehe',
+                             overwrite = T)
+    
+    ever.idu.proportions = lapply(nsduh.data, function(one.data){
+        if (all(names(dim(one.data))!='last.inj'))
+            one.data
+        else
+            get.ever.use.proportion(apply(one.data, 1:2, sum))
+        
+    })
     
     
+    cache.object.for.version(object = ever.idu.proportions,
+                             name ='ever.idu.proportions',
+                             version = 'ehe',
+                             overwrite = T)
     
     # Exploring the fit
     get.active.to.remission.ratio(apply(nsduh.data$sex, 1:2, sum))
