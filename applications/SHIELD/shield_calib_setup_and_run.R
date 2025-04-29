@@ -21,10 +21,13 @@ source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
 #
+
 # LOCATION='C.12580'
-LOCATION='C.10580' #Albany-Schenectady-Troy, NY
+LOCATION='C.35620'
+
+
 set.seed(00000)
-CALIBRATION.NAME = 'pop.demog.2' 
+CALIBRATION.NAME = 'pop.demog.NYC' 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
 # clear.calibration.cache(version='shield',

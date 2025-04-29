@@ -7,8 +7,9 @@ N.ITER=15000
 #04.23: <pop.demog.1> we found discrepancies in the population size, Zoe is working on a fix
 #04.25: <pop.demog.wEmigration> same chain run with 6 parameters by Ryan
 #04.29: <pop.demog.2> Zoe has update the survillance data. we have a bad fit to older agegroups, and the fertility in Baltimore. Trying the fit in NY
+ 
 
-register.calibration.info('pop.demog.2', 
+register.calibration.info('pop.demog.NYC.RF', 
                           likelihood.instructions = likelihood.instructions.demographics,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
