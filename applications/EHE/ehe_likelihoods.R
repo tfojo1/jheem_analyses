@@ -310,6 +310,20 @@ race.risk.new.diagnoses.likelihood.instructions =
                                        equalize.weight.by.year = T
   )
 
+race.risk.new.diagnoses.likelihood.instructions.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                         outcome.for.sim = "new",
+                                         dimensions = c("race","risk"),
+                                         levels.of.stratification = c(0,1,2), 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = DIAGNOSES.CV.STATE, 
+                                         error.variance.type = 'cv',
+                                         minimum.error.sd = 1,
+                                         weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                         equalize.weight.by.year = T
+    )
+
 race.risk.halfx.cv.expv.new.diagnoses.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                          outcome.for.sim = "new",
@@ -645,6 +659,20 @@ race.risk.prevalence.likelihood.instructions =
                                        weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
                                        equalize.weight.by.year = T
   )
+
+race.risk.prevalence.likelihood.instructions.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                         outcome.for.sim = "diagnosed.prevalence",
+                                         dimensions = c("race","risk"),
+                                         levels.of.stratification = c(0,1,2), 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = list(PREVALENCE.CV.STATE), 
+                                         error.variance.type = c('cv'),
+                                         minimum.error.sd = 1,
+                                         weights = (1*TRANSMISSION.WEIGHT), #list(0.3), # see prev_new_aware_weighting.R 
+                                         equalize.weight.by.year = T
+    )
 
 race.risk.halfx.cv.expv.prevalence.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
@@ -2035,9 +2063,12 @@ P.NEW.FOLD.CHANGE.GT.3 = 0.02778896
 future.incidence.change.likelihood.instructions = 
     create.custom.likelihood.instructions(
         name = 'future.incidence.change',
-        compute.function = function(sim, log=T){
+        compute.function = function(sim, data, log=T){
             
-            fold.change.inc = sim$get('incidence', year=2025:2030, keep.dimensions=c('year','age','race','sex','risk')) / sim$get('incidence', year=2020:2025, keep.dimensions=c('year','age','race','sex','risk'))
+            inc = sim$optimized.get(data$optimized.get.instr)
+            
+            fold.change.inc = inc[as.character(2025:2030),,,,,] / inc[as.character(2020:2025),,,,,]
+            # fold.change.inc = sim$get('incidence', year=2025:2030, keep.dimensions=c('year','age','race','sex','risk')) / sim$get('incidence', year=2020:2025, keep.dimensions=c('year','age','race','sex','risk'))
             fold.change.inc[is.na(fold.change.inc)] = 100
             max.fold.change.inc = apply(fold.change.inc, 2:5, max)
             
@@ -2050,7 +2081,21 @@ future.incidence.change.likelihood.instructions =
                 exp(rv)
             else
                 rv
-        })
+        },
+        get.data.function = function(version, location)
+        {
+            sim.metadata = get.simulation.metadata(version=version, location=location)
+            optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
+                outcomes = 'incidence', 
+                dimension.values = list(year=2020:2030),
+                keep.dimensions = c('year','age','race','sex','risk')
+            )
+            
+            list(
+                optimized.get.instr = optimized.get.instr
+            )
+        }
+        )
 
 
 #-- IDU Active/Prior Ratio --#
@@ -2060,19 +2105,23 @@ idu.active.prior.ratio.likelihood.instructions = create.custom.likelihood.instru
     
     compute.function = function(sim, data, log=T)
     {
-        active.prior.ratios.by.age = sim$get('population', 
-                                             dimension.values=list(year = data$years,
-                                                                   risk = 'active_IDU'),
-                                             keep.dimensions = 'age',
-                                             drop.single.sim.dimension = T) /
-            sim$get('population', 
-                    dimension.values=list(year = data$years,
-                                          risk = 'IDU_in_remission'),
-                    keep.dimensions = 'age',
-                    drop.single.sim.dimension = T)
+        pop = sim$optimized.get(data$optimized.get.instr)
+        
+        active.prior.ratios.by.age = colSums(pop[,,'active_IDU']) /colSums(pop[,,'IDU_in_remission'])
+        
+        # active.prior.ratios.by.age = sim$get('population',
+        #                                      dimension.values=list(year = data$active.to.remission.ratios$years,
+        #                                                            risk = 'active_IDU'),
+        #                                      keep.dimensions = 'age',
+        #                                      drop.single.sim.dimension = T) /
+        #     sim$get('population',
+        #             dimension.values=list(year = data$active.to.remission.ratios$years,
+        #                                   risk = 'IDU_in_remission'),
+        #             keep.dimensions = 'age',
+        #             drop.single.sim.dimension = T)
        
        d = dlnorm(x = active.prior.ratios.by.age,
-                  meanlog = base::log(as.numeric(data$age)),
+                  meanlog = base::log(as.numeric(data$active.to.remission.ratios$age)),
                   sdlog = log(1.25) / 2,
                   log = log)
        
@@ -2085,7 +2134,19 @@ idu.active.prior.ratio.likelihood.instructions = create.custom.likelihood.instru
     get.data.function = function(version, location)
     {
         active.to.remission.ratios = get.cached.object.for.version('active.to.remission.ratios', version=version)
-        active.to.remission.ratios
+        
+        optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
+            'population', 
+            dimension.values=list(year = active.to.remission.ratios$years,
+                                  risk = c('active_IDU','IDU_in_remission')),
+            keep.dimensions = c('year','age','risk'),
+            drop.single.sim.dimension = T
+        )
+        
+        list(
+            active.to.remission.ratios = active.to.remission.ratios,
+            optimized.get.instr = optimized.get.instr
+        )
     }
 )
 
@@ -2179,6 +2240,21 @@ trans.state.likelihood.instructions.2 =
                                  total.new.diagnoses.10x.cv.likelihood.instructions.state,
                                  total.prevalence.10x.cv.instructions.state,
                                  non.age.aids.diagnoses.16x.likelihood.instructions.state,
+                                 population.likelihood.instructions.trans,
+                                 heroin.likelihood.instructions.trans,
+                                 cocaine.likelihood.instructions.trans,
+                                 biased.hiv.mortality.likelihood.instructions.full,
+                                 future.incidence.change.likelihood.instructions,
+                                 idu.active.prior.ratio.likelihood.instructions
+                                 #state.aids.diagnoses.proportions.instructions
+                                 #weight = TRANSMISSION.WEIGHT
+                                 
+    )
+
+trans.state.likelihood.instructions.B = 
+    join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions.state,
+                                 race.risk.prevalence.likelihood.instructions.state,
+                                 non.age.aids.diagnoses.16x.likelihood.instructions,
                                  population.likelihood.instructions.trans,
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,
