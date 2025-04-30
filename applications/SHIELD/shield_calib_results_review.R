@@ -7,14 +7,15 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
 VERSION='shield'
 LOCATION='C.12580' #BALTIMORE.MSA
-CALIBRATION.CODE.TO.RUN='pop.demog.shield'
+# LOCATION='C.35620'#NYC
+CALIBRATION.CODE.TO.RUN='pop.demog.3'
 # DATE=Sys.Date()
-DATE="2025-04-25"
+# DATE="2025-04-25"
 
 
 # COMPLETE MCMC:Reading from file:
 #Q drive:
-if(1==1){
+if(1==2){
         load(paste0("/Volumes/jheem$/results/Shield/",CALIBRATION.CODE.TO.RUN,"_simset_",DATE,"_",LOCATION,".Rdata"))
         
 }

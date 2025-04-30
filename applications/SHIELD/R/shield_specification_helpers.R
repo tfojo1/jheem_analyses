@@ -295,7 +295,7 @@ get.fertility.rate.functional.form<-function(location, specification.metadata, p
   if (length(mapped.fertility.rates)==0)
     stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
                 locations::get.location.name(location), ")"))
-  #fit a gausian model to the data; we will use this model to estimate fertility.rate at the knots 
+  #fit a Gaussian model to the data; we will use this model to estimate fertility.rate at the knots 
   #alternatively, we could use an average of 5 years around each knot
   # reshape into a datafram
   df= reshape2::melt(mapped.fertility.rates, varnames = c("age", "race", "year"), value.name = "fertility.rate")

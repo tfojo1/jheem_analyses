@@ -8,16 +8,13 @@
 source('applications/SHIELD/shield_specification.R')
 
 VERSION='shield'
-# LOCATION='C.12580' #Baltimore MSA
-LOCATION='C.35620'#NYC 
-#'@MS:How to find the codes
+LOCATION='C.12580' #Baltimore MSA
+# LOCATION='C.35620'#NYC 
+#'@MS:How to find the codes for each MSA?
 
 # TEST the likelihoods ----
 source('applications/SHIELD/shield_likelihoods.R')
 
-# instantiate all likelihoods
-# likelihood.all<- likelihood.instructions.all$instantiate.likelihood(VERSION,LOCATION,verbose = T)
-likelihood.all<- likelihood.instructions.demographics$instantiate.likelihood(VERSION,LOCATION,verbose = T)
 
 # make a run:
 engine = create.jheem.engine( VERSION,  LOCATION, end.year = 2030)
@@ -25,7 +22,10 @@ specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
-# compute all likelihoods   
+# INSTANTIATE LIKELIHOODS
+# likelihood.all<- likelihood.instructions.all$instantiate.likelihood(VERSION,LOCATION,verbose = T)
+likelihood.all<- likelihood.instructions.demographics$instantiate.likelihood(VERSION,LOCATION,verbose = T)
+# COMPUTE LIKELIHOODS   
 likelihood.all$compute.piecewise(sim)
 # simplot(sim, 'diagnosis.total')
 
