@@ -16,6 +16,7 @@ DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010,
 DEFAULT.AGING.YEAR=2007 # differential aging starts in 2007
 DEFAULT.MIGRATION.YEAR=2007 # migration
 DEFAULT.STI.SCREENING.YEAR=1980 # year to start the STI screenings
+DEFAULT.FERTILITY.YEARS=2005 
 
 
 # Caching required objects: 
@@ -168,7 +169,7 @@ register.fixed.model.strata(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fertility.rate',
                        get.functional.form.function = get.fertility.rate.functional.form,
-                       functional.form.from.time = DEFAULT.POPULATION.YEARS, #only projects values from 2010 forward
+                       functional.form.from.time = DEFAULT.FERTILITY.YEARS, #only projects values from 2010 forward
                        scale = 'rate')
 
 ##---- Birth Proportions ----

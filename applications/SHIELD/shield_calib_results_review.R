@@ -1,3 +1,4 @@
+library(plotly)
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
@@ -9,7 +10,7 @@ VERSION='shield'
 LOCATION='C.12580' #BALTIMORE.MSA
 
 # LOCATION='C.35620'#NYC
-CALIBRATION.CODE.TO.RUN='pop.demog.3'
+CALIBRATION.CODE.TO.RUN='pop.demog.5'
 # DATE=Sys.Date()
 DATE="2025-04-29"
 
@@ -45,7 +46,7 @@ simset=simset;simset
 # REVIEW-----
 simset$n.sim
 simplot(
-        # simset$first.sim(),
+         simset$first.sim(),
         simset$last.sim(),
         # facet.by = "age",
         # facet.by = "sex",
@@ -102,10 +103,20 @@ simset$traceplot("fertility")
  params=simset$last.sim()$params
  engine=create.jheem.engine('shield','C.12580',end.year = 2030)
  sim1=engine$run(params)
- 
+ params.2 = simset$first.sim()$params
 
  
+ params["age15.19.hispanic.fertility.rate.multiplier.1"] = 1.0598548 
+ params["age15.19.hispanic.fertility.rate.multiplier.2"] = 0.1
  
+ params["age20.24.hispanic.fertility.rate.multiplier.1"] = 1.2 
+ params["age20.24.hispanic.fertility.rate.multiplier.2"] = 0.9
+ 
+ params["age25.29.hispanic.fertility.rate.multiplier.1"] = 0.82 
+ params["age25.29.hispanic.fertility.rate.multiplier.2"] = 0.82
+ 
+ params["age40.44.hispanic.fertility.rate.multiplier.1"] = 0.01 
+ params["age40.44.hispanic.fertility.rate.multiplier.2"] = 0.009
 
  sim2=engine$run(params)
 
@@ -126,6 +137,9 @@ lik.sex.race$compare.sims(sim1, sim2, piecewise = T)
 lik.age$compare.sims(sim1, sim2, piecewise = T, log = T) #sim2/sim1
 lik.fert$compare.sims(sim1, sim2, piecewise = T, log = T) 
 lik.fert$compare.sims(simset$first.sim(), simset$last.sim(), piecewise = T, log = T) 
+
+
+lik.fert$compute(sim2, debug = T)
 
 simplot(
   # simset$first.sim(),
