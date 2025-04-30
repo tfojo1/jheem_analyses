@@ -2135,6 +2135,7 @@ idu.active.prior.ratio.likelihood.instructions = create.custom.likelihood.instru
     {
         active.to.remission.ratios = get.cached.object.for.version('active.to.remission.ratios', version=version)
         
+        sim.metadata = get.simulation.metadata(version=version, location=location)
         optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
             'population', 
             dimension.values=list(year = active.to.remission.ratios$years,
