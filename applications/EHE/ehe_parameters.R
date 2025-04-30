@@ -463,7 +463,8 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     #idu by sex from table 9 and 10 from
     #  https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf
     # RR of prob of daily use (heroin) * prob of needle sharing
-    female.idu.susceptibility.rr = Lognormal.Distribution(-0.1504802, 0.5506755), # the mean and sd of log of all data values of new diagnoses of female idu / male idu - all years and locations
+    female.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+            #OLD: Lognormal.Distribution(-0.1504802, 0.5506755), # the mean and sd of log of all data values of new diagnoses of female idu / male idu - all years and locations
             # z=SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__sex__risk[,,,'idu']
             # ratio = z[,,'female'] / z[,,'male']
             # mask = !is.na(ratio) & ratio!=0 & ratio!=Inf
@@ -611,21 +612,28 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     msm.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     msm.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
+
+    heterosexual.male.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
+    heterosexual.male.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
+    female.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
+    female.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
-    black.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
-    hispanic.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
-    other.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
-
-    msm.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
-
-    idu.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
-    idu.relapse.multiplier = Lognormal.Distribution(0, .5*log(2)),
-
     age1.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     age2.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     age3.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     age4.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
     age5.incident.idu.multiplier = Lognormal.Distribution(0, 0.5*log(2)),
+
+    black.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+    hispanic.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+    other.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+
+    msm.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+    heterosexual.male.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+    female.active.idu.initial.prevalence.ratio = Lognormal.Distribution(0, 0.5*log(4)),
+
+    idu.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
+    idu.relapse.multiplier = Lognormal.Distribution(0, .5*log(2)),
 
     age1.idu.relapse.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
     age2.idu.relapse.remission.multiplier = Lognormal.Distribution(0, .5*log(2)),
@@ -1279,6 +1287,16 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'msm.active.idu.initial.prevalence.ratio',
       'msm.incident.idu.multiplier.1',
       'msm.incident.idu.multiplier.2'),
+
+    heterosexual.male.idu.incidence = c(
+    'heterosexual.male.active.idu.initial.prevalence.ratio',
+    'heterosexual.male.incident.idu.multiplier.1',
+    'heterosexual.male.incident.idu.multiplier.2'),
+
+    female.idu.incidence = c(
+    'female.active.idu.initial.prevalence.ratio',
+    'female.incident.idu.multiplier.1',
+    'female.incident.idu.multiplier.2'),
 
     age1.idu.transitions = c(
       'age1.incident.idu.multiplier',

@@ -4,3 +4,6 @@
 # (when on Hopkins network or through VPN)
 #
 # \\cloud.nas.jh.edu\jheem$
+
+# For Macs:
+# press Command + K

@@ -1154,6 +1154,8 @@ set.ehe.idu.from.parameters = function(model.settings,
 {
     specification.metadata = model.settings$specification.metadata
     races = specification.metadata$dim.names$race
+    sexes = sexes.for.param.names = specification.metadata$dim.names$sex
+    sexes.for.param.names[sexes.for.param.names=='heterosexual_male'] = 'heterosexual.male'
     ages = specification.metadata$dim.names$age
     n.ages = length(ages)
     
@@ -1175,11 +1177,11 @@ set.ehe.idu.from.parameters = function(model.settings,
                                                                       applies.to.dimension.values = ages,
                                                                       dimension = 'age')
         
-        param.name = paste0('msm.incident.idu.multiplier.', time)
+        param.names = paste0(sexes.for.param.names, '.incident.idu.multiplier.', time)
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
                                                                       alpha.name = alpha.name,
-                                                                      values = parameters[param.name],
-                                                                      applies.to.dimension.values = 'msm',
+                                                                      values = parameters[param.names],
+                                                                      applies.to.dimension.values = sexes,
                                                                       dimension = 'sex')
     }
     
