@@ -9,8 +9,9 @@ N.ITER=15000
 #04.29: <pop.demog.2> NYC. Zoe has update the survillance data. we have a bad fit to older agegroups, and the fertility in Baltimore. 
 #04.29: <pop.demog.3> Baltimore, added race.age interaction parameters for fertility.rates
 #04.29: <pop.demog.3.pk> same run as <pop.demog.3>  
+#04.29: <pop.demog.4> Baltimore, added race.age.time interaction parameters for fertility.rates
 
-register.calibration.info('pop.demog.3.pk', 
+register.calibration.info('pop.demog.4', 
                           likelihood.instructions = likelihood.instructions.demographics,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start

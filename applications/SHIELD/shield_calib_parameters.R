@@ -9,30 +9,49 @@ POPULATION.PARAMETERS.PRIOR=join.distributions(
   # (6 agegroups, 3 race, 2 knots)-> max 36 params
   # we start with 6 age, and 3 race, parameters applied to both knots -> 9 total
   # added interaction between age and race, now we have 9 -> 18 total
-  age15.19.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age15.19.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age15.19.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    # Fertility rate multipliers by age × race × time (time1 and time2)
+    age15.19.black.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age15.19.black.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age15.19.hispanic.fertility.rate.multiplier.1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age15.19.hispanic.fertility.rate.multiplier.2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age15.19.other.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age15.19.other.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
-  age20.24.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age20.24.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age20.24.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age20.24.black.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age20.24.black.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age20.24.hispanic.fertility.rate.multiplier.1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age20.24.hispanic.fertility.rate.multiplier.2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age20.24.other.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age20.24.other.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
-  age25.29.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age25.29.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age25.29.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age25.29.black.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age25.29.black.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age25.29.hispanic.fertility.rate.multiplier.1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age25.29.hispanic.fertility.rate.multiplier.2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age25.29.other.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age25.29.other.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
-  age30.34.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age30.34.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age30.34.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age30.34.black.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age30.34.black.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age30.34.hispanic.fertility.rate.multiplier.1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age30.34.hispanic.fertility.rate.multiplier.2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age30.34.other.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age30.34.other.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
-  age35.39.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age35.39.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age35.39.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age35.39.black.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age35.39.black.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age35.39.hispanic.fertility.rate.multiplier.1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age35.39.hispanic.fertility.rate.multiplier.2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age35.39.other.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age35.39.other.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
-  age40.44.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age40.44.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age40.44.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  
+    age40.44.black.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age40.44.black.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age40.44.hispanic.fertility.rate.multiplier.1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age40.44.hispanic.fertility.rate.multiplier.2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age40.44.other.fertility.rate.multiplier.1    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    age40.44.other.fertility.rate.multiplier.2    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    
   # Mortality rates by race:
   black.general.mortality.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   hispanic.general.mortality.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -192,19 +211,20 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         }}}                                      
   
   ## Fertility rates by race/age to time1/time2 knots----
-  #when we have a function with knots, we use alpha.name = time (taking one at a time)
-  for (time in c("time1", "time2")) {
+  for (time.index in c(1, 2)) {
+      alpha.name <- paste0("time", time.index)
+      
       for (age.index in seq_along(fertile.ages)) {
           agegroup <- fertile.ages[age.index]
           age.range <- fertile.age.ranges[age.index]
           
           for (race in races) {
-              param.name <- paste0("age", age.range, ".", race, ".fertility.rate.multiplier")
+              param.name <- paste0("age", age.range, ".", race, ".fertility.rate.multiplier.", time.index)
               
               set.element.functional.form.interaction.alphas(
                   model.settings,
                   element.name = "fertility.rate",
-                  alpha.name = time,
+                  alpha.name = alpha.name,
                   value = parameters[param.name],
                   applies.to.dimension.values = list(
                       age = agegroup,
@@ -214,6 +234,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
           }
       }
   }
+  
   
   ## Immigration rate multipliers by race for time1/time2 knots----
   set.element.functional.form.main.effect.alphas(model.settings,
@@ -304,40 +325,76 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
 ## SHIELD.POPULATION.SAMPLING.BLOCKS ----
 SHIELD.POPULATION.SAMPLING.BLOCKS = list(
     # Fertility: grouped by age range
-    fertility.rates.age15.19 = c(
-        "age15.19.black.fertility.rate.multiplier",
-        "age15.19.hispanic.fertility.rate.multiplier",
-        "age15.19.other.fertility.rate.multiplier"
+    fertility.rates.age15.19.1 = c(
+        "age15.19.black.fertility.rate.multiplier.1",
+        "age15.19.hispanic.fertility.rate.multiplier.1",
+        "age15.19.other.fertility.rate.multiplier.1"
     ),
     
-    fertility.rates.age20.24 = c(
-        "age20.24.black.fertility.rate.multiplier",
-        "age20.24.hispanic.fertility.rate.multiplier",
-        "age20.24.other.fertility.rate.multiplier"
+    fertility.rates.age15.19.2 = c(
+        "age15.19.black.fertility.rate.multiplier.2",
+        "age15.19.hispanic.fertility.rate.multiplier.2",
+        "age15.19.other.fertility.rate.multiplier.2"
     ),
     
-    fertility.rates.age25.29 = c(
-        "age25.29.black.fertility.rate.multiplier",
-        "age25.29.hispanic.fertility.rate.multiplier",
-        "age25.29.other.fertility.rate.multiplier"
+    fertility.rates.age20.24.1 = c(
+        "age20.24.black.fertility.rate.multiplier.1",
+        "age20.24.hispanic.fertility.rate.multiplier.1",
+        "age20.24.other.fertility.rate.multiplier.1"
     ),
     
-    fertility.rates.age30.34 = c(
-        "age30.34.black.fertility.rate.multiplier",
-        "age30.34.hispanic.fertility.rate.multiplier",
-        "age30.34.other.fertility.rate.multiplier"
+    fertility.rates.age20.24.2 = c(
+        "age20.24.black.fertility.rate.multiplier.2",
+        "age20.24.hispanic.fertility.rate.multiplier.2",
+        "age20.24.other.fertility.rate.multiplier.2"
     ),
     
-    fertility.rates.age35.39 = c(
-        "age35.39.black.fertility.rate.multiplier",
-        "age35.39.hispanic.fertility.rate.multiplier",
-        "age35.39.other.fertility.rate.multiplier"
+    fertility.rates.age25.29.1 = c(
+        "age25.29.black.fertility.rate.multiplier.1",
+        "age25.29.hispanic.fertility.rate.multiplier.1",
+        "age25.29.other.fertility.rate.multiplier.1"
     ),
     
-    fertility.rates.age40.44 = c(
-        "age40.44.black.fertility.rate.multiplier",
-        "age40.44.hispanic.fertility.rate.multiplier",
-        "age40.44.other.fertility.rate.multiplier"
+    fertility.rates.age25.29.2 = c(
+        "age25.29.black.fertility.rate.multiplier.2",
+        "age25.29.hispanic.fertility.rate.multiplier.2",
+        "age25.29.other.fertility.rate.multiplier.2"
+    ),
+    
+    fertility.rates.age30.34.1 = c(
+        "age30.34.black.fertility.rate.multiplier.1",
+        "age30.34.hispanic.fertility.rate.multiplier.1",
+        "age30.34.other.fertility.rate.multiplier.1"
+    ),
+    
+    fertility.rates.age30.34.2 = c(
+        "age30.34.black.fertility.rate.multiplier.2",
+        "age30.34.hispanic.fertility.rate.multiplier.2",
+        "age30.34.other.fertility.rate.multiplier.2"
+    ),
+    
+    fertility.rates.age35.39.1 = c(
+        "age35.39.black.fertility.rate.multiplier.1",
+        "age35.39.hispanic.fertility.rate.multiplier.1",
+        "age35.39.other.fertility.rate.multiplier.1"
+    ),
+    
+    fertility.rates.age35.39.2 = c(
+        "age35.39.black.fertility.rate.multiplier.2",
+        "age35.39.hispanic.fertility.rate.multiplier.2",
+        "age35.39.other.fertility.rate.multiplier.2"
+    ),
+    
+    fertility.rates.age40.44.1 = c(
+        "age40.44.black.fertility.rate.multiplier.1",
+        "age40.44.hispanic.fertility.rate.multiplier.1",
+        "age40.44.other.fertility.rate.multiplier.1"
+    ),
+    
+    fertility.rates.age40.44.2 = c(
+        "age40.44.black.fertility.rate.multiplier.2",
+        "age40.44.hispanic.fertility.rate.multiplier.2",
+        "age40.44.other.fertility.rate.multiplier.2"
     ),
   
   mortality.rates.by.race=c("black.general.mortality.rate.multiplier",

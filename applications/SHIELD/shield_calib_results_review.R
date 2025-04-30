@@ -7,10 +7,12 @@ stratum.style.manager = create.style.manager(color.data.by = "stratum")
 
 VERSION='shield'
 LOCATION='C.12580' #BALTIMORE.MSA
+
 # LOCATION='C.35620'#NYC
 CALIBRATION.CODE.TO.RUN='pop.demog.3'
 # DATE=Sys.Date()
-# DATE="2025-04-25"
+DATE="2025-04-29"
+
 
 
 # COMPLETE MCMC:Reading from file:
@@ -64,6 +66,7 @@ simplot(
 
 #Fertility (calibrated to data by age/race 2007-2023  )
 simplot( simset$last.sim(),
+         simset$first.sim(),
          # facet.by = "age",
          # facet.by = "sex",
          # facet.by = "race",
@@ -101,15 +104,7 @@ simset$traceplot("fertility")
  sim1=engine$run(params)
  
 
- params["black.fertility.rate.multiplier"]   = 0.8363844
- params["hispanic.fertility.rate.multiplier"] = 0.6446388
- params["other.fertility.rate.multiplier"]    = 0.8498888
- params["age15.19.fertility.rate.multiplier"] = 0.7059593
- params["age20.24.fertility.rate.multiplier"] = 1.079762
- params["age25.29.fertility.rate.multiplier"] = 1.135441
- params["age30.34.fertility.rate.multiplier"] = 1.110618
- params["age35.39.fertility.rate.multiplier"] = 1.050863
- params["age40.44.fertility.rate.multiplier"] = 0.6490817
+ 
  
 
  sim2=engine$run(params)
@@ -121,13 +116,16 @@ lik.sex.race=population.likelihood.instructions.2way.sex.race$instantiate.likeli
 lik.sex.age=population.likelihood.instructions.2way.sex.age$instantiate.likelihood('shield','C.12580')
 lik.age.race=population.likelihood.instructions.2way.age.race$instantiate.likelihood('shield','C.12580')
 lik.age = population.likelihood.instructions.1way.age$instantiate.likelihood('shield','C.12580')
+lik.fert = fertility.likelihood.instructions$instantiate.likelihood('shield','C.12580')
+
+
 #compute and compare:
 lik.age.race$compare.sims(sim1, sim2,piecewise = T)
 lik.sex.age$compare.sims(sim1, sim2,piecewise = T)
 lik.sex.race$compare.sims(sim1, sim2, piecewise = T)
 lik.age$compare.sims(sim1, sim2, piecewise = T, log = T) #sim2/sim1
 lik.fert$compare.sims(sim1, sim2, piecewise = T, log = T) 
-
+lik.fert$compare.sims(simset$first.sim(), simset$last.sim(), piecewise = T, log = T) 
 
 simplot(
   # simset$first.sim(),
