@@ -1,7 +1,7 @@
 cat("*** Running Shield_source_code.R ***\n")
 # detach("package:jheem2", character.only = TRUE, unload = TRUE)
 
-rm(list = ls())
+# rm(list = ls())
 NEW.SOURCE=T
 USE.JHEEM2.PACKAGE=T
 

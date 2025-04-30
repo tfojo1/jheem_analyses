@@ -248,7 +248,7 @@ plot.projected.values<-function(type='glm.three.way',family='gaussian'){
 }
 
 ## ----
-plot.projected.values(type='glm.three.way',family='gaussian')[4]
+plot.projected.values(type='glm.two.way2',family='gaussian')[4]
 plot.projected.values(type='glm.three.way',family='quasibinomial')[4]
  
 
