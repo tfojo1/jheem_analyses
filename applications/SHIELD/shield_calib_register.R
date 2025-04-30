@@ -1,5 +1,5 @@
 cat("*** Running Shiled_register_calibration.R ***\n")
-N.ITER=15000
+N.ITER=30000
 #SUMMARY -----
 # simsets are saved in: /Volumes/jheem$/shield/pop.demog.1.Rdata
 #04.14: PK: I removed initial infected population to speed up the sims #check base_params prp.of.initial.population.infected.syphilis=0
@@ -8,10 +8,11 @@ N.ITER=15000
 #04.25: <pop.demog.wEmigration> same chain run with 6 parameters by Ryan
 #04.29: <pop.demog.2> NYC. Zoe has update the survillance data. we have a bad fit to older agegroups, and the fertility in Baltimore. 
 #04.29: <pop.demog.3> Baltimore, added race.age interaction parameters for fertility.rates
-#04.29: <pop.demog.3.pk> same run as <pop.demog.3>  
-#04.29: <pop.demog.4> Baltimore, added race.age.time interaction parameters for fertility.rates
+#04.30: <pop.demog.3.pk> same run as <pop.demog.3>  
+#04.30: <pop.demog.4> Baltimore, added race.age.time interaction parameters for fertility.rates
+#'@Ryan: how is this different from #3?
 
-register.calibration.info('pop.demog.4', 
+register.calibration.info('pop.demog.3.pk.30k', 
                           likelihood.instructions = likelihood.instructions.demographics,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
