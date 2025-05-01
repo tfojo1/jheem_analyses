@@ -235,10 +235,23 @@ data.manager$register.ontology(
         risk=c('msm', 'not_msm')
     ))
 
+# Pull from Ryan White Data Manager ---------------------------------------
+ryan.white.data.manager = load.data.manager("Q:/data_managers/ryan.white.data.manager.rdata")
 
-# Source Processing -------------------------------------------------------
-source('data_processing/ryan.white.data.manager/Data Manager for Webtool/Webtool Data Manager Outcomes_Ryan White.R') #This pulls the outcome from Ryan White
-source('data_processing/ryan.white.data.manager/Data Manager for Webtool/Webtool Data Manager Outcomes_HIV Surveillance.R') #This pulls the outcome from JHEEM
+ryan.white.subset = ryan.white.data.manager$subset.data(outcomes.to.keep = c('non.adap.clients', 'adap.proportion', 'oahs.clients',  'oahs.suppression', 'adap.suppression'),
+                                                                            sources.to.keep = c( 'ryan.white.program', 'nastad.adap'),
+                                                                            ontologies.to.keep =c('ryan.white.pdfs'))
+
+# Pull from HIV Surveillance Manager --------------------------------------
+surveillance.manager = load.data.manager("Q:/data_managers/surveillance.manager.rdata")
+
+hiv.surveillance.subset = surveillance.manager$subset.data(outcomes.to.keep = c('suppression', 'total.prevalence', 'awareness', 'proportion.tested', 'proportion.tested.n', 'prep', 'diagnosed.prevalence', 'diagnoses'),
+                                        sources.to.keep = c('cdc.hiv', 'cdc.aggregated.proportion', 'lhd', 'cdc.aggregated.county', 'brfss', 'aidsvu', 'cdc.prep', 'prep.cdc.aggregated.county', 'prep.aidsvu.aggregated.county', 'cdc.surveillance.reports'),
+                                        ontologies.to.keep =c('cdc', 'lhd', 'brfss', 'aidsvu', 'cdc.msa.reports'))
+
+# Merge  ------------------------------------------------------------------
+hiv.surveillance.subset$import.data(ryan.white.subset)
+data.manager = hiv.surveillance.subset
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/ryan.white.web.data.manager.rdata")
