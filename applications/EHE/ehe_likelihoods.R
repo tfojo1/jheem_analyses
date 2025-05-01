@@ -2571,6 +2571,10 @@ full.state.weighted.likelihood.instructions.2 = join.likelihood.instructions(
     future.incidence.change.likelihood.instructions
 )
 
+full.state.weighted.likelihood.instructions.2.fl.half = join.likelihood.instructions(
+    full.state.weighted.likelihood.instructions.2, 
+    additional.weights = 1/2)
+
 FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
   population.likelihood.instructions.full, 

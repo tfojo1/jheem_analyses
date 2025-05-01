@@ -271,6 +271,8 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE.B,
 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
                           likelihood.instructions = full.state.weighted.likelihood.instructions.2,
+                          special.case.likelihood.instructions = 
+                              list(FL=full.state.weighted.likelihood.instructions.2.fl.half),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -278,7 +280,7 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
                           thin = 200, 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE),
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE), # CALIBRATION.CODE.TRANS.STATE.B for MS only 
                           description = "Full with covid likelihoods"
 )
 
