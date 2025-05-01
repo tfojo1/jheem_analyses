@@ -9,16 +9,11 @@ CALIBRATION.CODE.FULL.PLUS.COVID = 'full.ehe'
 CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
 
 CALIBRATION.CODE.POP.STATE = 'pop.ehe.state'
-CALIBRATION.CODE.POP.STATE.9 = 'pop.ehe.state.9'
-CALIBRATION.CODE.POP.STATE.10 = 'pop.ehe.state.10'
 CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
-CALIBRATION.CODE.TRANS.STATE.9 = 'trans.ehe.state.9'
-CALIBRATION.CODE.TRANS.STATE.10 = 'trans.ehe.state.10'
+CALIBRATION.CODE.TRANS.STATE.B = 'trans.ehe.state.B'
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
-CALIBRATION.CODE.FULL.STATE.7 = 'full.ehe.state.7'
-CALIBRATION.CODE.FULL.STATE.8 = 'full.ehe.state.8'
-CALIBRATION.CODE.FULL.STATE.9 = 'full.ehe.state.9'
-CALIBRATION.CODE.FULL.STATE.10 = 'full.ehe.state.10'
+CALIBRATION.CODE.FULL.STATE.B = 'full.ehe.state.B'
+CALIBRATION.CODE.FULL.STATE.2 = 'full.ehe.state.2'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
 N.ITER.POP = 20000
@@ -215,23 +210,6 @@ register.calibration.info(CALIBRATION.CODE.POP.STATE,
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
-copy.calibration.info(from.code = CALIBRATION.CODE.POP.STATE,
-                      to.code = CALIBRATION.CODE.POP.STATE.9)
-
-register.calibration.info(CALIBRATION.CODE.POP.STATE.10,
-                          likelihood.instructions = pop.state.likelihood.instructions.2, 
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = par.names.pop,
-                          parameter.aliases = par.aliases.population,
-                          n.iter = N.ITER.POP,
-                          thin = 50, 
-                          fixed.initial.parameter.values = c(global.trate=0.09), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get population parameters in the general vicinity"
-)
-
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           likelihood.instructions = trans.state.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -247,8 +225,8 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
 )
 
-register.calibration.info(CALIBRATION.CODE.TRANS.STATE.9,
-                          likelihood.instructions = trans.state.likelihood.instructions,
+register.calibration.info(CALIBRATION.CODE.TRANS.STATE.B,
+                          likelihood.instructions = trans.state.likelihood.instructions.B,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
@@ -259,23 +237,9 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE.9,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.9
+                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
 )
 
-register.calibration.info(CALIBRATION.CODE.TRANS.STATE.10,
-                          likelihood.instructions = trans.state.likelihood.instructions.2,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = c(par.names.transmission), 
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = N.ITER.TRANS,
-                          thin = 50, 
-                          #fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE.10
-)
 
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,
@@ -291,9 +255,7 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE,
                           description = "Full with covid likelihoods"
 )
 
-
-# state-level full calibration - removed AIDS deaths 
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.7,
+register.calibration.info(CALIBRATION.CODE.FULL.STATE.B,
                           likelihood.instructions = full.state.weighted.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
@@ -302,11 +264,12 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE.7,
                           thin = 200, 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE),
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE.B),
                           description = "Full with covid likelihoods"
 )
 
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.8,
+
+register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
                           likelihood.instructions = full.state.weighted.likelihood.instructions.2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
@@ -316,33 +279,6 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE.8,
                           is.preliminary = T,
                           max.run.time.seconds = 10,
                           preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE),
-                          description = "Full with covid likelihoods"
-)
-
-
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.9,
-                          likelihood.instructions = full.state.weighted.likelihood.instructions,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
-                          thin = 200, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE.9),
-                          description = "Full with covid likelihoods"
-)
-
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.10,
-                          likelihood.instructions = full.state.weighted.likelihood.instructions.2,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
-                          thin = 200, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE.10),
                           description = "Full with covid likelihoods"
 )
 
