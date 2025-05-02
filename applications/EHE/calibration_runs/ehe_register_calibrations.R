@@ -12,6 +12,7 @@ CALIBRATION.CODE.POP.STATE = 'pop.ehe.state'
 CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
 CALIBRATION.CODE.TRANS.STATE.B = 'trans.ehe.state.B'
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
+CALIBRATION.CODE.FULL.STATE.2 = 'full.ehe.state.2'
 CALIBRATION.CODE.FULL.STATE.B = 'full.ehe.state.B'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
@@ -242,6 +243,19 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE.B,
 
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,
+                          likelihood.instructions = full.state.weighted.likelihood.instructions,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
+                          n.iter = N.ITER.FULL, 
+                          thin = 200, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 10,
+                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE),
+                          description = "Full with covid likelihoods"
+)
+
+register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
                           likelihood.instructions = full.state.weighted.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
