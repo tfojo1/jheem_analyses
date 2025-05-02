@@ -60,9 +60,19 @@ set.up.fit.rw.simset <- function(location,
     
     if (verbose)
         print("Instantiating the likelihood...")
-    likelihood = ryan.white.likelihood.instructions$instantiate.likelihood('rw',
-                                                                           location=simset$location, 
-                                                                           data.manager = RW.DATA.MANAGER)
+    
+    if (get.location.type(simset$location)=='STATE')
+    {
+        likelihood = ryan.white.likelihood.instructions.state$instantiate.likelihood('rw',
+                                                                                     location=simset$location, 
+                                                                                     data.manager = RW.DATA.MANAGER)
+    }
+    else
+    {
+        likelihood = ryan.white.likelihood.instructions$instantiate.likelihood('rw',
+                                                                               location=simset$location, 
+                                                                               data.manager = RW.DATA.MANAGER)
+    }
     
     compute.likelihood = function(sim)
     {

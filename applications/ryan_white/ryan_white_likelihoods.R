@@ -474,11 +474,74 @@ rw.adap.likelihood.instructions =
 #                                                    equalize.weight.by.year = T
 #   )
 
+rw.adap.likelihood.instructions.state = create.basic.likelihood.instructions(
+    outcome.for.data = "adap.clients", 
+    outcome.for.sim = "adap.clients",
+    dimensions = c("age","sex","race"),
+    levels.of.stratification = c(0,1), # 0 = totals, 1 = 1-way stratification
+    from.year = RW.CALIBRATE.FROM.YEAR,
+    correlation.different.years = RW.DIFFERENT.YEARS.CORRELATION, # this is the default
+    correlation.different.strata = 0.1, # this is the default
+    correlation.different.sources = 0.3, # default
+    correlation.same.source.different.details = 0.3, 
+    
+    observation.correlation.form = 'compound.symmetry', 
+    
+    error.variance.term = 0.05,
+    error.variance.type = 'cv',
+    
+    weights = 1,
+    
+    # if there are more datapoints for certain years, this will normalize
+    # e.g., if there are a few years with only the totals 
+    # before the stratifications are available
+    equalize.weight.by.year = T
+)
+
+
+rw.adap.suppression.likelihood.instructions.state = create.basic.likelihood.instructions(
+    outcome.for.data = "adap.suppression", 
+    outcome.for.sim = "adap.suppression",
+    dimensions = c("age","sex","race","risk"),
+    levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification
+    from.year = RW.CALIBRATE.FROM.YEAR,
+    correlation.different.years = 0.5, # this is the default
+    correlation.different.strata = 0.1, # this is the default
+    correlation.different.sources = 0.3, # default
+    correlation.same.source.different.details = 0.3, # default
+    
+    observation.correlation.form = 'compound.symmetry', 
+    
+    error.variance.term = 0.05,
+    error.variance.type = 'cv',
+    
+    weights = 1,
+    
+    # if there are more datapoints for certain years, this will normalize
+    # e.g., if there are a few years with only the totals 
+    # before the stratifications are available
+    equalize.weight.by.year = T
+)
+
+
 ryan.white.likelihood.instructions = join.likelihood.instructions(
   
     rw.adap.likelihood.instructions,
     rw.adap.suppression.likelihood.instructions,
   
+    rw.non.adap.likelihood.instructions,
+    rw.non.adap.sex.risk.proportion.likelihood.instructions,
+    
+    rw.oahs.likelihood.instructions,
+    rw.oahs.suppression.likelihood.instructions
+    
+)
+
+ryan.white.likelihood.instructions.state = join.likelihood.instructions(
+    
+    rw.adap.likelihood.instructions.state,
+    rw.adap.suppression.likelihood.instructions.state,
+    
     rw.non.adap.likelihood.instructions,
     rw.non.adap.sex.risk.proportion.likelihood.instructions,
     

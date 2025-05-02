@@ -13,7 +13,6 @@ CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
 CALIBRATION.CODE.TRANS.STATE.B = 'trans.ehe.state.B'
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
 CALIBRATION.CODE.FULL.STATE.B = 'full.ehe.state.B'
-CALIBRATION.CODE.FULL.STATE.2 = 'full.ehe.state.2'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
 N.ITER.POP = 20000
@@ -269,25 +268,10 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE.B,
 )
 
 
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
-                          likelihood.instructions = full.state.weighted.likelihood.instructions.2,
-                          special.case.likelihood.instructions = 
-                              list(FL=full.state.weighted.likelihood.instructions.2.fl.half),
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
-                          thin = 200, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE), # CALIBRATION.CODE.TRANS.STATE.B for MS only 
-                          description = "Full with covid likelihoods"
-)
-
 
 # state-level final calibration 
 register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
-                          likelihood.instructions = FULL.likelihood.instructions.8x.new.prev.state,
+                          likelihood.instructions = full.state.likelihood.instructions.2.half.weight,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -297,7 +281,7 @@ register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
                           n.burn = ifelse(RUNNING.ON.DESKTOP, 0, floor(N.ITER.FINAL/2)),
                           is.preliminary = F,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.STATE),
+                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.STATE.2),
                           description = "FULL RUN"
 )
 
