@@ -1,6 +1,7 @@
 
 source('../jheem_analyses/applications/ehe/ehe_specification.R')
 source('../jheem_analyses/applications/cdc_testing/cdc_testing_parameters.R')
+source('../jheem_analyses/applications/cdc_testing/odds_ratio_estimation.R')
 
 
 CDCT.SPECIFICATION = create.jheem.specification(version='cdct',
@@ -23,7 +24,7 @@ register.model.quantity(CDCT.SPECIFICATION, name = "cdc.nonfunded.testing.of.und
                         value = expression(super.testing.of.undiagnosed*(1-fraction.diagnoses.from.cdc)))
 
 register.model.element(CDCT.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
-                       functional.form = create.logistic.linear.functional.form(intercept = log(0.25)-log(0.75), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
+                       functional.form = create.logistic.linear.functional.form(intercept =diagnoses.intercept , slope = diagnoses.slope, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
