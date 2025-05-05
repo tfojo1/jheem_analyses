@@ -11,10 +11,11 @@ N.ITER=30000
 #04.29: <pop.demog.4> Baltimore, added race.age.time interaction parameters for fertility.rates (32 params)
 #04.30: <pop.demog.3.pk> same run as <pop.demog.3>  
 #05.01: <pop.demog.5> Baltimore, rolled back to 9 params for fert., added fert. calbration start at 2005 and population variance function added
-#05.01: <pop.demog.6> Baltimore, rolled back to 18 params for fert.
+#05.02: <pop.demog.6> Baltimore, rolled back to 18 params for fert.
+#05.05: <pop.demog.7> Baltimore, rolled back to 9 params for fert., Todd fixed issue with JHEEM model
 
 
-register.calibration.info('pop.demog.6', 
+register.calibration.info('pop.demog.7', 
                           likelihood.instructions = likelihood.instructions.demographics,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
