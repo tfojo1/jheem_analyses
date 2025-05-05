@@ -10,10 +10,8 @@ CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
 
 CALIBRATION.CODE.POP.STATE = 'pop.ehe.state'
 CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
-CALIBRATION.CODE.TRANS.STATE.B = 'trans.ehe.state.B'
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
 CALIBRATION.CODE.FULL.STATE.2 = 'full.ehe.state.2'
-CALIBRATION.CODE.FULL.STATE.B = 'full.ehe.state.B'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
 N.ITER.POP = 20000
@@ -54,7 +52,7 @@ register.calibration.info(CALIBRATION.CODE.POPULATION,
 )
 
 #-- REGISTER TRANSMISSION CALIBRATION  --#
-par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAMETERS.PRIOR@var.names) | 
+par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[(grepl('trate', EHE.PARAMETERS.PRIOR@var.names) & !grepl('after', EHE.PARAMETERS.PRIOR@var.names)) | 
                                                             grepl('msm\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility', 
                                                                   EHE.PARAMETERS.PRIOR@var.names) | 
                                                             grepl('sexual\\.assortativity', EHE.PARAMETERS.PRIOR@var.names) | 
@@ -67,7 +65,8 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[grepl('trate', EHE.PARAM
                                                             grepl('fraction\\.heterosexual', EHE.PARAMETERS.PRIOR@var.names) | 
                                                             grepl('oe', EHE.PARAMETERS.PRIOR@var.names) | 
                                                             grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names)  |
-                                                            grepl('male\\.vs\\.female\\.heterosexual\\.rr', EHE.PARAMETERS.PRIOR@var.names)
+                                                            grepl('male\\.vs\\.female\\.heterosexual\\.rr', EHE.PARAMETERS.PRIOR@var.names)|
+                                                            (grepl('idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) & !grepl("age", EHE.PARAMETERS.PRIOR@var.names))
                                                         # grepl('susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) |   
                                                         # grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
 ]
@@ -195,9 +194,15 @@ register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
                           description = "FULL RUN"
 )
 
-## STATE-LEVEL POP, TRANS, FULL, AND FINAL
+##---------------------------------------------##
+##-- STATE-LEVEL POP, TRANS, FULL, AND FINAL --##
+##---------------------------------------------##
+
 register.calibration.info(CALIBRATION.CODE.POP.STATE,
                           likelihood.instructions = pop.state.likelihood.instructions, 
+                          special.case.likelihood.instructions = list(
+                              MS = pop.state.upweighted.new.prev.likelihood.instructions
+                          ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = par.names.pop,
@@ -212,6 +217,9 @@ register.calibration.info(CALIBRATION.CODE.POP.STATE,
 
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           likelihood.instructions = trans.state.likelihood.instructions,
+                          special.case.likelihood.instructions = list(
+                              AL = trans.state.halfx.likelihood.instructions
+                          ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 
@@ -224,26 +232,10 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           description = "A quick run to get transmission parameters in the general vicinity",
                           preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
 )
-
-register.calibration.info(CALIBRATION.CODE.TRANS.STATE.B,
-                          likelihood.instructions = trans.state.likelihood.instructions.B,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = c(par.names.transmission), 
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = N.ITER.TRANS,
-                          thin = 50, 
-                          #fixed.initial.parameter.values = c(global.trate=0.1), 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          description = "A quick run to get transmission parameters in the general vicinity",
-                          preceding.calibration.codes = CALIBRATION.CODE.POP.STATE
-)
-
 
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,
-                          likelihood.instructions = full.state.weighted.likelihood.instructions,
+                          likelihood.instructions = full.state.likelihood.instructions,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -256,7 +248,7 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE,
 )
 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
-                          likelihood.instructions = full.state.weighted.likelihood.instructions,
+                          likelihood.instructions = full.state.weighted.likelihood.instructions.2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -268,24 +260,9 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
                           description = "Full with covid likelihoods"
 )
 
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.B,
-                          likelihood.instructions = full.state.weighted.likelihood.instructions,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
-                          thin = 200, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE.B),
-                          description = "Full with covid likelihoods"
-)
-
-
-
 # state-level final calibration 
 register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
-                          likelihood.instructions = full.state.likelihood.instructions.2.half.weight,
+                          likelihood.instructions = full.state.likelihood.instructions.half.weight,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -295,7 +272,7 @@ register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
                           n.burn = ifelse(RUNNING.ON.DESKTOP, 0, floor(N.ITER.FINAL/2)),
                           is.preliminary = F,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.STATE.2),
+                          preceding.calibration.codes = c(CALIBRATION.CODE.FULL.STATE),
                           description = "FULL RUN"
 )
 

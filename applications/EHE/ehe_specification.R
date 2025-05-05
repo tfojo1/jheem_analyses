@@ -1522,7 +1522,7 @@ register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'sexual.transmission.rates',
                                applies.to = list(sex.from=c('female'),
                                                  sex.to=c('heterosexual_male','msm')),
-                               value = expression(heterosexual.trates * male.vs.female.heterosexual.rr))
+                               value = 'heterosexual.trates')
 
 # The flattened rates lets us track this as an outcome
 register.model.quantity(EHE.SPECIFICATION,
@@ -1543,28 +1543,22 @@ register.model.quantity.subset(EHE.SPECIFICATION,
 register.model.quantity.subset(EHE.SPECIFICATION,
                                name = 'flattened.sexual.transmission.rates',
                                applies.to = list(sex.to='heterosexual_male'),
-                               value = expression(global.trate * heterosexual.trates * male.vs.female.heterosexual.rr))
+                               value = expression(global.trate * heterosexual.trates))
 
-register.model.element(EHE.SPECIFICATION,
-                       name = 'male.vs.female.heterosexual.rr',
-                       value = 3.75/4.75 * 87.4/92,
-                       # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
-                       # 2) ratio of condomless vaginal sex (male vs female)
-                       scale = 'ratio')
-
-TRATE.MIN = 1e-05
+TRATE.MIN = 0#1e-05
 register.model.element(EHE.SPECIFICATION,
                        name = 'msm.trates',
                        scale = 'rate',
                        functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
                                                                                knot.values = as.list(TRATE.DEFAULT.VALUES),
-                                                                               #link = 'log',
                                                                                link = 'identity',
                                                                                min = TRATE.MIN,
                                                                                knot.link = 'log',
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
                                                                                modifiers.apply.to.change = T,
+                                                                               after.modifier.increasing.change.link = 'identity',
+                                                                               after.modifier.decreasing.change.link = 'log',
                                                                                overwrite.modifiers.with.alphas = T
                        ),
                        functional.form.from.time = TIME.PRE.PEAK)
@@ -1582,7 +1576,8 @@ register.model.element(EHE.SPECIFICATION,
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
                                                                                modifiers.apply.to.change = T,
-                                                                            #   after.modifier.application = 'additive.on.link.scale',
+                                                                               after.modifier.increasing.change.link = 'identity',
+                                                                               after.modifier.decreasing.change.link = 'log',
                                                                                overwrite.modifiers.with.alphas = T
                        ),
                        functional.form.from.time = TIME.PRE.PEAK)
@@ -1688,14 +1683,14 @@ register.model.element(EHE.SPECIFICATION,
                        scale = 'rate',
                        functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
                                                                                knot.values = as.list(TRATE.DEFAULT.VALUES),
-                                                                               #link = 'log',
                                                                                link = 'identity',
                                                                                min = TRATE.MIN,
                                                                                knot.link = 'log',
                                                                                after.time = TRATE.AFTER.TIME,
                                                                                after.modifier = 1,
                                                                                modifiers.apply.to.change = T,
-                                                                             #  after.modifier.application = 'multiplicative.of.change.on.value.scale',
+                                                                               after.modifier.increasing.change.link = 'identity',
+                                                                               after.modifier.decreasing.change.link = 'log',
                                                                                overwrite.modifiers.with.alphas = T
                        ),
                        functional.form.from.time = TIME.PRE.PEAK)

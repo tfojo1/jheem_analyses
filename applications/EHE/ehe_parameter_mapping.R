@@ -412,43 +412,86 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     
     for (i in 1:length(trate.alpha.times))
     {
-      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
-                                                                    alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                                    values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
-                                                                    applies.to.dimension.values = 'msm',
-                                                                    dimension = 'sex.to')
-      
-      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.trates',
-                                                                    alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                                    values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
-                                                                    applies.to.dimension.values = active.and.prior.idu.states,
-                                                                    dimension = 'risk.to')
+        alpha.name = paste0('rate.', trate.alpha.times[i])
         
-      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
-                                                                    alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                                    values = parameters['female.idu.susceptibility.rr'],
-                                                                    applies.to.dimension.values = 'female',
-                                                                    dimension = 'sex.to')
-      
-      set.element.functional.form.interaction.alphas(model.settings,
-                                                     element.name = "heterosexual.trates",
-                                                     alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                     value = parameters['female.idu.susceptibility.rr'],
-                                                     applies.to.dimension.values = list(sex.to = 'female',
-                                                                                        risk.to = active.and.prior.idu.states))
-      
-      model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
-                                                                    alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                                    values = parameters['heterosexual.male.idu.susceptibility.rr'],
-                                                                    applies.to.dimension.values = 'heterosexual_male',
-                                                                    dimension = 'sex.to')
-      
-      set.element.functional.form.interaction.alphas(model.settings,
-                                                     element.name = "heterosexual.trates",
-                                                     alpha.name = paste0('rate.', trate.alpha.times[i]),
-                                                     value = parameters['heterosexual.male.idu.susceptibility.rr'],
-                                                     applies.to.dimension.values = list(sex.to = 'heterosexual_male',
-                                                                                        risk.to = active.and.prior.idu.states))
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
+                                                                      alpha.name = alpha.name,
+                                                                      values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
+                                                                      applies.to.dimension.values = 'msm',
+                                                                      dimension = 'sex.to')
+        
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'msm.trates',
+                                                                      alpha.name = alpha.name,
+                                                                      values = parameters[paste0('msm.idu.susceptibility.rr.', trate.parameter.times[i])],
+                                                                      applies.to.dimension.values = active.and.prior.idu.states,
+                                                                      dimension = 'risk.to')
+        
+        
+        for (race in races)
+        {
+            # Female
+            
+            female.param.value = parameters[paste0(race, '.female.idu.susceptibility.rr')]
+            
+            set.element.functional.form.interaction.alphas(
+                model.settings,
+                element.name = "idu.trates",
+                alpha.name = alpha.name,
+                value = female.param.value,
+                applies.to.dimension.values = list(sex.to = 'female',
+                                                   race.to = race))
+            
+        # model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
+        #                                                             alpha.name = paste0('rate.', trate.alpha.times[i]),
+        #                                                             values = parameters['female.idu.susceptibility.rr'],
+        #                                                             applies.to.dimension.values = 'female',
+        #                                                             dimension = 'sex.to')
+
+          set.element.functional.form.interaction.alphas(model.settings,
+                                                         element.name = "heterosexual.trates",
+                                                         alpha.name = alpha.name,
+                                                         value = female.param.value,
+                                                         applies.to.dimension.values = list(sex.to = 'female',
+                                                                                            risk.to = active.and.prior.idu.states,
+                                                                                            race.to = race))
+          
+
+          # Male
+          
+          het.male.param.value = parameters[paste0(race, '.heterosexual.male.idu.susceptibility.rr')]
+          
+          set.element.functional.form.interaction.alphas(
+              model.settings,
+              element.name = "idu.trates",
+              alpha.name = alpha.name,
+              value = het.male.param.value,
+              applies.to.dimension.values = list(sex.to = 'heterosexual_male',
+                                                 race.to = race))
+          
+          # model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.trates',
+          #                                                               alpha.name = paste0('rate.', trate.alpha.times[i]),
+          #                                                               values = parameters['heterosexual.male.idu.susceptibility.rr'],
+          #                                                               applies.to.dimension.values = 'heterosexual_male',
+          #                                                               dimension = 'sex.to')
+          
+          set.element.functional.form.interaction.alphas(
+              model.settings,
+              element.name = "heterosexual.trates",
+              alpha.name = alpha.name,
+              value = het.male.param.value,
+              applies.to.dimension.values = list(sex.to = 'heterosexual_male',
+                                                 risk.to = active.and.prior.idu.states,
+                                                 race.to = race))
+          
+          set.element.functional.form.interaction.alphas(
+              model.settings,
+              element.name = "heterosexual.trates",
+              alpha.name = alpha.name,
+              value = parameters[paste0(race, '.male.vs.female.heterosexual.rr')],
+              applies.to.dimension.values = list(sex.to = 'heterosexual_male',
+                                                 risk.to = never.idu.states,
+                                                 race.to = race))
+        }
     }
 
     set.element.functional.form.main.effect.alphas(model.settings = model.settings,
@@ -1064,12 +1107,12 @@ set.ehe.trate.alphas.from.parameters <- function(model.settings,
     }
 
     # After Modifier
-    param.name = paste0(category, '.fraction.trate.change.after.t2')
+    param.names = paste0(races, '.', category, '.ratio.trate.change.after.t2')
     model.settings$set.element.functional.form.main.effect.alphas(element.name = elem.name,
-                                                                alpha.name = 'after.modifier',
-                                                                values = parameters[param.name],
-                                                                applies.to.dimension.values = 'all',
-                                                                dimension = 'all')
+                                                                  alpha.name = 'after.modifier',
+                                                                  values = parameters[param.names],
+                                                                  applies.to.dimension.values = races,
+                                                                  dimension = 'race.to')
 }
 
 # set.ehe.aging.from.parameters <- function(model.settings,

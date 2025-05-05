@@ -470,6 +470,21 @@ total.new.diagnoses.cv.likelihood.instructions.state =
                                          name = 'total.new'
     )
 
+total.new.diagnoses.4x.cv.likelihood.instructions.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
+                                         outcome.for.sim = "new",
+                                         dimensions = character(),
+                                         levels.of.stratification = c(0), 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = DIAGNOSES.CV.STATE,
+                                         error.variance.type = 'cv',
+                                         minimum.error.sd = 1,
+                                         weights = (4), #list(0.3), # see prev_new_aware_weighting.R 
+                                         equalize.weight.by.year = T,
+                                         name = 'total.new'
+    )
+
 total.new.diagnoses.8x.cv.expv.likelihood.instructions = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                          outcome.for.sim = "new",
@@ -817,6 +832,21 @@ total.prevalence.cv.likelihood.instructions.state =
                                          error.variance.type = 'cv',
                                          minimum.error.sd = 1,
                                          weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
+                                         equalize.weight.by.year = T,
+                                         name = 'total.prevalence'
+    )
+
+total.prevalence.4x.cv.likelihood.instructions.state = 
+    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
+                                         outcome.for.sim = "diagnosed.prevalence",
+                                         dimensions = character(),
+                                         levels.of.stratification = 0, 
+                                         from.year = 2008, 
+                                         observation.correlation.form = 'compound.symmetry', 
+                                         error.variance.term = PREVALENCE.CV.STATE,
+                                         error.variance.type = 'cv',
+                                         minimum.error.sd = 1,
+                                         weights = (4), #list(0.3), # see prev_new_aware_weighting.R 
                                          equalize.weight.by.year = T,
                                          name = 'total.prevalence'
     )
@@ -2117,24 +2147,44 @@ future.change.penalty.likelihood.instructions =
 
 # NEW.FOLD.CHANGE.14.19 = SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2019',,,,,] / SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2014',,,,,]
 # P.NEW.FOLD.CHANGE.GT.3 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 3)
+# P.NEW.FOLD.CHANGE.GT.4 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 4)
+# P.NEW.FOLD.CHANGE.GT.6 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 6)
+# P.NEW.FOLD.CHANGE.GT.8 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 8)
 P.NEW.FOLD.CHANGE.GT.3 = 0.02778896
+P.NEW.FOLD.CHANGE.GT.4 = 0.01167942
+P.NEW.FOLD.CHANGE.GT.6 = 0.002416432
+P.NEW.FOLD.CHANGE.GT.8 = 0.001208216
+
+P.NEW.FOLD.CHANGE.LTE.3 = 1-P.NEW.FOLD.CHANGE.GT.3
+P.NEW.FOLD.CHANGE.3.TO.4 = P.NEW.FOLD.CHANGE.GT.3 - P.NEW.FOLD.CHANGE.GT.4
+P.NEW.FOLD.CHANGE.4.TO.6 = P.NEW.FOLD.CHANGE.GT.4 - P.NEW.FOLD.CHANGE.GT.6
+P.NEW.FOLD.CHANGE.6.TO.8 = P.NEW.FOLD.CHANGE.GT.6 - P.NEW.FOLD.CHANGE.GT.8
+
 
 future.incidence.change.likelihood.instructions = 
     create.custom.likelihood.instructions(
         name = 'future.incidence.change',
         compute.function = function(sim, data, log=T){
             
-            inc = sim$optimized.get(data$optimized.get.instr)
+            inc.new = sim$optimized.get(data$optimized.get.instr)
             
-            fold.change.inc = inc[as.character(2025:2030),,,,,] / inc[as.character(2020:2025),,,,,]
+            fold.change.inc = inc.new[as.character(2020:2030),,,,,,] / inc.new[as.character(2015:2025),,,,,,]
             # fold.change.inc = sim$get('incidence', year=2025:2030, keep.dimensions=c('year','age','race','sex','risk')) / sim$get('incidence', year=2020:2025, keep.dimensions=c('year','age','race','sex','risk'))
-            fold.change.inc[is.na(fold.change.inc)] = 100
-            max.fold.change.inc = apply(fold.change.inc, 2:5, max)
+            fold.change.inc[is.na(fold.change.inc)] = 1
+            max.fold.change.inc = apply(fold.change.inc, c(2:6), max)
             
-            n.fold.change.gt.3 = sum(max.fold.change.inc>3)
-            n.fold.change.lte.3 = length(max.fold.change.inc) - n.fold.change.gt.3
+            n.fold.change.gt.8 = sum(max.fold.change.inc>8)
+            n.fold.change.6.to.8 = sum(max.fold.change.inc<=8 & max.fold.change.inc>6)
+            n.fold.change.4.to.6 = sum(max.fold.change.inc<=6 & max.fold.change.inc>4)
+            n.fold.change.3.to.4 = sum(max.fold.change.inc<=4 & max.fold.change.inc>3)
+            n.fold.change.lte.3 = sum(max.fold.change.inc<=3)
             
-            rv = sum(log(P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.gt.3 + log(1-P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.lte.3)
+            rv = sum(log(P.NEW.FOLD.CHANGE.GT.8)*n.fold.change.gt.8 +
+                         log(P.NEW.FOLD.CHANGE.6.TO.8)*n.fold.change.6.to.8 +
+                         log(P.NEW.FOLD.CHANGE.4.TO.6)*n.fold.change.4.to.6 +
+                         log(P.NEW.FOLD.CHANGE.3.TO.4)*n.fold.change.3.to.4 +
+                         log(P.NEW.FOLD.CHANGE.LTE.3)*n.fold.change.lte.3)
+         #   rv = sum(log(P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.gt.3 + log(1-P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.lte.3)
             
             if (!log)
                 exp(rv)
@@ -2145,8 +2195,8 @@ future.incidence.change.likelihood.instructions =
         {
             sim.metadata = get.simulation.metadata(version=version, location=location)
             optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
-                outcomes = 'incidence', 
-                dimension.values = list(year=2020:2030),
+                outcomes = c('new','incidence'), 
+                dimension.values = list(year=2015:2030),
                 keep.dimensions = c('year','age','race','sex','risk')
             )
             
@@ -2167,6 +2217,7 @@ idu.active.prior.ratio.likelihood.instructions = create.custom.likelihood.instru
         pop = sim$optimized.get(data$optimized.get.instr)
         
         active.prior.ratios.by.age = colSums(pop[,,'active_IDU']) /colSums(pop[,,'IDU_in_remission'])
+        active.prior.ratios.by.age[is.na(active.prior.ratios.by.age)] = 1
         
         # active.prior.ratios.by.age = sim$get('population',
         #                                      dimension.values=list(year = data$active.to.remission.ratios$years,
@@ -2227,11 +2278,23 @@ pop.state.likelihood.instructions =
                                  immigration.likelihood.instructions.pop.state, 
                                  emigration.likelihood.instructions.pop.state,
                                  general.mortality.likelihood.instructions.pop.state,
-                                 total.prevalence.cv.likelihood.instructions, 
-                                 total.new.diagnoses.cv.likelihood.instructions,
-                                 total.aids.diagnoses.cv.likelihood.instructions
+                                 total.prevalence.cv.likelihood.instructions.state, 
+                                 total.new.diagnoses.cv.likelihood.instructions.state,
+                                 total.aids.diagnoses.cv.likelihood.instructions.state
                                  #weight = POPULATION.WEIGHT
     ) 
+
+pop.state.upweighted.new.prev.likelihood.instructions = 
+    join.likelihood.instructions(population.likelihood.instructions.pop.state,
+                                 immigration.likelihood.instructions.pop.state, 
+                                 emigration.likelihood.instructions.pop.state,
+                                 general.mortality.likelihood.instructions.pop.state,
+                                 total.prevalence.4x.cv.likelihood.instructions.state, 
+                                 total.new.diagnoses.4x.cv.likelihood.instructions.state,
+                                 total.aids.diagnoses.cv.likelihood.instructions.state
+                                 #weight = POPULATION.WEIGHT
+    ) 
+
 
 pop.state.likelihood.instructions.2 = 
     join.likelihood.instructions(population.likelihood.instructions.pop.state,
@@ -2278,29 +2341,13 @@ transmission.pop.idu.aware.aids.testing.likelihood.instructions.4x.aids =
 
 # state-level transmission calibration 
 trans.state.likelihood.instructions = 
-    join.likelihood.instructions(race.risk.halfx.cv.new.diagnoses.likelihood.instructions,
-                                 race.risk.halfx.cv.prevalence.likelihood.instructions,
-                                 total.new.diagnoses.10x.cv.likelihood.instructions,
-                                 total.prevalence.10x.cv.instructions,
-                                 non.age.aids.diagnoses.16x.likelihood.instructions,
-                                 population.likelihood.instructions.trans,
-                                 heroin.likelihood.instructions.trans,
-                                 cocaine.likelihood.instructions.trans,
-                                 biased.hiv.mortality.likelihood.instructions.full,
-                                 future.incidence.change.likelihood.instructions,
-                                 idu.active.prior.ratio.likelihood.instructions
-                                 #state.aids.diagnoses.proportions.instructions
-                                 #weight = TRANSMISSION.WEIGHT
-                                 
-    )
-
-trans.state.likelihood.instructions.2 = 
     join.likelihood.instructions(race.risk.halfx.cv.new.diagnoses.likelihood.instructions.state,
                                  race.risk.halfx.cv.prevalence.likelihood.instructions.state,
                                  total.new.diagnoses.10x.cv.likelihood.instructions.state,
                                  total.prevalence.10x.cv.instructions.state,
                                  non.age.aids.diagnoses.16x.likelihood.instructions.state,
-                                 population.likelihood.instructions.trans,
+#                                 population.likelihood.instructions.trans,
+                                 population.likelihood.instructions.pop.state,
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,
                                  biased.hiv.mortality.likelihood.instructions.full,
@@ -2311,21 +2358,28 @@ trans.state.likelihood.instructions.2 =
                                  
     )
 
-trans.state.likelihood.instructions.B = 
-    join.likelihood.instructions(race.risk.new.diagnoses.likelihood.instructions.state,
-                                 race.risk.prevalence.likelihood.instructions.state,
-                                 non.age.aids.diagnoses.16x.likelihood.instructions,
-                                 population.likelihood.instructions.trans,
+trans.state.halfx.likelihood.instructions = 
+    join.likelihood.instructions(race.risk.halfx.cv.new.diagnoses.likelihood.instructions.state,
+                                 race.risk.halfx.cv.prevalence.likelihood.instructions.state,
+                                 total.new.diagnoses.10x.cv.likelihood.instructions.state,
+                                 total.prevalence.10x.cv.instructions.state,
+                                 non.age.aids.diagnoses.16x.likelihood.instructions.state,
+                                 #population.likelihood.instructions.trans,
+                                 population.likelihood.instructions.pop.state,
                                  heroin.likelihood.instructions.trans,
                                  cocaine.likelihood.instructions.trans,
                                  biased.hiv.mortality.likelihood.instructions.full,
                                  future.incidence.change.likelihood.instructions,
-                                 idu.active.prior.ratio.likelihood.instructions
+                                 idu.active.prior.ratio.likelihood.instructions,
+                                 additional.weights = 0.5
                                  #state.aids.diagnoses.proportions.instructions
                                  #weight = TRANSMISSION.WEIGHT
                                  
     )
-
+    
+# For backward compatibility in registration
+trans.state.likelihood.instructions.2 = trans.state.likelihood.instructions
+        
 
 #-- FULL LIKELIHOOD WITH THREE COVID LIKELIHOODS --# ---- 
 FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
@@ -2372,165 +2426,24 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   future.incidence.change.likelihood.instructions
 )
 
+
+#-- STATE FULL --#
+
 # state-level full calibration 
 full.state.likelihood.instructions = join.likelihood.instructions(
     # POPULATION LIKELIHOODS
-    population.likelihood.instructions.full, 
-    immigration.likelihood.instructions.full, 
-    emigration.likelihood.instructions.full,
+    # join.likelihood.instructions(
+    #     population.likelihood.instructions.full, 
+    #     additional.weights = 1/16),
+    # 
+    # join.likelihood.instructions(
+    #     immigration.likelihood.instructions.full, 
+    #     emigration.likelihood.instructions.full,
+    #     additional.weights = 1/4),
     
-    # TRANSMISSION LIKELIHOODS
-    total.new.diagnoses.16x.cv.expv.likelihood.instructions,
-    new.diagnoses.2x.one.way.cv.expv.likelihood.instructions,
-    new.diagnoses.halfx.cv.expv.likelihood.instructions,
-    
-    total.prevalence.16x.cv.expv.likelihood.instructions,
-    prevalence.2x.one.way.cv.and.exp.v.likelihood.instructions,
-    prevalence.halfx.cv.and.exp.v.likelihood.instructions,
-    
-    # MORTALITY LIKELIHOODS
-    biased.hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.16x.likelihood.instructions,
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.likelihood.instructions,
-    hiv.test.positivity.likelihood.instructions, 
-    awareness.likelihood.instructions,
-    suppression.likelihood.instructions,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.likelihood.instructions.full,
-    cocaine.likelihood.instructions.full,
-    idu.active.prior.ratio.likelihood.instructions,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions,
-    
-    # FUTURE INCIDENCE PENALTY
-    future.incidence.change.likelihood.instructions
-)
-
-full.state.plus.aids.prop.likelihood.instructions = join.likelihood.instructions(
-    full.state.likelihood.instructions,
-    state.aids.diagnoses.proportions.instructions
-)
-
-full.state.weighted.likelihood.instructions = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    join.likelihood.instructions(
-        population.likelihood.instructions.full, 
-        additional.weights = 1/16),
-    
-    join.likelihood.instructions(
-        immigration.likelihood.instructions.full, 
-        emigration.likelihood.instructions.full,
-        additional.weights = 1/4),
-    
-    # TRANSMISSION LIKELIHOODS
-    total.new.diagnoses.24x.cv.likelihood.instructions,
-    new.diagnoses.1.5x.one.way.cv.likelihood.instructions,
-    new.diagnoses.halfx.cv.likelihood.instructions,
-
-    total.prevalence.24x.cv.likelihood.instructions,
-    prevalence.1.5x.one.way.cv.likelihood.instructions,
-    prevalence.halfx.cv.likelihood.instructions,
-    
-    # MORTALITY LIKELIHOODS
-    biased.hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.16x.likelihood.instructions,
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.likelihood.instructions,
-    hiv.test.positivity.likelihood.instructions, 
-    awareness.likelihood.instructions,
-    suppression.likelihood.instructions,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.likelihood.instructions.full,
-    cocaine.likelihood.instructions.full,
-    idu.active.prior.ratio.likelihood.instructions,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions,
-    
-    # FUTURE INCIDENCE PENALTY
-    future.incidence.change.likelihood.instructions
-)
-
-full.state.weighted.likelihood.instructions.B = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    join.likelihood.instructions(
-        population.likelihood.instructions.full, 
-        additional.weights = 1/16),
-    
-    join.likelihood.instructions(
-        immigration.likelihood.instructions.full, 
-        emigration.likelihood.instructions.full,
-        additional.weights = 1/4),
-    
-    # TRANSMISSION LIKELIHOODS
-    new.diagnoses.cv.likelihood.instructions.state,
-    prevalence.cv.likelihood.instructions.state,
-    
-    # MORTALITY LIKELIHOODS
-    biased.hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.16x.likelihood.instructions,
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.likelihood.instructions,
-    hiv.test.positivity.likelihood.instructions, 
-    awareness.likelihood.instructions,
-    suppression.likelihood.instructions,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.likelihood.instructions.full,
-    cocaine.likelihood.instructions.full,
-    idu.active.prior.ratio.likelihood.instructions,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions,
-    
-    # FUTURE INCIDENCE PENALTY
-    future.incidence.change.likelihood.instructions
-)
-
-full.state.weighted.likelihood.instructions.2 = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    join.likelihood.instructions(
-        population.likelihood.instructions.full, 
-        additional.weights = 1/16),
-    
-    join.likelihood.instructions(
-        immigration.likelihood.instructions.full, 
-        emigration.likelihood.instructions.full,
-        additional.weights = 1/4),
+    population.likelihood.instructions.pop.state,
+    immigration.likelihood.instructions.pop.state,
+    emigration.likelihood.instructions.pop.state,
     
     # TRANSMISSION LIKELIHOODS
     total.new.diagnoses.84x.cv.likelihood.instructions.state,
@@ -2571,13 +2484,13 @@ full.state.weighted.likelihood.instructions.2 = join.likelihood.instructions(
     future.incidence.change.likelihood.instructions
 )
 
-full.state.likelihood.instructions.2.half.weight = join.likelihood.instructions(
-    full.state.weighted.likelihood.instructions.2, 
+# For backward compatibility for now
+full.state.weighted.likelihood.instructions.2 = full.state.likelihood.instructions
+
+full.state.likelihood.instructions.half.weight = join.likelihood.instructions(
+    full.state.likelihood.instructions, 
     additional.weights = 1/2)
 
-full.state.weighted.likelihood.instructions.2.fl.half = join.likelihood.instructions(
-    full.state.weighted.likelihood.instructions.2, 
-    additional.weights = 1/2)
 
 FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   # POPULATION LIKELIHOODS
@@ -2620,43 +2533,3 @@ FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   ps.syphilis.year.on.year.change.likelihood.instructions
 )
 
-# state-level final calibration - UPDATE WITH WHATEVER WE USE FOR FULL
-FULL.likelihood.instructions.8x.new.prev.state = join.likelihood.instructions(
-    # POPULATION LIKELIHOODS
-    population.likelihood.instructions.full, 
-    immigration.likelihood.instructions.full, 
-    emigration.likelihood.instructions.full,
-    
-    # TRANSMISSION LIKELIHOODS
-    total.new.diagnoses.4x.cv.expv.likelihood.instructions,
-    new.diagnoses.7.8x.cv.expv.likelihood.instructions,
-    total.prevalence.4x.cv.expv.likelihood.instructions,
-    prevalence.7.8x.cv.and.exp.v.likelihood.instructions,
-    
-    # MORTALITY LIKELIHOODS
-    hiv.mortality.likelihood.instructions.full,
-    general.mortality.likelihood.instructions.full,
-    
-    # AIDS DIAGNOSES LIKELIHOOD
-    non.age.aids.diagnoses.likelihood.instructions.full.state, # state-level: through 2000
-    
-    # CONTINUUM LIKELIHOODS
-    proportion.tested.likelihood.instructions,
-    hiv.test.positivity.likelihood.instructions, 
-    awareness.likelihood.instructions,
-    suppression.likelihood.instructions,
-    
-    # PREP LIKELIHOODS
-    prep.uptake.likelihood.instructions,
-    prep.indications.likelihood.instructions,
-    
-    # IDU LIKELIHOODS
-    heroin.likelihood.instructions.full,
-    cocaine.likelihood.instructions.full,
-    idu.active.prior.ratio.likelihood.instructions,
-    
-    # COVID LIKELIHOODS
-    number.of.tests.year.on.year.change.likelihood.instructions,
-    gonorrhea.year.on.year.change.likelihood.instructions,
-    ps.syphilis.year.on.year.change.likelihood.instructions
-)

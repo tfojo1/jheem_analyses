@@ -458,18 +458,26 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     #products of 
     # 1) ratio of female.to.male vs male.to.female - from Maunank's paper
     # 2) ratio of condomless vaginal sex (male vs female)
-    male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
+    black.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
+    hispanic.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
+    other.male.vs.female.heterosexual.rr = Lognormal.Distribution(log(3.75/4.75 * 87.4/92), 0.5*log(2)),
 
     #idu by sex from table 9 and 10 from
     #  https://www.cdc.gov/hiv/pdf/library/reports/surveillance/cdc-hiv-surveillance-special-report-number-24.pdf
     # RR of prob of daily use (heroin) * prob of needle sharing
-    female.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    black.female.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    hispanic.female.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    other.female.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
             #OLD: Lognormal.Distribution(-0.1504802, 0.5506755), # the mean and sd of log of all data values of new diagnoses of female idu / male idu - all years and locations
             # z=SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__sex__risk[,,,'idu']
             # ratio = z[,,'female'] / z[,,'male']
             # mask = !is.na(ratio) & ratio!=0 & ratio!=Inf
             #OLD: Lognormal.Distribution(log(.777/.755*.626/.585), 0.5*log(2)),
-    heterosexual.male.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+
+    black.heterosexual.male.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    hispanic.heterosexual.male.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+    other.heterosexual.male.idu.susceptibility.rr = Lognormal.Distribution(0, 0.5*log(2)),
+
     idu.sex.assortativity.multiplier = Lognormal.Distribution(0, 0.5*log(4)),
 
     #-- HIV Testing --#
@@ -598,10 +606,6 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     
     #-- IDU Transitions --#
     
-    # black.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
-    # hispanic.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
-    # other.incident.idu.multiplier.0 = Lognormal.Distribution(0, .5*log(2)),
-    
     black.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     hispanic.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     other.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
@@ -615,6 +619,7 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
 
     heterosexual.male.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     heterosexual.male.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
+
     female.incident.idu.multiplier.1 = Lognormal.Distribution(0, .5*log(2)),
     female.incident.idu.multiplier.2 = Lognormal.Distribution(0, .5*log(2)),
     
@@ -705,9 +710,17 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     diagnosed.transmission.rr = Lognormal.Distribution(log(mean(c(1-.68, 1/3.5))), 0.25*log(2), upper=1), #avg of Marks 2006 and Marks 2005
     
     #-- Uncertainty About the Future --#
-    msm.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
-    heterosexual.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
-    idu.fraction.trate.change.after.t2 = Lognormal.Distribution(meanlog=log(0.1), sdlog=log(2), lower=0, upper=0.5),
+    black.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    hispanic.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    other.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    
+    black.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    hispanic.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    other.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    
+    black.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    hispanic.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    other.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
     
     #-- COVID Parameters --#
     
@@ -1100,7 +1113,11 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'other.msm.trate.2'
     ),
 
-    msm.fraction.trate.change.after.t2 = c('msm.fraction.trate.change.after.t2'),
+    msm.ratio.trate.change.after.t2 = c(
+        'black.msm.ratio.trate.change.after.t2',
+        'hispanic.msm.ratio.trate.change.after.t2',
+        'other.msm.ratio.trate.change.after.t2'
+    ),
 
     young.black.msm.age.susceptibility = c(
       'age1.black.msm.susceptibility.rr.01',
@@ -1188,10 +1205,16 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'other.heterosexual.trate.1',
       'other.heterosexual.trate.2'),
 
-    heterosexual.fraction.trate.change.after.t2 = 'heterosexual.fraction.trate.change.after.t2',
+    heterosexual.ratio.trate.change.after.t2 = c(
+        'black.heterosexual.ratio.trate.change.after.t2',
+        'hispanic.heterosexual.ratio.trate.change.after.t2',
+        'other.heterosexual.ratio.trate.change.after.t2'
+    ),
     
-
-    male.vs.female.heterosexual.rr = 'male.vs.female.heterosexual.rr',    
+    male.vs.female.heterosexual.rr = c(
+        'black.male.vs.female.heterosexual.rr',
+        'hispanic.male.vs.female.heterosexual.rr',
+        'other.male.vs.female.heterosexual.rr'),
 
     heterosexual.age.susceptibility.01 = c(
       'age1.heterosexual.susceptibility.rr.01',
@@ -1241,7 +1264,11 @@ BASE.HIV.SAMPLING.BLOCKS = list(
       'other.idu.trate.1',
       'other.idu.trate.2'),
     
-    idu.fraction.trate.change.after.t2 = 'idu.fraction.trate.change.after.t2',
+    idu.ratio.trate.change.after.t2 = c(
+        'black.idu.ratio.trate.change.after.t2',
+        'hispanic.idu.ratio.trate.change.after.t2',
+        'other.idu.ratio.trate.change.after.t2'
+    ),
     
     msm.idu.transmission = c(
       'msm.idu.susceptibility.rr.peak',
@@ -1322,10 +1349,19 @@ BASE.HIV.SAMPLING.BLOCKS = list(
     other.idu.transitions = c('idu.remission.multiplier',
                               'idu.relapse.multiplier'),
 
-    idu.susceptibility.by.sex = c(
-        'female.idu.susceptibility.rr',
-        'heterosexual.male.idu.susceptibility.rr',
-        'idu.sex.assortativity.multiplier'),
+    female.idu.susceptibility = c(
+        'black.female.idu.susceptibility.rr',
+        'hispanic.female.idu.susceptibility.rr',
+        'other.female.idu.susceptibility.rr'
+    ),
+
+    heterosexual.male.idu.susceptibility = c(
+        'black.heterosexual.male.idu.susceptibility.rr',
+        'hispanic.heterosexual.male.idu.susceptibility.rr',
+        'other.heterosexual.male.idu.susceptibility.rr'
+    ),
+
+    idu.sex.assortativity = c('idu.sex.assortativity.multiplier'),
 
 #-- Other Transmission Multipliers --#
 
