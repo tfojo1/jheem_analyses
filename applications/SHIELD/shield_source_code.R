@@ -3,7 +3,7 @@ cat("*** Running Shield_source_code.R ***\n")
 
 # rm(list = ls())
 NEW.SOURCE=T
-USE.JHEEM2.PACKAGE=T
+USE.JHEEM2.PACKAGE=F
 
 
 #pulling JHEEM_ANALYSIS # Load the git2r package ----
