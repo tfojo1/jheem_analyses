@@ -8,30 +8,18 @@ POPULATION.PARAMETERS.PRIOR=join.distributions(
   ## Fertility rates 
   # (6 agegroups, 3 race, 2 knots)-> max 36 params
   # we start with 6 age, and 3 race, parameters applied to both knots -> 9 total
-    # Fertility rate multipliers by age × race (18 paramters)
-    age15.19.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age15.19.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age15.19.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    # Race-level fertility rate multipliers
+    black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
     
-    age20.24.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age20.24.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age20.24.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    
-    age25.29.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age25.29.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age25.29.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    
-    age30.34.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age30.34.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age30.34.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    
-    age35.39.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age35.39.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age35.39.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    
-    age40.44.black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age40.44.hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    age40.44.other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    # Age-level fertility rate multipliers
+    age15.19.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    age20.24.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    age25.29.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    age30.34.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    age35.39.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    age40.44.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
     
   # Mortality rates by race:
   black.general.mortality.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -192,27 +180,36 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         }}}                                      
   
   ## Fertility rates by race/age to time1/time2 knots----
-  for (time in c("time1", "time2")) {
-      for (age.index in seq_along(fertile.ages)) {
-          agegroup <- fertile.ages[age.index]
-          age.range <- fertile.age.ranges[age.index]
-          
-          for (race in races) {
-              param.name <- paste0("age", age.range, ".", race, ".fertility.rate.multiplier")
-              
-              set.element.functional.form.interaction.alphas(
-                  model.settings,
-                  element.name = "fertility.rate",
-                  alpha.name = time,
-                  value = parameters[param.name],
-                  applies.to.dimension.values = list(
-                      age = agegroup,
-                      race = race
-                  )
-              )
-          }
-      }
-  }
+  # Fertility multipliers by race (applied to both time1 and time2)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "fertility.rate",
+                                                 alpha.name = "time1",
+                                                 values = parameters[paste0(races, ".fertility.rate.multiplier")],
+                                                 dimension = "race",
+                                                 applies.to.dimension.values = races)
+  
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "fertility.rate",
+                                                 alpha.name = "time2",
+                                                 values = parameters[paste0(races, ".fertility.rate.multiplier")],
+                                                 dimension = "race",
+                                                 applies.to.dimension.values = races)
+  
+  # Fertility multipliers by age
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "fertility.rate",
+                                                 alpha.name = "time1",
+                                                 values = parameters[paste0("age", fertile.age.ranges, ".fertility.rate.multiplier")],
+                                                 dimension = "age",
+                                                 applies.to.dimension.values = fertile.ages)
+  
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "fertility.rate",
+                                                 alpha.name = "time2",
+                                                 values = parameters[paste0("age", fertile.age.ranges, ".fertility.rate.multiplier")],
+                                                 dimension = "age",
+                                                 applies.to.dimension.values = fertile.ages)
+  
   
   
   ## Immigration rate multipliers by race for time1/time2 knots----
@@ -304,38 +301,24 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
 ## SHIELD.POPULATION.SAMPLING.BLOCKS ----
 SHIELD.POPULATION.SAMPLING.BLOCKS = list(
     # Fertility: 
-    fertility.rates.group1 = c(
-        "age15.19.black.fertility.rate.multiplier",
-        "age15.19.hispanic.fertility.rate.multiplier",
-        "age15.19.other.fertility.rate.multiplier",
-        "age20.24.black.fertility.rate.multiplier",
-        "age20.24.hispanic.fertility.rate.multiplier"
+    fertility.rates.by.race = c(
+        "black.fertility.rate.multiplier",
+        "hispanic.fertility.rate.multiplier",
+        "other.fertility.rate.multiplier"
     ),
     
-    fertility.rates.group2 = c(
-        "age20.24.other.fertility.rate.multiplier",
-        "age25.29.black.fertility.rate.multiplier",
-        "age25.29.hispanic.fertility.rate.multiplier",
-        "age25.29.other.fertility.rate.multiplier",
-        "age30.34.black.fertility.rate.multiplier"
+    fertility.rates.by.age.1 = c(
+        "age15.19.fertility.rate.multiplier",
+        "age20.24.fertility.rate.multiplier",
+        "age25.29.fertility.rate.multiplier"
     ),
     
-    fertility.rates.group3 = c(
-        "age30.34.hispanic.fertility.rate.multiplier",
-        "age30.34.other.fertility.rate.multiplier",
-        "age35.39.black.fertility.rate.multiplier",
-        "age35.39.hispanic.fertility.rate.multiplier",
-        "age35.39.other.fertility.rate.multiplier"
+    fertility.rates.by.age.2 = c(
+        "age30.34.fertility.rate.multiplier",
+        "age35.39.fertility.rate.multiplier",
+        "age40.44.fertility.rate.multiplier"
     ),
     
-    fertility.rates.group4 = c(
-        "age40.44.black.fertility.rate.multiplier",
-        "age40.44.hispanic.fertility.rate.multiplier",
-        "age40.44.other.fertility.rate.multiplier"
-    ),
-    
-    
-  
   mortality.rates.by.race=c("black.general.mortality.rate.multiplier",
                             "hispanic.general.mortality.rate.multiplier",
                             "other.general.mortality.rate.multiplier"),
