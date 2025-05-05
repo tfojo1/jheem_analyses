@@ -15,7 +15,7 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
 CALIBRATION.CODE.TO.RUN <- 'pop.demog.6'
-DATE <- "2025-05-01"
+DATE <- "2025-05-02"
 
 # Load or Assemble Simulation Set ----
 if (FALSE) {
@@ -47,10 +47,25 @@ params.last  <- sim.last$params
 engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 
 params.manual <- params.last
-params.manual["age40.44.fertility.rate.multiplier"] <- 0.3
-params.manual["hispanic.fertility.rate.multiplier"] <- 0.5
+params.manual["age40.44.hispanic.fertility.rate.multiplier"] <- 10 # last: 0.06205035, first: 1.0000000
+
+fertility.params = names(params.manual)[grepl("fertility.rate.multiplier", names(params.manual))]
+
+params.manual[fertility.params] = params.first[fertility.params]
+
 
 sim.manual <- engine$run(params.manual)
+
+q=engine$extract.quantity.values()
+
+input.fertility = q$fertility.rate[["2020"]]
+dimnames(sim.manual$immigration)
+pop = sim.manual$population["2020",,"40-44 years","hispanic","female",]
+births = sim.manual$births.from["2020",,"40-44 years","hispanic","female",]
+immigration = sim.manual$immigration["2020",,"40-44 years","hispanic","female",]
+emigration = sim.manual$emigration["2020",,"40-44 years","hispanic","female",]
+
+pop*input.fertility["40-44 years","hispanic"]
 
 # Save simset (optional)
 # save(simset, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", Sys.Date(), "_", LOCATION, ".Rdata"))
@@ -62,6 +77,7 @@ simset$n.sim
 simplot(
     sim.first,
     sim.last,
+    sim.manual,
     split.by = "race", facet.by = "age",
     outcomes = c("population"),
     dimension.values = list(year = 2000:2030)
@@ -117,25 +133,19 @@ lik.fert$compute(sim.last, debug = TRUE)
 
 # Focused Population Plots ----
 simplot(
-    sim.first, sim.last,
+    sim.first, sim.last, sim.manual,
     facet.by = "age", split.by = "race",
     outcomes = c("population"),
     dimension.values = list(year = 2000:2030, race = "hispanic", sex = "female")
 )
 
 simplot(
-    sim.first, sim.last,
+    sim.first, sim.last, sim.manual,
     facet.by = "age", split.by = "race",
     outcomes = c("births.from"),
     dimension.values = list(year = 2000:2030, race = "hispanic")
 )
 
-simplot(
-    sim.first, sim.last,
-    facet.by = "age", split.by = "race",
-    outcomes = c("fertility.rate"),
-    dimension.values = list(year = 2000:2030)
-)
 
 # Census Population Summaries ----
 rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location__age[,'C.12580',])
