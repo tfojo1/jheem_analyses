@@ -26,35 +26,35 @@ w=c(w1,w2)
 # so for example we need to calibrate prop aware in Baltimiore to data from MD and building 
 # some uncertainty to account for similarities between those locations
 
+# Error variance for population data <From EHE model>
 population.error.sd.shield = function(data, details=attr(data, 'details'), version, location)
 {
-    melted.data = reshape2::melt(data)
-    years.since.preceding.census = melted.data$year %% 10
-    years.from.nearest.census = pmin(years.since.preceding.census, -melted.data$year %% 10)
-    
-    inherent.census.cv = 0.015
-    
-    stratified.dimension.candidates = c('age','race','sex')
-    n.stratified.dimensions = length(intersect(names(dim(data)), stratified.dimension.candidates))
-    
-    if (n.stratified.dimensions<=1)
-        max.post.censal.cv = 0.1561269
-    else
-        max.post.censal.cv = 0.1939618
-    
-    max.post.censal.var = inherent.census.cv^2 + max.post.censal.cv^2
-    
-    post.censal.cv = exp(log(inherent.census.cv) + years.since.preceding.census * (0.5*log(max.post.censal.var) - log(inherent.census.cv)) / 9)
-    WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL = 4
-    intercensal.cv = exp(log(inherent.census.cv) + years.from.nearest.census * (0.5*log(max.post.censal.var / WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL) - log(inherent.census.cv)) / 9)
-    
-    is.intercensal = grepl('intercensal', details, ignore.case = TRUE) | n.stratified.dimensions==0
-    cv = post.censal.cv
-    cv[is.intercensal] = intercensal.cv
-    
-    data * cv
+  melted.data = reshape2::melt(data)
+  years.since.preceding.census = melted.data$year %% 10
+  years.from.nearest.census = pmin(years.since.preceding.census, -melted.data$year %% 10)
+  
+  inherent.census.cv = 0.015
+  
+  stratified.dimension.candidates = c('age','race','sex')
+  n.stratified.dimensions = length(intersect(names(dim(data)), stratified.dimension.candidates))
+  
+  if (n.stratified.dimensions<=1)
+    max.post.censal.cv = 0.1561269
+  else
+    max.post.censal.cv = 0.1939618
+  
+  max.post.censal.var = inherent.census.cv^2 + max.post.censal.cv^2
+  
+  post.censal.cv = exp(log(inherent.census.cv) + years.since.preceding.census * (0.5*log(max.post.censal.var) - log(inherent.census.cv)) / 9)
+  WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL = 4
+  intercensal.cv = exp(log(inherent.census.cv) + years.from.nearest.census * (0.5*log(max.post.censal.var / WEIGHT.TO.INTERCENSAL.VS.POSTCENSAL) - log(inherent.census.cv)) / 9)
+  
+  is.intercensal = grepl('intercensal', details, ignore.case = TRUE) | n.stratified.dimensions==0
+  cv = post.censal.cv
+  cv[is.intercensal] = intercensal.cv
+  
+  data * cv
 }
-
 population.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.sim = "population",
                                        outcome.for.data = "population", 
@@ -74,15 +74,14 @@ population.likelihood.instructions =
                                        # should always be specified; describes how precise the estimates are; 
                                        # e.g., estimates can be off by 3% each year
                                        error.variance.term = population.error.sd.shield, 
-                                       #error.variance.term = pop.year.cvs,  
                                        error.variance.type = 'function.sd',
                                        
                                        # downweight because large population size; 
                                        # can get more specific with create.likelihood.weights 
                                        #(e.g., different weight for age X)
                                        weights = w,
-                                       equalize.weight.by.year = F #if we dont have as many data points in one year it'll be upweighted
-                                       #in years that we have more data points we will downweight them
+                                       equalize.weight.by.year = F #if we dont have as many data points in one year it'll be up weighted
+                                       #in years that we have more data points we will down weight them
                                        
                                        # if there are more data points for certain years, this will normalize
                                        # e.g., if there are a few years with only the totals 
@@ -91,34 +90,29 @@ population.likelihood.instructions =
   )
 
 #** DEATHS **  ----
-# CalibTarget: deaths: 2001-2020 by agegroup,sex, race, ethnicty for the US model 
-# SURVEILLANCE.MANAGER$data$deaths$estimate$census.aggregated.population$census$year__location
+# CalibTarget: deaths: 2001-2020 by agegroup,sex, race, ethnicity for the US model 
 deaths.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "deaths",
-                                       outcome.for.data = "deaths", #fix type
+                                       outcome.for.data = "deaths", 
                                        levels.of.stratification = c(0), 
                                        from.year = 2010, 
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.015, # in absence of data I am assuming the population level
-                                       error.variance.type = 'cv',
-                                       # weights = (18*TOTAL.WEIGHT), # see prev_new_aware_weighting.R
-                                       # equalize.weight.by.year = T
+                                       observation.correlation.form = 'compound.symmetry', 
+                                       error.variance.term = population.error.sd.shield, #assuming the population level uncertainty
+                                       error.variance.type = 'function.sd',
                                        na.rm =T
   )
 
 #** FETILITY RATE **  ----
 # CalibTarget: Fertility.rate: 2007-2023 agegroup race ethnicty 
-# dimnames(SURVEILLANCE.MANAGER$data$fertility.rate$estimate$cdc.wonder.natality$cdc.fertility$year__location__age__race__ethnicity)
 fertility.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "fertility.rate",
                                        outcome.for.data = "fertility.rate",  
-                                       
                                        dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1,2), # 0 = totals, 1 = 1-way stratification (e.g., age), 2 = 2-way stratification (e.g
-                                       from.year = 2005,  #data available from 2007-2023
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 2007,  #data available from 2007-2023
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.015, # in absence of data I am assuming the population level
-                                       error.variance.type = 'cv',
+                                       error.variance.term = population.error.sd.shield,  #assuming the population level uncertainty
+                                       error.variance.type = 'function.sd',
                                        na.rm =T
   )
 
@@ -128,16 +122,15 @@ fertility.likelihood.instructions =
 immigration.likelihood.instructions = 
   create.basic.likelihood.instructions(outcome.for.sim = "immigration",
                                        outcome.for.data = "immigration", 
-                                       
                                        dimensions = c('age','race','sex'), 
                                        levels.of.stratification = c(0,1),
                                        from.year = 2011, 
                                        to.year=2020,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary ???
+                                       error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary ??? 
+                                       #'@Ryan: can you check the error variance? 
                                        error.variance.type = 'cv',
-                                       weights = 1,
-                                       equalize.weight.by.year = T,
+                                       equalize.weight.by.year = T,  #'@Ryan: do we need this? 
                                        na.rm =T
   )
 
@@ -151,9 +144,8 @@ emigration.likelihood.instructions =
                                         to.year=2020,
                                         observation.correlation.form = 'compound.symmetry', 
                                         error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
-                                        error.variance.type = 'cv',
-                                        weights = 1,
-                                        equalize.weight.by.year = T,
+                                        error.variance.type = 'cv',#'@Ryan: can you check the error variance? 
+                                        equalize.weight.by.year = T, #'@Ryan: do we need this? 
                                         na.rm =T
   )
 
@@ -401,17 +393,17 @@ likelihood.instructions.demographics=join.likelihood.instructions(
   emigration.likelihood.instructions)
 
 likelihood.instructions.syphilis.diagnoses=join.likelihood.instructions(
-    population.likelihood.instructions,
-    deaths.likelihood.instructions,
-    fertility.likelihood.instructions,
-    
-    immigration.likelihood.instructions,
-    emigration.likelihood.instructions,
-    
-    ps.diagnosis.likelihood.instructions,
-    early.diagnosis.likelihood.instructions,
-    late.diagnosis.likelihood.instructions,
-    total.diagnosis.likelihood.instructions)
+  population.likelihood.instructions,
+  deaths.likelihood.instructions,
+  fertility.likelihood.instructions,
+  
+  immigration.likelihood.instructions,
+  emigration.likelihood.instructions,
+  
+  ps.diagnosis.likelihood.instructions,
+  early.diagnosis.likelihood.instructions,
+  late.diagnosis.likelihood.instructions,
+  total.diagnosis.likelihood.instructions)
 
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
