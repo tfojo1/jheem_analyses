@@ -470,21 +470,6 @@ total.new.diagnoses.cv.likelihood.instructions.state =
                                          name = 'total.new'
     )
 
-risk.new.diagnoses.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
-                                         outcome.for.sim = "new",
-                                         dimensions = 'risk',
-                                         levels.of.stratification = c(0,1), 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = DIAGNOSES.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.new'
-    )
-
 total.new.diagnoses.4x.cv.likelihood.instructions.state = 
     create.basic.likelihood.instructions(outcome.for.data = "diagnoses",
                                          outcome.for.sim = "new",
@@ -841,21 +826,6 @@ total.prevalence.cv.likelihood.instructions.state =
                                          outcome.for.sim = "diagnosed.prevalence",
                                          dimensions = character(),
                                          levels.of.stratification = 0, 
-                                         from.year = 2008, 
-                                         observation.correlation.form = 'compound.symmetry', 
-                                         error.variance.term = PREVALENCE.CV.STATE,
-                                         error.variance.type = 'cv',
-                                         minimum.error.sd = 1,
-                                         weights = (1), #list(0.3), # see prev_new_aware_weighting.R 
-                                         equalize.weight.by.year = T,
-                                         name = 'total.prevalence'
-    )
-
-risk.prevalence.cv.likelihood.instructions.state = 
-    create.basic.likelihood.instructions(outcome.for.data = "diagnosed.prevalence",
-                                         outcome.for.sim = "diagnosed.prevalence",
-                                         dimensions = 'risk',
-                                         levels.of.stratification = c(0,1), 
                                          from.year = 2008, 
                                          observation.correlation.form = 'compound.symmetry', 
                                          error.variance.term = PREVALENCE.CV.STATE,
@@ -1345,21 +1315,6 @@ total.aids.diagnoses.cv.likelihood.instructions.state =
                                          equalize.weight.by.year = T
     )
 
-risk.aids.diagnoses.cv.likelihood.instructions.state =
-    create.basic.likelihood.instructions(outcome.for.data = "aids.diagnoses",
-                                         outcome.for.sim = "aids.diagnoses",
-                                         dimensions = 'risk',
-                                         levels.of.stratification = c(0,1),
-                                         from.year = 1985,
-                                         to.year = 1995,
-                                         correlation.different.years = 0.3,
-                                         #observation.correlation.form = 'compound.symmetry',
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = DIAGNOSES.CV.STATE, 
-                                         error.variance.type = 'cv',
-                                         weights = (1),
-                                         equalize.weight.by.year = T
-    )
 
 #-- HIV-MORTALITY  ----
 # all-cause mortality among pwh
@@ -2345,34 +2300,34 @@ pop.state.likelihood.instructions =
                                  immigration.likelihood.instructions.pop.state, 
                                  emigration.likelihood.instructions.pop.state,
                                  general.mortality.likelihood.instructions.pop.state,
-                                 risk.prevalence.cv.likelihood.instructions.state, 
-                                 risk.new.diagnoses.cv.likelihood.instructions.state,
-                                 risk.aids.diagnoses.cv.likelihood.instructions.state
+                                 total.prevalence.cv.likelihood.instructions.state, 
+                                 total.new.diagnoses.cv.likelihood.instructions.state,
+                                 total.aids.diagnoses.cv.likelihood.instructions.state
                                  #weight = POPULATION.WEIGHT
     ) 
 
-# pop.state.upweighted.new.prev.likelihood.instructions = 
-#     join.likelihood.instructions(population.likelihood.instructions.pop.state,
-#                                  immigration.likelihood.instructions.pop.state, 
-#                                  emigration.likelihood.instructions.pop.state,
-#                                  general.mortality.likelihood.instructions.pop.state,
-#                                  total.prevalence.4x.cv.likelihood.instructions.state, 
-#                                  total.new.diagnoses.4x.cv.likelihood.instructions.state,
-#                                  total.aids.diagnoses.cv.likelihood.instructions.state
-#                                  #weight = POPULATION.WEIGHT
-#     ) 
-# 
-# 
-# pop.state.likelihood.instructions.2 = 
-#     join.likelihood.instructions(population.likelihood.instructions.pop.state,
-#                                  immigration.likelihood.instructions.pop.state, 
-#                                  emigration.likelihood.instructions.pop.state,
-#                                  general.mortality.likelihood.instructions.pop.state,
-#                                  total.prevalence.cv.likelihood.instructions.state, 
-#                                  total.new.diagnoses.cv.likelihood.instructions.state,
-#                                  total.aids.diagnoses.cv.likelihood.instructions.state
-#                                  #weight = POPULATION.WEIGHT
-#     ) 
+pop.state.upweighted.new.prev.likelihood.instructions = 
+    join.likelihood.instructions(population.likelihood.instructions.pop.state,
+                                 immigration.likelihood.instructions.pop.state, 
+                                 emigration.likelihood.instructions.pop.state,
+                                 general.mortality.likelihood.instructions.pop.state,
+                                 total.prevalence.4x.cv.likelihood.instructions.state, 
+                                 total.new.diagnoses.4x.cv.likelihood.instructions.state,
+                                 total.aids.diagnoses.cv.likelihood.instructions.state
+                                 #weight = POPULATION.WEIGHT
+    ) 
+
+
+pop.state.likelihood.instructions.2 = 
+    join.likelihood.instructions(population.likelihood.instructions.pop.state,
+                                 immigration.likelihood.instructions.pop.state, 
+                                 emigration.likelihood.instructions.pop.state,
+                                 general.mortality.likelihood.instructions.pop.state,
+                                 total.prevalence.cv.likelihood.instructions.state, 
+                                 total.new.diagnoses.cv.likelihood.instructions.state,
+                                 total.aids.diagnoses.cv.likelihood.instructions.state
+                                 #weight = POPULATION.WEIGHT
+    ) 
 
 #-- JOIN THE TRANSMISSION-RELATED AND POPULATION LIKELIHOODS --#  ----
 transmission.pop.idu.aware.aids.testing.likelihood.instructions = 

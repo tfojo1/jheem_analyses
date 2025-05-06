@@ -11,7 +11,6 @@ CALIBRATION.CODE.EHE.FINAL = 'final.ehe'
 CALIBRATION.CODE.POP.STATE = 'pop.ehe.state'
 CALIBRATION.CODE.TRANS.STATE = 'trans.ehe.state'
 CALIBRATION.CODE.FULL.STATE = 'full.ehe.state'
-CALIBRATION.CODE.FULL.STATE.2 = 'full.ehe.state.2'
 CALIBRATION.CODE.EHE.FINAL.STATE = 'final.ehe.state'
 N.ITER.TEST = 10000
 N.ITER.POP = 20000
@@ -66,7 +65,9 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[(grepl('trate', EHE.PARA
                                                             grepl('oe', EHE.PARAMETERS.PRIOR@var.names) | 
                                                             grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names)  |
                                                             grepl('male\\.vs\\.female\\.heterosexual\\.rr', EHE.PARAMETERS.PRIOR@var.names)|
-                                                            (grepl('idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) & !grepl("age", EHE.PARAMETERS.PRIOR@var.names))
+                                                            (grepl('idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) & !grepl("age", EHE.PARAMETERS.PRIOR@var.names)) |
+                                                            ((grepl('suppressed\\.or', EHE.PARAMETERS.PRIOR@var.names) | grepl('suppressed\\.slope\\.or', EHE.PARAMETERS.PRIOR@var.names)) & 
+                                                                 !grepl('age', EHE.PARAMETERS.PRIOR@var.names))
                                                         # grepl('susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) |   
                                                         # grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
 ]
@@ -236,19 +237,6 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,
                           likelihood.instructions = full.state.likelihood.instructions,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
-                          n.iter = N.ITER.FULL, 
-                          thin = 200, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 10,
-                          preceding.calibration.codes = c(CALIBRATION.CODE.TRANS.STATE),
-                          description = "Full with covid likelihoods"
-)
-
-register.calibration.info(CALIBRATION.CODE.FULL.STATE.2,
-                          likelihood.instructions = full.state.weighted.likelihood.instructions.2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
