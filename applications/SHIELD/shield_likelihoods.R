@@ -151,61 +151,84 @@ emigration.likelihood.instructions =
 
 
 #** SYPHILIS DIAGNOSIS ** ----
-# we have modeled the misclassification of EL/LL diagnosis in the model and here we only fit to reported (biased) data
+##---- Total ----
+# data from 1941-2022 (cdc.pdf.report) for national model Only (total)
+# data from 1993-1999 (cdc.pdf.report) for MSA and national (total)
+# data from 2000-2023 for MSA level (cdc.sti) for MSA (total)
+total.diagnosis.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
+                                       outcome.for.data = "total.syphilis.diagnoses",  
+                                       levels.of.stratification = c(0),
+                                       from.year = 1993,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, #'@Ryan: we need to estimate this 
+                                       error.variance.type = 'cv',
+                                       minimum.error.sd = 1 #
+  )
 ##---- PS ----
+# data from 1941-2022 (cdc.pdf.report) for national model Only (total)
+# data from 1994-1999 (cdc.pdf.report) for national model Only (by race, agegroup, sex)
+# data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
+# data from 2000-2023 (cdc.sti) for state & national (by race, agegroup, sex)
+#
+# data from 1993-1999 (cdc.pdf.report) for MSA and national (total, sex)
+# data from 1998-2023 for MSA level (cdc.sti) for MSA (total)
+# data from 2000-2023 for MSA level (cdc.sti) for MSA (total; sex; race; age group)
+# data from 2000-2023 for MSA level (cdc.sti) for MSA (age group+sex; age group + race; race+sex)
 ps.diagnosis.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                        outcome.for.data = "ps.syphilis.diagnoses",  
-                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2), 
-                                       from.year = 2000,
+                                       from.year = 1993,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
+                                       error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       minimum.error.sd = 1
+                                       minimum.error.sd = 1  
   )
 ##---- EARLY ----
+# data from 1941-2022 (cdc.pdf.report) for national model Only (total)
+# data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
+# data from 2000-2023 (cdc.sti) for state & national (by race, agegroup, sex)
+#
+# data from 1993-1999 (cdc.pdf.report) for MSA and national (total)
+# data from 1998-2023 for MSA level (cdc.sti) for MSA (total)
+# data from 2000-2023 for MSA level (cdc.sti) for MSA (total; sex; race; age group; age group+sex; race+sex; age group+race; age group+race+sex)
+#
 #MISCLASSIFICATION ERROR 
+# we have modeled the misclassification of EL/LL diagnosis in the model and here we only fit to reported (biased) data
 early.diagnosis.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                        outcome.for.data = "early.syphilis.diagnoses", 
-                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2,3),
-                                       from.year = 2000,
+                                       from.year = 1993,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
+                                       error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
                                        minimum.error.sd = 1
   )
 ##---- Late/Unknown ---- 
+# data from 1941-2022 (cdc.pdf.report) for national model Only (total)
+# data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
+# data from 2000-2023 (cdc.sti) for state & national (by race, agegroup, sex)
+#
+# data from 1993-1999 (cdc.pdf.report) for MSA and national (total)
+# data from 1998-2023 for MSA level (cdc.sti) for MSA (total)
+# data from 2000-2023 for MSA level (cdc.sti) for MSA (total; sex; race; age group; age group+sex; race+sex; age group+race; age group+race+sex)
+#
 late.diagnosis.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                        outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                       
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2,3),
-                                       from.year = 2000,
+                                       from.year = 1993,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
+                                       error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
                                        minimum.error.sd = 1
   )
 
-##---- Total ----
-total.diagnosis.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
-                                       outcome.for.data = "total.syphilis.diagnoses",  
-                                       
-                                       dimensions = c("age","race","sex"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 1941,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
-                                       error.variance.type = 'cv',
-                                       minimum.error.sd = 1 #
-  )
 
 ##---- Congenital ----
 #poportion of state level births that are complicated by congenital syphilis 
@@ -388,7 +411,6 @@ likelihood.instructions.demographics=join.likelihood.instructions(
   population.likelihood.instructions,
   deaths.likelihood.instructions,
   fertility.likelihood.instructions,
-  
   immigration.likelihood.instructions,
   emigration.likelihood.instructions)
 
@@ -396,7 +418,6 @@ likelihood.instructions.syphilis.diagnoses=join.likelihood.instructions(
   population.likelihood.instructions,
   deaths.likelihood.instructions,
   fertility.likelihood.instructions,
-  
   immigration.likelihood.instructions,
   emigration.likelihood.instructions,
   
