@@ -31,6 +31,9 @@ create.auto.regressive.covariance.matrix = function(correlation.coefficient,
   
 }
 
+LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE = log(0.75)
+LOG.SD.FUTURE.TRATE.RATIO.CHANGE = log(1.5)/2
+
 create.compound.symmetry.covariance.matrix = function(correlation.coefficient,
                                                       n,sd){
 
@@ -687,7 +690,7 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     #-- Other Sexual Mixing --#
     
     oe.female.pairings.with.msm = Lognormal.Distribution(log(0.0895), 0.5*log(2), upper = 1), #Pathela 2006 - see below
-    fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.0004), 0.5*log(2), upper=1),
+    fraction.heterosexual.male.pairings.with.male = Lognormal.Distribution(log(.00001), 0.5*log(2), upper=1),
 
     oe.never.idu.pairings.with.idu = Lognormal.Distribution(log(0.05), 0.5*log(2), upper=1), #see calculations below
     idu.sexual.oe.rr = Lognormal.Distribution(0, 0.2381851), # see idu_sexual_oes.R combined.sd
@@ -710,17 +713,17 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     diagnosed.transmission.rr = Lognormal.Distribution(log(mean(c(1-.68, 1/3.5))), 0.25*log(2), upper=1), #avg of Marks 2006 and Marks 2005
     
     #-- Uncertainty About the Future --#
-    black.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
-    hispanic.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
-    other.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    black.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    hispanic.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    other.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
     
-    black.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
-    hispanic.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
-    other.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    black.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    hispanic.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    other.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
     
-    black.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
-    hispanic.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
-    other.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=0, sdlog=log(1.25)/2),
+    black.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    hispanic.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    other.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
     
     #-- COVID Parameters --#
     

@@ -155,3 +155,7 @@ cdc.testing.apply.set.parameters <- function(model.settings, parameters)
     
    
 }
+
+CDC.TESTING.PARAMETER.SAMPLING.BLOCKS = list(
+    
+)

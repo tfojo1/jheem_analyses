@@ -1,6 +1,6 @@
 
 #Read data frame #chagne working direcotry
-source("applications/cdc_testing/cdc_testing_parameters.R")
+source("../jheem_analyses/applications/cdc_testing/cdc_testing_parameters.R")
 df <- read.csv("/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/cdc_diagnoses.csv")
 
 #Set reference categories
