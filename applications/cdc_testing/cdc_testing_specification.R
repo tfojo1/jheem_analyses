@@ -24,7 +24,7 @@ register.model.quantity(CDCT.SPECIFICATION, name = "cdc.nonfunded.testing.of.und
                         value = expression(super.testing.of.undiagnosed*(1-fraction.diagnoses.from.cdc)))
 
 register.model.element(CDCT.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
-                       functional.form = create.logistic.linear.functional.form(intercept =diagnoses.intercept , slope = diagnoses.slope, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
+                       get.functional.form.function = get.fraction.diagnoses.from.cdc.model,
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
@@ -78,7 +78,7 @@ track.cumulative.outcome(CDCT.SPECIFICATION,
                          keep.dimensions = c('location'))
 
 track.cumulative.outcome(CDCT.SPECIFICATION,
-                         name = 'cdc.hiv.test.positivity',
+                         name = 'total.cdc.hiv.test.positivity',
                          corresponding.data.outcome = 'cdc.hiv.test.positivity',
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of CDC-funded HIV Tests that are Positive',
                                                                     description = "Proportion of CDC-funded HIV Tests that are Positive",
