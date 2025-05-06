@@ -29,7 +29,7 @@ register.model.element(CDCT.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
                        functional.form.from.time = 2010)
 
 register.model.element(CDCT.SPECIFICATION, name = "fraction.tests.from.cdc",
-                       functional.form = create.logistic.linear.functional.form(intercept = log(0.25)-log(0.75), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
+                       functional.form = create.logistic.linear.functional.form(intercept = log(0.092800629)-log(0.9071994), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
