@@ -1207,7 +1207,7 @@ register.model.element(EHE.SPECIFICATION,
 
 register.model.element(EHE.SPECIFICATION,
                        name = 'fraction.heterosexual.male.pairings.with.male',
-                       value = 0.004, 
+                       value = 0.00001, 
                        scale = 'ratio')
 
 register.model.element(EHE.SPECIFICATION,
@@ -1791,7 +1791,7 @@ track.dynamic.outcome(EHE.SPECIFICATION,
                                                                  axis.name = 'Infections',
                                                                  units = 'infections',
                                                                  singular.unit = 'infection'),
-                      dynamic.quantity.name = 'incidence',
+                      dynamic.quantity.name = 'incidence.from',
                       keep.dimensions = c('location','age','race','sex','risk'))
 
 track.point.outcome(EHE.SPECIFICATION,

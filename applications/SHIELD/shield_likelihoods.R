@@ -400,6 +400,19 @@ likelihood.instructions.demographics=join.likelihood.instructions(
   immigration.likelihood.instructions,
   emigration.likelihood.instructions)
 
+likelihood.instructions.syphilis.diagnoses=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions,
+    fertility.likelihood.instructions,
+    
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions,
+    
+    ps.diagnosis.likelihood.instructions,
+    early.diagnosis.likelihood.instructions,
+    late.diagnosis.likelihood.instructions,
+    total.diagnosis.likelihood.instructions)
+
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
 #   create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 
