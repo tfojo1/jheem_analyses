@@ -1,6 +1,3 @@
-DEFAULT.POPULATION.YEARS=2010 #used for generating the initial population and sexual contact oes (observed/estimated race estimates)
-DEFAULT.MORTALITY.RATE.YEARS=c('2001-2010','2011-2020') #2001:2020
-DEFAULT.FERTILITY.RATE.YEARS=c(2007:2023)
 
 # Documentation
 # devtools::document("../jheem_analyses/applications/SHIELD/")
