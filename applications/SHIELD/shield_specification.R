@@ -880,7 +880,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'multiplier.syphilis.screening.to.hiv.tests',
                        scale = 'ratio',
                        get.functional.form.function = get.syphilis.to.hiv.testing.functional.form,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.YEAR) #1980
+                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR) #1980
 # combine:
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.screening',
