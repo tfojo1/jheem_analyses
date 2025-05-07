@@ -10,14 +10,6 @@ cat('*** Running Shiled_specification.R ***\n')
 # Working directory is set to the main JHEEM_Analysis folder:
 source('applications/SHIELD/shield_source_code.R')
 
-# setting up global values:
-DEFAULT.START.YEAR=1940 # simulation start year
-DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. #the same year that we use for estimating proportion MSM
-DEFAULT.AGING.YEAR=2007 # differential aging starts in 2007
-DEFAULT.MIGRATION.YEAR=2007 # migration
-DEFAULT.STI.SCREENING.YEAR=1980 # year to start the STI screenings
-DEFAULT.FERTILITY.YEARS=2005 
-
 
 # Caching required objects: 
 # HIV testing priors from BRFSS
@@ -169,7 +161,7 @@ register.fixed.model.strata(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fertility.rate',
                        get.functional.form.function = get.fertility.rate.functional.form,
-                       functional.form.from.time = DEFAULT.FERTILITY.YEARS, #only projects values from 2010 forward
+                       functional.form.from.time = DEFAULT.FERTILITY.START.YEARS,  
                        scale = 'rate')
 
 ##---- Birth Proportions ----
@@ -265,7 +257,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.general.aging',
                        scale = 'rate',
                        get.functional.form.function = get.empiric.aging.rates,
-                       functional.form.from.time = DEFAULT.AGING.YEAR)
+                       functional.form.from.time = DEFAULT.AGING.START.YEAR)
 
 register.aging(SHIELD.SPECIFICATION,
                groups = c('uninfected','infected'),
@@ -280,7 +272,7 @@ register.aging(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.immigration',
                        get.functional.form.function = get.immigration.rates.functional.form,
-                       functional.form.from.time = DEFAULT.MIGRATION.YEAR,
+                       functional.form.from.time = DEFAULT.MIGRATION.START.YEAR,
                        scale = 'rate')
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'null.proportions', 
@@ -307,7 +299,7 @@ register.natality(specification = SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.emigration',
                        get.functional.form.function = get.emigration.rates.functional.form,
-                       functional.form.from.time = DEFAULT.MIGRATION.YEAR,
+                       functional.form.from.time = DEFAULT.MIGRATION.START.YEAR,
                        scale = 'rate')
 # We use the mortality mechanism to model emigrations, but shouldnt count them in deaths
 register.mortality(SHIELD.SPECIFICATION,
@@ -888,7 +880,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'multiplier.syphilis.screening.to.hiv.tests',
                        scale = 'ratio',
                        get.functional.form.function = get.syphilis.to.hiv.testing.functional.form,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.YEAR) #1980
+                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR) #1980
 # combine:
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.screening',

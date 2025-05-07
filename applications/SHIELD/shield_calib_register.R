@@ -32,6 +32,7 @@ register.calibration.info('pop.demog.8',
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
+# Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('syphilis.diagnoses.1', 
                           preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses,

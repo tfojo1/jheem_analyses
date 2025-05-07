@@ -99,13 +99,22 @@ print("PAIRING.INPUT.MANAGER created")
 CENSUS.AGES = as.character(sort( parse.age.strata.names(CENSUS.MANAGER$ontologies$census$age)$lower ))
 cat("CENSUS.AGES set to ",CENSUS.AGES,"\n")
 
-# DEFAULT.POPULATION.YEARS = 2007
-# cat("DEFAULT.POPULATION.YEARS set to ",DEFAULT.POPULATION.YEARS,"\n")
-
+# SETTING UP GLOBAL VARIABLES:
+# most demographic data are available starting in 2007 or 2010. we start mapping the functional values in 2005 for a smooth transition 
+DEFAULT.START.YEAR=1940 # simulation start year
+DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. #the same year that we use for estimating proportion MSM
+DEFAULT.POPULATION.YEARS=2010 #used for generating the initial population and sexual contact oes (observed/estimated race estimates)
+DEFAULT.AGING.START.YEAR=2005 
+DEFAULT.MIGRATION.START.YEAR=2005 
+DEFAULT.MORTALITY.RATE.YEARS=c('2001-2010','2011-2020') #2001:2020
+#
+DEFAULT.FERTILITY.START.YEARS=2005  
+DEFAULT.FERTILITY.RATE.YEARS=c(2007:2023)
 FERTILE.AGES=c('15-19 years','20-24 years','25-29 years','30-34 years','35-39 years','40-44 years')
 NON.FERTILE.AGES=c('0-14 years','45-49 years', '50-54 years', '55-64 years', '65+ years')
-cat("FERTILE.AGES set to ",FERTILE.AGES,"\n")
-
-
+#
+DEFAULT.STI.SCREENING.START.YEAR=1980 # year to start the STI screenings
+#
+cat("Global variables are defined \n")
 cat("*** Shield_source_code.R completed! ***\n")
 
