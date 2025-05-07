@@ -161,7 +161,7 @@ register.fixed.model.strata(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fertility.rate',
                        get.functional.form.function = get.fertility.rate.functional.form,
-                       functional.form.from.time = DEFAULT.FERTILITY.YEARS, #only projects values from 2010 forward
+                       functional.form.from.time = DEFAULT.FERTILITY.START.YEARS,  
                        scale = 'rate')
 
 ##---- Birth Proportions ----
@@ -257,7 +257,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.general.aging',
                        scale = 'rate',
                        get.functional.form.function = get.empiric.aging.rates,
-                       functional.form.from.time = DEFAULT.AGING.YEAR)
+                       functional.form.from.time = DEFAULT.AGING.START.YEAR)
 
 register.aging(SHIELD.SPECIFICATION,
                groups = c('uninfected','infected'),
@@ -272,7 +272,7 @@ register.aging(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.immigration',
                        get.functional.form.function = get.immigration.rates.functional.form,
-                       functional.form.from.time = DEFAULT.MIGRATION.YEAR,
+                       functional.form.from.time = DEFAULT.MIGRATION.START.YEAR,
                        scale = 'rate')
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'null.proportions', 
@@ -299,7 +299,7 @@ register.natality(specification = SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.emigration',
                        get.functional.form.function = get.emigration.rates.functional.form,
-                       functional.form.from.time = DEFAULT.MIGRATION.YEAR,
+                       functional.form.from.time = DEFAULT.MIGRATION.START.YEAR,
                        scale = 'rate')
 # We use the mortality mechanism to model emigrations, but shouldnt count them in deaths
 register.mortality(SHIELD.SPECIFICATION,
