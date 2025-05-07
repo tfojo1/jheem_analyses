@@ -1159,6 +1159,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        value=SHIELD_BASE_PARAMETER_VALUES['rr.congenital.syphilis.prenatal.care.third.trimester'])
 # assuming rr.congenital.syphilis.no.prenatal.care =1
 
+##-----------------#######----------------#######-----------------##----
 #*** OUTPUTS *** --#----
 ##--------------------------------------------------------------------------------------------------------------#
 # !!!for dynamic transitions that change over time (e.g., testing), the anchor points are coded at the begginign of the year 
