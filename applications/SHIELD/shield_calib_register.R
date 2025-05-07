@@ -13,8 +13,8 @@ N.ITER=15000
 #05.01: <pop.demog.5> Baltimore, rolled back to 9 params for fert., added fert. calbration start at 2005 and population variance function added
 #05.02: <pop.demog.6> Baltimore, rolled back to 18 params for fert.
 #05.05: <pop.demog.7> Baltimore, rolled back to 9 params for fert., Todd fixed issue with JHEEM model
-#05.06: <pop.demog.8> same as pop.demog.7
-
+#05.07: <pop.demog.8> same as pop.demog.7
+#05.08: <syphilis.diagnoses.1> same as pop.demog.8 with syphilis
 
 register.calibration.info('pop.demog.8', 
                           likelihood.instructions = likelihood.instructions.demographics,

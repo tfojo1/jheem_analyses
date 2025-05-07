@@ -37,8 +37,8 @@ lb.prev=.5; hb.prev=1.5 # added uncertainty (reflecting uncertainty in fraction.
 # and adjust that for fraction.reported (set to 50%) to account for cases that are undiagnosed 
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.initial.population.infected.syphilis',
-                                      # 0.007,0.007*lb.prev,0.007*hb.prev,
-                                      0,0,0,
+                                      0.007,0.007*lb.prev,0.007*hb.prev,
+                                      #0,0,0,
                                       citation = "input_syphilis_prev_1940.R")
 #By STAGE
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.primary',

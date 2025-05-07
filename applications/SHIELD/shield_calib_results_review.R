@@ -14,8 +14,8 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'pop.demog.6'
-DATE <- "2025-05-02"
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.1'
+DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
 if (FALSE) {
@@ -49,6 +49,9 @@ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 params.manual <- params.last
 params.manual["age40.44.hispanic.fertility.rate.multiplier"] <- 10 # last: 0.06205035, first: 1.0000000
 
+params.manual
+
+
 fertility.params = names(params.manual)[grepl("fertility.rate.multiplier", names(params.manual))]
 
 params.manual[fertility.params] = params.first[fertility.params]
@@ -77,7 +80,7 @@ simset$n.sim
 simplot(
     sim.first,
     sim.last,
-    sim.manual,
+    #sim.manual,
     split.by = "race", facet.by = "age",
     outcomes = c("population"),
     dimension.values = list(year = 2000:2030)
@@ -95,7 +98,7 @@ simplot(
 simplot(
     sim.first,
     sim.last,
-    sim.manual,
+    #sim.manual,
     split.by = "race", facet.by = "age",
     outcomes = c("fertility.rate"),
     dimension.values = list(year = 2000:2030)
