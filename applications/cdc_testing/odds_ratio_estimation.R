@@ -19,6 +19,7 @@ get.fraction.diagnoses.from.cdc.model <- function(specification.metadata)
     df$age = age.mapping[df$age]
     df$age <- relevel(factor(df$age), ref = "all")
     df$sex <- relevel(factor(df$sex), ref = "all")
+    
     #Logistic regression
     oddsratio_model <- suppressWarnings(glm(diagnoses ~ as.factor(race)*year + as.factor(age)*year + as.factor(sex)*year, data = df, weights = number, family = binomial(link = "logit")))
     summary(oddsratio_model)

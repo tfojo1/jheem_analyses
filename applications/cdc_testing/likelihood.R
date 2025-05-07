@@ -4,20 +4,36 @@ source("applications/cdc_testing/cdc_testing_specification.R")
 
 transmuter = create.jheem.transmuter(simulation.set = sim,to.version = "cdct")
 
-# Example data
-y <- c(12, 25, 18)        # CDC-funded diagnoses (2019-2021)
-n <- c(20, 40, 30)        # total diagnoses observed (2019-2021)
-p_hat <- c(0.6, 0.55, 0.5)  # model-predicted proportion of cdc funded diagnoses (cdc funded diagnoses/total diagnoses)
+sim2 = transmuter$transmute(1)
 
-# Likelihood (product of binomial probabilities)
-likelihood <- function(y, n, p_hat) {
-    prod(dbinom(y, size = n, prob = p_hat))
-}
+#CDC Tests Likelihood Instructions 
 
-# Log-likelihood (more stable)
-log_likelihood <- function(y, n, p_hat) {
-    sum(dbinom(y, size = n, prob = p_hat, log = TRUE))
-}
+cdc.tests.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "hiv.tests", 
+                                                                         outcome.for.sim = "cdc.funded.tests",
+                                                                         dimensions = character(), #total
+                                                                         levels.of.stratification = 0,
+                                                                         from.year = 2010,
+                                                                         to.year = 2019,
+                                                                         observation.correlation.form = 'compound.symmetry',
+                                                                         correlation.different.years = 0.5,
+                                                                         error.variance.term = .05,
+                                                                         error.variance.type = c('cv')
+                                                                         )
 
-# Use
-log_likelihood(y, n, p_hat)
+cdc.test.positivity.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "cdc.hiv.test.positivity", 
+                                                                         outcome.for.sim = "total.cdc.hiv.test.positivity",
+                                                                         dimensions = character(), #total
+                                                                         levels.of.stratification = 0,
+                                                                         from.year = 2010,
+                                                                         to.year = 2019,
+                                                                         observation.correlation.form = 'compound.symmetry',
+                                                                         correlation.different.years = 0.5,
+                                                                         error.variance.term = .001,
+                                                                         error.variance.type = c('sd')
+)
+
+
+cdc.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.tests.likelihood.instructions)
+
+
+
