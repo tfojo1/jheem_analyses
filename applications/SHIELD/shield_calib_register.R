@@ -15,6 +15,7 @@ N.ITER=15000
 #05.05: <pop.demog.7> Baltimore, rolled back to 9 params for fert., Todd fixed issue with JHEEM model
 #05.07: <pop.demog.8> same as pop.demog.7
 #05.08: <syphilis.diagnoses.1> same as pop.demog.8 with syphilis
+#05.08: <syphilis.diagnoses.2> same as syphilis.diagnoses.1, using total by stage
 
 register.calibration.info('pop.demog.8', 
                           likelihood.instructions = likelihood.instructions.demographics,
@@ -33,7 +34,7 @@ register.calibration.info('pop.demog.8',
 )
 
 # Calibrating to demographic and syphilis diagnoses targets
-register.calibration.info('syphilis.diagnoses.1', 
+register.calibration.info('syphilis.diagnoses.2', 
                           preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses,
                           data.manager = SURVEILLANCE.MANAGER,
