@@ -2466,7 +2466,7 @@ trans.state.likelihood.instructions =
                                  race.risk.halfx.cv.prevalence.likelihood.instructions.state,
                                  total.new.diagnoses.10x.cv.likelihood.instructions.state,
                                  total.prevalence.10x.cv.instructions.state,
-                                 race.risk.suppression.basic.likelihood.instructions.state,
+                                 #race.risk.suppression.basic.likelihood.instructions.state,
                                  non.age.aids.diagnoses.16x.likelihood.instructions.state,
                                  population.likelihood.instructions.trans,
                                  heroin.basic.likelihood.instructions.state,
