@@ -2220,10 +2220,12 @@ future.change.penalty.likelihood.instructions =
 # P.NEW.FOLD.CHANGE.GT.6 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 6)
 # P.NEW.FOLD.CHANGE.GT.8 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 8)
 
-z = NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19) & NEW.FOLD.CHANGE.14.19>0] 
-MEAN.NEW.FOLD.CHANGE = mean(log(z))
-SD.NEW.FOLD.CHANGE = sd(log(z))
-ps = plnorm(c(0,2,3,4,6,8), mean(log(z)), sd(log(z)))
+# z = NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19) & NEW.FOLD.CHANGE.14.19>0] 
+# MEAN.NEW.FOLD.CHANGE = mean(log(z))
+# SD.NEW.FOLD.CHANGE = sd(log(z))
+# ps = plnorm(c(0,2,3,4,6,8), mean(log(z)), sd(log(z)))
+MEAN.NEW.FOLD.CHANGE = -0.04470926
+SD.NEW.FOLD.CHANGE = 0.6549829
 P.NEW.FOLD.CHANGE.LTE.2 = plnorm(2, meanlog = MEAN.NEW.FOLD.CHANGE, sdlog = SD.NEW.FOLD.CHANGE)
 
 # P.NEW.FOLD.CHANGE.GT.2 = 0.07893677
