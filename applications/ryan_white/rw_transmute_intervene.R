@@ -1,7 +1,7 @@
 ATI.INDICES = 19
-LOCATIONS.TO.ATI = 'C.18140'#'C.32820'
+LOCATIONS.TO.ATI = 'TX'#'C.32820'
 
-RESUME.FIRST = T
+RESUME.FIRST = F
 RERUN = F
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')

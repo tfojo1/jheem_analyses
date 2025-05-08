@@ -172,7 +172,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
   
   if (output=='sd')
   {
-    errors = all.values1 - all.values2
+   # errors = all.values1 - all.values2
     rv = sqrt(sum(e^2)/n)
     
     rv

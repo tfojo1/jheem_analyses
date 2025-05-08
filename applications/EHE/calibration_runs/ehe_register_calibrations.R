@@ -218,9 +218,9 @@ register.calibration.info(CALIBRATION.CODE.POP.STATE,
 
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           likelihood.instructions = trans.state.likelihood.instructions,
-                          special.case.likelihood.instructions = list(
-                              AL = trans.state.halfx.likelihood.instructions
-                          ),
+                          # special.case.likelihood.instructions = list(
+                          #     AL = trans.state.halfx.likelihood.instructions
+                          # ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           parameter.names = c(par.names.transmission), 

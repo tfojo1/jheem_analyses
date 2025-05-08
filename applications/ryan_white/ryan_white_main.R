@@ -16,7 +16,7 @@ RW.LOCATIONS = c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO" )
 # Run settings
 VERBOSE = T
 CALIBRATION.CODE = "full.ehe.state" # 'final.ehe' # for now, with stage 3 state calibrations
-N.SIM = 100 #1000  # for now, with stage 3 state calibrations
+N.SIM = 10 #1000  # for now, with stage 3 state calibrations
 FORCE.REDO = T
 N.CHUNKS = 20
 
