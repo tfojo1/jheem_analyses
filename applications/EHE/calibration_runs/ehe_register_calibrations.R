@@ -67,8 +67,8 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[(grepl('trate', EHE.PARA
                                                             grepl('female\\.vs\\.heterosexual\\.male\\.idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names)  |
                                                             grepl('male\\.vs\\.female\\.heterosexual\\.rr', EHE.PARAMETERS.PRIOR@var.names)|
                                                             (grepl('idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) & !grepl("age", EHE.PARAMETERS.PRIOR@var.names)) |
-                                                            ((grepl('suppressed\\.or', EHE.PARAMETERS.PRIOR@var.names) | grepl('suppressed\\.slope\\.or', EHE.PARAMETERS.PRIOR@var.names)) & 
-                                                                 !grepl('age', EHE.PARAMETERS.PRIOR@var.names)) |
+                                                            # ((grepl('suppressed\\.or', EHE.PARAMETERS.PRIOR@var.names) | grepl('suppressed\\.slope\\.or', EHE.PARAMETERS.PRIOR@var.names)) & 
+                                                            #      !grepl('age', EHE.PARAMETERS.PRIOR@var.names)) |
                                                             grepl('proportion\\.msm\\.of\\.male', EHE.PARAMETERS.PRIOR@var.names)
                                                         # grepl('susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) |   
                                                         # grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)

@@ -2335,10 +2335,15 @@ proportion.msm.likelihood.instructions = create.custom.likelihood.instructions(
     compute.function = function(sim, data, log=T)
     {
         sim.total = sim$optimized.get(data$total.optimized.get.instr)
-        sim.by.race = sim$optimized.get(data$race.optimized.get.instr)
-        
         total.d = dnorm(data$totals, sim.total, data$total.sd)
-        race.d = dnorm(data$by.race, sim.by.race, data$race.sd)
+        
+        if (is.null(data$by.race))
+            race.d = 0
+        else
+        {
+            sim.by.race = sim$optimized.get(data$race.optimized.get.instr)
+            race.d = dnorm(data$by.race, sim.by.race, data$race.sd)
+        }
         
         d = sum(total.d, na.rm=T) + sum(race.d, na.rm=T)
         
@@ -2389,39 +2394,44 @@ proportion.msm.likelihood.instructions = create.custom.likelihood.instructions(
                                               keep.dimensions = c('year','race'))       
         
         if (is.null(race.data))
-            stop(paste0("Could not pull race-specific data on 'proportion.msm' for location '", location, "'"))
-        
-        race.years = dimnames(race.data)$year
-        
-        males = SURVEILLANCE.MANAGER$pull('adult.population',
-                                          dimension.values = list(location=location, sex='male', year=race.years),
-                                          keep.dimensions = c('year','race','ethnicity'))[,,,1]
-        
-        if (is.null(males))
-            stop(paste0("Could not pull population data for location '", location, "'"))
-        
-        dim.names = list(year = race.years,
-                         race = spec.metadata$dim.names$race)
-        
-        proportion.msm.by.race = array(NA, dim = sapply(dim.names, length), dimnames = dim.names)
-        
-        proportion.msm.by.race[,'hispanic'] = race.data[,'hispanic',1]
-        proportion.msm.by.race[,'black'] = race.data[,'black',1]
-        
-        p.white = race.data[,'white',1]
-        n.white = males[,'white','not hispanic']
-        
-        p.aapi = 0.9 * race.data[,'asian',1] + 0.1 * race.data[,'native hawaiian/other pacific islander',1]
-        n.aapi = males[,'asian or pacific islander', 'not hispanic']
-        
-        p.aian = race.data[,'american indian/alaska native',1]
-        n.aian = males[,'american indian or alaska native', 'not hispanic']
-        
-        p.other = cbind(p.white, p.aapi, p.aian)
-        n.other = cbind(n.white, n.aapi, n.aian)
-        n.other[is.na(p.other)] = NA
-        
-        proportion.msm.by.race[,'other'] = rowSums(p.other * n.other, na.rm=T) / rowSums(n.other, na.rm=T)
+        {
+#            stop(paste0("Could not pull race-specific data on 'proportion.msm' for location '", location, "'"))
+            proportion.msm.by.race = NULL
+        }
+        else
+        {
+            race.years = dimnames(race.data)$year
+            
+            males = SURVEILLANCE.MANAGER$pull('adult.population',
+                                              dimension.values = list(location=location, sex='male', year=race.years),
+                                              keep.dimensions = c('year','race','ethnicity'))[,,,1]
+            
+            if (is.null(males))
+                stop(paste0("Could not pull population data for location '", location, "'"))
+            
+            dim.names = list(year = race.years,
+                             race = spec.metadata$dim.names$race)
+            
+            proportion.msm.by.race = array(NA, dim = sapply(dim.names, length), dimnames = dim.names)
+            
+            proportion.msm.by.race[,'hispanic'] = race.data[,'hispanic',1]
+            proportion.msm.by.race[,'black'] = race.data[,'black',1]
+            
+            p.white = race.data[,'white',1]
+            n.white = males[,'white','not hispanic']
+            
+            p.aapi = 0.9 * race.data[,'asian',1] + 0.1 * race.data[,'native hawaiian/other pacific islander',1]
+            n.aapi = males[,'asian or pacific islander', 'not hispanic']
+            
+            p.aian = race.data[,'american indian/alaska native',1]
+            n.aian = males[,'american indian or alaska native', 'not hispanic']
+            
+            p.other = cbind(p.white, p.aapi, p.aian)
+            n.other = cbind(n.white, n.aapi, n.aian)
+            n.other[is.na(p.other)] = NA
+            
+            proportion.msm.by.race[,'other'] = rowSums(p.other * n.other, na.rm=T) / rowSums(n.other, na.rm=T)
+        }
         
         #-- Set up optimized get instructions --#
         
@@ -2432,12 +2442,17 @@ proportion.msm.likelihood.instructions = create.custom.likelihood.instructions(
             drop.single.sim.dimension = T
         )
         
-        race.optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
-            'proportion.msm', 
-            dimension.values=list(year = total.years, race=dimnames(proportion.msm.by.race)$race),
-            keep.dimensions = c('year','race'),
-            drop.single.sim.dimension = T
-        )
+        if (is.null(proportion.msm.by.race))
+            race.optimized.get.instr = NULL
+        else
+        {
+            race.optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
+                'proportion.msm', 
+                dimension.values=list(year = total.years, race=dimnames(proportion.msm.by.race)$race),
+                keep.dimensions = c('year','race'),
+                drop.single.sim.dimension = T
+            )
+        }
         
         #-- Package it up --#
         
