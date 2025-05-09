@@ -2266,6 +2266,39 @@ track.integrated.outcome(EHE.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex')
 )
 
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'number.male',
+                         scale = 'non.negative.number',
+                         outcome.metadata = NULL,
+                         value = 'population',
+                         subset.dimension.values = list(sex=c('heterosexual_male','msm')),
+                         keep.dimensions = c('location','race'),
+                         save = F)
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'number.msm',
+                         scale = 'non.negative.number',
+                         outcome.metadata = NULL,
+                         value = 'population',
+                         subset.dimension.values = list(sex=c('msm')),
+                         keep.dimensions = c('location','race'),
+                         save = F)
+
+track.cumulative.outcome(EHE.SPECIFICATION,
+                         name = 'proportion.msm',
+                         corresponding.data.outcome = 'proportion.msm',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Males who are MSM',
+                                                                    description = "The Proportion of Males in the population who are MSM",
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'Proportion MSM',
+                                                                    units = '%',
+                                                                    singular.unit = '%'),
+                         value = 'number.msm',
+                         value.is.numerator = T,
+                         denominator.outcome = 'number.male',
+                         keep.dimensions = c('location','race')
+                         )
+
 
 ##--------------------------------##
 ##--------------------------------##

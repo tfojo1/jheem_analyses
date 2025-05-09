@@ -605,7 +605,9 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     age5.prep.indications.or = Lognormal.Distribution(0, log(2)),
 
     #-- Proportion MSM --#
-    proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    black.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    other.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
     
     #-- IDU Transitions --#
     
@@ -1021,7 +1023,10 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
 # BASE.HIV.SAMPLING.BLOCKS ----
 BASE.HIV.SAMPLING.BLOCKS = list(
     
-    proportion.msm.of.male = 'proportion.msm.of.male.mult',
+    proportion.msm.of.male = c(
+        'black.proportion.msm.of.male.mult',
+        'hispanic.proportion.msm.of.male.mult',
+        'other.proportion.msm.of.male.mult'),
     
 #-- HIV AGING --#
 

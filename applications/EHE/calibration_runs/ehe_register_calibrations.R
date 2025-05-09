@@ -25,7 +25,8 @@ print("REGISTERING CALIBRATIONS")
 #-- REGISTER POPULATION CALIBRATION  --#
 par.names.pop = c(
     POPULATION.PARAMETERS.PRIOR@var.names[!grepl('hiv\\..*migration', POPULATION.PARAMETERS.PRIOR@var.names)],
-    "global.trate"#,
+    "global.trate",
+    EHE.PARAMETERS.PRIOR@var.names[grepl('proportion\\.msm\\.of\\.male', EHE.PARAMETERS.PRIOR@var.names)]
 )
 
 par.aliases.population = list(
@@ -67,7 +68,8 @@ par.names.transmission = EHE.PARAMETERS.PRIOR@var.names[(grepl('trate', EHE.PARA
                                                             grepl('male\\.vs\\.female\\.heterosexual\\.rr', EHE.PARAMETERS.PRIOR@var.names)|
                                                             (grepl('idu\\.susceptibility\\.rr', EHE.PARAMETERS.PRIOR@var.names) & !grepl("age", EHE.PARAMETERS.PRIOR@var.names)) |
                                                             ((grepl('suppressed\\.or', EHE.PARAMETERS.PRIOR@var.names) | grepl('suppressed\\.slope\\.or', EHE.PARAMETERS.PRIOR@var.names)) & 
-                                                                 !grepl('age', EHE.PARAMETERS.PRIOR@var.names))
+                                                                 !grepl('age', EHE.PARAMETERS.PRIOR@var.names)) |
+                                                            grepl('proportion\\.msm\\.of\\.male', EHE.PARAMETERS.PRIOR@var.names)
                                                         # grepl('susceptibility.rr', EHE.PARAMETERS.PRIOR@var.names) |   
                                                         # grepl('hiv.aging', EHE.PARAMETERS.PRIOR@var.names)
 ]

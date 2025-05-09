@@ -2327,6 +2327,157 @@ OLD.future.incidence.change.likelihood.instructions =
         }
         )
 
+#-- PROPORTION MSM --#
+
+proportion.msm.likelihood.instructions = create.custom.likelihood.instructions(
+    name = 'idu.active.prior.ratio',
+    
+    compute.function = function(sim, data, log=T)
+    {
+        sim.total = sim$optimized.get(data$total.optimized.get.instr)
+        sim.by.race = sim$optimized.get(data$race.optimized.get.instr)
+        
+        total.d = dnorm(data$totals, sim.total, data$total.sd)
+        race.d = dnorm(data$by.race, sim.by.race, data$race.sd)
+        
+        d = sum(total.d, na.rm=T) + sum(race.d, na.rm=T)
+        
+        if (log)
+            sum(d)
+        else
+            prod(d)
+    },
+    
+    get.data.function = function(version, location)
+    {
+        sim.metadata = get.simulation.metadata(version=version, location=location)
+        spec.metadata = get.specification.metadata(version=version, location=location)
+        
+        counties = get.contained.locations(location, 'county')
+        
+        #-- Pull the total data --#
+        total.data = SURVEILLANCE.MANAGER$pull('proportion.msm',
+                                                  dimension.values = list(location=counties,
+                                                                          sex='male'))[,,1,drop=F]
+        if (is.null(total.data))
+            stop(paste0("Could not pull data on 'proportion.msm' totals for location '", location, "'"))
+        
+        total.years = dimnames(total.data)$year
+        males = CENSUS.MANAGER$pull(outcome = 'population',
+                                    keep.dimensions = c('location', 'age','race','ethnicity'),
+                                    dimension.values = list(location = counties,
+                                                            year = total.years,
+                                                            sex = 'male'),
+                                    from.ontology.names = 'census')[,,,,1,drop=F]
+        
+        if (length(total.years)==1)
+        {
+            dim.names = c(list(year=total.years),
+                          dimnames(males))
+            
+            dim(males) = sapply(dim.names, length)
+            dimnames(males) = dim.names
+        }
+        
+        males = apply(males, c('year','location'), sum)
+        
+        total.proportion.msm = rowSums(total.data * as.numeric(males)) / rowSums(males)
+            
+        #-- Pull the race data, map it, and aggregated it --#
+        race.data = SURVEILLANCE.MANAGER$pull('proportion.msm',
+                                              dimension.values = list(location=location, sex='male'),
+                                              keep.dimensions = c('year','race'))       
+        
+        if (is.null(race.data))
+            stop(paste0("Could not pull race-specific data on 'proportion.msm' for location '", location, "'"))
+        
+        race.years = dimnames(race.data)$year
+        
+        males = SURVEILLANCE.MANAGER$pull('adult.population',
+                                          dimension.values = list(location=location, sex='male', year=race.years),
+                                          keep.dimensions = c('year','race','ethnicity'))[,,,1]
+        
+        if (is.null(males))
+            stop(paste0("Could not pull population data for location '", location, "'"))
+        
+        dim.names = list(year = race.years,
+                         race = spec.metadata$dim.names$race)
+        
+        proportion.msm.by.race = array(NA, dim = sapply(dim.names, length), dimnames = dim.names)
+        
+        proportion.msm.by.race[,'hispanic'] = race.data[,'hispanic',1]
+        proportion.msm.by.race[,'black'] = race.data[,'black',1]
+        
+        p.white = race.data[,'white',1]
+        n.white = males[,'white','not hispanic']
+        
+        p.aapi = 0.9 * race.data[,'asian',1] + 0.1 * race.data[,'native hawaiian/other pacific islander',1]
+        n.aapi = males[,'asian or pacific islander', 'not hispanic']
+        
+        p.aian = race.data[,'american indian/alaska native',1]
+        n.aian = males[,'american indian or alaska native', 'not hispanic']
+        
+        p.other = cbind(p.white, p.aapi, p.aian)
+        n.other = cbind(n.white, n.aapi, n.aian)
+        n.other[is.na(p.other)] = NA
+        
+        proportion.msm.by.race[,'other'] = rowSums(p.other * n.other, na.rm=T) / rowSums(n.other, na.rm=T)
+        
+        #-- Set up optimized get instructions --#
+        
+        total.optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
+            'proportion.msm', 
+            dimension.values=list(year = total.years),
+            keep.dimensions = c('year'),
+            drop.single.sim.dimension = T
+        )
+        
+        race.optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
+            'proportion.msm', 
+            dimension.values=list(year = total.years, race=dimnames(proportion.msm.by.race)$race),
+            keep.dimensions = c('year','race'),
+            drop.single.sim.dimension = T
+        )
+        
+        #-- Package it up --#
+        
+        
+        list(
+            totals = total.proportion.msm,
+            by.race = proportion.msm.by.race,
+            
+            total.optimized.get.instr = total.optimized.get.instr,
+            race.optimized.get.instr = race.optimized.get.instr,
+            
+            total.sd = 0.005,
+            race.sd = 0.025
+        )
+    }
+)
+
+# proportion.msm.basic.likelihood.instructions = create.basic.likelihood.instructions(
+#     outcome.for.data = "proportion.msm", 
+#     outcome.for.sim = "proportion.msm",
+#     dimensions = c("race"),
+#     levels.of.stratification = c(0,1), # 0 = totals, 1 = 1-way stratification
+#     from.year = 2010,
+#     correlation.different.years = 0.5, # this is the default
+#     correlation.different.strata = 0.1, # this is the default
+#     correlation.different.sources = 0.3, # default
+#     correlation.same.source.different.details = 0.3, # default
+#     
+#     observation.correlation.form = 'autoregressive.1', 
+#     
+#     error.variance.term = 0.005,
+#     error.variance.type = 'cv',
+#     
+#     weights = 1,
+#     
+#     # if there are more datapoints for certain years, this will normalize
+#     # e.g., if there are a few years with only the totals 
+#     # before the stratifications are available
+#     equalize.weight.by.year = F
+# )
 
 #-- IDU Active/Prior Ratio --#
 
@@ -2401,7 +2552,8 @@ pop.state.likelihood.instructions =
                                  general.mortality.likelihood.instructions.pop.state,
                                  total.prevalence.cv.likelihood.instructions.state, 
                                  total.new.diagnoses.cv.likelihood.instructions.state,
-                                 total.aids.diagnoses.cv.likelihood.instructions.state
+                                 total.aids.diagnoses.cv.likelihood.instructions.state,
+                                 proportion.msm.likelihood.instructions
                                  #weight = POPULATION.WEIGHT
     ) 
 
@@ -2412,7 +2564,8 @@ pop.state.upweighted.new.prev.likelihood.instructions =
                                  general.mortality.likelihood.instructions.pop.state,
                                  total.prevalence.4x.cv.likelihood.instructions.state, 
                                  total.new.diagnoses.4x.cv.likelihood.instructions.state,
-                                 total.aids.diagnoses.cv.likelihood.instructions.state
+                                 total.aids.diagnoses.cv.likelihood.instructions.state,
+                                 proportion.msm.likelihood.instructions
                                  #weight = POPULATION.WEIGHT
     ) 
 
@@ -2424,7 +2577,8 @@ pop.state.likelihood.instructions.2 =
                                  general.mortality.likelihood.instructions.pop.state,
                                  total.prevalence.cv.likelihood.instructions.state, 
                                  total.new.diagnoses.cv.likelihood.instructions.state,
-                                 total.aids.diagnoses.cv.likelihood.instructions.state
+                                 total.aids.diagnoses.cv.likelihood.instructions.state,
+                                 proportion.msm.likelihood.instructions
                                  #weight = POPULATION.WEIGHT
     ) 
 
@@ -2473,7 +2627,8 @@ trans.state.likelihood.instructions =
                                  cocaine.basic.likelihood.instructions.state,
                                  biased.hiv.mortality.likelihood.instructions.full,
                                  future.incidence.change.likelihood.instructions,
-                                 idu.active.prior.ratio.likelihood.instructions
+                                 idu.active.prior.ratio.likelihood.instructions,
+                                 proportion.msm.likelihood.instructions
                                  
     )
 
@@ -2587,7 +2742,10 @@ full.state.likelihood.instructions = join.likelihood.instructions(
     ps.syphilis.year.on.year.change.likelihood.instructions,
     
     # FUTURE INCIDENCE PENALTY
-    future.incidence.change.likelihood.instructions
+    future.incidence.change.likelihood.instructions,
+    
+    # PROPORTION MSM
+    proportion.msm.likelihood.instructions
 )
 
 # For backward compatibility for now
