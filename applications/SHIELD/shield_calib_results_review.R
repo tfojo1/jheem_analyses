@@ -14,7 +14,7 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.1'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.2'
 DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
@@ -44,11 +44,14 @@ params.first <- sim.first$params
 params.last  <- sim.last$params
 
 # Run Manual Simulation ----
-# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 # params.manual <- params.last
 # params.manual["age40.44.hispanic.fertility.rate.multiplier"] <- 10 # last: 0.06205035, first: 1.0000000
 
 # sim.manual <- engine$run(params.manual)
+
+sim.first <- engine$run(params.first)
+sim.last <- engine$run(params.last)
 
 # q=engine$extract.quantity.values() #returns the input values to the model
 # input.fertility = q$fertility.rate[["2020"]]
@@ -69,14 +72,17 @@ simplot(
 
 # Plot syphilis total diagnosis ----
 simplot(
-    sim.first,
+    #sim.first,
     sim.last,
     #sim.manual,
-    # split.by = "race", facet.by = "age", #we are matching the totals only for now
+    split.by = "race", facet.by = "sex", #we are matching the totals only for now
+    #split.by = "sex",
     outcomes = c("diagnosis.ps"),
-    # outcomes = c("diagnosis.el.misclassified"),
-    # outcomes = c("diagnosis.late.misclassified"),
-    dimension.values = list(year = 1990:2025)
+    #outcomes = c("diagnosis.el.misclassified"),
+    #outcomes = c("diagnosis.late.misclassified"),
+    dimension.values = list(year = 1990:2025),
+    style.manager = stratum.style.manager
+    
 )
 
 # Plot Population ----

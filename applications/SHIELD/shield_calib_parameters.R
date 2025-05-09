@@ -115,9 +115,11 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   transmission.rate.multiplier.msm0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.msm3 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   ### by race:
-  transmission.rate.multiplier.msm.black= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.black= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.other= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
   ## Sexual Mixing by Age
   age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)) #directly used in specification helper function
@@ -252,7 +254,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  dimension = "sex",
                                                  applies.to.dimension.values = c('female'))
     ## Transmission ----
-  for(time in 0:2){
+  for(time in 0:3){
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
                                                    alpha.name = paste0('time',time),
@@ -260,11 +262,11 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = 'all',
                                                    applies.to.dimension.values = 'all')
     set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "transmission.rate.msm",
+                                                   element.name = "transmission.rate",
                                                    alpha.name = paste0('time',time),
-                                                   values = parameters[c("transmission.rate.multiplier.msm.black","transmission.rate.multiplier.msm.hispanic")],
+                                                   values = parameters[c("transmission.rate.multiplier.black","transmission.rate.multiplier.hispanic", "transmission.rate.multiplier.other")],
                                                    dimension = "race.to", #recipient
-                                                   applies.to.dimension.values = c("black","hispanic"))
+                                                   applies.to.dimension.values = c("black","hispanic", "other"))
   }
   
   
@@ -452,9 +454,13 @@ SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
     "transmission.rate.multiplier.msm0",
     "transmission.rate.multiplier.msm1",
     "transmission.rate.multiplier.msm2",
-    "transmission.rate.multiplier.msm.black",
-    "transmission.rate.multiplier.msm.hispanic"),
+    "transmission.rate.multiplier.msm3"),
   #
+  race.transmission = c(
+      "transmission.rate.multiplier.black",
+      "transmission.rate.multiplier.hispanic",
+      "transmission.rate.multiplier.other"
+  ),
   age.mixing.transmission=("age.mixing.sd.mult")
 )
 
