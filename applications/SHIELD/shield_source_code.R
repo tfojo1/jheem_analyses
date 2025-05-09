@@ -2,8 +2,9 @@ cat("*** Running Shield_source_code.R ***\n")
 # detach("package:jheem2", character.only = TRUE, unload = TRUE)
 
 # rm(list = ls())
-NEW.SOURCE=T
-USE.JHEEM2.PACKAGE=F
+source("../jheem_analyses/source_code.R") #top jheem analysis source code
+source("../jheem_analyses/use_jheem2_package_setting.R") #this file creates a variable USE.JHEEM2.PACKAGE
+# USE.JHEEM2.PACKAGE=F
 
 
 #pulling JHEEM_ANALYSIS # Load the git2r package ----
