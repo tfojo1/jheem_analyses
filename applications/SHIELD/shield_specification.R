@@ -1441,7 +1441,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  singular.unit = 'case'),
                       scale='non.negative.number',
                       dynamic.quantity.name = 'remission.from', #where they come from
-                      #corresponding.data.outcome = 'cns.syphilis.diagnoses',
+                      corresponding.data.outcome = 'cns.syphilis.diagnoses',
                       keep.dimensions = c('location','age','race','sex','stage'),
                       save = T
 )
@@ -1459,7 +1459,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         #corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', #<just for comparison>
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', #<just for comparison>
                          keep.dimensions = c('location','age','race','sex'),
                          save = T
 )
@@ -1475,7 +1475,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         #corresponding.data.outcome = 'early.syphilis.diagnoses',#<just for comparison>
+                         corresponding.data.outcome = 'early.syphilis.diagnoses',#<just for comparison>
                          keep.dimensions = c('location','age','race','sex'),
                          save = T
 )
@@ -1491,7 +1491,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         #corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',  #<just for comparison>
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',  #<just for comparison>
                          keep.dimensions = c('location','age','race','sex'),
                          save = T
 )
@@ -1509,7 +1509,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          force.dim.names.to.keep.dimensions = T,
                          scale='non.negative.number',
-                         #corresponding.data.outcome = 'early.syphilis.diagnoses',
+                         corresponding.data.outcome = 'early.syphilis.diagnoses',
                          keep.dimensions = c('location','age','race','sex'),
                          save = T
 )
@@ -1526,7 +1526,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
-                         #corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#<just for comparison>
+                         corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#<just for comparison>
                          keep.dimensions = c('location','age','race','sex'),
                          save = T
 )
