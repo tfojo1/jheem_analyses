@@ -1097,8 +1097,7 @@ get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
 
 #'@:Todd: need to add an option for the national model ----
 #-- MIGRATION --# ----
-get.immigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.START.YEAR){
-  
+get.immigration.rates.functional.form <- function(location, specification.metadata ){
   rates = get.immigration.rates(location=location,
                                 specification.metadata = specification.metadata) 
   
@@ -1112,11 +1111,10 @@ get.immigration.rates.functional.form <- function(location, specification.metada
                                         knots.are.on.transformed.scale = F)
 }
 
-get.immigration.rates <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.START.YEAR){
+get.immigration.rates <- function(location, specification.metadata ){
   # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
   # oneway stratification only for one timepoint  (2011-2015) breakdown by age, by race, by sex
   # (2016-2020) aggregate numbers 
-  
   #because of limitations in data, only data from 2011-2015 was used 
   #annual number of immigrants
   immigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "immigration",
@@ -1132,7 +1130,7 @@ get.immigration.rates <- function(location, specification.metadata, population.y
   c(immigration.rates)
 }
 
-get.emigration.rates.functional.form <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.START.YEAR){
+get.emigration.rates.functional.form <- function(location, specification.metadata){
   
   rates = get.emigration.rates(location=location,
                                specification.metadata = specification.metadata) 
@@ -1147,7 +1145,7 @@ get.emigration.rates.functional.form <- function(location, specification.metadat
                                         knots.are.on.transformed.scale = F)
 }
 
-get.emigration.rates <- function(location, specification.metadata, population.years=DEFAULT.MIGRATION.START.YEAR){
+get.emigration.rates <- function(location, specification.metadata ){
   # this will be one top-level beta for the MSA, then we'll include alphas by strata (race and age only, not sex)? 
   emigration.numbers = SURVEILLANCE.MANAGER$pull(outcome = "emigration",
                                                  location = location,
