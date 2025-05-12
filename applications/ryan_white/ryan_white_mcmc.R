@@ -467,7 +467,7 @@ fit.rw.simset <- function(simset,
                           n.iter.first.sim=3000, 
                           n.iter.subsequent.sims=300, 
                           n.iter.subsequent.sims.if.restart.params=1000,
-                          load.previous = T,
+                          load.previous = F,
                           verbose=F, track.mcmc=F)
 {
     SAVE.DIR = file.path(get.jheem.root.directory(), "tmp")
