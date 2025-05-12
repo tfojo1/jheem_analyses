@@ -19,6 +19,8 @@ N.ITER=15000
 #05.09: <syphilis.diagnoses.3.pk> adding more transmission params for msm, het and by race, calibrating to total diagnosis by stage
 #05.12: <syphilis.diagnoses.4.pk> adding time4 transmission params for msm, het, setting likelihoods to total and marginals for syphilis diagnosis
 
+
+# Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('pop.demog.8', 
                           likelihood.instructions = likelihood.instructions.demographics,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -35,8 +37,7 @@ register.calibration.info('pop.demog.8',
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
-# Calibrating to demographic and syphilis diagnoses targets
-register.calibration.info('syphilis.diagnoses.4.pk', 
+register.calibration.info('syphilis.diagnoses.4.pk1', 
                           # preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses,
                           data.manager = SURVEILLANCE.MANAGER,
