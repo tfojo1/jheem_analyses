@@ -77,7 +77,7 @@ data.manager$register.parent.source('ACS', full.name = 'American Community Surve
 
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss') #child
 data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory') #child
-surveillance.manager$register.source('emory.aggregated', parent.source= "ACS", full.name = "Emory University- Aggregated", short.name='emory.aggregated') 
+data.manager$register.source('emory.aggregated', parent.source= "ACS", full.name = "Emory University- Aggregated", short.name='emory.aggregated') 
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -161,7 +161,7 @@ for(msa in MSAS.OF.INTEREST){
                              dimension.values = list(location=msa), 
                              url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
                              details='Emory University MSM Research from American Community Survey')
-    
+}
 
 #Save:
 save(surveillance.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section3.rdata")
