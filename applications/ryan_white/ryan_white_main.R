@@ -10,13 +10,13 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_interventions.R')
 
 #RW.LOCATIONS = setdiff(MSAS.OF.INTEREST, c(ST.LOUIS.MSA, CINCINATTI.MSA))
-RW.LOCATIONS = c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO" )
+RW.LOCATIONS = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
 # St Louis is not an EHE city, Cincinatti does not have RW data
 
 # Run settings
 VERBOSE = T
-CALIBRATION.CODE = "full.ehe.state" # 'final.ehe' # for now, with stage 3 state calibrations
-N.SIM = 10 #1000  # for now, with stage 3 state calibrations
+CALIBRATION.CODE = "final.ehe.state" # 'final.ehe' # for now, with stage 3 state calibrations
+N.SIM = 100 #1000  # for now, with stage 3 state calibrations
 FORCE.REDO = T
 N.CHUNKS = 20
 
