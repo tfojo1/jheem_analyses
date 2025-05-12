@@ -12,23 +12,21 @@ LOCATION='C.12580' #Baltimore MSA
 # LOCATION='C.35620'#NYC 
 #'@MS:How to find the codes for each MSA?
 
-# TEST the likelihoods ----
-source('applications/SHIELD/shield_likelihoods.R')
-
-
 # make a run:
 engine = create.jheem.engine( VERSION,  LOCATION, end.year = 2030)
 specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
-ds=engine$extract.diffeq.settings()
-ds$state_and_dx_sizes #differential vector (compartments and outcomes)
-sum(ds$state_and_dx_sizes)
-sim$solver.metadata
+# of elements
+# ds=engine$extract.diffeq.settings()
+# # ds$state_and_dx_sizes #differential vector (compartments and outcomes)
+# sum(ds$state_and_dx_sizes)
+# sim$solver.metadata
 
 
 # INSTANTIATE LIKELIHOODS
+source('applications/SHIELD/shield_likelihoods.R')
 # likelihood.all<- likelihood.instructions.all$instantiate.likelihood(VERSION,LOCATION,verbose = T)
 likelihood.all<- likelihood.instructions.syphilis.diagnoses$instantiate.likelihood(VERSION,LOCATION,verbose = T)
 # COMPUTE LIKELIHOODS   
