@@ -14,7 +14,7 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.2'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.3.pk'
 DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
@@ -72,14 +72,14 @@ simplot(
 
 # Plot syphilis total diagnosis ----
 simplot(
-    #sim.first,
+    sim.first,
     sim.last,
     #sim.manual,
     split.by = "race", facet.by = "sex", #we are matching the totals only for now
     #split.by = "sex",
-    outcomes = c("diagnosis.ps"),
-    #outcomes = c("diagnosis.el.misclassified"),
-    #outcomes = c("diagnosis.late.misclassified"),
+    # outcomes = c("diagnosis.ps"),
+    # outcomes = c("diagnosis.el.misclassified"),
+    outcomes = c("diagnosis.late.misclassified"),
     dimension.values = list(year = 1990:2025),
     style.manager = stratum.style.manager
     
@@ -90,8 +90,8 @@ simplot(
     sim.first,
     sim.last,
     #sim.manual,
-    split.by = "race", facet.by = "age",
-    outcomes = c("population"),
+    # split.by = "race", facet.by = "age",
+    outcomes = c("hiv.testing"),
     dimension.values = list(year = 2000:2030)
 )
 

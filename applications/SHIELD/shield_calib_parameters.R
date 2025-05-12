@@ -112,15 +112,17 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   ## Transmission
   global.transmission.rate = Lognormal.Distribution(meanlog = log(3.5), sdlog = 0.5*log(2)), #directly used in specification (will need sth uch larger) 
   # msm multipliers by time
-  transmission.rate.multiplier.msm0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm3 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.msm0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #1990,
+  transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #1995
+  transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #2000
+  transmission.rate.multiplier.msm3 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #2010
+  transmission.rate.multiplier.msm4 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #2020
   # heterosexual multipliers by time
   transmission.rate.multiplier.heterosexual0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.heterosexual1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.heterosexual2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.heterosexual3 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.heterosexual4 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   ### race multipliers (shared for msm and het):
   transmission.rate.multiplier.black= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -259,7 +261,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  dimension = "sex",
                                                  applies.to.dimension.values = c('female'))
     ## Transmission ----
-  for(time in 0:3){
+  for(time in c(0:4)){
     #multipliers for msm rates in each knot:
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
@@ -274,6 +276,9 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    values = parameters[paste0("transmission.rate.multiplier.heterosexual",time)],
                                                    dimension = 'all',
                                                    applies.to.dimension.values = 'all')
+    
+ 
+    
     #race multipliers, shared for msm and heterosexuals: 
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
@@ -475,13 +480,15 @@ SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
     "transmission.rate.multiplier.msm0",
     "transmission.rate.multiplier.msm1",
     "transmission.rate.multiplier.msm2",
-    "transmission.rate.multiplier.msm3"),
+    "transmission.rate.multiplier.msm3",
+    "transmission.rate.multiplier.msm4"),
   #
   het.transmission =c(
     "transmission.rate.multiplier.heterosexual0",
     "transmission.rate.multiplier.heterosexual1",
     "transmission.rate.multiplier.heterosexual2",
-    "transmission.rate.multiplier.heterosexual3" 
+    "transmission.rate.multiplier.heterosexual3",
+    "transmission.rate.multiplier.heterosexual4" 
   ) ,
   race.transmission = c(
       "transmission.rate.multiplier.black",

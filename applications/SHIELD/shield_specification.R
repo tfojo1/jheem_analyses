@@ -365,12 +365,12 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming th
 # Future Expnasions: msm.trate.by.race #add more alphas #if we assume the multiplier by black vs other remain the sma over time we only ned 2
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.msm',
-                       functional.form = create.natural.spline.functional.form(knot.times = c(time0=1990, time1=2000, time2=2010,time3=2020),
+                       functional.form = create.natural.spline.functional.form(knot.times = c(time0=1990, time1=1995, time2=2000,time3=2010,time4=2020),
                                                                                #if we wanted to use a natural spline without log transformation:
                                                                                # knot.values = list(time0=1,time1=1,time2=1) , knots.are.on.transformed.scale = F, #on the identity scale
                                                                                #use a log(y) transformation, so that all returned values are positive
                                                                                # this will also help with data that is skewed to right (long right tail)
-                                                                               knot.values = list(time0=0,time1=0,time2=0,time3=0) ,
+                                                                               knot.values = list(time0=0,time1=0,time2=0,time3=0,time4=0) ,
                                                                                knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                                #
                                                                                min=0, #even after using log for knots, value can be negative so we need to truncate
@@ -380,8 +380,8 @@ register.model.element(SHIELD.SPECIFICATION,
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.heterosexual',
-                       functional.form = create.linear.spline.functional.form(knot.times = c(time0=1990, time1=2000, time2=2010,time3=2020),
-                                                                              knot.values = list(time0=0,time1=0,time2=0,time3=0) ,
+                       functional.form = create.linear.spline.functional.form(knot.times = c(time0=1990, time1=1995, time2=2000,time3=2010,time4=2020),
+                                                                              knot.values = list(time0=0,time1=0,time2=0,time3=0,time4=0) ,
                                                                               knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                               min=0,
                                                                               knot.link = 'log',link='identity') ,
@@ -1184,8 +1184,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'person'), #will read the scale from metadata
                          value.to.integrate = 'point.population',
                          corresponding.data.outcome = 'population' ,
-                         keep.dimensions = c('location','age','race','sex'),
-                         
+                         keep.dimensions = c('location','age','race','sex')
 )
 
 
@@ -1207,7 +1206,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 
 
 ##---- Births ----
-track.dynamic.outcome(SHIELD.SPECIFICATION,
+track.dynamic.outcome(SHIELD.SPECIFICATION, #expensive: may be able to remove and approximate 
                       name='births.from',
                       outcome.metadata = create.outcome.metadata(display.name = 'Births',
                                                                  description = 'Births',
@@ -1224,7 +1223,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 )
 
 ##---- Deaths ----
-track.dynamic.outcome(SHIELD.SPECIFICATION,
+track.dynamic.outcome(SHIELD.SPECIFICATION, #expensive
                       name='deaths',
                       outcome.metadata = create.outcome.metadata(display.name = 'Total Deaths',
                                                                  description = 'Total Deaths',
@@ -1236,7 +1235,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'mortality', #internal JHEEM construct for deaths
                       corresponding.data.outcome = 'deaths',
                       groups = NULL, 
-                      keep.dimensions = c('location','age','race','sex'),
+                      keep.dimensions = c('location'), #'age','race','sex' <saving on time>
                       exclude.tags = 'emigration',
 )
 
@@ -1251,7 +1250,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'births',
                       corresponding.data.outcome = 'immigration', 
                       include.tags = "immigration",
-                      keep.dimensions = c('location','age','race','sex'))
+                      keep.dimensions = c('location','age','race','sex')) #could save on age,sex,race and approximate by multiplying migration * population
 
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'emigration',
@@ -1263,7 +1262,7 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'mortality',
                       corresponding.data.outcome = 'emigration', 
                       include.tags = "emigration",
-                      keep.dimensions = c('location','age','race','sex'))
+                      keep.dimensions = c('location','age','race','sex'))#could save on age,sex,race
 
 ##---- HIV Testing -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,

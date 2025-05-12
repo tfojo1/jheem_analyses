@@ -17,6 +17,7 @@ N.ITER=15000
 #05.08: <syphilis.diagnoses.1> same as pop.demog.8 with syphilis
 #05.08: <syphilis.diagnoses.2> same as syphilis.diagnoses.1, using total by stage
 #05.09: <syphilis.diagnoses.3.pk> adding more transmission params for msm, het and by race, calibrating to total diagnosis by stage
+#05.12: <syphilis.diagnoses.4.pk> adding time4 transmission params for msm, het, setting likelihoods to total and marginals for syphilis diagnosis
 
 register.calibration.info('pop.demog.8', 
                           likelihood.instructions = likelihood.instructions.demographics,
@@ -35,7 +36,7 @@ register.calibration.info('pop.demog.8',
 )
 
 # Calibrating to demographic and syphilis diagnoses targets
-register.calibration.info('syphilis.diagnoses.3.pk', 
+register.calibration.info('syphilis.diagnoses.4.pk', 
                           # preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses,
                           data.manager = SURVEILLANCE.MANAGER,

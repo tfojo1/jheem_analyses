@@ -22,6 +22,12 @@ specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
+ds=engine$extract.diffeq.settings()
+ds$state_and_dx_sizes #differential vector (compartments and outcomes)
+sum(ds$state_and_dx_sizes)
+sim$solver.metadata
+
+
 # INSTANTIATE LIKELIHOODS
 # likelihood.all<- likelihood.instructions.all$instantiate.likelihood(VERSION,LOCATION,verbose = T)
 likelihood.all<- likelihood.instructions.syphilis.diagnoses$instantiate.likelihood(VERSION,LOCATION,verbose = T)
