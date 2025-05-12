@@ -12,7 +12,7 @@ simset.p.intr = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM, 'rw.
 
 PLOT.YEARS = 2010:2030
 
-PLOT.DIR = file.path('../../results/ryan_white/figure_city_projections/', loc)
+PLOT.DIR = file.path(paste0('../../results/ryan_white/figure_', tolower(RW.LOCATION.DESCRIPTOR) ,'_projections/', loc))
 PLOT.HEIGHT = 2
 PLOT.WIDTH = 3
 PLOT.DPI = 600

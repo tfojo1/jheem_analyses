@@ -4,6 +4,7 @@
 YEARS.TO.CONSIDER = as.character(2025:2030)
 YEARS.TO.CONSIDER2 = as.character(2025:2035)
 
+
 #-- Description if RW Continues --#
 
 print("RYAN WHITE CONTINUES: ")
@@ -86,7 +87,7 @@ mean.ci.rel.total.infections.averted.end.by.city = cbind(
 mean.ci.rel.total.infections.averted.end.by.city = mean.ci.rel.total.infections.averted.end.by.city[order(mean.ci.rel.total.infections.averted.end.by.city[,1]),]
 n.cities = nrow(mean.ci.rel.total.infections.averted.end.by.city)
 
-print(paste0("Smallest City-Level Increase in Infections 2025-2030 if Ryan White Ends Indefinitely: ", 
+print(paste0("Smallest ", RW.LOCATION.DESCRIPTOR, "-Level Increase in Infections 2025-2030 if Ryan White Ends Indefinitely: ", 
              get.location.name(rownames(mean.ci.rel.total.infections.averted.end.by.city)[1]), " - ",
              format(round(mean.ci.rel.total.infections.averted.end.by.city[1,1]*100), big.mark=','),
              "% [",
@@ -96,7 +97,7 @@ print(paste0("Smallest City-Level Increase in Infections 2025-2030 if Ryan White
              "%]"))
 
 
-print(paste0("Largest City-Level Increase in Infections 2025-2030 if Ryan White Ends Indefinitely: ", 
+print(paste0("Largest ", RW.LOCATION.DESCRIPTOR, "-Level Increase in Infections 2025-2030 if Ryan White Ends Indefinitely: ", 
              get.location.name(rownames(mean.ci.rel.total.infections.averted.end.by.city)[n.cities]), " - ",
              format(round(mean.ci.rel.total.infections.averted.end.by.city[n.cities,1]*100), big.mark=','),
              "% [",
@@ -106,8 +107,8 @@ print(paste0("Largest City-Level Increase in Infections 2025-2030 if Ryan White 
              "%]"))
 
 # By medicaid expansion
-total.incidence.medicaid.expansion = total.incidence[,,RW.MEDICAID.EXPANSION.CITIES,]
-total.incidence.medicaid.nonexpansion = total.incidence[,,RW.MEDICAID.NONEXPANSION.CITIES,]
+total.incidence.medicaid.expansion = total.incidence[,,RW.MEDICAID.EXPANSION.LOCATIONS,]
+total.incidence.medicaid.nonexpansion = total.incidence[,,RW.MEDICAID.NONEXPANSION.LOCATIONS,]
 
 total.expansion.inf.2025.2030 = apply(total.incidence.medicaid.expansion[as.character(2025:2030),,,], c('sim','intervention'), sum)
 ratio.inf.expansion = (total.expansion.inf.2025.2030[,'rw.end'] - total.expansion.inf.2025.2030[,'noint']) / total.expansion.inf.2025.2030[,'noint']
@@ -437,7 +438,7 @@ print(paste0("Diagnoses 2025-2030 if Ryan White Continues: ",
 abs.delta.cessation.tot.dx.noint1 = apply(total.new[YEARS.TO.CONSIDER,,,'rw.end',drop=F], c('sim'), sum, na.rm=T) - tot.dx.noint1
 rel.delta.cessation.tot.dx.noint1 = abs.delta.cessation.tot.dx.noint1 / tot.dx.noint1
 
-print(paste0("Absolute Increase in Infections 2025-2030 in Ryan White Cessation: ", 
+print(paste0("Absolute Increase in Diagnoses 2025-2030 in Ryan White Cessation: ", 
              format(round(mean(abs.delta.cessation.tot.dx.noint1, na.rm=T)), big.mark=','),
              " [",
              format(round(quantile(abs.delta.cessation.tot.dx.noint1, probs=.025, na.rm=T)), big.mark=','),
@@ -445,7 +446,7 @@ print(paste0("Absolute Increase in Infections 2025-2030 in Ryan White Cessation:
              format(round(quantile(abs.delta.cessation.tot.dx.noint1, probs=.975, na.rm=T)), big.mark=','),
              "]"))
 
-print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Cessation: ", 
+print(paste0("Relative Increase in Diagnoses 2025-2030 in Ryan White Cessation: ", 
              format(round(mean(rel.delta.cessation.tot.dx.noint1, na.rm=T)*100), big.mark=','),
              "% [",
              format(round(quantile(rel.delta.cessation.tot.dx.noint1, probs=.025, na.rm=T)*100), big.mark=','),
@@ -457,7 +458,7 @@ print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Cessation:
 abs.delta.b.intr.tot.dx.noint1 = apply(total.new[YEARS.TO.CONSIDER,,,'rw.b.intr',drop=F], c('sim'), sum, na.rm=T) - tot.dx.noint1
 rel.delta.b.intr.tot.dx.noint1 = abs.delta.b.intr.tot.dx.noint1 / tot.dx.noint1
 
-print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Brief Interruption: ", 
+print(paste0("Relative Increase in Diagnoses 2025-2030 in Ryan White Brief Interruption: ", 
              format(round(mean(rel.delta.b.intr.tot.dx.noint1, na.rm=T)*100), big.mark=','),
              "% [",
              format(round(quantile(rel.delta.b.intr.tot.dx.noint1, probs=.025, na.rm=T)*100), big.mark=','),
@@ -468,7 +469,7 @@ print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Brief Inte
 abs.delta.p.intr.tot.dx.noint1 = apply(total.new[YEARS.TO.CONSIDER,,,'rw.p.intr',drop=F], c('sim'), sum, na.rm=T) - tot.dx.noint1
 rel.delta.p.intr.tot.dx.noint1 = abs.delta.p.intr.tot.dx.noint1 / tot.dx.noint1
 
-print(paste0("Relative Increase in Infections 2025-2030 in Ryan White Brief Interruption: ", 
+print(paste0("Relative Increase in Diagnoses 2025-2030 in Ryan White Brief Interruption: ", 
              format(round(mean(rel.delta.p.intr.tot.dx.noint1, na.rm=T)*100), big.mark=','),
              "% [",
              format(round(quantile(rel.delta.p.intr.tot.dx.noint1, probs=.025, na.rm=T)*100), big.mark=','),

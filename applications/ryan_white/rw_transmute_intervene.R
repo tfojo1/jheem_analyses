@@ -4,7 +4,7 @@ RESUME.FIRST = F
 RERUN = F
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
-LOCATIONS.TO.ATI = RW.LOCATIONS
+LOCATIONS.TO.ATI = RW.LOCATIONS[1:4]
 
 
 for (loc in LOCATIONS.TO.ATI)

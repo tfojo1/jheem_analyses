@@ -1,5 +1,5 @@
 YEARS.TO.CONSIDER = as.character(2025:2030)
-PLOT.DIR = file.path('../../results/ryan_white/shaded_table_boxplot')
+PLOT.DIR = file.path(paste0('../../results/ryan_white/shaded_table_boxplot_', tolower(RW.LOCATION.DESCRIPTOR)))
 
 total.infections.continue.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 
@@ -21,16 +21,16 @@ ordered.cities = rownames(mean.ci.rel.total.infections.averted.end.by.city)
 
 mean.ci.rel.total.infections.averted.end.by.city = rbind(
   mean.ci.rel.total.infections.averted.end.by.city,
-  c(mean = mean(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.75)),
-  c(mean = mean(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.75)),
   c(mean = mean(rowSums(abs.total.infections.averted.end.by.city) / rowSums(total.infections.continue.by.city)),
     lower = quantile(rowSums(abs.total.infections.averted.end.by.city) / rowSums(total.infections.continue.by.city), probs=0.025),
     upper = quantile(rowSums(abs.total.infections.averted.end.by.city) / rowSums(total.infections.continue.by.city), probs=0.975),
@@ -50,16 +50,16 @@ mean.ci.abs.total.infections.averted.end.by.city = cbind(
 mean.ci.abs.total.infections.averted.end.by.city = mean.ci.abs.total.infections.averted.end.by.city[ordered.cities,]
 mean.ci.abs.total.infections.averted.end.by.city = rbind(
   mean.ci.abs.total.infections.averted.end.by.city,
-  c(mean = mean(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.75)),
-  c(mean = mean(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.end.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.75)),
   c(mean = mean(rowSums(abs.total.infections.averted.end.by.city)),
     lower = quantile(rowSums(abs.total.infections.averted.end.by.city), probs=0.025),
     upper = quantile(rowSums(abs.total.infections.averted.end.by.city), probs=0.975),
@@ -79,16 +79,16 @@ mean.ci.total.infections.continue.by.city = cbind(
 mean.ci.total.infections.continue.by.city = mean.ci.total.infections.continue.by.city[ordered.cities,]
 mean.ci.total.infections.continue.by.city = rbind(
   mean.ci.total.infections.continue.by.city,
-  c(mean = mean(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES])),
-    lower = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.75)),
-  c(mean = mean(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES])),
-    lower = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.75)),
+  c(mean = mean(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.75)),
+  c(mean = mean(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.75)),
   c(mean = mean(rowSums(total.infections.continue.by.city)),
     lower = quantile(rowSums(total.infections.continue.by.city), probs=0.025),
     upper = quantile(rowSums(total.infections.continue.by.city), probs=0.975),
@@ -111,16 +111,16 @@ mean.ci.rel.total.infections.averted.b.intr.by.city = mean.ci.rel.total.infectio
 
 mean.ci.rel.total.infections.averted.b.intr.by.city = rbind(
   mean.ci.rel.total.infections.averted.b.intr.by.city,
-  c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.75)),
-  c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.75)),
   c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city) / rowSums(total.infections.continue.by.city)),
     lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city) / rowSums(total.infections.continue.by.city), probs=0.025),
     upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city) / rowSums(total.infections.continue.by.city), probs=0.975),
@@ -139,16 +139,16 @@ mean.ci.abs.total.infections.averted.b.intr.by.city = cbind(
 mean.ci.abs.total.infections.averted.b.intr.by.city = mean.ci.abs.total.infections.averted.b.intr.by.city[ordered.cities,]
 mean.ci.abs.total.infections.averted.b.intr.by.city = rbind(
   mean.ci.abs.total.infections.averted.b.intr.by.city,
-  c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.75)),
-  c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.75)),
   c(mean = mean(rowSums(abs.total.infections.averted.b.intr.by.city)),
     lower = quantile(rowSums(abs.total.infections.averted.b.intr.by.city), probs=0.025),
     upper = quantile(rowSums(abs.total.infections.averted.b.intr.by.city), probs=0.975),
@@ -172,16 +172,16 @@ mean.ci.rel.total.infections.averted.p.intr.by.city = mean.ci.rel.total.infectio
 
 mean.ci.rel.total.infections.averted.p.intr.by.city = rbind(
   mean.ci.rel.total.infections.averted.p.intr.by.city,
-  c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.75)),
-  c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]) / rowSums(total.infections.continue.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.75)),
   c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city) / rowSums(total.infections.continue.by.city)),
     lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city) / rowSums(total.infections.continue.by.city), probs=0.025),
     upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city) / rowSums(total.infections.continue.by.city), probs=0.975),
@@ -200,16 +200,16 @@ mean.ci.abs.total.infections.averted.p.intr.by.city = cbind(
 mean.ci.abs.total.infections.averted.p.intr.by.city = mean.ci.abs.total.infections.averted.p.intr.by.city[ordered.cities,]
 mean.ci.abs.total.infections.averted.p.intr.by.city = rbind(
   mean.ci.abs.total.infections.averted.p.intr.by.city,
-  c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.CITIES]), probs=0.75)),
-  c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES])),
-    lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.025),
-    upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.975),
-    iqr.lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.25),
-    iqr.upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.CITIES]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.EXPANSION.LOCATIONS]), probs=0.75)),
+  c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS])),
+    lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.025),
+    upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.975),
+    iqr.lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.25),
+    iqr.upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city[,RW.MEDICAID.NONEXPANSION.LOCATIONS]), probs=0.75)),
   c(mean = mean(rowSums(abs.total.infections.averted.p.intr.by.city)),
     lower = quantile(rowSums(abs.total.infections.averted.p.intr.by.city), probs=0.025),
     upper = quantile(rowSums(abs.total.infections.averted.p.intr.by.city), probs=0.975),
@@ -261,9 +261,15 @@ table.city = data.frame(
 )
 
 # Make table
-city.plus.total.names = c(RW.CITY.SHORT.NAMES[ordered.cities],
-                          exp="Medicaid Expansion Cities",
-                          nonexp="Medicaid Non-Expansion Cities",
+
+if (RW.IS.STATE.LEVEL)
+    location.names = locations::get.location.name(ordered.cities)
+if (!RW.IS.STATE.LEVEL)
+    RW.CITY.SHORT.NAMES[ordered.cities]
+    
+city.plus.total.names = c(location.names,
+                          exp=paste0("Medicaid Expansion ", RW.LOCATION.DESCRIPTOR.PLURAL),
+                          nonexp=paste0("Medicaid Non-Expansion ", RW.LOCATION.DESCRIPTOR.PLURAL),
                           total="Total")
 
 table.city = data.frame(
@@ -316,14 +322,14 @@ color.by = cbind(
 
 text.color = matrix(RW.EXP.LABEL.COLOR, nrow=nrow(color.by), ncol=ncol(color.by))
 nonexp.mask = sapply(names(city.plus.total.names), function(city){
-    any(city == RW.MEDICAID.NONEXPANSION.CITIES)
+    any(city == RW.MEDICAID.NONEXPANSION.LOCATIONS)
 })
 nonexp.mask['nonexp'] = T
 total.mask = names(city.plus.total.names) == 'total'
 text.color[2*(1:length(city.plus.total.names)),][nonexp.mask,] = RW.NONEXP.LABEL.COLOR
 text.color[2*(1:length(city.plus.total.names))-1,][nonexp.mask,] = RW.NONEXP.LABEL.COLOR
 text.color[2*(1:length(city.plus.total.names)),][total.mask,] = RW.TOTAL.LABEL.COLOR
-text.color[2*(1:length(city.plus.total.names))-1,][total.mask,] = paste0(RW.TOTAL.LABEL.COLOR,'FF')
+text.color[2*(1:length(city.plus.total.names))-1,][total.mask,] = paste0(RW.TOTAL.TEXT.COLOR,'FF')
 text.color[,-1] = '#FFFFFFFF'
 
 
@@ -373,13 +379,13 @@ boxplot.df = rbind(
 
 boxplot.df$location = factor(boxplot.df$location,
                              levels = c(city.plus.total.names[c('total','nonexp','exp')],
-                                        rev(RW.CITY.SHORT.NAMES[ordered.cities])))
+                                        rev(location.names)))
 
 boxplot.df$group = paste0(boxplot.df$Scenario, "_", boxplot.df$location)
 
 
 nonexp.mask = sapply(boxplot.df$loc.code, function(city){
-    any(city==RW.MEDICAID.NONEXPANSION.CITIES)
+    any(city==RW.MEDICAID.NONEXPANSION.LOCATIONS)
 })
 nonexp.mask[boxplot.df$loc.code=='nonexp'] = T
 total.mask = boxplot.df$loc.code == 'total'
@@ -427,5 +433,5 @@ PLOT.DPI = 600
 PLOT.DEVICE = 'png'
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'city_boxplots.png'),
+       filename=file.path(PLOT.DIR, paste0(tolower(RW.LOCATION.DESCRIPTOR), '_boxplots.png')),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)

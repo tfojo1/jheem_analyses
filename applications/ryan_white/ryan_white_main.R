@@ -9,9 +9,16 @@ source('../jheem_analyses/applications/ryan_white/ryan_white_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_interventions.R')
 
-#RW.LOCATIONS = setdiff(MSAS.OF.INTEREST, c(ST.LOUIS.MSA, CINCINATTI.MSA))
-RW.LOCATIONS = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
-# St Louis is not an EHE city, Cincinatti does not have RW data
+RW.IS.STATE.LEVEL = T
+
+if (RW.IS.STATE.LEVEL)
+    RW.LOCATIONS = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
+if (!RW.IS.STATE.LEVEL)
+    RW.LOCATIONS = setdiff(MSAS.OF.INTEREST, c(ST.LOUIS.MSA, CINCINATTI.MSA))
+    # St Louis is not an EHE city, Cincinatti does not have RW data
+
+RW.LOCATION.DESCRIPTOR = ifelse(RW.IS.STATE.LEVEL, 'State', "City")
+RW.LOCATION.DESCRIPTOR.PLURAL = ifelse(RW.IS.STATE.LEVEL, 'States', "Cities")
 
 # Run settings
 VERBOSE = T
@@ -54,8 +61,17 @@ city.main.state.medicaid.expansion = unlist(sapply(city.main.state, function(st)
   
 }))
 
-RW.MEDICAID.EXPANSION.CITIES = names(city.main.state.medicaid.expansion)[city.main.state.medicaid.expansion]
-RW.MEDICAID.NONEXPANSION.CITIES = names(city.main.state.medicaid.expansion)[!city.main.state.medicaid.expansion]
+if (RW.IS.STATE.LEVEL)
+{
+    RW.MEDICAID.EXPANSION.LOCATIONS = intersect(RW.LOCATIONS, MEDICAID.EXPANSION.STATES)
+    RW.MEDICAID.NONEXPANSION.LOCATIONS = intersect(RW.LOCATIONS, MEDICAID.NONEXPANSION.STATES)
+}
+
+if (!RW.IS.STATE.LEVEL)
+{
+    RW.MEDICAID.EXPANSION.CITIES = RW.MEDICAID.EXPANSION.LOCATIONS = names(city.main.state.medicaid.expansion)[city.main.state.medicaid.expansion]
+    RW.MEDICAID.NONEXPANSION.CITIES = RW.MEDICAID.NONEXPANSION.LOCATIONS = names(city.main.state.medicaid.expansion)[!city.main.state.medicaid.expansion]
+}
 
 shade.darker <- function(color, delta)
 {
@@ -75,6 +91,7 @@ RW.NONEXP.LABEL.COLOR = shade.darker(RW.NONEXP.COLOR,-80)
 RW.EXP.COLOR = RW.PALETTE.RAW[6]
 RW.EXP.LABEL.COLOR = shade.darker(RW.EXP.COLOR,-40)
 RW.TOTAL.LABEL.COLOR = "#000000"
+RW.TOTAL.TEXT.COLOR = "#FFFFFF"
 
 RW.PALETTE = c(
     data = RW.DATA.COLOR,
