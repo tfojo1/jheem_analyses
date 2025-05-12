@@ -24,7 +24,7 @@ sim = engine$run(params)
 
 # INSTANTIATE LIKELIHOODS
 # likelihood.all<- likelihood.instructions.all$instantiate.likelihood(VERSION,LOCATION,verbose = T)
-likelihood.all<- likelihood.instructions.demographics$instantiate.likelihood(VERSION,LOCATION,verbose = T)
+likelihood.all<- likelihood.instructions.syphilis.diagnoses$instantiate.likelihood(VERSION,LOCATION,verbose = T)
 # COMPUTE LIKELIHOODS   
 likelihood.all$compute.piecewise(sim)
 # simplot(sim, 'diagnosis.total')

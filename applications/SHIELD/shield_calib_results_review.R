@@ -14,7 +14,7 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.1'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.2'
 DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
@@ -35,7 +35,7 @@ if (TRUE) {
 }
 
 # Quick checkpoint ----
-simset = simset; simset
+simset$n.sim
 
 # Extract first and last simulations and their parameters ----
 sim.first    <- simset$first.sim()
@@ -44,39 +44,48 @@ params.first <- sim.first$params
 params.last  <- sim.last$params
 
 # Run Manual Simulation ----
-engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+# params.manual <- params.last
+# params.manual["age40.44.hispanic.fertility.rate.multiplier"] <- 10 # last: 0.06205035, first: 1.0000000
 
-params.manual <- params.last
-params.manual["age40.44.hispanic.fertility.rate.multiplier"] <- 10 # last: 0.06205035, first: 1.0000000
+# sim.manual <- engine$run(params.manual)
 
-params.manual
+sim.first <- engine$run(params.first)
+sim.last <- engine$run(params.last)
 
-
-fertility.params = names(params.manual)[grepl("fertility.rate.multiplier", names(params.manual))]
-
-params.manual[fertility.params] = params.first[fertility.params]
-
-
-sim.manual <- engine$run(params.manual)
-
-q=engine$extract.quantity.values()
-
-input.fertility = q$fertility.rate[["2020"]]
-dimnames(sim.manual$immigration)
-pop = sim.manual$population["2020",,"40-44 years","hispanic","female",]
-births = sim.manual$births.from["2020",,"40-44 years","hispanic","female",]
-immigration = sim.manual$immigration["2020",,"40-44 years","hispanic","female",]
-emigration = sim.manual$emigration["2020",,"40-44 years","hispanic","female",]
-
-pop*input.fertility["40-44 years","hispanic"]
+# q=engine$extract.quantity.values() #returns the input values to the model
+# input.fertility = q$fertility.rate[["2020"]]
+# dimnames(sim.manual$immigration)
 
 # Save simset (optional)
 # save(simset, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", Sys.Date(), "_", LOCATION, ".Rdata"))
 
-# Simulation Diagnostics and Visualization ----
-simset$n.sim
+# Plot syphilis total diagnosis ----
+simplot(
+    sim.first,
+    sim.last,
+    #sim.manual,
+    # split.by = "race", facet.by = "age",
+    outcomes = c("diagnosis.total"),
+    dimension.values = list(year = 1990:2025)
+)
 
-# Population
+# Plot syphilis total diagnosis ----
+simplot(
+    #sim.first,
+    sim.last,
+    #sim.manual,
+    split.by = "race", facet.by = "sex", #we are matching the totals only for now
+    #split.by = "sex",
+    outcomes = c("diagnosis.ps"),
+    #outcomes = c("diagnosis.el.misclassified"),
+    #outcomes = c("diagnosis.late.misclassified"),
+    dimension.values = list(year = 1990:2025),
+    style.manager = stratum.style.manager
+    
+)
+
+# Plot Population ----
 simplot(
     sim.first,
     sim.last,
@@ -94,7 +103,7 @@ simplot(
     dimension.values = list(year = 2000:2030)
 )
 
-# Fertility
+# Plot Fertility ----
 simplot(
     sim.first,
     sim.last,
@@ -104,7 +113,7 @@ simplot(
     dimension.values = list(year = 2000:2030)
 )
 
-# Immigration / Emigration
+# Plot Immigration / Emigration ----
 simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:2030))
 simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
 
@@ -117,48 +126,24 @@ simset$traceplot("mortality")
 simset$traceplot("fertility")
 
 # Likelihood Comparison ----
-source("applications/SHIELD/debug_likelihoods.R")
-
-lik         <- likelihood.instructions.demographics$instantiate.likelihood(VERSION, LOCATION)
-lik.sex.race <- population.likelihood.instructions.2way.sex.race$instantiate.likelihood(VERSION, LOCATION)
-lik.sex.age  <- population.likelihood.instructions.2way.sex.age$instantiate.likelihood(VERSION, LOCATION)
-lik.age.race <- population.likelihood.instructions.2way.age.race$instantiate.likelihood(VERSION, LOCATION)
-lik.age      <- population.likelihood.instructions.1way.age$instantiate.likelihood(VERSION, LOCATION)
-lik.fert     <- fertility.likelihood.instructions$instantiate.likelihood(VERSION, LOCATION)
-
-lik$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
-lik.age.race$compare.sims(sim.first, sim.last, piecewise = TRUE)
-lik.sex.age$compare.sims(sim.first, sim.last, piecewise = TRUE)
-lik.sex.race$compare.sims(sim.first, sim.last, piecewise = TRUE)
-lik.age$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
-lik.fert$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
-lik.fert$compute(sim.last, debug = TRUE)
-
-# Focused Population Plots ----
-simplot(
-    sim.first, sim.last, sim.manual,
-    facet.by = "age", split.by = "race",
-    outcomes = c("population"),
-    dimension.values = list(year = 2000:2030, race = "hispanic", sex = "female")
-)
-
-simplot(
-    sim.first, sim.last, sim.manual,
-    facet.by = "age", split.by = "race",
-    outcomes = c("births.from"),
-    dimension.values = list(year = 2000:2030, race = "hispanic")
-)
-
-
-# Census Population Summaries ----
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location__age[,'C.12580',])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__age[,'C.12580',])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__sex[,'C.12580',])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity[,'C.12580',,])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity[,'C.12580',,,'hispanic'])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity[,'C.12580',,,'not hispanic'])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__age__race__ethnicity[,'C.12580',,,])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity__sex[,'C.12580',,,])
+if (1==2){
+    source("applications/SHIELD/debug_likelihoods.R")
+    
+    lik         <- likelihood.instructions.demographics$instantiate.likelihood(VERSION, LOCATION)
+    lik.sex.race <- population.likelihood.instructions.2way.sex.race$instantiate.likelihood(VERSION, LOCATION)
+    lik.sex.age  <- population.likelihood.instructions.2way.sex.age$instantiate.likelihood(VERSION, LOCATION)
+    lik.age.race <- population.likelihood.instructions.2way.age.race$instantiate.likelihood(VERSION, LOCATION)
+    lik.age      <- population.likelihood.instructions.1way.age$instantiate.likelihood(VERSION, LOCATION)
+    lik.fert     <- fertility.likelihood.instructions$instantiate.likelihood(VERSION, LOCATION)
+    
+    lik$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
+    lik.age.race$compare.sims(sim.first, sim.last, piecewise = TRUE)
+    lik.sex.age$compare.sims(sim.first, sim.last, piecewise = TRUE)
+    lik.sex.race$compare.sims(sim.first, sim.last, piecewise = TRUE)
+    lik.age$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
+    lik.fert$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
+    lik.fert$compute(sim.last, debug = TRUE)
+}
 
 # Gaussian Reference Proportions ----
 dnorm(0, mean = 0, sd = 1)
