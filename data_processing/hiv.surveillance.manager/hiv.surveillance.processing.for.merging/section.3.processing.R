@@ -45,13 +45,22 @@ data.manager$register.outcome(
     description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
 
 data.manager$register.outcome(
+    'proportion.msm.n',           
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Denominator value for proportion msm',
+        axis.name = 'Denominator value for proportion msm',
+        units = '%',
+        description = "Denominator value for proportion msm"))
+
+data.manager$register.outcome(
   'proportion.msm', 
   metadata = create.outcome.metadata(
     scale = 'proportion',
     display.name = 'Proportion of MSM',
     axis.name = 'Proportion of MSM',
     units = '%',
-    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'adult.population')
+    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'proportion.msm.n')
 
 data.manager$register.outcome(
   'unweighted.denominator',

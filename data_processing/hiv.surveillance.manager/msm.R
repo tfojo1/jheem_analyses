@@ -227,6 +227,93 @@ for (data in msm.state.age) {
     details = 'Behavioral Risk Factor Surveillance System')
 }
 
+
+# Adding proportion.msm.n -------------------------------------------------
+
+proportion.msm.n.total = lapply(data.list.brfss.state.msm, function(file){
+    
+    data=file[[2]]
+    filename = file[[1]]
+    
+    data <- data %>%
+        select(year, location, n_weighted, sex)%>%
+        rename(value = n_weighted)%>%
+        mutate(outcome = "proportion.msm.n")
+    
+    data= as.data.frame(data)
+    list(filename, data) 
+})
+
+proportion.msm.n.race = lapply(data.list.brfss.state.msm.race, function(file){
+    
+    data=file[[2]]
+    filename = file[[1]]
+    
+    data <- data %>%
+        select(year, location, n_weighted, sex, race)%>%
+        rename(value = n_weighted)%>%
+        mutate(outcome = "proportion.msm.n")
+    
+    data= as.data.frame(data)
+    list(filename, data) 
+})
+
+proportion.msm.n.age = lapply(data.list.brfss.state.msm.age, function(file){
+    
+    data=file[[2]]
+    filename = file[[1]]
+    
+    data <- data %>%
+        select(year, location, n_weighted, sex, age)%>%
+        rename(value = n_weighted)%>%
+        mutate(outcome = "proportion.msm.n")
+    
+    data= as.data.frame(data)
+    list(filename, data) 
+})
+
+#Put proportion.msm.n - TOTAL
+msm.n.total = lapply(proportion.msm.n.total, `[[`, 2)
+for (data in msm.n.total) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(sex = "male"),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+#Put proportion.msm.n - RACE
+msm.n.race = lapply(proportion.msm.n.race, `[[`, 2)  
+
+for (data in msm.n.race) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(sex = "male"),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+#Put proportion.msm.n - AGE
+msm.n.age = lapply(proportion.msm.n.age, `[[`, 2)  
+
+for (data in msm.n.age) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(sex = "male"),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+
 ###############################################################################
             ##Emory MSM Data by County for 2013#
 ###############################################################################
