@@ -47,7 +47,7 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex.for.msm, function(f
   filename = file[[1]] 
   
   #Create MSM proportion
-  data$outcome= "proportion.msm"
+  data$outcome= "brfss.proportion.msm"
   data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
   
   data<- data %>%
@@ -121,7 +121,7 @@ data.list.brfss.state.msm.race = lapply(data.list.race.male.denom, function(file
   data= subset(data, data$race != "unknown")
   
   #Create MSM proportion
-  data$outcome= "proportion.msm"
+  data$outcome= "brfss.proportion.msm"
   data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
   
   data<- data %>%
@@ -159,7 +159,7 @@ data.list.brfss.state.msm.age = lapply(data.list.age.male.denom, function(file){
   data= subset(data, data$age != "Unknown")
   
   #Create MSM proportion
-  data$outcome= "proportion.msm"
+  data$outcome= "brfss.proportion.msm"
   data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
   
   data<- data %>%
@@ -238,7 +238,7 @@ proportion.msm.n.total = lapply(data.list.brfss.state.msm, function(file){
     data <- data %>%
         select(year, location, n_weighted, sex)%>%
         rename(value = n_weighted)%>%
-        mutate(outcome = "proportion.msm.n")
+        mutate(outcome = "brfss.proportion.msm.n")
     
     data= as.data.frame(data)
     list(filename, data) 
@@ -252,7 +252,7 @@ proportion.msm.n.race = lapply(data.list.brfss.state.msm.race, function(file){
     data <- data %>%
         select(year, location, n_weighted, sex, race)%>%
         rename(value = n_weighted)%>%
-        mutate(outcome = "proportion.msm.n")
+        mutate(outcome = "brfss.proportion.msm.n")
     
     data= as.data.frame(data)
     list(filename, data) 
@@ -266,7 +266,7 @@ proportion.msm.n.age = lapply(data.list.brfss.state.msm.age, function(file){
     data <- data %>%
         select(year, location, n_weighted, sex, age)%>%
         rename(value = n_weighted)%>%
-        mutate(outcome = "proportion.msm.n")
+        mutate(outcome = "brfss.proportion.msm.n")
     
     data= as.data.frame(data)
     list(filename, data) 
@@ -389,7 +389,7 @@ data.list.emory.msm.county = lapply(data.list.emory.msm, function(file){
   filename = file[["filename"]]
   
   data$year = "2013"
-  data$outcome= "proportion.msm"
+  data$outcome= "emory.proportion.msm"
 
   data$value = as.numeric(data$MSM5YEAR/data$ADULTMEN)
   data$value = round(data$value, digits=2)
@@ -417,7 +417,7 @@ data.list.emory.msm.msa = lapply(data.list.emory.msm, function(file){
   filename = file[["filename"]]
   
   data$year = "2013"
-  data$outcome= "proportion.msm"
+  data$outcome= "emory.proportion.msm"
   
   #To create location- for MSA use 'CBSACODE' and also 'METMICSA' ==1 for metropolitian statistical area
     data = subset(data, data$METMICSA == "1") #Select msas only
@@ -458,7 +458,7 @@ data.list.emory.msm.state = lapply(data.list.emory.msm, function(file){
   filename = file[["filename"]]
   
   data$year = "2013"
-  data$outcome= "proportion.msm"
+  data$outcome= "emory.proportion.msm"
   
   #To create location- combine state and county FIPS
   data$state_code= str_pad(data$STATEFP, width=2, side="left", pad="0")

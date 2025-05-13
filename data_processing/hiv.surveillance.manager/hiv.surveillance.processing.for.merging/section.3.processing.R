@@ -45,22 +45,31 @@ data.manager$register.outcome(
     description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
 
 data.manager$register.outcome(
-    'proportion.msm.n',           
+    'brfss.proportion.msm.n',           
     metadata = create.outcome.metadata(
         scale = 'non.negative.number',
-        display.name = 'Denominator value for proportion msm',
-        axis.name = 'Denominator value for proportion msm',
+        display.name = 'Denominator value for proportion msm from BRFSS',
+        axis.name = 'Denominator value for proportion msm from BRFSS',
         units = '%',
-        description = "Denominator value for proportion msm"))
+        description = "Denominator value for proportion msm from BRFSS"))
 
 data.manager$register.outcome(
-  'proportion.msm', 
+  'brfss.proportion.msm', 
   metadata = create.outcome.metadata(
     scale = 'proportion',
-    display.name = 'Proportion of MSM',
-    axis.name = 'Proportion of MSM',
+    display.name = 'Proportion of MSM from BRFSS',
+    axis.name = 'Proportion of MSM from BRFSS',
     units = '%',
-    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'proportion.msm.n')
+    description = "Proportion of Men who have sex with Men from BRFSS"), denominator.outcome = 'brfss.proportion.msm.n')
+
+data.manager$register.outcome(
+    'emory.proportion.msm', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion of MSM from Emory',
+        axis.name = 'Proportion of MSM from Emory',
+        units = '%',
+        description = "Proportion of Men who have sex with Men from Emory"), denominator.outcome = 'adult.population')
 
 data.manager$register.outcome(
   'unweighted.denominator',
@@ -105,63 +114,5 @@ source('data_processing/hiv.surveillance.manager/brfss_msa_weighted.R') #Source 
 source('data_processing/hiv.surveillance.manager/msm.R') #Source msm
 source('data_processing/hiv.surveillance.manager/brfss_unweighted_denominators.R') #Source BRFSS Unweighted Denominator values
 
-surveillance.manager = data.manager
-
-# Aggregate proportion.msm to state ---------------------------------------
-
-source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
-source('../jheem2/R/HELPERS_array_helpers.R')
-source('commoncode/locations_of_interest.R')
-
-state.vector = state.abb 
-state.vector = state.vector[!state.vector == "CT"] #CT is creating an issue - so until you sort that just remove it and see if this works.  #The Emory data has the CT codes from before 2020
-
-for(state in state.vector){
-    
-    counties.in.the.state = locations::get.contained.locations(state, "COUNTY")
-    #print(state)
-    counties.we.have.data.for = counties.in.the.state[counties.in.the.state %in% dimnames(surveillance.manager$data$proportion.msm$estimate$emory$emory$year__location__sex)$location] #only pull what we have data for
-    
-    aggregated.data <- surveillance.manager$pull('proportion.msm',
-                                                 sources='emory',
-                                                 keep.dimensions = c('year', 'sex'), #removing location so we can aggregate
-                                                 dimension.values=list(location=counties.we.have.data.for)) 
-    
-    aggregated.data <- apply(aggregated.data, c('year', 'sex'), function(x) {x}) #this is because source is kept as a dimension so we need to remove that
-    
-    surveillance.manager$put(aggregated.data,
-                             outcome = 'proportion.msm',
-                             source = 'emory.aggregated',
-                             ontology.name = 'emory',
-                             dimension.values = list(location=state), #one put per state so use state not the state vector
-                             url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
-                             details='Emory University MSM Research from American Community Survey')
-    
-}
-
-# Aggregate proportion.msm to MSA ---------------------------------------
-
-for(msa in MSAS.OF.INTEREST){
-    
-    counties.in.the.msa = locations::get.contained.locations(msa, "COUNTY")
-    #print(msa)
-    counties.we.have.data.for = counties.in.the.msa[counties.in.the.msa %in% dimnames(surveillance.manager$data$proportion.msm$estimate$emory$emory$year__location__sex)$location] #only pull what we have data for
-    
-    aggregated.data <- surveillance.manager$pull('proportion.msm',
-                                                 sources='emory',
-                                                 keep.dimensions = c('year', 'sex'),
-                                                 dimension.values=list(location=counties.we.have.data.for)) 
-    
-    aggregated.data <- apply(aggregated.data, c('year', 'sex'), function(x) {x}) 
-    
-    surveillance.manager$put(aggregated.data,
-                             outcome = 'proportion.msm',
-                             source = 'emory.aggregated',
-                             ontology.name = 'emory',
-                             dimension.values = list(location=msa), 
-                             url = 'https://prismhealth.emory.edu/estimating-the-population-sizes-of-men-who-have-sex-with-men-in-us-states-and-counties-using-data-from-the-american-community-survey/',
-                             details='Emory University MSM Research from American Community Survey')
-}
-
 #Save:
-save(surveillance.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section3.rdata")
+save(data.manager, file="Q:/data_managers/data.manager.merge/surveillance.manager_section3.rdata")
