@@ -39,34 +39,26 @@ sim.last     <- simset$last.sim()
 params.first <- sim.first$params
 params.last  <- sim.last$params
 
+
 # Run Manual Simulation ----
 engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-params.manual <- params.last
-# params.manual["transmission.rate.multiplier.msm0"] <- 1.6 #1990
-params.manual["transmission.rate.multiplier.msm1"] <- 1.6 #1995
-params.manual["transmission.rate.multiplier.msm2"] <- 0.9 #2000
-params.manual["transmission.rate.multiplier.msm3"] <- 1 #2010
-params.manual["transmission.rate.multiplier.msm4"] <- 1.4 #2020
-
-# params.manual["transmission.rate.multiplier.heterosexual0"] <- 1 #1990
-params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.3 #1995
-params.manual["transmission.rate.multiplier.heterosexual2"] <- .95 #2000
-# params.manual["transmission.rate.multiplier.heterosexual3"] <- 1 #2010
-# params.manual["transmission.rate.multiplier.heterosexual4"] <- 1 #2020
-
-sim.manual <- engine$run(params.manual)
-
-# Save simset (optional)
-# save(simset, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", Sys.Date(), "_", LOCATION, ".Rdata"))
-
-# Plot syphilis total diagnosis ----
-# simplot(
-#     # sim.first,
-#     sim.last,
-#     sim.manual,
-#     outcomes = c("diagnosis.total"),
-#     dimension.values = list(year = 1990:2025)
-# )
+#
+{
+    params.manual <- params.last
+    # params.manual["transmission.rate.multiplier.msm0"] <- 1 #1990
+    params.manual["transmission.rate.multiplier.msm1"] <- 1.2 #1995
+    params.manual["transmission.rate.multiplier.msm2"] <- 0.95 #2000
+    params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
+    params.manual["transmission.rate.multiplier.msm4"] <- 1.07 #2020
+    
+    # params.manual["transmission.rate.multiplier.heterosexual0"] <- 1 #1990
+    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.2 #1995
+    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.92 #2000
+    params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
+    params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.05 #2020
+    
+    sim.manual <- engine$run(params.manual)
+}
 
 
 # Plot syphilis total diagnosis  
@@ -83,6 +75,15 @@ simplot(
     dimension.values = list(year = 1990:2025),
     style.manager = stratum.style.manager
 )
+
+# Plot syphilis total diagnosis ----
+# simplot(
+#     # sim.first,
+#     sim.last,
+#     sim.manual,
+#     outcomes = c("diagnosis.total"),
+#     dimension.values = list(year = 1990:2025)
+# )
 
 # Plot Population 
 simplot(
@@ -147,17 +148,22 @@ if (1==2){
 }
 
 
-
+source("applications/SHIELD/shield_likelihoods.R")
 # Likelihood Comparison ----
 lik<- likelihood.instructions.syphilis.diagnoses.totals$instantiate.likelihood(VERSION, LOCATION)
 lik$compare.sims( sim.last, sim.manual, piecewise = T)
 lik$compute(sim.last, debug = T)
 
-lik.ps=ps.diagnosis.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
+lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
 lik.ps$compute(sim.last, debug = T)
 lik.ps$compute(sim.manual, debug = T)
 lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
 
+
+# Save simset ----
+# save(simset, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", Sys.Date(), "_", LOCATION, ".Rdata"))
+# Save sim.manual
+# save(sim.manual, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_sim.manual_", Sys.Date(), "_", LOCATION, ".Rdata"))
 
 # Looking inside the engine -----
 # q=engine$extract.quantity.values() #returns the input values to the model
