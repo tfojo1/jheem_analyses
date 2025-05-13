@@ -11,7 +11,7 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.4.pk'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.5.pk'
 DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
@@ -41,60 +41,61 @@ params.last  <- sim.last$params
 
 
 # Run Manual Simulation ----
-engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-#
-{
-    params.manual <- params.last
-    # params.manual["transmission.rate.multiplier.msm0"] <- 1 #1990
-    params.manual["transmission.rate.multiplier.msm1"] <- 1.2 #1995
-    params.manual["transmission.rate.multiplier.msm2"] <- 0.95 #2000
-    params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
-    params.manual["transmission.rate.multiplier.msm4"] <- 1.07 #2020
-    
-    # params.manual["transmission.rate.multiplier.heterosexual0"] <- 1 #1990
-    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.2 #1995
-    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.92 #2000
-    params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
-    params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.05 #2020
-    
-    sim.manual <- engine$run(params.manual)
-}
+# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+# #
+# {
+#     params.manual <- params.last
+#     # params.manual["transmission.rate.multiplier.msm0"] <- 1 #1990
+#     params.manual["transmission.rate.multiplier.msm1"] <- 1.2 #1995
+#     params.manual["transmission.rate.multiplier.msm2"] <- 0.95 #2000
+#     params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
+#     params.manual["transmission.rate.multiplier.msm4"] <- 1.07 #2020
+#     
+#     # params.manual["transmission.rate.multiplier.heterosexual0"] <- 1 #1990
+#     params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.2 #1995
+#     params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.92 #2000
+#     params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
+#     params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.05 #2020
+#     
+#     sim.manual <- engine$run(params.manual)
+# }
 
 
 # Plot syphilis total diagnosis  
 simplot(
-    # sim.first,
+    sim.first,
     sim.last,
-    sim.manual,
-    # split.by = "sex",
+    # sim.manual,
+    split.by = "sex",
     # split.by = "race", facet.by = "sex", #we are matching the totals only for now
     # split.by = "race", facet.by = "age",
+    # outcomes = c("diagnosis.total"),
     outcomes = c("diagnosis.ps"),
     # outcomes = c("diagnosis.el.misclassified"),
     # outcomes = c("diagnosis.late.misclassified"),
-    dimension.values = list(year = 1990:2025),
-    style.manager = stratum.style.manager
+    dimension.values = list(year = 1990:2025) 
 )
+ 
 
-# Plot syphilis total diagnosis ----
-# simplot(
-#     # sim.first,
-#     sim.last,
-#     sim.manual,
-#     outcomes = c("diagnosis.total"),
-#     dimension.values = list(year = 1990:2025)
-# )
-
-# Plot Population 
+# Plot hiv.testing 
 simplot(
     sim.first,
     sim.last,
     #sim.manual,
-    # split.by = "race", facet.by = "age",
+    # facet.by = "sex",
+    # facet.by = "age",
     outcomes = c("hiv.testing"),
     dimension.values = list(year = 2000:2030)
 )
-
+# Plot Population
+simplot(
+    sim.first,
+    sim.last,
+    #sim.manual,
+    split.by = "race", facet.by = "age",
+    outcomes = c("population"),
+    dimension.values = list(year = 2000:2030)
+)
 # Deaths
 simplot(
     sim.first,
@@ -121,6 +122,8 @@ simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:
 simset$get.mcmc.mixing.statistic()
 simset$traceplot("trans")
 cbind(simset$get.params("trans"))
+cbind(sim.manual$get.params("trans"))
+
 simset$traceplot("black.aging")
 simset$traceplot("other.aging")
 simset$traceplot("hispanic.aging")
@@ -151,7 +154,7 @@ if (1==2){
 source("applications/SHIELD/shield_likelihoods.R")
 # Likelihood Comparison ----
 lik<- likelihood.instructions.syphilis.diagnoses.totals$instantiate.likelihood(VERSION, LOCATION)
-lik$compare.sims( sim.last, sim.manual, piecewise = T)
+lik$compare.sims( sim.last, sim.manual, piecewise = F)
 lik$compute(sim.last, debug = T)
 
 lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
