@@ -33,7 +33,7 @@ register.calibration.info('pop.demog.8',
                           thin = 50, 
                           # fixed.initial.parameter.values = c(global.transmission.rate=3),
                           is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
-                          max.run.time.seconds = 10, 
+                          max.run.time.seconds = 30, 
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
@@ -51,7 +51,7 @@ register.calibration.info('syphilis.diagnoses.4.pk1',
                           thin = 50, 
                           # fixed.initial.parameter.values = c(global.transmission.rate=3),
                           is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
-                          max.run.time.seconds = 10, 
+                          max.run.time.seconds = 30, 
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
