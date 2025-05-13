@@ -1,11 +1,8 @@
-# Load Required Libraries ----
+# Load Required Libraries and Commoncode----
 library(plotly)
-
-# Load SHIELD and Common Code ----
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
-
 # Set Plotting Styles ----
 location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager   = create.style.manager(color.data.by = "source")
@@ -14,7 +11,7 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.3.pk'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.4.pk'
 DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
@@ -36,56 +33,58 @@ if (TRUE) {
 
 # Quick checkpoint ----
 simset$n.sim
-
-# Extract first and last simulations and their parameters ----
+# Extract first and last simulations and their parameters 
 sim.first    <- simset$first.sim()
 sim.last     <- simset$last.sim()
 params.first <- sim.first$params
 params.last  <- sim.last$params
 
 # Run Manual Simulation ----
- engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-# params.manual <- params.last
-# params.manual["age40.44.hispanic.fertility.rate.multiplier"] <- 10 # last: 0.06205035, first: 1.0000000
+engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+params.manual <- params.last
+# params.manual["transmission.rate.multiplier.msm0"] <- 1.6 #1990
+params.manual["transmission.rate.multiplier.msm1"] <- 1.6 #1995
+params.manual["transmission.rate.multiplier.msm2"] <- 0.9 #2000
+params.manual["transmission.rate.multiplier.msm3"] <- 1 #2010
+params.manual["transmission.rate.multiplier.msm4"] <- 1.4 #2020
 
-# sim.manual <- engine$run(params.manual)
+# params.manual["transmission.rate.multiplier.heterosexual0"] <- 1 #1990
+params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.3 #1995
+params.manual["transmission.rate.multiplier.heterosexual2"] <- .95 #2000
+# params.manual["transmission.rate.multiplier.heterosexual3"] <- 1 #2010
+# params.manual["transmission.rate.multiplier.heterosexual4"] <- 1 #2020
 
-sim.first <- engine$run(params.first)
-sim.last <- engine$run(params.last)
-
-# q=engine$extract.quantity.values() #returns the input values to the model
-# input.fertility = q$fertility.rate[["2020"]]
-# dimnames(sim.manual$immigration)
+sim.manual <- engine$run(params.manual)
 
 # Save simset (optional)
 # save(simset, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", Sys.Date(), "_", LOCATION, ".Rdata"))
 
 # Plot syphilis total diagnosis ----
-simplot(
-    sim.first,
-    sim.last,
-    #sim.manual,
-    # split.by = "race", facet.by = "age",
-    outcomes = c("diagnosis.total"),
-    dimension.values = list(year = 1990:2025)
-)
+# simplot(
+#     # sim.first,
+#     sim.last,
+#     sim.manual,
+#     outcomes = c("diagnosis.total"),
+#     dimension.values = list(year = 1990:2025)
+# )
 
-# Plot syphilis total diagnosis ----
+
+# Plot syphilis total diagnosis  
 simplot(
-    sim.first,
+    # sim.first,
     sim.last,
-    #sim.manual,
-    split.by = "race", facet.by = "sex", #we are matching the totals only for now
-    #split.by = "sex",
-    # outcomes = c("diagnosis.ps"),
+    sim.manual,
+    # split.by = "sex",
+    # split.by = "race", facet.by = "sex", #we are matching the totals only for now
+    # split.by = "race", facet.by = "age",
+    outcomes = c("diagnosis.ps"),
     # outcomes = c("diagnosis.el.misclassified"),
-    outcomes = c("diagnosis.late.misclassified"),
+    # outcomes = c("diagnosis.late.misclassified"),
     dimension.values = list(year = 1990:2025),
     style.manager = stratum.style.manager
-    
 )
 
-# Plot Population ----
+# Plot Population 
 simplot(
     sim.first,
     sim.last,
@@ -103,7 +102,7 @@ simplot(
     dimension.values = list(year = 2000:2030)
 )
 
-# Plot Fertility ----
+# Plot Fertility 
 simplot(
     sim.first,
     sim.last,
@@ -113,12 +112,14 @@ simplot(
     dimension.values = list(year = 2000:2030)
 )
 
-# Plot Immigration / Emigration ----
+# Plot Immigration / Emigration 
 simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:2030))
 simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
 
 # MCMC Diagnostics ----
 simset$get.mcmc.mixing.statistic()
+simset$traceplot("trans")
+cbind(simset$get.params("trans"))
 simset$traceplot("black.aging")
 simset$traceplot("other.aging")
 simset$traceplot("hispanic.aging")
@@ -129,7 +130,7 @@ simset$traceplot("fertility")
 if (1==2){
     source("applications/SHIELD/debug_likelihoods.R")
     
-    lik         <- likelihood.instructions.demographics$instantiate.likelihood(VERSION, LOCATION)
+    lik         <- likelihood.instructions.syphilis.diagnoses$instantiate.likelihood(VERSION, LOCATION)
     lik.sex.race <- population.likelihood.instructions.2way.sex.race$instantiate.likelihood(VERSION, LOCATION)
     lik.sex.age  <- population.likelihood.instructions.2way.sex.age$instantiate.likelihood(VERSION, LOCATION)
     lik.age.race <- population.likelihood.instructions.2way.age.race$instantiate.likelihood(VERSION, LOCATION)
@@ -144,6 +145,25 @@ if (1==2){
     lik.fert$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
     lik.fert$compute(sim.last, debug = TRUE)
 }
+
+
+
+# Likelihood Comparison ----
+lik<- likelihood.instructions.syphilis.diagnoses.totals$instantiate.likelihood(VERSION, LOCATION)
+lik$compare.sims( sim.last, sim.manual, piecewise = T)
+lik$compute(sim.last, debug = T)
+
+lik.ps=ps.diagnosis.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
+lik.ps$compute(sim.last, debug = T)
+lik.ps$compute(sim.manual, debug = T)
+lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
+
+
+# Looking inside the engine -----
+# q=engine$extract.quantity.values() #returns the input values to the model
+# input.fertility = q$fertility.rate[["2020"]]
+# dimnames(sim.manual$immigration)
+
 
 # Gaussian Reference Proportions ----
 dnorm(0, mean = 0, sd = 1)

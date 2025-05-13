@@ -476,17 +476,19 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
 SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
   global.transmission.rate=c("global.transmission.rate"),
   #
-  msm.transmission = c(
+  msm.transmission.block1 = c(
     "transmission.rate.multiplier.msm0",
     "transmission.rate.multiplier.msm1",
-    "transmission.rate.multiplier.msm2",
+    "transmission.rate.multiplier.msm2"),
+  msm.transmission.block2=c(
     "transmission.rate.multiplier.msm3",
     "transmission.rate.multiplier.msm4"),
   #
-  het.transmission =c(
+  het.transmission.block1 =c(
     "transmission.rate.multiplier.heterosexual0",
     "transmission.rate.multiplier.heterosexual1",
-    "transmission.rate.multiplier.heterosexual2",
+    "transmission.rate.multiplier.heterosexual2"),
+  het.transmission.block2=c(
     "transmission.rate.multiplier.heterosexual3",
     "transmission.rate.multiplier.heterosexual4" 
   ) ,

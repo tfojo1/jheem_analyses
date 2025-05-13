@@ -18,28 +18,27 @@ N.ITER=15000
 #05.08: <syphilis.diagnoses.2> same as syphilis.diagnoses.1, using total by stage
 #05.09: <syphilis.diagnoses.3.pk> adding more transmission params for msm, het and by race, calibrating to total diagnosis by stage
 #05.12: <syphilis.diagnoses.4.pk> adding time4 transmission params for msm, het, setting likelihoods to total and marginals for syphilis diagnosis
-
+#05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
 
 # Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('pop.demog.8', 
                           likelihood.instructions = likelihood.instructions.demographics,
                           data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
-                          parameter.names = c(# can include a subset of parameters
+                          end.year = 2030,  
+                          parameter.names = c(
                               POPULATION.PARAMETERS.PRIOR@var.names,
                               AGING.PARAMETERS.PRIOR@var.names 
                           ), 
                           n.iter = N.ITER,
                           thin = 50, 
-                          # fixed.initial.parameter.values = c(global.transmission.rate=3),
-                          is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
+                          is.preliminary = T, 
                           max.run.time.seconds = 30, 
                           description = "A quick run to get population parameters in the general vicinity"
 )
 
-register.calibration.info('syphilis.diagnoses.4.pk1', 
-                          # preceding.calibration.codes = 'pop.demog.8',
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses,
+register.calibration.info('syphilis.diagnoses.5.pk', 
+                          preceding.calibration.codes = 'pop.demog.8',
+                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
                           parameter.names = c(# can include a subset of parameters
@@ -49,13 +48,14 @@ register.calibration.info('syphilis.diagnoses.4.pk1',
                           ), 
                           n.iter = N.ITER,
                           thin = 50, 
-                          # fixed.initial.parameter.values = c(global.transmission.rate=3),
-                          is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
-                          max.run.time.seconds = 30, 
-                          description = "A quick run to get population parameters in the general vicinity"
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity"
 )
 
 # cat("*** Shiled_register_calibration.R completed!***\n")
 
-
+# fixed.initial.parameter.values = c(global.transmission.rate=3), #change the initial value for a parameter
+# is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
+# max.run.time.seconds = 30,  # If solving the differential equations takes longer than this, it returns a ‘degenerate’ sim where all outcomes are NA and the likelihood evaluates to -Inf.
 # get.contained.locations('US', 'CBSA')
