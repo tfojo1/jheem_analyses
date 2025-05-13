@@ -68,7 +68,7 @@ simplot(sim, 'diagnosis.total')
  
 simplot(sim, 'diagnosis.ps')
 simplot.data.only('diagnosis.ps',LOCATION)
-lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood(version,LOCATION )
+lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION )
 lik$compute(sim,debug = T)
 # sd= coef.variation * mean
 
