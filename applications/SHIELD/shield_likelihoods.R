@@ -21,6 +21,14 @@ w2=lapply(2020:2023, function(year){
 })
 w=c(w1,w2)
 
+w.half <- lapply(w, function(wi) {
+    create.likelihood.weights(
+        total.weight = 0.5 * wi$total.weight,
+        dimension.values = wi$dimension.values,
+        is.recursive = wi$is.recursive
+    )
+})
+
 
 POPULATION.WEIGHT = 1
 TRANSMISSION.WEIGHT = 1
@@ -85,7 +93,7 @@ population.likelihood.instructions =
                                        # downweight because large population size; 
                                        # can get more specific with create.likelihood.weights 
                                        #(e.g., different weight for age X)
-                                       weights = lapply(w, function(x) 0.5 * x),
+                                       weights = w.half,
                                        equalize.weight.by.year = F #if we dont have as many data points in one year it'll be up weighted
                                        #in years that we have more data points we will down weight them
                                        
