@@ -168,7 +168,10 @@ lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
 # Save sim.manual
 # save(sim.manual, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_sim.manual_", Sys.Date(), "_", LOCATION, ".Rdata"))
 
-
+# Looking inside the engine -----
+q=engine$extract.quantity.values() #returns the input values to the model
+input.fertility = q$fertility.rate[["2020"]]
+dimnames(sim.manual$immigration)
 
 # Gaussian Reference Proportions ----
 dnorm(0, mean = 0, sd = 1)
