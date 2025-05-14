@@ -20,7 +20,7 @@ N.ITER=15000
 #05.12: <syphilis.diagnoses.4.pk> adding time4 transmission params for msm, het, setting likelihoods to total and marginals for syphilis diagnosis
 #05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
 
-solver = create.solver.metadata(rtol = 0.01, atol = 0.1) #reducing the tolerance to speed up the simulation
+solver = create.solver.metadata(rtol = 0.01, atol = 0.5) #reducing the tolerance to speed up the simulation
 
 # Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('pop.demog.8', 

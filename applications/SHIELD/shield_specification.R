@@ -1242,47 +1242,96 @@ track.dynamic.outcome(SHIELD.SPECIFICATION, #expensive
 ##---- Migration ----
 # We can track stratified values directly, but to save the speed, we estiamte total rate first, and 
 # approximate age,sex,race stratifications by multiplying migration * population
+# track.dynamic.outcome(SHIELD.SPECIFICATION,
+#                       name = 'immigration.total',
+#                       outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
+#                                                                  description = "Number of People Immigrating into the Population in the Past Year",
+#                                                                  scale = 'non.negative.number',
+#                                                                  axis.name = 'Number Immigrating',
+#                                                                  units = 'individuals'),
+#                       dynamic.quantity.name = 'births',
+#                       corresponding.data.outcome = 'immigration', 
+#                       include.tags = "immigration",
+#                       keep.dimensions = c('location')
+# )  
+# # total immigration rate
+# track.cumulative.outcome(SHIELD.SPECIFICATION,
+#                          name = 'immigration.rate',
+#                          value = expression(emigration.total/population),
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
+#                                                                     description = "Number of People Immigrating into the Population in the Past Year",
+#                                                                     scale = 'rate',
+#                                                                     axis.name = 'Rate',
+#                                                                     units = 'rate'),
+#                          denominator.outcome = 'population',
+#                          corresponding.data.outcome = 'immigration' ,
+#                          keep.dimensions = c('location')
+# )
+# # stratified immigration values: 
+# track.cumulative.outcome(SHIELD.SPECIFICATION,
+#                          name = 'immigration',
+#                          value = expression(immigration.rate * population),
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
+#                                                                     description = "Number of People Immigrating into the Population in the Past Year",
+#                                                                     scale = 'non.negative.number',
+#                                                                     axis.name = 'Number Emigrating',
+#                                                                     units = 'individuals'),
+#                          scale='non.negative.number',
+#                          corresponding.data.outcome = 'immigration' ,
+#                          keep.dimensions = c('location','age','race','sex')
+# )
+# total emigration value by location:
+# track.dynamic.outcome(SHIELD.SPECIFICATION,
+#                       name = 'emigration.total',
+#                       outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
+#                                                                  description = "Number of People Emigrating from the Population in the Past Year",
+#                                                                  scale = 'non.negative.number',
+#                                                                  axis.name = 'Number Emigrating',
+#                                                                  units = 'individuals'),
+#                       dynamic.quantity.name = 'mortality',
+#                       corresponding.data.outcome = 'emigration', 
+#                       include.tags = "emigration",
+#                       keep.dimensions = c('location'))
+# total emigration rate
+# track.cumulative.outcome(SHIELD.SPECIFICATION,
+#                          name = 'emigration.rate',
+#                          value = expression(emigration.total/population),
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
+#                                                                     description = "Rate People Emigrating from the Population in the Past Year",
+#                                                                     scale = 'rate',
+#                                                                     axis.name = 'Rate',
+#                                                                     units = 'rate'),
+#                          denominator.outcome = 'population',
+#                          corresponding.data.outcome = 'emigration' ,
+#                          keep.dimensions = c('location')
+# )
+# # statified emigration values: 
+# track.cumulative.outcome(SHIELD.SPECIFICATION,
+#                          name = 'emigration',
+#                          value = expression(emigration.rate * population),
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
+#                                                                     description = "Number of People Emigrating from the Population in the Past Year",
+#                                                                     scale = 'non.negative.number',
+#                                                                     axis.name = 'Number Emigrating',
+#                                                                     units = 'individuals'),
+#                          scale='non.negative.number',
+#                          corresponding.data.outcome = 'emigration' ,
+#                          keep.dimensions = c('location','age','race','sex')
+# )
 track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name = 'immigration.total',
+                      name = 'immigration',
                       outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
                                                                  description = "Number of People Immigrating into the Population in the Past Year",
                                                                  scale = 'non.negative.number',
                                                                  axis.name = 'Number Immigrating',
                                                                  units = 'individuals'),
                       dynamic.quantity.name = 'births',
-                      corresponding.data.outcome = 'immigration', 
+                      corresponding.data.outcome = 'immigration',
                       include.tags = "immigration",
-                      keep.dimensions = c('location')
-)  
-# total immigration rate
-track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'immigration.rate',
-                         value = expression(emigration.total/population),
-                         outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
-                                                                    description = "Number of People Immigrating into the Population in the Past Year",
-                                                                    scale = 'rate',
-                                                                    axis.name = 'Rate',
-                                                                    units = 'rate'),
-                         denominator.outcome = 'population',
-                         corresponding.data.outcome = 'immigration' ,
-                         keep.dimensions = c('location')
+                      keep.dimensions = c('location','age','race','sex')
 )
-# stratified immigration values: 
-track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'immigration',
-                         value = expression(immigration.rate * population),
-                         outcome.metadata = create.outcome.metadata(display.name = 'Immigration',
-                                                                    description = "Number of People Immigrating into the Population in the Past Year",
-                                                                    scale = 'non.negative.number',
-                                                                    axis.name = 'Number Emigrating',
-                                                                    units = 'individuals'),
-                         scale='non.negative.number',
-                         corresponding.data.outcome = 'immigration' ,
-                         keep.dimensions = c('location','age','race','sex')
-)
-# total emigration value by location:
 track.dynamic.outcome(SHIELD.SPECIFICATION,
-                      name = 'emigration.total',
+                      name = 'emigration',
                       outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
                                                                  description = "Number of People Emigrating from the Population in the Past Year",
                                                                  scale = 'non.negative.number',
@@ -1291,33 +1340,8 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'mortality',
                       corresponding.data.outcome = 'emigration', 
                       include.tags = "emigration",
-                      keep.dimensions = c('location'))
-# total emigration rate
-track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'emigration.rate',
-                         value = expression(emigration.total/population),
-                         outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
-                                                                    description = "Rate People Emigrating from the Population in the Past Year",
-                                                                    scale = 'rate',
-                                                                    axis.name = 'Rate',
-                                                                    units = 'rate'),
-                         denominator.outcome = 'population',
-                         corresponding.data.outcome = 'emigration' ,
-                         keep.dimensions = c('location')
-)
-# statified emigration values: 
-track.cumulative.outcome(SHIELD.SPECIFICATION,
-                         name = 'emigration',
-                         value = expression(emigration.rate * population),
-                         outcome.metadata = create.outcome.metadata(display.name = 'Emigration',
-                                                                    description = "Number of People Emigrating from the Population in the Past Year",
-                                                                    scale = 'non.negative.number',
-                                                                    axis.name = 'Number Emigrating',
-                                                                    units = 'individuals'),
-                         scale='non.negative.number',
-                         corresponding.data.outcome = 'emigration' ,
-                         keep.dimensions = c('location','age','race','sex')
-)
+                      keep.dimensions = c('location','age','race','sex')
+                      )
 ##---- HIV Testing -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       name = 'hiv.testing',
