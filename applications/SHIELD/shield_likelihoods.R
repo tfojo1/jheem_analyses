@@ -20,6 +20,12 @@ w2=lapply(2020:2023, function(year){
   create.likelihood.weights(total.weight,dimension.values = list(year=year))
 })
 w=c(w1,w2)
+
+
+POPULATION.WEIGHT = 1
+TRANSMISSION.WEIGHT = 1
+PRENATAL.WEIGHT = 1
+TESTING.WEIGHT = 1
 #** POPULATION SIZES ** ----
 # Basic likelihood: where we have data at the location level desired
 # sometimes we dont have the calibration data for the location of interest. 
@@ -79,7 +85,7 @@ population.likelihood.instructions =
                                        # downweight because large population size; 
                                        # can get more specific with create.likelihood.weights 
                                        #(e.g., different weight for age X)
-                                       weights = w,
+                                       weights = lapply(w, function(x) 0.5 * x),
                                        equalize.weight.by.year = F #if we dont have as many data points in one year it'll be up weighted
                                        #in years that we have more data points we will down weight them
                                        
@@ -99,6 +105,7 @@ deaths.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = population.error.sd.shield, #assuming the population level uncertainty
                                        error.variance.type = 'function.sd',
+                                       weights = 0.5*POPULATION.WEIGHT ,
                                        na.rm =T
   )
 
@@ -113,6 +120,7 @@ fertility.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = population.error.sd.shield,  #assuming the population level uncertainty
                                        error.variance.type = 'function.sd',
+                                       weights = 0.5*POPULATION.WEIGHT ,
                                        na.rm =T
   )
 
@@ -130,6 +138,7 @@ immigration.likelihood.instructions =
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary ??? 
                                        #'@Ryan: can you check the error variance? 
                                        error.variance.type = 'cv',
+                                       weights = 0.5*POPULATION.WEIGHT ,
                                        equalize.weight.by.year = T,  #'@Ryan: do we need this? 
                                        na.rm =T
   )
@@ -146,6 +155,7 @@ emigration.likelihood.instructions =
                                         error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                         error.variance.type = 'cv',#'@Ryan: can you check the error variance? 
                                         equalize.weight.by.year = T, #'@Ryan: do we need this? 
+                                        weights = 0.5*POPULATION.WEIGHT ,
                                         na.rm =T
   )
 
@@ -163,6 +173,7 @@ total.diagnosis.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
+                                       weights = 0.5*TRANSMISSION.WEIGHT ,
                                        minimum.error.sd = 1 #
   )
 ##---- PS ----
@@ -184,6 +195,7 @@ ps.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
+                                       weights = 0.5*TRANSMISSION.WEIGHT,
                                        minimum.error.sd = 1  
   )
 
@@ -197,6 +209,7 @@ ps.diagnosis.likelihood.instructions =
                                          observation.correlation.form = 'compound.symmetry',
                                          error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
+                                         weights = 0.5*TRANSMISSION.WEIGHT,
                                          minimum.error.sd = 1  
     )
 ##---- EARLY ----
@@ -218,6 +231,7 @@ early.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
+                                       weights = 0.5*TRANSMISSION.WEIGHT,
                                        minimum.error.sd = 1
   )
 
@@ -231,6 +245,7 @@ early.diagnosis.likelihood.instructions =
                                          observation.correlation.form = 'compound.symmetry',
                                          error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
+                                         weights = 0.5*TRANSMISSION.WEIGHT,
                                          minimum.error.sd = 1
     )
 ##---- Late/Unknown ---- 
@@ -250,6 +265,7 @@ late.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
+                                       weights = 0.5*TRANSMISSION.WEIGHT,
                                        minimum.error.sd = 1
   )
 
@@ -262,6 +278,7 @@ late.diagnosis.likelihood.instructions =
                                          observation.correlation.form = 'compound.symmetry',
                                          error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
+                                         weights = 0.5*TRANSMISSION.WEIGHT,
                                          minimum.error.sd = 1
     )
 
@@ -351,6 +368,7 @@ prenatal.care.first.trimester.likelihood.instructions =
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
+                                       weights = 0.5*PRENATAL.WEIGHT,
                                        error.variance.type = 'function.sd')
 prenatal.care.second.trimester.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.second.trimester",
@@ -369,6 +387,7 @@ prenatal.care.second.trimester.likelihood.instructions =
                                          
                                          return(sd)
                                        },
+                                       weights = 0.5*PRENATAL.WEIGHT,
                                        error.variance.type = 'function.sd')
 
 prenatal.care.third.trimester.likelihood.instructions =
@@ -386,6 +405,7 @@ prenatal.care.third.trimester.likelihood.instructions =
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
+                                       weights = 0.5*PRENATAL.WEIGHT,
                                        error.variance.type = 'function.sd')
 no.prenatal.care.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "prp.no.prenatal.care",
@@ -402,6 +422,7 @@ no.prenatal.care.likelihood.instructions =
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
+                                       weights = 0.5*PRENATAL.WEIGHT,
                                        error.variance.type = 'function.sd')
 
 ##** HIV TESTS ** ----
@@ -413,7 +434,8 @@ hiv.testing.likelihood.instructions =
                                        levels.of.stratification = c(0,1,2),
                                        from.year = 2014,
                                        observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05, 
+                                       error.variance.term = 0.05,
+                                       weights = 0.5*TESTING.WEIGHT,
                                        error.variance.type = 'cv'
   )
 
