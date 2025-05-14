@@ -20,6 +20,8 @@ N.ITER=15000
 #05.12: <syphilis.diagnoses.4.pk> adding time4 transmission params for msm, het, setting likelihoods to total and marginals for syphilis diagnosis
 #05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
 
+solver = create.solver.metadata(rtol = 0.01, atol = 0.1) #reducing the tolerance to speed up the simulation
+
 # Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('pop.demog.8', 
                           likelihood.instructions = likelihood.instructions.demographics,
@@ -33,7 +35,8 @@ register.calibration.info('pop.demog.8',
                           thin = 50, 
                           is.preliminary = T, 
                           max.run.time.seconds = 30, 
-                          description = "A quick run to get population parameters in the general vicinity"
+                          description = "A quick run to get population parameters in the general vicinity",
+                          solver.metadata = solver
 )
 
 register.calibration.info('syphilis.diagnoses.5.pk', 
@@ -50,7 +53,8 @@ register.calibration.info('syphilis.diagnoses.5.pk',
                           thin = 50, 
                           is.preliminary = T,
                           max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity"
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = solver
 )
 
 # cat("*** Shiled_register_calibration.R completed!***\n")

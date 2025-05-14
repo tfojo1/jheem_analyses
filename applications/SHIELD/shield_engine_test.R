@@ -18,11 +18,7 @@ specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
-# of elements
-# ds=engine$extract.diffeq.settings()
-# # ds$state_and_dx_sizes #differential vector (compartments and outcomes)
-# sum(ds$state_and_dx_sizes)
-# sim$solver.metadata
+
 
 
 # INSTANTIATE LIKELIHOODS
