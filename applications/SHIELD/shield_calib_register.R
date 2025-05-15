@@ -23,8 +23,11 @@ N.ITER=15000
     
 #05.15: <syphilis.diagnoses.7.pk> reducing atol to 0.1, using 0.5 weight to loosen the likelihoods
 #05.15: <syphilis.diagnoses.7.RF> reducing atol to 0.1, using 0.8 weight to loosen the likelihoods
+#05.15: <syphilis.diagnoses.8.RF> using 0.8 weight to loosen the likelihoods. atol restored to default
 
-solver = create.solver.metadata(rtol = 0.01, atol = 0.1) #reducing the tolerance to speed up the simulation
+
+
+#solver = create.solver.metadata(rtol = 0.01, atol = 0.1) #reducing the tolerance to speed up the simulation
 
 # Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('pop.demog.8', 
