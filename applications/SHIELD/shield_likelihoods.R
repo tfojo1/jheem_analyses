@@ -8,7 +8,7 @@
 
 
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
-TOTAL.WEIGHT=.5
+TOTAL.WEIGHT=.8
 POPULATION.WEIGHT = TOTAL.WEIGHT
 TRANSMISSION.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
