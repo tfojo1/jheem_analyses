@@ -22,6 +22,7 @@ N.ITER=15000
 #05.14: @'Ryan: add the weight param to likelihood and set to 0.5 to weaken the likelihoods 
     
 #05.15: <syphilis.diagnoses.7.pk> reducing atol to 0.1, using 0.5 weight to loosen the likelihoods
+#05.15: <syphilis.diagnoses.7.RF> reducing atol to 0.1, using 0.8 weight to loosen the likelihoods
 
 solver = create.solver.metadata(rtol = 0.01, atol = 0.1) #reducing the tolerance to speed up the simulation
 
@@ -42,7 +43,7 @@ register.calibration.info('pop.demog.8',
                           solver.metadata = solver
 )
 
-register.calibration.info('syphilis.diagnoses.7.pk', 
+register.calibration.info('syphilis.diagnoses.7.RF', 
                           preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
                           data.manager = SURVEILLANCE.MANAGER,
