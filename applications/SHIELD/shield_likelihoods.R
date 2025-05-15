@@ -7,7 +7,7 @@
 # we should bound agegroups at 85+
 
 
-# WEIGHTS:
+# WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
 TOTAL.WEIGHT=.5
 POPULATION.WEIGHT = TOTAL.WEIGHT
 TRANSMISSION.WEIGHT = TOTAL.WEIGHT

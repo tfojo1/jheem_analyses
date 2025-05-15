@@ -21,8 +21,9 @@ N.ITER=15000
 #05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
 #05.14: @'Ryan: add the weight param to likelihood and set to 0.5 to weaken the likelihoods 
     
+#05.15: <syphilis.diagnoses.7.pk> reducing atol to 0.1, using 0.5 weight to loosen the likelihoods
 
-solver = create.solver.metadata(rtol = 0.01, atol = 0.5) #reducing the tolerance to speed up the simulation
+solver = create.solver.metadata(rtol = 0.01, atol = 0.1) #reducing the tolerance to speed up the simulation
 
 # Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('pop.demog.8', 
@@ -41,7 +42,7 @@ register.calibration.info('pop.demog.8',
                           solver.metadata = solver
 )
 
-register.calibration.info('syphilis.diagnoses.5.pk', 
+register.calibration.info('syphilis.diagnoses.7.pk', 
                           preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
                           data.manager = SURVEILLANCE.MANAGER,
