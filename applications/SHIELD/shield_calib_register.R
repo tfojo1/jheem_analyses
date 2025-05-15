@@ -19,7 +19,7 @@ N.ITER=15000
 #05.09: <syphilis.diagnoses.3.pk> adding more transmission params for msm, het and by race, calibrating to total diagnosis by stage
 #05.12: <syphilis.diagnoses.4.pk> adding time4 transmission params for msm, het, setting likelihoods to total and marginals for syphilis diagnosis
 #05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
-#05.14: @'Ryan: add the weight param to likelihood and set to 0.5 to weaken the likelihoods 
+#05.14: <syphilis.diagnoses.6.RF> add the weight param to likelihood and set to 0.5 to weaken the likelihoods 
     
 #05.15: <syphilis.diagnoses.7.pk> reducing atol to 0.1, using 0.5 weight to loosen the likelihoods
 #05.15: <syphilis.diagnoses.7.RF> reducing atol to 0.1, using 0.8 weight to loosen the likelihoods
@@ -46,7 +46,7 @@ register.calibration.info('pop.demog.8',
                           solver.metadata = solver
 )
 
-register.calibration.info('syphilis.diagnoses.7.RF', 
+register.calibration.info('syphilis.diagnoses.8.RF', 
                           preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
                           data.manager = SURVEILLANCE.MANAGER,
