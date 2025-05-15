@@ -27,7 +27,7 @@ N.ITER=15000
 
 
 
-#solver = create.solver.metadata(rtol = 0.01, atol = 0.1) #reducing the tolerance to speed up the simulation
+solver = create.solver.metadata() #rtol,atol
 
 # Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('pop.demog.8', 
