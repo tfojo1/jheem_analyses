@@ -40,7 +40,7 @@ register.calibration.info('syphilis.diagnoses.8.RF',
 )
 
 register.calibration.info('syphilis.diagnoses.8.pk', 
-                          preceding.calibration.codes = 'pop.demog.8',
+                          # preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
