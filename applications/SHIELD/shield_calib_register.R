@@ -21,7 +21,11 @@ N.ITER=15000
 #05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
 #05.14: @'Ryan: add the weight param to likelihood and set to 0.5 to weaken the likelihoods 
     
-#05.15: <syphilis.diagnoses.7.pk> reducing atol to 0.1, using 0.5 weight to loosen the likelihoods
+#05.15: <syphilis.diagnoses.7.pk> reducing atol to 0.1, using 0.5 weight to loosen the likelihoods >> the chain is not mixing.
+#05.15: <syphilis.diagnoses.7.pk1> reverting changes in rtol/atol and weight to check that model performs as expected
+# >> model is working well and parameters are mixing at 40% completion. 
+# 05.16: <syphilis.diagnoses.7.pk2> changing weight to .8
+
 #05.15: <syphilis.diagnoses.7.RF> reducing atol to 0.1, using 0.8 weight to loosen the likelihoods
 
 solver = create.solver.metadata(rtol = 0.01, atol = 0.1) #reducing the tolerance to speed up the simulation
@@ -61,6 +65,22 @@ register.calibration.info('syphilis.diagnoses.7.RF',
                           solver.metadata = solver
 )
 
+register.calibration.info('syphilis.diagnoses.7.pk2', 
+                          preceding.calibration.codes = 'pop.demog.8',
+                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
+                          parameter.names = c(# can include a subset of parameters
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names,
+                              TRANSMISSION.PARAMETERS.PRIOR@var.names
+                          ), 
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity" 
+)
 # cat("*** Shiled_register_calibration.R completed!***\n")
 
 # fixed.initial.parameter.values = c(global.transmission.rate=3), #change the initial value for a parameter

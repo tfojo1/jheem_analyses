@@ -11,7 +11,7 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.6.pk'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.7.pk'
 DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
@@ -66,7 +66,7 @@ simplot(
     sim.first,
     sim.last,
     # sim.manual,
-    split.by = "sex",
+    # split.by = "sex",
     # split.by = "race", facet.by = "sex", #we are matching the totals only for now
     # split.by = "race", facet.by = "age",
     # outcomes = c("diagnosis.total"),
