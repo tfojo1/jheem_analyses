@@ -1,4 +1,6 @@
 cat("*** Running Shiled_register_calibration.R ***\n")
+source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
+
 N.ITER=15000
 #SUMMARY -----
 # simsets are saved in: /Volumes/jheem$/shield/pop.demog.1.Rdata
@@ -84,7 +86,7 @@ register.calibration.info('syphilis.diagnoses.7.pk2',
                           max.run.time.seconds = 30,
                           description = "A quick run to get syphilis parameters in the general vicinity" 
 )
-# cat("*** Shiled_register_calibration.R completed!***\n")
+cat("*** Shiled_register_calibration.R completed!***\n")
 
 # fixed.initial.parameter.values = c(global.transmission.rate=3), #change the initial value for a parameter
 # is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
