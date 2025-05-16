@@ -13,9 +13,9 @@ for(state in state.vector){
 
     counties.in.the.state = locations::get.contained.locations(state, "COUNTY")
     #print(state)
-    counties.we.have.data.for = counties.in.the.state[counties.in.the.state %in% dimnames(surveillance.manager$data$emory.proportion.msm$estimate$emory$emory$year__location__sex)$location] #only pull what we have data for
+    counties.we.have.data.for = counties.in.the.state[counties.in.the.state %in% dimnames(surveillance.manager$data$proportion.msm$estimate$emory$emory$year__location__sex)$location] #only pull what we have data for
 
-    aggregated.data <- surveillance.manager$pull('emory.proportion.msm',
+    aggregated.data <- surveillance.manager$pull('proportion.msm',
                                                  sources='emory',
                                                  keep.dimensions = c('year', 'sex'), #removing location so we can aggregate
                                                  dimension.values=list(location=counties.we.have.data.for))
@@ -23,7 +23,7 @@ for(state in state.vector){
     aggregated.data <- apply(aggregated.data, c('year', 'sex'), function(x) {x}) #this is because source is kept as a dimension so we need to remove that
 
     surveillance.manager$put(aggregated.data,
-                             outcome = 'emory.proportion.msm',
+                             outcome = 'proportion.msm',
                              source = 'emory.aggregated',
                              ontology.name = 'emory',
                              dimension.values = list(location=state), #one put per state so use state not the state vector
@@ -38,9 +38,9 @@ for(msa in MSAS.OF.INTEREST){
 
     counties.in.the.msa = locations::get.contained.locations(msa, "COUNTY")
     #print(msa)
-    counties.we.have.data.for = counties.in.the.msa[counties.in.the.msa %in% dimnames(surveillance.manager$data$emory.proportion.msm$estimate$emory$emory$year__location__sex)$location] #only pull what we have data for
+    counties.we.have.data.for = counties.in.the.msa[counties.in.the.msa %in% dimnames(surveillance.manager$data$proportion.msm$estimate$emory$emory$year__location__sex)$location] #only pull what we have data for
 
-    aggregated.data <- surveillance.manager$pull('emory.proportion.msm',
+    aggregated.data <- surveillance.manager$pull('proportion.msm',
                                                  sources='emory',
                                                  keep.dimensions = c('year', 'sex'),
                                                  dimension.values=list(location=counties.we.have.data.for))
@@ -48,7 +48,7 @@ for(msa in MSAS.OF.INTEREST){
     aggregated.data <- apply(aggregated.data, c('year', 'sex'), function(x) {x})
 
     surveillance.manager$put(aggregated.data,
-                             outcome = 'emory.proportion.msm',
+                             outcome = 'proportion.msm',
                              source = 'emory.aggregated',
                              ontology.name = 'emory',
                              dimension.values = list(location=msa),
