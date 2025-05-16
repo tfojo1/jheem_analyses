@@ -6,7 +6,8 @@ OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs2")
 MODULE.LOAD.COMMANDS = c('source cluster_scripts/rockfish_module_loads.sh')
 EHE.SPEC <- "applications/EHE/ehe_specification.R"
 EHE.REG <- "applications/EHE/calibration_runs/ehe_register_calibrations.R"
-
+SHIELD.SPEC<- "applications/SHIELD/shield_specification.R"
+SHIELD.REG <- "applications/SHIELD/shield_register_calibrations.R"
 make.sbatch.script <- function(filename,
                                mem=NULL,
                                mem.per.cpu=NULL,
