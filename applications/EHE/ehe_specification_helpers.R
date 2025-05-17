@@ -475,7 +475,12 @@ get.best.guess.msm.proportions <- function(location,
     states = locations::get.overlapping.locations(location, 'state')
    
     # Get county-level proportions
-    proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+    if (any(SURVEILLANCE.MANAGER$outcomes=='proportion.msm')) # to handle that zoe changed these outcome names ~May 9, 2025
+        outcome.name = 'proportion.msm'
+    else
+        outcome.name = 'emory.proportion.msm'
+    
+    proportion.msm.by.county = SURVEILLANCE.MANAGER$pull(outcome = outcome.name,
                                                          dimension.values = list(location=counties,
                                                                                  sex='male'))
     if (is.null(proportion.msm.by.county) || !setequal(counties, dimnames(proportion.msm.by.county)$location))
@@ -526,7 +531,13 @@ get.best.guess.msm.proportions <- function(location,
         states.for.p.msm = 'MS'
     else
         states.for.p.msm = states
-    raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = 'proportion.msm',
+    
+    if (any(SURVEILLANCE.MANAGER$outcomes=='proportion.msm')) # to handle that zoe changed these outcome names ~May 9, 2025
+        outcome.name = 'proportion.msm'
+    else
+        outcome.name = 'brfss.proportion.msm'
+    
+    raw.proportion.msm.by.race = SURVEILLANCE.MANAGER$pull(outcome = outcome.name,
                                                            keep.dimensions = c('year','location','race'),
                                                            dimension.values = list(location = states.for.p.msm,
                                                                                    sex = 'male'))
