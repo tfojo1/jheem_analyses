@@ -11,7 +11,11 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.5.pk'
+
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.7.pk'
+
+# CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.RF'
+
 DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
@@ -40,25 +44,25 @@ params.first <- sim.first$params
 params.last  <- sim.last$params
 
 
-# Run Manual Simulation ----
-# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-# #
-# {
-#     params.manual <- params.last
-#     # params.manual["transmission.rate.multiplier.msm0"] <- 1 #1990
-#     params.manual["transmission.rate.multiplier.msm1"] <- 1.2 #1995
-#     params.manual["transmission.rate.multiplier.msm2"] <- 0.95 #2000
-#     params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
-#     params.manual["transmission.rate.multiplier.msm4"] <- 1.07 #2020
-#     
-#     # params.manual["transmission.rate.multiplier.heterosexual0"] <- 1 #1990
-#     params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.2 #1995
-#     params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.92 #2000
-#     params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
-#     params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.05 #2020
-#     
-#     sim.manual <- engine$run(params.manual)
-# }
+#Run Manual Simulation ----
+engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+#
+{
+    params.manual <- params.last
+    # params.manual["transmission.rate.multiplier.msm0"] <- 1 #1990
+    params.manual["transmission.rate.multiplier.msm1"] <- 1.2 #1995
+    params.manual["transmission.rate.multiplier.msm2"] <- 0.95 #2000
+    params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
+    params.manual["transmission.rate.multiplier.msm4"] <- 1.07 #2020
+
+    # params.manual["transmission.rate.multiplier.heterosexual0"] <- 1 #1990
+    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.2 #1995
+    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.92 #2000
+    params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
+    params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.05 #2020
+
+    sim.manual <- engine$run(params.manual)
+}
 
 
 # Plot syphilis total diagnosis  
@@ -91,7 +95,7 @@ simplot(
 simplot(
     sim.first,
     sim.last,
-    #sim.manual,
+    sim.manual,
     split.by = "race", facet.by = "age",
     outcomes = c("population"),
     dimension.values = list(year = 2000:2030)
@@ -108,7 +112,7 @@ simplot(
 simplot(
     sim.first,
     sim.last,
-    #sim.manual,
+    sim.manual,
     split.by = "race", facet.by = "age",
     outcomes = c("fertility.rate"),
     dimension.values = list(year = 2000:2030)

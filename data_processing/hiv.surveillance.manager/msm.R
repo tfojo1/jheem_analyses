@@ -47,7 +47,7 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex.for.msm, function(f
   filename = file[[1]] 
   
   #Create MSM proportion
-  data$outcome= "brfss.proportion.msm"
+  data$outcome= "proportion.msm"
   data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
   
   data<- data %>%
@@ -56,7 +56,7 @@ data.list.brfss.state.msm = lapply(data.list.brfss.state.sex.for.msm, function(f
     ungroup()
 
   data <- data %>%
-    select(outcome, year, location, msm, msm_total, n_weighted)%>% #n_weighted here is the sum of the weights by sex#
+    select(outcome, year, location, msm, msm_total, n_weighted, `_LLCPWT`)%>% #n_weighted here is the sum of the weights by sex#
     filter(!is.na(msm_total))%>%
      mutate(value = (msm_total/n_weighted))
 
@@ -121,7 +121,7 @@ data.list.brfss.state.msm.race = lapply(data.list.race.male.denom, function(file
   data= subset(data, data$race != "unknown")
   
   #Create MSM proportion
-  data$outcome= "brfss.proportion.msm"
+  data$outcome= "proportion.msm"
   data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
   
   data<- data %>%
@@ -130,7 +130,7 @@ data.list.brfss.state.msm.race = lapply(data.list.race.male.denom, function(file
     ungroup()
 
   data <- data %>%
-    select(outcome, year, location, race, msm, msm_total, n_weighted)%>%
+    select(outcome, year, location, race, msm, msm_total, n_weighted, `_LLCPWT`)%>%
     filter(!is.na(msm_total))%>%
     mutate(value = (msm_total/n_weighted))
    
@@ -159,7 +159,7 @@ data.list.brfss.state.msm.age = lapply(data.list.age.male.denom, function(file){
   data= subset(data, data$age != "Unknown")
   
   #Create MSM proportion
-  data$outcome= "brfss.proportion.msm"
+  data$outcome= "proportion.msm"
   data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
   
   data<- data %>%
@@ -168,7 +168,7 @@ data.list.brfss.state.msm.age = lapply(data.list.age.male.denom, function(file){
     ungroup()
 
   data <- data %>%
-    select(outcome, year, location, age, msm, msm_total, n_weighted)%>%
+    select(outcome, year, location, age, msm, msm_total, n_weighted, `_LLCPWT`)%>%
     filter(!is.na(msm_total))%>%
     mutate(value = (msm_total/n_weighted))
   
@@ -238,7 +238,7 @@ proportion.msm.n.total = lapply(data.list.brfss.state.msm, function(file){
     data <- data %>%
         select(year, location, n_weighted, sex)%>%
         rename(value = n_weighted)%>%
-        mutate(outcome = "brfss.proportion.msm.n")
+        mutate(outcome = "proportion.msm.n")
     
     data= as.data.frame(data)
     list(filename, data) 
@@ -252,7 +252,7 @@ proportion.msm.n.race = lapply(data.list.brfss.state.msm.race, function(file){
     data <- data %>%
         select(year, location, n_weighted, sex, race)%>%
         rename(value = n_weighted)%>%
-        mutate(outcome = "brfss.proportion.msm.n")
+        mutate(outcome = "proportion.msm.n")
     
     data= as.data.frame(data)
     list(filename, data) 
@@ -266,7 +266,7 @@ proportion.msm.n.age = lapply(data.list.brfss.state.msm.age, function(file){
     data <- data %>%
         select(year, location, n_weighted, sex, age)%>%
         rename(value = n_weighted)%>%
-        mutate(outcome = "brfss.proportion.msm.n")
+        mutate(outcome = "proportion.msm.n")
     
     data= as.data.frame(data)
     list(filename, data) 
@@ -309,6 +309,119 @@ for (data in msm.n.age) {
         ontology.name = 'brfss',
         source = 'brfss',
         dimension.values = list(sex = "male"),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+
+# Update for May 2025: Add in Variance value for proportion.msm da --------
+# Create Variance for proportion.msm data from BRFSS (note, this is only by state level)
+#stratifications: sex; sex+race; sex+age
+
+#Variance- Total (sex) -----------------------------------------------------
+variance.total.state = lapply(data.list.brfss.state.msm, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data <- data %>%
+        mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+        group_by(year, location)%>%
+        mutate(sum_each_sq_weight = sum(weight_squared))%>%
+        ungroup()%>%
+        mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+        select(year, location, outcome, variance)%>%
+        rename(value = variance)%>% #rename the old value to now be variance.  This now represents the variance metric for the proportion tested outcome
+        mutate(sex = "male")
+    
+    data<- data[!duplicated(data), ]
+    
+    data= as.data.frame(data)
+    list(filename, data) 
+})
+
+
+#Variance- Sex+Race -----------------------------------------------------
+variance.sex.state = lapply(data.list.brfss.state.msm.race, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data <- data %>%
+        mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+        group_by(year, location, sex)%>%
+        mutate(sum_each_sq_weight = sum(weight_squared))%>%
+        ungroup()%>%
+        mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+        select(year, location, outcome, variance, race, sex)%>%
+        rename(value = variance)
+    
+    data<- data[!duplicated(data), ]
+    
+    data= as.data.frame(data)
+    list(filename, data) 
+})
+#Variance- Sex+Age -----------------------------------------------------
+variance.age.state = lapply(data.list.brfss.state.msm.age, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data <- data %>%
+        mutate(weight_squared = ((`_LLCPWT`)^2))%>%
+        group_by(year, location, age)%>%
+        mutate(sum_each_sq_weight = sum(weight_squared))%>%
+        ungroup()%>%
+        mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
+        select(year, location, outcome, variance, age, sex)%>%
+        rename(value = variance)
+    
+    data<- data[!duplicated(data), ]
+    
+    data= as.data.frame(data)
+    list(filename, data) 
+})
+
+
+# Put the variance data for proportion.msm ---------------------------------------------------
+prop.msm.variance.state= lapply(variance.total.state, `[[`, 2)
+
+for (data in prop.msm.variance.state) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        metric = 'variance',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.msm.variance.sex.state= lapply(variance.sex.state, `[[`, 2)
+
+for (data in prop.msm.variance.sex.state) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        metric = 'variance',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+prop.msm.variance.age.state= lapply(variance.age.state, `[[`, 2)
+
+for (data in prop.msm.variance.age.state) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        metric = 'variance',
+        dimension.values = list(),
         url = 'https://www.cdc.gov/brfss/index.html',
         details = 'Behavioral Risk Factor Surveillance System')
 }
@@ -389,7 +502,7 @@ data.list.emory.msm.county = lapply(data.list.emory.msm, function(file){
   filename = file[["filename"]]
   
   data$year = "2013"
-  data$outcome= "emory.proportion.msm"
+  data$outcome= "proportion.msm"
 
   data$value = as.numeric(data$MSM5YEAR/data$ADULTMEN)
   data$value = round(data$value, digits=2)
@@ -417,7 +530,7 @@ data.list.emory.msm.msa = lapply(data.list.emory.msm, function(file){
   filename = file[["filename"]]
   
   data$year = "2013"
-  data$outcome= "emory.proportion.msm"
+  data$outcome= "proportion.msm"
   
   #To create location- for MSA use 'CBSACODE' and also 'METMICSA' ==1 for metropolitian statistical area
     data = subset(data, data$METMICSA == "1") #Select msas only
@@ -458,7 +571,7 @@ data.list.emory.msm.state = lapply(data.list.emory.msm, function(file){
   filename = file[["filename"]]
   
   data$year = "2013"
-  data$outcome= "emory.proportion.msm"
+  data$outcome= "proportion.msm"
   
   #To create location- combine state and county FIPS
   data$state_code= str_pad(data$STATEFP, width=2, side="left", pad="0")

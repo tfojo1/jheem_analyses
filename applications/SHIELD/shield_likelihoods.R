@@ -7,8 +7,15 @@
 # we should bound agegroups at 85+
 
 
-# LIKELIHOODS INCLUDED: 
-#the census runs population count every 10 years, in 2010, and 2020.
+# WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
+TOTAL.WEIGHT=0.8
+POPULATION.WEIGHT = TOTAL.WEIGHT
+TRANSMISSION.WEIGHT = TOTAL.WEIGHT
+PRENATAL.WEIGHT = TOTAL.WEIGHT
+TESTING.WEIGHT = TOTAL.WEIGHT
+
+# Population weights: 
+# the census runs population count every 10 years, in 2010, and 2020.
 # the values reported between these years are extrapolated based on the previous census data.
 # so we have more faith in those years and less int he ones between decades
 w1=lapply(2010:2019, function(year){
@@ -19,21 +26,15 @@ w2=lapply(2020:2023, function(year){
   total.weight = 0.95^(year-2020)
   create.likelihood.weights(total.weight,dimension.values = list(year=year))
 })
-w=c(w1,w2)
-
-w.half <- lapply(w, function(wi) {
-    create.likelihood.weights(
-        total.weight = 0.5 * wi$total.weight,
-        dimension.values = wi$dimension.values,
-        is.recursive = wi$is.recursive
-    )
+w.population <- lapply(c(w1,w2), function(wi) {
+  create.likelihood.weights(
+    total.weight = POPULATION.WEIGHT * wi$total.weight,
+    dimension.values = wi$dimension.values,
+    is.recursive = wi$is.recursive
+  )
 })
 
 
-POPULATION.WEIGHT = 1
-TRANSMISSION.WEIGHT = 1
-PRENATAL.WEIGHT = 1
-TESTING.WEIGHT = 1
 #** POPULATION SIZES ** ----
 # Basic likelihood: where we have data at the location level desired
 # sometimes we dont have the calibration data for the location of interest. 
@@ -93,7 +94,7 @@ population.likelihood.instructions =
                                        # downweight because large population size; 
                                        # can get more specific with create.likelihood.weights 
                                        #(e.g., different weight for age X)
-                                       weights = w.half,
+                                       weights = w.population,
                                        equalize.weight.by.year = F #if we dont have as many data points in one year it'll be up weighted
                                        #in years that we have more data points we will down weight them
                                        
@@ -113,7 +114,7 @@ deaths.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry', 
                                        error.variance.term = population.error.sd.shield, #assuming the population level uncertainty
                                        error.variance.type = 'function.sd',
-                                       weights = 0.5*POPULATION.WEIGHT ,
+                                       weights = POPULATION.WEIGHT ,
                                        na.rm =T
   )
 
@@ -128,7 +129,7 @@ fertility.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = population.error.sd.shield,  #assuming the population level uncertainty
                                        error.variance.type = 'function.sd',
-                                       weights = 0.5*POPULATION.WEIGHT ,
+                                       weights = POPULATION.WEIGHT ,
                                        na.rm =T
   )
 
@@ -146,7 +147,7 @@ immigration.likelihood.instructions =
                                        error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary ??? 
                                        #'@Ryan: can you check the error variance? 
                                        error.variance.type = 'cv',
-                                       weights = 0.5*POPULATION.WEIGHT ,
+                                       weights = POPULATION.WEIGHT ,
                                        equalize.weight.by.year = T,  #'@Ryan: do we need this? 
                                        na.rm =T
   )
@@ -163,7 +164,7 @@ emigration.likelihood.instructions =
                                         error.variance.term = 0.13, # using MOEs from data - see migration_MOE_summary
                                         error.variance.type = 'cv',#'@Ryan: can you check the error variance? 
                                         equalize.weight.by.year = T, #'@Ryan: do we need this? 
-                                        weights = 0.5*POPULATION.WEIGHT ,
+                                        weights = POPULATION.WEIGHT ,
                                         na.rm =T
   )
 
@@ -181,7 +182,7 @@ total.diagnosis.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = 0.5*TRANSMISSION.WEIGHT ,
+                                       weights = TRANSMISSION.WEIGHT ,
                                        minimum.error.sd = 1 #
   )
 ##---- PS ----
@@ -203,23 +204,23 @@ ps.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = 0.5*TRANSMISSION.WEIGHT,
+                                       weights = TRANSMISSION.WEIGHT,
                                        minimum.error.sd = 1  
   )
 
 
 ps.diagnosis.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         dimensions = c("age","race","sex"),
-                                         levels.of.stratification = c(0,1,2), 
-                                         from.year = 1993,
-                                         observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = 0.05, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = 0.5*TRANSMISSION.WEIGHT,
-                                         minimum.error.sd = 1  
-    )
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                       outcome.for.data = "ps.syphilis.diagnoses",  
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2), 
+                                       from.year = 1993,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, #'@Ryan: we need to estimate this 
+                                       error.variance.type = 'cv',
+                                       weights = TRANSMISSION.WEIGHT,
+                                       minimum.error.sd = 1  
+  )
 ##---- EARLY ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
 # data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
@@ -239,23 +240,23 @@ early.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = 0.5*TRANSMISSION.WEIGHT,
+                                       weights = TRANSMISSION.WEIGHT,
                                        minimum.error.sd = 1
   )
 
 
 early.diagnosis.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
-                                         outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("age","race","sex"),
-                                         levels.of.stratification = c(0,1,2,3),
-                                         from.year = 1993,
-                                         observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = 0.05, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = 0.5*TRANSMISSION.WEIGHT,
-                                         minimum.error.sd = 1
-    )
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
+                                       outcome.for.data = "early.syphilis.diagnoses", 
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2,3),
+                                       from.year = 1993,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, #'@Ryan: we need to estimate this 
+                                       error.variance.type = 'cv',
+                                       weights = TRANSMISSION.WEIGHT,
+                                       minimum.error.sd = 1
+  )
 ##---- Late/Unknown ---- 
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
 # data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
@@ -273,22 +274,22 @@ late.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = 0.5*TRANSMISSION.WEIGHT,
+                                       weights = TRANSMISSION.WEIGHT,
                                        minimum.error.sd = 1
   )
 
 late.diagnosis.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("age","race","sex"),
-                                         levels.of.stratification = c(0,1,2,3),
-                                         from.year = 1993,
-                                         observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = 0.05, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = 0.5*TRANSMISSION.WEIGHT,
-                                         minimum.error.sd = 1
-    )
+  create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                       outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2,3),
+                                       from.year = 1993,
+                                       observation.correlation.form = 'compound.symmetry',
+                                       error.variance.term = 0.05, #'@Ryan: we need to estimate this 
+                                       error.variance.type = 'cv',
+                                       weights = TRANSMISSION.WEIGHT,
+                                       minimum.error.sd = 1
+  )
 
 ##---- Congenital ----
 #poportion of state level births that are complicated by congenital syphilis 
@@ -376,7 +377,7 @@ prenatal.care.first.trimester.likelihood.instructions =
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
-                                       weights = 0.5*PRENATAL.WEIGHT,
+                                       weights = PRENATAL.WEIGHT,
                                        error.variance.type = 'function.sd')
 prenatal.care.second.trimester.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.second.trimester",
@@ -395,7 +396,7 @@ prenatal.care.second.trimester.likelihood.instructions =
                                          
                                          return(sd)
                                        },
-                                       weights = 0.5*PRENATAL.WEIGHT,
+                                       weights = PRENATAL.WEIGHT,
                                        error.variance.type = 'function.sd')
 
 prenatal.care.third.trimester.likelihood.instructions =
@@ -413,7 +414,7 @@ prenatal.care.third.trimester.likelihood.instructions =
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
-                                       weights = 0.5*PRENATAL.WEIGHT,
+                                       weights = PRENATAL.WEIGHT,
                                        error.variance.type = 'function.sd')
 no.prenatal.care.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "prp.no.prenatal.care",
@@ -430,7 +431,7 @@ no.prenatal.care.likelihood.instructions =
                                          var= (data* (0.05))^2+msa.variance
                                          return(sqrt(var))
                                        },
-                                       weights = 0.5*PRENATAL.WEIGHT,
+                                       weights = PRENATAL.WEIGHT,
                                        error.variance.type = 'function.sd')
 
 ##** HIV TESTS ** ----
@@ -443,7 +444,7 @@ hiv.testing.likelihood.instructions =
                                        from.year = 2014,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05,
-                                       weights = 0.5*TESTING.WEIGHT,
+                                       weights = TESTING.WEIGHT,
                                        error.variance.type = 'cv'
   )
 
@@ -468,7 +469,7 @@ likelihood.instructions.syphilis.diagnoses.totals=join.likelihood.instructions(
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
   late.diagnosis.total.likelihood.instructions
-  )
+)
 
 likelihood.instructions.syphilis.diagnoses.with.margins=join.likelihood.instructions(
   population.likelihood.instructions,
@@ -478,11 +479,11 @@ likelihood.instructions.syphilis.diagnoses.with.margins=join.likelihood.instruct
   emigration.likelihood.instructions,
   
   total.diagnosis.likelihood.instructions,
-    ps.diagnosis.likelihood.instructions,
-    early.diagnosis.likelihood.instructions,
-    late.diagnosis.likelihood.instructions
+  ps.diagnosis.likelihood.instructions,
+  early.diagnosis.likelihood.instructions,
+  late.diagnosis.likelihood.instructions
 )
- 
+
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
 #   create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 

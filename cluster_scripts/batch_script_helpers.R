@@ -1,11 +1,12 @@
 # Get the absolute path to jheem_analyses directory
-# JHEEM_DIR = file.path("/scratch4/pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses")
 USER =  Sys.getenv("USER")
-JHEEM_DIR = file.path("scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
-OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs2")
+JHEEM_DIR = file.path("/scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
+OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs")
 MODULE.LOAD.COMMANDS = c('source cluster_scripts/rockfish_module_loads.sh')
 EHE.SPEC <- "applications/EHE/ehe_specification.R"
 EHE.REG <- "applications/EHE/calibration_runs/ehe_register_calibrations.R"
+SHIELD.SPEC<- "applications/SHIELD/shield_specification.R"
+SHIELD.REG <- "applications/SHIELD/shield_calib_register.R"
 
 make.sbatch.script <- function(filename,
                                mem=NULL,
