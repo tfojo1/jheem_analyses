@@ -55,9 +55,11 @@ register.calibration.info('syphilis.diagnoses.8.pk',
 )
 ##############
 # Trying diagnosis targets one at a time
-register.calibration.info('syphilis.diag.9.pk.psTotal', 
-                          preceding.calibration.codes = "syphilis.diagnoses.8.RF",
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.psTotal,  
+calibnames=c("elTotal","psTotal","psElTotal","all.totals")
+lapply(calibnames,function(x){
+register.calibration.info(code = paste0('syphilis.9.pk.',x), 
+                          preceding.calibration.codes = "pop.demog.8",
+                          likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
                           param.names.trans.demog, 
@@ -68,45 +70,8 @@ register.calibration.info('syphilis.diag.9.pk.psTotal',
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = solver
 )
-register.calibration.info('syphilis.diag.9.pk.elTotal', 
-                          preceding.calibration.codes = "syphilis.diagnoses.8.RF",
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.elTotal,  
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  
-                          param.names.trans.demog, 
-                          n.iter = N.ITER,
-                          thin = 50, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
-)
-register.calibration.info('syphilis.diag.9.pk.psTotal.elTotal', 
-                          preceding.calibration.codes = "syphilis.diagnoses.8.RF",
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.psTotal.elTotal,  
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  
-                          param.names.trans.demog, 
-                          n.iter = N.ITER,
-                          thin = 50, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
-)
-register.calibration.info('syphilis.diag.9.pk.allTotals', 
-                          preceding.calibration.codes = "syphilis.diagnoses.8.RF",
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.all.totals,  
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  
-                          param.names.trans.demog, 
-                          n.iter = N.ITER,
-                          thin = 50, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
-)
+    })
+
 cat("*** Shiled_register_calibration.R completed!***\n")
 
 
@@ -145,6 +110,7 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 #05.15: <syphilis.diagnoses.7.RF> reducing atol to 0.1, using 0.8 weight to loosen the likelihoods
 
 #05.15: <syphilis.diagnoses.8.RF> using 0.8 weight to loosen the likelihoods. atol restored to default >> running
-# 05.16: <syphilis.diagnoses.8.pk> using rtol=0.01, atol=0.1, and Total.weight=0.8; ROCKFISH >> 83%complete, params not mixing at all
+# 05.16: <syphilis.diagnoses.8.pk> using rtol=0.01, atol=0.1, and Total.weight=0.8; starting from priors:
+# ROCKFISH >> 83%complete, params not mixing at all (could this be an issue with starting priors? Ryan's chain is mixing well)
 
-# 5.19: <syphilis.diag.9.pk.***> Total.weight=0.8:  starting from Ryan's model, trying diagnosis likelihoods one a time
+# 5.19: <syphilis.diag.9.pk.***> Total.weight=0.8:  starting from pop.demog.8's model, trying diagnosis likelihoods one a time
