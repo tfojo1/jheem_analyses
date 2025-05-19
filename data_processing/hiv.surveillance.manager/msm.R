@@ -349,7 +349,7 @@ variance.sex.state = lapply(data.list.brfss.state.msm.race, function(file){
     
     data <- data %>%
         mutate(weight_squared = ((`_LLCPWT`)^2))%>%
-        group_by(year, location, sex)%>%
+        group_by(year, location, sex, race)%>%
         mutate(sum_each_sq_weight = sum(weight_squared))%>%
         ungroup()%>%
         mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
@@ -369,7 +369,7 @@ variance.age.state = lapply(data.list.brfss.state.msm.age, function(file){
     
     data <- data %>%
         mutate(weight_squared = ((`_LLCPWT`)^2))%>%
-        group_by(year, location, age)%>%
+        group_by(year, location, sex, age)%>%
         mutate(sum_each_sq_weight = sum(weight_squared))%>%
         ungroup()%>%
         mutate(variance = value*(1-value)*(sum_each_sq_weight)/ ((n_weighted)^2))%>% #n_weighted is the sum of the weights by strata
