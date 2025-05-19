@@ -28,7 +28,7 @@ LOCATION='C.12580' #Baltimore MSA
 
 set.seed(00000)
 
-CALIBRATION.NAME = 'syphilis.diagnoses.7.pk2' 
+CALIBRATION.NAME = 'syphilis.9.pk.allTotals' 
 
 # CALIBRATION.NAME = 'syphilis.diagnoses.8.RF' 
 

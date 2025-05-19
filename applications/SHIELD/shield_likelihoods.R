@@ -460,6 +460,7 @@ likelihood.instructions.demographics=join.likelihood.instructions(
   emigration.likelihood.instructions)
 
 #-- LIKELIHOOD INSTRUCTIONS FOR DIAGNOSIS ----
+# calibnames=c("elTotal","psTotal","psElTotal","all.totals")
 likelihood.instructions.syphilis.diagnoses.all.totals=join.likelihood.instructions( #all 4 total values 
   likelihood.instructions.demographics,  #
   total.diagnosis.likelihood.instructions,
@@ -475,7 +476,7 @@ likelihood.instructions.syphilis.diagnoses.elTotal=join.likelihood.instructions(
   likelihood.instructions.demographics,  #
   early.diagnosis.total.likelihood.instructions
 )
-likelihood.instructions.syphilis.diagnoses.psTotal.elTotal=join.likelihood.instructions( # PS total and the early total
+likelihood.instructions.syphilis.diagnoses.psElTotal=join.likelihood.instructions( # PS total and the early total
   likelihood.instructions.demographics, #
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions
