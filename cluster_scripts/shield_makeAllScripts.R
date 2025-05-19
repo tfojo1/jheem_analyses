@@ -13,10 +13,10 @@ lapply(calibnames,function(x){
     SHIELD.SPEC<- "applications/SHIELD/shield_specification.R"
     SHIELD.REG <- "applications/SHIELD/shield_calib_register.R"
     
-    # make.setup.scripts(location,version,calib.name,SHIELD.SPEC, SHIELD.REG,account='pkasaie1')
-    # make.run.scripts(location,version,calib.name,1,SHIELD.SPEC, SHIELD.REG,account='pkasaie1', time.hours=72)
-    # make.setup.master.script(master.name,location,version,calib.name,overwrite = T)
-    # make.run.master.script(master.name,location,version,calib.name,1,overwrite = T)
+    make.setup.scripts(location,version,calib.name,SHIELD.SPEC, SHIELD.REG,account='pkasaie1')
+    make.run.scripts(location,version,calib.name,1,SHIELD.SPEC, SHIELD.REG,account='pkasaie1', time.hours=72)
+    make.setup.master.script(master.name,location,version,calib.name,overwrite = T)
+    make.run.master.script(master.name,location,version,calib.name,1,overwrite = T)
     
     cat("*** Created all scripts for ",calib.name," *** \n")
 })
