@@ -35,6 +35,10 @@ if (TRUE) {
     )
 }
 
+# simset5=simset
+simset=simset5
+# simset8=simset
+
 # Quick checkpoint ----
 simset$n.sim
 # Extract first and last simulations and their parameters 
@@ -80,51 +84,50 @@ simplot(
     dimension.values = list(year = 1990:2025) 
 )
  
-
-# Plot hiv.testing 
-simplot(
-    sim.first,
-    sim.last,
-    #sim.manual,
-    # facet.by = "sex",
-    # facet.by = "age",
-    outcomes = c("hiv.testing"),
-    dimension.values = list(year = 2000:2030)
-)
-# Plot Population
-simplot(
-    sim.first,
-    sim.last,
-    sim.manual,
-    split.by = "race", facet.by = "age",
-    outcomes = c("population"),
-    dimension.values = list(year = 2000:2030)
-)
-# Deaths
-simplot(
-    sim.first,
-    sim.last,
-    outcomes = c("deaths"),
-    dimension.values = list(year = 2000:2030)
-)
-
-# Plot Fertility 
-simplot(
-    sim.first,
-    sim.last,
-    sim.manual,
-    split.by = "race", facet.by = "age",
-    outcomes = c("fertility.rate"),
-    dimension.values = list(year = 2000:2030)
-)
-
-# Plot Immigration / Emigration 
-simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:2030))
-simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
+# 
+# # Plot hiv.testing 
+# simplot(
+#     sim.first,
+#     sim.last,
+#     #sim.manual,
+#     # facet.by = "sex",
+#     # facet.by = "age",
+#     outcomes = c("hiv.testing"),
+#     dimension.values = list(year = 2000:2030)
+# )
+# # Plot Population
+# simplot(
+#     sim.first,
+#     sim.last,
+#     sim.manual,
+#     split.by = "race", facet.by = "age",
+#     outcomes = c("population"),
+#     dimension.values = list(year = 2000:2030)
+# )
+# # Deaths
+# simplot(
+#     sim.first,
+#     sim.last,
+#     outcomes = c("deaths"),
+#     dimension.values = list(year = 2000:2030)
+# )
+# 
+# # Plot Fertility 
+# simplot(
+#     sim.first,
+#     sim.last,
+#     sim.manual,
+#     split.by = "race", facet.by = "age",
+#     outcomes = c("fertility.rate"),
+#     dimension.values = list(year = 2000:2030)
+# )
+# 
+# # Plot Immigration / Emigration 
+# simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:2030))
+# simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
 
 # MCMC Diagnostics ----
 simset$get.mcmc.mixing.statistic()
-
 simset$traceplot("trans")
 cbind(simset$get.params("trans"))
 cbind(sim.manual$get.params("trans"))

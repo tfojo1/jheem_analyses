@@ -467,7 +467,6 @@ likelihood.instructions.syphilis.diagnoses.all.totals=join.likelihood.instructio
   early.diagnosis.total.likelihood.instructions,
   late.diagnosis.total.likelihood.instructions
 )
-
 likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(#only PS total
   likelihood.instructions.demographics,  #
    ps.diagnosis.total.likelihood.instructions
@@ -475,7 +474,8 @@ likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(
 likelihood.instructions.syphilis.diagnoses.elTotal=join.likelihood.instructions(#only EL total
   likelihood.instructions.demographics,  #
   early.diagnosis.total.likelihood.instructions
-)likelihood.instructions.syphilis.diagnoses.psTotal.elTotal=join.likelihood.instructions( # PS total and the early total
+)
+likelihood.instructions.syphilis.diagnoses.psTotal.elTotal=join.likelihood.instructions( # PS total and the early total
   likelihood.instructions.demographics, #
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions

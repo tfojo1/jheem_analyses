@@ -91,7 +91,18 @@ register.calibration.info('syphilis.diag.9.pk.psTotal.elTotal',
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = solver
 )
-
+register.calibration.info('syphilis.diag.9.pk.allTotals', 
+                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.all.totals,  
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          param.names.trans.demog, 
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = solver
+)
 cat("*** Shiled_register_calibration.R completed!***\n")
 
 
