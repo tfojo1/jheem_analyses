@@ -2,8 +2,8 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
 N.ITER=15000
-solver = create.solver.metadata(rtol = 0.01, atol=0.1) #rtol,atol
-# solver = create.solver.metadata() #default solver
+# solver = create.solver.metadata(rtol = 0.01, atol=0.1) #rtol,atol
+solver = create.solver.metadata() #default solver
 param.names.trans.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
                            AGING.PARAMETERS.PRIOR@var.names,
                            TRANSMISSION.PARAMETERS.PRIOR@var.names)
@@ -56,6 +56,7 @@ register.calibration.info('syphilis.diagnoses.8.pk',
 ##############
 # Trying diagnosis targets one at a time
 register.calibration.info('syphilis.diag.9.pk.psTotal', 
+                          preceding.calibration.codes = "syphilis.diagnoses.8.RF",
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.psTotal,  
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030, 
@@ -68,6 +69,7 @@ register.calibration.info('syphilis.diag.9.pk.psTotal',
                           solver.metadata = solver
 )
 register.calibration.info('syphilis.diag.9.pk.elTotal', 
+                          preceding.calibration.codes = "syphilis.diagnoses.8.RF",
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.elTotal,  
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
@@ -80,6 +82,7 @@ register.calibration.info('syphilis.diag.9.pk.elTotal',
                           solver.metadata = solver
 )
 register.calibration.info('syphilis.diag.9.pk.psTotal.elTotal', 
+                          preceding.calibration.codes = "syphilis.diagnoses.8.RF",
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.psTotal.elTotal,  
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
@@ -92,6 +95,7 @@ register.calibration.info('syphilis.diag.9.pk.psTotal.elTotal',
                           solver.metadata = solver
 )
 register.calibration.info('syphilis.diag.9.pk.allTotals', 
+                          preceding.calibration.codes = "syphilis.diagnoses.8.RF",
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.all.totals,  
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
@@ -143,4 +147,4 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 #05.15: <syphilis.diagnoses.8.RF> using 0.8 weight to loosen the likelihoods. atol restored to default >> running
 # 05.16: <syphilis.diagnoses.8.pk> using rtol=0.01, atol=0.1, and Total.weight=0.8; ROCKFISH >> 83%complete, params not mixing at all
 
-# 5.19: <syphilis.diag.9.pk.***> Total.weight=1:  trying diagnosis likelihoods one a time
+# 5.19: <syphilis.diag.9.pk.***> Total.weight=0.8:  starting from Ryan's model, trying diagnosis likelihoods one a time

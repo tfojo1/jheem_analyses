@@ -12,9 +12,14 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
 
+# get.jheem.root.directory() #"/Volumes/jheem$"
+
+# ROOT.DIR="../../files/"
+# set.jheem.root.directory(ROOT.DIR)
+
 CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.pk'
 
-# CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.RF'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.RF'
 
 DATE <- "2025-05-07"
 
@@ -35,10 +40,10 @@ if (TRUE) {
     )
 }
 
-# simset5=simset
-simset=simset5
-# simset8=simset
-
+# # simset5=simset
+# simset=simset5
+# # simset8=simset
+# simset=simset8
 # Quick checkpoint ----
 simset$n.sim
 # Extract first and last simulations and their parameters 
@@ -78,8 +83,8 @@ simplot(
     # split.by = "race", facet.by = "sex", #we are matching the totals only for now
     # split.by = "race", facet.by = "age",
     # outcomes = c("diagnosis.total"),
-    # outcomes = c("diagnosis.ps"),
-    outcomes = c("diagnosis.el.misclassified"),
+    outcomes = c("diagnosis.ps"),
+    # outcomes = c("diagnosis.el.misclassified"),
     # outcomes = c("diagnosis.late.misclassified"),
     dimension.values = list(year = 1990:2025) 
 )

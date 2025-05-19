@@ -3,7 +3,8 @@ source("cluster_scripts/batch_script_helpers.R")
 location="C.12580"
 version="shield"
 calibnames=c("9.pk.psTotal","9.pk.elTotal","9.pk.psTotal.elTotal","9.pk.all.totals")
-lapply(x in calibnames,function(x){
+
+lapply(x %in% calibnames,function(x){
     calib.name=paste0("syphilis.diag.",x)
     master.name=paste0("shieldMaster.",x)
     cat("*** Creating setup, run, setup_master and run_master scripts for ",calib.name," *** \n")
