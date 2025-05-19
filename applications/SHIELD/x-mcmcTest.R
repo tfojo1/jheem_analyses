@@ -13,10 +13,10 @@ set.seed(00000)
 CALIBRATION.NAME = 'pop.demog.test' 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
-# clear.calibration.cache(version=VERSION,
-#                         location=LOCATION,
-#                        calibration.code = CALIBRATION.NAME,
-#                         allow.remove.incomplete = T)
+clear.calibration.cache(version=VERSION,
+                        location=LOCATION,
+                       calibration.code = CALIBRATION.NAME,
+                        allow.remove.incomplete = T)
 # print("Cashe is cleared")
 
 set.up.calibration(version=VERSION,
