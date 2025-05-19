@@ -8,7 +8,7 @@
 
 
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
-TOTAL.WEIGHT=0.8
+TOTAL.WEIGHT=1
 POPULATION.WEIGHT = TOTAL.WEIGHT
 TRANSMISSION.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
@@ -459,29 +459,26 @@ likelihood.instructions.demographics=join.likelihood.instructions(
   immigration.likelihood.instructions,
   emigration.likelihood.instructions)
 
-likelihood.instructions.syphilis.diagnoses.totals=join.likelihood.instructions(
-  population.likelihood.instructions,
-  deaths.likelihood.instructions,
-  fertility.likelihood.instructions,
-  immigration.likelihood.instructions,
-  emigration.likelihood.instructions,
+#-- LIKELIHOOD INSTRUCTIONS FOR DIAGNOSIS ----
+likelihood.instructions.syphilis.diagnoses.all.totals=join.likelihood.instructions( #all 4 total values 
+  likelihood.instructions.demographics,  #
   total.diagnosis.likelihood.instructions,
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
   late.diagnosis.total.likelihood.instructions
 )
 
-likelihood.instructions.syphilis.diagnoses.with.margins=join.likelihood.instructions(
-  population.likelihood.instructions,
-  deaths.likelihood.instructions,
-  fertility.likelihood.instructions,
-  immigration.likelihood.instructions,
-  emigration.likelihood.instructions,
-  
-  total.diagnosis.likelihood.instructions,
-  ps.diagnosis.likelihood.instructions,
-  early.diagnosis.likelihood.instructions,
-  late.diagnosis.likelihood.instructions
+likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(#only PS total
+  likelihood.instructions.demographics,  #
+   ps.diagnosis.total.likelihood.instructions
+)
+likelihood.instructions.syphilis.diagnoses.elTotal=join.likelihood.instructions(#only EL total
+  likelihood.instructions.demographics,  #
+  early.diagnosis.total.likelihood.instructions
+)likelihood.instructions.syphilis.diagnoses.psTotal.elTotal=join.likelihood.instructions( # PS total and the early total
+  likelihood.instructions.demographics, #
+  ps.diagnosis.total.likelihood.instructions,
+  early.diagnosis.total.likelihood.instructions
 )
 
 ##--OPTIONAL:CNS ----

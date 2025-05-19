@@ -3,6 +3,11 @@ source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
 N.ITER=15000
 solver = create.solver.metadata(rtol = 0.01, atol=0.1) #rtol,atol
+# solver = create.solver.metadata() #default solver
+param.names.trans.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
+                           AGING.PARAMETERS.PRIOR@var.names,
+                           TRANSMISSION.PARAMETERS.PRIOR@var.names)
+
 
 # Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('pop.demog.8', 
@@ -20,17 +25,13 @@ register.calibration.info('pop.demog.8',
                           description = "A quick run to get population parameters in the general vicinity",
                           solver.metadata = solver
 )
-
+#############
 register.calibration.info('syphilis.diagnoses.8.RF', 
                           preceding.calibration.codes = 'pop.demog.8',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
-                          parameter.names = c(# can include a subset of parameters
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names,
-                              TRANSMISSION.PARAMETERS.PRIOR@var.names
-                          ), 
+                          param.names.trans.demog, 
                           n.iter = N.ITER,
                           thin = 50, 
                           is.preliminary = T,
@@ -44,11 +45,7 @@ register.calibration.info('syphilis.diagnoses.8.pk',
                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
-                          parameter.names = c(# can include a subset of parameters
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names,
-                              TRANSMISSION.PARAMETERS.PRIOR@var.names
-                          ), 
+                          param.names.trans.demog, 
                           n.iter = N.ITER,
                           thin = 50, 
                           is.preliminary = T,
@@ -56,6 +53,45 @@ register.calibration.info('syphilis.diagnoses.8.pk',
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = solver
 )
+##############
+# Trying diagnosis targets one at a time
+register.calibration.info('syphilis.diag.9.pk.psTotal', 
+                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.psTotal,  
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030, 
+                          param.names.trans.demog, 
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = solver
+)
+register.calibration.info('syphilis.diag.9.pk.elTotal', 
+                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.elTotal,  
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          param.names.trans.demog, 
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = solver
+)
+register.calibration.info('syphilis.diag.9.pk.psTotal.elTotal', 
+                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.psTotal.elTotal,  
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          param.names.trans.demog, 
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = solver
+)
+
 cat("*** Shiled_register_calibration.R completed!***\n")
 
 
@@ -82,6 +118,8 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 #05.08: <syphilis.diagnoses.2> same as syphilis.diagnoses.1, using total by stage
 #05.09: <syphilis.diagnoses.3.pk> adding more transmission params for msm, het and by race, calibrating to total diagnosis by stage
 #05.12: <syphilis.diagnoses.4.pk> adding time4 transmission params for msm, het, setting likelihoods to total and marginals for syphilis diagnosis
+#>> couldnt fit well, we are going to work on the total diagnosis first before moving to marginals
+#######
 #05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
 # >> 51%, parameters were mixing well, but couldnt fit the peak in 1995
 
@@ -89,8 +127,9 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 
 #05.15: <syphilis.diagnoses.7.pk> reducing atol to 0.1, using 0.5 weight to loosen the likelihoods # >> the chain is not mixing well.
 #05.15: <syphilis.diagnoses.7.pk1> reverting changes in rtol/atol and weight to check that model performs as expected# >> model is working well and parameters are mixing at 40% completion. 
-
 #05.15: <syphilis.diagnoses.7.RF> reducing atol to 0.1, using 0.8 weight to loosen the likelihoods
-#05.15: <syphilis.diagnoses.8.RF> using 0.8 weight to loosen the likelihoods. atol restored to default >> running
 
-# 05.16: <syphilis.diagnoses.8.pk> using rtol=0.01, atol=0.1, and Total.weight=0.8; ROCKFISH >> 80%complete, params not mixing
+#05.15: <syphilis.diagnoses.8.RF> using 0.8 weight to loosen the likelihoods. atol restored to default >> running
+# 05.16: <syphilis.diagnoses.8.pk> using rtol=0.01, atol=0.1, and Total.weight=0.8; ROCKFISH >> 83%complete, params not mixing at all
+
+# 5.19: <syphilis.diag.9.pk.***> Total.weight=1:  trying diagnosis likelihoods one a time
