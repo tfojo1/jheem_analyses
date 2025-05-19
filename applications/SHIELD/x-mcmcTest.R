@@ -18,12 +18,12 @@ print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locati
 #                        calibration.code = CALIBRATION.NAME,
 #                         allow.remove.incomplete = T)
 # print("Cashe is cleared")
-#
-# set.up.calibration(version=VERSION,
-#                    location=LOCATION,
-#                    calibration.code = CALIBRATION.NAME,
-#                    cache.frequency = 100 #how often write the results to disk 
-# )  
+
+set.up.calibration(version=VERSION,
+                   location=LOCATION,
+                   calibration.code = CALIBRATION.NAME,
+                   cache.frequency = 1 #how often write the results to disk
+)
 print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 
 
@@ -34,7 +34,7 @@ mcmc = run.calibration(version = VERSION,
                        location = LOCATION,
                        calibration.code = CALIBRATION.NAME,
                        chains = 1,
-                       update.frequency = 50,
+                       update.frequency = 1,
                        update.detail = 'med')
 end.time = Sys.time()
 run.time = as.numeric(end.time) - as.numeric(start.time)
