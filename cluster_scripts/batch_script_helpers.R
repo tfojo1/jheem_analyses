@@ -39,7 +39,7 @@ make.sbatch.script <- function(filename,
         cat("#SBATCH --output=", output, '\n', sep='')
     
     if (!is.null(time.hours))
-        cat("#SBATCH --time=", time.hours, ':00:00\n', sep='')
+        cat("#SBATCH --time=", format_time_hours(time.hours), '\n', sep='')
     
     if (!is.null(partition))
         cat("#SBATCH --partition=", partition, '\n', sep='')
@@ -370,6 +370,14 @@ get.multiphase.filename <- function(calibration.codes, chain, extension=".bat") 
 
 get.assemble.filename <- function(calibration.code, extension=".bat") {
     paste0("assemble_", calibration.code, extension)
+}
+
+format_time_hours <- function(time_with_decimal) {
+    hours <- floor(time_with_decimal)
+    minutes <- round((time_with_decimal - hours) * 60)
+    if (minutes > 10) output <- paste0(hours, ":", minutes, ":00")
+    else output <- paste0(hours, ":0", minutes, ":00")
+    output
 }
 
 ## FOR ANDREW EHE APPLICATIONS
