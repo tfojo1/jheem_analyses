@@ -25,6 +25,22 @@ register.calibration.info('pop.demog.8',
                           description = "A quick run to get population parameters in the general vicinity",
                           solver.metadata = solver
 )
+## TEST for Nick:
+register.calibration.info('pop.demog.test', 
+                          likelihood.instructions = likelihood.instructions.demographics,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(
+                              POPULATION.PARAMETERS.PRIOR@var.names,
+                              AGING.PARAMETERS.PRIOR@var.names 
+                          ), 
+                          n.iter = N.ITER,
+                          thin = 50, 
+                          is.preliminary = T, 
+                          max.run.time.seconds = 30, 
+                          description = "A quick run to get population parameters in the general vicinity",
+                          solver.metadata = solver
+)
 #############
 register.calibration.info('syphilis.diagnoses.8.RF',
                           preceding.calibration.codes = 'pop.demog.8',

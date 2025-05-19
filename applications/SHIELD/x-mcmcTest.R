@@ -1,19 +1,4 @@
-
-# # Get the command-line arguments passed to the script
-# args <- commandArgs(trailingOnly = TRUE)
-# 
-# # Check if an argument was provided (in this case, checking if it's not empty)
-# if (length(args) > 0 && args[1] != "rockfish") {
-#   # If the first argument is not empty, use it as the working directory
-#   JHEEM.DIR="/home/pkasaie1/scratch4-pkasaie1/jheem_analyses"
-# } else {
-#   # If no argument is provided, print a message and don't change the working directory
-#   JHEEM.DIR="~/OneDrive - Johns Hopkins/SHIELDR01/Simulation/code/jheem_analyses/"
-# }
-# setwd(JHEEM.DIR)
-# cat("Working directory set to:", getwd(), "\n")
-
-
+# sample run for Nick to test on the servers
 ##----
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
@@ -23,13 +8,9 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 #
 VERSION='shield'
 LOCATION='C.12580' #Baltimore MSA
-# LOCATION='C.35620'#NYC
-
-
 set.seed(00000)
 
-CALIBRATION.NAME = 'syphilis.diagnoses.8.RF' 
-
+CALIBRATION.NAME = 'pop.demog.test' 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
 # clear.calibration.cache(version=VERSION,

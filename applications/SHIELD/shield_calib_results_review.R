@@ -40,10 +40,10 @@ if (TRUE) {
     )
 }
 
-# # simset5=simset
-# simset=simset5
-# # simset8=simset
-# simset=simset8
+# simset5=simset
+# simset8=simset
+# simset8.rf=simset
+simset=simset8.rf
 # Quick checkpoint ----
 simset$n.sim
 # Extract first and last simulations and their parameters 
