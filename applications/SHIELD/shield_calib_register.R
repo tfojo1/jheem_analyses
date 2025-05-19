@@ -35,7 +35,7 @@ register.calibration.info('pop.demog.test',
                               AGING.PARAMETERS.PRIOR@var.names 
                           ), 
                           n.iter = 10,
-                          thin = 0, 
+                          thin = 1, 
                           is.preliminary = T, 
                           max.run.time.seconds = 30, 
                           description = "A quick run to get population parameters in the general vicinity",
