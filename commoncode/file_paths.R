@@ -2,6 +2,7 @@
 
 BIG.DESKTOP.ROOT.DIR = 'Q:'
 MAC.ROOT.DIR = "/Volumes/jheem$"
+PEARL1.ROOT.DIR = "/mnt/jheem_nas_share"
 
 LAPTOP.ROOT.DIR = '../../files'
 if (file.exists(file.path("../test_runs", "mcmc_runs"))) # a hedge against early on when we kept the files in the code subdirectory
@@ -18,4 +19,11 @@ if (RUNNING.ON.DESKTOP)
 
 if (RUNNING.ON.MAC)
     ROOT.DIR = MAC.ROOT.DIR
+
+if ((Sys.info()["nodename"] == "pearl1.jhsph.edu" || Sys.info()["nodename"] == "pearl1") &&
+    dir.exists(PEARL1.ROOT.DIR) &&
+    file.exists(file.path(PEARL1.ROOT.DIR, "mcmc_runs"))) {
+    
+    ROOT.DIR = PEARL1.ROOT.DIR
+}
 
