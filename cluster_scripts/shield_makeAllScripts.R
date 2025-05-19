@@ -2,7 +2,7 @@ source("cluster_scripts/batch_script_helpers.R")
 
 location="C.12580"
 version="shield"
-calibnames=c("9.pk.psTotal","9.pk.elTotal","9.pk.psTotal.elTotal","9.pk.all.totals")
+calibnames=c("9.pk.elTotal","9.pk.psTotal","9.pk.psTotal.elTotal","9.pk.all.totals")
 
 lapply(calibnames,function(x){
     calib.name=paste0("syphilis.diag.",x)

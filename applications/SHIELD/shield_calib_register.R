@@ -26,28 +26,28 @@ register.calibration.info('pop.demog.8',
                           solver.metadata = solver
 )
 #############
-register.calibration.info('syphilis.diagnoses.8.RF', 
+register.calibration.info('syphilis.diagnoses.8.RF',
                           preceding.calibration.codes = 'pop.demog.8',
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
+                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.all.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
-                          param.names.trans.demog, 
+                          param.names.trans.demog,
                           n.iter = N.ITER,
-                          thin = 50, 
+                          thin = 50,
                           is.preliminary = T,
                           max.run.time.seconds = 30,
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = solver
 )
 
-register.calibration.info('syphilis.diagnoses.8.pk', 
+register.calibration.info('syphilis.diagnoses.8.pk',
                           # preceding.calibration.codes = 'pop.demog.8',
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.totals,
+                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.all.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
-                          param.names.trans.demog, 
+                          param.names.trans.demog,
                           n.iter = N.ITER,
-                          thin = 50, 
+                          thin = 50,
                           is.preliminary = T,
                           max.run.time.seconds = 30,
                           description = "A quick run to get syphilis parameters in the general vicinity",
