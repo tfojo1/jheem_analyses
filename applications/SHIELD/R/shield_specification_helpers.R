@@ -604,7 +604,7 @@ get.empiric.aging.rates <- function(location, specification.metadata,
 do.get.empiric.aging.rates <- function(location, 
                                        specification.metadata,
                                        years=c('time1'=2010,'time2'=2020)
-                                       #                                       force.match.age.brackets.to.before.smoothing = NULL #if we wanted to use diff age brackets
+                                       # force.match.age.brackets.to.before.smoothing = NULL #if we wanted to use diff age brackets
 )
 {
   if (location=='US')

@@ -14,10 +14,10 @@ LOCATION <- 'C.12580'  # Baltimore MSA
 
 # get.jheem.root.directory() #"/Volumes/jheem$"
 
-# ROOT.DIR="../../files/"
-# set.jheem.root.directory(ROOT.DIR)
+ROOT.DIR="../../files/"
+set.jheem.root.directory(ROOT.DIR)
 
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.pk'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.9.pk.psTotal'
 
 CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.RF'
 
@@ -43,7 +43,7 @@ if (TRUE) {
 # simset5=simset
 # simset8=simset
 # simset8.rf=simset
-simset=simset8.rf
+# simset=simset8.rf
 # Quick checkpoint ----
 simset$n.sim
 # Extract first and last simulations and their parameters 
@@ -56,30 +56,29 @@ params.last  <- sim.last$params
 #Run Manual Simulation ----
 # engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 #
-# {
-#     params.manual <- params.last
-#     # params.manual["transmission.rate.multiplier.msm0"] <- 1 #1990
-#     params.manual["transmission.rate.multiplier.msm1"] <- 1.2 #1995
-#     params.manual["transmission.rate.multiplier.msm2"] <- 0.95 #2000
-#     params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
-#     params.manual["transmission.rate.multiplier.msm4"] <- 1.07 #2020
-# 
-#     # params.manual["transmission.rate.multiplier.heterosexual0"] <- 1 #1990
-#     params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.2 #1995
-#     params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.92 #2000
-#     params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
-#     params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.05 #2020
-# 
-#     sim.manual <- engine$run(params.manual)
-# }
+{
+    params.manual <- params.last
+    params.manual["transmission.rate.multiplier.msm0"] <- 1.16 #1990
+    params.manual["transmission.rate.multiplier.msm1"] <- 1.18 #1995
+    params.manual["transmission.rate.multiplier.msm2"] <- 0.93 #2000
+    params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
+    params.manual["transmission.rate.multiplier.msm4"] <- 1.05 #2020
 
+    params.manual["transmission.rate.multiplier.heterosexual0"] <- .988 #1990
+    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.215 #1995
+    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.905 #2000
+    params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
+    params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.055 #2020
+
+    sim.manual <- engine$run(params.manual)
 
 # Plot syphilis total diagnosis  
 simplot(
     sim.first,
     sim.last,
-    # sim.manual,
+    sim.manual,
     # split.by = "sex",
+    # split.by = "race",
     # split.by = "race", facet.by = "sex", #we are matching the totals only for now
     # split.by = "race", facet.by = "age",
     # outcomes = c("diagnosis.total"),
@@ -88,7 +87,13 @@ simplot(
     # outcomes = c("diagnosis.late.misclassified"),
     dimension.values = list(year = 1990:2025) 
 )
- 
+}
+
+# lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
+# lik.ps$compute(sim.last, debug = T)
+# lik.ps$compute(sim.manual, debug = T)
+lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
+
 # 
 # # Plot hiv.testing 
 # simplot(
@@ -100,36 +105,36 @@ simplot(
 #     outcomes = c("hiv.testing"),
 #     dimension.values = list(year = 2000:2030)
 # )
-# # Plot Population
-# simplot(
-#     sim.first,
-#     sim.last,
-#     sim.manual,
-#     split.by = "race", facet.by = "age",
-#     outcomes = c("population"),
-#     dimension.values = list(year = 2000:2030)
-# )
-# # Deaths
-# simplot(
-#     sim.first,
-#     sim.last,
-#     outcomes = c("deaths"),
-#     dimension.values = list(year = 2000:2030)
-# )
+# Plot Population
+simplot(
+    sim.first,
+    sim.last,
+    sim.manual,
+    split.by = "race", facet.by = "age",
+    outcomes = c("population"),
+    dimension.values = list(year = 2000:2030)
+)
+# Deaths
+simplot(
+    sim.first,
+    sim.last,
+    outcomes = c("deaths"),
+    dimension.values = list(year = 2000:2030)
+)
+
+# Plot Fertility
+simplot(
+    sim.first,
+    sim.last,
+    sim.manual,
+    split.by = "race", facet.by = "age",
+    outcomes = c("fertility.rate"),
+    dimension.values = list(year = 2000:2030)
+)
 # 
-# # Plot Fertility 
-# simplot(
-#     sim.first,
-#     sim.last,
-#     sim.manual,
-#     split.by = "race", facet.by = "age",
-#     outcomes = c("fertility.rate"),
-#     dimension.values = list(year = 2000:2030)
-# )
-# 
-# # Plot Immigration / Emigration 
-# simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:2030))
-# simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
+# Plot Immigration / Emigration
+simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:2030))
+simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
 
 # MCMC Diagnostics ----
 simset$get.mcmc.mixing.statistic()
@@ -166,7 +171,7 @@ if (1==2){
 
 source("applications/SHIELD/shield_likelihoods.R")
 # Likelihood Comparison ----
-lik<- likelihood.instructions.syphilis.diagnoses.totals$instantiate.likelihood(VERSION, LOCATION)
+lik<- likelihood.instructions.syphilis.diagnoses.psTotal$instantiate.likelihood(VERSION, LOCATION)
 lik$compare.sims( sim.last, sim.manual, piecewise = F)
 lik$compute(sim.last, debug = T)
 
