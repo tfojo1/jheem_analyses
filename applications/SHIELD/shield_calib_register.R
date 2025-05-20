@@ -88,6 +88,23 @@ register.calibration.info(code = paste0('syphilis.9.pk.',x),
 )
     })
 
+calibnames=c("psTotal")
+lapply(calibnames,function(x){
+    register.calibration.info(code = paste0('syphilis.10.pk.',x), 
+                              preceding.calibration.codes = "pop.demog.8",
+                              likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030, 
+                              param.names.trans.demog, 
+                              n.iter = N.ITER,
+                              thin = 50, 
+                              is.preliminary = T,
+                              max.run.time.seconds = 30,
+                              description = "A quick run to get syphilis parameters in the general vicinity",
+                              solver.metadata = solver
+    )
+})
+
 cat("*** Shiled_register_calibration.R completed!***\n")
 
 
@@ -130,3 +147,4 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 # ROCKFISH >> 83%complete, params not mixing at all (could this be an issue with starting priors? Ryan's chain is mixing well)
 
 # 5.19: <syphilis.diag.9.pk.***> Total.weight=0.8:  starting from pop.demog.8's model, trying diagnosis likelihoods one a time
+# 5.20: <syphilis.diag.10.pk.psTotal> Total.weight=0.8:  starting from pop.demog.8's model, trying ps.total diagnosis with dynamic weights 

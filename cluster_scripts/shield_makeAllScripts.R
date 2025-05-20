@@ -2,11 +2,13 @@ source("cluster_scripts/batch_script_helpers.R")
 
 location="C.12580"
 version="shield"
-calibnames=c("elTotal","psTotal","psElTotal","all.totals")
+# calibnames=c("elTotal","psTotal","psElTotal","all.totals")
+calibnames=c("psTotal")
+
 
 lapply(calibnames,function(x){
-    calib.name=paste0("syphilis.9.pk.",x)
-    master.name=paste0("shieldMaster.9.pk.",x)
+    calib.name=paste0("syphilis.10.pk.",x)
+    master.name=paste0("shieldMaster.10.pk.",x)
     cat("*** Creating setup, run, setup_master and run_master scripts for ",calib.name," *** \n")
     
     # these are defined in batch_script_helpers.R
