@@ -7,8 +7,8 @@ calibnames=c("psTotal")
 
 
 lapply(calibnames,function(x){
-    calib.name=paste0("syphilis.10.pk.",x)
-    master.name=paste0("shieldMaster.10.pk.",x)
+    calib.name=paste0("syphilis.11.pk.",x)
+    master.name=paste0("shieldMaster.11.pk.",x)
     cat("*** Creating setup, run, setup_master and run_master scripts for ",calib.name," *** \n")
     
     # these are defined in batch_script_helpers.R
