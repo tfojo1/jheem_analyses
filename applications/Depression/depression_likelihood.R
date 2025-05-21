@@ -115,7 +115,7 @@ pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(ou
 # will yield 4 numbers, estimate and SD for being being inside/outside of MSA                                  
 # look at Melissa's code for this to get a sense of what to do // in EHE folder, ehe_bias_estimates_cache.R & ehe_likelihoods.R
 
-dep_likelihood_full <- join.likelihood.instructions(FULL.likelihood.instructions.with.covid, 
+dep_likelihood_full <- join.likelihood.instructions(FULL.likelihood.instructions.8x.new.prev, 
                                                     proportionDep_likelihood_inst, 
                                                     prev_ratio_inst, 
                                                     hiv_depTx_inst, 
