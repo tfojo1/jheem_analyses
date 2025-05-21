@@ -350,23 +350,23 @@ write.shaded.table(tab = table.city[2*(1:length(city.plus.total.names))-1,1,drop
 
 
 boxplot.df.end = as.data.frame(mean.ci.rel.total.infections.averted.end.by.city)
-boxplot.df.end$Scenario = '3.end'
+boxplot.df.end$Scenario = '0.end'
 boxplot.df.end$location = city.plus.total.names
 boxplot.df.end$loc.code = names(city.plus.total.names)
 
 boxplot.df.p.intr = as.data.frame(mean.ci.rel.total.infections.averted.p.intr.by.city)
-boxplot.df.p.intr$Scenario = '2.p.intr'
+boxplot.df.p.intr$Scenario = '1.p.intr'
 boxplot.df.p.intr$location = city.plus.total.names
 boxplot.df.p.intr$loc.code = names(city.plus.total.names)
 
 boxplot.df.b.intr = as.data.frame(mean.ci.rel.total.infections.averted.b.intr.by.city)
-boxplot.df.b.intr$Scenario = '1.b.intr'
+boxplot.df.b.intr$Scenario = '2.b.intr'
 boxplot.df.b.intr$location = city.plus.total.names
 boxplot.df.b.intr$loc.code = names(city.plus.total.names)
 
 boxplot.df.spacer = boxplot.df.end
 boxplot.df.spacer$mean = boxplot.df.spacer$lower = boxplot.df.spacer$upper = boxplot.df.spacer$iqr.lower = boxplot.df.spacer$iqr.upper = NA
-boxplot.df.spacer$Scenario = '0.spacer'
+boxplot.df.spacer$Scenario = '3.spacer'
 boxplot.df.spacer = boxplot.df.spacer[boxplot.df.spacer$loc.code!='total',]
 
 boxplot.df = rbind(
@@ -376,24 +376,30 @@ boxplot.df = rbind(
   boxplot.df.b.intr
 )
 
+city.plus.total.names['exp'] = "Medicaid\nExpansion States"
+city.plus.total.names['nonexp'] = "Medicaid\nNon-Expansion States"
 
-boxplot.df$location = factor(boxplot.df$location,
-                             levels = c(city.plus.total.names[c('total','nonexp','exp')],
-                                        rev(location.names)))
+# boxplot.df$location = factor(boxplot.df$location,
+#                              levels = rev(c(city.plus.total.names[c('total','nonexp','exp')],
+#                                         rev(location.names))))
 
-boxplot.df$group = paste0(boxplot.df$Scenario, "_", boxplot.df$location)
+loc.code.levels = c(names(location.names), c('exp','nonexp','total'))
+boxplot.df$loc.code = factor(boxplot.df$loc.code,
+                             levels = loc.code.levels)
+
+boxplot.df$group = paste0(boxplot.df$Scenario, "_", boxplot.df$loc.code)
 
 
-nonexp.mask = sapply(boxplot.df$loc.code, function(city){
+nonexp.mask = sapply(loc.code.levels, function(city){
     any(city==RW.MEDICAID.NONEXPANSION.LOCATIONS)
 })
-nonexp.mask[boxplot.df$loc.code=='nonexp'] = T
-total.mask = boxplot.df$loc.code == 'total'
-total.and.subtotal.mask = total.mask | boxplot.df$loc.code == 'exp' | boxplot.df$loc.code == 'nonexp'
+nonexp.mask[loc.code.levels=='nonexp'] = T
+total.mask = loc.code.levels == 'total'
+total.and.subtotal.mask = total.mask | loc.code.levels == 'exp' | loc.code.levels == 'nonexp'
 
-location.colors = rep(RW.EXP.LABEL.COLOR, length(boxplot.df$location))
+location.colors = rep(RW.EXP.LABEL.COLOR, length(loc.code.levels))
 location.colors[nonexp.mask] = RW.NONEXP.LABEL.COLOR
-location.face = rep('plain', length(boxplot.df$location))
+location.face = rep('plain', length(loc.code.levels))
 
 location.colors[total.mask] = RW.TOTAL.LABEL.COLOR
 location.face[total.and.subtotal.mask] = 'bold'
@@ -401,36 +407,42 @@ location.face[total.and.subtotal.mask] = 'bold'
 
 plot = ggplot() + 
   geom_boxplot(data = boxplot.df,
-               aes(y = location,
-                   xmiddle = mean,
-                   xlower = iqr.lower,
-                   xupper = iqr.upper,
-                   xmin = lower,
-                   xmax = upper,
+               aes(x = loc.code,
+                   middle = mean,
+                   lower = iqr.lower,
+                   upper = iqr.upper,
+                   min = lower,
+                   max = upper,
                    fill = Scenario,
                    group = group),
                stat = 'identity',
                position = position_dodge2()) + 
-  scale_fill_manual(values = c('3.end'=RW.END.COLOR,
-                               '2.p.intr'=RW.P.INTR.COLOR,
-                               '1.b.intr'=RW.B.INTR.COLOR),
-                    labels = c('3.end'='Cessation',
-                               '2.p.intr'='Prolonged Interruption',
-                               '1.b.intr'='Brief Interruption'),
+  scale_fill_manual(values = c('0.end'=RW.END.COLOR,
+                               '1.p.intr'=RW.P.INTR.COLOR,
+                               '2.b.intr'=RW.B.INTR.COLOR),
+                    labels = c('0.end'='Cessation',
+                               '1.p.intr'='Prolonged Interruption',
+                               '2.b.intr'='Brief Interruption'),
                     name=NULL) +
   theme_bw() +
-  scale_x_continuous(labels = scales::percent) +
-  ylab(NULL) +
-  xlab("Relative Increase in HIV Infections, 2025-2030") + 
+  scale_y_continuous(labels = scales::percent) +
+  scale_x_discrete(labels = city.plus.total.names) + 
+  xlab(NULL) +
+  ylab("Relative Increase in HIV Infections, 2025-2030") + 
   theme(legend.position = 'bottom',
         legend.direction = 'horizontal',
-        axis.text.y = element_text(color=rev(location.colors), face=rev(location.face))); print(plot)
+        axis.text.x = element_text(color=location.colors, 
+                                   face=location.face,
+                                   angle = 45,
+                                   hjust = 1)); print(plot)
   
 
-PLOT.HEIGHT = 7
+PLOT.HEIGHT = 5
 PLOT.WIDTH = 6.5
 PLOT.DPI = 600
 PLOT.DEVICE = 'png'
+
+print(plot)
 
 ggsave(plot = plot, 
        filename=file.path(PLOT.DIR, paste0(tolower(RW.LOCATION.DESCRIPTOR), '_boxplots.png')),

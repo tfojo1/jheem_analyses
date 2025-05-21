@@ -61,7 +61,8 @@ cdc.testing.apply.set.parameters <- function(model.settings, parameters)
     
     
     parameter.prefixes = c(
-        fraction.diagnoses.from.cdc = 'cdc.funded.diagnoses.'
+        fraction.diagnoses.from.cdc = 'cdc.funded.diagnoses.',
+        fraction.tests.from.cdc = 'cdc.funded.tests.'
         
     )
     element.names = names(parameter.prefixes)
@@ -158,10 +159,12 @@ cdc.testing.apply.set.parameters <- function(model.settings, parameters)
 
 
 CDC.TESTING.PARAMETER.SAMPLING.BLOCKS = list(
-    cdc.funded.diagnoses.by.race <- c("cdc.funded.diagnoses.black.or","cdc.funded.diagnoses.hispanic.or","cdc.funded.diagnoses.other.or"),
-    cdc.funded.diagnoses.by.risk <- c("cdc.funded.diagnoses.msm.or","cdc.funded.diagnoses.msm.idu.or","cdc.funded.diagnoses.idu.male.or","cdc.funded.diagnoses.idu.female.or","cdc.funded.diagnoses.heterosexual.male.or","cdc.funded.diagnoses.heterosexual.female.or"),
-    cdc.funded.diagnoses.by.age <- c("cdc.funded.diagnoses.age1.or","cdc.funded.diagnoses.age2.or","cdc.funded.diagnoses.age3.or","cdc.funded.diagnoses.age4.or","cdc.funded.diagnoses.age5.or"),
-    cdc.funded.tests.by.race <- c("cdc.funded.tests.black.or","cdc.funded.tests.hispanic.or","cdc.funded.tests.other.or"),
-    cdc.funded.tests.by.risk <- c("cdc.funded.tests.msm.or","cdc.funded.tests.msm.idu.or","cdc.funded.tests.idu.male.or","cdc.funded.tests.idu.female.or","cdc.funded.tests.heterosexual.male.or","cdc.funded.tests.heterosexual.female.or"),
-    cdc.funded.tests.by.age <- c("cdc.funded.tests.age1.or","cdc.funded.tests.age2.or","cdc.funded.tests.age3.or","cdc.funded.tests.age4.or","cdc.funded.tests.age5.or")
+    cdc.funded.tests = 'cdc.funded.tests.or',
+    cdc.funded.diagnoses.by.race = c("cdc.funded.diagnoses.black.or","cdc.funded.diagnoses.hispanic.or","cdc.funded.diagnoses.other.or"),
+    cdc.funded.diagnoses.by.risk = c("cdc.funded.diagnoses.msm.or","cdc.funded.diagnoses.msm.idu.or","cdc.funded.diagnoses.idu.male.or","cdc.funded.diagnoses.idu.female.or","cdc.funded.diagnoses.heterosexual.male.or","cdc.funded.diagnoses.heterosexual.female.or"),
+    cdc.funded.diagnoses.by.age = c("cdc.funded.diagnoses.age1.or","cdc.funded.diagnoses.age2.or","cdc.funded.diagnoses.age3.or","cdc.funded.diagnoses.age4.or","cdc.funded.diagnoses.age5.or"),
+    cdc.funded.tests.by.race = c("cdc.funded.tests.black.or","cdc.funded.tests.hispanic.or","cdc.funded.tests.other.or"),
+    cdc.funded.tests.by.risk = c("cdc.funded.tests.msm.or","cdc.funded.tests.msm.idu.or","cdc.funded.tests.idu.male.or","cdc.funded.tests.idu.female.or","cdc.funded.tests.heterosexual.male.or","cdc.funded.tests.heterosexual.female.or"),
+    cdc.funded.tests.by.age = c("cdc.funded.tests.age1.or","cdc.funded.tests.age2.or","cdc.funded.tests.age3.or","cdc.funded.tests.age4.or","cdc.funded.tests.age5.or"),
+    cdc.funded.diagnoses = 'cdc.funded.diagnoses.or'
 )

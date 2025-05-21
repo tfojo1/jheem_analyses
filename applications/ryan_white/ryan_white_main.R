@@ -22,8 +22,8 @@ RW.LOCATION.DESCRIPTOR.PLURAL = ifelse(RW.IS.STATE.LEVEL, 'States', "Cities")
 
 # Run settings
 VERBOSE = T
-CALIBRATION.CODE = "final.ehe.state" # 'final.ehe' # for now, with stage 3 state calibrations
-N.SIM = 100 #1000  # for now, with stage 3 state calibrations
+CALIBRATION.CODE = "final.ehe.state" 
+N.SIM = 1000  
 FORCE.REDO = T
 N.CHUNKS = 20
 
