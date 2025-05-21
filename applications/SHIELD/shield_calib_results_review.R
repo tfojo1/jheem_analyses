@@ -62,17 +62,17 @@ params.last  <- sim.last$params
 #
 {
     params.manual <- params.last
-    # params.manual["transmission.rate.multiplier.msm0"] <- 1.16 #1990
-    params.manual["transmission.rate.multiplier.msm1"] <- 1.2 #1995
-    params.manual["transmission.rate.multiplier.msm2"] <- 0.9 #2000
-    # params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
-    # params.manual["transmission.rate.multiplier.msm4"] <- 1.05 #2020
+    params.manual["transmission.rate.multiplier.msm0"] <- 1.16 #1990
+    params.manual["transmission.rate.multiplier.msm1"] <- 1.18 #1995
+    params.manual["transmission.rate.multiplier.msm2"] <- 0.93 #2000
+    params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
+    params.manual["transmission.rate.multiplier.msm4"] <- 1.05 #2020
 
-    # params.manual["transmission.rate.multiplier.heterosexual0"] <- .988 #1990
-    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.2 #1995
-    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.9 #2000
-    # params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
-    # params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.055 #2020
+    params.manual["transmission.rate.multiplier.heterosexual0"] <- .988 #1990
+    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.215 #1995
+    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.905 #2000
+    params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
+    params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.055 #2020
 
     sim.manual <- engine$run(params.manual)
 
@@ -93,12 +93,13 @@ simplot(
 )
 }
 
-# lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
+lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
+lik.total=likelihood.instructions.syphilis.diagnoses.psTotal$instantiate.likelihood(VERSION,LOCATION)
 # lik.ps$compute(sim.last, debug = T)
 # lik.ps$compute(sim.manual, debug = T)
-lik.ps$compare.sims(sim.first, sim.last, piecewise = T)
+# lik.ps$compare.sims(sim.first, sim.last, piecewise = T)
 lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
-
+lik.total$compare.sims(sim.last, sim.manual, piecewise = F)
 # 
 # # Plot hiv.testing 
 # simplot(
