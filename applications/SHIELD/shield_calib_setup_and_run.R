@@ -28,7 +28,7 @@ LOCATION='C.12580' #Baltimore MSA
 
 set.seed(00000)
 
-CALIBRATION.NAME = 'syphilis.diag.10.pk.psTotal' 
+CALIBRATION.NAME = 'syphilis.10.pk.psTotal' 
 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
@@ -38,11 +38,11 @@ print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locati
 #                         allow.remove.incomplete = T)
 # print("Cashe is cleared")
 #
-# set.up.calibration(version=VERSION,
-#                    location=LOCATION,
-#                    calibration.code = CALIBRATION.NAME,
-#                    cache.frequency = 100 #how often write the results to disk 
-# )  
+set.up.calibration(version=VERSION,
+                   location=LOCATION,
+                   calibration.code = CALIBRATION.NAME,
+                   cache.frequency = 100 #how often write the results to disk
+)
 print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 
 

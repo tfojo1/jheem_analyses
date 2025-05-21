@@ -115,14 +115,14 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   #option 1: 10 independant params
   # # msm multipliers by time
   transmission.rate.multiplier.msm0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #1990,
-  transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #1995
-  transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #2000
+  transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = log(1.2), sdlog = 0.5*log(2)), #1995 #increasing the peak value
+  transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)), #2000 #decreasing the rate after
   transmission.rate.multiplier.msm3 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #2010
   transmission.rate.multiplier.msm4 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #2020
   # heterosexual multipliers by time
   transmission.rate.multiplier.heterosexual0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.heterosexual1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.heterosexual2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.heterosexual1 = Lognormal.Distribution(meanlog = log(1.2), sdlog = 0.5*log(2)),#1995 #increasing the peak value
+  transmission.rate.multiplier.heterosexual2 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)),#2000 #decreasing the rate after
   transmission.rate.multiplier.heterosexual3 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.heterosexual4 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   

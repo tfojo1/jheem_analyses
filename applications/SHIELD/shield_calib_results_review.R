@@ -17,11 +17,12 @@ LOCATION <- 'C.12580'  # Baltimore MSA
 ROOT.DIR="../../files/"
 set.jheem.root.directory(ROOT.DIR)
 
+# DATE <- "2025-05-07"
 CALIBRATION.CODE.TO.RUN <- 'syphilis.9.pk.psTotal'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.10.pk.psTotal'
 
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.RF'
+# CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.RF'
 
-DATE <- "2025-05-07"
 
 # Load or Assemble Simulation Set ----
 if (FALSE) {
@@ -40,10 +41,13 @@ if (TRUE) {
     )
 }
 
-# simset5=simset
+simset10=simset
+
 # simset8=simset
 # simset8.rf=simset
 # simset=simset8.rf
+simset=simset9
+simset=simset10
 # Quick checkpoint ----
 simset$n.sim
 # Extract first and last simulations and their parameters 
@@ -58,17 +62,17 @@ params.last  <- sim.last$params
 #
 {
     params.manual <- params.last
-    params.manual["transmission.rate.multiplier.msm0"] <- 1.16 #1990
-    params.manual["transmission.rate.multiplier.msm1"] <- 1.18 #1995
-    params.manual["transmission.rate.multiplier.msm2"] <- 0.93 #2000
-    params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
-    params.manual["transmission.rate.multiplier.msm4"] <- 1.05 #2020
+    # params.manual["transmission.rate.multiplier.msm0"] <- 1.16 #1990
+    params.manual["transmission.rate.multiplier.msm1"] <- 1.2 #1995
+    params.manual["transmission.rate.multiplier.msm2"] <- 0.9 #2000
+    # params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
+    # params.manual["transmission.rate.multiplier.msm4"] <- 1.05 #2020
 
-    params.manual["transmission.rate.multiplier.heterosexual0"] <- .988 #1990
-    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.215 #1995
-    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.905 #2000
-    params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
-    params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.055 #2020
+    # params.manual["transmission.rate.multiplier.heterosexual0"] <- .988 #1990
+    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.2 #1995
+    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.9 #2000
+    # params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
+    # params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.055 #2020
 
     sim.manual <- engine$run(params.manual)
 
@@ -92,6 +96,7 @@ simplot(
 # lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
 # lik.ps$compute(sim.last, debug = T)
 # lik.ps$compute(sim.manual, debug = T)
+lik.ps$compare.sims(sim.first, sim.last, piecewise = T)
 lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
 
 # 
@@ -137,7 +142,7 @@ simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:
 simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
 
 # MCMC Diagnostics ----
-simset$get.mcmc.mixing.statistic()
+head(simset$get.mcmc.mixing.statistic())
 simset$traceplot("trans")
 cbind(simset$get.params("trans"))
 cbind(sim.manual$get.params("trans"))

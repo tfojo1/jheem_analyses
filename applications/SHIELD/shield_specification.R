@@ -1328,7 +1328,8 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'births',
                       corresponding.data.outcome = 'immigration',
                       include.tags = "immigration",
-                      keep.dimensions = c('location','age','race','sex')
+                      # keep.dimensions = c('location','age','race','sex')
+                      keep.dimensions = c('location' ) #revision on May21 to speed up
 )
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name = 'emigration',
@@ -1340,8 +1341,9 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       dynamic.quantity.name = 'mortality',
                       corresponding.data.outcome = 'emigration', 
                       include.tags = "emigration",
-                      keep.dimensions = c('location','age','race','sex')
-                      )
+                      # keep.dimensions = c('location','age','race','sex')
+                      keep.dimensions = c('location' ) #revision on May21 to speed up
+                                            )
 ##---- HIV Testing -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       name = 'hiv.testing',
@@ -1456,7 +1458,8 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       scale='non.negative.number',
                       dynamic.quantity.name = 'remission.from', 
                       corresponding.data.outcome = 'total.syphilis.diagnoses'  ,
-                      keep.dimensions = c('location','age','race','sex','stage') #have to keep these dimensions because they're used for ps and other stages below
+                      # keep.dimensions = c('location','age','race','sex','stage') #have to keep these dimensions because they're used for ps and other stages below
+                      keep.dimensions = c('location','stage') #revision on May21 to speed up
 )
 ### Primary/Secondary diagnoses ----
 # <used in calibration>
@@ -1472,7 +1475,8 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
                          corresponding.data.outcome = 'ps.syphilis.diagnoses' ,
-                         keep.dimensions = c('location','age','race','sex')
+                         # keep.dimensions = c('location','age','race','sex')
+                         keep.dimensions = c('location' ) #revision on May21 to speed up
 )
 
 
@@ -1490,7 +1494,8 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
                          corresponding.data.outcome = 'early.syphilis.diagnoses',#<just for comparison>
-                         keep.dimensions = c('location','age','race','sex') 
+                         # keep.dimensions = c('location','age','race','sex') 
+                         keep.dimensions = c('location' ) #revision on May21 to speed up
 )
 ### Late Latent Syphilis: True Estimate 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
@@ -1505,7 +1510,8 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',  #<just for comparison>
-                         keep.dimensions = c('location','age','race','sex') 
+                         # keep.dimensions = c('location','age','race','sex') 
+                         keep.dimensions = c('location' ) #revision on May21 to speed up
 )
 # Early Latent Syphilis: Misclassified Estimate reported
 # <used in calibration>
@@ -1522,7 +1528,8 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          force.dim.names.to.keep.dimensions = T,
                          scale='non.negative.number',
                          corresponding.data.outcome = 'early.syphilis.diagnoses',
-                         keep.dimensions = c('location','age','race','sex') 
+                         # keep.dimensions = c('location','age','race','sex') 
+                         keep.dimensions = c('location' ) #revision on May21 to speed up
 )
 
 # Late Latent Syphilis: Misclassified Estimate in the model
@@ -1538,7 +1545,8 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#<just for comparison>
-                         keep.dimensions = c('location','age','race','sex') 
+                         # keep.dimensions = c('location','age','race','sex') 
+                         keep.dimensions = c('location' ) #revision on May21 to speed up
 )
 
 # # Late Syphilis (including LL, Tertirary and CNS): True Estimate
@@ -1570,7 +1578,8 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',
-                         keep.dimensions = c('location','age','race','sex') 
+                         # keep.dimensions = c('location','age','race','sex') 
+                         keep.dimensions = c('location' ) #revision on May21 to speed up
 )
 
 # Tertiary & CNS diagnosis (all cases are symptomatic: no misclassification)
@@ -1587,7 +1596,8 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                                                                     singular.unit = 'case'),
                          scale='non.negative.number',
                          # corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', #<just for comparison>
-                         keep.dimensions = c('location','age','race','sex') 
+                         # keep.dimensions = c('location','age','race','sex') 
+                         keep.dimensions = c('location' ) #revision on May21 to speed up
 ) 
 ### Congenital Diagnoses -----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
