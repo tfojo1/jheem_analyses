@@ -74,13 +74,20 @@ MEDICAID.NONEXPANSION.STATES = names(states.name.plus)[!STATE.MEDICAID.EXPANSION
 
 get.fraction.medicaid.expansion <- function(location)
 {
-    name = locations::get.location.name(location)
-    
-    split = strsplit(name, ', ')
-    states.str = split[[1]][length(split[[1]])]
-    states = strsplit(states.str, "-")[[1]]
-    
-    main.state = states[1]
-    
-    as.numeric(STATE.MEDICAID.EXPANSION[gsub(" ", "_", get.location.name(main.state))])
+    if (any(MEDICAID.EXPANSION.STATES==location))
+        1
+    else if (any(MEDICAID.NONEXPANSION.STATES==location))
+        0
+    else
+    {
+        name = locations::get.location.name(location)
+        
+        split = strsplit(name, ', ')
+        states.str = split[[1]][length(split[[1]])]
+        states = strsplit(states.str, "-")[[1]]
+        
+        main.state = states[1]
+        
+        as.numeric(STATE.MEDICAID.EXPANSION[gsub(" ", "_", get.location.name(main.state))])
+    }
 }

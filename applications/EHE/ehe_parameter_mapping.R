@@ -363,10 +363,10 @@ EHE.APPLY.PARAMETERS.FN = function(model.settings, parameters)
     #-- Proportion MSM of Male --#
     
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'proportion.msm.of.male',
-                                                                alpha.name = 'value',
-                                                                values = parameters['proportion.msm.of.male.mult'],
-                                                                applies.to.dimension.values = 'all',
-                                                                dimension = 'all')
+                                                                  alpha.name = 'value',
+                                                                  values = parameters[paste0(races, '.proportion.msm.of.male.mult')],
+                                                                  applies.to.dimension.values = races,
+                                                                  dimension = 'race')
 
     #-- Transmission Rates --#
     

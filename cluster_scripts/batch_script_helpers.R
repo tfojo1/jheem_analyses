@@ -1,11 +1,12 @@
 # Get the absolute path to jheem_analyses directory
-# JHEEM_DIR = file.path("/scratch4/pkasaie1", Sys.getenv("USER"), "jheem/code/jheem_analyses")
 USER =  Sys.getenv("USER")
-JHEEM_DIR = file.path("scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
-OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs2")
+JHEEM_DIR = file.path("/scratch4/pkasaie1", USER, "jheem/code/jheem_analyses")
+OUTPUT.DIR = file.path(JHEEM_DIR, "cluster_scripts/outputs")
 MODULE.LOAD.COMMANDS = c('source cluster_scripts/rockfish_module_loads.sh')
 EHE.SPEC <- "applications/EHE/ehe_specification.R"
 EHE.REG <- "applications/EHE/calibration_runs/ehe_register_calibrations.R"
+SHIELD.SPEC<- "applications/SHIELD/shield_specification.R"
+SHIELD.REG <- "applications/SHIELD/shield_calib_register.R"
 
 make.sbatch.script <- function(filename,
                                mem=NULL,
@@ -38,7 +39,7 @@ make.sbatch.script <- function(filename,
         cat("#SBATCH --output=", output, '\n', sep='')
     
     if (!is.null(time.hours))
-        cat("#SBATCH --time=", time.hours, ':00:00\n', sep='')
+        cat("#SBATCH --time=", format_time_hours(time.hours), '\n', sep='')
     
     if (!is.null(partition))
         cat("#SBATCH --partition=", partition, '\n', sep='')
@@ -71,7 +72,7 @@ make.setup.scripts <- function(locations,
 {
     # Create output directories for each location
     for (location in locations) {
-        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code, extension=".out"))
+        output_path <- file.path(OUTPUT.DIR, version, location)
         if (!dir.exists(output_path))
             dir.create(output_path, recursive=TRUE)
             
@@ -83,7 +84,7 @@ make.setup.scripts <- function(locations,
         # Create the batch script
         make.sbatch.script(filename=file.path(dir, version, location, get.setup.filename(calibration.code)),
                            mem=mem,
-                           output = output_path,
+                           output = file.path(output_path, get.setup.filename(calibration.code, extension=".out")),
                            job.name = paste0('S_', location),
                            partition = partition,
                            time.hours = time.hours,
@@ -108,7 +109,7 @@ make.run.scripts <- function(locations,
     for (location in locations) {
         # Create output directories for each location/chain combination
         for (chain in chains) {
-            output_path <- file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out"))
+            output_path <- file.path(OUTPUT.DIR, version, location)
             if (!dir.exists(output_path))
                 dir.create(output_path, recursive=TRUE)
         }
@@ -123,7 +124,7 @@ make.run.scripts <- function(locations,
             make.sbatch.script(filename=file.path(dir, version, location, get.run.filename(calibration.code, chain)),
                                job.name = paste0("R_", location, "_", chain),
                                mem=mem,
-                               output = output_path,
+                               output = file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out")),
                                partition=partition,
                                time.hours = time.hours,
                                account=account,
@@ -148,7 +149,7 @@ make.multiphase.scripts <- function(locations,
     for (location in locations) {
         # Create output directories for each location/chain combination
         for (chain in chains) {
-            output_path <- file.path(OUTPUT.DIR, version, location, get.multiphase.filename(calibration.codes, chain, extension=".out"))
+            output_path <- file.path(OUTPUT.DIR, version, location)
             if (!dir.exists(output_path))
                 dir.create(output_path, recursive=TRUE)
         }
@@ -163,7 +164,7 @@ make.multiphase.scripts <- function(locations,
             make.sbatch.script(filename=file.path(dir, version, location, get.multiphase.filename(calibration.codes, chain)),
                                job.name = paste0("M_", location, "_", chain),
                                mem=mem,
-                               output = output_path,
+                               output = file.path(OUTPUT.DIR, version, location, get.multiphase.filename(calibration.codes, chain, extension=".out")),
                                partition=partition,
                                time.hours = 36,
                                account=account,
@@ -185,7 +186,7 @@ make.assemble.scripts <- function(locations,
                                   cpus.per.task=2)
 {
     for (location in locations) {
-        output_path <- file.path(OUTPUT.DIR, version, location, get.assemble.filename(calibration.code, extension=".out"))
+        output_path <- file.path(OUTPUT.DIR, version, location)
         if (!dir.exists(output_path))
             dir.create(output_path, recursive=TRUE)
         
@@ -197,7 +198,7 @@ make.assemble.scripts <- function(locations,
         # Create the batch script
         make.sbatch.script(filename=file.path(dir, version, location, get.assemble.filename(calibration.code)),
                            cpus.per.task=cpus.per.task,
-                           output = output_path,
+                           output = file.path(output_path, get.assemble.filename(calibration.code, extension=".out")),
                            job.name = paste0('S_', location),
                            partition = partition,
                            time.hours = 2,
@@ -369,6 +370,14 @@ get.multiphase.filename <- function(calibration.codes, chain, extension=".bat") 
 
 get.assemble.filename <- function(calibration.code, extension=".bat") {
     paste0("assemble_", calibration.code, extension)
+}
+
+format_time_hours <- function(time_with_decimal) {
+    hours <- floor(time_with_decimal)
+    minutes <- round((time_with_decimal - hours) * 60)
+    if (minutes > 10) output <- paste0(hours, ":", minutes, ":00")
+    else output <- paste0(hours, ":0", minutes, ":00")
+    output
 }
 
 ## FOR ANDREW EHE APPLICATIONS

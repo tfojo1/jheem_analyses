@@ -45,13 +45,22 @@ data.manager$register.outcome(
     description = "Proportion of People who have received an HIV test in the last year"), denominator.outcome = 'proportion.tested.n')
 
 data.manager$register.outcome(
-  'proportion.msm', 
-  metadata = create.outcome.metadata(
-    scale = 'proportion',
-    display.name = 'Proportion of MSM',
-    axis.name = 'Proportion of MSM',
-    units = '%',
-    description = "Proportion of Men who have sex with Men"), denominator.outcome = 'adult.population')
+    'proportion.msm.n',           
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Proportion msm n value from BRFSS',
+        axis.name = 'Proportion msm n value from BRFSS',
+        units = '%',
+        description = "Proportion msm n value from BRFSS"))
+
+data.manager$register.outcome(
+    'proportion.msm', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion of MSM',
+        axis.name = 'Proportion of MSM',
+        units = '%',
+        description = "Proportion of Men who have sex with Men"), denominator.outcome = 'adult.population')
 
 data.manager$register.outcome(
   'unweighted.denominator',
@@ -68,6 +77,7 @@ data.manager$register.parent.source('ACS', full.name = 'American Community Surve
 
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss') #child
 data.manager$register.source('emory', parent.source= "ACS", full.name = "Emory University", short.name='emory') #child
+data.manager$register.source('emory.aggregated', parent.source= "ACS", full.name = "Emory University- Aggregated", short.name='emory.aggregated') 
 
 #Register Ontologies:
 data.manager$register.ontology(

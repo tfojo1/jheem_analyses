@@ -1,11 +1,8 @@
-# Load Required Libraries ----
+# Load Required Libraries and Commoncode----
 library(plotly)
-
-# Load SHIELD and Common Code ----
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
-
 # Set Plotting Styles ----
 location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager   = create.style.manager(color.data.by = "source")
@@ -14,8 +11,18 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.1'
-DATE <- "2025-05-07"
+
+# get.jheem.root.directory() #"/Volumes/jheem$"
+
+ROOT.DIR="../../files/"
+set.jheem.root.directory(ROOT.DIR)
+
+# DATE <- "2025-05-07"
+CALIBRATION.CODE.TO.RUN <- 'syphilis.9.pk.psTotal'
+CALIBRATION.CODE.TO.RUN <- 'syphilis.10.pk.psTotal'
+
+# CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.8.RF'
+
 
 # Load or Assemble Simulation Set ----
 if (FALSE) {
@@ -34,58 +41,85 @@ if (TRUE) {
     )
 }
 
-# Quick checkpoint ----
-simset = simset; simset
+simset10=simset
 
-# Extract first and last simulations and their parameters ----
+# simset8=simset
+# simset8.rf=simset
+# simset=simset8.rf
+simset=simset9
+simset=simset10
+# Quick checkpoint ----
+simset$n.sim
+# Extract first and last simulations and their parameters 
 sim.first    <- simset$first.sim()
 sim.last     <- simset$last.sim()
 params.first <- sim.first$params
 params.last  <- sim.last$params
 
-# Run Manual Simulation ----
-engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 
-params.manual <- params.last
-params.manual["age40.44.hispanic.fertility.rate.multiplier"] <- 10 # last: 0.06205035, first: 1.0000000
+#Run Manual Simulation ----
+# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+#
+{
+    params.manual <- params.last
+    params.manual["transmission.rate.multiplier.msm0"] <- 1.16 #1990
+    params.manual["transmission.rate.multiplier.msm1"] <- 1.18 #1995
+    params.manual["transmission.rate.multiplier.msm2"] <- 0.93 #2000
+    params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
+    params.manual["transmission.rate.multiplier.msm4"] <- 1.05 #2020
 
-params.manual
+    params.manual["transmission.rate.multiplier.heterosexual0"] <- .988 #1990
+    params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.215 #1995
+    params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.905 #2000
+    params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
+    params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.055 #2020
 
+    sim.manual <- engine$run(params.manual)
 
-fertility.params = names(params.manual)[grepl("fertility.rate.multiplier", names(params.manual))]
-
-params.manual[fertility.params] = params.first[fertility.params]
-
-
-sim.manual <- engine$run(params.manual)
-
-q=engine$extract.quantity.values()
-
-input.fertility = q$fertility.rate[["2020"]]
-dimnames(sim.manual$immigration)
-pop = sim.manual$population["2020",,"40-44 years","hispanic","female",]
-births = sim.manual$births.from["2020",,"40-44 years","hispanic","female",]
-immigration = sim.manual$immigration["2020",,"40-44 years","hispanic","female",]
-emigration = sim.manual$emigration["2020",,"40-44 years","hispanic","female",]
-
-pop*input.fertility["40-44 years","hispanic"]
-
-# Save simset (optional)
-# save(simset, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", Sys.Date(), "_", LOCATION, ".Rdata"))
-
-# Simulation Diagnostics and Visualization ----
-simset$n.sim
-
-# Population
+# Plot syphilis total diagnosis  
 simplot(
     sim.first,
     sim.last,
-    #sim.manual,
+    sim.manual,
+    # split.by = "sex",
+    # split.by = "race",
+    # split.by = "race", facet.by = "sex", #we are matching the totals only for now
+    # split.by = "race", facet.by = "age",
+    # outcomes = c("diagnosis.total"),
+    outcomes = c("diagnosis.ps"),
+    # outcomes = c("diagnosis.el.misclassified"),
+    # outcomes = c("diagnosis.late.misclassified"),
+    dimension.values = list(year = 1990:2025) 
+)
+}
+
+lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
+lik.total=likelihood.instructions.syphilis.diagnoses.psTotal$instantiate.likelihood(VERSION,LOCATION)
+# lik.ps$compute(sim.last, debug = T)
+# lik.ps$compute(sim.manual, debug = T)
+# lik.ps$compare.sims(sim.first, sim.last, piecewise = T)
+lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
+lik.total$compare.sims(sim.last, sim.manual, piecewise = F)
+# 
+# # Plot hiv.testing 
+# simplot(
+#     sim.first,
+#     sim.last,
+#     #sim.manual,
+#     # facet.by = "sex",
+#     # facet.by = "age",
+#     outcomes = c("hiv.testing"),
+#     dimension.values = list(year = 2000:2030)
+# )
+# Plot Population
+simplot(
+    sim.first,
+    sim.last,
+    sim.manual,
     split.by = "race", facet.by = "age",
     outcomes = c("population"),
     dimension.values = list(year = 2000:2030)
 )
-
 # Deaths
 simplot(
     sim.first,
@@ -94,22 +128,26 @@ simplot(
     dimension.values = list(year = 2000:2030)
 )
 
-# Fertility
+# Plot Fertility
 simplot(
     sim.first,
     sim.last,
-    #sim.manual,
+    sim.manual,
     split.by = "race", facet.by = "age",
     outcomes = c("fertility.rate"),
     dimension.values = list(year = 2000:2030)
 )
-
-# Immigration / Emigration
+# 
+# Plot Immigration / Emigration
 simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:2030))
 simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
 
 # MCMC Diagnostics ----
-simset$get.mcmc.mixing.statistic()
+head(simset$get.mcmc.mixing.statistic())
+simset$traceplot("trans")
+cbind(simset$get.params("trans"))
+cbind(sim.manual$get.params("trans"))
+
 simset$traceplot("black.aging")
 simset$traceplot("other.aging")
 simset$traceplot("hispanic.aging")
@@ -117,48 +155,49 @@ simset$traceplot("mortality")
 simset$traceplot("fertility")
 
 # Likelihood Comparison ----
-source("applications/SHIELD/debug_likelihoods.R")
-
-lik         <- likelihood.instructions.demographics$instantiate.likelihood(VERSION, LOCATION)
-lik.sex.race <- population.likelihood.instructions.2way.sex.race$instantiate.likelihood(VERSION, LOCATION)
-lik.sex.age  <- population.likelihood.instructions.2way.sex.age$instantiate.likelihood(VERSION, LOCATION)
-lik.age.race <- population.likelihood.instructions.2way.age.race$instantiate.likelihood(VERSION, LOCATION)
-lik.age      <- population.likelihood.instructions.1way.age$instantiate.likelihood(VERSION, LOCATION)
-lik.fert     <- fertility.likelihood.instructions$instantiate.likelihood(VERSION, LOCATION)
-
-lik$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
-lik.age.race$compare.sims(sim.first, sim.last, piecewise = TRUE)
-lik.sex.age$compare.sims(sim.first, sim.last, piecewise = TRUE)
-lik.sex.race$compare.sims(sim.first, sim.last, piecewise = TRUE)
-lik.age$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
-lik.fert$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
-lik.fert$compute(sim.last, debug = TRUE)
-
-# Focused Population Plots ----
-simplot(
-    sim.first, sim.last, sim.manual,
-    facet.by = "age", split.by = "race",
-    outcomes = c("population"),
-    dimension.values = list(year = 2000:2030, race = "hispanic", sex = "female")
-)
-
-simplot(
-    sim.first, sim.last, sim.manual,
-    facet.by = "age", split.by = "race",
-    outcomes = c("births.from"),
-    dimension.values = list(year = 2000:2030, race = "hispanic")
-)
+if (1==2){
+    source("applications/SHIELD/debug_likelihoods.R")
+    
+    lik         <- likelihood.instructions.syphilis.diagnoses$instantiate.likelihood(VERSION, LOCATION)
+    lik.sex.race <- population.likelihood.instructions.2way.sex.race$instantiate.likelihood(VERSION, LOCATION)
+    lik.sex.age  <- population.likelihood.instructions.2way.sex.age$instantiate.likelihood(VERSION, LOCATION)
+    lik.age.race <- population.likelihood.instructions.2way.age.race$instantiate.likelihood(VERSION, LOCATION)
+    lik.age      <- population.likelihood.instructions.1way.age$instantiate.likelihood(VERSION, LOCATION)
+    lik.fert     <- fertility.likelihood.instructions$instantiate.likelihood(VERSION, LOCATION)
+    
+    lik$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
+    lik.age.race$compare.sims(sim.first, sim.last, piecewise = TRUE)
+    lik.sex.age$compare.sims(sim.first, sim.last, piecewise = TRUE)
+    lik.sex.race$compare.sims(sim.first, sim.last, piecewise = TRUE)
+    lik.age$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
+    lik.fert$compare.sims(sim.first, sim.last, piecewise = TRUE, log = TRUE)
+    lik.fert$compute(sim.last, debug = TRUE)
+}
 
 
-# Census Population Summaries ----
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location__age[,'C.12580',])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__age[,'C.12580',])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__sex[,'C.12580',])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity[,'C.12580',,])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity[,'C.12580',,,'hispanic'])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity[,'C.12580',,,'not hispanic'])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__age__race__ethnicity[,'C.12580',,,])
-rowSums(SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$stratified.census$year__location__race__ethnicity__sex[,'C.12580',,,])
+source("applications/SHIELD/shield_likelihoods.R")
+# Likelihood Comparison ----
+lik<- likelihood.instructions.syphilis.diagnoses.psTotal$instantiate.likelihood(VERSION, LOCATION)
+lik$compare.sims( sim.last, sim.manual, piecewise = F)
+lik$compute(sim.last, debug = T)
+
+lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
+lik.ps$compute(sim.last, debug = T)
+lik.ps$compute(sim.manual, debug = T)
+lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
+
+# lik$compute(sim,debug=T)
+# mask = lik.summary$stratum== "15-19 years __hispanic"
+# lik.summary[mask]
+# Save simset ----
+# save(simset, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", Sys.Date(), "_", LOCATION, ".Rdata"))
+# Save sim.manual
+# save(sim.manual, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_sim.manual_", Sys.Date(), "_", LOCATION, ".Rdata"))
+
+# Looking inside the engine -----
+q=engine$extract.quantity.values() #returns the input values to the model
+input.fertility = q$fertility.rate[["2020"]]
+dimnames(sim.manual$immigration)
 
 # Gaussian Reference Proportions ----
 dnorm(0, mean = 0, sd = 1)

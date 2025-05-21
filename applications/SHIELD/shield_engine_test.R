@@ -12,19 +12,19 @@ LOCATION='C.12580' #Baltimore MSA
 # LOCATION='C.35620'#NYC 
 #'@MS:How to find the codes for each MSA?
 
-# TEST the likelihoods ----
-source('applications/SHIELD/shield_likelihoods.R')
-
-
 # make a run:
 engine = create.jheem.engine( VERSION,  LOCATION, end.year = 2030)
 specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
+
+
+
 # INSTANTIATE LIKELIHOODS
+source('applications/SHIELD/shield_likelihoods.R')
 # likelihood.all<- likelihood.instructions.all$instantiate.likelihood(VERSION,LOCATION,verbose = T)
-likelihood.all<- likelihood.instructions.demographics$instantiate.likelihood(VERSION,LOCATION,verbose = T)
+likelihood.all<- likelihood.instructions.syphilis.diagnoses$instantiate.likelihood(VERSION,LOCATION,verbose = T)
 # COMPUTE LIKELIHOODS   
 likelihood.all$compute.piecewise(sim)
 # simplot(sim, 'diagnosis.total')
@@ -64,7 +64,7 @@ simplot(sim, 'diagnosis.total')
  
 simplot(sim, 'diagnosis.ps')
 simplot.data.only('diagnosis.ps',LOCATION)
-lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood(version,LOCATION )
+lik=ps.diagnosis.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION )
 lik$compute(sim,debug = T)
 # sd= coef.variation * mean
 

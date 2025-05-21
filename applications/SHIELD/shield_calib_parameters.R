@@ -111,13 +111,26 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
   ## Transmission
   global.transmission.rate = Lognormal.Distribution(meanlog = log(3.5), sdlog = 0.5*log(2)), #directly used in specification (will need sth uch larger) 
-  #
-  transmission.rate.multiplier.msm0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  ### by race:
-  transmission.rate.multiplier.msm.black= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  
+  #option 1: 10 independant params
+  # # msm multipliers by time
+  transmission.rate.multiplier.msm0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #1990,
+  transmission.rate.multiplier.msm1 = Lognormal.Distribution(meanlog = log(1.2), sdlog = 0.5*log(2)), #1995 #increasing the peak value
+  transmission.rate.multiplier.msm2 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)), #2000 #decreasing the rate after
+  transmission.rate.multiplier.msm3 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #2010
+  transmission.rate.multiplier.msm4 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #2020
+  # heterosexual multipliers by time
+  transmission.rate.multiplier.heterosexual0 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.heterosexual1 = Lognormal.Distribution(meanlog = log(1.2), sdlog = 0.5*log(2)),#1995 #increasing the peak value
+  transmission.rate.multiplier.heterosexual2 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)),#2000 #decreasing the rate after
+  transmission.rate.multiplier.heterosexual3 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.heterosexual4 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  
+   
+  ### race multipliers (shared for msm and het):
+  transmission.rate.multiplier.black= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  transmission.rate.multiplier.other= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
   ## Sexual Mixing by Age
   age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)) #directly used in specification helper function
@@ -252,19 +265,38 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  dimension = "sex",
                                                  applies.to.dimension.values = c('female'))
     ## Transmission ----
-  for(time in 0:2){
+  for(time in c(0:4)){
+    #multipliers for msm rates in each knot:
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
                                                    alpha.name = paste0('time',time),
                                                    values = parameters[paste0("transmission.rate.multiplier.msm",time)],
                                                    dimension = 'all',
                                                    applies.to.dimension.values = 'all')
+    #multipliers for heterosexual rates in each knot:
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "transmission.rate.heterosexual",
+                                                   alpha.name = paste0('time',time),
+                                                   values = parameters[paste0("transmission.rate.multiplier.heterosexual",time)],
+                                                   dimension = 'all',
+                                                   applies.to.dimension.values = 'all')
+    
+ 
+    
+    #race multipliers, shared for msm and heterosexuals: 
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
                                                    alpha.name = paste0('time',time),
-                                                   values = parameters[c("transmission.rate.multiplier.msm.black","transmission.rate.multiplier.msm.hispanic")],
+                                                   values = parameters[c("transmission.rate.multiplier.black","transmission.rate.multiplier.hispanic", "transmission.rate.multiplier.other")],
                                                    dimension = "race.to", #recipient
-                                                   applies.to.dimension.values = c("black","hispanic"))
+                                                   applies.to.dimension.values = c("black","hispanic", "other"))
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "transmission.rate.heterosexual",
+                                                   alpha.name = paste0('time',time),
+                                                   values = parameters[c("transmission.rate.multiplier.black","transmission.rate.multiplier.hispanic", "transmission.rate.multiplier.other")],
+                                                   dimension = "race.to", #recipient
+                                                   applies.to.dimension.values = c("black","hispanic", "other"))
+    
   }
   
   
@@ -448,13 +480,27 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
 SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
   global.transmission.rate=c("global.transmission.rate"),
   #
-  msm.transmission = c(
+  msm.transmission.block1 = c(
     "transmission.rate.multiplier.msm0",
     "transmission.rate.multiplier.msm1",
-    "transmission.rate.multiplier.msm2",
-    "transmission.rate.multiplier.msm.black",
-    "transmission.rate.multiplier.msm.hispanic"),
+    "transmission.rate.multiplier.msm2"),
+  msm.transmission.block2=c(
+    "transmission.rate.multiplier.msm3",
+    "transmission.rate.multiplier.msm4"),
   #
+  het.transmission.block1 =c(
+    "transmission.rate.multiplier.heterosexual0",
+    "transmission.rate.multiplier.heterosexual1",
+    "transmission.rate.multiplier.heterosexual2"),
+  het.transmission.block2=c(
+    "transmission.rate.multiplier.heterosexual3",
+    "transmission.rate.multiplier.heterosexual4" 
+  ) ,
+  race.transmission = c(
+      "transmission.rate.multiplier.black",
+      "transmission.rate.multiplier.hispanic",
+      "transmission.rate.multiplier.other"
+  ),
   age.mixing.transmission=("age.mixing.sd.mult")
 )
 

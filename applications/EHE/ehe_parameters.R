@@ -31,8 +31,8 @@ create.auto.regressive.covariance.matrix = function(correlation.coefficient,
   
 }
 
-LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE = log(0.75)
-LOG.SD.FUTURE.TRATE.RATIO.CHANGE = log(1.5)/2
+MEAN.FUTURE.TRATE.RATIO.CHANGE = 0.75
+SD.FUTURE.TRATE.RATIO.CHANGE = 0.3
 
 create.compound.symmetry.covariance.matrix = function(correlation.coefficient,
                                                       n,sd){
@@ -605,7 +605,9 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     age5.prep.indications.or = Lognormal.Distribution(0, log(2)),
 
     #-- Proportion MSM --#
-    proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    black.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    other.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
     
     #-- IDU Transitions --#
     
@@ -713,17 +715,17 @@ BASE.HIV.PARAMETERS.PRIOR = distributions::join.distributions(
     diagnosed.transmission.rr = Lognormal.Distribution(log(mean(c(1-.68, 1/3.5))), 0.25*log(2), upper=1), #avg of Marks 2006 and Marks 2005
     
     #-- Uncertainty About the Future --#
-    black.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
-    hispanic.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
-    other.msm.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    black.msm.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
+    hispanic.msm.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
+    other.msm.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
     
-    black.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
-    hispanic.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
-    other.idu.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    black.idu.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
+    hispanic.idu.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
+    other.idu.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
     
-    black.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
-    hispanic.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
-    other.heterosexual.ratio.trate.change.after.t2 = Lognormal.Distribution(meanlog=LOG.MEAN.FUTURE.TRATE.RATIO.CHANGE, sdlog=LOG.SD.FUTURE.TRATE.RATIO.CHANGE),
+    black.heterosexual.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
+    hispanic.heterosexual.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
+    other.heterosexual.ratio.trate.change.after.t2 = Normal.Distribution(mean = MEAN.FUTURE.TRATE.RATIO.CHANGE, sd = SD.FUTURE.TRATE.RATIO.CHANGE, lower = 0),
     
     #-- COVID Parameters --#
     
@@ -1021,7 +1023,10 @@ EHE.POPULATION.SAMPLING.BLOCKS = list(
 # BASE.HIV.SAMPLING.BLOCKS ----
 BASE.HIV.SAMPLING.BLOCKS = list(
     
-    proportion.msm.of.male = 'proportion.msm.of.male.mult',
+    proportion.msm.of.male = c(
+        'black.proportion.msm.of.male.mult',
+        'hispanic.proportion.msm.of.male.mult',
+        'other.proportion.msm.of.male.mult'),
     
 #-- HIV AGING --#
 

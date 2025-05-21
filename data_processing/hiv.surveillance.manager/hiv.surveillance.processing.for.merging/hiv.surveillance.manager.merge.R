@@ -27,6 +27,9 @@ surveillance.manager = section1
 # Run this code- it uses both HIV data and adult.population ---------------
 source('data_processing/hiv.surveillance.manager/tests.per.population.R') # Source code to create hiv.tests.per.population 
 
+# Source code to aggregate proportion.msm  --------------------------------
+source('data_processing/hiv.surveillance.manager/aggregating.proportion.msm.R')
+
 # Remove outliers ---------------------------------------------------------
 save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
 
