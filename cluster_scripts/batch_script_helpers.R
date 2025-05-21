@@ -72,7 +72,7 @@ make.setup.scripts <- function(locations,
 {
     # Create output directories for each location
     for (location in locations) {
-        output_path <- file.path(OUTPUT.DIR, version, location, get.setup.filename(calibration.code, extension=".out"))
+        output_path <- file.path(OUTPUT.DIR, version, location)
         if (!dir.exists(output_path))
             dir.create(output_path, recursive=TRUE)
             
@@ -84,7 +84,7 @@ make.setup.scripts <- function(locations,
         # Create the batch script
         make.sbatch.script(filename=file.path(dir, version, location, get.setup.filename(calibration.code)),
                            mem=mem,
-                           output = output_path,
+                           output = file.path(output_path, get.setup.filename(calibration.code, extension=".out")),
                            job.name = paste0('S_', location),
                            partition = partition,
                            time.hours = time.hours,
@@ -109,7 +109,7 @@ make.run.scripts <- function(locations,
     for (location in locations) {
         # Create output directories for each location/chain combination
         for (chain in chains) {
-            output_path <- file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out"))
+            output_path <- file.path(OUTPUT.DIR, version, location)
             if (!dir.exists(output_path))
                 dir.create(output_path, recursive=TRUE)
         }
@@ -124,7 +124,7 @@ make.run.scripts <- function(locations,
             make.sbatch.script(filename=file.path(dir, version, location, get.run.filename(calibration.code, chain)),
                                job.name = paste0("R_", location, "_", chain),
                                mem=mem,
-                               output = output_path,
+                               output = file.path(OUTPUT.DIR, version, location, get.run.filename(calibration.code, chain, extension=".out")),
                                partition=partition,
                                time.hours = time.hours,
                                account=account,
@@ -149,7 +149,7 @@ make.multiphase.scripts <- function(locations,
     for (location in locations) {
         # Create output directories for each location/chain combination
         for (chain in chains) {
-            output_path <- file.path(OUTPUT.DIR, version, location, get.multiphase.filename(calibration.codes, chain, extension=".out"))
+            output_path <- file.path(OUTPUT.DIR, version, location)
             if (!dir.exists(output_path))
                 dir.create(output_path, recursive=TRUE)
         }
@@ -164,7 +164,7 @@ make.multiphase.scripts <- function(locations,
             make.sbatch.script(filename=file.path(dir, version, location, get.multiphase.filename(calibration.codes, chain)),
                                job.name = paste0("M_", location, "_", chain),
                                mem=mem,
-                               output = output_path,
+                               output = file.path(OUTPUT.DIR, version, location, get.multiphase.filename(calibration.codes, chain, extension=".out")),
                                partition=partition,
                                time.hours = 36,
                                account=account,
@@ -186,7 +186,7 @@ make.assemble.scripts <- function(locations,
                                   cpus.per.task=2)
 {
     for (location in locations) {
-        output_path <- file.path(OUTPUT.DIR, version, location, get.assemble.filename(calibration.code, extension=".out"))
+        output_path <- file.path(OUTPUT.DIR, version, location)
         if (!dir.exists(output_path))
             dir.create(output_path, recursive=TRUE)
         
@@ -198,7 +198,7 @@ make.assemble.scripts <- function(locations,
         # Create the batch script
         make.sbatch.script(filename=file.path(dir, version, location, get.assemble.filename(calibration.code)),
                            cpus.per.task=cpus.per.task,
-                           output = output_path,
+                           output = file.path(output_path, get.assemble.filename(calibration.code, extension=".out")),
                            job.name = paste0('S_', location),
                            partition = partition,
                            time.hours = 2,
