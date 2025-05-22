@@ -89,7 +89,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
  
 ##---- Infected ---- # 1970
-# Assuming all infected acases are undiagnosed/untreated
+# Assuming all infected cases are undiagnosed/untreated
 # Rate of diagnoses (per 100,000) by stage
 register.model.element.values(SHIELD.SPECIFICATION,
                               'diagnoses.rate.primary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.primary.1970'],
@@ -99,9 +99,7 @@ register.model.element.values(SHIELD.SPECIFICATION,
                               'diagnoses.rate.tertiary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.tertiary.1970'],
                               scale = 'proportion')
 
-##multipliers of initial diagnoses in 1970: tuned in calibration
-# initial.infection.multiplier.1970.early = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ps and EL
-# initial.infection.multiplier.1970.late = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ll and tertiary
+# multipliers of initial diagnoses in 1970: tuned in calibration
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'initial.infection.multiplier.1970.early',
                        scale = 'rate',
@@ -111,11 +109,11 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'rate',
                        value = 1)
 
+# Estiamting size of infected population
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.infected',
                         # dimensions = c('continuum','stage'),
                         value = 0)
-
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'n.initial.population.infected',
                                applies.to = list(continuum='undiagnosed', stage='primary'),
