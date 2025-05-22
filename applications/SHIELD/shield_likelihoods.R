@@ -8,7 +8,7 @@
 
 
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
-TOTAL.WEIGHT=0.8
+TOTAL.WEIGHT=1
 POPULATION.WEIGHT = TOTAL.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
@@ -35,15 +35,15 @@ w.population <- lapply(c(w1,w2), function(wi) {
 })
 
 # adding more weight to diagnosis data before 2000 and those after 2010
-w.diagnosis=lapply(c(1993:2023),function(year){
-  if(year<2000){w=1
-  }else{ if(year<2010){w=.5
-  }else{ w=1}
-  }
-  total.weight = DIAGNOSIS.WEIGHT * w
-  create.likelihood.weights(total.weight,dimension.values = list(year=year))
-  
-})
+# w.diagnosis=lapply(c(1993:2023),function(year){
+#   if(year<2000){w=1
+#   }else{ if(year<2010){w=.5
+#   }else{ w=1}
+#   }
+#   total.weight = DIAGNOSIS.WEIGHT * w
+#   create.likelihood.weights(total.weight,dimension.values = list(year=year))
+#   
+# })
    
 #** POPULATION SIZES ** ----
 # Basic likelihood: where we have data at the location level desired
@@ -192,8 +192,8 @@ total.diagnosis.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = w.diagnosis ,
-                                       equalize.weight.by.year = F,
+                                       weights = DIAGNOSIS.WEIGHT ,
+                                       equalize.weight.by.year = T,
                                        minimum.error.sd = 1 #
   )
 ##---- PS ----
@@ -215,8 +215,8 @@ ps.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = w.diagnosis,
-                                       equalize.weight.by.year = F,
+                                       weights = DIAGNOSIS.WEIGHT,
+                                       equalize.weight.by.year = T,
                                        minimum.error.sd = 1  
   )
 
@@ -230,8 +230,8 @@ ps.diagnosis.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = w.diagnosis,
-                                       equalize.weight.by.year = F,
+                                       weights = DIAGNOSIS.WEIGHT,
+                                       equalize.weight.by.year = T,
                                        minimum.error.sd = 1  
   )
 ##---- EARLY ----
@@ -253,8 +253,8 @@ early.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = w.diagnosis,
-                                       equalize.weight.by.year = F,
+                                       weights = DIAGNOSIS.WEIGHT,
+                                       equalize.weight.by.year = T,
                                        minimum.error.sd = 1
   )
 
@@ -268,8 +268,8 @@ early.diagnosis.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = w.diagnosis,
-                                       equalize.weight.by.year = F,
+                                       weights = DIAGNOSIS.WEIGHT,
+                                       equalize.weight.by.year = T,
                                        minimum.error.sd = 1
   )
 ##---- Late/Unknown ---- 
@@ -289,8 +289,8 @@ late.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = w.diagnosis,
-                                       equalize.weight.by.year = F,
+                                       weights = DIAGNOSIS.WEIGHT,
+                                       equalize.weight.by.year = T,
                                        minimum.error.sd = 1
   )
 
@@ -303,8 +303,8 @@ late.diagnosis.likelihood.instructions =
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = w.diagnosis,
-                                       equalize.weight.by.year = F,
+                                       weights = DIAGNOSIS.WEIGHT,
+                                       equalize.weight.by.year = T,
                                        minimum.error.sd = 1
   )
 
@@ -352,7 +352,7 @@ late.diagnosis.likelihood.instructions =
 # 
 #                                                    partitioning.function = EHE.PARTITIONING.FUNCTION,# we use for unknown outcomes (e.g., number of IDUs by age race in Baltimore) (not needed here)
 # 
-#                                                    weights = (1*w.diagnosis),
+#                                                    weights = (1*DIAGNOSIS.WEIGHT),
 #                                                    equalize.weight.by.year = T
 #   )
 
