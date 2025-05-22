@@ -36,26 +36,37 @@ lb.prev=.5; hb.prev=1.5 # added uncertainty (reflecting uncertainty in fraction.
 # Due to unavailability of data, we etiamte this based on fraction of population diagnosed with non.congenital syphilis 
 # and adjust that for fraction.reported (set to 50%) to account for cases that are undiagnosed 
 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.initial.population.infected.syphilis',
-                                      0.007,0.007*lb.prev,0.007*hb.prev,
-                                      #0,0,0,
-                                      citation = "input_syphilis_prev_1940.R")
+# SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.initial.population.infected.syphilis',
+#                                       0.007,0.007*lb.prev,0.007*hb.prev,
+#                                       #0,0,0,
+#                                       citation = "input_syphilis_prev_1940.R")
 #By STAGE
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.primary',
-                                      0.04486131, 0.04486131*lb, 0.04486131*hb,
-                                      citation = "input_syphilis_prev_1940.R") 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.secondary',
-                                      0.1345839, 0.1345839*lb, 0.1345839*hb,
-                                      citation = "input_syphilis_prev_1940.R")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.early.latent',
-                                      0.2867137, 0.2867137*lb, 0.2867137*hb,
-                                      citation = "input_syphilis_prev_1940.R")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.late.latent',
-                                      0.4003808, 0.4003808*lb, 0.4003808*hb,
-                                      citation = "input_syphilis_prev_1940.R")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.tertiary',
-                                      0.1334603, 0.1334603*lb, 0.1334603*hb,
-                                      citation = "input_syphilis_prev_1940.R")
+# SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.primary',
+#                                       0.04486131, 0.04486131*lb, 0.04486131*hb,
+#                                       citation = "input_syphilis_prev_1940.R") 
+# SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.secondary',
+#                                       0.1345839, 0.1345839*lb, 0.1345839*hb,
+#                                       citation = "input_syphilis_prev_1940.R")
+# SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.early.latent',
+#                                       0.2867137, 0.2867137*lb, 0.2867137*hb,
+#                                       citation = "input_syphilis_prev_1940.R")
+# SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.late.latent',
+#                                       0.4003808, 0.4003808*lb, 0.4003808*hb,
+#                                       citation = "input_syphilis_prev_1940.R")
+# SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.pop.tertiary',
+#                                       0.1334603, 0.1334603*lb, 0.1334603*hb,
+#                                       citation = "input_syphilis_prev_1940.R")
+# Diagnoses rate by stage
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.primary.1970',
+                                      2.7/100000,0,0,                                      citation = "input_syphilis_diagnoses_1970.R")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.secondary.1970',
+                                      8.1/100000,0,0,                                      citation = "input_syphilis_diagnoses_1970.R")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.early.latent.1970',
+                                      8/100000,0,0,                                      citation = "input_syphilis_diagnoses_1970.R")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.late.latent.1970',
+                                      18.525/100000,0,0,                                       citation = "input_syphilis_diagnoses_1970.R")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.tertiary.1970',
+                                      6.175/100000, 0,0,                                      citation = "input_syphilis_diagnoses_1970.R")
 
 # *** TRANSMISSION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  

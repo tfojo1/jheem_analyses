@@ -109,6 +109,11 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
+  initial.infection.multiplier.1970.early = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ps and EL
+  initial.infection.multiplier.1970.late = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ll and tertiary
+  
+  
+  
   ## Transmission
   global.transmission.rate = Lognormal.Distribution(meanlog = log(3.5), sdlog = 0.5*log(2)), #directly used in specification (will need sth uch larger) 
   
@@ -264,7 +269,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  values = parameters["female.general.mortality.rate.multiplier"],
                                                  dimension = "sex",
                                                  applies.to.dimension.values = c('female'))
-    ## Transmission ----
+ 
+  ## Transmission ----
   for(time in c(0:4)){
     #multipliers for msm rates in each knot:
     set.element.functional.form.main.effect.alphas(model.settings,

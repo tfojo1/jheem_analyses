@@ -29,8 +29,8 @@ engine1 = create.jheem.engine( VERSION,  LOCATION, end.year = 2030)
 specification.metadata=get.specification.metadata(VERSION,LOCATION)
 params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim1 = engine1$run(params)
-# Number of elements
-ds1=engine1$extract.diffeq.settings()
+# Number of elements in the ODE solver:
+ds1=engine1$extract.diffeq.settings() 
 ds1$state_and_dx_sizes  
 sum(ds1$state_and_dx_sizes)
 sim1$solver.metadata
