@@ -57,6 +57,25 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.infected.po
                                       0.1334603, 0.1334603*lb, 0.1334603*hb,
                                       citation = "input_syphilis_prev_1940.R")
 
+# By stage (TOTAL population proportions) — derived from infected proportion × infected prevalence
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.total.pop.primary',
+                                      0.00031403, 0.00031403*lb, 0.00031403*hb,
+                                      citation = "derived from prp.of.infected.pop.primary × prp.of.initial.population.infected.syphilis")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.total.pop.secondary',
+                                      0.00094209, 0.00094209*lb, 0.00094209*hb,
+                                      citation = "derived from prp.of.infected.pop.secondary × prp.of.initial.population.infected.syphilis")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.total.pop.early.latent',
+                                      0.00200699, 0.00200699*lb, 0.00200699*hb,
+                                      citation = "derived from prp.of.infected.pop.early.latent × prp.of.initial.population.infected.syphilis")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.total.pop.late.latent',
+                                      0.00280267, 0.00280267*lb, 0.00280267*hb,
+                                      citation = "derived from prp.of.infected.pop.late.latent × prp.of.initial.population.infected.syphilis")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.of.total.pop.tertiary',
+                                      0.00093422, 0.00093422*lb, 0.00093422*hb,
+                                      citation = "derived from prp.of.infected.pop.tertiary × prp.of.initial.population.infected.syphilis")
+
+
+
 # *** TRANSMISSION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
                                       1,1,1)  #TBD

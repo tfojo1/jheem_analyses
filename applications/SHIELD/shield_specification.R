@@ -88,6 +88,8 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value = expression(n.initial.male.population * (1-prp.msm.of.male)))
 
 ##---- Infected ----
+
+
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.initial.population.infected.syphilis',
                        scale = 'proportion',
@@ -100,35 +102,50 @@ register.model.element.values(SHIELD.SPECIFICATION,
                               'prp.of.infected.pop.tertiary'=SHIELD_BASE_PARAMETER_VALUES['prp.of.infected.pop.tertiary'],
                               scale = 'proportion')
 
+register.model.element.values(SHIELD.SPECIFICATION,
+                              'prp.of.total.pop.primary' = SHIELD_BASE_PARAMETER_VALUES['prp.of.total.pop.primary'],
+                              'prp.of.total.pop.secondary' = SHIELD_BASE_PARAMETER_VALUES['prp.of.total.pop.secondary'],
+                              'prp.of.total.pop.early.latent' = SHIELD_BASE_PARAMETER_VALUES['prp.of.total.pop.early.latent'],
+                              'prp.of.total.pop.late.latent' = SHIELD_BASE_PARAMETER_VALUES['prp.of.total.pop.late.latent'],
+                              'prp.of.total.pop.tertiary' = SHIELD_BASE_PARAMETER_VALUES['prp.of.total.pop.tertiary'],
+                              scale = 'proportion'
+)
+
+
 # Assuming all infected acases are undiagnosed/untreated
 # we will use this quanitity to inform the stages below
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'n.initial.population.infected.all.stages',
-                        value =  expression(n.initial.population * prp.initial.population.infected.syphilis)) #age, race, sex
+#register.model.quantity(SHIELD.SPECIFICATION,
+                        #name = 'n.initial.population.infected.all.stages',
+                        #value =  expression(n.initial.population * prp.initial.population.infected.syphilis)) #age, race, sex
 # main quantity of interest: by stage
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.infected',
                         value = 0)
+
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'n.initial.population.infected',
                                applies.to = list(continuum='undiagnosed', stage='primary'),
-                               value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.primary ))
+                               value = expression(n.initial.population * prp.of.total.pop.primary))
+
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'n.initial.population.infected',
                                applies.to = list(continuum='undiagnosed', stage='secondary'),
-                               value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.secondary ))
+                               value = expression(n.initial.population * prp.of.total.pop.secondary))
+
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'n.initial.population.infected',
                                applies.to = list(continuum='undiagnosed', stage='early.latent'),
-                               value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.early.latent ))
+                               value = expression(n.initial.population * prp.of.total.pop.early.latent))
+
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'n.initial.population.infected',
                                applies.to = list(continuum='undiagnosed', stage='late.latent'),
-                               value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.late.latent ))
+                               value = expression(n.initial.population * prp.of.total.pop.late.latent))
+
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'n.initial.population.infected',
                                applies.to = list(continuum='undiagnosed', stage='tertiary'),
-                               value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.tertiary ))
+                               value = expression(n.initial.population * prp.of.total.pop.tertiary))
 #register the infected population:
 register.initial.population(SHIELD.SPECIFICATION,
                             group = 'infected',
