@@ -87,6 +87,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(sex='heterosexual_male'),
                                value = expression(n.initial.male.population * (1-prp.msm.of.male)))
 
+ 
 ##---- Infected ---- # 1970
 # Assuming all infected acases are undiagnosed/untreated
 # Rate of diagnoses (per 100,000) by stage
@@ -97,6 +98,7 @@ register.model.element.values(SHIELD.SPECIFICATION,
                               'diagnoses.rate.late.latent.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.late.latent.1970'],
                               'diagnoses.rate.tertiary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.tertiary.1970'],
                               scale = 'proportion')
+
 ##multipliers of initial diagnoses in 1970: tuned in calibration
 # initial.infection.multiplier.1970.early = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ps and EL
 # initial.infection.multiplier.1970.late = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ll and tertiary
@@ -108,11 +110,12 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'initial.infection.multiplier.1970.late',
                        scale = 'rate',
                        value = 1)
-# estimating total population infected by stage
+
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.infected',
                         # dimensions = c('continuum','stage'),
                         value = 0)
+
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'n.initial.population.infected',
                                applies.to = list(continuum='undiagnosed', stage='primary'),
@@ -134,6 +137,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(continuum='undiagnosed', stage='tertiary'),
                                value = expression(n.initial.population * diagnoses.rate.tertiary.1970 *initial.infection.multiplier.1970.late))
 
+ 
 #register the infected population:
 register.initial.population(SHIELD.SPECIFICATION,
                             group = 'infected',
