@@ -495,7 +495,8 @@ likelihood.instructions.syphilis.diagnoses.psElTotal=join.likelihood.instruction
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions
 )
-likelihood.instructions.syphilis.diagnoses.psEllateTotal=join.likelihood.instructions( # PS total and the early total
+
+likelihood.instructions.syphilis.diagnoses.psElLlTotal=join.likelihood.instructions( # PS total and the early total
     likelihood.instructions.demographics, #
     ps.diagnosis.total.likelihood.instructions,
     early.diagnosis.total.likelihood.instructions,

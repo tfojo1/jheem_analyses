@@ -90,7 +90,7 @@ register.calibration.info(code = paste0('syphilis.11.pk.',x),
 
 
 # Trying diagnosis targets one at a time
-calibnames=c("psElTotal","psEllateTotal","all.totals")
+calibnames=c("psElTotal","psElLlTotal","all.totals")
 lapply(calibnames,function(x){
     register.calibration.info(code = paste0('syphilis.11.rf.',x), 
                               preceding.calibration.codes = "pop.demog.8",
