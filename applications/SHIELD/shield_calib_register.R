@@ -71,9 +71,9 @@ register.calibration.info('syphilis.diagnoses.8.pk',
 )
 ##############
 # Trying diagnosis targets one at a time
-calibnames=c("elTotal","psTotal","psElTotal","all.totals")
+calibnames=c("psElTotal","all.totals")
 lapply(calibnames,function(x){
-register.calibration.info(code = paste0('syphilis.9.pk.',x), 
+register.calibration.info(code = paste0('syphilis.11.pk.',x), 
                           preceding.calibration.codes = "pop.demog.8",
                           likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
                           data.manager = SURVEILLANCE.MANAGER,
@@ -86,23 +86,6 @@ register.calibration.info(code = paste0('syphilis.9.pk.',x),
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = solver
 )
-    })
-
-calibnames=c("psTotal")
-lapply(calibnames,function(x){
-    register.calibration.info(code = paste0('syphilis.11.pk.',x), 
-                              preceding.calibration.codes = "pop.demog.8",
-                              likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
-                              data.manager = SURVEILLANCE.MANAGER,
-                              end.year = 2030, 
-                              param.names.trans.demog, 
-                              n.iter = N.ITER,
-                              thin = 50, 
-                              is.preliminary = T,
-                              max.run.time.seconds = 30,
-                              description = "A quick run to get syphilis parameters in the general vicinity",
-                              solver.metadata = solver
-    )
 })
 
 cat("*** Shiled_register_calibration.R completed!***\n")
