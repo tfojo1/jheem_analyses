@@ -1221,13 +1221,13 @@ set.ehe.idu.from.parameters = function(model.settings,
                                                                       dimension = 'age')
         
         param.names = paste0(sexes.for.param.names, '.incident.idu.multiplier.', time)
+        param.mask = !is.na(parameters[param.names])
         model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.incidence',
                                                                       alpha.name = alpha.name,
-                                                                      values = parameters[param.names],
-                                                                      applies.to.dimension.values = sexes,
+                                                                      values = parameters[param.names][param.mask],
+                                                                      applies.to.dimension.values = sexes[param.mask],
                                                                       dimension = 'sex')
     }
-    
     
     model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.remission',
                                                                   alpha.name = 'value',
@@ -1241,16 +1241,20 @@ set.ehe.idu.from.parameters = function(model.settings,
                                                                   applies.to.dimension.values = 'all',
                                                                   dimension = 'all')
     
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.remission',
-                                                                  alpha.name = 'value',
-                                                                  values = 1 / parameters[paste0('age', 1:n.ages, ".idu.relapse.remission.multiplier")],
-                                                                  applies.to.dimension.values = ages,
-                                                                  dimension = 'age')
-    
-    model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.relapse',
-                                                                  alpha.name = 'value',
-                                                                  values = parameters[paste0('age', 1:n.ages, ".idu.relapse.remission.multiplier")],
-                                                                  applies.to.dimension.values = ages,
-                                                                  dimension = 'age')
+    param.values = parameters[paste0('age', 1:n.ages, ".idu.relapse.remission.multiplier")]
+    if (!all(is.na(param.values)))
+    {
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.remission',
+                                                                      alpha.name = 'value',
+                                                                      values = 1 / param.values,
+                                                                      applies.to.dimension.values = ages,
+                                                                      dimension = 'age')
+        
+        model.settings$set.element.functional.form.main.effect.alphas(element.name = 'idu.relapse',
+                                                                      alpha.name = 'value',
+                                                                      values = param.values,
+                                                                      applies.to.dimension.values = ages,
+                                                                      dimension = 'age')
+    }
 }
 
