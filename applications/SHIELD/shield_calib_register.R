@@ -106,7 +106,21 @@ lapply(calibnames,function(x){
                               solver.metadata = solver
     )
 })
-
+lapply(calibnames,function(x){
+    register.calibration.info(code = paste0('syphilis.12.rf.',x), 
+                              preceding.calibration.codes = "pop.demog.8",
+                              likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030, 
+                              param.names.trans.demog, 
+                              n.iter = N.ITER,
+                              thin = 50, 
+                              is.preliminary = T,
+                              max.run.time.seconds = 30,
+                              description = "A quick run to get syphilis parameters in the general vicinity",
+                              solver.metadata = solver
+    )
+})
 
 cat("*** Shiled_register_calibration.R completed!***\n")
 
@@ -160,4 +174,6 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 
 # 5.21: <syphilis.11.pk.psTotal> same settings, revising the prior for transmission in 1995 & 2000, reducing number of outputs to speed up the model
 # >> in progress
+
+
 

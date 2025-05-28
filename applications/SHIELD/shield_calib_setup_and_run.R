@@ -28,7 +28,7 @@ LOCATION='C.12580' #Baltimore MSA
 
 set.seed(00000)
 
-CALIBRATION.NAME = 'syphilis.11.pk.psTotal' 
+CALIBRATION.NAME = 'syphilis.12.rf.psElTotal' 
 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
