@@ -332,14 +332,15 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   ## Testing ----
   
   for (stage in c("primary", "secondary")) {
+      for (group in c("msm", "heterosexual_male", "female")) {
           param.name = paste0("prp.symptomatic.", stage, ".", group)
           set.element.functional.form.main.effect.alphas(model.settings,
                                                          element.name = param.name,
                                                          value = parameters[[param.name]],
                                                          dimension = 'all',
                                                          applies.to.dimension.values = 'all')
-      }
-  }
+      }}
+  
   
   
   
