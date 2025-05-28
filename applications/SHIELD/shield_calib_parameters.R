@@ -1,5 +1,9 @@
 source('../jheem_analyses/applications/SHIELD/shield_base_parameters.R')
 
+logit = function(p){
+    log(p) - log(1-p)
+}
+
 #my best guess for this parameter is different in different locations, so we formulate prior as a multiply of the best guess
 # Defining the calibration parameters and prior distributions
 
@@ -144,10 +148,6 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   
 ) 
 
-
-logit = function(p){
-    log(p) - log(1-p)
-}
 
 TESTING.PARAMETERS.PRIOR=join.distributions( 
     # for testing
@@ -336,9 +336,11 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   for (stage in c("primary", "secondary")) {
       for (group in c("msm", "heterosexual_male", "female")) {
           param.name = paste0("prp.symptomatic.", stage, ".", group)
-          set.model.parameter(model.settings,
-                              element.name = param.name,
-                              value = parameters[[param.name]])
+          set.element.functional.form.main.effect.alphas(model.settings,
+                                                         element.name = param.name,
+                                                         value = parameters[[param.name]],
+                                                         dimension = 'all',
+                                                         applies.to.dimension.values = 'all')
       }
   }
   
