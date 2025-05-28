@@ -27,3 +27,14 @@ age_hist <- age_hist +
     ggtitle("Diagnosed Prevalence in 2025 (Georgia)") +
     ylab("Persons (in thousands)") +
     xlab("Age Group")
+
+y = arr[,,1]
+names(y)[5] = "55-100 years"
+y=c(y,"101-110 years" = 0)
+y = restratify.age.counts(y,desired.age.brackets = c(13:100))
+qplot(names(y),(y))
+cumsum(y)/sum(y)
+
+x = restratify.age.counts(arr,desired.age.brackets = c(13:100),smooth.infinite.age.to = 101)
+qplot(names(x[1,,1]),cumsum(x[1,,1]))
+cumsum(x[1,,1])/sum(x)
