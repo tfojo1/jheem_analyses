@@ -1,6 +1,6 @@
 cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-
+source('../jheem_analyses/applications/SHIELD/shield_base_parameters.R')
 N.ITER=15000
 solver = create.solver.metadata(rtol = 0.001, atol=0.05) #rtol,atol
 # solver = create.solver.metadata() #default solver

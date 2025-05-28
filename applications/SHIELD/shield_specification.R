@@ -840,12 +840,12 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 ##---- 1-SYMPTHOMATIC TESTING ----
 # proportions that are symptomatic during primary and secondary stages:
 register.model.element.values(SHIELD.SPECIFICATION,
-                              'prp.symptomatic.primary.msm'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm'] ,
-                              'prp.symptomatic.primary.heterosexual_male'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male'] ,
-                              'prp.symptomatic.primary.female'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female'] ,
-                              'prp.symptomatic.secondary.msm'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm'] ,
-                              'prp.symptomatic.secondary.heterosexual_male'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male'] ,
-                              'prp.symptomatic.secondary.female'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female'] ,
+                              'prp.symptomatic.primary.msm'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est'] ,
+                              'prp.symptomatic.primary.heterosexual_male'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'] ,
+                              'prp.symptomatic.primary.female'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'] ,
+                              'prp.symptomatic.secondary.msm'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est'] ,
+                              'prp.symptomatic.secondary.heterosexual_male'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'] ,
+                              'prp.symptomatic.secondary.female'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'] ,
                               scale = 'proportion')
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.symptomatic.primary',
