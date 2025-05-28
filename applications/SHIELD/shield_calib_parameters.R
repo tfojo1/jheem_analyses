@@ -138,8 +138,32 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   ## Sexual Mixing by Age
   age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)) #directly used in specification helper function
   #to control the standard deviation of the contact matrix by age
+
   
 ) 
+
+
+logit = function(p){
+    log(p) - log(1-p)
+}
+
+TESTING.PARAMETERS.PRIOR=join.distributions( 
+    # for testing
+    prp.symptomatic.primary.msm = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm']), sdlogit = log(2)/2 ) , 
+    prp.symptomatic.primary.heterosexual_male = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male']), sdlogit = log(2)/2 ) ,
+    prp.symptomatic.primary.female = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female']), sdlogit = log(2)/2 ) ,
+    prp.symptomatic.secondary.msm = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm']), sdlogit = log(2)/2 ) ,
+    prp.symptomatic.secondary.heterosexual_male = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male']), sdlogit = log(2)/2 ) ,
+    prp.symptomatic.secondary.female= Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female']), sdlogit = log(2)/2 ) ,
+    
+    # for screening
+    hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5)
+    
+    
+    
+    )
+
 
 ## SYPHILIS.PARAMETERS.PRIOR ----
 # SYPHILIS.PARAMETERS.PRIOR=join.distributions( 
@@ -302,6 +326,34 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = c("black","hispanic", "other"))
     
   }
+  
+  
+  
+  ## Testing ----
+  
+  for (stage in c("primary", "secondary")) {
+      for (group in c("msm", "heterosexual_male", "female")) {
+          param.name = paste0("prp.symptomatic.", stage, ".", group)
+          set.model.parameter(model.settings,
+                              element.name = param.name,
+                              value = parameters[[param.name]])
+      }
+  }
+  
+  
+  
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "rate.testing.hiv.without.covid.over.14",
+                                                 alpha.name = "intercept",
+                                                 values = parameters["hiv.testing.or"],
+                                                 dimension = "all", #recipient
+                                                 applies.to.dimension.values = "all")
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "rate.testing.hiv.without.covid.over.14",
+                                                 alpha.name = "slope",
+                                                 values = parameters["hiv.testing.slope.or"],
+                                                 dimension = "all", #recipient
+                                                 applies.to.dimension.values = "all")
   
   
 }
@@ -512,15 +564,36 @@ SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
   age.mixing.transmission=("age.mixing.sd.mult")
 )
 
+
+SHIELD.TESTING.SAMPLING.BLOCKS = list(
+    symptomatic.primary = c(
+        "prp.symptomatic.primary.msm",
+        "prp.symptomatic.primary.heterosexual_male",
+        "prp.symptomatic.primary.female"
+    ),
+    symptomatic.secondary = c(
+        "prp.symptomatic.secondary.msm",
+        "prp.symptomatic.secondary.heterosexual_male",
+        "prp.symptomatic.secondary.female"
+    ),
+    Screening = c(
+        "hiv.testing.or",
+        "hiv.testing.slope.or"
+    )
+)
+
+
 # SUMMARIZE ---- #these will be registered in the specification 
 SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
   POPULATION.PARAMETERS.PRIOR,
   AGING.PARAMETERS.PRIOR,
-  TRANSMISSION.PARAMETERS.PRIOR
+  TRANSMISSION.PARAMETERS.PRIOR,
+  TESTING.PARAMETERS.PRIOR
 )
 
 SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
   SHIELD.POPULATION.SAMPLING.BLOCKS,
   SHIELD.AGING.SAMPLING.BLOCKS,
-  SHIELD.TRANSMISSION.SAMPLING.BLOCKS
+  SHIELD.TRANSMISSION.SAMPLING.BLOCKS,
+  SHIELD.TESTING.SAMPLING.BLOCKS
 )
