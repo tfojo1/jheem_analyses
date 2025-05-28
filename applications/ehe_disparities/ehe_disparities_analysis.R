@@ -27,9 +27,10 @@ source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_intervent
 #load_simset(date="2025_01-31", msa="35620") #NYC
 
 source("../jheem_analyses/commoncode/locations_of_interest.R")
+MSAS.OF.INTEREST[16:17]
 
 CALIBRATION.CODE="final.ehe"
-LOCATIONS=MSAS.OF.INTEREST[1:4] #run in parallel (total=33)
+LOCATIONS=MSAS.OF.INTEREST[16:17] #run in parallel (total=33)
 INTERVENTIONS=c("noint", "fullint")
 NSIM=1000
 
@@ -38,6 +39,8 @@ collection=create.simset.collection(version="ehe", calibration.code = CALIBRATIO
                                     locations = LOCATIONS, interventions = INTERVENTIONS, n.sim = NSIM)
 
 collection$run(2025, 2035, verbose=TRUE, stop.for.errors=T, overwrite.prior=F)
+
+
 
 #################################
 
