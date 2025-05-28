@@ -1,3 +1,5 @@
+source('../jheem_analyses/applications/SHIELD/shield_base_parameters.R')
+
 #my best guess for this parameter is different in different locations, so we formulate prior as a multiply of the best guess
 # Defining the calibration parameters and prior distributions
 
