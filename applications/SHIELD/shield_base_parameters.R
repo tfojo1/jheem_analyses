@@ -193,27 +193,27 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.early.latent.
                                       0.085 ,0.05, 0.12,
                                       citation = "syphilis_natural_history.docx")
 
-## ---- SYMPTOMATIC INFECTIONS ----
+## ---- SYMPTOMATIC INFECTIONS ----                        
 ## Proportion of incident cases presenting with symptomatic primary or secondary disease: 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm.est',
                                       0.25, 0.2, 0.29, #data from MSM 
                                       citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.msm',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.msm.est',
                                       0.16, 0.15, 0.17, #data from MSM
                                       citation = "syphilis_natural_history.docx")
 
 #'@Melissa: we need additional estimates for females (females are generally less symp in the primary stage) #'@Khalil
 # values set based on MSM data
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.heterosexual_male',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.heterosexual_male.est',
                                       0.25, 0.2, 0.29, 
                                       citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.heterosexual_male',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.heterosexual_male.est',
                                       0.16, 0.15, 0.17,  
                                       citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.female',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.female.est',
                                       0.25, 0.2, 0.29,  
                                       citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.female',
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.female.est',
                                       0.16, 0.15, 0.17, 
                                       citation = "syphilis_natural_history.docx")
 
