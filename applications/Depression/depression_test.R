@@ -8,6 +8,8 @@ params["global.trate"] = 0.075
 
 engine=create.jheem.engine("dep", "C.12580", end.year = 2025)
 sim = engine$run(params)
+like <- dep_likelihood_full$instantiate.likelihood("dep","C.12580")
+
 simplot(sim,'proportion.depressed')
 
 

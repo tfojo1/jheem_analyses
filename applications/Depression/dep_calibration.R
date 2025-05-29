@@ -14,7 +14,7 @@ register.calibration.info('dep.init',
                           thin = 200, 
                           is.preliminary = T,
                           max.run.time.seconds = 10,
-                          preceding.calibration.codes = 'final.ehe', # or full.ehe
+                          preceding.calibration.codes = 'full.ehe', # or full.ehe / final.ehe.state
                           description = "Initial depression calibration", 
                           draw.from.parent.version = T
 )
