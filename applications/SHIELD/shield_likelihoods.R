@@ -501,7 +501,8 @@ likelihood.instructions.syphilis.diagnoses.psLlTotal=join.likelihood.instruction
     likelihood.instructions.demographics, #
     ps.diagnosis.total.likelihood.instructions,
     early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions
+    late.diagnosis.total.likelihood.instructions,
+    hiv.testing.likelihood.instructions
 )
 
 ##--OPTIONAL:CNS ----
