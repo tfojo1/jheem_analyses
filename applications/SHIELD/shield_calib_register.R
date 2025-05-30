@@ -6,7 +6,8 @@ solver = create.solver.metadata(rtol = 0.001, atol=0.05) #rtol,atol
 # solver = create.solver.metadata() #default solver
 param.names.trans.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
                            AGING.PARAMETERS.PRIOR@var.names,
-                           TRANSMISSION.PARAMETERS.PRIOR@var.names)
+                           TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                           TESTING.PARAMETERS.PRIOR@var.names)
 
 
 # Calibrating to demographic and syphilis diagnoses targets
