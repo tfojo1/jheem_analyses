@@ -1,12 +1,13 @@
 cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-source('../jheem_analyses/applications/SHIELD/shield_base_parameters.R')
+
 N.ITER=15000
 solver = create.solver.metadata(rtol = 0.001, atol=0.05) #rtol,atol
 # solver = create.solver.metadata() #default solver
 param.names.trans.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
                            AGING.PARAMETERS.PRIOR@var.names,
-                           TRANSMISSION.PARAMETERS.PRIOR@var.names)
+                           TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                           TESTING.PARAMETERS.PRIOR@var.names)
 
 
 # Calibrating to demographic and syphilis diagnoses targets
@@ -122,6 +123,22 @@ lapply(calibnames,function(x){
     )
 })
 
+lapply(calibnames,function(x){
+    register.calibration.info(code = paste0('syphilis.13.rf.',x), 
+                              preceding.calibration.codes = "pop.demog.8",
+                              likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030, 
+                              param.names.trans.demog, 
+                              n.iter = N.ITER,
+                              thin = 50, 
+                              is.preliminary = T,
+                              max.run.time.seconds = 30,
+                              description = "A quick run to get syphilis parameters in the general vicinity",
+                              solver.metadata = solver
+    )
+})
+
 cat("*** Shiled_register_calibration.R completed!***\n")
 
 
@@ -175,5 +192,8 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 # 5.21: <syphilis.11.pk.psTotal> same settings, revising the prior for transmission in 1995 & 2000, reducing number of outputs to speed up the model
 # >> in progress
 
+# 5.23: <syphilis.11.rf.psElTotal> now includes likelihood for PS and EL stages
 
+# 5.27: <syphilis.12.rf.psElTotal> Includes testing parameters for calibration
 
+# 5.30: <syphilis.13.rf.psElTotal> adding likelihood for HIV testing
