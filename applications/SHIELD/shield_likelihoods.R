@@ -493,7 +493,8 @@ likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(
 likelihood.instructions.syphilis.diagnoses.psElTotal=join.likelihood.instructions( # PS total and the early total
   likelihood.instructions.demographics, #
   ps.diagnosis.total.likelihood.instructions,
-  early.diagnosis.total.likelihood.instructions
+  early.diagnosis.total.likelihood.instructions,
+  hiv.testing.likelihood.instructions
 )
 
 likelihood.instructions.syphilis.diagnoses.psLlTotal=join.likelihood.instructions( # PS total and the early total
