@@ -11,7 +11,7 @@ CDCT.SPECIFICATION = create.jheem.specification(version='cdct',
 
 
 register.model.quantity(CDCT.SPECIFICATION, name = "testing.of.undiagnosed",
-                        value = expression(cdc.funded.testing.of.undiagnosed*cdc.effect+cdc.nonfunded.testing.of.undiagnosed))
+                        value = expression(cdc.funded.testing.of.undiagnosed+cdc.nonfunded.testing.of.undiagnosed))
 
 register.model.element(CDCT.SPECIFICATION, name = "cdc.effect",
                        value = 1,
@@ -24,7 +24,7 @@ register.model.quantity(CDCT.SPECIFICATION, name = "cdc.nonfunded.testing.of.und
                         value = expression(super.testing.of.undiagnosed*(1-fraction.diagnoses.from.cdc)))
 
 register.model.element(CDCT.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
-                       get.functional.form.function = get.fraction.diagnoses.from.cdc.model,
+                       get.functional.form.function = get.fraction.diagnoses.from.cdc.model.spline,
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
@@ -75,7 +75,8 @@ track.cumulative.outcome(CDCT.SPECIFICATION,
                                                                     singular.unit = 'test'),
                          scale = 'non.negative.number',
                          value = expression(cdc.funded.diagnoses + cdc.funded.tests.in.uninfected),
-                         keep.dimensions = c('location'))
+                         keep.dimensions = c('location'),
+                         corresponding.data.outcome = "hiv.tests")
 
 track.cumulative.outcome(CDCT.SPECIFICATION,
                          name = 'total.cdc.hiv.test.positivity',
