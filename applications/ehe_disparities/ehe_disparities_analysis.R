@@ -27,10 +27,10 @@ source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_intervent
 #load_simset(date="2025_01-31", msa="35620") #NYC
 
 source("../jheem_analyses/commoncode/locations_of_interest.R")
-MSAS.OF.INTEREST[16:17]
+MSAS.OF.INTEREST #list of MSAs
 
 CALIBRATION.CODE="final.ehe"
-LOCATIONS=MSAS.OF.INTEREST[16:17] #run in parallel (total=33)
+LOCATIONS=MSAS.OF.INTEREST[c(1:27,29:32)] #skip Cincinnati and St Louis
 INTERVENTIONS=c("noint", "fullint")
 NSIM=1000
 
@@ -40,25 +40,20 @@ collection=create.simset.collection(version="ehe", calibration.code = CALIBRATIO
 
 collection$run(2025, 2035, verbose=TRUE, stop.for.errors=T, overwrite.prior=F)
 
-
-
 #################################
 
 #Examine parameter distributions for the joint intervention
-
 x <- collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'individual.simulations')
 
 #Overall
 apply(x[,,,2], 1, quantile, probs=0.025)
 apply(x[,,,2], 1, quantile, probs=0.975)
 
-#Baltimore
-apply(x[,,1,2], 1, quantile, probs=0.025)
-apply(x[,,1,2], 1, quantile, probs=0.975)
-
-#Houston
-apply(x[,,2,2], 1, quantile, probs=0.025)
-apply(x[,,2,2], 1, quantile, probs=0.975)
+#Individual MSAs
+for (i in 1:31) {
+    print(apply(x[,,i,2], 1, quantile, probs=0.025))
+    print(apply(x[,,i,2], 1, quantile, probs=0.975))
+}
 
 #################################
 
