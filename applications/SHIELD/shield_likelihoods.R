@@ -459,6 +459,7 @@ hiv.testing.likelihood.instructions =
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2),
                                        from.year = 2014,
+                                       to.year = 2019,
                                        observation.correlation.form = 'compound.symmetry',
                                        error.variance.term = 0.05,
                                        weights = TESTING.WEIGHT,
