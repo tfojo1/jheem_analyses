@@ -987,6 +987,17 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         scale = 'rate',
                         value = expression(rate.testing.hiv * multiplier.syphilis.screening.to.hiv.tests))
 
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'rate.screening',
+                               applies.to = list(stage = c("primary", "secondary")),
+                               apply.function = "multiply",
+                               value = "rate.screening.ps.multiplier")
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = "rate.screening.ps.multiplier",
+                       scale = 'proportion',
+                       value = 0.5)
+
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
 # prop of pregnant women receiving 'successful' prenatal screening 
 # How to model treatment failures that still result in congenital syphilis? 

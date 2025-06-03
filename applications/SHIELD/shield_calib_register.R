@@ -124,7 +124,7 @@ lapply(calibnames,function(x){
 })
 
 lapply(calibnames,function(x){
-    register.calibration.info(code = paste0('syphilis.13.rf.',x), 
+    register.calibration.info(code = paste0('syphilis.15.rf.',x), 
                               preceding.calibration.codes = "pop.demog.8",
                               likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
                               data.manager = SURVEILLANCE.MANAGER,
@@ -197,3 +197,10 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 # 5.27: <syphilis.12.rf.psElTotal> Includes testing parameters for calibration
 
 # 5.30: <syphilis.13.rf.psElTotal> adding likelihood for HIV testing
+
+# 6.02: <syphilis.14.rf.psElTotal> added scenond transition route for latent 
+
+# 6.03: <syphilis.15.rf.psElTotal> reverted to 5.30 model, modified to have multiplier for ps screening 
+
+
+
