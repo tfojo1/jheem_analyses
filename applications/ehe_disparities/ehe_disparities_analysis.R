@@ -58,15 +58,64 @@ for (i in 1:31) {
 #################################
 
 #Output incidence and population estimates for 2035 and 2025
-#results = collection$get(outcomes = c("new", "incidence", "population"),
-#                         dimension.values = list(year=2035),
-#                         keep.dimensions = c("race"))
+if (1==2)
+{
+    results = collection$get(outcomes = c("new", "incidence", "population"),
+                             dimension.values = list(year=2035),
+                             keep.dimensions = c("race"))
 
-#baseline = collection$get(outcomes = c("new", "incidence", "population"),
-#                         dimension.values = list(year=2025),
-#                         keep.dimensions = c("race"))
+    baseline = collection$get(outcomes = c("new", "incidence", "population"),
+                             dimension.values = list(year=2025),
+                             keep.dimensions = c("race"))
 
-#save(results, baseline, file=file.path(get.jheem.root.directory(),"results","ehe_disparities","results.Rdata"))
+    
+    resample.nas = function(values)
+    {
+        resampled.values = apply(values, 'location', function(x){
+            
+            na.mask = apply(is.na(x), 'sim', any)
+            
+            if (any(na.mask))
+            {
+                na.sim.names = dimnames(x)$sim[na.mask]
+                non.na.sim.names = dimnames(x)$sim[!na.mask]
+                
+                sim.names.to.resample = sample(setdiff(non.na.sim.names, 'Total'), size = sum(na.mask), replace=F)
+                
+                resampled = array.access(x, sim=sim.names.to.resample)
+                dimnames(resampled)$sim = na.sim.names
+                array.access(x, sim=na.sim.names) = resampled
+                
+                x
+            }
+            else
+                x
+        })
+        
+        dim.names = c(dimnames(values)[setdiff(names(dimnames(values)), 'location')], dimnames(values)['location'])
+        dim(resampled.values) = sapply(dim.names, length)
+        dimnames(resampled.values) = dim.names
+        
+        resampled.values = apply(resampled.values, names(dimnames(values)), function(x){x})
+        
+        if (any(dimnames(resampled.values)$location=='Total'))
+        {
+            array.access(resampled.values, location='Total') = apply(array.access(resampled.values,
+                                                                             location = setdiff(dimnames(resampled.values)$location, 'Total')),
+                                                                setdiff(names(dim(resampled.values)), 'location'),
+                                                                sum)
+        }
+        
+        resampled.values
+    }
+    
+    results = resample.nas(results)
+    baseline = resample.nas(baseline)
+    
+    
+    save(results, baseline, file=file.path(get.jheem.root.directory(),"results","ehe_disparities","results.Rdata"))
+    
+}
 load(file.path(get.jheem.root.directory(),"results","ehe_disparities","results.Rdata"))
 
 
