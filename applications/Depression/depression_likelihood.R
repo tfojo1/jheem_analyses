@@ -42,7 +42,7 @@ DEP.PARTITIONING.FUNCTION = function(arr, version='dep', location)
 }
 ## Similar to EHE partitioning function
 
-proportionDep_likelihood_inst <- create.nested.proportion.likelihood.instructions(outcome.for.data = 'depression', outcome.for.sim = 'proportion.depressed', 
+nested.proportionDep_likelihood_inst <- create.nested.proportion.likelihood.instructions(outcome.for.data = 'depression', outcome.for.sim = 'proportion.depressed', 
                                         denominator.outcome.for.data = 'adult.population', 
                                         location.types = c('STATE','COUNTY'),
                                         minimum.geographic.resolution.type = 'COUNTY',
@@ -81,6 +81,25 @@ proportionDep_likelihood_inst <- create.nested.proportion.likelihood.instruction
                                                                    # we use mapping to reconcile data from sources to what the model stratifications are 
 )
 
+proportionDep_likelihood_inst <- create.basic.likelihood.instructions(outcome.for.sim = 'proportion.depressed',
+                                                                      outcome.for.data = 'depression',
+                                                                      dimensions = c("age"),
+                                                                      levels.of.stratification = c(0,1), # 0 = totals, 1 = 1-way stratification
+                                                                      omit.years = 2020,
+                                                                      correlation.different.years = 0.5, # this is the default
+                                                                      correlation.different.strata = 0.1, # this is the default
+                                                                      correlation.different.sources = 0.3, # default
+                                                                      correlation.same.source.different.details = 0.3, # default
+                                                                      
+                                                                      observation.correlation.form = 'compound.symmetry', 
+                                                                      
+                                                                      error.variance.term = 0.03,
+                                                                      error.variance.type = 'sd',
+                                                                      
+                                                                      # if there are more datapoints for certain years, this will normalize
+                                                                      # e.g., if there are a few years with only the totals 
+                                                                      # before the stratifications are available
+                                                                      equalize.weight.by.year = F)
 
 ##
 prev_ratio_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'prev_ratio_depression',
@@ -115,7 +134,8 @@ pop_depTx_inst <- create.basic.likelihood.instructions.with.specified.outcome(ou
 # will yield 4 numbers, estimate and SD for being being inside/outside of MSA                                  
 # look at Melissa's code for this to get a sense of what to do // in EHE folder, ehe_bias_estimates_cache.R & ehe_likelihoods.R
 
-dep_likelihood_full <- join.likelihood.instructions(FULL.likelihood.instructions.8x.new.prev, 
+dep_likelihood_full <- join.likelihood.instructions(full.state.likelihood.instructions.half.weight,
+    #FULL.likelihood.instructions.8x.new.prev, 
                                                     proportionDep_likelihood_inst, 
                                                     prev_ratio_inst, 
                                                     hiv_depTx_inst, 
