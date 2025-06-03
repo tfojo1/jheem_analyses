@@ -1,8 +1,8 @@
-devtools::install_github('tfojo1/jheem2')
+#devtools::install_github('tfojo1/jheem2')
 source('../jheem_analyses/applications/Depression/dep_calibration.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 
-LOCATION = BALTIMORE.MSA #"GA"
+LOCATION = "GA"
 CALIBRATION.CODES.TO.RUN = "dep.init"
 
 for (CALIBRATION.CODE.TO.RUN in CALIBRATION.CODES.TO.RUN)

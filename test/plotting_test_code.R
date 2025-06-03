@@ -23,18 +23,18 @@ simplot(simset$last.sim(),
         outcomes = c("population"), 
         dimension.values = list(year = 2000:2030)) 
 
-simplot(simset$last.sim(),
-        simset,
-        outcomes = c("population"), 
-        style.manager = source.style.manager, # use when looking at totals 
-        dimension.values = list(year = 2000:2030)) 
-
-simplot(simset$last.sim(),
-        simset,
-        #facet.by = "age", # age, race; 1-way 
-        outcomes = c("immigration","emigration"), 
-        style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+# simplot(simset$last.sim(),
+#         simset,
+#         outcomes = c("population"), 
+#         style.manager = source.style.manager, # use when looking at totals 
+#         dimension.values = list(year = 2000:2030)) 
+# 
+# simplot(simset$last.sim(),
+#         simset,
+#         #facet.by = "age", # age, race; 1-way 
+#         outcomes = c("immigration","emigration"), 
+#         style.manager = location.style.manager,
+#         dimension.values = list(year = 2000:2030)) 
 
 simplot(simset$last.sim(),
         simset,

@@ -1,6 +1,6 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
-RW.STATES = c("CA","NY","FL","GA","TX","AL","MS","LA","IL","MO") # "WI"
+RW.STATES = c("CA","NY","FL","GA","TX","AL","MS","LA","IL","MO","WI") # "WI"
 
 rw.total.prevalence = sum(SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location["2021",RW.STATES])
 
