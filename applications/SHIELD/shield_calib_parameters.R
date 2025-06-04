@@ -162,7 +162,8 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     # for screening
     hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
-    rate.screening.ps.multiplier = Logitnormal.Distribution( meanlogit = 0, sdlogit = log(4)/2 )
+    rate.screening.ps.multiplier = Logitnormal.Distribution( meanlogit = 0, sdlogit = log(4)/2 ),
+    rate.screening.el.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
     )
 
 
@@ -570,7 +571,8 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
     Screening = c(
         "hiv.testing.or",
         "hiv.testing.slope.or",
-        "rate.screening.ps.multiplier"
+        "rate.screening.ps.multiplier",
+        "rate.screening.el.multiplier"
     )
 )
 

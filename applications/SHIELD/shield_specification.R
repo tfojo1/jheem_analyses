@@ -993,8 +993,19 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                apply.function = "multiply",
                                value = "rate.screening.ps.multiplier")
 
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'rate.screening',
+                               applies.to = list(stage = "early.latent"),
+                               apply.function = "multiply",
+                               value = "rate.screening.el.multiplier")
+
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.ps.multiplier",
+                       scale = 'proportion',
+                       value = 0.5)
+
+register.model.element(SHIELD.SPECIFICATION,
+                       name = "rate.screening.el.multiplier",
                        scale = 'proportion',
                        value = 0.5)
 
