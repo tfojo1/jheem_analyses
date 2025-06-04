@@ -124,7 +124,7 @@ lapply(calibnames,function(x){
 })
 
 lapply(calibnames,function(x){
-    register.calibration.info(code = paste0('syphilis.15.rf.',x), 
+    register.calibration.info(code = paste0('syphilis.16.rf.',x), 
                               preceding.calibration.codes = "pop.demog.8",
                               likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
                               data.manager = SURVEILLANCE.MANAGER,
@@ -201,6 +201,8 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 # 6.02: <syphilis.14.rf.psElTotal> added scenond transition route for latent 
 
 # 6.03: <syphilis.15.rf.psElTotal> reverted to 5.30 model, modified to have multiplier for ps screening 
+
+# 6.04: <syphilis.16.rf.psElTotal> included  multiplier for el screening
 
 
 
