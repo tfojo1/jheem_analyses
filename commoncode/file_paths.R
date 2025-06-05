@@ -2,7 +2,13 @@
 
 BIG.DESKTOP.ROOT.DIR = 'Q:'
 MAC.ROOT.DIR = "/Volumes/jheem$"
-PEARL1.ROOT.DIR = "/mnt/jheem_nas_share"
+JHU_SERVER_NAS_MOUNT_PATH = "/mnt/jheem_nas_share"
+
+JHU_SERVER_HOSTNAMES = c(
+    "pearl1.jhsph.edu", "pearl1",
+    "shield1.jhsph.edu", "shield1",
+    "shield2.jhsph.edu", "shield2"
+)
 
 LAPTOP.ROOT.DIR = '../../files'
 if (file.exists(file.path("../test_runs", "mcmc_runs"))) # a hedge against early on when we kept the files in the code subdirectory
@@ -20,10 +26,12 @@ if (RUNNING.ON.DESKTOP)
 if (RUNNING.ON.MAC)
     ROOT.DIR = MAC.ROOT.DIR
 
-if ((Sys.info()["nodename"] == "pearl1.jhsph.edu" || Sys.info()["nodename"] == "pearl1") &&
-    dir.exists(PEARL1.ROOT.DIR) &&
-    file.exists(file.path(PEARL1.ROOT.DIR, "mcmc_runs"))) {
-    
-    ROOT.DIR = PEARL1.ROOT.DIR
+# Check for JHU Servers (pearl1, shield1, shield2)
+IS_JHU_SERVER = (Sys.info()["nodename"] %in% JHU_SERVER_HOSTNAMES) &&
+                dir.exists(JHU_SERVER_NAS_MOUNT_PATH) &&
+                file.exists(file.path(JHU_SERVER_NAS_MOUNT_PATH, "mcmc_runs"))
+
+if (IS_JHU_SERVER) {    
+    ROOT.DIR = JHU_SERVER_NAS_MOUNT_PATH
 }
 
