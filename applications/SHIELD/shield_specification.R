@@ -838,17 +838,9 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
 #*** CONTINUUM TRANSISION *** ----
 ##---- 1-SYMPTHOMATIC TESTING ----
-# proportions that are symptomatic during primary and secondary stages:
-# register.model.element.values(SHIELD.SPECIFICATION,
-#                               'prp.symptomatic.primary.msm'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est'] ,
-#                               'prp.symptomatic.primary.heterosexual_male'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'] ,
-#                               'prp.symptomatic.primary.female'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'] ,
-#                               'prp.symptomatic.secondary.msm'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est'] ,
-#                               'prp.symptomatic.secondary.heterosexual_male'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'] ,
-#                               'prp.symptomatic.secondary.female'=SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'] ,
-#                               scale = 'proportion')
-
-# Register symptomatic proportions for primary and secondary stages
+# Register "Effective" symptomatic proportions for primary and secondary stages
+# We assume 100% care seeking and testing rate for ”symptomatic” cases in Primary&Secondary Stage (effective proportion) 
+# Those who don’t notice the symptoms or don’t seek care based on symptoms are treated as asymptomatic. 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.symptomatic.primary.heterosexual_male',
                        scale = 'proportion',
@@ -903,21 +895,10 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'prp.symptomatic.secondary',
                                applies.to = list(sex='msm'),
                                value = 'prp.symptomatic.secondary.msm')
-# Symptomatic testing rates:
-# untreated progression rate * propotion of cases diagnosed through symotomatic testing during a stage
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.testing.symptomatic',
-                        scale = 'rate',
-                        value = 0)
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.testing.symptomatic',
-                               applies.to = list(stage='primary'),
-                               value = expression(1/duration.primary * prp.diagnosed.sym.testing.primary))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.testing.symptomatic',
-                               applies.to = list(stage='secondary'),
-                               value = expression(1/duration.secondary * prp.diagnosed.sym.testing.secondary))
-#
+
+# We assume 100% care/seeking and testing rate for symptomatic individuals
+# For now, we assume 100% test.sensitivity as well. 
+# proportion of symp.testing that are successfully diagnosed: 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.diagnosed.sym.testing.primary',
                         scale = 'proportion',
@@ -934,11 +915,25 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'prp.diagnosed.sym.testing.secondary',
                                applies.to = list(stage='secondary'),
                                value = 'prp.symptomatic.secondary') # can also add: *sensitivity of test in primary * care seeking behavior
-#
+
+# Testing is modeled at the "End" of a stage, not during. 
+# Rate of symptomatic testing:
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.testing.symptomatic',
+                        scale = 'rate',
+                        value = 0)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'rate.testing.symptomatic',
+                               applies.to = list(stage='primary'),
+                               value = expression(1/duration.primary * prp.diagnosed.sym.testing.primary))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'rate.testing.symptomatic',
+                               applies.to = list(stage='secondary'),
+                               value = expression(1/duration.secondary * prp.diagnosed.sym.testing.secondary))
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.testing.tertiary',
                        scale = 'rate',
-                       value =12) #average of 1month
+                       value =SHIELD_BASE_PARAMETER_VALUES['rate.testing.tertiary'] )  
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.testing.symptomatic',
                                applies.to = list(stage=c('tertiary')),
@@ -947,7 +942,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.testing.cns',
                        scale = 'rate',
-                       value =12) #average of 1month
+                       value =SHIELD_BASE_PARAMETER_VALUES['rate.testing.cns'] )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.testing.symptomatic',
                                applies.to = list(stage=c('cns')),

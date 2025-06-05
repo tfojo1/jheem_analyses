@@ -159,63 +159,71 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.b
 # *** NATURAL HISTORY ---- ##-----
 ## ---- STATE DURATIONS ---- assuming as fixed 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.primary',
-                                      4/52, 2/52, 6/52, #2-6weeks 
+                                      1/12, 0,0, #2-6weeks 
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary',
-                                      2/12, 1/12,3/12, #1-3 months
+                                      2/12, 0,0, #1-3 months
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.early.latent',
-                                      8/12, 9/12, 11/12, #9-11 months (to sum to 1year with secondary)
+                                      9/12, 0,0, #9-11 months (to sum to 1year with secondary)
                                       citation = "syphilis_natural_history.docx")
 
 ## ---- TRANSITION RATES ----
 # RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
-                                      0.25,.25 * lb,.25 *hb,
+                                      0.25,0,0,
                                       citation = "syphilis_natural_history.docx")
 # Late Latent to Tertiary:
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
-                                      0.01049095 ,0.00946867 ,0.01151324,  
+                                      0.01049095 ,0,0, #0.00946867 ,0.01151324,  
                                       citation = "untreated_syphilis_progression_rates.R")
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
-                                      0.010286933, 0.008440789, 0.012133077,
+                                      0.010286933, 0,0, #0.008440789, 0.012133077,
                                       citation = "untreated_syphilis_progression_rates.R")
 # Late Latent to CNS:
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.male',
-                                      0.004465265,0.004465265* lb,0.004465265*hb,
+                                      0.004465265,0,0,
                                       citation = "untreated_syphilis_progression_rates.R")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.female',
-                                      0.002227628,0.002227628 * lb,0.002227628* hb,
+                                      0.002227628,0,0,
                                       citation = "untreated_syphilis_progression_rates.R")
 # Early Latent to CNS:
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.early.latent.to.cns',
-                                      0.085 ,0.05, 0.12,
+                                      0.085 ,0,0,# 0.05, 0.12,
                                       citation = "syphilis_natural_history.docx")
 
 ## ---- SYMPTOMATIC INFECTIONS ----                        
 ## Proportion of incident cases presenting with symptomatic primary or secondary disease: 
+# FOR HET_MALE AND FEMALES, values set based on MSM data #LIMITATION
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm.est',
                                       0.25, 0.2, 0.29, #data from MSM 
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.msm.est',
                                       0.16, 0.15, 0.17, #data from MSM
                                       citation = "syphilis_natural_history.docx")
-
-#'@Melissa: we need additional estimates for females (females are generally less symp in the primary stage) #'@Khalil
-# values set based on MSM data
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.heterosexual_male.est',
-                                      0.25, 0.2, 0.29, 
+                                      0.25, 0,0,# 0.2, 0.29, 
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.heterosexual_male.est',
-                                      0.16, 0.15, 0.17,  
+                                      0.16, 0,0, # 0.15, 0.17,  
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.female.est',
-                                      0.25, 0.2, 0.29,  
+                                      0.25, 0,0, #  0.2, 0.29,  
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.female.est',
-                                      0.16, 0.15, 0.17, 
+                                      0.16, 0,0, #  0.15, 0.17, 
                                       citation = "syphilis_natural_history.docx")
+
+
+# rate of symptomatic.testing during the tertiary stage (assuming everyone in tertiary are symptomatic)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.tertiary',
+                                       12,0,0, #average of 1 month
+                                      citation = "syphilis_natural_history.docx")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.cns',
+                                      12,0,0, #average of 1 month
+                                      citation = "syphilis_natural_history.docx")
+
 
 # *** TESTING ---- ##-----
 ## ---- HIV Testing By Age ----
