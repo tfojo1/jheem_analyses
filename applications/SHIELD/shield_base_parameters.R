@@ -218,10 +218,10 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.se
 
 # rate of symptomatic.testing during the tertiary stage (assuming everyone in tertiary are symptomatic)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.tertiary',
-                                       12,0,0, #average of 1 month
+                                       1/12,0,0, #average of 1 month
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.cns',
-                                      12,0,0, #average of 1 month
+                                      1/12,0,0, #average of 1 month
                                       citation = "syphilis_natural_history.docx")
 
 
