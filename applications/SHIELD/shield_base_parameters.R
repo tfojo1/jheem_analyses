@@ -135,7 +135,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.tran
                                       0.1,0.05,0.15,
                                       citation = "syphilis_natural_history.docx") 
 
-## ---- Risk Ratios Based on Prenatal Care timing  ----
+## ---- Risk Ratios Based on Prenatal Cares timing  ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.no.prenatal.care',
                                       0.36,0.28,0.449, 
                                       citation = "syphilis_natural_history.docx") 
@@ -159,7 +159,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.births.multi.b
 # *** NATURAL HISTORY ---- ##-----
 ## ---- STATE DURATIONS ---- assuming as fixed 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.primary',
-                                      1/12, 0,0, #2-6weeks 
+                                      4/52, 0,0, #2-6weeks 
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.secondary',
                                       2/12, 0,0, #1-3 months
