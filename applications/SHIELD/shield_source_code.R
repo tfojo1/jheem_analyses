@@ -103,7 +103,7 @@ cat("CENSUS.AGES set to ",CENSUS.AGES,"\n")
 # most demographic data are available starting in 2007 or 2010. we start mapping the functional values in 2005 for a smooth transition 
 # if you specify the functional.form.from.time to equal 2005, it will map the function back to that year but then remain static before then
 
-DEFAULT.START.YEAR=1940 # simulation start year
+DEFAULT.START.YEAR=1970 # simulation start year
 DEFAULT.FIX.STRATA.YEAR=2010 # full population breakdown is available post-2010, and birth data is available post 2007. #the same year that we use for estimating proportion MSM
 DEFAULT.POPULATION.YEARS=2010 #used for generating the initial population and sexual contact oes (observed/estimated race estimates)
 DEFAULT.AGING.START.YEAR=2005 
