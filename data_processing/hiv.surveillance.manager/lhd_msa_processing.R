@@ -25,11 +25,19 @@ data.list.lhd.clean = lapply(data.list.lhd, function(file){
   
   data$value = round(data$value, digits=2)
   
-  data$location =locations::get.cbsa.for.msa.name(data$msa)
+  if(grepl("state", filename)) {
+      data$location = data$location
+  }
+  
+  if(grepl("updated_msa", filename)) {
+      data$location =locations::get.cbsa.for.msa.name(data$location)
+  }
+ 
   
   data$race = ifelse(data$demo=="black", "black",
                      ifelse(data$demo =='hispanic', "hispanic",
-                            ifelse(data$demo =='other race', 'other', "")))
+                            ifelse(data$demo =='white', "other",
+                            ifelse(data$demo =='other race', 'other', ""))))
               
   data$age = ifelse(data$demo=="13-24 years", "13-24 years",
                     ifelse(data$demo =='25-34 years', "25-34 years",
@@ -204,6 +212,14 @@ san_antonio = lapply(combined_list, function(file){
   list(filename, data) 
 })
 
+nj = lapply(combined_list, function(file){
+    data=file[[2]] 
+    filename = file[[1]] 
+    data= subset(data, data$location == "NJ")
+    data= as.data.frame(data)
+    list(filename, data) 
+})
+
 ################################################################################
                    ###Add LHD to Data Manager###
             #Put by location to add details for each LHD#
@@ -352,6 +368,18 @@ for (data in lhd_san_antonio) {
     details = 'Local Health Department Reports')
 }
 
+#Put NJ - (because there isn't NJ suppression data in Atlas Plus)
+lhd_nj = lapply(nj, `[[`, 2)
+
+for (data in lhd_nj) {
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'lhd',
+        source = 'lhd',
+        dimension.values = list(),
+        url = 'https://www-doh.nj.gov/doh-shad/indicator/summary/HIVViralLoad.html',
+        details = 'Local Health Department Reports')
+}
 
 
 # Adding Update for 8.27.24 - Awareness + Prevalence for MSAs -------------
