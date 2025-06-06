@@ -124,8 +124,8 @@ lapply(calibnames,function(x){
 })
 
 lapply(calibnames,function(x){
-    register.calibration.info(code = paste0('syphilis.16.rf.',x), 
-                              preceding.calibration.codes = "pop.demog.8",
+    register.calibration.info(code = paste0('syphilis.6.06.rf.',x), 
+                              #preceding.calibration.codes = "pop.demog.8",
                               likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030, 
@@ -204,5 +204,5 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 
 # 6.04: <syphilis.16.rf.psElTotal> included  multiplier for el screening
 
-
+# 6.06: <syphilis.6.06.rf.psElTotal> added 1970s calibratable params, changed default year to 1970s
 
