@@ -157,6 +157,14 @@ if (DEFAULT.START.YEAR==1940){
                                   'diagnoses.rate.tertiary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.tertiary.1970'],
                                   scale = 'proportion')
     
+    register.model.quantity(SHIELD.SPECIFICATION,
+                            name='diagnoses.rate.all.stage.1970',
+                            value=expression(diagnoses.rate.primary.1970 + 
+                                             diagnoses.rate.secondary.1970 + 
+                                             diagnoses.rate.early.latent.1970 + 
+                                             diagnoses.rate.late.latent.1970 + 
+                                             diagnoses.rate.tertiary.1970)
+                            )
     # multipliers of initial diagnoses in 1970: tuned in calibration
     register.model.element(SHIELD.SPECIFICATION,
                            name = 'initial.infection.multiplier.1970.early',
@@ -201,11 +209,14 @@ if (DEFAULT.START.YEAR==1940){
                                 value = 'n.initial.population.infected')
     ##---- Uninfected ----
     register.model.quantity(SHIELD.SPECIFICATION,
+                            name = 'n.initial.population.infected.all.stages',
+                            value = expression(n.initial.population* diagnoses.rate.all.stage.1970))
+    register.model.quantity(SHIELD.SPECIFICATION,
                             name = 'n.initial.population.uninfected',
                             value = 0)
     register.model.quantity.subset(SHIELD.SPECIFICATION,
                                    name = 'n.initial.population.uninfected',
-                                   value = expression(n.initial.population - n.initial.population.infected),
+                                   value = expression(n.initial.population - n.initial.population.infected.all.stages),
                                    applies.to = list(profile='susceptible'))
     #register uninfected population:
     register.initial.population(SHIELD.SPECIFICATION,
