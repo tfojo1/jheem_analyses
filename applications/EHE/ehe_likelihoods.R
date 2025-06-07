@@ -2237,8 +2237,8 @@ LOG.P.NEW.FOLD.CHANGE.LTE.2 = log(P.NEW.FOLD.CHANGE.LTE.2)
 
 MEAN.NEW.FOLD.CHANGE.10Y = -0.1668702
 SD.NEW.FOLD.CHANGE.10Y = 0.7779033
-P.NEW.FOLD.CHANGE.10Y.LTE.2 = plnorm(2, meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y)
-LOG.P.NEW.FOLD.CHANGE.10Y.LTE.2 = log(P.NEW.FOLD.CHANGE.10Y.LTE.2)
+P.NEW.FOLD.CHANGE.10Y.LTE.2.2 = plnorm(2.5, meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y)
+LOG.P.NEW.FOLD.CHANGE.10Y.LTE.2.2 = log(P.NEW.FOLD.CHANGE.10Y.LTE.2.2)
 
 # x = seq(0,8,length=1000)
 # d = rep(P.NEW.FOLD.CHANGE.LTE.2, length(x))
@@ -2294,10 +2294,10 @@ future.incidence.change.likelihood.instructions =
             
             mask.fold.change.lte.2.5 = fold.change.inc <= 2.5
             
-            d.gte.2 = dlnorm(fold.change.inc[!mask.fold.change.lte.2.5], meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y, log = T)
-            d.lt.2 = LOG.P.NEW.FOLD.CHANGE.10Y.LTE.2.5 * sum(mask.fold.change.lte.2.5)
+            d.gte.2.5 = dlnorm(fold.change.inc[!mask.fold.change.lte.2.5], meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y, log = T)
+            d.lt.2.5 = LOG.P.NEW.FOLD.CHANGE.10Y.LTE.2.5 * sum(mask.fold.change.lte.2.5)
             
-            rv = sum(d.gte.2) + d.lt.2
+            rv = sum(d.gte.2.5) + d.lt.2.5
             
             if (!log)
                 exp(rv)
