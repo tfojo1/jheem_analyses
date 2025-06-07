@@ -2214,6 +2214,7 @@ future.change.penalty.likelihood.instructions =
 #-- INCIDENCE FUTURE CHANGE - going to penalize sharp rises in incidence among any stratum --#
 
 # NEW.FOLD.CHANGE.14.19 = SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2019',,,,,] / SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2014',,,,,]
+NEW.FOLD.CHANGE.09.19 = SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2019',,,,,] / SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2009',,,,,]
 # P.NEW.FOLD.CHANGE.GT.2 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 2)
 # P.NEW.FOLD.CHANGE.GT.3 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 3)
 # P.NEW.FOLD.CHANGE.GT.4 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 4)
@@ -2224,24 +2225,27 @@ future.change.penalty.likelihood.instructions =
 # MEAN.NEW.FOLD.CHANGE = mean(log(z))
 # SD.NEW.FOLD.CHANGE = sd(log(z))
 # ps = plnorm(c(0,2,3,4,6,8), mean(log(z)), sd(log(z)))
+
 MEAN.NEW.FOLD.CHANGE = -0.04470926
 SD.NEW.FOLD.CHANGE = 0.6549829
 P.NEW.FOLD.CHANGE.LTE.2 = plnorm(2, meanlog = MEAN.NEW.FOLD.CHANGE, sdlog = SD.NEW.FOLD.CHANGE)
+LOG.P.NEW.FOLD.CHANGE.LTE.2 = log(P.NEW.FOLD.CHANGE.LTE.2)
 
-# P.NEW.FOLD.CHANGE.GT.2 = 0.07893677
-# P.NEW.FOLD.CHANGE.GT.3 = 0.02778896
-# P.NEW.FOLD.CHANGE.GT.4 = 0.01167942
-# P.NEW.FOLD.CHANGE.GT.6 = 0.002416432
-# P.NEW.FOLD.CHANGE.GT.8 = 0.001208216
-# 
-# P.NEW.FOLD.CHANGE.LTE.2 = 1-P.NEW.FOLD.CHANGE.GT.2
-# P.NEW.FOLD.CHANGE.2.TO.3 = P.NEW.FOLD.CHANGE.GT.2 - P.NEW.FOLD.CHANGE.GT.3
-# P.NEW.FOLD.CHANGE.3.TO.4 = P.NEW.FOLD.CHANGE.GT.3 - P.NEW.FOLD.CHANGE.GT.4
-# P.NEW.FOLD.CHANGE.4.TO.6 = P.NEW.FOLD.CHANGE.GT.4 - P.NEW.FOLD.CHANGE.GT.6
-# P.NEW.FOLD.CHANGE.6.TO.8 = P.NEW.FOLD.CHANGE.GT.6 - P.NEW.FOLD.CHANGE.GT.8
+# z = NEW.FOLD.CHANGE.09.19[!is.na(NEW.FOLD.CHANGE.09.19) & !is.infinite(NEW.FOLD.CHANGE.09.19) & NEW.FOLD.CHANGE.09.19>0] 
+# MEAN.NEW.FOLD.CHANGE.10Y = mean(log(z))
+# SD.NEW.FOLD.CHANGE.10Y = sd(log(z))
 
+MEAN.NEW.FOLD.CHANGE.10Y = -0.1668702
+SD.NEW.FOLD.CHANGE.10Y = 0.7779033
+P.NEW.FOLD.CHANGE.10Y.LTE.2 = plnorm(2, meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y)
+LOG.P.NEW.FOLD.CHANGE.10Y.LTE.2 = log(P.NEW.FOLD.CHANGE.10Y.LTE.2)
 
-future.incidence.change.likelihood.instructions = 
+# x = seq(0,8,length=1000)
+# d = rep(P.NEW.FOLD.CHANGE.LTE.2, length(x))
+# d[x>2] = dlnorm(x[x>2], meanlog = P.NEW.FOLD.CHANGE.10Y.LTE.2, sdlog = SD.NEW.FOLD.CHANGE)
+# qplot(x,log(d))
+
+future.incidence.change.5y.likelihood.instructions = 
     create.custom.likelihood.instructions(
         name = 'future.incidence.change',
         compute.function = function(sim, data, log=T){
@@ -2254,7 +2258,7 @@ future.incidence.change.likelihood.instructions =
             mask.fold.change.lte.2 = fold.change.inc <= 2
             
             d.gte.2 = dlnorm(fold.change.inc[!mask.fold.change.lte.2], meanlog = MEAN.NEW.FOLD.CHANGE, sdlog = SD.NEW.FOLD.CHANGE, log = T)
-            d.lt.2 = P.NEW.FOLD.CHANGE.LTE.2 * sum(mask.fold.change.lte.2)
+            d.lt.2 = LOG.P.NEW.FOLD.CHANGE.LTE.2 * sum(mask.fold.change.lte.2)
             
             rv = sum(d.gte.2) + d.lt.2
             
@@ -2269,6 +2273,43 @@ future.incidence.change.likelihood.instructions =
             optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
                 outcomes = c('new','incidence'), 
                 dimension.values = list(year=2015:2030),
+                keep.dimensions = c('year','age','race','sex','risk')
+            )
+            
+            list(
+                optimized.get.instr = optimized.get.instr
+            )
+        }
+    )
+
+future.incidence.change.likelihood.instructions = 
+    create.custom.likelihood.instructions(
+        name = 'future.incidence.change',
+        compute.function = function(sim, data, log=T){
+            
+            inc.new = sim$optimized.get(data$optimized.get.instr)
+            
+            fold.change.inc = inc.new[as.character(2026:2035),,,,,,] / inc.new[as.character(2016:2025),,,,,,]
+            fold.change.inc[is.na(fold.change.inc)] = 1
+            
+            mask.fold.change.lte.2.5 = fold.change.inc <= 2.5
+            
+            d.gte.2 = dlnorm(fold.change.inc[!mask.fold.change.lte.2.5], meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y, log = T)
+            d.lt.2 = LOG.P.NEW.FOLD.CHANGE.10Y.LTE.2.5 * sum(mask.fold.change.lte.2.5)
+            
+            rv = sum(d.gte.2) + d.lt.2
+            
+            if (!log)
+                exp(rv)
+            else
+                rv
+        },
+        get.data.function = function(version, location)
+        {
+            sim.metadata = get.simulation.metadata(version=version, location=location)
+            optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
+                outcomes = c('new','incidence'), 
+                dimension.values = list(year=2015:2035),
                 keep.dimensions = c('year','age','race','sex','risk')
             )
             
