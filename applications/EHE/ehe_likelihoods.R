@@ -2240,10 +2240,10 @@ SD.NEW.FOLD.CHANGE.10Y = 0.7779033
 P.NEW.FOLD.CHANGE.10Y.LTE.2.5 = plnorm(2.5, meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y)
 LOG.D.NEW.FOLD.CHANGE.10Y.LTE.2.5 = log(P.NEW.FOLD.CHANGE.10Y.LTE.2.5/2.5)
 
-x = seq(0,8,length=1000)
-d = rep(exp(LOG.D.NEW.FOLD.CHANGE.10Y.LTE.2.5), length(x))
-d[x>2.5] = dlnorm(x[x>2.5], meanlog = P.NEW.FOLD.CHANGE.10Y.LTE.2, sdlog = SD.NEW.FOLD.CHANGE)
-qplot(x,log(d))
+# x = seq(0,8,length=1000)
+# d = rep(exp(LOG.D.NEW.FOLD.CHANGE.10Y.LTE.2.5), length(x))
+# d[x>2.5] = dlnorm(x[x>2.5], meanlog = P.NEW.FOLD.CHANGE.10Y.LTE.2, sdlog = SD.NEW.FOLD.CHANGE)
+# qplot(x,d)
 
 future.incidence.change.5y.likelihood.instructions = 
     create.custom.likelihood.instructions(
