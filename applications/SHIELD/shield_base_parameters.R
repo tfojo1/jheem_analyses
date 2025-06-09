@@ -1,7 +1,5 @@
 # made from SHIELD_BASE_PARAMETERS.R
 
-lb=hb=1 #we use these multipliers to construct a range for those parameters where only a single value is available 
-
 # what are the citation numbers?
 add.parameter <- function(params, param.name,
                           value,
@@ -24,28 +22,24 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
                              comment=character())
 
 # ci's are not used
-# citation numbers are oubmed ID, they're for our own records'
-
-lb.prev=.5; hb.prev=1.5 # added uncertainty (reflecting uncertainty in fraction.reported)
-
-
+# citation numbers are pubmed ID, they're for our own records'
 
 # *** INITIAL POPULATION INFECTED in 1970 ---- ## ----
 # Due to unavailability of data, we estimate this based on rate of syphilis diagnosis in that year <input_syphilis_prev_1970.R>
 # (we further add two calibration parameters to tune the number pf people with early stage and late stage syphilis in 1970) 
 
-b.seed.infections = 0 # multiplier used to turn off infections in the demographic calibration 
+b.seed.infections = 1 # multiplier used to turn off infections in the demographic calibration 
 # Diagnoses rate by stage in 1970
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.primary.1970',
-                                      b.seed.infections* 2.7/100000,0,0,                                      citation = "input_syphilis_diagnoses_1970.R")
+                                      b.seed.infections* 2.7/100000,0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.secondary.1970',
-                                      b.seed.infections* 8.1/100000,0,0,                                      citation = "input_syphilis_diagnoses_1970.R")
+                                      b.seed.infections* 8.1/100000,0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.early.latent.1970',
-                                      b.seed.infections* 8/100000,0,0,                                      citation = "input_syphilis_diagnoses_1970.R")
+                                      b.seed.infections* 8/100000,0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.late.latent.1970',
-                                      b.seed.infections* 18.525/100000,0,0,                                       citation = "input_syphilis_diagnoses_1970.R")
+                                      b.seed.infections* 18.525/100000,0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'diagnoses.rate.tertiary.1970',
-                                      b.seed.infections* 6.175/100000, 0,0,                                      citation = "input_syphilis_diagnoses_1970.R")
+                                      b.seed.infections* 6.175/100000, 0,0)
 
 # *** TRANSMISSION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
@@ -54,22 +48,22 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.seconda
 ## ---- MIXING BY SEXUAL ORIENTATION ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,
                                       'oe.female.pairings.with.msm', #observed to estimated ratio of contacts for females with male who are msm
-                                      0.0895, 0.0895*lb, 0.0895*hb,  
+                                      0.0895,0,0,
                                       citation='Pathela 2006')
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.heterosexual_male.pairings.with.male',
-                                      0.004,0.004*lb, 0.004*hb,  
+                                      0.004,0,0,
                                       citation='JHEEM assumption')
 
 ## ---- SEXUAL CONTACT BY RACE ---- ## ----
 #base sexual contact oes by race for the same race (black-black, hispanic-hispanic, other-other)
 #these are average values from 4 different studies that are included in the pairing_input_manager
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'oe.sexual.byrace.bb',
-                                      3.76, 3.76*lb, 3.76*hb, citation='JHEEMassumption')
+                                      3.76, 0,0, citation='JHEEMassumption')
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'oe.sexual.byrace.hh',
-                                      2.19, 2.19*lb, 2.19*hb, citation='JHEEMassumption')
+                                      2.19, 0,0, citation='JHEEMassumption')
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'oe.sexual.byrace.oo',
-                                      1.55, 1.55*lb, 1.55*hb, citation='JHEEM assumption')
+                                      1.55,0,0,  citation='JHEEM assumption')
 
 ## ---- SEXUAL TRANSMISSION RATES ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'male.to.female.sexual.transmission',
@@ -196,7 +190,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.se
 ## ---- HIV Testing By Age ----
 # what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
-                                     0.62, 0.62*lb, 0.62*hb,
+                                     0.62, 0,0,
                                      citation = "input_fraction_hiv_test_by_age.R")
 # *** CONTACT TRACING ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
@@ -226,18 +220,20 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.conta
 percent.misclassified.el.as.llu=0.096
 percent.misclassified.llu.as.el =  0.272
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
-                                      percent.misclassified.el.as.llu,percent.misclassified.el.as.llu*lb, percent.misclassified.el.as.llu*hb)
+                                      percent.misclassified.el.as.llu,
+                                      0,0)
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
-                                      percent.misclassified.llu.as.el,percent.misclassified.llu.as.el*lb, percent.misclassified.llu.as.el*hb)
+                                      percent.misclassified.llu.as.el,
+                                      0,0)
 
 
 # TBD: *** PROP OF IMMEDIATE TREATMENTS By TESTING ROUTE ---- ##----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
-                                      0.89,0.89*lb ,0.89*hb,
+                                      0.89,0,0,
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.testing.symptomatic', 
-                                      0.89,0.89*lb ,0.89*hb,
+                                      0.89,0,0,
                                       citation = "syphilis_natural_history.docx")
 #differences by stage of infection (early vs late) was too small to include 
 
@@ -245,7 +241,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immedi
 #if someone is diagnosed and doesnt receive immediate treatment, what is the rate of treatment
 #'@Todd: should we seperate this besed on sympthoms? or for pregnant women? 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
-                                      1.91,1.91*lb, 1.91*hb) #
+                                      1.91,0,0) #
 
 ## ********** -----
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values

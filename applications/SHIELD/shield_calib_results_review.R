@@ -14,11 +14,11 @@ VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
 
 # get.jheem.root.directory() #"/Volumes/jheem$"
-ROOT.DIR="../../files/"
-set.jheem.root.directory(ROOT.DIR)
+# ROOT.DIR="../../files/"
+# set.jheem.root.directory(ROOT.DIR)
 
-# DATE <- "2025-05-07"
-CALIBRATION.CODE.TO.RUN <- 'syphilis.9.pk.psTotal'
+DATE <- "2025-06-09"
+CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'
 # CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.5.pk'
 
 
@@ -27,10 +27,10 @@ CALIBRATION.CODE.TO.RUN <- 'syphilis.9.pk.psTotal'
 if (FALSE) {
     load(paste0("/Volumes/jheem$/results/Shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
 }
-if (FALSE) {
+if (TRUE) {
     load(paste0("../jheem_analyses/prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
 }
-if (TRUE) {
+if (FALSE) {
     get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
     simset <- assemble.simulations.from.calibration(
         version = VERSION,
@@ -41,10 +41,6 @@ if (TRUE) {
 }
 # sim=extract.last.simulation.from.calibration(version,LOCATION,CALIBRATION.CODE.TO.RUN,allow.incomplete = T)
 
-# simset9=simset
-# simset10=simset
-# # simset11=simset
-# simset=simset9
 # Quick checkpoint ----
 simset$n.sim
 # Extract first and last simulations and their parameters 
@@ -53,7 +49,19 @@ sim.last     <- simset$last.sim()
 params.first <- sim.first$params
 params.last  <- sim.last$params
 
-# 
+# REVIEW
+simplot(
+    sim.first,
+    sim.last,
+    # split.by = "sex",
+    # split.by = "age",
+    # split.by = "race",
+    # split.by = "race", facet.by = "sex",
+    split.by = "race", facet.by = "age",
+    outcomes = c("population"),
+    style.manager = source.style.manager
+)
+
 #Run Manual Simulation ----
 # engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 #
@@ -72,43 +80,45 @@ params.last  <- sim.last$params
     # params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.055 #2020
     # 
     # sim.manual <- engine$run(params.manual)
-
-# Plot syphilis total diagnosis  
-simplot(
-    # sim.first,
-    sim.last,
-    # sim,
-    # sim2,
-    # sim.manual,
-    # split.by = "sex",
-    split.by = "age",
-    # split.by = "race",
-    # split.by = "race", facet.by = "sex", #we are matching the totals only for now
-    # split.by = "race", facet.by = "age",
-    # outcomes = c("diagnosis.total"),
-    # outcomes = c("diagnosis.ps"),
-    # outcomes = c("diagnosis.el.misclassified"),
-    outcomes = c("diagnosis.late.misclassified"),
-    dimension.values = list(year = 1990:2025),
-    style.manager = source.style.manager
-)
+    
+    simplot(
+        # sim.first,
+        sim.last,
+        # sim.manual,
+        # split.by = "sex",
+        # split.by = "age",
+        # split.by = "race",
+        # split.by = "race", facet.by = "sex", #we are matching the totals only for now
+        split.by = "race", facet.by = "age",
+        # outcomes = c("population"),
+        # outcomes = c("diagnosis.total"),
+        # outcomes = c("diagnosis.ps"),
+        # outcomes = c("diagnosis.el.misclassified"),
+        # outcomes = c("diagnosis.late.misclassified"),
+        dimension.values = list(year = 1990:2030),
+        style.manager = source.style.manager
+    )
 }
 
-engine= create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-enable.jheem.solver.tracking() #will slow down but track additional data
-sim=engine$run(sim.last$params)
-x=get.jheem.solver.tracked.info()
-qplot(x$diffeq.computed.times)
-length(x$diffeq.computed.times)
-# the more states are changing the smaller steps we need to take
 
-#to test the solver for a good simulation 
-solver = create.solver.metadata(rtol =0.01, atol=0.1 ) #default solver
-engine2=create.jheem.engine(VERSION, LOCATION, end.year = 2030, solver.metadata = solver)
-sim2=engine2$run(sim.last$params)
-x2=get.jheem.solver.tracked.info()
-qplot(x2$diffeq.computed.times)
-sim2$run.metadata$n.diffeq.evaluations
+# Reviewing the engine computation time
+{
+    # engine= create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+    # enable.jheem.solver.tracking() #will slow down but track additional data
+    # sim=engine$run(sim.last$params)
+    # x=get.jheem.solver.tracked.info()
+    # qplot(x$diffeq.computed.times)
+    # length(x$diffeq.computed.times)
+    # # the more states are changing the smaller steps we need to take
+    # 
+    # #to test the solver for a good simulation 
+    # solver = create.solver.metadata(rtol =0.01, atol=0.1 ) #default solver
+    # engine2=create.jheem.engine(VERSION, LOCATION, end.year = 2030, solver.metadata = solver)
+    # sim2=engine2$run(sim.last$params)
+    # x2=get.jheem.solver.tracked.info()
+    # qplot(x2$diffeq.computed.times)
+    # sim2$run.metadata$n.diffeq.evaluations
+}
 
 range(sim$infected-sim2$infected)
 
@@ -134,38 +144,6 @@ calculate.density(SHIELD.FULL.PARAMETERS.PRIOR, sim.manual$params) / calculate.d
 #     outcomes = c("hiv.testing"),
 #     dimension.values = list(year = 2000:2030)
 # )
-# Plot Population
-simplot(
-    # sim.first,
-    sim.last,
-    # sim.manual,
-    # split.by = "race", facet.by = "age",
-    split.by = "sex", facet.by = "age",
-    
-    outcomes = c("population"),
-    dimension.values = list(year = 2000:2030)
-)
-# Deaths
-simplot(
-    # sim.first,
-    sim.last,
-    outcomes = c("deaths"),
-    dimension.values = list(year = 2000:2030)
-)
-
-# Plot Fertility
-simplot(
-    # sim.first,
-    sim.last,
-    # sim.manual,
-    split.by = "race", facet.by = "age",
-    outcomes = c("fertility.rate"),
-    dimension.values = list(year = 2000:2030)
-)
-#
-# Plot Immigration / Emigration
-simplot(sim.last, outcomes = "immigration", dimension.values = list(year = 2000:2030))
-simplot(sim.last, outcomes = "emigration",  dimension.values = list(year = 2000:2030))
 
 # MCMC Diagnostics ----
 head(simset$get.mcmc.mixing.statistic())
