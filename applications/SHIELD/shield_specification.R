@@ -1016,7 +1016,7 @@ register.model.element(SHIELD.SPECIFICATION,
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.el.multiplier",
-                       scale = 'proportion',
+                       scale = 'ratio',
                        value = 0.5)
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
