@@ -116,6 +116,7 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
+  # Initial infection multipliers:
   initial.infection.multiplier.1970.early = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ps and EL
   initial.infection.multiplier.1970.late = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ll and tertiary
   
@@ -151,7 +152,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 
 TESTING.PARAMETERS.PRIOR=join.distributions( 
-    # for testing
+    # for symptomatic testing
     prp.symptomatic.primary.msm = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']), sdlogit = log(2)/2 ) , 
     prp.symptomatic.primary.heterosexual_male = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est']), sdlogit = log(2)/2 ) ,
     prp.symptomatic.primary.female = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est']), sdlogit = log(2)/2 ) ,
@@ -159,9 +160,11 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     prp.symptomatic.secondary.heterosexual_male = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est']), sdlogit = log(2)/2 ) ,
     prp.symptomatic.secondary.female= Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est']), sdlogit = log(2)/2 ) ,
     
-    # for screening
+    # for HIV  screening
     hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
+    
+    # for syphilis screening: Multiplicative coefficients for the screening rates 
     rate.screening.ps.multiplier = Logitnormal.Distribution( meanlogit = 0, sdlogit = log(4)/2 ),
     rate.screening.el.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
     )
