@@ -4,21 +4,23 @@ source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 N.ITER=15000
 solver = create.solver.metadata(rtol = 0.001, atol=0.05) #rtol,atol
 # solver = create.solver.metadata() #default solver
-param.names.trans.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
-                           AGING.PARAMETERS.PRIOR@var.names,
-                           TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                           TESTING.PARAMETERS.PRIOR@var.names)
 
+
+param.names.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
+                           AGING.PARAMETERS.PRIOR@var.names
+                          )
+
+param.names.all<-c(POPULATION.PARAMETERS.PRIOR@var.names,
+                   AGING.PARAMETERS.PRIOR@var.names,
+                   TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                   TESTING.PARAMETERS.PRIOR@var.names)
 
 # Calibrating to demographic and syphilis diagnoses targets
-register.calibration.info('pop.demog.8', 
+register.calibration.info('calib.demog.06.09.pk', 
                           likelihood.instructions = likelihood.instructions.demographics,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
-                          parameter.names = c(
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names 
-                          ), 
+                          parameter.names = param.names.demog, 
                           n.iter = N.ITER,
                           thin = 50, 
                           is.preliminary = T, 
@@ -26,118 +28,37 @@ register.calibration.info('pop.demog.8',
                           description = "A quick run to get population parameters in the general vicinity",
                           solver.metadata = solver
 )
-## TEST for Nick:
-register.calibration.info('pop.demog.test', 
-                          likelihood.instructions = likelihood.instructions.demographics,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  
-                          parameter.names = c(
-                              POPULATION.PARAMETERS.PRIOR@var.names,
-                              AGING.PARAMETERS.PRIOR@var.names 
-                          ), 
-                          n.iter = 10,
-                          thin = 1, 
-                          is.preliminary = T, 
-                          max.run.time.seconds = 30, 
-                          description = "A quick run to get population parameters in the general vicinity",
-                          solver.metadata = solver
-)
+# ## TEST for Nick:
+# register.calibration.info('pop.demog.test', 
+#                           likelihood.instructions = likelihood.instructions.demographics,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,  
+#                           parameter.names = c(
+#                               POPULATION.PARAMETERS.PRIOR@var.names,
+#                               AGING.PARAMETERS.PRIOR@var.names 
+#                           ), 
+#                           n.iter = 10,
+#                           thin = 1, 
+#                           is.preliminary = T, 
+#                           max.run.time.seconds = 30, 
+#                           description = "A quick run to get population parameters in the general vicinity",
+#                           solver.metadata = solver
+# )
 #############
-register.calibration.info('syphilis.diagnoses.8.RF',
-                          preceding.calibration.codes = 'pop.demog.8',
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.all.totals,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
-                          param.names.trans.demog,
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
-)
-
-register.calibration.info('syphilis.diagnoses.8.pk',
-                          # preceding.calibration.codes = 'pop.demog.8',
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.all.totals,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  # the most efficient way is to run it to the last year of data; but it's also helpful to review projections for start
-                          param.names.trans.demog,
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
-)
-##############
-# Trying diagnosis targets one at a time
-calibnames=c("psElTotal","all.totals")
-lapply(calibnames,function(x){
-register.calibration.info(code = paste0('syphilis.11.pk.',x), 
-                          preceding.calibration.codes = "pop.demog.8",
-                          likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030, 
-                          param.names.trans.demog, 
-                          n.iter = N.ITER,
-                          thin = 50, 
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
-)
-})
-
-
-# Trying diagnosis targets one at a time
-calibnames=c("psElTotal","psLlTotal","all.totals")
-lapply(calibnames,function(x){
-    register.calibration.info(code = paste0('syphilis.11.rf.',x), 
-                              preceding.calibration.codes = "pop.demog.8",
-                              likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
-                              data.manager = SURVEILLANCE.MANAGER,
-                              end.year = 2030, 
-                              param.names.trans.demog, 
-                              n.iter = N.ITER,
-                              thin = 50, 
-                              is.preliminary = T,
-                              max.run.time.seconds = 30,
-                              description = "A quick run to get syphilis parameters in the general vicinity",
-                              solver.metadata = solver
-    )
-})
-lapply(calibnames,function(x){
-    register.calibration.info(code = paste0('syphilis.12.rf.',x), 
-                              preceding.calibration.codes = "pop.demog.8",
-                              likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
-                              data.manager = SURVEILLANCE.MANAGER,
-                              end.year = 2030, 
-                              param.names.trans.demog, 
-                              n.iter = N.ITER,
-                              thin = 50, 
-                              is.preliminary = T,
-                              max.run.time.seconds = 30,
-                              description = "A quick run to get syphilis parameters in the general vicinity",
-                              solver.metadata = solver
-    )
-})
-
-lapply(calibnames,function(x){
-    register.calibration.info(code = paste0('syphilis.6.06.rf.',x), 
-                              #preceding.calibration.codes = "pop.demog.8",
-                              likelihood.instructions = get(paste0("likelihood.instructions.syphilis.diagnoses.",x)),  
-                              data.manager = SURVEILLANCE.MANAGER,
-                              end.year = 2030, 
-                              param.names.trans.demog, 
-                              n.iter = N.ITER,
-                              thin = 50, 
-                              is.preliminary = T,
-                              max.run.time.seconds = 30,
-                              description = "A quick run to get syphilis parameters in the general vicinity",
-                              solver.metadata = solver
-    )
-})
+# calibrating to demographics, total ps and total EL syphilis diagnosis targets and hiv tests 
+# register.calibration.info(code = "calib.diagnosis.06.09.pk", 
+#                           #preceding.calibration.codes = "pop.demog.8",
+#                           likelihood.instructions = likelihood.instructions.syphilis.diagnoses.psElTotal,  
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030, 
+#                           param.names.trans.demog, 
+#                           n.iter = N.ITER,
+#                           thin = 50, 
+#                           is.preliminary = T,
+#                           max.run.time.seconds = 30,
+#                           description = "A quick run to get syphilis parameters in the general vicinity",
+#                           solver.metadata = solver
+# ) 
 
 cat("*** Shiled_register_calibration.R completed!***\n")
 
@@ -149,23 +70,7 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 
 #LOG -----
 # simsets are saved in: /Volumes/jheem$/shield/pop.demog.1.Rdata
-#04.14: PK: I removed initial infected population to speed up the sims #check base_params prp.of.initial.population.infected.syphilis=0
-#04.18: Ryan added immigration parameters
-#04.23: <pop.demog.1> we found discrepancies in the population size, Zoe is working on a fix
-#04.25: <pop.demog.wEmigration> same chain run with 6 parameters by Ryan
-#04.29: <pop.demog.2> NYC. Zoe has update the survillance data. we have a bad fit to older agegroups, and the fertility in Baltimore. 
-#04.29: <pop.demog.3> Baltimore, added race.age interaction parameters for fertility.rates (18 params)
-#04.29: <pop.demog.4> Baltimore, added race.age.time interaction parameters for fertility.rates (32 params)
-#04.30: <pop.demog.3.pk> same run as <pop.demog.3>  
-#05.01: <pop.demog.5> Baltimore, rolled back to 9 params for fert., added fert. calbration start at 2005 and population variance function added
-#05.02: <pop.demog.6> Baltimore, rolled back to 18 params for fert.
-#05.05: <pop.demog.7> Baltimore, rolled back to 9 params for fert., Todd fixed issue with JHEEM model
-#05.07: <pop.demog.8> same as pop.demog.7
-#05.08: <syphilis.diagnoses.1> same as pop.demog.8 with syphilis
-#05.08: <syphilis.diagnoses.2> same as syphilis.diagnoses.1, using total by stage
-#05.09: <syphilis.diagnoses.3.pk> adding more transmission params for msm, het and by race, calibrating to total diagnosis by stage
-#05.12: <syphilis.diagnoses.4.pk> adding time4 transmission params for msm, het, setting likelihoods to total and marginals for syphilis diagnosis
-#>> couldnt fit well, we are going to work on the total diagnosis first before moving to marginals
+
 #######
 #05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
 # >> 51%, parameters were mixing well, but couldnt fit the peak in 1995
@@ -206,3 +111,5 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 
 # 6.06: <syphilis.6.06.rf.psElTotal> added 1970s calibratable params, changed default year to 1970s
 
+# 6.09: <calib.demog.06.09.pk>: running a demographic calibration to fit the targets with 1970 start date
+# <syphilis.6.09.rf.psElTotal> revising the symp.testing logic. Now it occurs during the stages 
