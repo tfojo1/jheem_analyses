@@ -318,4 +318,25 @@ ggsave(plot = plot,
 
 
 
+plot = ggplot() + 
+    geom_point(data=df.city.summ, 
+               aes(new.per.prev, excess, size=new, fill=medicaid),
+               shape=21, show.legend = F) + 
+    ylab("Relative Excess HIV Infections") +
+    xlab("Proportion of Outpatient Ambulatory\nClients Virally Suppressed in 2025") + 
+    THEME + CITY.SIZE.SCALE + CITY.COLOR +
+ #   geom_segment(data = df.label, aes(x, y, xend=oahs.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
+#    scale_x_continuous(labels = scales::percent, limits = c(0.84,0.94)) +
+    geom_label(data=df.prcc,
+               aes(x, y, label=value), size=PRCC.SIZE,
+               vjust = 0.5, hjust = 0, show.legend = F) +
+    geom_text(data=df.label, 
+              aes(x, y, label=name), size=LABEL.SIZE,
+              vjust = 0, hjust=1, show.legend = F); print(plot)
+
+
+
+
+
 

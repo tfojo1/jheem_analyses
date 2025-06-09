@@ -55,22 +55,29 @@ city.main.state = sapply(RW.LOCATIONS, function(loc){
   states[1]
 })
 
-city.main.state.medicaid.expansion = unlist(sapply(city.main.state, function(st){
-  
-  state_info$medicaid_expansion[state_info$state==gsub(" ", "_", locations::get.location.name(st))]=='Yes'
-  
-}))
 
 if (RW.IS.STATE.LEVEL)
 {
     RW.MEDICAID.EXPANSION.LOCATIONS = intersect(RW.LOCATIONS, MEDICAID.EXPANSION.STATES)
     RW.MEDICAID.NONEXPANSION.LOCATIONS = intersect(RW.LOCATIONS, MEDICAID.NONEXPANSION.STATES)
+    
+    city.main.state.medicaid.expansion = rep(T, length(RW.LOCATIONS))
+    names(city.main.state.medicaid.expansion) = RW.LOCATIONS
+    
+    city.main.state.medicaid.expansion[intersect(MEDICAID.NONEXPANSION.STATES, RW.LOCATIONS)] = F
 }
 
 if (!RW.IS.STATE.LEVEL)
 {
     RW.MEDICAID.EXPANSION.CITIES = RW.MEDICAID.EXPANSION.LOCATIONS = names(city.main.state.medicaid.expansion)[city.main.state.medicaid.expansion]
     RW.MEDICAID.NONEXPANSION.CITIES = RW.MEDICAID.NONEXPANSION.LOCATIONS = names(city.main.state.medicaid.expansion)[!city.main.state.medicaid.expansion]
+    
+    
+    city.main.state.medicaid.expansion = unlist(sapply(city.main.state, function(st){
+        
+        state_info$medicaid_expansion[state_info$state==gsub(" ", "_", locations::get.location.name(st))]=='Yes'
+        
+    }))
 }
 
 shade.darker <- function(color, delta)
