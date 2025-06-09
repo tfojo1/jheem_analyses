@@ -168,6 +168,15 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.early.lat
                                       9/12, 0,0, #9-11 months (to sum to 1year with secondary)
                                       citation = "syphilis_natural_history.docx")
 
+
+# Assuming a duration of 1 month for tertiary and cns: they're symptomatic stages, followed by immediate testing 
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.tertiary',
+                                      1/12,0,0, #average of 1 month
+                                      citation = "syphilis_natural_history.docx")
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
+                                      1/12,0,0, #average of 1 month
+                                      citation = "syphilis_natural_history.docx")
+
 ## ---- TRANSITION RATES ----
 # RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
@@ -216,14 +225,6 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.se
                                       citation = "syphilis_natural_history.docx")
 
 
-# rate of symptomatic.testing during the tertiary stage (assuming everyone in tertiary are symptomatic)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.tertiary',
-                                       12,0,0, #average of 1 month
-                                      citation = "syphilis_natural_history.docx")
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.testing.cns',
-                                      12,0,0, #average of 1 month
-                                      citation = "syphilis_natural_history.docx")
-
 
 # *** TESTING ---- ##-----
 ## ---- HIV Testing By Age ----
@@ -233,24 +234,24 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests
                                      citation = "input_fraction_hiv_test_by_age.R")
 # *** CONTACT TRACING ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
-                                      0.8, 0.3, 0.98,
+                                      0.8, 0,0, #0.3, 0.98,
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
-                                      0.1, .05, 0.2,
+                                      0.1, 0,0, #.05, 0.2,
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.empirically.treated.infected.per.index.case',
-                                      0.1, 0.04, 0.19,
+                                      0.1, 0,0, #0.04, 0.19,
                                       citation = "syphilis_natural_history.docx")
  
 #'@Todd: I am not sure about these. also if we vary them, we may add to >1
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.primary',
-                                      0.1425, 0.1425*lb,  0.1425*hb,
+                                      0.1425, 0,0,
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
-                                      0.4275,0.4275*lb, 0.4275*hb,
+                                      0.4275, 0,0,
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
-                                      0.215,0.215*lb, 0.215*hb,
+                                      0.215, 0,0,
                                       citation = "syphilis_natural_history.docx")
 
 
