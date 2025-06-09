@@ -14,5 +14,5 @@ cdc.testing.cessation.effect = create.intervention.effect(quantity.name = "cdc.f
                                                           allow.values.greater.than.otherwise = F)
 
 cdc.testing.cessation = create.intervention(WHOLE.POPULATION,cdc.testing.cessation.effect,code = "cdct.end")
-
-sim.cessation = cdc.testing.cessation$run(sim2, start.year = 2025, end.year = 2035)
+simset.cess = cdc.testing.cessation$run(simset, end.year = 2035)
+#sim.cessation = cdc.testing.cessation$run(sim2, start.year = 2025, end.year = 2035)

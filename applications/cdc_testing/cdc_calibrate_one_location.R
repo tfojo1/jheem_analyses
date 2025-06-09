@@ -11,6 +11,8 @@ set.up.transmute.calibration('cdct',
                              allow.overwrite.cache = TRUE,
                              return.simulations = F)
 
-run.transmute.calibration("cdct",location = LOCATION, n.sim = N.SIMS, chunks = 1:N.CHUNKS,verbose =  T)
+print(paste0("RUNNNING"))
+run.transmute.calibration("cdct",location = LOCATION, n.sim = N.SIMS, chunks = 1:N.CHUNKS,verbose =  T, ignore.errors = F)
 
+simset = assemble.transmuted.simulations('cdct', LOCATION, n.sim = N.SIMS)
 

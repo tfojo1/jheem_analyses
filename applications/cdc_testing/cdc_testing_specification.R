@@ -18,7 +18,8 @@ register.model.element(CDCT.SPECIFICATION, name = "cdc.effect",
                        scale = "proportion")
 
 register.model.quantity(CDCT.SPECIFICATION, name = "cdc.funded.testing.of.undiagnosed",
-                       value = expression(super.testing.of.undiagnosed*fraction.diagnoses.from.cdc))
+                       value = expression(super.testing.of.undiagnosed*fraction.diagnoses.from.cdc),
+                       scale = 'rate')
 
 register.model.quantity(CDCT.SPECIFICATION, name = "cdc.nonfunded.testing.of.undiagnosed",
                         value = expression(super.testing.of.undiagnosed*(1-fraction.diagnoses.from.cdc)))
