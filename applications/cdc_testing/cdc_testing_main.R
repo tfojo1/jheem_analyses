@@ -5,8 +5,8 @@ SURVEILLANCE.MANAGER$put(data = as.numeric(NA), allow.na.to.overwrite = TRUE, ou
 source("applications/cdc_testing/cdc_testing_parameters.R")
 source("applications/cdc_testing/likelihood.R")
 
-N.SIMS = 100
-N.CHUNKS = 4
+N.SIMS = 10
+N.CHUNKS = 1
 
 register.transmute.calibration.info(transmute.code = 'cdct',
                                     from.version = 'ehe',
