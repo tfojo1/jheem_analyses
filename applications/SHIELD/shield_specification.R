@@ -210,14 +210,18 @@ if (DEFAULT.START.YEAR==1940){
     ##---- Uninfected ----
     register.model.quantity(SHIELD.SPECIFICATION,
                             name = 'n.initial.population.infected.all.stages',
-                            value = expression(n.initial.population* diagnoses.rate.all.stage.1970))
+                            value = expression(n.initial.population* diagnoses.rate.all.stage.1970)
+                            )
+    
     register.model.quantity(SHIELD.SPECIFICATION,
                             name = 'n.initial.population.uninfected',
                             value = 0)
     register.model.quantity.subset(SHIELD.SPECIFICATION,
                                    name = 'n.initial.population.uninfected',
                                    value = expression(n.initial.population - n.initial.population.infected.all.stages),
-                                   applies.to = list(profile='susceptible'))
+                                   applies.to = list(profile='susceptible')
+                                   )
+    
     #register uninfected population:
     register.initial.population(SHIELD.SPECIFICATION,
                                 group = 'uninfected',
