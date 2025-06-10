@@ -1,5 +1,7 @@
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/EHE/ehe_aids_proportions_likelihood.R')
+source('../jheem_analyses/applications/EHE/future_incidence_likelihood_instructions.R')
+
 # LIKELIHOODS INCLUDED: 
 # population, immigration, emigration, new diagnoses, prevalence, hiv mortality, general mortality, 
 # AIDS diagnoses, AIDS deaths, suppression, proportion.tested, hiv.test.positivity
@@ -2182,191 +2184,37 @@ ps.syphilis.year.on.year.change.likelihood.instructions =
   )
 
 
-#-- FUTURE CHANGE PENALTY LIKELIHOOD (to prevent new diagnoses from taking off in the future) ---- 
-future.change.penalty.fn = function(sim,log=T){
-  
-  # 2009, 2019, 2029 diagnoses
-  diagnoses = sim$get(outcomes = 'new',keep.dimensions = "year",dimension.values = list(year=c(2009,2019,2029)))
-  
-  pre.change = (diagnoses[2]-diagnoses[1])/diagnoses[1]
-  post.change = (diagnoses[3]-diagnoses[2])/diagnoses[2]
-  
-  spread = 0.2 # parameter to tune how wide distribution is 
-  
-  lik = 0.5*dnorm(post.change,mean = (pre.change - spread), sd = spread) + 
-    0.5*dnorm(post.change,mean = (pre.change + spread), sd = spread)
-  
-  if(log){
-    rv = log(lik)
-  } else{
-    rv = lik
-  }
-  rv 
-  
-}
-
-future.change.penalty.likelihood.instructions = 
-  create.custom.likelihood.instructions(name = "future.change.penalty", # default will be outcome for sim 
-                                        #outcome.for.sim = NULL, # placeholder, want this to be NULL
-                                        compute.function = future.change.penalty.fn)
-
 
 #-- INCIDENCE FUTURE CHANGE - going to penalize sharp rises in incidence among any stratum --#
+# code in future_incidence_likelihood_instructions.R
 
-# NEW.FOLD.CHANGE.14.19 = SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2019',,,,,] / SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2014',,,,,]
-NEW.FOLD.CHANGE.09.19 = SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2019',,,,,] / SURVEILLANCE.MANAGER$data$diagnoses$estimate$cdc.hiv$cdc$year__location__age__race__sex__risk['2009',,,,,]
-# P.NEW.FOLD.CHANGE.GT.2 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 2)
-# P.NEW.FOLD.CHANGE.GT.3 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 3)
-# P.NEW.FOLD.CHANGE.GT.4 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 4)
-# P.NEW.FOLD.CHANGE.GT.6 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 6)
-# P.NEW.FOLD.CHANGE.GT.8 = mean(NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19)] > 8)
+# get.new.diagnoses.smoothed.fold.change.pairs.distribution(5, c('race','sex','risk','age'), pivot.lag = 1)
+future.incidence.new.pivot.5y.likelihood.instructions = create.future.change.pivot.likelihood.instructions(
+    outcomes = c('new','incidence'),
+    pivot.years = 2026:2030,
+    pivot.lag = 1,
+    year.span = 5,
+    dimensions = c('age','race','sex','risk'),
+    log.ratio.ratio.mean = -0.02176556, # from get.new.diagnoses.smoothed.fold.change.pairs.distribution call above
+    log.ratio.ratio.sd = 0.4892191,
+    ratio.ratio.threshold = 2,
+    name = 'future.incidence.new.pivot.5y')
 
-# z = NEW.FOLD.CHANGE.14.19[!is.na(NEW.FOLD.CHANGE.14.19) & !is.infinite(NEW.FOLD.CHANGE.14.19) & NEW.FOLD.CHANGE.14.19>0] 
-# MEAN.NEW.FOLD.CHANGE = mean(log(z))
-# SD.NEW.FOLD.CHANGE = sd(log(z))
-# ps = plnorm(c(0,2,3,4,6,8), mean(log(z)), sd(log(z)))
+# get.new.diagnoses.smoothed.fold.change.distribution(10, c('age','race','sex','risk'))
+future.incidence.new.10y.likelihood.instructions = create.future.change.likelihood.instructions(
+    outcomes = c('new','incidence'),
+    end.years = 2026:2035,
+    year.span = 10,
+    dimensions = c('age','race','sex','risk'),
+    log.ratio.mean = -0.3306992, # from get.new.diagnoses.smoothed.fold.change.distribution call above
+    log.ratio.sd = 0.7790756,
+    ratio.threshold = 2.5,
+    name = 'future.incidence.new.10y')
 
-MEAN.NEW.FOLD.CHANGE = -0.04470926
-SD.NEW.FOLD.CHANGE = 0.6549829
-P.NEW.FOLD.CHANGE.LTE.2 = plnorm(2, meanlog = MEAN.NEW.FOLD.CHANGE, sdlog = SD.NEW.FOLD.CHANGE)
-LOG.P.NEW.FOLD.CHANGE.LTE.2 = log(P.NEW.FOLD.CHANGE.LTE.2)
-
-# z = NEW.FOLD.CHANGE.09.19[!is.na(NEW.FOLD.CHANGE.09.19) & !is.infinite(NEW.FOLD.CHANGE.09.19) & NEW.FOLD.CHANGE.09.19>0] 
-# MEAN.NEW.FOLD.CHANGE.10Y = mean(log(z))
-# SD.NEW.FOLD.CHANGE.10Y = sd(log(z))
-
-MEAN.NEW.FOLD.CHANGE.10Y = -0.1668702
-SD.NEW.FOLD.CHANGE.10Y = 0.7779033
-P.NEW.FOLD.CHANGE.10Y.LTE.2.5 = plnorm(2.5, meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y)
-LOG.D.NEW.FOLD.CHANGE.10Y.LTE.2.5 = log(P.NEW.FOLD.CHANGE.10Y.LTE.2.5/2.5)
-
-# x = seq(0,8,length=1000)
-# d = rep(exp(LOG.D.NEW.FOLD.CHANGE.10Y.LTE.2.5), length(x))
-# d[x>2.5] = dlnorm(x[x>2.5], meanlog = P.NEW.FOLD.CHANGE.10Y.LTE.2, sdlog = SD.NEW.FOLD.CHANGE)
-# qplot(x,d)
-
-future.incidence.change.5y.likelihood.instructions = 
-    create.custom.likelihood.instructions(
-        name = 'future.incidence.change',
-        compute.function = function(sim, data, log=T){
-            
-            inc.new = sim$optimized.get(data$optimized.get.instr)
-            
-            fold.change.inc = inc.new[as.character(2021:2030),,,,,,] / inc.new[as.character(2016:2025),,,,,,]
-            fold.change.inc[is.na(fold.change.inc)] = 1
-            
-            mask.fold.change.lte.2 = fold.change.inc <= 2
-            
-            d.gte.2 = dlnorm(fold.change.inc[!mask.fold.change.lte.2], meanlog = MEAN.NEW.FOLD.CHANGE, sdlog = SD.NEW.FOLD.CHANGE, log = T)
-            d.lt.2 = LOG.P.NEW.FOLD.CHANGE.LTE.2 * sum(mask.fold.change.lte.2)
-            
-            rv = sum(d.gte.2) + d.lt.2
-            
-            if (!log)
-                exp(rv)
-            else
-                rv
-        },
-        get.data.function = function(version, location)
-        {
-            sim.metadata = get.simulation.metadata(version=version, location=location)
-            optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
-                outcomes = c('new','incidence'), 
-                dimension.values = list(year=2015:2030),
-                keep.dimensions = c('year','age','race','sex','risk')
-            )
-            
-            list(
-                optimized.get.instr = optimized.get.instr
-            )
-        }
-    )
-
-future.incidence.change.likelihood.instructions = 
-    create.custom.likelihood.instructions(
-        name = 'future.incidence.change',
-        compute.function = function(sim, data, log=T){
-            
-            inc.new = sim$optimized.get(data$optimized.get.instr)
-            
-            fold.change.inc = inc.new[as.character(2026:2035),,,,,,] / inc.new[as.character(2016:2025),,,,,,]
-            fold.change.inc[is.na(fold.change.inc)] = 1
-            
-            mask.fold.change.lte.2.5 = fold.change.inc <= 2.5
-            
-            d.gte.2.5 = dlnorm(fold.change.inc[!mask.fold.change.lte.2.5], meanlog = MEAN.NEW.FOLD.CHANGE.10Y, sdlog = SD.NEW.FOLD.CHANGE.10Y, log = T)
-            d.lt.2.5 = LOG.D.NEW.FOLD.CHANGE.10Y.LTE.2.5 * sum(mask.fold.change.lte.2.5)
-            
-            rv = sum(d.gte.2.5) + d.lt.2.5
-            
-            if (!log)
-                exp(rv)
-            else
-                rv
-        },
-        get.data.function = function(version, location)
-        {
-            sim.metadata = get.simulation.metadata(version=version, location=location)
-            optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
-                outcomes = c('new','incidence'), 
-                dimension.values = list(year=2015:2035),
-                keep.dimensions = c('year','age','race','sex','risk')
-            )
-            
-            list(
-                optimized.get.instr = optimized.get.instr
-            )
-        }
-    )
-
-
-
-OLD.future.incidence.change.likelihood.instructions = 
-    create.custom.likelihood.instructions(
-        name = 'future.incidence.change',
-        compute.function = function(sim, data, log=T){
-            
-            inc.new = sim$optimized.get(data$optimized.get.instr)
-            
-            fold.change.inc = inc.new[as.character(2020:2030),,,,,,] / inc.new[as.character(2015:2025),,,,,,]
-            # fold.change.inc = sim$get('incidence', year=2025:2030, keep.dimensions=c('year','age','race','sex','risk')) / sim$get('incidence', year=2020:2025, keep.dimensions=c('year','age','race','sex','risk'))
-            fold.change.inc[is.na(fold.change.inc)] = 1
-            max.fold.change.inc = apply(fold.change.inc, c(2:6), max)
-            
-            n.fold.change.gt.8 = sum(max.fold.change.inc>8)
-            n.fold.change.6.to.8 = sum(max.fold.change.inc<=8 & max.fold.change.inc>6)
-            n.fold.change.4.to.6 = sum(max.fold.change.inc<=6 & max.fold.change.inc>4)
-            n.fold.change.3.to.4 = sum(max.fold.change.inc<=4 & max.fold.change.inc>3)
-            n.fold.change.2.to.3 = sum(max.fold.change.inc<=3 & max.fold.change.inc>2)
-            n.fold.change.lte.2 = sum(max.fold.change.inc<=2)
-            
-            rv = sum(log(P.NEW.FOLD.CHANGE.GT.8)*n.fold.change.gt.8 +
-                         log(P.NEW.FOLD.CHANGE.6.TO.8)*n.fold.change.6.to.8 +
-                         log(P.NEW.FOLD.CHANGE.4.TO.6)*n.fold.change.4.to.6 +
-                         log(P.NEW.FOLD.CHANGE.3.TO.4)*n.fold.change.3.to.4 +
-                         log(P.NEW.FOLD.CHANGE.2.TO.3)*n.fold.change.2.to.3 +
-                         log(P.NEW.FOLD.CHANGE.LTE.2)*n.fold.change.lte.2)
-         #   rv = sum(log(P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.gt.3 + log(1-P.NEW.FOLD.CHANGE.GT.3)*n.fold.change.lte.3)
-            
-            if (!log)
-                exp(rv)
-            else
-                rv
-        },
-        get.data.function = function(version, location)
-        {
-            sim.metadata = get.simulation.metadata(version=version, location=location)
-            optimized.get.instr = sim.metadata$prepare.optimized.get.instructions(
-                outcomes = c('new','incidence'), 
-                dimension.values = list(year=2015:2030),
-                keep.dimensions = c('year','age','race','sex','risk')
-            )
-            
-            list(
-                optimized.get.instr = optimized.get.instr
-            )
-        }
-        )
+future.new.incidence.change.likelihood.instructions = join.likelihood.instructions(
+    future.incidence.new.pivot.5y.likelihood.instructions,
+    future.incidence.new.10y.likelihood.instructions
+)
 
 #-- PROPORTION MSM --#
 
@@ -2682,7 +2530,7 @@ trans.state.likelihood.instructions =
                                  heroin.basic.likelihood.instructions.state,
                                  cocaine.basic.likelihood.instructions.state,
                                  biased.hiv.mortality.likelihood.instructions.full,
-                                 future.incidence.change.likelihood.instructions,
+                                 future.new.incidence.change.likelihood.instructions,
                                  idu.active.prior.ratio.likelihood.instructions,
                                  proportion.msm.likelihood.instructions
                                  
@@ -2740,7 +2588,7 @@ FULL.likelihood.instructions.32x.new.prev = join.likelihood.instructions(
   ps.syphilis.year.on.year.change.likelihood.instructions,
   
   # FUTURE INCIDENCE PENALTY
-  future.incidence.change.likelihood.instructions
+  future.new.incidence.change.likelihood.instructions
 )
 
 
@@ -2798,7 +2646,7 @@ full.state.likelihood.instructions = join.likelihood.instructions(
     ps.syphilis.year.on.year.change.likelihood.instructions,
     
     # FUTURE INCIDENCE PENALTY
-    future.incidence.change.likelihood.instructions,
+    future.new.incidence.change.likelihood.instructions,
     
     # PROPORTION MSM
     proportion.msm.likelihood.instructions

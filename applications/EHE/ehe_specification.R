@@ -1496,6 +1496,10 @@ TRATE.KNOT.TIMES = c(rate.pre.peak=1970,
                      rate.1=2010, 
                      rate.2=2020)
 TRATE.AFTER.TIME = 2030
+TRATE.TAPER.BY.TIME = 2035
+TRATE.TAPER.FROM.P = 0.6
+TRATE.TAPER.TO.P = 0.95
+
 TIME.PRE.PEAK = TRATE.KNOT.TIMES['rate.pre.peak']
 TRATE.DEFAULT.VALUES = sapply(TRATE.KNOT.TIMES, function(time){1})
 
@@ -1549,17 +1553,22 @@ TRATE.MIN = 0#1e-05
 register.model.element(EHE.SPECIFICATION,
                        name = 'msm.trates',
                        scale = 'rate',
-                       functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
-                                                                               knot.values = as.list(TRATE.DEFAULT.VALUES),
-                                                                               link = 'identity',
-                                                                               min = TRATE.MIN,
-                                                                               knot.link = 'log',
-                                                                               after.time = TRATE.AFTER.TIME,
-                                                                               after.modifier = 1,
-                                                                               modifiers.apply.to.change = T,
-                                                                               after.modifier.increasing.change.link = 'identity',
-                                                                               after.modifier.decreasing.change.link = 'log',
-                                                                               overwrite.modifiers.with.alphas = T
+                       functional.form = create.logistic.taper.functional.form(
+                           base.functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
+                                                                                        knot.values = as.list(TRATE.DEFAULT.VALUES),
+                                                                                        link = 'identity',
+                                                                                        min = TRATE.MIN,
+                                                                                        knot.link = 'log',
+                                                                                        after.time = TRATE.AFTER.TIME,
+                                                                                        after.modifier = 1,
+                                                                                        modifiers.apply.to.change = T,
+                                                                                        after.modifier.increasing.change.link = 'identity',
+                                                                                        after.modifier.decreasing.change.link = 'log',
+                                                                                        overwrite.modifiers.with.alphas = T),
+                           taper.start.year = TRATE.AFTER.TIME,
+                           taper.year.2 = TRATE.TAPER.BY.TIME,
+                           p.at.taper.start = TRATE.TAPER.FROM.P,
+                           p.at.year.2 = TRATE.TAPER.TO.P
                        ),
                        functional.form.from.time = TIME.PRE.PEAK)
 
@@ -1567,18 +1576,23 @@ register.model.element(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'heterosexual.trates',
                        scale = 'rate',
-                       functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
-                                                                               knot.values = as.list(TRATE.DEFAULT.VALUES),
-                                                                               #link = 'log',
-                                                                               link = 'identity',
-                                                                               min = TRATE.MIN,
-                                                                               knot.link = 'log',
-                                                                               after.time = TRATE.AFTER.TIME,
-                                                                               after.modifier = 1,
-                                                                               modifiers.apply.to.change = T,
-                                                                               after.modifier.increasing.change.link = 'identity',
-                                                                               after.modifier.decreasing.change.link = 'log',
-                                                                               overwrite.modifiers.with.alphas = T
+                       functional.form = create.logistic.taper.functional.form(
+                           base.functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
+                                                                                        knot.values = as.list(TRATE.DEFAULT.VALUES),
+                                                                                        #link = 'log',
+                                                                                        link = 'identity',
+                                                                                        min = TRATE.MIN,
+                                                                                        knot.link = 'log',
+                                                                                        after.time = TRATE.AFTER.TIME,
+                                                                                        after.modifier = 1,
+                                                                                        modifiers.apply.to.change = T,
+                                                                                        after.modifier.increasing.change.link = 'identity',
+                                                                                        after.modifier.decreasing.change.link = 'log',
+                                                                                        overwrite.modifiers.with.alphas = T),
+                           taper.start.year = TRATE.AFTER.TIME,
+                           taper.year.2 = TRATE.TAPER.BY.TIME,
+                           p.at.taper.start = TRATE.TAPER.FROM.P,
+                           p.at.year.2 = TRATE.TAPER.TO.P
                        ),
                        functional.form.from.time = TIME.PRE.PEAK)
 
@@ -1681,17 +1695,22 @@ register.model.quantity(EHE.SPECIFICATION,
 register.model.element(EHE.SPECIFICATION,
                        name = 'idu.trates',
                        scale = 'rate',
-                       functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
-                                                                               knot.values = as.list(TRATE.DEFAULT.VALUES),
-                                                                               link = 'identity',
-                                                                               min = TRATE.MIN,
-                                                                               knot.link = 'log',
-                                                                               after.time = TRATE.AFTER.TIME,
-                                                                               after.modifier = 1,
-                                                                               modifiers.apply.to.change = T,
-                                                                               after.modifier.increasing.change.link = 'identity',
-                                                                               after.modifier.decreasing.change.link = 'log',
-                                                                               overwrite.modifiers.with.alphas = T
+                       functional.form = create.logistic.taper.functional.form(
+                           base.functional.form = create.natural.spline.functional.form(knot.times=TRATE.KNOT.TIMES,
+                                                                                        knot.values = as.list(TRATE.DEFAULT.VALUES),
+                                                                                        link = 'identity',
+                                                                                        min = TRATE.MIN,
+                                                                                        knot.link = 'log',
+                                                                                        after.time = TRATE.AFTER.TIME,
+                                                                                        after.modifier = 1,
+                                                                                        modifiers.apply.to.change = T,
+                                                                                        after.modifier.increasing.change.link = 'identity',
+                                                                                        after.modifier.decreasing.change.link = 'log',
+                                                                                        overwrite.modifiers.with.alphas = T),
+                           taper.start.year = TRATE.AFTER.TIME,
+                           taper.year.2 = TRATE.TAPER.BY.TIME,
+                           p.at.taper.start = TRATE.TAPER.FROM.P,
+                           p.at.year.2 = TRATE.TAPER.TO.P
                        ),
                        functional.form.from.time = TIME.PRE.PEAK)
 
