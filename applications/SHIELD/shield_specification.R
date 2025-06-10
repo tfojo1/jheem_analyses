@@ -929,13 +929,9 @@ register.model.element(SHIELD.SPECIFICATION,
 # Tuning testing rate for EL
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.el.multiplier",
-<<<<<<< HEAD
-                       scale = 'ratio',
-                       value = 0.5)
-=======
                        scale = 'ratio', #can be below or over 1
                        value = 1)
->>>>>>> exit_ps
+
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
 # prop of pregnant women receiving 'successful' prenatal screening 
