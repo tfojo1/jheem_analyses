@@ -45,13 +45,16 @@ collection$run(2025, 2035, verbose=TRUE, stop.for.errors=T, overwrite.prior=F)
 #Examine parameter distributions for the joint intervention
 x <- collection$get.parameters(c('testing.multiplier', 'unsuppressed.multiplier', 'uninitiated.multiplier'),summary.type = 'individual.simulations')
 
-#Overall
+#Across MSAs
 apply(x[,,,2], 1, quantile, probs=0.025)
+apply(x[,,,2], 1, quantile, probs=0.5)
 apply(x[,,,2], 1, quantile, probs=0.975)
 
-#Individual MSAs
+#Within MSAs
 for (i in 1:31) {
+    print(dimnames(x)[[3]][i])
     print(apply(x[,,i,2], 1, quantile, probs=0.025))
+    print(apply(x[,,i,2], 1, quantile, probs=0.5))
     print(apply(x[,,i,2], 1, quantile, probs=0.975))
 }
 
@@ -116,63 +119,20 @@ if (1==2)
     save(results, baseline, file=file.path(get.jheem.root.directory(),"results","ehe_disparities","results.Rdata"))
     
 }
+
 load(file.path(get.jheem.root.directory(),"results","ehe_disparities","results.Rdata"))
+dim(results)
 
-
-#resample from simulations without NAs
-
-
-#################################
-
-#Add indicators of structural racism 
-
-#1. Residential Segregation, 2020
-#https://belonging.berkeley.edu/most-least-segregated-metro-regions-2020
-
-
-#2. % Below FPL & Concentration of Poverty, 2020
-#Pull in 5-year ACS data on population at or below FPL in 2020
-crosswalk <- read.csv("../jheem_analyses/applications/ehe_disparities/cbsa2fipsxw.csv") %>%
-  filter(principalcity=="yes") #include all counties that cover the principal city of each MSA
-
-varlist <- c("S1701_C01_001E","S1701_C02_001E","S1701_C03_001E") #denominator, numerator, percent
-
-fpl_msa <- get_acs(geography = "cbsa",
-                   variables = varlist,
-                   survey = "acs5",
-                   output = "wide",
-                   year = 2020) %>%
-  mutate(cbsacode=as.numeric(GEOID))
-fpl_msa <- right_join(fpl_msa, crosswalk, join_by(cbsacode==cbsacode)) %>%
-  mutate(fpl_msa=S1701_C03_001E, den_county=S1701_C01_001E, pov_county=S1701_C02_001E, msa=NAME) %>%
-  select(cbsacode, msa, statename, fpl_msa, den_county, pov_county)
-fpl_state <- get_acs(geography = "state",
-                     variables = varlist,
-                     survey = "acs5",
-                     output = "wide",
-                     year = 2020) %>%
-  mutate(den_state=S1701_C01_001E, pov_state=S1701_C02_001E) %>%
-  select(NAME, den_state, pov_state)
-#sum across counties within principal city
-#calculate concentration of poverty as ratio of % people at or below FPL in principal city vs. state
-fpl <- distinct(left_join(fpl_msa, fpl_state, join_by(statename==NAME))) %>%
-  group_by(statename) %>%
-  mutate(den_city=sum(den_county),
-         pov_city=sum(pov_county),
-         fpl_city=pov_city/den_city,
-         fpl_state=pov_state/den_state,
-         conc_pov=fpl_city/fpl_state)
-
-#categorize into high, medium, low  
-
+#for some simulations and locations, the model is estimating zeros for all outcomes
+results["black",869,,"C.35380","noint"]
+results["black",869,,"C.35380","fullint"]
 
 #################################
 
 #Tables
 
-#Sum incidence and population estimates by structural racism indicators
-
 #Sum incidence and population estimates across all MSAs
+#results <- results[,,,1:31,] #remove total row
 total_results <- apply(results, setdiff(names(dim(results)), "location"), sum)
 #dim(total_results)
 #total_results[,,,2]
@@ -183,18 +143,34 @@ oldresults = results
 results = array(0, dim = sapply(dim.names, length), dimnames = dim.names)
 results[, , , "Total", ] = total_results
 results[, , , dimnames(oldresults)$location, ] = oldresults
-#results
+dim(results)
+
+#Calculate population totals by race/ethnicity, averaged across simulations
+pop_black <- round(apply(results["black", , "population", ,"noint"], c("location"), sum),1)
+pop_hisp <- round(apply(results["hispanic", , "population", ,"noint"], c("location"), sum),1)
+pop_other <- round(apply(results["other", , "population", ,"noint"], c("location"), sum),1)
+pop_total <- round(apply(results[, , "population", , "noint"], c("location"), sum),1)
+
+#Calculate percent of population that is Black or Hispanic
+pct_blackhisp <- round((pop_black+pop_hisp)/pop_total*100,1)
 
 #Calculate percent of new infections by race/ethnicity, averaged across simulations
 pct_black <- apply(results["black", , "incidence", , ], c("location", "intervention"), sum) / apply(results[ , , "incidence", , ], c("location", "intervention"), sum)
 pct_hisp <- apply(results["hispanic", , "incidence", , ], c("location", "intervention"), sum) / apply(results[ , , "incidence", , ], c("location", "intervention"), sum)
 pct_other <- apply(results["other", , "incidence", , ], c("location", "intervention"), sum) / apply(results[ , , "incidence", , ], c("location", "intervention"), sum)
 
-#Calculate incidence rates
+#Calculate incidence rate within each simulation
 ir_black <- apply(results["black", , "incidence", , ], c("sim", "location", "intervention"), sum) / apply(results["black", , "population", , ], c("sim", "location", "intervention"), sum) 
 ir_hisp <- apply(results["hispanic", , "incidence", , ], c("sim", "location", "intervention"), sum) / apply(results["hispanic", , "population", , ], c("sim", "location", "intervention"), sum) 
 ir_other <- apply(results["other", , "incidence", , ], c("sim", "location", "intervention"), sum) / apply(results["other", , "population", , ], c("sim", "location", "intervention"), sum) 
 ir_total <- apply(results[ , , "incidence", , ], c("sim", "location", "intervention"), sum) / apply(results[ , , "population", , ], c("sim", "location", "intervention"), sum) 
+
+
+###NaNs come from model estimates of 0
+ir_black[,"C.35380","fullint"]
+results["black",,"population","C.35380","fullint"]
+
+
 
 #Take the median, 2.5th and 97.5th percentile of the IRs across simulations
 ir_black_median = apply(ir_black, c("location", "intervention"), median)
@@ -224,7 +200,6 @@ ir_total_upper = apply(ir_total, c("location", "intervention"), quantile, probs=
 ir_total_medianci = paste0(round(ir_total_median*100000, 0), " (", round(ir_total_lower*100000, 0), ", ", round(ir_total_upper*100000, 0), ")")
 dim(ir_total_medianci) = dim(ir_total_median)
 dimnames(ir_total_medianci) = dimnames(ir_total_median)
-ir_total_medianci
 
 #Calculate IRD
 ird_black <- ir_black - ir_other
@@ -261,23 +236,33 @@ dim(irr_hisp_medianci) = dim(log_irr_hisp_median)
 dimnames(irr_hisp_medianci) = dimnames(log_irr_hisp_median)
 
 #Combine and output to CSV
-table = cbind("IR NoInt Overall" = ir_total_medianci[, "noint"],
-              "IR NoInt Black" = ir_black_medianci[, "noint"],
-              "IR NoInt Hispanic" = ir_hisp_medianci[, "noint"],
-              "IR NoInt Other" = ir_other_medianci[, "noint"],
-              "IRD NoInt Black" = ird_black_medianci[, "noint"],
-              "IRD NoInt Hispanic" = ird_hisp_medianci[, "noint"],
-              "IRR NoInt Black" = irr_black_medianci[, "noint"],
-              "IRR NoInt Hispanic" = irr_hisp_medianci[, "noint"],
-              "IR Int Overall" = ir_total_medianci[, "fullint"],
-              "IR Int Black" = ir_black_medianci[, "fullint"],
-              "IR Int Hispanic" = ir_hisp_medianci[, "fullint"],
-              "IR Int Other" = ir_other_medianci[, "fullint"],
-              "IRD Int Black" = ird_black_medianci[, "fullint"],
-              "IRD Int Hispanic" = ird_hisp_medianci[, "fullint"],
-              "IRR Int Black" = irr_black_medianci[, "fullint"],
-              "IRR Int Hispanic" = irr_hisp_medianci[, "fullint"]
-)
+
+ir_total_noint = ir_total_medianci[, "noint"]
+ir_black_noint = ir_black_medianci[, "noint"]
+ir_hisp_noint = ir_hisp_medianci[, "noint"]
+ir_other_noint = ir_other_medianci[, "noint"]
+ird_black_noint = ird_black_medianci[, "noint"]
+ird_hisp_noint = ird_hisp_medianci[, "noint"]
+irr_black_noint = irr_black_medianci[, "noint"]
+irr_hisp_noint = irr_hisp_medianci[, "noint"]
+ir_total_int = ir_total_medianci[, "fullint"]
+ir_black_int = ir_black_medianci[, "fullint"]
+ir_hisp_int = ir_hisp_medianci[, "fullint"]
+ir_other_int = ir_other_medianci[, "fullint"]
+ird_black_int = ird_black_medianci[, "fullint"]
+ird_hisp_int = ird_hisp_medianci[, "fullint"]
+irr_black_int = irr_black_medianci[, "fullint"]
+irr_hisp_int = irr_hisp_medianci[, "fullint"]
+
+table = data.frame(pop_total,
+                   pct_blackhisp,
+                   ir_total_noint, ir_black_noint, ir_hisp_noint, ir_other_noint,
+                   ird_black_noint, ird_hisp_noint,
+                   irr_black_noint, irr_hisp_noint,
+                   ir_total_int, ir_black_int, ir_hisp_int, ir_other_int,
+                   ird_black_int, ird_hisp_int,
+                   irr_black_int, irr_hisp_int) %>%
+    arrange(desc(pop_total))
 
 table
 
@@ -287,66 +272,74 @@ write.csv(table, file="../../code/jheem_analyses/applications/ehe_disparities/ta
 
 #################################
 
-#Figures
-#Estimated incidence rates by race/ethnicity under null vs. full intervention
+#Plot estimated incidence rates by race/ethnicity under null vs. full intervention
 
-#Atlanta
-#no intervention
-file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.12060',intervention.code='noint',sub.version=NULL,n.sim=100)
-load(file)
-noint=simset
-apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
+#No Intervention
+setwd("/Users/laurenzalla/Library/CloudStorage/OneDrive-JohnsHopkins/JHEEM/code/jheem_analyses/applications/ehe_disparities")
+for (i in 1:31) {
+    file=get.simset.filename("ehe",calibration.code=CALIBRATION.CODE,location=LOCATIONS[i],intervention.code='noint',sub.version=NULL,n.sim=NSIM)
+    load(file)
+    noint=simset
+    apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+    png(file=paste0("Plots/",LOCATIONS[i],"_","noint.png"))
+    simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
+    dev.off()
+}
 
-#full intervention (through 2030)
-file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.12060',intervention.code='fullint',sub.version=NULL,n.sim=100)
-load(file)
-int=simset
-apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(int,'incidence', split.by='race', summary.type = 'median.and.interval')
+#Full Intervention
+setwd("/Users/laurenzalla/Library/CloudStorage/OneDrive-JohnsHopkins/JHEEM/code/jheem_analyses/applications/ehe_disparities")
+for (i in 1:31) {
+    file=get.simset.filename("ehe",calibration.code=CALIBRATION.CODE,location=LOCATIONS[i],intervention.code='fullint',sub.version=NULL,n.sim=NSIM)
+    load(file)
+    noint=simset
+    apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
+    png(file=paste0("Plots/",LOCATIONS[i],"_","noint.png"))
+    simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
+    dev.off()
+}
 
 
-#Baltimore
-#no intervention
-file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.12580',intervention.code='noint',sub.version=NULL,n.sim=100)
-load(file)
-noint=simset
-apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
 
-#full intervention (through 2030)
-file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.12580',intervention.code='fullint',sub.version=NULL,n.sim=100)
-load(file)
-int=simset
-apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(int,'incidence', split.by='race', summary.type = 'median.and.interval')
+#Add indicators of structural racism 
 
-#Houston
-#no intervention
-file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.26420',intervention.code='noint',sub.version=NULL,n.sim=100)
-load(file)
-noint=simset
-apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
+#1. Residential Segregation, 2020
+#https://belonging.berkeley.edu/most-least-segregated-metro-regions-2020
 
-#full intervention (through 2030)
-file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.26420',intervention.code='fullint',sub.version=NULL,n.sim=100)
-load(file)
-int=simset
-apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(int,'incidence', split.by='race', summary.type = 'median.and.interval')
 
-#New York
-#no intervention
-file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.35620',intervention.code='noint',sub.version=NULL,n.sim=100)
-load(file)
-noint=simset
-apply(noint$get(outcomes='incidence',keep.dimensions='year')/noint$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(noint,'incidence', split.by='race', summary.type = 'median.and.interval')
+#2. % Below FPL & Concentration of Poverty, 2020
+#Pull in 5-year ACS data on population at or below FPL in 2020
+crosswalk <- read.csv("../jheem_analyses/applications/ehe_disparities/cbsa2fipsxw.csv") %>%
+    filter(principalcity=="yes") #include all counties that cover the principal city of each MSA
 
-#full intervention (through 2030)
-file=get.simset.filename("ehe",calibration.code='full.with.covid2',location='C.35620',intervention.code='fullint',sub.version=NULL,n.sim=100)
-load(file)
-int=simset
-apply(int$get(outcomes='incidence',keep.dimensions='year')/int$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-simplot(int,'incidence', split.by='race', summary.type = 'median.and.interval')
+varlist <- c("S1701_C01_001E","S1701_C02_001E","S1701_C03_001E") #denominator, numerator, percent
+
+fpl_msa <- get_acs(geography = "cbsa",
+                   variables = varlist,
+                   survey = "acs5",
+                   output = "wide",
+                   year = 2020) %>%
+    mutate(cbsacode=as.numeric(GEOID))
+fpl_msa <- right_join(fpl_msa, crosswalk, join_by(cbsacode==cbsacode)) %>%
+    mutate(fpl_msa=S1701_C03_001E, den_county=S1701_C01_001E, pov_county=S1701_C02_001E, msa=NAME) %>%
+    select(cbsacode, msa, statename, fpl_msa, den_county, pov_county)
+fpl_state <- get_acs(geography = "state",
+                     variables = varlist,
+                     survey = "acs5",
+                     output = "wide",
+                     year = 2020) %>%
+    mutate(den_state=S1701_C01_001E, pov_state=S1701_C02_001E) %>%
+    select(NAME, den_state, pov_state)
+#sum across counties within principal city
+#calculate concentration of poverty as ratio of % people at or below FPL in principal city vs. state
+fpl <- distinct(left_join(fpl_msa, fpl_state, join_by(statename==NAME))) %>%
+    group_by(statename) %>%
+    mutate(den_city=sum(den_county),
+           pov_city=sum(pov_county),
+           fpl_city=pov_city/den_city,
+           fpl_state=pov_state/den_state,
+           conc_pov=fpl_city/fpl_state)
+
+#categorize into high, medium, low  
+
+
+#################################
