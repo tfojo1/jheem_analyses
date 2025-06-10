@@ -25,10 +25,9 @@ VERSION='shield'
 LOCATION='C.12580' #Baltimore MSA
 # LOCATION='C.35620'#NYC
 
-
 set.seed(00000)
 
-CALIBRATION.NAME = 'syphilis.6.06.rf.psElTotal' 
+CALIBRATION.NAME = 'calib.diagnosis.06.09.pk' 
 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
