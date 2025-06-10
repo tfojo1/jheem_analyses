@@ -14,20 +14,20 @@ simplot(
     style.manager = source.style.manager
 )
 simplot(
-    sim.first,
+    # sim.first,
     sim.last,
     outcomes = c("deaths"),
     style.manager = source.style.manager
 )
 simplot(
-    sim.first,
+    # sim.first,
     sim.last,
     split.by = "race", facet.by = "age",
     outcomes = c("fertility.rate"),
     style.manager = source.style.manager
 )
 simplot(
-    sim.first,
+    # sim.first,
     sim.last,
     split.by = "race",
     outcomes = c("immigration","emigration"),

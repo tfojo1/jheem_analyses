@@ -111,5 +111,9 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 
 # 6.06: <syphilis.6.06.rf.psElTotal> added 1970s calibratable params, changed default year to 1970s
 
+# 6.09: revising the symp.testing logic. Now it occurs during the stages. 
 # 6.09: <calib.demog.06.09.pk>: running a demographic calibration to fit the targets with 1970 start date
-# <syphilis.6.09.rf.psElTotal> revising the symp.testing logic. Now it occurs during the stages 
+# >> this run worked well. will be using this simset as the starting one for next calibrations
+
+#6.09 <calib.diagnosis.06.09.pk>: running a calibration with demographic, total ps, total EL and hiv test likelihoods
+# >> we still cant generate the peak in 1997 for the EL

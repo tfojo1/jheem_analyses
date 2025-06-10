@@ -5,8 +5,7 @@ source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 # Set Plotting Styles ----
 location.style.manager = create.style.manager(color.data.by = "location.type")
-source.style.manager   = create.style.manager( shape.data.by = "source",
-                                               color.data.by = "stratum")
+source.style.manager   = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
 stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 
 # Configuration ----
@@ -17,9 +16,9 @@ LOCATION <- 'C.12580'  # Baltimore MSA
 # ROOT.DIR="../../files/"
 # set.jheem.root.directory(ROOT.DIR)
 
-DATE <- "2025-06-09"
-CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'
-# CALIBRATION.CODE.TO.RUN <- 'syphilis.diagnoses.5.pk'
+
+# CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
+CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.06.09.pk'; DATE <- "2025-06-10"
 
 
 
@@ -57,45 +56,53 @@ simplot(
     # split.by = "age",
     # split.by = "race",
     # split.by = "race", facet.by = "sex",
-    split.by = "race", facet.by = "age",
-    outcomes = c("population"),
+    # split.by = "race", facet.by = "age",
+    # outcomes = c("population"),
+    outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
     style.manager = source.style.manager
 )
 
+# MCMC Diagnostics ----
+{
+    head(simset$get.mcmc.mixing.statistic())
+    simset$traceplot("trans")
+    cbind(simset$get.params("trans"))
+    cbind(sim.last$get.params("trans"))
+    
+    simset$traceplot("screen")
+    simset$traceplot("initial")
+    simset$traceplot("test")
+    
+    simset$traceplot("black.aging")
+    simset$traceplot("hispanic.aging")
+    simset$traceplot("mortality")
+    simset$traceplot("fertility")
+}
 #Run Manual Simulation ----
 # engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 #
 {
-    # params.manual <- params.last
-    # params.manual["transmission.rate.multiplier.msm0"] <- 1.16 #1990
-    # params.manual["transmission.rate.multiplier.msm1"] <- 1.18 #1995
-    # params.manual["transmission.rate.multiplier.msm2"] <- 0.93 #2000
-    # params.manual["transmission.rate.multiplier.msm3"] <- 1.07 #2010
-    # params.manual["transmission.rate.multiplier.msm4"] <- 1.05 #2020
-    # 
-    # params.manual["transmission.rate.multiplier.heterosexual0"] <- .988 #1990
-    # params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.215 #1995
-    # params.manual["transmission.rate.multiplier.heterosexual2"] <- 0.905 #2000
-    # params.manual["transmission.rate.multiplier.heterosexual3"] <- 1.06 #2010
-    # params.manual["transmission.rate.multiplier.heterosexual4"] <- 1.055 #2020
-    # 
-    # sim.manual <- engine$run(params.manual)
+    params.manual <- params.last
+    params.manual["hiv.testing.or"] <- 1.004 
+    params.manual["hiv.testing.slope.or"] <- 0.9995
+    params.manual["rate.screening.ps.multiplier"] <- 0.5
+    params.manual["rate.screening.el.multiplier"] <- 1.
+    
+    sim.manual <- engine$run(params.manual)
     
     simplot(
         # sim.first,
         sim.last,
-        # sim.manual,
+        sim.manual,
         # split.by = "sex",
         # split.by = "age",
         # split.by = "race",
         # split.by = "race", facet.by = "sex", #we are matching the totals only for now
-        split.by = "race", facet.by = "age",
+        # split.by = "race", facet.by = "age",
         # outcomes = c("population"),
         # outcomes = c("diagnosis.total"),
-        # outcomes = c("diagnosis.ps"),
-        # outcomes = c("diagnosis.el.misclassified"),
-        # outcomes = c("diagnosis.late.misclassified"),
-        dimension.values = list(year = 1990:2030),
+        outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
+        # dimension.values = list(year = 1970:2030),
         style.manager = source.style.manager
     )
 }
@@ -145,17 +152,7 @@ calculate.density(SHIELD.FULL.PARAMETERS.PRIOR, sim.manual$params) / calculate.d
 #     dimension.values = list(year = 2000:2030)
 # )
 
-# MCMC Diagnostics ----
-head(simset$get.mcmc.mixing.statistic())
-simset$traceplot("trans")
-cbind(simset$get.params("trans"))
-cbind(sim.last$get.params("trans"))
 
-simset$traceplot("black.aging")
-simset$traceplot("other.aging")
-simset$traceplot("hispanic.aging")
-simset$traceplot("mortality")
-simset$traceplot("fertility")
 
 # Likelihood Comparison ----
 if (1==2){
