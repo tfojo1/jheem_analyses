@@ -88,145 +88,86 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(sex='heterosexual_male'),
                                value = expression(n.initial.male.population * (1-prp.msm.of.male)))
 ##---- Infected ---- 
-if (DEFAULT.START.YEAR==1940){
-    register.model.element(SHIELD.SPECIFICATION,
-                           name = 'prp.initial.population.infected.syphilis',
-                           scale = 'proportion',
-                           value = SHIELD_BASE_PARAMETER_VALUES['prp.of.initial.population.infected.syphilis'] ) 
-    register.model.element.values(SHIELD.SPECIFICATION,
-                                  'prp.of.infected.pop.primary'=SHIELD_BASE_PARAMETER_VALUES['prp.of.infected.pop.primary'],
-                                  'prp.of.infected.pop.secondary'=SHIELD_BASE_PARAMETER_VALUES['prp.of.infected.pop.secondary'],
-                                  'prp.of.infected.pop.early.latent'=SHIELD_BASE_PARAMETER_VALUES['prp.of.infected.pop.early.latent'],
-                                  'prp.of.infected.pop.late.latent'=SHIELD_BASE_PARAMETER_VALUES['prp.of.infected.pop.late.latent'],
-                                  'prp.of.infected.pop.tertiary'=SHIELD_BASE_PARAMETER_VALUES['prp.of.infected.pop.tertiary'],
-                                  scale = 'proportion')
-    
-    # Assuming all infected acases are undiagnosed/untreated
-    # we will use this quanitity to inform the stages below
-    register.model.quantity(SHIELD.SPECIFICATION,
-                            name = 'n.initial.population.infected.all.stages',
-                            value =  expression(n.initial.population * prp.initial.population.infected.syphilis)) #age, race, sex
-    # main quantity of interest: by stage
-    register.model.quantity(SHIELD.SPECIFICATION,
-                            name = 'n.initial.population.infected',
-                            value = 0)
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='primary'),
-                                   value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.primary ))
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='secondary'),
-                                   value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.secondary ))
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='early.latent'),
-                                   value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.early.latent ))
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='late.latent'),
-                                   value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.late.latent ))
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='tertiary'),
-                                   value = expression(n.initial.population.infected.all.stages*prp.of.infected.pop.tertiary ))
-    #register the infected population:
-    register.initial.population(SHIELD.SPECIFICATION,
-                                group = 'infected',
-                                value = 'n.initial.population.infected')
-    ##---- Uninfected ----
-    register.model.quantity(SHIELD.SPECIFICATION,
-                            name = 'n.initial.population.uninfected',
-                            value = 0)
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.uninfected',
-                                   value = expression(n.initial.population - n.initial.population.infected.all.stages),
-                                   applies.to = list(profile='susceptible'))
-    #register uninfected population:
-    register.initial.population(SHIELD.SPECIFICATION,
-                                group = 'uninfected',
-                                value = 'n.initial.population.uninfected')
-}else { # # 1970
-    # # Assuming all infected cases are undiagnosed/untreated
-    # # Rate of diagnoses (per 100,000) by stage
-    register.model.element.values(SHIELD.SPECIFICATION,
-                                  'diagnoses.rate.primary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.primary.1970'],
-                                  'diagnoses.rate.secondary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.secondary.1970'],
-                                  'diagnoses.rate.early.latent.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.early.latent.1970'],
-                                  'diagnoses.rate.late.latent.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.late.latent.1970'],
-                                  'diagnoses.rate.tertiary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.tertiary.1970'],
-                                  scale = 'proportion')
-    
-    register.model.quantity(SHIELD.SPECIFICATION,
-                            name='diagnoses.rate.all.stage.1970',
-                            value=expression(diagnoses.rate.primary.1970 + 
+# 1970
+# # Assuming all infected cases are undiagnosed/untreated
+# # Rate of diagnoses (per 100,000) by stage
+register.model.element.values(SHIELD.SPECIFICATION,
+                              'diagnoses.rate.primary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.primary.1970'],
+                              'diagnoses.rate.secondary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.secondary.1970'],
+                              'diagnoses.rate.early.latent.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.early.latent.1970'],
+                              'diagnoses.rate.late.latent.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.late.latent.1970'],
+                              'diagnoses.rate.tertiary.1970' = SHIELD_BASE_PARAMETER_VALUES['diagnoses.rate.tertiary.1970'],
+                              scale = 'proportion')
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name='diagnoses.rate.all.stage.1970',
+                        value=expression(diagnoses.rate.primary.1970 + 
                                              diagnoses.rate.secondary.1970 + 
                                              diagnoses.rate.early.latent.1970 + 
                                              diagnoses.rate.late.latent.1970 + 
                                              diagnoses.rate.tertiary.1970)
-                            )
-    # multipliers of initial diagnoses in 1970: tuned in calibration
-    register.model.element(SHIELD.SPECIFICATION,
-                           name = 'initial.infection.multiplier.1970.early',
-                           scale = 'rate',
-                           value = 1)
-    register.model.element(SHIELD.SPECIFICATION,
-                           name = 'initial.infection.multiplier.1970.late',
-                           scale = 'rate',
-                           value = 1)
-    
-    # Estimating size of infected population
-    register.model.quantity(SHIELD.SPECIFICATION,
-                            name = 'n.initial.population.infected',
-                            # dimensions = c('continuum','stage'),
-                            value = 0)
-    
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='primary'),
-                                   value = expression(n.initial.population * diagnoses.rate.primary.1970 *initial.infection.multiplier.1970.early ))
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='secondary'),
-                                   value = expression(n.initial.population * diagnoses.rate.secondary.1970 *initial.infection.multiplier.1970.early ))
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='early.latent'),
-                                   value = expression(n.initial.population * diagnoses.rate.early.latent.1970 *initial.infection.multiplier.1970.early ))
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='late.latent'),
-                                   value = expression(n.initial.population * diagnoses.rate.late.latent.1970 *initial.infection.multiplier.1970.late ))
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.infected',
-                                   applies.to = list(continuum='undiagnosed', stage='tertiary'),
-                                   value = expression(n.initial.population * diagnoses.rate.tertiary.1970 *initial.infection.multiplier.1970.late))
-    
-    
-    #register the infected population:
-    register.initial.population(SHIELD.SPECIFICATION,
-                                group = 'infected',
-                                value = 'n.initial.population.infected')
-    ##---- Uninfected ----
-    register.model.quantity(SHIELD.SPECIFICATION,
-                            name = 'n.initial.population.infected.all.stages',
-                            value = expression(n.initial.population* diagnoses.rate.all.stage.1970)
-                            )
-    
-    register.model.quantity(SHIELD.SPECIFICATION,
-                            name = 'n.initial.population.uninfected',
-                            value = 0)
-    register.model.quantity.subset(SHIELD.SPECIFICATION,
-                                   name = 'n.initial.population.uninfected',
-                                   value = expression(n.initial.population - n.initial.population.infected.all.stages),
-                                   applies.to = list(profile='susceptible')
-                                   )
-    
-    #register uninfected population:
-    register.initial.population(SHIELD.SPECIFICATION,
-                                group = 'uninfected',
-                                value = 'n.initial.population.uninfected')
-}
+)
+# multipliers of initial diagnoses in 1970: tuned in calibration
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'initial.infection.multiplier.1970.early',
+                       scale = 'rate',
+                       value = 1)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'initial.infection.multiplier.1970.late',
+                       scale = 'rate',
+                       value = 1)
+
+# Estimating size of infected population
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'n.initial.population.infected',
+                        # dimensions = c('continuum','stage'),
+                        value = 0)
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'n.initial.population.infected',
+                               applies.to = list(continuum='undiagnosed', stage='primary'),
+                               value = expression(n.initial.population * diagnoses.rate.primary.1970 *initial.infection.multiplier.1970.early ))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'n.initial.population.infected',
+                               applies.to = list(continuum='undiagnosed', stage='secondary'),
+                               value = expression(n.initial.population * diagnoses.rate.secondary.1970 *initial.infection.multiplier.1970.early ))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'n.initial.population.infected',
+                               applies.to = list(continuum='undiagnosed', stage='early.latent'),
+                               value = expression(n.initial.population * diagnoses.rate.early.latent.1970 *initial.infection.multiplier.1970.early ))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'n.initial.population.infected',
+                               applies.to = list(continuum='undiagnosed', stage='late.latent'),
+                               value = expression(n.initial.population * diagnoses.rate.late.latent.1970 *initial.infection.multiplier.1970.late ))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'n.initial.population.infected',
+                               applies.to = list(continuum='undiagnosed', stage='tertiary'),
+                               value = expression(n.initial.population * diagnoses.rate.tertiary.1970 *initial.infection.multiplier.1970.late))
+
+
+#register the infected population:
+register.initial.population(SHIELD.SPECIFICATION,
+                            group = 'infected',
+                            value = 'n.initial.population.infected')
+##---- Uninfected ----
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'n.initial.population.infected.all.stages',
+                        value = expression(n.initial.population* diagnoses.rate.all.stage.1970)
+)
+
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'n.initial.population.uninfected',
+                        value = 0)
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'n.initial.population.uninfected',
+                               value = expression(n.initial.population - n.initial.population.infected.all.stages),
+                               applies.to = list(profile='susceptible')
+)
+
+#register uninfected population:
+register.initial.population(SHIELD.SPECIFICATION,
+                            group = 'uninfected',
+                            value = 'n.initial.population.uninfected')
 
 
 ##---- Fix Strata Sizes----
@@ -714,59 +655,37 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'duration.early.latent',
                        scale = 'time',
                        value = SHIELD_BASE_PARAMETER_VALUES['duration.early.latent'])
-# we need to merge symptomatic testing with disese progression
-# if we model them seperately, sym.testing applies to everyone in that stage and increasing it can shorten the disease stage period for everyone regardeless of their symptoms
-# Here we model disease progression to the next stage after subtracting the proportions that are diagnosed during that stage 
+
+# progression to next stage:
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
-                    applies.to = list('continuum'='undiagnosed'),
                     from.compartments = 'primary',
                     to.compartments = 'secondary',
-                    value = expression(1/duration.primary * 
-                                           (1-prp.diagnosed.sym.testing.primary)) , #defined below in symptom testing
-                    tag = 'primary to secondary undiagnosed')
+                    value =expression(1/duration.primary) , 
+                    tag = 'progression.primary.secondary')
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
-                    applies.to = list('continuum'='undiagnosed'),
                     groups = 'infected',
                     from.compartments = 'secondary',
                     to.compartments = 'early.latent',
-                    value = expression(1/duration.secondary * 
-                                           (1-prp.diagnosed.sym.testing.secondary)),#defined below in symptom testing
-                    tag = 'secondary to EL undiagnosed')
+                    value = expression(1/duration.secondary),
+                    tag = 'progression.secondary.el')
 
-# if you receive sym.testing in the primary stage, you can become diagnosed.untreated or diagnosed.treated but since the rate of testing is modeled at the end of this stage, 
-# you have to become "secondary" first and then be tested and diagnosed
-#'@Todd: this is not always true. say if sym.testing=0, those in primary stage could receive sti.screening and become diagnosed.untreated or diagnosed.treated while still in the primary stage
-register.transition(SHIELD.SPECIFICATION,
-                    dimension = 'stage',
-                    groups = 'infected',
-                    applies.to = list('continuum'='diagnosed.untreated'),
-                    from.compartments = 'primary',
-                    to.compartments = 'secondary',
-                    value = 48 , # a high rate to ensure that they can't remain in this stage 
-                    tag = 'diagnosed at the end of primary stage')
-
-register.transition(SHIELD.SPECIFICATION,
-                    dimension = 'stage',
-                    applies.to = list('continuum'='diagnosed.untreated'),
-                    groups = 'infected',
-                    from.compartments = 'secondary',
-                    to.compartments = 'early.latent',
-                    value = 48,
-                    tag = 'diagnosed at the end of secondary stage')
 ###---- Relapse ---- (Early Latent to Secondary):
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prop.early.latent.to.secondary',
                        scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prop.early.latent.to.secondary'])
+                       value = SHIELD_BASE_PARAMETER_VALUES['prop.early.latent.to.secondary']
+)
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
                     from.compartments = 'early.latent',
                     to.compartments = 'secondary',
-                    value = expression(prop.early.latent.to.secondary * (1/duration.early.latent)))
+                    value = expression(prop.early.latent.to.secondary * (1/duration.early.latent)),
+                    tag = 'progression.el.secondary'
+)
 
 ###---- EL to LL Progression -----
 register.transition(SHIELD.SPECIFICATION,
@@ -774,7 +693,9 @@ register.transition(SHIELD.SPECIFICATION,
                     groups = 'infected',
                     from.compartments = 'early.latent',
                     to.compartments = 'late.latent',
-                    value = expression((1-prop.early.latent.to.secondary) * (1/duration.early.latent)))
+                    value = expression((1-prop.early.latent.to.secondary) * (1/duration.early.latent)),#those who dont relapse
+                    tag = 'progression.el.ll'
+)
 
 ###---- LL to Tertiary (by sex) -----
 register.transition(SHIELD.SPECIFICATION,
@@ -782,7 +703,9 @@ register.transition(SHIELD.SPECIFICATION,
                     groups = 'infected',
                     from.compartments = 'late.latent',
                     to.compartments = 'tertiary',
-                    value = 'rate.late.latent.to.tertiary')
+                    value = 'rate.late.latent.to.tertiary',
+                    tag = 'progression.ll.tertiary'
+)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.late.latent.to.tertiary.male',
                        scale = 'rate',
@@ -800,41 +723,31 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value = 'rate.late.latent.to.tertiary.female')
 ###---- EL to CNS (by sex) -----
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'rate.early.latent.to.cns',
+                       name = 'rate.early.stage.to.cns',
                        scale = 'rate',
-                       value = SHIELD_BASE_PARAMETER_VALUES['rate.early.latent.to.cns']) #* can add multiplier to sample 
-#'@Todd: why doesnt this work?
-# register.transition(SHIELD.SPECIFICATION,
-#                     dimension = 'stage',
-#                     groups = 'infected',
-#                     from.compartments = c('primary','secondary','early.latent'),
-#                     to.compartments = 'cns',
-#                     value = 'rate.early.latent.to.cns')
+                       value = SHIELD_BASE_PARAMETER_VALUES['rate.early.stage.to.cns']) #* can add multiplier to sample 
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
                     from.compartments = c('primary'),
                     to.compartments = 'cns',
-                    value = 'rate.early.latent.to.cns')
+                    value = 'rate.early.stage.to.cns',
+                    tag = 'progression.primary.cns')
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
                     from.compartments = c('secondary'),
                     to.compartments = 'cns',
-                    value = 'rate.early.latent.to.cns')
+                    value = 'rate.early.stage.to.cns',
+                    tag = 'progression.secondary.cns')
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
                     from.compartments = c('early.latent'),
                     to.compartments = 'cns',
-                    value = 'rate.early.latent.to.cns')
+                    value = 'rate.early.stage.to.cns',
+                    tag = 'progression.el.cns')
 ###---- LL to CNS (by sex) -----
-register.transition(SHIELD.SPECIFICATION,
-                    dimension = 'stage',
-                    groups = 'infected',
-                    from.compartments = 'late.latent',
-                    to.compartments = 'cns',
-                    value = 'rate.late.latent.to.cns')
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.late.latent.to.cns.male',
                        scale = 'rate',
@@ -850,7 +763,13 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.late.latent.to.cns',
                                applies.to = list(sex='female'),
                                value = 'rate.late.latent.to.cns.female')
-
+register.transition(SHIELD.SPECIFICATION,
+                    dimension = 'stage',
+                    groups = 'infected',
+                    from.compartments = 'late.latent',
+                    to.compartments = 'cns',
+                    value = 'rate.late.latent.to.cns',
+                    tag = 'progression.ll.cns')
 #*** CONTINUUM TRANSISION *** ----
 ##---- 1-SYMPTHOMATIC TESTING ----
 # Register "Effective" symptomatic proportions for primary and secondary stages
@@ -860,32 +779,26 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.symptomatic.primary.heterosexual_male',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'])
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.symptomatic.primary.female',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'])
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.symptomatic.primary.msm',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est'])
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.symptomatic.secondary.heterosexual_male',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'])
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.symptomatic.secondary.female',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'])
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.symptomatic.secondary.msm',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est'])
-
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.symptomatic.primary',
                         scale='proportion',
@@ -931,8 +844,9 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(stage='secondary'),
                                value = 'prp.symptomatic.secondary') # can also add: *sensitivity of test in primary * care seeking behavior
 
-# Testing is modeled at the "End" of a stage, not during. 
-# Rate of symptomatic testing:
+#  Testing is modeled "during the stage", i.e. at the same time as the stage is active. 
+#  r= -log(1-p)/t
+# we only calculate the rate here, and model the transitions below 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.testing.symptomatic',
                         scale = 'rate',
@@ -940,32 +854,32 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.testing.symptomatic',
                                applies.to = list(stage='primary'),
-                               value = expression(1/duration.primary * prp.diagnosed.sym.testing.primary))
+                               value = expression(-log(1-prp.diagnosed.sym.testing.primary)/duration.primary))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.testing.symptomatic',
                                applies.to = list(stage='secondary'),
-                               value = expression(1/duration.secondary * prp.diagnosed.sym.testing.secondary))
+                               value = expression(-log(1-prp.diagnosed.sym.testing.secondary)/duration.secondary))
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'rate.testing.tertiary',
-                       scale = 'rate',
-                       value =SHIELD_BASE_PARAMETER_VALUES['rate.testing.tertiary'] )  
+                       name = 'duration.tertiary',
+                       scale = 'non.negative.number',
+                       value =SHIELD_BASE_PARAMETER_VALUES['duration.tertiary'] )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.testing.symptomatic',
                                applies.to = list(stage=c('tertiary')),
-                               value ='rate.testing.tertiary' )
-#
+                               value =expression(1/duration.tertiary))
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'rate.testing.cns',
+                       name = 'duration.cns',
                        scale = 'rate',
-                       value =SHIELD_BASE_PARAMETER_VALUES['rate.testing.cns'] )
+                       value =SHIELD_BASE_PARAMETER_VALUES['duration.cns'] )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.testing.symptomatic',
                                applies.to = list(stage=c('cns')),
-                               value ='rate.testing.cns' )
+                               value =expression(1/duration.cns))
+
 
 ##---- 2-SCREENING FOR ALL ----
 # We estimate this from HIV Testing rates in JHEEM : background testing rate has a functional form and parameters are tuned 
-# wei will calibrate this to testing data, and assume that screening rate is a multiple of that rate
+# we will calibrate this to testing data, and assume that STI screening rate is a function of HIV rate
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.testing.hiv.without.covid',
                         scale = 'rate',
@@ -978,50 +892,54 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.testing.hiv.without.covid.over.14',
                        scale = 'rate',
                        get.functional.form.function = get.hiv.testing.functional.form,
-                       functional.form.scale = 'proportion', #the functional form takes a proportion and produces a rate (from BRFSS: have u had a hiv test in the last year)
+                       functional.form.scale = 'proportion', #the functional form takes a proportion and produces a rate (from BRFSS: have u had a hiv test in the last year?)
                        functional.form.from.time = 2010)
 register.model.quantity(SHIELD.SPECIFICATION, 
                         name = 'rate.testing.hiv',
                         scale = 'rate',
                         value = 'rate.testing.hiv.without.covid')
 
-# defining a STI multiplier
+# defining a STI multiplier over time:
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'multiplier.syphilis.screening.to.hiv.tests',
                        scale = 'ratio',
-                       get.functional.form.function = get.syphilis.to.hiv.testing.functional.form,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR) #1980
-# combine:
+                       get.functional.form.function = get.syphilis.to.hiv.testing.functional.form, #starts in 1980 and has 5 knots
+                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR) 
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.screening',
+                        name = 'rate.sti.screening',
                         scale = 'rate',
                         value = expression(rate.testing.hiv * multiplier.syphilis.screening.to.hiv.tests))
 
+# additional STI multiplier by stage 
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.screening',
+                               name = 'rate.sti.screening',
                                applies.to = list(stage = c("primary", "secondary")),
                                apply.function = "multiply",
                                value = "rate.screening.ps.multiplier")
-
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.screening',
+                               name = 'rate.sti.screening',
                                applies.to = list(stage = "early.latent"),
                                apply.function = "multiply",
                                value = "rate.screening.el.multiplier")
-
+# Reducing testing for primary/secondary 
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.ps.multiplier",
-                       scale = 'proportion',
+                       scale = 'proportion', #<1
                        value = 0.5)
-
+# Tuning testing rate for EL
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.el.multiplier",
+<<<<<<< HEAD
                        scale = 'ratio',
                        value = 0.5)
+=======
+                       scale = 'ratio', #can be below or over 1
+                       value = 1)
+>>>>>>> exit_ps
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
 # prop of pregnant women receiving 'successful' prenatal screening 
-# How to model treatment failures that still result in congenital syphilis? 
+# TBD: How to model treatment failures that still result in congenital syphilis? 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.received.prenatal.care',
                         scale = 'proportion',
@@ -1030,6 +948,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.births.multi.born',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.births.multi.born'])
+# This rate is not applied to fertile women yet. we do that below when we are using it: 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.prenatal.care',
                         scale = 'rate',
@@ -1040,8 +959,8 @@ register.model.quantity(SHIELD.SPECIFICATION,
 # how many diagnosis are generated via contact tracing of a new diagnosis.... variable by age, race... 
 # rate of diagnosis through CT= rate of diagnosis at baseline * average number of new diagnosis per index case
 
-# average number of new caes diagnosed treateed per index case. + # diagnosed but not treated
-# number of people empericlllay trated (whi have syphilis) + number diagnosed/teated 
+# average number of new cases diagnosed treated per index case. + # diagnosed but not treated
+# number of people empirically treated (who have syphilis) + number diagnosed/treated 
 # number of diagnosis by stage #now  we need to split this by age race sex
 
 # contact tracing cascade: 
@@ -1049,17 +968,14 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'prop.index.cases.reached.for.contact.tracing',
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prop.index.cases.reached.for.contact.tracing'])
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'contacts.diagnosed.treated.per.index.case',
-                       scale = 'rate',
+                       scale = 'ratio',
                        value = SHIELD_BASE_PARAMETER_VALUES['contacts.diagnosed.treated.per.index.case'])
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'contacts.empirically.treated.infected.per.index.case',
-                       scale = 'rate',
+                       scale = 'ratio',
                        value = SHIELD_BASE_PARAMETER_VALUES['contacts.empirically.treated.infected.per.index.case'])
-
 
 # stage of infection among newly diagnosed contacts: 
 register.model.element.values(SHIELD.SPECIFICATION,
@@ -1067,7 +983,6 @@ register.model.element.values(SHIELD.SPECIFICATION,
                               'prp.infected.contacts.in.secondary' = SHIELD_BASE_PARAMETER_VALUES['prp.infected.contacts.in.secondary'],
                               'prp.infected.contacts.in.early.latent' = SHIELD_BASE_PARAMETER_VALUES['prp.infected.contacts.in.early.latent'], 
                               scale = 'proportion')
-
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.infected.contacts.in.late.latent',
                         scale = 'proportion',
@@ -1076,54 +991,47 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.infected.contacts.by.stage',
                         value = 0)
-
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name ='prp.infected.contacts.by.stage',
                                applies.to = list(stage='primary'),
                                value = 'prp.infected.contacts.in.primary')
-
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name ='prp.infected.contacts.by.stage',
                                applies.to = list(stage='secondary'),
                                value = 'prp.infected.contacts.in.secondary')
-
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name ='prp.infected.contacts.by.stage',
                                applies.to = list(stage='early.latent'),
                                value = 'prp.infected.contacts.in.early.latent')
-
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name ='prp.infected.contacts.by.stage',
                                applies.to = list(stage='late.latent'),
                                value = 'prp.infected.contacts.in.late.latent')
 
 # Calculating index cases diagnosis rates that can trigger contact tracing for those indexes:  
+# a function of symp.testing, sti.screening and prenatal.screening.
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'index.case.diagnosis.rate',
                         scale='rate',
                         dimensions = c('location', 'age','race','sex','stage'),
                         value = 0)
-
 register.model.quantity.subset(SHIELD.SPECIFICATION, 
                                name = 'index.case.diagnosis.rate',
                                applies.to = list(sex=c('msm','heterosexual_male'),age='all.ages', stage=c('primary','secondary','early.latent')),
-                               value = expression(rate.testing.symptomatic + rate.screening))
-
+                               value = expression(rate.testing.symptomatic + rate.sti.screening ))
 register.model.quantity.subset(SHIELD.SPECIFICATION, 
                                name = 'index.case.diagnosis.rate',
                                applies.to = list(sex=c('female'),age=NON.FERTILE.AGES, stage=c('primary','secondary','early.latent')),
-                               value = expression(rate.testing.symptomatic + rate.screening))
-
+                               value = expression(rate.testing.symptomatic + rate.sti.screening ))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'index.case.diagnosis.rate',
                                applies.to = list(sex='female',age=FERTILE.AGES,stage=c('primary','secondary','early.latent')),
-                               value =expression(rate.testing.symptomatic + rate.screening + rate.prenatal.care))
+                               value =expression(rate.testing.symptomatic + rate.sti.screening + rate.prenatal.care))
 
-# Mapping contact tracing rates from indexes to their contacts:
+# Mapping contact tracing rates from index cases to their contacts:
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.of.contacts.per.case',
                         value = get.rate.of.contacts.per.case)
-
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.infected.contacts.diagnosed.treated',
                         scale='rate',
@@ -1131,7 +1039,6 @@ register.model.quantity(SHIELD.SPECIFICATION,
                                                prop.index.cases.reached.for.contact.tracing* 
                                                contacts.diagnosed.treated.per.index.case * 
                                                prp.infected.contacts.by.stage))
-
 register.model.quantity(SHIELD.SPECIFICATION,  
                         name = 'rate.infected.contacts.empirically.treated',
                         scale='rate',
@@ -1140,11 +1047,9 @@ register.model.quantity(SHIELD.SPECIFICATION,
                                                contacts.empirically.treated.infected.per.index.case *
                                                prp.infected.contacts.by.stage))
 
-
-
 #*** TREATMENT *** --#----
 # a proportion will receive immediate treatment, another group will be delayed
-# we need to sepearete this for each testing because the tratment is different
+# we need to separate this for each testing because the treatment is different
 ##---- Immediate Treatments ----
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prp.treated.immediately.following.screening',
@@ -1155,58 +1060,61 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'proportion',
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.treated.immediately.following.testing.symptomatic']) 
 
-
-# All immediate treatments except prenatal: 
+# All immediate treatments except prenatal: #1-testing, 2-sti.screeing, 3-contact tracing
+# & then adding all those receiving prenatal screening
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.treated.immediately.post.diagnosis',
-                        value = expression(rate.screening * prp.treated.immediately.following.screening +
-                                               rate.testing.symptomatic * prp.treated.immediately.following.testing.symptomatic +
+                        name = 'rate.diagnosis.immediate.treatment',
+                        value = expression(rate.testing.symptomatic * prp.treated.immediately.following.testing.symptomatic + 
+                                               rate.sti.screening * prp.treated.immediately.following.screening + 
                                                rate.infected.contacts.diagnosed.treated 
                         ))
-# Adding prenatal:
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.treated.immediately.post.diagnosis',
+                               name = 'rate.diagnosis.immediate.treatment',
                                apply.function = 'add',
                                applies.to = list(sex='female',age=FERTILE.AGES),
-                               value= expression(rate.prenatal.care ))
-##---- Remission ---- 
-# this has 2 components: those diagnosed and immediately treated (including contacts who were diagnosed/treated) 
-# and 2) those contacts who were empirically treated (but not diagnosed)
+                               value= expression(rate.prenatal.care )
+)
+##---- Remission ---- [infected to uninfected]
+# this has 2 components: 
+## 1) those diagnosed and immediately treated (including contacts who were diagnosed/treated) 
+## 2) those contacts who were empirically treated (but not diagnosed)
+
+## 1) "Diagnosis & Immediate Treatment"
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'remission.prp',
                         value = 1)
-# treatments post diagnosis:
 register.remission(SHIELD.SPECIFICATION,
                    applies.to = list(continuum = 'undiagnosed'),
                    all.remissions.into.compartments = list(profile = 'diagnosed.treated'),
-                   remission.rate.value = 'rate.treated.immediately.post.diagnosis',
+                   remission.rate.value = 'rate.diagnosis.immediate.treatment',
                    remission.proportions.value = 'remission.prp',
-                   tag = 'treatment.immediate.postDiagnosis')
+                   tag = 'remission.treated.immediately')
 
-# Emperical treatments (among those infected) that didnt include a diagnosis 
+## 2) "No Diagnosis & Emperical Treatment"
 register.remission(SHIELD.SPECIFICATION,
                    applies.to = list(continuum = 'undiagnosed'),
                    all.remissions.into.compartments = list(profile = 'diagnosed.treated'),
                    remission.rate.value = 'rate.infected.contacts.empirically.treated',
                    remission.proportions.value = 'remission.prp',
-                   tag = 'treatment.immediate.emperical')
+                   tag = 'remission.treated.emperically.post.ct')
 
 ##---- Delayed Treatments ----
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.treatment.delayed.post.diagnosis',
-                        value = expression(rate.screening * (1- prp.treated.immediately.following.screening )+
-                                               rate.testing.symptomatic * (1-prp.treated.immediately.following.testing.symptomatic)))
+# only for sym.testing and sti.screening:
 # assuming that all prenatal care results in immediate treatment and those delayed treatment failing to avert congenital syphilis are accounted in the outcome
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'rate.diagnosis.delayed.treatment',
+                        value = expression(rate.testing.symptomatic * (1-prp.treated.immediately.following.testing.symptomatic)+
+                                               rate.sti.screening * (1- prp.treated.immediately.following.screening )
+                        ))
 
-#'@Todd: I am not sure about this
-#'we want these people to move from primary.undiagnosed to secondary.diagnosed.untreated  but transitions dont move in multiple dimensions 
-# modeling proportion of diagnosis resulting in delayed treatment diagnosed.delayed
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'continuum',
                     groups = 'infected',
                     from.compartments =  'undiagnosed',
                     to.compartments = 'diagnosed.untreated',
-                    value = 'rate.treatment.delayed.post.diagnosis')
+                    value = 'rate.diagnosis.delayed.treatment',
+                    tag='progression.undiagnosed.to.diagnosedUntreated')
+
 # how long will it take for someone to get treated after a positive diagnosis? 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.treatment.after.delay',
@@ -1217,7 +1125,7 @@ register.remission(SHIELD.SPECIFICATION,
                    all.remissions.into.compartments = list(profile = 'diagnosed.treated'),
                    remission.rate.value = 'rate.treatment.after.delay',
                    remission.proportions.value='remission.prp',
-                   tag = 'treatment.delayed.postDiagnosis' )
+                   tag = 'remission.treated.after.delay' )
 
 
 #*** CONGENITAL SYPHILIS *** ----

@@ -1,6 +1,8 @@
 
 source("applications/SHIELD/shield_base_parameters.R")
 
+# Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
+
 logit = function(p){
     log(p) - log(1-p)
 }
@@ -165,7 +167,7 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
     # for syphilis screening: Multiplicative coefficients for the screening rates 
-    rate.screening.ps.multiplier = Logitnormal.Distribution( meanlogit = 0, sdlogit = log(4)/2 ),
+    rate.screening.ps.multiplier = Logitnormal.Distribution( meanlogit = 0, sdlogit = log(4)/2 ), #get.intervals(rate.screening.ps.multiplier) #most values between 0.25-0.75
     rate.screening.el.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
     )
 
