@@ -56,11 +56,18 @@ simplot(
     # split.by = "age",
     # split.by = "race",
     # split.by = "race", facet.by = "sex",
-    # split.by = "race", facet.by = "age",
-    # outcomes = c("population"),
-    outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
+    split.by = "race", facet.by = "age",
+    outcomes = c("population"),
+    # outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
     style.manager = source.style.manager
 )
+
+
+#better starting state
+#downweight the likelihoods
+#run one with a subset of targets 
+## take out population likelihoods and parameters 
+
 
 # MCMC Diagnostics ----
 {
@@ -69,9 +76,10 @@ simplot(
     cbind(simset$get.params("trans"))
     cbind(sim.last$get.params("trans"))
     
+    simset$traceplot("test")
     simset$traceplot("screen")
     simset$traceplot("initial")
-    simset$traceplot("test")
+    
     
     simset$traceplot("black.aging")
     simset$traceplot("hispanic.aging")
