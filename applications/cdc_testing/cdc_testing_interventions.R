@@ -52,16 +52,3 @@ cdc.testing.prolonged.interruption.effect = create.intervention.effect(quantity.
 
 cdc.testing.cessation.prolonged.interruption = create.intervention(WHOLE.POPULATION,cdc.testing.prolonged.interruption.effect,code = "cdct.pintr",parameters = proportion.tested.regardless.values)
 
-qbeta(0.975, shape1 = 4.84, shape2 = 4.84)
-qbeta(0.025, shape1 = 4.84, shape2 = 4.84)
-
-
-1/(exp(-qnorm(c(0.025,0.975,0.5), mean = 0, sd = 0.7)) + 1)  
-x = seq(0,1, length = 1000)
-qplot(c(x,x,x),c(dbeta(x,shape1 = 4.84, shape2 = 4.84),dnorm(log(x)- log(1-x), 0, 0.7)*1/(x*(1-x)), dnorm(x, mean = 0.5, sd = 0.1530612)), color = rep(c("beta","logit norm", "normal"), each = 1000))
-
-
-
-simset = rerun.simulations(simset)
-
-#sim.cessation = cdc.testing.cessation$run(sim2, start.year = 2025, end.year = 2035)
