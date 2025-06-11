@@ -388,7 +388,9 @@ create.future.change.likelihood.instructions <- function(outcomes,
         sim.values = sim$optimized.get(data$optimized.get.instr)
         
         fold.change = sim.values[data$end.indices] / sim.values[data$start.indices]
-        
+        fold.change[(sim.values[data$end.indices]==0 & sim.values[data$start.indices]==0) | 
+                        (is.infinite(sim.values[data$end.indices] & is.infinite(sim.values[data$start.indices])))] = 1
+        fold.change[is.infinite(fold.change)] = 100
 
         #-- Plug in to stats --#
         
@@ -503,10 +505,14 @@ create.future.change.pivot.likelihood.instructions <- function(outcomes,
         sim.values = sim$optimized.get(data$optimized.get.instr)
         
         pre.fold.change = sim.values[data$pivot1.indices] / sim.values[data$pre.pivot.indices]
+        pre.fold.change[ sim.values[data$pivot1.indices]==0 & sim.values[data$pre.pivot.indices]==0 ] = 1
+        
         post.fold.change = sim.values[data$post.pivot.indices] / sim.values[data$pivot2.indices]
+        post.fold.change[ sim.values[data$post.pivot.indices]==0 & sim.values[data$pivot2.indices]==0 ] = 1
         
         pre.post.fold.change.ratio = post.fold.change / pre.fold.change
-        
+        pre.post.fold.change.ratio[(post.fold.change==0 & pre.fold.change==0) | (is.infinite(post.fold.change) & is.infinite(pre.fold.change))] = 1
+        pre.post.fold.change.ratio[is.infinite(pre.post.fold.change.ratio)] = 100
         
         #-- Plug in to stats --#
         
