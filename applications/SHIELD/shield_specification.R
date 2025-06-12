@@ -925,12 +925,12 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.ps.multiplier",
                        scale = 'proportion', #<1
-                       value = 0.5)
+                       value = 0) # set to zero
 # Tuning testing rate for EL
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.el.multiplier",
                        scale = 'ratio', #can be below or over 1
-                       value = 1)
+                       value = 1) #fixed at 1
 
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
