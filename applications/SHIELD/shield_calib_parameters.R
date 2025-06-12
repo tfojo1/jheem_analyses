@@ -167,9 +167,9 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
     syphilis.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    syphilis.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+    syphilis.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)) #,
     
-    # for syphilis screening: Multiplicative coefficients for the screening rates 
+    # for syphilis screening: Multiplicative coefficients for the screening rates #temp removed to fix values
     #rate.screening.ps.multiplier = Logitnormal.Distribution( meanlogit = 0, sdlogit = log(4)/2 ), #get.intervals(rate.screening.ps.multiplier) #most values between 0.25-0.75
     #rate.screening.el.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
     )
@@ -592,7 +592,7 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
     screening = c(
         "hiv.testing.or",
         "hiv.testing.slope.or"
-        #"rate.screening.ps.multiplier",
+        #"rate.screening.ps.multiplier", temp removed to fix values
         #"rate.screening.el.multiplier"
     ),
     screening.2 = c(
