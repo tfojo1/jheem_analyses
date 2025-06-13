@@ -602,7 +602,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.transmissibility',
                                applies.to=list(stage='early.latent'),
-                               value = .25)
+                               value = 0) # @ryan add to base params
 
 # where do nw infections go to?
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -673,11 +673,19 @@ register.transition(SHIELD.SPECIFICATION,
                     tag = 'progression.secondary.el')
 
 ###---- Relapse ---- (Early Latent to Secondary):
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'prop.early.latent.to.secondary',
+#                        scale = 'proportion',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['prop.early.latent.to.secondary'] # potentially turn into tunable parameter
+# )
+
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prop.early.latent.to.secondary',
                        scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prop.early.latent.to.secondary'] # potentially turn into tunable parameter
+                       value = 0 # potentially turn into tunable parameter
 )
+
+
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
