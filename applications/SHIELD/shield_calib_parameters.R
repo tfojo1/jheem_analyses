@@ -169,7 +169,7 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     syphilis.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     syphilis.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     syphilis.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+    syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2))#,
     
     # for syphilis screening: Multiplicative coefficients for the screening rates #temp removed to fix values
     #rate.screening.ps.multiplier = Logitnormal.Distribution( meanlogit = 0, sdlogit = log(4)/2 ), #get.intervals(rate.screening.ps.multiplier) #most values between 0.25-0.75
