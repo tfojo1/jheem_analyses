@@ -419,7 +419,7 @@ plot = ggplot() +
                                '1.b.intr'='Brief Interruption'),
                     name=NULL) +
   theme_bw() +
-  scale_x_continuous(labels = scales::percent) +
+  scale_x_continuous(labels = scales::percent, sec.axis = dup_axis()) +
   ylab(NULL) +
   xlab("Relative Increase in HIV Infections, 2025-2030") + 
   theme(legend.position = 'bottom',

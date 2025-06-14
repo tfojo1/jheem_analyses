@@ -219,6 +219,9 @@ RW.effect.values = get_suppresion_effect_arcsin(1000, rw_survey)
 #RW.effect.values = get_suppresion_effect_logit(1000, rw_survey)
 set.seed(reset.seed)
 
+load('../jheem_analyses/applications/ryan_white/adjusted.RW.effect.values.Rdata')
+    # gives us adjusted.RW.effect.values
+
 if (1==2) # for checking the simulated distribution approximates the observed one
 {
     cbind(rowMeans(RW.effect.values),
@@ -307,6 +310,16 @@ rw.cessation = create.intervention(adap.cessation.expansion.effect,
                                    WHOLE.POPULATION, 
                                    code = "rw.end")
 
+rw.cessation.conservative = create.intervention(adap.cessation.expansion.effect,
+                                                adap.cessation.nonexpansion.effect,
+                                                oahs.cessation.expansion.effect,
+                                                oahs.cessation.nonexpansion.effect,
+                                                rw.support.cessation.expansion.effect, 
+                                                rw.support.cessation.nonexpansion.effect, 
+                                                parameters = adjusted.RW.effect.values, 
+                                                WHOLE.POPULATION, 
+                                                code = "rw.end.cons")
+
 # Temporary Lapse of ADAP
 adap.brief.interruption.expansion.effect = create.intervention.effect(quantity.name = 'adap.suppression.expansion.effect',
                                                             start.time = START.YEAR,
@@ -380,6 +393,16 @@ rw.brief.interruption = create.intervention(adap.brief.interruption.expansion.ef
                                             WHOLE.POPULATION,
                                             code = "rw.b.intr")
 
+rw.brief.interruption.conservative = create.intervention(adap.brief.interruption.expansion.effect,
+                                                         adap.brief.interruption.nonexpansion.effect,
+                                                         oahs.brief.interruption.expansion.effect,
+                                                         oahs.brief.interruption.nonexpansion.effect,
+                                                         rw.support.brief.interruption.expansion.effect,
+                                                         rw.support.brief.interruption.nonexpansion.effect,
+                                                         parameters = adjusted.RW.effect.values, 
+                                                         WHOLE.POPULATION,
+                                                         code = "rw.b.intr.cons")
+
 # Temporary Lapse of ADAP
 adap.prolonged.interruption.expansion.effect = create.intervention.effect(quantity.name = 'adap.suppression.expansion.effect',
                                                             start.time = START.YEAR,
@@ -452,3 +475,13 @@ rw.prolonged.interruption = create.intervention(adap.prolonged.interruption.expa
                                                 parameters = RW.effect.values, 
                                                 WHOLE.POPULATION,
                                                 code = "rw.p.intr")
+
+rw.prolonged.interruption.conservative = create.intervention(adap.prolonged.interruption.expansion.effect,
+                                                adap.prolonged.interruption.nonexpansion.effect,
+                                                oahs.prolonged.interruption.expansion.effect,
+                                                oahs.prolonged.interruption.nonexpansion.effect,
+                                                rw.support.prolonged.interruption.expansion.effect,
+                                                rw.support.prolonged.interruption.nonexpansion.effect,
+                                                parameters = adjusted.RW.effect.values, 
+                                                WHOLE.POPULATION,
+                                                code = "rw.p.intr.cons")
