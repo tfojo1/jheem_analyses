@@ -1086,9 +1086,9 @@ get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
   create.natural.spline.functional.form(knot.times = c("1980"=1980, "1990"=1990, "2000"=2000, "2010"=2010,"2020"=2020),
                                         knot.values=list("1980"=0.8, "1990"=0.8, "2000"=0.8, "2010"=0.8,"2020"=0.8), #'@PK: is 80% a good value?
                                         knot.min = 0, #knot values can not exceed this range
-                                        knot.max = 1,#knot values can not exceed this range
+                                        #knot.max = 1,#knot values can not exceed this range
                                         min=0, #projected spline values should remain within this range
-                                        max=1, #projected spline values should remain within this range
+                                        #max=1, #projected spline values should remain within this range
                                         knots.are.on.transformed.scale = F,
                                         knot.link = "log",
                                         link = "identity" #it's safer to use linear extrapolation between knots to avoid exponential growth

@@ -194,7 +194,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests
                                      citation = "input_fraction_hiv_test_by_age.R")
 # *** CONTACT TRACING ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
-                                      0.8, 0,0, #0.3, 0.98,
+                                      0, 0,0,  # 0.8,0,0   #0.3, 0.98,
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
                                       0.1, 0,0, #.05, 0.2,

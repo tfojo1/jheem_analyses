@@ -602,7 +602,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.transmissibility',
                                applies.to=list(stage='early.latent'),
-                               value = .25)
+                               value = 0) # @ryan add to base params
 
 # where do nw infections go to?
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -673,11 +673,19 @@ register.transition(SHIELD.SPECIFICATION,
                     tag = 'progression.secondary.el')
 
 ###---- Relapse ---- (Early Latent to Secondary):
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'prop.early.latent.to.secondary',
+#                        scale = 'proportion',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['prop.early.latent.to.secondary'] # potentially turn into tunable parameter
+# )
+
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'prop.early.latent.to.secondary',
                        scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prop.early.latent.to.secondary']
+                       value = 0 # potentially turn into tunable parameter
 )
+
+
 register.transition(SHIELD.SPECIFICATION,
                     dimension = 'stage',
                     groups = 'infected',
@@ -925,12 +933,12 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.ps.multiplier",
                        scale = 'proportion', #<1
-                       value = 0.5)
+                       value = 0) # set to zero
 # Tuning testing rate for EL
 register.model.element(SHIELD.SPECIFICATION,
                        name = "rate.screening.el.multiplier",
                        scale = 'ratio', #can be below or over 1
-                       value = 1)
+                       value = 1) #fixed at 1
 
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
@@ -948,7 +956,7 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.prenatal.care',
                         scale = 'rate',
-                        value = expression( fertility.rate/(1+prp.births.multi.born) * prp.received.prenatal.care)) # we factor multi-births into this  
+                        value = expression( 0*fertility.rate/(1+prp.births.multi.born) * prp.received.prenatal.care)) # we factor multi-births into this, added zero 
 
 ##---- 4- CONTACT TRACING ----
 # number of contacts traced among those diagnosed with early syphilis 
@@ -1458,17 +1466,17 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 
 ##---- Syphilis Incidence ---- 
 # (new infections + reinfections)
-# track.dynamic.outcome(SHIELD.SPECIFICATION,
-#                       name = 'incidence',
-#                       outcome.metadata = create.outcome.metadata(display.name = 'Incidence',
-#                                                                  description = 'Number of Individuals Infected with Syphilis in the Past Year',
-#                                                                  scale = 'non.negative.number',
-#                                                                  axis.name = 'Cases',
-#                                                                  units = 'cases',
-#                                                                  singular.unit = 'case'),
-#                       dynamic.quantity.name = 'incidence.from', # use of '.from' helps us track where individuals are coming from (differentiate new vs re-infections)
-#                       keep.dimensions = c('location','age','race','sex','profile')
-# )
+track.dynamic.outcome(SHIELD.SPECIFICATION,
+                      name = 'incidence',
+                      outcome.metadata = create.outcome.metadata(display.name = 'Incidence',
+                                                                 description = 'Number of Individuals Infected with Syphilis in the Past Year',
+                                                                 scale = 'non.negative.number',
+                                                                 axis.name = 'Cases',
+                                                                 units = 'cases',
+                                                                 singular.unit = 'case'),
+                      dynamic.quantity.name = 'incidence.from', # use of '.from' helps us track where individuals are coming from (differentiate new vs re-infections)
+                      keep.dimensions = c('location','age','race','sex','profile')
+)
 ##---- Syphilis Diagnosis ----
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fraction.el.misclassified.ll',

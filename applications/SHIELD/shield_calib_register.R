@@ -117,3 +117,13 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 
 #6.09 <calib.diagnosis.06.09.pk>: running a calibration with demographic, total ps, total EL and hiv test likelihoods
 # >> we still cant generate the peak in 1997 for the EL
+
+#6.10 <calib.diagnosis.06.10.rf>: Added tunable screening sti knot values for 1990 and 2000 
+
+#6.11 <calib.diagnosis.06.11.2.rf>: 1) set contact tracing prp reached to 0
+# 2) set prenatal care to zero
+# 3) Diagnosis LH weight set to 0.8
+# 4) Removed likelihood for demographics
+
+#6.12 <calib.diagnosis.06.12.rf>: 1) fixed values for ps and el screening multi
+# 2) removed max knot values in sti screening functional form
