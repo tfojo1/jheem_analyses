@@ -3,9 +3,8 @@ if (!exists('RW.effect.values'))
     source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
 ADJUST.ADAP = T
-ADJUST.OAHS = T
-ADJUST.SUPPORT = T
-
+ADJUST.OAHS = F
+ADJUST.SUPPORT = F
 
 OAHS.SD.INFLATION = 1
 SUPPORT.SD.INFLATION = 1
@@ -27,7 +26,6 @@ n.iter.before.cov = 0
 cov.base.update=1
 cov.update.prior=500
 cov.update.decay=1
-
 
 
 set.seed(12333533)
@@ -165,6 +163,39 @@ run.adjust.mcmc <- function(service.type,
     values
 }
 
+resample.adjust <- function(n = KEEP,
+                            service.type, 
+                            run.sim,
+                            likelihood, 
+                            expansion)
+{
+    n.sample = 1000*n
+    
+    
+    param.name = paste0(service.type, '.loss')
+    
+    prior.kde = prepare.kde.arcsin(service.type=service.type, expansion=expansion)
+    
+    samples = seq(0,1, length=n.sample)
+    
+    d.prior = dkde(samples, prior.kde)
+    sims = lapply(samples, function(x){
+        names(x) = param.name
+        run.sim(x)
+    })
+    d.lik = exp(sapply(sims, likelihood))
+    
+    d.post = d.prior * d.lik
+    cum.post = cumsum(d.post) / sum(d.post)
+    
+    rands = runif(n)
+    
+    sapply(rands, function(rand){
+        lte.samples = samples[rand >= cum.post]
+        lte.samples[length(lte.samples)]
+    })
+}
+
 ##--------------------------##
 ##-- Parse Diepstra Study --##
 ##--------------------------##
@@ -243,6 +274,39 @@ log.sd.support = (log(ci.support[2]) - log(ci.support[1])) / 2/ 1.96
 # Other studies showing benefit:
 #   https://pmc.ncbi.nlm.nih.gov/articles/PMC5087096/
 
+##---------------------------------##
+##--   SET UP ADDITIONAL ERROR   --##
+##--    Based on variation in    --##
+##-- p/odds suppression by state --##
+##---------------------------------##
+
+#-- Calculate the N0 for the beta-binomial for P suppressed --#
+
+p.expansion = RW.DATA.MANAGER$data$oahs.suppression$estimate$ryan.white.program$ryan.white.pdfs$year__location[,MEDICAID.EXPANSION.STATES]
+#p.expansion = p.expansion[!is.na(p.expansion)]
+
+p.nonexpansion = RW.DATA.MANAGER$data$oahs.suppression$estimate$ryan.white.program$ryan.white.pdfs$year__location[,MEDICAID.NONEXPANSION.STATES]
+#p.nonexpansion = p.nonexpansion[!is.na(p.nonexpansion)]
+
+
+mse.p.expansion = mean(apply(p.expansion, 'year', var, na.rm=T)) #var(as.numeric(p.expansion), na.rm = T)
+mse.p.nonexpansion = (mean(p.nonexpansion, na.rm = T)-mean(p.expansion, na.rm = T))^2 + var(as.numeric(p.nonexpansion), na.rm = T)
+
+
+p.for.erly = 1 - 0.64/.82
+
+N0.EXPANSION.FOR.ERLY = p.for.erly * (1-p.for.erly) / rmse.expansion - 1
+N0.NONEXPANSION.FOR.ERLY = p.for.erly * (1-p.for.erly) / rmse.nonexpansion - 1
+
+#-- Calculate the log var for Odds Suppressed --#
+
+log.odds.expansion = log(p.expansion) - log(1-p.expansion)
+log.odds.nonexpansion = log(p.nonexpansion) - log(1-p.nonexpansion)
+
+MSE.LOG.ODDS.EXPANSION = mean(apply(log.odds.expansion, 'year', var, na.rm=T))#var(log.odds.expansion)
+MSE.LOG.ODDS.NONEXPANSION = (mean(log.odds.nonexpansion, na.rm=T)-mean(log.odds.expansion, na.rm=T))^2 + mean(apply(log.odds.nonexpansion, 'year', var, na.rm=T)) #var(log.odds.expansion)
+
+
 ##-----------------##
 ##-- ADJUST ADAP --##
 ##-----------------##
@@ -275,44 +339,76 @@ adjust.adap.run.sim = function(parameters)
     )
 }
 
-adjust.adap.likelihood <- function(sim, log=T)
+adjust.adap.likelihood.expansion <- function(sim, log=T)
 {
-    d.erly = dbinom(x = round(sim$n.long.term.disenrolled.newly.unsuppressed/1),
-           size = round(sim$n.long.term.disenrolled.previously.suppressed/1),
-           prob = sim$adap.loss,
-           log = log)
+    adjust.adap.likelihood(sim, log=log, n0 = N0.EXPANSION.FOR.ERLY)
+}
+
+adjust.adap.likelihood.nonexpansion <- function(sim, log=T)
+{
+    adjust.adap.likelihood(sim, log=log, n0 = N0.NONEXPANSION.FOR.ERLY)
+}
+
+adjust.adap.likelihood <- function(sim, log=T, n0)
+{
+    # d.erly = dbinom(x = round(sim$n.long.term.disenrolled.newly.unsuppressed/1),
+    #        size = round(sim$n.long.term.disenrolled.previously.suppressed/1),
+    #        prob = sim$adap.loss,
+    #        log = log)
     
-    log.or.comprehensive = log(o.comprehensive) - log(sim$p.comprehensive) + log(1-sim$p.comprehensive)
-    log.or.core.adap = log(o.core.adap) - log(sim$p.core.adap) + log(1-sim$p.core.adap)
-    log.or.support.adap = log(o.support.adap) - log(sim$p.support.adap) + log(1-sim$p.support.adap)
-    log.or.adap = log(o.adap) - log(sim$p.adap) + log(1-sim$p.adap)
     
-    d.diepstra = log(n.comprehensive * dnorm(log.or.comprehensive, log.mean.comprehensive, log.sd.comprehensive, log=F) +
-        n.core.adap * dnorm(log.or.core.adap, log.mean.core.adap, log.sd.core.adap, log=F) +
-      #  n.support.adap * dnorm(log.or.support.adap, log.mean.support.adap, log.sd.support.adap, log=F) +
-        n.adap * dnorm(log.or.adap, log.mean.adap, log.sd.adap, log=F)) - 
-        log(n.comprehensive + n.core.adap + n.adap)
+    d.erly = dnorm(x = sim$n.long.term.disenrolled.newly.unsuppressed,
+                   mean = sim$n.long.term.disenrolled.previously.suppressed * sim$adap.loss, #np
+                   sd = sqrt(sim$n.long.term.disenrolled.previously.suppressed * sim$adap.loss * (1-sim$adap.loss) * (n0 + sim$n.long.term.disenrolled.previously.suppressed) / (n0 + 1)),
+                   log = log
+                   )
+    
+    # log.or.comprehensive = log(o.comprehensive) - log(sim$p.comprehensive) + log(1-sim$p.comprehensive)
+    # log.or.core.adap = log(o.core.adap) - log(sim$p.core.adap) + log(1-sim$p.core.adap)
+    # log.or.support.adap = log(o.support.adap) - log(sim$p.support.adap) + log(1-sim$p.support.adap)
+    # log.or.adap = log(o.adap) - log(sim$p.adap) + log(1-sim$p.adap)
+    # 
+    # d.diepstra = log(n.comprehensive * dnorm(log.or.comprehensive, log.mean.comprehensive, log.sd.comprehensive, log=F) +
+    #     n.core.adap * dnorm(log.or.core.adap, log.mean.core.adap, log.sd.core.adap, log=F) +
+    #   #  n.support.adap * dnorm(log.or.support.adap, log.mean.support.adap, log.sd.support.adap, log=F) +
+    #     n.adap * dnorm(log.or.adap, log.mean.adap, log.sd.adap, log=F)) - 
+    #     log(n.comprehensive + n.core.adap + n.adap)
+    
+    
+    #    d.diepstra + d.erly
 
     # return
     d.erly
-#    d.diepstra + d.erly
 
 }
 
 
 if (ADJUST.ADAP)
 {
-    adjusted.adap.expansion.values = run.adjust.mcmc(service.type = 'adap', 
-                                                     run.sim = adjust.adap.run.sim,
-                                                     likelihood = adjust.adap.likelihood,
-                                                     expansion = T,
-                                                     start.value = 0.22)
     
-    adjusted.adap.nonexpansion.values = run.adjust.mcmc(service.type = 'adap', 
+    adjusted.adap.expansion.values = resample.adjust(n = KEEP,
+                                                     service.type = 'adap', 
+                                                     run.sim = adjust.adap.run.sim,
+                                                     likelihood = adjust.adap.likelihood.expansion,
+                                                     expansion = T)
+    
+    adjusted.adap.nonexpansion.values = resample.adjust(n = KEEP,
+                                                        service.type = 'adap', 
                                                         run.sim = adjust.adap.run.sim,
-                                                        likelihood = adjust.adap.likelihood,
-                                                        expansion = F,
-                                                        start.value = 0.22)
+                                                        likelihood = adjust.adap.likelihood.nonexpansion,
+                                                        expansion = F)
+    
+    # adjusted.adap.expansion.values = run.adjust.mcmc(service.type = 'adap', 
+    #                                                  run.sim = adjust.adap.run.sim,
+    #                                                  likelihood = adjust.adap.likelihood.expansion,
+    #                                                  expansion = T,
+    #                                                  start.value = 0.22)
+    # 
+    # adjusted.adap.nonexpansion.values = run.adjust.mcmc(service.type = 'adap', 
+    #                                                     run.sim = adjust.adap.run.sim,
+    #                                                     likelihood = adjust.adap.likelihood.nonexpansion,
+    #                                                     expansion = F,
+    #                                                     start.value = 0.22)
 }
 
 
@@ -333,31 +429,58 @@ adjust.oahs.run.sim = function(parameters)
     )
 }
 
-adjust.oahs.likelihood <- function(sim, log=T)
+adjust.oahs.likelihood.expansion <- function(sim, log=T)
+{
+    adjust.oahs.likelihood(sim, mse=MSE.LOG.ODDS.EXPANSION, log=log)
+}
+
+adjust.oahs.likelihood.nonexpansion <- function(sim, log=T)
+{
+    adjust.oahs.likelihood(sim, mse=MSE.LOG.ODDS.NONEXPANSION, log=log)
+}
+
+adjust.oahs.likelihood <- function(sim, mse, log=T)
 {
     log.or.core = log(o.core) - log(sim$p.core) + log(1-sim$p.core)
-    d.core = dnorm(log.or.core, log.mean.core, log.sd.core * OAHS.SD.INFLATION, log=T)
+    d.core = dnorm(log.or.core, log.mean.core, sqrt(log.sd.core^2 + mse), log=T)
     
-    log.or.core.support = log(o.core.support) - log(sim$p.core.support) + log(1-sim$p.core.support)
-    d.core.support = dnorm(log.or.core.support, log.mean.core.support, log.sd.core.support * OAHS.SD.INFLATION, log=T)
-            
+   log.or.core.support = log(o.core.support) - log(sim$p.core.support) + log(1-sim$p.core.support)
+   d.core.support = dnorm(log.or.core.support, log.mean.core.support, sqrt(log.sd.core.support^2 + mse), log=T)
+ 
+  # d.core.support
+           
     d.core + d.core.support
+   
+#   log(d.core * n.core + d.core.support * n.core.support) - log(n.core + n.core.support)
 }
 
 if (ADJUST.OAHS)
 {   
-    adjusted.oahs.expansion.values = run.adjust.mcmc(service.type = 'oahs', 
+    adjusted.oahs.expansion.values = resample.adjust(n = KEEP,
+                                                     service.type = 'oahs', 
                                                      run.sim = adjust.oahs.run.sim,
-                                                     likelihood = adjust.oahs.likelihood,
+                                                     likelihood = adjust.oahs.likelihood.expansion,
                                                      expansion = T)
     
-    adjusted.oahs.nonexpansion.values = run.adjust.mcmc(service.type = 'oahs', 
-                                                        run.sim = adjust.oahs.run.sim,
-                                                        likelihood = adjust.oahs.likelihood,
-                                                        expansion = F)
-}
+    adjusted.oahs.nonexpansion.values = resample.adjust(n = KEEP,
+                                                     service.type = 'oahs', 
+                                                     run.sim = adjust.oahs.run.sim,
+                                                     likelihood = adjust.oahs.likelihood.expansion,
+                                                     expansion = F)
+    
+    
+#     adjusted.oahs.expansion.values = run.adjust.mcmc(service.type = 'oahs', 
+#                                                      run.sim = adjust.oahs.run.sim,
+#                                                      likelihood = adjust.oahs.likelihood.expansion,
+#                                                      expansion = T)
+#     
+#     adjusted.oahs.nonexpansion.values = run.adjust.mcmc(service.type = 'oahs', 
+#                                                         run.sim = adjust.oahs.run.sim,
+#                                                         likelihood = adjust.oahs.likelihood.nonexpansion,
+#                                                         expansion = F)
+ }
 
-
+    
 ##--------------------##
 ##-- ADJUST Support --##
 ##--------------------##
@@ -377,14 +500,24 @@ adjust.support.run.sim = function(parameters)
     )
 }
 
-adjust.support.likelihood <- function(sim, log=T)
+adjust.support.likelihood.expansion <- function(sim, log=T)
+{
+    adjust.support.likelihood(sim, mse=MSE.LOG.ODDS.EXPANSION, log=log)
+}
+
+adjust.support.likelihood.nonexpansion <- function(sim, log=T)
+{
+    adjust.support.likelihood(sim, mse=MSE.LOG.ODDS.NONEXPANSION, log=log)
+}
+
+adjust.support.likelihood <- function(sim, mse, log=T)
 {
     log.or.core.support = log(o.core.support) - log(sim$p.core.support) + log(1-sim$p.core.support)
     log.or.core = log(o.core) - log(o.none)
     
     d.core.support = dnorm(log.or.core.support,# - log.or.core,
           mean = log.mean.core.support - log.mean.core,
-          sd = sqrt(log.sd.core.support^2 + log.sd.core^2) * SUPPORT.SD.INFLATION,
+          sd = sqrt(log.sd.core.support^2 + log.sd.core^2 + mse),
           log = T)
     
     
@@ -393,7 +526,7 @@ adjust.support.likelihood <- function(sim, log=T)
     
     d.support.adap = dnorm(log.or.support.adap,# - log.or.adap,
                            mean = log.mean.support.adap - log.mean.adap,
-                           sd = sqrt(log.sd.support.adap^2 + log.sd.adap^2) * SUPPORT.SD.INFLATION,
+                           sd = sqrt(log.sd.support.adap^2 + log.sd.adap^2 + mse),
                            log = T)
     
     
@@ -402,14 +535,14 @@ adjust.support.likelihood <- function(sim, log=T)
     
     d.comprehensive = dnorm(log.or.comprehensive,# - log.or.core.adap,
                            mean = log.mean.comprehensive - log.mean.core.adap,
-                           sd = sqrt(log.sd.comprehensive^2 + log.sd.core.adap^2) * SUPPORT.SD.INFLATION,
+                           sd = sqrt(log.sd.comprehensive^2 + log.sd.core.adap^2 + mse),
                            log = T)
     
     log.or.support = log(o.support) - log(sim$p.support) + log(1-sim$p.support)
     
     d.support = dnorm(log.or.support,
                       mean = log.mean.support,
-                      sd = log.sd.support * SUPPORT.SD.INFLATION,
+                      sd = sqrt(log.sd.support^2 + mse),
                       log = T)
     
     # log(prod(sqrt(n.core.support) * d.core.support + 
@@ -423,15 +556,27 @@ adjust.support.likelihood <- function(sim, log=T)
 
 if (ADJUST.SUPPORT)
 {
-    adjusted.support.expansion.values = run.adjust.mcmc(service.type = 'support', 
+    adjusted.support.expansion.values = resample.adjust(n = KEEP,
+                                                     service.type = 'support', 
                                                      run.sim = adjust.support.run.sim,
-                                                     likelihood = adjust.support.likelihood,
+                                                     likelihood = adjust.support.likelihood.expansion,
                                                      expansion = T)
     
-    adjusted.support.nonexpansion.values = run.adjust.mcmc(service.type = 'support', 
+    adjusted.support.nonexpansion.values = resample.adjust(n = KEEP,
+                                                        service.type = 'support', 
                                                         run.sim = adjust.support.run.sim,
-                                                        likelihood = adjust.support.likelihood,
+                                                        likelihood = adjust.support.likelihood.nonexpansion,
                                                         expansion = F)
+    
+    # adjusted.support.expansion.values = run.adjust.mcmc(service.type = 'support', 
+    #                                                  run.sim = adjust.support.run.sim,
+    #                                                  likelihood = adjust.support.likelihood.expansion,
+    #                                                  expansion = T)
+    # 
+    # adjusted.support.nonexpansion.values = run.adjust.mcmc(service.type = 'support', 
+    #                                                     run.sim = adjust.support.run.sim,
+    #                                                     likelihood = adjust.support.likelihood.nonexpansion,
+    #                                                     expansion = F)
 }
 
 
@@ -459,6 +604,8 @@ if (ADJUST.ADAP && ADJUST.OAHS && ADJUST.SUPPORT)
     # examine
     
     rowMeans(adjusted.RW.effect.values)
+    cbind(rowMeans(adjusted.RW.effect.values),
+          t(apply(adjusted.RW.effect.values, 1, quantile, probs=c(.25, .75))))
     
     qplot(adjusted.RW.effect.values[1,])
     qplot(adjusted.RW.effect.values[2,])

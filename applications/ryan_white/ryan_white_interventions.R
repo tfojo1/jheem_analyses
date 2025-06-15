@@ -49,7 +49,9 @@ get_suppresion_effect_arcsin = function(n, rw_survey) {
   X.expansion = pmax(pmin(X.expansion, 1 - epsilon), epsilon)  # Ensure all values are within (0,1)
   X.nonexpansion = pmax(pmin(X.nonexpansion, 1 - epsilon), epsilon)  # Ensure all values are within (0,1)
   
-  
+  # print(paste0("n expansion = ", nrow(X.expansion)))
+  #   print(paste0("n non-expansion = ", nrow(X.nonexpansion)))
+  # 
   
   # Arcsin transformation
   arcsin_X = asin(sqrt(X))
