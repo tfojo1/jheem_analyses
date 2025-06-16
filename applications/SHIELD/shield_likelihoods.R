@@ -10,7 +10,7 @@
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
 TOTAL.WEIGHT=1
 POPULATION.WEIGHT = TOTAL.WEIGHT
-DIAGNOSIS.WEIGHT = 0.8
+DIAGNOSIS.WEIGHT = 0.125
 PRENATAL.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
 
@@ -492,7 +492,7 @@ likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(
   
 )
 likelihood.instructions.syphilis.diagnoses.psElTotal=join.likelihood.instructions( # PS total and the early total
-  #likelihood.instructions.demographics, #
+  #likelihood.instructions.demographics, # 
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
   hiv.testing.likelihood.instructions
