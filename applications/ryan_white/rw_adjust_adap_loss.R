@@ -3,8 +3,8 @@ if (!exists('RW.effect.values'))
     source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
 ADJUST.ADAP = T
-ADJUST.OAHS = F
-ADJUST.SUPPORT = F
+ADJUST.OAHS = T
+ADJUST.SUPPORT = T
 
 OAHS.SD.INFLATION = 1
 SUPPORT.SD.INFLATION = 1
@@ -288,23 +288,31 @@ p.expansion = RW.DATA.MANAGER$data$oahs.suppression$estimate$ryan.white.program$
 p.nonexpansion = RW.DATA.MANAGER$data$oahs.suppression$estimate$ryan.white.program$ryan.white.pdfs$year__location[,MEDICAID.NONEXPANSION.STATES]
 #p.nonexpansion = p.nonexpansion[!is.na(p.nonexpansion)]
 
+p.adap.expansion = RW.DATA.MANAGER$data$adap.suppression$estimate$nastad.adap$ryan.white.pdfs$year__location[,MEDICAID.EXPANSION.STATES]
+p.adap.expansion = p.adap.expansion[,apply(p.adap.expansion, 2, min, na.rm=T)>.5]
 
-mse.p.expansion = mean(apply(p.expansion, 'year', var, na.rm=T)) #var(as.numeric(p.expansion), na.rm = T)
-mse.p.nonexpansion = (mean(p.nonexpansion, na.rm = T)-mean(p.expansion, na.rm = T))^2 + var(as.numeric(p.nonexpansion), na.rm = T)
+p.adap.nonexpansion = RW.DATA.MANAGER$data$adap.suppression$estimate$nastad.adap$ryan.white.pdfs$year__location[,MEDICAID.NONEXPANSION.STATES]
+p.adap.nonexpansion = p.adap.nonexpansion[,apply(p.adap.nonexpansion, 2, min, na.rm=T)>.5]
+
+MSE.REDUCTION = 1
+
+mse.p.expansion = mean(apply(p.adap.expansion, 'year', var, na.rm=T)) / MSE.REDUCTION #var(as.numeric(p.expansion), na.rm = T)
+mse.p.nonexpansion = ( (mean(p.adap.expansion, na.rm = T)-mean(p.adap.nonexpansion, na.rm = T))^2 +  mean(apply(p.adap.nonexpansion, 'year', var, na.rm=T)) ) / MSE.REDUCTION
 
 
 p.for.erly = 1 - 0.64/.82
 
-N0.EXPANSION.FOR.ERLY = p.for.erly * (1-p.for.erly) / rmse.expansion - 1
-N0.NONEXPANSION.FOR.ERLY = p.for.erly * (1-p.for.erly) / rmse.nonexpansion - 1
+N0.EXPANSION.FOR.ERLY = p.for.erly * (1-p.for.erly) / mse.p.expansion - 1
+N0.NONEXPANSION.FOR.ERLY = p.for.erly * (1-p.for.erly) / mse.p.nonexpansion - 1
 
 #-- Calculate the log var for Odds Suppressed --#
 
 log.odds.expansion = log(p.expansion) - log(1-p.expansion)
 log.odds.nonexpansion = log(p.nonexpansion) - log(1-p.nonexpansion)
 
-MSE.LOG.ODDS.EXPANSION = mean(apply(log.odds.expansion, 'year', var, na.rm=T))#var(log.odds.expansion)
-MSE.LOG.ODDS.NONEXPANSION = (mean(log.odds.nonexpansion, na.rm=T)-mean(log.odds.expansion, na.rm=T))^2 + mean(apply(log.odds.nonexpansion, 'year', var, na.rm=T)) #var(log.odds.expansion)
+MSE.LOG.ODDS.EXPANSION = mean(apply(log.odds.expansion, 'year', var, na.rm=T)) / MSE.REDUCTION#var(log.odds.expansion)
+MSE.LOG.ODDS.NONEXPANSION = ( (mean(log.odds.nonexpansion, na.rm=T)-mean(log.odds.expansion, na.rm=T))^2 +
+                                  mean(apply(log.odds.nonexpansion, 'year', var, na.rm=T)) ) / MSE.REDUCTION #var(log.odds.expansion)
 
 
 ##-----------------##
@@ -598,14 +606,14 @@ if (ADJUST.ADAP && ADJUST.OAHS && ADJUST.SUPPORT)
     
     
     # save
-    save(adjusted.RW.effect.values,
-         file = '../jheem_analyses/applications/ryan_white/adjusted.RW.effect.values.Rdata')
+  #  save(adjusted.RW.effect.values,
+  #       file = '../jheem_analyses/applications/ryan_white/adjusted.RW.effect.values.Rdata')
     
     # examine
     
     rowMeans(adjusted.RW.effect.values)
-    cbind(rowMeans(adjusted.RW.effect.values),
-          t(apply(adjusted.RW.effect.values, 1, quantile, probs=c(.25, .75))))
+    print(cbind(rowMeans(adjusted.RW.effect.values),
+          t(apply(adjusted.RW.effect.values, 1, quantile, probs=c(.25, .75)))))
     
     qplot(adjusted.RW.effect.values[1,])
     qplot(adjusted.RW.effect.values[2,])
