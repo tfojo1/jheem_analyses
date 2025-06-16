@@ -57,7 +57,19 @@ register.calibration.info(code = "calib.diagnosis.06.16.w0.5.pk",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = solver
 )
-
+register.calibration.info(code = "calib.diagnosis.06.16.w0.125.pk",
+                          preceding.calibration.codes = "calib.demog.06.09.pk",
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          param.names.all,
+                          n.iter = N.ITER,
+                          thin = 50,
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = solver
+)
 # ## TEST for Nick:
 # register.calibration.info('pop.demog.test', 
 #                           likelihood.instructions = likelihood.instructions.demographics,
