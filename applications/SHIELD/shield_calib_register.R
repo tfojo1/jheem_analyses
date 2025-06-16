@@ -10,8 +10,8 @@ param.names.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
                            AGING.PARAMETERS.PRIOR@var.names
                           )
 
-param.names.all<-c(POPULATION.PARAMETERS.PRIOR@var.names,
-                   AGING.PARAMETERS.PRIOR@var.names,
+param.names.all<-c(#POPULATION.PARAMETERS.PRIOR@var.names,
+                   #AGING.PARAMETERS.PRIOR@var.names,
                    TRANSMISSION.PARAMETERS.PRIOR@var.names,
                    TESTING.PARAMETERS.PRIOR@var.names)
 
