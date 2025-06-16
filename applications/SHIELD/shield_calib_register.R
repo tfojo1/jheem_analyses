@@ -5,15 +5,21 @@ N.ITER=15000
 solver = create.solver.metadata(rtol = 0.001, atol=0.05) #rtol,atol
 # solver = create.solver.metadata() #default solver
 
-
+#parameter set for demographic calibration
 param.names.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
                            AGING.PARAMETERS.PRIOR@var.names
                           )
 
-param.names.all<-c(#POPULATION.PARAMETERS.PRIOR@var.names,
-                   #AGING.PARAMETERS.PRIOR@var.names,
-                   TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#parameter set for diagnosis calibration
+param.names.diag<-c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                    TESTING.PARAMETERS.PRIOR@var.names)
+
+#parameter set for demographic & diagnosis calibration
+param.names.all<-c(
+    POPULATION.PARAMETERS.PRIOR@var.names,
+    AGING.PARAMETERS.PRIOR@var.names,
+    TRANSMISSION.PARAMETERS.PRIOR@var.names,
+    TESTING.PARAMETERS.PRIOR@var.names)
 
 # Calibrating to demographic and syphilis diagnoses targets
 register.calibration.info('calib.demog.06.09.pk', 
@@ -28,6 +34,30 @@ register.calibration.info('calib.demog.06.09.pk',
                           description = "A quick run to get population parameters in the general vicinity",
                           solver.metadata = solver
 )
+
+#############
+# calibrating to total ps; total EL diagnosis and hiv tests targets
+# downweighting the likelihood
+# removed relapse =0 
+# removed infectiousness for EL stage =0
+# removed screening for PS (muliplier set to 0)
+# took out prenatal care
+# took out contact tracing
+
+register.calibration.info(code = "calib.diagnosis.06.16.w0.5.pk",
+                          preceding.calibration.codes = "calib.demog.06.09.pk",
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          param.names.all,
+                          n.iter = N.ITER,
+                          thin = 50,
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = solver
+)
+
 # ## TEST for Nick:
 # register.calibration.info('pop.demog.test', 
 #                           likelihood.instructions = likelihood.instructions.demographics,
@@ -44,22 +74,6 @@ register.calibration.info('calib.demog.06.09.pk',
 #                           description = "A quick run to get population parameters in the general vicinity",
 #                           solver.metadata = solver
 # )
-#############
-# calibrating to demographics, total ps and total EL syphilis diagnosis targets and hiv tests 
-register.calibration.info(code = "calib.diagnosis.06.09.pk",
-                          preceding.calibration.codes = "calib.demog.06.09.pk",
-                          likelihood.instructions = likelihood.instructions.syphilis.diagnoses.psElTotal,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          param.names.all,
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
-)
-
 cat("*** Shiled_register_calibration.R completed!***\n")
 
 

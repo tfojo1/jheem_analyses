@@ -27,7 +27,7 @@ LOCATION='C.12580' #Baltimore MSA
 
 set.seed(00000)
 
-CALIBRATION.NAME = 'calib.diagnosis.06.09.pk' 
+CALIBRATION.NAME = 'calib.diagnosis.06.16.w0.5.pk' 
 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
