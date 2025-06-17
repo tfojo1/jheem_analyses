@@ -8,11 +8,12 @@
 
 
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
-TOTAL.WEIGHT=1
+TOTAL.WEIGHT=1/8
 POPULATION.WEIGHT = TOTAL.WEIGHT
-DIAGNOSIS.WEIGHT = 0.8
-PRENATAL.WEIGHT = TOTAL.WEIGHT
+DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
+PRENATAL.WEIGHT = TOTAL.WEIGHT
+
 
 # Population weights: 
 # the census runs population count every 10 years, in 2010, and 2020.
@@ -491,20 +492,14 @@ likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(
    ps.diagnosis.total.likelihood.instructions
   
 )
-likelihood.instructions.syphilis.diagnoses.psElTotal=join.likelihood.instructions( # PS total and the early total
-  #likelihood.instructions.demographics, #
+
+# PS total and the early total; HIV tests
+likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instructions(
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
   hiv.testing.likelihood.instructions
 )
 
-likelihood.instructions.syphilis.diagnoses.psLlTotal=join.likelihood.instructions( # PS total and the early total
-    likelihood.instructions.demographics, #
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions,
-    hiv.testing.likelihood.instructions
-)
 
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
