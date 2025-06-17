@@ -22,12 +22,18 @@ RW.LOCATION.DESCRIPTOR.PLURAL = ifelse(RW.IS.STATE.LEVEL, 'States', "Cities")
 
 # Run settings
 VERBOSE = T
-CALIBRATION.CODE = "final.ehe.state" 
 N.SIM = 1000  
 FORCE.REDO = T
 N.CHUNKS = 20
 
-RW.INTERVENTION.CODES = c('noint', 'rw.end', 'rw.b.intr', 'rw.p.intr')
+if (RW.IS.STATE.LEVEL)
+    CALIBRATION.CODE = "final.ehe.state"
+if (!RW.IS.STATE.LEVEL)
+    CALIBRATION.CODE = 'final.ehe'
+
+RW.INTERVENTION.CODES = c('noint', 
+                          'rw.end', 'rw.b.intr', 'rw.p.intr',
+                          'rw.end.cons', 'rw.b.intr.cons', 'rw.p.intr.cons')
 
 RW.INT.RUN.TO.YEAR = 2035
 RW.INT.RUN.FROM.YEAR = 2025
@@ -69,15 +75,14 @@ if (RW.IS.STATE.LEVEL)
 
 if (!RW.IS.STATE.LEVEL)
 {
-    RW.MEDICAID.EXPANSION.CITIES = RW.MEDICAID.EXPANSION.LOCATIONS = names(city.main.state.medicaid.expansion)[city.main.state.medicaid.expansion]
-    RW.MEDICAID.NONEXPANSION.CITIES = RW.MEDICAID.NONEXPANSION.LOCATIONS = names(city.main.state.medicaid.expansion)[!city.main.state.medicaid.expansion]
-    
-    
     city.main.state.medicaid.expansion = unlist(sapply(city.main.state, function(st){
         
         state_info$medicaid_expansion[state_info$state==gsub(" ", "_", locations::get.location.name(st))]=='Yes'
         
     }))
+    
+    RW.MEDICAID.EXPANSION.CITIES = RW.MEDICAID.EXPANSION.LOCATIONS = names(city.main.state.medicaid.expansion)[city.main.state.medicaid.expansion]
+    RW.MEDICAID.NONEXPANSION.CITIES = RW.MEDICAID.NONEXPANSION.LOCATIONS = names(city.main.state.medicaid.expansion)[!city.main.state.medicaid.expansion]
 }
 
 shade.darker <- function(color, delta)
