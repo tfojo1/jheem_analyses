@@ -5,6 +5,8 @@ library(ppcor)
 library(tidyr)
 library(dplyr)
 library(ggplot2)
+library(scales)
+library(tibble)
 
 #load simualtion set
 
@@ -346,4 +348,132 @@ ggplot(all_prcc_plot, aes(x = PRCC, y = parameter)) +
         strip.text = element_text(face = "bold"),
         legend.position = "bottom"
     )
+
+
+#Table 1 Results 
+
+#Cdct.end
+plot_data_list_cdct.end <- vector("list", length(states))
+names(plot_data_list_cdct.end) <- states
+
+intervention <- "cdct.end"
+# Loop through interventions and states to collect results
+    for (a in 1:length(states)) {
+        ri <- (colSums(total.results[as.character(2025:2030), , "incidence", states[a], intervention]) -
+                   colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])) /
+            colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
+        
+        temp_df <- data.frame(
+            state = states[a],
+            intervention = intervention,
+            relative_incidence = ri * 100  # convert to percent
+        )
+        plot_data_list_cdct.end[[a]] <- temp_df
+    }
+
+
+
+#Cdct.bintr
+plot_data_list_cdct.bintr <- vector("list", length(states))
+names(plot_data_list_cdct.bintr) <- states
+
+intervention <- "cdct.bintr"
+# Loop through interventions and states to collect results
+for (a in 1:length(states)) {
+    ri <- (colSums(total.results[as.character(2025:2030), , "incidence", states[a], intervention]) -
+               colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])) /
+        colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
+    
+    temp_df <- data.frame(
+        state = states[a],
+        intervention = intervention,
+        relative_incidence = ri * 100  # convert to percent
+    )
+    plot_data_list_cdct.bintr[[a]] <- temp_df
+}
+
+
+#Cdct.pintr
+plot_data_list_cdct.pintr <- vector("list", length(states))
+names(plot_data_list_cdct.pintr) <- states
+
+intervention <- "cdct.pintr"
+# Loop through interventions and states to collect results
+for (a in 1:length(states)) {
+    ri <- (colSums(total.results[as.character(2025:2030), , "incidence", states[a], intervention]) -
+               colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])) /
+        colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
+    
+    temp_df <- data.frame(
+        state = states[a],
+        intervention = intervention,
+        relative_incidence = ri * 100  # convert to percent
+    )
+    plot_data_list_cdct.pintr[[a]] <- temp_df
+}
+
+
+# combine  intervention lists and names
+intervention_lists <- list(
+    `Cessation` = plot_data_list_cdct.end,
+    `Brief Interruption` = plot_data_list_cdct.bintr,
+    `Prolonged Interruption` = plot_data_list_cdct.pintr
+)
+
+# Function to extract summary stats from each list
+extract_summary <- function(df_list, intervention_name) {
+    do.call(rbind, lapply(seq_along(df_list), function(i) {
+        x <- df_list[[i]]$relative_incidence
+        tibble(
+            State = states[i],
+            Intervention = intervention_name,
+            Mean = mean(x),
+            Lower = quantile(x, 0.025),
+            Upper = quantile(x, 0.975)
+        )
+    }))
+}
+
+# Get summaries for all 3 interventions
+summary_data <- bind_rows(
+    extract_summary(plot_data_list_cdct.end, "Cessation"),
+    extract_summary(plot_data_list_cdct.bintr, "Brief Interruption"),
+    extract_summary(plot_data_list_cdct.pintr, "Prolonged Interruption")
+)
+
+# Round to nearest whole number
+summary_data <- summary_data %>%
+    mutate(across(c(Mean, Lower, Upper), round, 1))
+
+
+summary_table <- summary_data %>%
+    mutate(label = paste0(Mean, " [", Lower, "-", Upper, "]")) %>%
+    dplyr::select(State, Intervention, label) %>%
+    pivot_wider(names_from = Intervention, values_from = label)
+
+
+heatmap_data <- summary_data %>%
+    mutate(Intervention = factor(Intervention, levels = c("Cessation", "Prolonged Interruption", "Brief Interruption")))
+
+# Create ggplot heatmap with CIs
+ggplot(heatmap_data, aes(x = Intervention, y = reorder(State, Mean), fill = Mean)) +
+    geom_tile(color = "white") +
+    geom_text(
+        aes(label = paste0(round(Mean, 1), "% [", round(Lower, 1), "–", round(Upper, 1), "]")),
+        color = "black", size = 3.3
+    ) +
+    scale_fill_gradient2(
+        low = "green", mid = "yellow", high = "red",
+        midpoint = median(heatmap_data$Mean, na.rm = TRUE),
+        limits = c(min(heatmap_data$Mean, na.rm = TRUE), max(heatmap_data$Mean, na.rm = TRUE))
+    ) +
+    labs(
+        title = "Relative Excess Incidence by State and Intervention (2025–2030)",
+        x = "Intervention",
+        y = "State",
+        fill = "Mean %"
+    ) +
+    theme_minimal() +
+    theme(axis.text.y = element_text(size = 10),
+          axis.text.x = element_text(size = 10, angle = 30, hjust = 1))
 
