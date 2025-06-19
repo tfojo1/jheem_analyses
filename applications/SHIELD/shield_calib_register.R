@@ -2,7 +2,7 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
 N.ITER=15000
-solver = create.solver.metadata(rtol = 0.001, atol=0.05) #rtol,atol
+solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
 # solver = create.solver.metadata() #default solver
 
 #parameter set for demographic calibration
@@ -44,7 +44,7 @@ register.calibration.info('calib.demog.06.09.pk',
 # took out prenatal care
 # took out contact tracing
 
-register.calibration.info(code = "calib.diagnosis.06.16.w0.5.pk",
+register.calibration.info(code = "calib.diagnosis.06.19.pk",
                           preceding.calibration.codes = "calib.demog.06.09.pk",
                           likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -57,19 +57,7 @@ register.calibration.info(code = "calib.diagnosis.06.16.w0.5.pk",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = solver
 )
-register.calibration.info(code = "calib.diagnosis.06.16.w0.125.pk",
-                          preceding.calibration.codes = "calib.demog.06.09.pk",
-                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          param.names.all,
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
-)
+ 
 # ## TEST for Nick:
 # register.calibration.info('pop.demog.test', 
 #                           likelihood.instructions = likelihood.instructions.demographics,
@@ -153,3 +141,15 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 
 #6.12 <calib.diagnosis.06.12.rf>: 1) fixed values for ps and el screening multi
 # 2) removed max knot values in sti screening functional form
+
+#06.17:  <calib.diag.06.17.pk> using a weight of 1/8
+# calibrating to total ps; total EL diagnosis and hiv tests targets
+# downweighting the likelihood
+# 1) removed relapse =0 #2) removed infectiousness for EL stage =0 #3) removed screening for PS (muliplier set to 0) #4) took out prenatal care #5) took out contact tracing
+##### calib.diag.06.17.pk1# changing the weight to 1/16
+
+#06.19:  <calib.diag.06.19.pk> using a weight of 1/8
+# calibrating to total ps; total EL diagnosis and hiv tests targets
+# downweighting the likelihood
+# 1) removed relapse =0 #2) removed infectiousness for EL stage =0 #3) removed screening for PS (muliplier set to 0) #4) took out prenatal care #5) took out contact tracing
+ 

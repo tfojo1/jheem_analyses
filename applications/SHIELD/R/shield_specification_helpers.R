@@ -1044,6 +1044,7 @@ get.hiv.testing.functional.form = function(specification.metadata){
   hiv.testing.functional.form
 }
 
+engine$extract.quantity.values()
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
 get.prp.prenatal.care.functional.form = function(specification.metadata,trimester){
   # cashed object from input_prenatal_prior_wonder
