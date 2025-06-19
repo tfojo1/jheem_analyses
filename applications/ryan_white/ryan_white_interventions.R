@@ -84,6 +84,10 @@ get_suppresion_effect_arcsin = function(n, rw_survey) {
       qkde(sampled_quantiles[[i]], kde_fit.nonexpansion_marginals[[i]])
   })
   
+  .GlobalEnv$RW.EFFECT.KDEs.EXPANSION = kde_fit.expansion_marginals
+  .GlobalEnv$RW.EFFECT.KDEs.NONEXPANSION = kde_fit.nonexpansion_marginals
+  
+  
   # Transform back using inverse logit
 #  sampled_values = (sin(sampled_arcsin))^2
   sampled_values.expansion = (sin(sampled_arcsin.expansion))^2

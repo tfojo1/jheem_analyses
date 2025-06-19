@@ -265,7 +265,7 @@ table.city = data.frame(
 if (RW.IS.STATE.LEVEL)
     location.names = locations::get.location.name(ordered.cities)
 if (!RW.IS.STATE.LEVEL)
-    RW.CITY.SHORT.NAMES[ordered.cities]
+    location.names = RW.CITY.SHORT.NAMES[ordered.cities]
     
 city.plus.total.names = c(location.names,
                           exp=paste0("Medicaid Expansion ", RW.LOCATION.DESCRIPTOR.PLURAL),
@@ -398,6 +398,11 @@ location.face = rep('plain', length(boxplot.df$location))
 location.colors[total.mask] = RW.TOTAL.LABEL.COLOR
 location.face[total.and.subtotal.mask] = 'bold'
 
+MAX = 1.6
+boxplot.df$upper = pmin(boxplot.df$upper, MAX)
+
+asterisk.df = boxplot.df[!is.na(boxplot.df$upper) & boxplot.df$upper==MAX,]
+
 
 plot = ggplot() + 
   geom_boxplot(data = boxplot.df,
@@ -411,6 +416,12 @@ plot = ggplot() +
                    group = group),
                stat = 'identity',
                position = position_dodge2()) + 
+    geom_text(data = asterisk.df[asterisk.df$Scenario=='3.end',],
+              aes(y=location, x=upper, label='*', group=group, vjust=0.5, hjust=0.5),
+              nudge_y=.25, nudge_x = 0.006) +
+    geom_text(data = asterisk.df[asterisk.df$Scenario!='3.end',],
+              aes(y=location, x=upper, label='*', group=group, vjust=0.5, hjust=0.5),
+              nudge_y=0, nudge_x = 0.006) +
   scale_fill_manual(values = c('3.end'=RW.END.COLOR,
                                '2.p.intr'=RW.P.INTR.COLOR,
                                '1.b.intr'=RW.B.INTR.COLOR),
@@ -419,7 +430,7 @@ plot = ggplot() +
                                '1.b.intr'='Brief Interruption'),
                     name=NULL) +
   theme_bw() +
-  scale_x_continuous(labels = scales::percent, sec.axis = dup_axis()) +
+  scale_x_continuous(labels = scales::percent, sec.axis = dup_axis(name=NULL)) +
   ylab(NULL) +
   xlab("Relative Increase in HIV Infections, 2025-2030") + 
   theme(legend.position = 'bottom',

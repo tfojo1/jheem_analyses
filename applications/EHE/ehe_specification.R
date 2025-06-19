@@ -55,7 +55,9 @@ EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
                                                    msm = 'MSM',
                                                    idu = 'PWID',
                                                    msm_idu = 'MSM/PWID'
-                                               )
+                                               ),
+                                               
+                                               default.solver.metadata = create.solver.metadata()
                                                )
 
 ##----------------------##

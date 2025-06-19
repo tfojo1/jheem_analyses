@@ -1546,7 +1546,8 @@ get.heterosexual.male.single.year.age.counts <- function(location, specification
 }
 
 
-get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
+get.msm.sexual.age.contact.proportions <- function(location,
+                                                   age.mixing.sd.mult,
                                                    single.year.msm.age.counts,
                                                    single.year.age.sexual.availability,
                                                    specification.metadata)
@@ -1559,7 +1560,8 @@ get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
                                              availability = single.year.age.sexual.availability)
 }
 
-get.heterosexual.male.sexual.age.contact.proportions <- function(age.mixing.sd.mult, 
+get.heterosexual.male.sexual.age.contact.proportions <- function(location,
+                                                                 age.mixing.sd.mult, 
                                                                  single.year.heterosexual.male.age.counts,
                                                                  single.year.age.sexual.availability,
                                                                  specification.metadata)
@@ -1572,7 +1574,8 @@ get.heterosexual.male.sexual.age.contact.proportions <- function(age.mixing.sd.m
                                              availability = single.year.age.sexual.availability)
 }
 
-get.female.sexual.age.contact.proportions <- function(age.mixing.sd.mult, 
+get.female.sexual.age.contact.proportions <- function(location,
+                                                      age.mixing.sd.mult, 
                                                       single.year.female.age.counts,
                                                       single.year.age.sexual.availability,
                                                       specification.metadata)
@@ -1585,7 +1588,8 @@ get.female.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
                                              availability = single.year.age.sexual.availability)
 }
 
-get.idu.age.contact.proportions <- function(age.mixing.sd.mult,
+get.idu.age.contact.proportions <- function(location,
+                                            age.mixing.sd.mult,
                                             single.year.age.counts,
                                             single.year.age.idu.availability,
                                             specification.metadata)

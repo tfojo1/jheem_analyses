@@ -9,6 +9,7 @@ PLOT.DEVICE = 'png'
 PLOT.TEXT.SIZE = 8
 
 
+KERNEL.XLIM = c(0,1)
 dim(rw_survey)
 
 states.plus = locations::get.all.for.type('STATE')
@@ -133,7 +134,7 @@ plot = ggplot(df.for.hist, aes(x=q1_adap_loss, fill=medicaid, group=medicaid)) +
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     theme_bw(base_size = PLOT.TEXT.SIZE) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
     ylim(0,Y.LIM) + 
     ylab(NULL); plot
 #    ylab("Number of Respondents"); plot
@@ -149,7 +150,7 @@ plot = ggplot(df.for.hist, aes(x=q2_oahs_loss, fill=medicaid, group=medicaid)) +
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     theme_bw(base_size = PLOT.TEXT.SIZE) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
     ylim(0,Y.LIM) + 
     ylab(NULL); print(plot)
 #    ylab("Number of Respondents"); plot
@@ -166,7 +167,7 @@ plot = ggplot(df.for.hist, aes(x=q3_support_loss, fill=medicaid, group=medicaid)
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     theme_bw(base_size = PLOT.TEXT.SIZE) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
     ylim(0,Y.LIM) + 
     ylab(NULL); print(plot)
 #    ylab("Number of Respondents"); plot
@@ -191,3 +192,133 @@ ggsave(plot = plot,
        height = PLOT.HEIGHT/2, width = PLOT.WIDTH*2, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
+#-- For sampled effects --#
+
+N.BINS.KERNEL = 25
+KERNEL.YLIM = c(0,110)
+
+df.kernel = as.data.frame(
+    rbind(t(RW.effect.values[1:3,]),
+          t(RW.effect.values[4:6,])))
+df.kernel$medicaid = rep(c('exp','nonexp'), each=ncol(RW.effect.values))
+
+colnames(df.kernel) = colnames(df.for.hist)
+
+plot = ggplot(df.kernel, aes(x=q1_adap_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS.KERNEL) +
+    scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
+                      labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
+                      name=NULL) +
+    ylim(KERNEL.YLIM) +
+    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    ylab(NULL); plot
+
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, "sampled_q1_adap.png"),
+       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+
+plot = ggplot(df.kernel, aes(x=q2_oahs_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS.KERNEL) +
+    scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
+                      labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
+                      name=NULL) +
+    ylim(KERNEL.YLIM) +
+    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    ylab(NULL); plot
+
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, "sampled_q2_oahs.png"),
+       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+
+plot = ggplot(df.kernel, aes(x=q3_support_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS.KERNEL) +
+    scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
+                      labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
+                      name=NULL) +
+    ylim(KERNEL.YLIM) +
+    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    ylab(NULL); plot
+
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, "sampled_q3_support.png"),
+       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+#-- For adjusted sampled effects --#
+
+KERNEL.ADJ.YLIM = c(0,420)
+
+df.kernel.adj = as.data.frame(
+    rbind(t(adjusted.RW.effect.values[1:3,]),
+          t(adjusted.RW.effect.values[4:6,])))
+df.kernel.adj$medicaid = rep(c('exp','nonexp'), each=ncol(RW.effect.values))
+
+colnames(df.kernel.adj) = colnames(df.for.hist)
+
+plot = ggplot(df.kernel.adj, aes(x=q1_adap_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS.KERNEL) +
+    scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
+                      labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
+                      name=NULL) +
+    ylim(KERNEL.ADJ.YLIM) +
+    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    ylab(NULL); plot
+
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, "sampled.adj_q1_adap.png"),
+       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+
+plot = ggplot(df.kernel.adj, aes(x=q2_oahs_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS.KERNEL) +
+    scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
+                      labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
+                      name=NULL) +
+    ylim(KERNEL.ADJ.YLIM) +
+    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    ylab(NULL); plot
+
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, "sampled.adj_q2_oahs.png"),
+       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+
+plot = ggplot(df.kernel.adj, aes(x=q3_support_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS.KERNEL) +
+    scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
+                      labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
+                      name=NULL) +
+    ylim(KERNEL.ADJ.YLIM) +
+    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    ylab(NULL); plot
+
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, "sampled.adj_q3_support.png"),
+       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+
+
+#-- Table legends --#
+
+dfs = list(survey=df.for.hist, samples=df.kernel, cons_samples=df.kernel.adj)
+questions = colnames(df.for.hist)[1:3]
+
+summaries = sapply(questions, function(q){
+        sapply(dfs, function(df){
+            sapply(c('exp','nonexp'), function(medicaid){
+            
+            values = df[[q]][ df[['medicaid']]==medicaid ]
+            values = values[!is.na(values)]
+            
+            paste0(round(100*mean(values)), '% [',
+                   round(100*quantile(values, probs=.25)), ' - ',
+                   round(100*quantile(values, probs=.75)), "%], n=",
+                   length(values))
+            
+        })
+    })
+})
+
+rownames(summaries) = paste0(rep(names(dfs), each=2), ", ", rep(c('expansion','nonexp'), 3))
+write.csv(summaries, file=file.path(PLOT.DIR, 'summary_stats.csv'))
