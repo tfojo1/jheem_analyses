@@ -199,6 +199,125 @@ Run the script using Rscript:
 Rscript applications/SHIELD/shield_calib_setup_and_run.R
 ```
 
+## Managing Long-Running `Rscript` Jobs from the Terminal
+
+When you run computationally intensive R scripts (like MCMC calibrations) using `Rscript` from the terminal, especially if you might disconnect from the server, here are some best practices and tools:
+
+### 1. Preventing Jobs from Terminating on Disconnect & Capturing Output
+
+If you simply run `Rscript my_model.R` and then your SSH connection (e.g., through VS Code or a terminal) drops or you close the window, the R script will typically be terminated. To prevent this and capture output:
+
+#### Method A: Using `nohup` and Output Redirection (Simple & Effective)
+
+`nohup` (no hangup) allows a command to keep running even after you log out. It also redirects standard output and standard error.
+
+**To run a script and save output to a file:**
+```bash
+nohup Rscript applications/SHIELD/shield_calib_setup_and_run.R > shield_run_output.txt 2>&1 &
+```
+
+- `nohup`: Runs the command immune to hangups.
+- `Rscript ...`: Your R script command.
+- `>`: Redirects standard output (what normally prints to the terminal).
+- `shield_run_output.txt`: The file where standard output will be saved. Choose a descriptive name.
+- `2>&1`: Redirects standard error (error messages) to the same place as standard output. This is important for capturing R errors.
+- `&`: Runs the command in the background, so you get your terminal prompt back immediately. The script will continue running on the server.
+
+**Checking Output:**
+- The output will be saved to `shield_run_output.txt` (or whatever you named it).
+- If you didn't specify redirection with `>`, `nohup` typically creates a file named `nohup.out` in your current directory (or home directory if the current isn't writable) and appends output there.
+- You can view the output file live (if it's being updated) using:
+  ```bash
+  tail -f shield_run_output.txt
+  ```
+  (Press `Ctrl+C` to stop `tail -f`).
+
+#### Method B: Using Terminal Multiplexers (`screen` or `tmux`) (More Advanced, Very Powerful)
+
+`screen` and `tmux` are terminal multiplexers that allow you to create persistent terminal sessions. You can start a job within a `screen` or `tmux` session, detach from it (leaving the job running on the server), log out, and then log back in later and reattach to the same session to see the live terminal and its history.
+
+**Basic `screen` Usage:**
+1. Start a new screen session: `screen -S my_r_job`
+2. You'll get a new terminal prompt inside the screen session. Run your R script normally:
+   ```bash
+   Rscript applications/SHIELD/shield_calib_setup_and_run.R
+   ```
+   (You can still redirect output to a file here if you want a permanent log: `Rscript ... > output.txt 2>&1`)
+3. **Detach from the screen session:** Press `Ctrl+A` then `d`. You'll be back in your original terminal, but `my_r_job` and the R script are still running inside the detached screen.
+4. You can now log out of the server.
+5. **Reattach later:** Log back into the server, then type: `screen -r my_r_job`
+   (Or `screen -ls` to list sessions, then `screen -r <session_id_or_name>`).
+
+`tmux` is similar but with different keybindings and features. Learning `screen` or `tmux` is highly recommended for managing long-running server tasks.
+
+### 2. Finding and Monitoring Ongoing R Jobs
+
+#### Method A: Using `ps` (Standard Linux Command)
+
+To see your R processes:
+```bash
+ps -fu YOUR_USERNAME | grep '[R]script' 
+# Or more generally for any R process:
+# ps -fu YOUR_USERNAME | grep '[R]'
+```
+
+Replace `YOUR_USERNAME` with your actual username (e.g., `ps -fu nsizemo1 | grep '[R]script'`).
+
+The `[R]` in `grep '[R]'` is a trick to prevent grep from finding its own process line.
+
+This will show you the Process ID (PID) and the command.
+
+#### Method B: Using JHEEM's get.calibration.progress Function
+
+If the R script is a JHEEM calibration that uses the project's caching mechanism, the `get.calibration.progress` R function can provide model-specific progress.
+
+**How to use it:**
+You would typically run this in a separate R session (e.g., in RStudio Server, or another terminal logged into the server running R).
+
+```r
+# Inside an R session:
+# Ensure necessary JHEEM setup/source files are loaded for this function to be available
+# and for it to know where to look for calibration cache files.
+
+# Example:
+# source("path/to/your/main_jheem_setup.R") # If needed
+
+get.calibration.progress(version = "shield", 
+                         locations = "C.12580", # Or a vector of locations
+                         calibration.code = "name_of_your_calibration") 
+                         # root.dir might need to be specified if not default
+```
+
+This function likely reads from the cache files being written by the ongoing MCMC run. The exact arguments (version, locations, calibration.code, root.dir) must match what the running calibration is using.
+
+### 3. Checking Status of a Specific Calibration and Killing a Job
+
+#### Checking Status:
+- Use `ps` as described above to see if the Rscript process is still running.
+- Use the `get.calibration.progress` R function as described above.
+- Check the output file you created (e.g., `tail shield_run_output.txt`) or the `nohup.out` file.
+
+#### Killing a Job (Terminating an R Process):
+
+If you need to stop an R script that's running (e.g., if it's stuck or you started it with incorrect parameters):
+
+1. **Find its Process ID (PID):**
+   Use `ps -fu YOUR_USERNAME | grep '[R]script'` to find the PID of the specific `Rscript ...` command you want to kill.
+
+2. **Send a Terminate Signal (Graceful Shutdown):**
+   ```bash
+   kill PID_OF_RSCRIPT
+   ```
+   (Replace `PID_OF_RSCRIPT` with the actual number). This asks the process to shut down cleanly.
+
+3. **If it doesn't stop after a short while, Send a Kill Signal (Forceful Shutdown):**
+   Use with caution, as this stops the process immediately without cleanup.
+   ```bash
+   kill -9 PID_OF_RSCRIPT
+   ```
+
+If the job was started in `screen` or `tmux`, you would typically reattach to that session and stop the R script from within its terminal using `Ctrl+C`.
+
 ### Using RStudio Server
 
 1. Access RStudio Server for the specific server (e.g., `http://pearl1.jhsph.edu:8787`) and log in.
