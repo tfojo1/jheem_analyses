@@ -185,7 +185,7 @@ register.fixed.model.strata(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'fertility.rate',
                        get.functional.form.function = get.fertility.rate.functional.form,
-                       functional.form.from.time = DEFAULT.FERTILITY.START.YEARS,  
+                       functional.form.from.time = DEFAULT.FERTILITY.START.YEARS,   #2005: the projections remain fix at this year's value for years before. 
                        scale = 'rate')
 
 ##---- Birth Proportions ----
@@ -281,7 +281,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.general.aging',
                        scale = 'rate',
                        get.functional.form.function = get.empiric.aging.rates,
-                       functional.form.from.time = DEFAULT.AGING.START.YEAR)
+                       functional.form.from.time = DEFAULT.AGING.START.YEAR)  #2005: the projections remain fix at this year's value for years before. 
 
 register.aging(SHIELD.SPECIFICATION,
                groups = c('uninfected','infected'),
@@ -296,7 +296,7 @@ register.aging(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.immigration',
                        get.functional.form.function = get.immigration.rates.functional.form,
-                       functional.form.from.time = DEFAULT.MIGRATION.START.YEAR,
+                       functional.form.from.time = DEFAULT.MIGRATION.START.YEAR,  #2005: the projections remain fix at this year's value for years before. 
                        scale = 'rate')
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'null.proportions', 
@@ -323,7 +323,7 @@ register.natality(specification = SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.emigration',
                        get.functional.form.function = get.emigration.rates.functional.form,
-                       functional.form.from.time = DEFAULT.MIGRATION.START.YEAR,
+                       functional.form.from.time = DEFAULT.MIGRATION.START.YEAR, #2005: the projections remain fix at this year's value for years before. 
                        scale = 'rate')
 # We use the mortality mechanism to model emigrations, but shouldnt count them in deaths
 register.mortality(SHIELD.SPECIFICATION,
@@ -390,26 +390,33 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming th
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.msm',
                        functional.form = create.natural.spline.functional.form(knot.times = c(time0=1990, time1=1995, time2=2000,time3=2010,time4=2020),
+                                                                               # knot.times =c("1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020)
                                                                                #if we wanted to use a natural spline without log transformation:
                                                                                # knot.values = list(time0=1,time1=1,time2=1) , knots.are.on.transformed.scale = F, #on the identity scale
                                                                                #use a log(y) transformation, so that all returned values are positive
                                                                                # this will also help with data that is skewed to right (long right tail)
                                                                                knot.values = list(time0=0,time1=0,time2=0,time3=0,time4=0) ,
+                                                                               # knot.values =c("1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0)
+                                                                               #
                                                                                knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                                #
                                                                                min=0, #even after using log for knots, value can be negative so we need to truncate
-                                                                               knot.link = 'log',link='identity'), #knots on the log-scale and values on the identity scale
-                       functional.form.from.time = 1980, #the projections remain fix at this year's value for years before.  
+                                                                               knot.link = 'log',
+                                                                               link='identity'), #knots on the log-scale and values on the identity scale
+                       functional.form.from.time = DEFAULT.TRANSMISSION.START.YEAR, #1980: the projections remain fix at this year's value for years before.  
                        scale='rate') #spline with 2010/2020
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.heterosexual',
                        functional.form = create.linear.spline.functional.form(knot.times = c(time0=1990, time1=1995, time2=2000,time3=2010,time4=2020),
+                                                                              # knot.times =c("1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020)
                                                                               knot.values = list(time0=0,time1=0,time2=0,time3=0,time4=0) ,
+                                                                              # knot.values =c("1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0)
                                                                               knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                               min=0,
-                                                                              knot.link = 'log',link='identity') ,
-                       functional.form.from.time = 1980,  
+                                                                              knot.link = 'log',
+                                                                              link='identity') ,
+                       functional.form.from.time = DEFAULT.TRANSMISSION.START.YEAR, #1980: the projections remain fix at this year's value for years before.  ,  
                        scale='rate')
 
 ##---- Sexual Contact: By AGE ----
@@ -903,7 +910,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'rate',
                        get.functional.form.function = get.hiv.testing.functional.form,
                        functional.form.scale = 'proportion', #the functional form takes a proportion and produces a rate (from BRFSS: have u had a hiv test in the last year?)
-                       functional.form.from.time = 2010)
+                       functional.form.from.time = DEFAULT.HIV.TESTING.START.YEAR) #2010: the projections remain fix at this year's value for years before. 
 register.model.quantity(SHIELD.SPECIFICATION, 
                         name = 'rate.testing.hiv',
                         scale = 'rate',
@@ -914,7 +921,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'multiplier.syphilis.screening.to.hiv.tests',
                        scale = 'ratio',
                        get.functional.form.function = get.syphilis.to.hiv.testing.functional.form, #starts in 1980 and has 5 knots
-                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR) 
+                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR) #1980  #the projections remain fix at this year's value for years before. 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sti.screening',
                         scale = 'rate',
@@ -1170,19 +1177,19 @@ register.model.element(SHIELD.SPECIFICATION,
                        name='prp.prenatal.care.first.trimester',
                        scale='proportion', 
                        get.functional.form.function = get.prp.prenatal.care.functional.form.first.trimester,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR)
+                       functional.form.from.time = DEFAULT.PRENATAL.CARE.START.YEAR) #1980: the projections remain fix at this year's value for years before. 
 #
 register.model.element(SHIELD.SPECIFICATION,
                        name='prp.prenatal.care.second.trimester.of.those.not.screened.first',
                        scale='proportion',
                        get.functional.form.function = get.prp.prenatal.care.functional.form.second.trimester.of.those.not.screened.first,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR)
+                       functional.form.from.time = DEFAULT.PRENATAL.CARE.START.YEAR) #1980: the projections remain fix at this year's value for years before. 
 #
 register.model.element(SHIELD.SPECIFICATION,
                        name='prp.prenatal.care.third.trimester.of.those.not.screened.first.second',
                        scale='proportion',
                        get.functional.form.function = get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.first.second,
-                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR)
+                       functional.form.from.time = DEFAULT.PRENATAL.CARE.START.YEAR) #1980: the projections remain fix at this year's value for years before. 
 #
 register.model.quantity(SHIELD.SPECIFICATION,
                         name='prp.prenatal.care.second.trimester',

@@ -115,7 +115,12 @@ DEFAULT.FERTILITY.RATE.YEARS=c(2007:2023)
 FERTILE.AGES=c('15-19 years','20-24 years','25-29 years','30-34 years','35-39 years','40-44 years')
 NON.FERTILE.AGES=c('0-14 years','45-49 years', '50-54 years', '55-64 years', '65+ years')
 #
-DEFAULT.STI.SCREENING.START.YEAR=1980 # year to start the STI screenings
+#the projections remain fix at this year's value for years before. 
+DEFAULT.STI.SCREENING.START.YEAR= 1980 # year to start the STI screenings
+DEFAULT.PRENATAL.CARE.START.YEAR=1980
+DEFAULT.TRANSMISSION.START.YEAR= 1980
+DEFAULT.HIV.TESTING.START.YEAR= 2010
+
 #
 cat("Global variables are defined \n")
 cat("*** Shield_source_code.R completed! ***\n")

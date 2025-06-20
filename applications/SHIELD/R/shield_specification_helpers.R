@@ -1040,6 +1040,7 @@ get.hiv.testing.functional.form = function(specification.metadata){
                                                                        slope = testing.prior$slopes,
                                                                        anchor.year = 2010,
                                                                        max = 0.9,
+                                                                       #min??
                                                                        parameters.are.on.logit.scale = T)
   hiv.testing.functional.form
 }
