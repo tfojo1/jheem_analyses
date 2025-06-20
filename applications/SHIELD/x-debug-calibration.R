@@ -2,25 +2,43 @@
 engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 
 params.manual <- params.last
+sim.manual0 <- engine$run(params.manual)
+
+
 # params.manual["global.transmission.rate"] <- 3.7870952 * 1
 # params.manual["hiv.testing.or"] <- params.manual["hiv.testing.or    "] *1.8
-params.manual["syphilis.screening.multiplier.1990"] <- params.manual["syphilis.screening.multiplier.1990"] *1.8
-params.manual["syphilis.screening.multiplier.2000"] <- params.manual["syphilis.screening.multiplier.2000"] *1.8
-params.manual["syphilis.screening.multiplier.2010"] <- params.manual["syphilis.screening.multiplier.2010"] *1.8
-params.manual["syphilis.screening.multiplier.2020"] <- params.manual["syphilis.screening.multiplier.2020"] *1.5
+# params.manual["syphilis.screening.multiplier.1990"] <- params.manual["syphilis.screening.multiplier.1990"] *1.8
+# params.manual["syphilis.screening.multiplier.2000"] <- params.manual["syphilis.screening.multiplier.2000"] *1.8
+# params.manual["syphilis.screening.multiplier.2010"] <- params.manual["syphilis.screening.multiplier.2010"] *1.8
+# params.manual["syphilis.screening.multiplier.2020"] <- params.manual["syphilis.screening.multiplier.2020"] *1.5
+sim.manual1 <- engine$run(params.manual)
 
 
-sim.manual <- engine$run(params.manual)
-# sim.manual0<-sim.manual
 simplot(
     # sim.first,
     # sim.last,
-    # sim.manual0,
+    sim.manual0,
+    sim.manual1,
+    # outcomes = c("diagnosis.total"),
+    outcomes = c("incidence",
+                 "diagnosis.total1",  "diagnosis.ps1","diagnosis.el.misclassified1",
+                 # "diagnosis.el.true","diagnosis.ll.true",
+                 "diagnosis.delayed.treatment","diagnosis.immediate.treatment",
+                 "diagnosis.congenital","hiv.testing"),
+    # dimension.values = list(year = 1970:2030),
+    style.manager = source.style.manager
+)
+
+simplot(
+    # sim.first,
+    # sim.last,
+    sim.manual0,
     sim.manual,
     # outcomes = c("diagnosis.total"),
     outcomes = c("incidence",
                  "diagnosis.total",  "diagnosis.total1",
                  "diagnosis.ps", "diagnosis.ps1",
+                 "diagnosis.el.misclassified","diagnosis.el.misclassified1",
                  # "diagnosis.el.misclassified","diagnosis.ll.misclassified",
                  # "diagnosis.el.true","diagnosis.ll.true",
                  "diagnosis.congenital","hiv.testing"),
@@ -29,7 +47,8 @@ simplot(
 )
 
 cbind(sim.manual$diagnosis.total,sim.manual$diagnosis.total1) #they are close but not the same
- 
+hist(unlist(sim.manual$diagnosis.total-sim.manual$diagnosis.total1))
+
 simplot(
     # sim.first,
     sim.last,
@@ -43,8 +62,8 @@ simplot(
 q=engine$extract.quantity.values() #returns the input values to the model
 
 q$sti.screening.by.stage
-stiscreening=q$rate.sti.screening
-dim(stiscreening)
+q$rate.sti.screening
+
 q$prop.index.cases.reached.for.contact.tracing #contact tracing
 q$prp.received.prenatal.care #prenatal care
 q$el.rel.secondary.transmissibility #EL infectiousness

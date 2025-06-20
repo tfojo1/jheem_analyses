@@ -148,28 +148,33 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
 # RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
                                       # 0.25,0,0,
-                                      0,0,0, #'@PK: Turning off vertical transmission for calibration'
+                                      0,0,0, #'@PK: temporary change for calibration
                                       citation = "syphilis_natural_history.docx")
 # Late Latent to Tertiary:
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
-                                      0.01049095 ,0,0, #0.00946867 ,0.01151324,  
+                                      # 0.01049095 ,0,0, #0.00946867 ,0.01151324,  
+                                      0,0,0,, #'@PK: temporary change for calibration
                                       citation = "untreated_syphilis_progression_rates.R")
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
-                                      0.010286933, 0,0, #0.008440789, 0.012133077,
+                                      # 0.010286933, 0,0, #0.008440789, 0.012133077,
+                                      0,0,0,, #'@PK: temporary change for calibration
                                       citation = "untreated_syphilis_progression_rates.R")
 
 # Early stages to CNS: #used for primary, secondary and EL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.early.stage.to.cns',
-                                      0.085 ,0,0,# 0.05, 0.12,
+                                      # 0.085 ,0,0,# 0.05, 0.12,
+                                      0,0,0,, #'@PK: temporary change for calibration
                                       citation = "syphilis_natural_history.docx")
 
 # Late Latent to CNS (by sex):
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.male',
-                                      0.004465265,0,0,
+                                      # 0.004465265,0,0,
+                                      0,0,0,, #'@PK: temporary change for calibration
                                       citation = "untreated_syphilis_progression_rates.R")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.female',
-                                      0.002227628,0,0,
+                                      # 0.002227628,0,0,
+                                      0,0,0,, #'@PK: temporary change for calibration
                                       citation = "untreated_syphilis_progression_rates.R")
 
 ## ---- SYMPTOMATIC INFECTIONS ----                        
