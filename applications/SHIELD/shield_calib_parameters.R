@@ -166,17 +166,19 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
-    # STI screening multiplier (relative to HIV screening)
+    # STI screening knots multiplier (relative to HIV screening)
     syphilis.screening.multiplier.1980 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     syphilis.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     syphilis.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     syphilis.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2))
+    syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     
-    # sti.screening.multiplier.ps
-    # for syphilis screening: Multiplicative coefficients for the screening rates #temp removed to fix values
-    #rate.screening.ps.multiplier = Logitnormal.Distribution( meanlogit = 0, sdlogit = log(4)/2 ), #get.intervals(rate.screening.ps.multiplier) #most values between 0.25-0.75
-    #rate.screening.el.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+    # STI screening multiplier by stage (defined in specification-no linking needed here)
+    sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #get.intervals(rate.screening.ps.multiplier) #most values between 0.25-0.75
+    sti.screening.multiplier.el = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
     )
 
 
@@ -590,12 +592,17 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
         "prp.symptomatic.secondary.heterosexual_male",
         "prp.symptomatic.secondary.female"
     ),
-    screening = c(
+    hiv.testing = c(
         "hiv.testing.or",
         "hiv.testing.slope.or"
-        #"rate.screening.ps.multiplier", temp removed to fix values
-        #"rate.screening.el.multiplier"
-    ),
+       ),
+    sti.screening.1=c(
+      "sti.screening.multiplier.ps",
+      "sti.screening.multiplier.el",
+      "sti.screening.multiplier.ll",
+      "sti.screening.multiplier.tertiary",
+      "sti.screening.multiplier.cns"
+      ),    
     screening.2 = c(
       "syphilis.screening.multiplier.1980",
         "syphilis.screening.multiplier.1990",

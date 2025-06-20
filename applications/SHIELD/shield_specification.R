@@ -934,27 +934,48 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sti.screening.by.stage',
                         scale = 'ratio',
                         value = 1)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'sti.screening.multiplier.ps',
+                       scale = 'ratio',
+                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.ps'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'sti.screening.multiplier.el',
+                       scale = 'ratio',
+                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.el'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'sti.screening.multiplier.ll',
+                       scale = 'ratio',
+                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.ll'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'sti.screening.multiplier.tertiary',
+                       scale = 'ratio',
+                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.tertiary'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'sti.screening.multiplier.cns',
+                       scale = 'ratio',
+                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.cns'])
 
+                       
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sti.screening.by.stage',
                                applies.to = list(stage = c("primary", "secondary")),
-                               value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.ps'])
+                               value = 'sti.screening.multiplier.ps')
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sti.screening.by.stage',
                                applies.to = list(stage = c("early.latent")),
-                               value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.el'])
+                               value = 'sti.screening.multiplier.el')
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sti.screening.by.stage',
                                applies.to = list(stage = c("late.latent")),
-                               value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.ll'])
+                               value = 'sti.screening.multiplier.ll')
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sti.screening.by.stage',
                                applies.to = list(stage = c("tertiary")),
-                               value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.tertiary'])
+                               value = 'sti.screening.multiplier.tertiary')
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sti.screening.by.stage',
                                applies.to = list(stage = c("cns")),
-                               value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.cns'])
+                               value = 'sti.screening.multiplier.cns')
 
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
@@ -1407,20 +1428,34 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       include.tags = "emigration",
                       keep.dimensions = c('location','age','race','sex')
 )
+
+##---- PREVALENCE ----
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name='prevalence',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Infected Population',
+                                                                    description = 'Infected Population size',
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Persons',
+                                                                    units = 'persons',
+                                                                    singular.unit = 'person'), #will read the scale from metadata
+                         value.to.integrate = 'infected',
+                         # corresponding.data.outcome = 'population' ,
+                         keep.dimensions = c('location','age','race','sex','stage','continuum')
+)
 ##---- STI screening -----
-# track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
-#                                       name = 'sti.testing',
-#                                       outcome.metadata = create.outcome.metadata(display.name = 'Proportion with STI screening in the Past Year',
-#                                                                                  description = "The Proportion of General Population who Received STI screening in the Past Year",
-#                                                                                  scale = 'proportion',
-#                                                                                  axis.name = 'Proportion Tested',
-#                                                                                  units = '%'),
-#                                       rate.value = 'rate.sti.screening',
-#                                       denominator.outcome =  'population.over.18',
-#                                       keep.dimensions = c('location','age','race','sex'), 
-#                                       # force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify  
-#                                       corresponding.data.outcome = 'proportion.tested.for.hiv'
-# )
+track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
+                                      name = 'sti.testing',
+                                      outcome.metadata = create.outcome.metadata(display.name = 'Proportion with STI screening in the Past Year',
+                                                                                 description = "The Proportion of General Population who Received STI screening in the Past Year",
+                                                                                 scale = 'proportion',
+                                                                                 axis.name = 'Proportion Tested',
+                                                                                 units = '%'),
+                                      rate.value = 'rate.sti.screening',
+                                      denominator.outcome =  'prevalence',
+                                      keep.dimensions = c('location','age','race','sex','stage'),
+                                      # force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify
+                                      corresponding.data.outcome = 'proportion.tested.for.hiv'
+)
                                       
 ##---- HIV Testing -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,

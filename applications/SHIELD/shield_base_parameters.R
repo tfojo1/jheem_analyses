@@ -48,7 +48,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.seconda
                                       1,1,1)  #assumption
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
                                       # .25,0,0,
-                                      0,0,0) #'@PK: Turning off infectiousness for calibration
+                                      0,0,0) #'@PK:  temporary change for calibration
 
 ## ---- MIXING BY SEXUAL ORIENTATION ---- ## ----
 #observed to estimated ratio of contacts for females with male who are msm
@@ -91,16 +91,16 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
 # Bolean variable to control prenatal care as a switch
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
                                       # 1,1,1
-                                      0,0,0 #'@PK: Turning off vertical transmission for calibration'
+                                      0,0,0 #'@PK:  temporary change for calibration
                                       ) 
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
                                       # 0.5,0.3,0.6,
-                                      0,0,0, #'@PK: Turning off vertical transmission for calibration'
+                                      0,0,0, #'@PK:  temporary change for calibration
                                       citation = "syphilis_natural_history.docx") 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
                                       # 0.1,0.05,0.15,
-                                      0,0,0, #'@PK: Turning off vertical transmission for calibration'
+                                      0,0,0, #'@PK:  temporary change for calibration
                                       citation = "syphilis_natural_history.docx") 
 
 ## ---- Risk Ratios Based on Prenatal Cares timing  ----
@@ -152,29 +152,29 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.
                                       citation = "syphilis_natural_history.docx")
 # Late Latent to Tertiary:
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
-                                      # 0.01049095 ,0,0, #0.00946867 ,0.01151324,  
-                                      0,0,0,, #'@PK: temporary change for calibration
+                                      0.01049095 ,0,0, #0.00946867 ,0.01151324,  
+                                      
                                       citation = "untreated_syphilis_progression_rates.R")
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.female',
-                                      # 0.010286933, 0,0, #0.008440789, 0.012133077,
-                                      0,0,0,, #'@PK: temporary change for calibration
+                                      0.010286933, 0,0, #0.008440789, 0.012133077,
+                                      # 0,0,0,, #'@PK: temporary change for calibration
                                       citation = "untreated_syphilis_progression_rates.R")
 
 # Early stages to CNS: #used for primary, secondary and EL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.early.stage.to.cns',
-                                      # 0.085 ,0,0,# 0.05, 0.12,
-                                      0,0,0,, #'@PK: temporary change for calibration
+                                      0.085 ,0,0,# 0.05, 0.12,
+                                      # 0,0,0,, #'@PK: temporary change for calibration
                                       citation = "syphilis_natural_history.docx")
 
 # Late Latent to CNS (by sex):
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.male',
-                                      # 0.004465265,0,0,
-                                      0,0,0,, #'@PK: temporary change for calibration
+                                      0.004465265,0,0,
+                                      # 0,0,0,, #'@PK: temporary change for calibration
                                       citation = "untreated_syphilis_progression_rates.R")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.cns.female',
-                                      # 0.002227628,0,0,
-                                      0,0,0,, #'@PK: temporary change for calibration
+                                      0.002227628,0,0,
+                                      # 0,0,0,, #'@PK: temporary change for calibration
                                       citation = "untreated_syphilis_progression_rates.R")
 
 ## ---- SYMPTOMATIC INFECTIONS ----                        
@@ -208,7 +208,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests
 
 # *** STI SCREENING ---- ##-----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ps',
-                                      0, 0,0 #'@PK: Turning off for calibration
+                                      0, 0,0 #'@PK:  temporary change for calibration
                                       )
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.el',
                                       1,1,1  
@@ -227,7 +227,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.mult
 # *** CONTACT TRACING ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
                                       # 0.8,0,0,   #0.3, 0.98,
-                                      0,0,0, #'@PK: Turning off vertical transmission for calibration'
+                                      0,0,0, #'@PK:  temporary change for calibration
                                       citation = "syphilis_natural_history.docx")
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
