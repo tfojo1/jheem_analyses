@@ -209,7 +209,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   fertile.ages=model.settings$specification.metadata$dim.names$age[2:7]
   fertile.age.ranges= c("15.19","20.24","25.29","30.34","35.39","40.44") 
   #buckets of aging from:
-  q=specification.metadata$age.upper.bounds
+  q=model.settings$specification.metadata$age.upper.bounds
   aging.from=q[1: (length(q)-1)]-1
   
   ## Aging Rates ----

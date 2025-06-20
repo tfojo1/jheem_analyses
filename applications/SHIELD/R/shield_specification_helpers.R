@@ -710,7 +710,8 @@ functions.sexual.contact.model<-function(){}
 #' @param specification.metadata specification.metadata
 #' @return OUTPUT_DESCRIPTION
 #' @references \file{inst/docs/sexual_contacts.docx}
-get.female.sexual.age.contact.proportions <- function(age.mixing.sd.mult, #multiplier of contact matrix sd
+get.female.sexual.age.contact.proportions <- function(location,
+                                                      age.mixing.sd.mult, #multiplier of contact matrix sd
                                                       single.year.female.age.counts,#N
                                                       single.year.age.sexual.availability,#what proportions sexually active
                                                       specification.metadata)
@@ -727,7 +728,8 @@ get.female.sexual.age.contact.proportions <- function(age.mixing.sd.mult, #multi
 #' @description returns a list of age contact proportions for msm
 #' @inheritParams get.female.sexual.age.contact.proportions
 #' @inherit get.female.sexual.age.contact.proportions return
-get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
+get.msm.sexual.age.contact.proportions <- function(location,
+                                                   age.mixing.sd.mult,
                                                    single.year.msm.age.counts,
                                                    single.year.age.sexual.availability,
                                                    specification.metadata)
@@ -744,7 +746,8 @@ get.msm.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
 #' @description returns a list of age contact proportions for het male
 #' @inheritParams get.female.sexual.age.contact.proportions
 #' @inherit get.female.sexual.age.contact.proportions return
-get.heterosexual_male.sexual.age.contact.proportions <- function(age.mixing.sd.mult,
+get.heterosexual_male.sexual.age.contact.proportions <- function(location,
+                                                                 age.mixing.sd.mult,
                                                                  single.year.heterosexual_male.age.counts,
                                                                  single.year.age.sexual.availability,
                                                                  specification.metadata)
@@ -1045,7 +1048,6 @@ get.hiv.testing.functional.form = function(specification.metadata){
   hiv.testing.functional.form
 }
 
-engine$extract.quantity.values()
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
 get.prp.prenatal.care.functional.form = function(specification.metadata,trimester){
   # cashed object from input_prenatal_prior_wonder
