@@ -1401,19 +1401,19 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       keep.dimensions = c('location','age','race','sex')
 )
 ##---- STI screening -----
-track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
-                                      name = 'sti.testing',
-                                      outcome.metadata = create.outcome.metadata(display.name = 'Proportion with STI screening in the Past Year',
-                                                                                 description = "The Proportion of General Population who Received STI screening in the Past Year",
-                                                                                 scale = 'proportion',
-                                                                                 axis.name = 'Proportion Tested',
-                                                                                 units = '%'),
-                                      rate.value = 'rate.sti.screening',
-                                      denominator.outcome =  'population',
-                                      keep.dimensions = c('location','age','race','sex'), 
-                                      force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify  
-                                      corresponding.data.outcome = 'proportion.tested.for.hiv'
-)
+# track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
+#                                       name = 'sti.testing',
+#                                       outcome.metadata = create.outcome.metadata(display.name = 'Proportion with STI screening in the Past Year',
+#                                                                                  description = "The Proportion of General Population who Received STI screening in the Past Year",
+#                                                                                  scale = 'proportion',
+#                                                                                  axis.name = 'Proportion Tested',
+#                                                                                  units = '%'),
+#                                       rate.value = 'rate.sti.screening',
+#                                       denominator.outcome =  'population.over.18',
+#                                       keep.dimensions = c('location','age','race','sex'), 
+#                                       # force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify  
+#                                       corresponding.data.outcome = 'proportion.tested.for.hiv'
+# )
                                       
 ##---- HIV Testing -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,

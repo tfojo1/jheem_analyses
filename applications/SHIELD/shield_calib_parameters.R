@@ -162,14 +162,16 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     prp.symptomatic.secondary.heterosexual_male = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est']), sdlogit = log(2)/2 ) ,
     prp.symptomatic.secondary.female= Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est']), sdlogit = log(2)/2 ) ,
     
-    # for HIV  screening
+    # for HIV screening
     hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
+    # STI screening multiplier (relative to HIV screening)
+    syphilis.screening.multiplier.1980 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     syphilis.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     syphilis.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     syphilis.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2))#,
+    syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2))
     
     # sti.screening.multiplier.ps
     # for syphilis screening: Multiplicative coefficients for the screening rates #temp removed to fix values
@@ -342,10 +344,9 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   
   
   
-  ## Testing ----
-  
- 
-  set.element.functional.form.main.effect.alphas(model.settings,
+  ## STI SCREENING  ----
+  # Changing the intercept and slope for HIV tests
+    set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "rate.testing.hiv.without.covid.over.14",
                                                  alpha.name = "intercept",
                                                  values = parameters["hiv.testing.or"],
@@ -358,30 +359,15 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
   
-  set.element.functional.form.main.effect.alphas(model.settings,
+  # Changing the knot values for retio of STI screening to HIV tests
+  for(time in c("1980","1990","2000","2010","2020")){
+    set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                 alpha.name = "1990",
-                                                 values = parameters["syphilis.screening.multiplier.1990"],
+                                                 alpha.name = time,
+                                                 values = parameters[paste0("syphilis.screening.multiplier.",time)],
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                 alpha.name = "2000",
-                                                 values = parameters["syphilis.screening.multiplier.2000"],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                 alpha.name = "2010",
-                                                 values = parameters["syphilis.screening.multiplier.2010"],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                 alpha.name = "2020",
-                                                 values = parameters["syphilis.screening.multiplier.2020"],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
+  }
   
  
 }
@@ -611,6 +597,7 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
         #"rate.screening.el.multiplier"
     ),
     screening.2 = c(
+      "syphilis.screening.multiplier.1980",
         "syphilis.screening.multiplier.1990",
         "syphilis.screening.multiplier.2000",
         "syphilis.screening.multiplier.2010",
