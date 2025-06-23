@@ -124,8 +124,8 @@ load(file.path(get.jheem.root.directory(),"results","ehe_disparities","results.R
 dim(results)
 
 #for some simulations and locations, the model is estimating zeros for all outcomes
-results["black",869,,"C.35380","noint"]
-results["black",869,,"C.35380","fullint"]
+results["black",80,,"C.12060","fullint"]
+results["black",944,,"C.12060","fullint"]
 
 #################################
 
@@ -167,9 +167,13 @@ ir_total <- apply(results[ , , "incidence", , ], c("sim", "location", "intervent
 
 
 ###NaNs come from model estimates of 0
-ir_black[,"C.35380","fullint"]
-results["black",,"population","C.35380","fullint"]
+ir_black[,"C.12060","fullint"]
+results["black",,"incidence","C.12060","fullint"]
+results["black",,"population","C.12060","fullint"]
 
+ir_black[,"C.47900","fullint"]
+results["black",,"incidence","C.47900","fullint"]
+results["black",,"population","C.47900","fullint"]
 
 
 #Take the median, 2.5th and 97.5th percentile of the IRs across simulations
