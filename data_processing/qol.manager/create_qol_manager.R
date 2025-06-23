@@ -198,20 +198,18 @@ qol_manager$register.source(
 
 cat("✅ Registered sources\n")
 
-# Register ontology (designed for sparse 6D structure)
+# Register simplified ontology (matches actual data structure)
 qol_ontology <- ontology(
     year = NULL,     # Incomplete - years vary by data availability
     location = NULL, # Incomplete - locations vary by data availability
     age = c('13+ years', '13-24 years', '25-34 years', '35-44 years', '45-54 years', '55+ years'),
-    race = c('all races', 'white'),
-    sex = c('all'),
-    risk = c('all transmission')
+    race = c('all races', 'white')
 )
 
 incomplete.dimensions(qol_ontology) <- c('year', 'location')
 qol_manager$register.ontology(name = 'qol.ontology', ont = qol_ontology)
 
-cat("✅ Registered ontology with sparse 6D support\n")
+cat("✅ Registered simplified ontology\n")
 
 # =============================================================================
 # PROCESS AND LOAD DATA
@@ -272,12 +270,10 @@ processed_qol_data <- all_qol_data %>%
             Race.Ethnicity == "All races/ethnicities" ~ "all races",
             Race.Ethnicity == "White" ~ "white",
             TRUE ~ "all races"
-        ),
-        sex = "all",
-        risk = "all transmission"
+        )
     ) %>%
     filter(!is.na(outcome), !is.na(value), !is.infinite(value)) %>%
-    select(outcome, year, location, age, race, sex, risk, value)
+    select(outcome, year, location, age, race, value)
 
 cat("✅ Processed", nrow(processed_qol_data), "data points\n")
 
@@ -336,12 +332,12 @@ cat("\n--- Validation Tests ---\n")
 # Test 1: US HIV stigma by year
 us_stigma <- qol_manager$pull(
     outcome = "hiv.stigma.pwh",
+    source = "cdc.atlasplus.qol",
+    from.ontology.names = "qol.ontology",
     dimension.values = list(
         location = "US", 
         age = "13+ years", 
-        race = "all races",
-        sex = "all",
-        risk = "all transmission"
+        race = "all races"
     ),
     keep.dimensions = "year"
 )
@@ -356,12 +352,12 @@ if(!is.null(us_stigma)) {
 # Test 2: All states for 2022
 states_2022 <- qol_manager$pull(
     outcome = "hiv.stigma.pwh",
+    source = "cdc.atlasplus.qol",
+    from.ontology.names = "qol.ontology",
     dimension.values = list(
         year = "2022",
         age = "13+ years", 
-        race = "all races",
-        sex = "all",
-        risk = "all transmission"
+        race = "all races"
     ),
     keep.dimensions = "location"
 )
@@ -378,13 +374,13 @@ cat("✅ Test 3: All outcomes for US 2022:\n")
 for(outcome in qol_outcomes) {
     result <- qol_manager$pull(
         outcome = outcome,
+        source = "cdc.atlasplus.qol",
+        from.ontology.names = "qol.ontology",
         dimension.values = list(
             location = "US",
             year = "2022", 
             age = "13+ years", 
-            race = "all races",
-            sex = "all",
-            risk = "all transmission"
+            race = "all races"
         ),
         keep.dimensions = "year"
     )
@@ -419,17 +415,17 @@ cat("   - Race stratification: 2 groups (US only)\n")
 cat("   - Total data points:", nrow(processed_qol_data), "\n")
 
 cat("\n⚠️  IMPORTANT USAGE NOTE:\n")
-cat("This data manager uses a sparse 6D array structure.\n")
-cat("Pull operations require explicit dimension specification:\n\n")
+cat("This data manager uses a 4D array structure (year, location, age, race).\n")
+cat("Pull operations require explicit source/ontology and dimension specification:\n\n")
 cat("# Example: Get US HIV stigma by year\n")
 cat("us_data <- qol_manager$pull(\n")
 cat("  outcome = 'hiv.stigma.pwh',\n")
+cat("  source = 'cdc.atlasplus.qol',\n")
+cat("  from.ontology.names = 'qol.ontology',\n")
 cat("  dimension.values = list(\n")
 cat("    location = 'US',\n")
 cat("    age = '13+ years',\n")
-cat("    race = 'all races',\n")
-cat("    sex = 'all',\n")
-cat("    risk = 'all transmission'\n")
+cat("    race = 'all races'\n")
 cat("  ),\n")
 cat("  keep.dimensions = 'year'\n")
 cat(")\n\n")
