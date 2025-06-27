@@ -125,6 +125,8 @@ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
     )
 }
 
+
+
 {
     lik=likelihood.instructions.syphilis.diag.total.no.demog$instantiate.likelihood(VERSION,LOCATION)
     # lik.ps$compute(sim.last, debug = T)
