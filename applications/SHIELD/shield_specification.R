@@ -17,10 +17,11 @@ source('applications/SHIELD/shield_source_code.R')
 # PRENATAL care coverage estiamtes from Wonder 
 # source("applications/SHIELD/inputs/input_cache_prenatal_prior_from_wonder.R")
 
-
+shield.solver= create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
 ##--------------------------------------------------------------------------------------------------------------#
 #*** INITIAL SET-UP *** ----
 SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
+                                                  default.solver.metadata = shield.solver,
                                                   iteration=1,
                                                   description = 'The initial SHIELD version, set up to model national epidemic',
                                                   start.year = DEFAULT.START.YEAR,
@@ -476,34 +477,29 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming th
 # Future Expnasions: msm.trate.by.race #add more alphas #if we assume the multiplier by black vs other remain the sma over time we only ned 2
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.msm',
-                       functional.form = create.natural.spline.functional.form(knot.times = c(time0=1990, time1=1995, time2=2000,time3=2010,time4=2020),
-                                                                               # knot.times =c("1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020)
-                                                                               #if we wanted to use a natural spline without log transformation:
-                                                                               # knot.values = list(time0=1,time1=1,time2=1) , knots.are.on.transformed.scale = F, #on the identity scale
-                                                                               #use a log(y) transformation, so that all returned values are positive
-                                                                               # this will also help with data that is skewed to right (long right tail)
-                                                                               knot.values = list(time0=0,time1=0,time2=0,time3=0,time4=0) ,
-                                                                               # knot.values =c("1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0)
-                                                                               #
+                       functional.form = create.natural.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                                                                               knot.values =list("1970"=0,"1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
                                                                                knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                                #
                                                                                min=0, #even after using log for knots, value can be negative so we need to truncate
                                                                                knot.link = 'log',
                                                                                link='identity'), #knots on the log-scale and values on the identity scale
-                       functional.form.from.time = DEFAULT.TRANSMISSION.START.YEAR, #1980: the projections remain fix at this year's value for years before.  
-                       scale='rate') #spline with 2010/2020
+                       functional.form.from.time = 1970, 
+                       scale='rate') 
+#if we wanted to use a natural spline without log transformation:
+# knot.values = list(time0=1,time1=1,time2=1) , knots.are.on.transformed.scale = F, #on the identity scale
+#use a log(y) transformation, so that all returned values are positive
+# this will also help with data that is skewed to right (long right tail)
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.heterosexual',
-                       functional.form = create.linear.spline.functional.form(knot.times = c(time0=1990, time1=1995, time2=2000,time3=2010,time4=2020),
-                                                                              # knot.times =c("1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020)
-                                                                              knot.values = list(time0=0,time1=0,time2=0,time3=0,time4=0) ,
-                                                                              # knot.values =c("1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0)
+                       functional.form = create.linear.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                                                                              knot.values =list("1970"=0,"1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
                                                                               knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                               min=0,
                                                                               knot.link = 'log',
                                                                               link='identity') ,
-                       functional.form.from.time = DEFAULT.TRANSMISSION.START.YEAR, #1980: the projections remain fix at this year's value for years before.  ,  
+                       functional.form.from.time = 1970, 
                        scale='rate')
 
 ##---- Sexual Contact: By AGE ----

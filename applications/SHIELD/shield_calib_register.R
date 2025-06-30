@@ -2,8 +2,8 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
 N.ITER=15000
-solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
-# solver = create.solver.metadata() #default solver
+shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
+default.solver= create.solver.metadata()
 
 #parameter set for demographic calibration
 param.names.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
@@ -32,7 +32,7 @@ register.calibration.info('calib.demog.06.09.pk',
                           is.preliminary = T, 
                           max.run.time.seconds = 30, 
                           description = "A quick run to get population parameters in the general vicinity",
-                          solver.metadata = solver
+                          solver.metadata = shield.solver
 )
 
 #############
@@ -44,18 +44,20 @@ register.calibration.info('calib.demog.06.09.pk',
 # took out prenatal care
 # took out contact tracing
 
-register.calibration.info(code = "calib.diagnosis.06.19.pk",
-                          preceding.calibration.codes = "calib.demog.06.09.pk",
-                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog,
+register.calibration.info(code = "calib.diagnosis.06.30.pk",
+                          preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
-                          param.names.all,
+                          parameter.names = 
+                            c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                            TESTING.PARAMETERS.PRIOR@var.names),
                           n.iter = N.ITER,
                           thin = 50,
                           is.preliminary = T,
                           max.run.time.seconds = 30,
                           description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = solver
+                          solver.metadata = shield.solver
 )
  
 # ## TEST for Nick:

@@ -493,10 +493,11 @@ likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(
   
 )
 
-# PS total and the early total; HIV tests
+# PS total, EL total, Late total, HIV tests
 likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instructions(
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
+  late.diagnosis.total.likelihood.instructions,
   hiv.testing.likelihood.instructions
 )
 
