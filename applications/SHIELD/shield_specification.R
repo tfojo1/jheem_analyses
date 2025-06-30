@@ -21,7 +21,7 @@ shield.solver= create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
 ##--------------------------------------------------------------------------------------------------------------#
 #*** INITIAL SET-UP *** ----
 SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
-                                                  default.solver.metadata = shield.solver,
+                                                  # default.solver.metadata = shield.solver,
                                                   iteration=1,
                                                   description = 'The initial SHIELD version, set up to model national epidemic',
                                                   start.year = DEFAULT.START.YEAR,
