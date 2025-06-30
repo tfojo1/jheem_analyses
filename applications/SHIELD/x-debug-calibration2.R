@@ -24,8 +24,21 @@ load("~/Downloads/params.set.Rdata")
 engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 {
     params.manual <- params.last
-    #remove
-    params.manual <- params.manual[!names(params.manual) %in% c("initial.infection.multiplier.1970.late","initial.infection.multiplier.1970.early")]
+
+    
+    params.manual['transmission.rate.multiplier.heterosexual1970']<-params.manual['transmission.rate.multiplier.heterosexual0']
+    params.manual['transmission.rate.multiplier.heterosexual1990']<-params.manual['transmission.rate.multiplier.heterosexual0']
+    params.manual['transmission.rate.multiplier.heterosexual1995']<-params.manual['transmission.rate.multiplier.heterosexual1']
+    params.manual['transmission.rate.multiplier.heterosexual2000']<-params.manual['transmission.rate.multiplier.heterosexual2']
+    params.manual['transmission.rate.multiplier.heterosexual2010']<-params.manual['transmission.rate.multiplier.heterosexual3']
+    params.manual['transmission.rate.multiplier.heterosexual2020']<-params.manual['transmission.rate.multiplier.heterosexual4']
+    
+    params.manual['transmission.rate.multiplier.msm1970']<-params.manual['transmission.rate.multiplier.msm0']
+    params.manual['transmission.rate.multiplier.msm1990']<-params.manual['transmission.rate.multiplier.msm0']
+    params.manual['transmission.rate.multiplier.msm1995']<-params.manual['transmission.rate.multiplier.msm1']
+    params.manual['transmission.rate.multiplier.msm2000']<-params.manual['transmission.rate.multiplier.msm2']
+    params.manual['transmission.rate.multiplier.msm2010']<-params.manual['transmission.rate.multiplier.msm3']
+    params.manual['transmission.rate.multiplier.msm2020']<-params.manual['transmission.rate.multiplier.msm4']
     
     #add calib params that have been added since then:
     params.manual["syphilis.screening.multiplier.1980"] <- 1
@@ -34,6 +47,11 @@ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
     params.manual["sti.screening.multiplier.ll"] <- 1
     params.manual["sti.screening.multiplier.tertiary"] <- 1
     params.manual["sti.screening.multiplier.cns"] <- 1
+    #remove
+    params.manual <- params.manual[!names(params.manual) %in% c("initial.infection.multiplier.1970.late","initial.infection.multiplier.1970.early",
+                                                                paste0('transmission.rate.multiplier.heterosexual',c(0:4)),
+                                                                paste0('transmission.rate.multiplier.msm',c(0:4)))
+                                   ]
     
     #  
     params.manual["ps.diagnoses.multiplier.1970"] <- 1
@@ -52,7 +70,7 @@ unlist(q$lu.diagnoses.multiplier.1970) *unlist(q$prp.lu.diag.1997)*sapply(q$n.in
 
 simplot(
     sim.manual0,
-    # sim.manual1,
+    sim.manual1,
     # outcomes = c("population"),
     # split.by = "profile",# facet.by = "age",
     outcomes = c(
@@ -72,22 +90,24 @@ simplot(
 
 {
     params.manual<- params.manual0
-    params.manual["transmission.rate.multiplier.heterosexual0"] <- 0
-    # params.manual["transmission.rate.multiplier.heterosexual1"] <- 1
-    # params.manual["transmission.rate.multiplier.heterosexual2"] <- 1
-    # params.manual["transmission.rate.multiplier.heterosexual3"] <- 1
-    # params.manual["transmission.rate.multiplier.heterosexual4"] <- 1
+    # params.manual["global.transmission.rate"] <- 4.2# 3.787095 
+    
+    params.manual["transmission.rate.multiplier.heterosexual1970"] <- 1.04#1990
+    # params.manual["transmission.rate.multiplier.heterosexual1"] <- 1.5 #1995
+    # params.manual["transmission.rate.multiplier.heterosexual2"] <- 1 #2000
+    # params.manual["transmission.rate.multiplier.heterosexual3"] <- 0
+    # params.manual["transmission.rate.multiplier.heterosexual4"] <- 0
     
     # transmission.rate.multiplier.heterosexual0       1.0386505
     # transmission.rate.multiplier.heterosexual1       1.5688099
     # transmission.rate.multiplier.heterosexual2       1.1142859
     # transmission.rate.multiplier.heterosexual3       1.3936504
     # transmission.rate.multiplier.heterosexual4       1.3756808
-    params.manual["transmission.rate.multiplier.msm0"] <- 0
-    # params.manual["transmission.rate.multiplier.msm1"] <- 1
+    params.manual["transmission.rate.multiplier.msm1970"] <- 1.5
+    # params.manual["transmission.rate.multiplier.msm1"] <- 1.5
     # params.manual["transmission.rate.multiplier.msm2"] <- 1
-    # params.manual["transmission.rate.multiplier.msm3"] <- 1
-    # params.manual["transmission.rate.multiplier.msm4"] <- 1
+    # params.manual["transmission.rate.multiplier.msm3"] <- 0
+    # params.manual["transmission.rate.multiplier.msm4"] <- 0
     # # transmission.rate.multiplier.msm0                1.4459724
     # # transmission.rate.multiplier.msm1                1.3638819
     # # transmission.rate.multiplier.msm2                1.5587803

@@ -146,7 +146,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)), 
   transmission.rate.multiplier.heterosexual2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
   transmission.rate.multiplier.heterosexual2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-   
+  
   ### race multipliers (shared for msm and het):
   transmission.rate.multiplier.black= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -181,7 +181,7 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
   
   # STI screening multiplier by stage (defined in specification-no linking needed here)
-  sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #get.intervals(rate.screening.ps.multiplier) #most values between 0.25-0.75
+  # sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #get.intervals(rate.screening.ps.multiplier) #most values between 0.25-0.75
   sti.screening.multiplier.el = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
@@ -573,7 +573,7 @@ SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
   msm.transmission.block2=c(
     "transmission.rate.multiplier.msm2000",
     "transmission.rate.multiplier.msm2010",
-  "transmission.rate.multiplier.msm2020"),
+    "transmission.rate.multiplier.msm2020"),
   #
   het.transmission.block1 =c(
     "transmission.rate.multiplier.heterosexual1970",
@@ -607,16 +607,20 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
     "hiv.testing.or",
     "hiv.testing.slope.or"
   ),
-  sti.screening.1=c(
-    "sti.screening.multiplier.ps",
+  
+  #excluding # "sti.screening.multiplier.ps",
+  sti.screening.by.stage1=c(
     "sti.screening.multiplier.el",
-    "sti.screening.multiplier.ll",
+    "sti.screening.multiplier.ll"),
+  sti.screening.by.stage2=c(
     "sti.screening.multiplier.tertiary",
     "sti.screening.multiplier.cns"
   ),    
-  screening.2 = c(
+  screening.by.time1 = c(
     "syphilis.screening.multiplier.1980",
-    "syphilis.screening.multiplier.1990",
+    "syphilis.screening.multiplier.1990"
+  ),
+  screening.by.time2 = c(
     "syphilis.screening.multiplier.2000",
     "syphilis.screening.multiplier.2010",
     "syphilis.screening.multiplier.2020"

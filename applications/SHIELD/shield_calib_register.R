@@ -59,6 +59,21 @@ register.calibration.info(code = "calib.diagnosis.06.30.pk",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = shield.solver
 )
+register.calibration.info(code = "calib.diagnosis.06.30.pk1",
+                          preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = 
+                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER,
+                          thin = 50,
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = shield.solver
+)
 # Log:
 # <calib.diagnosis.06.30.pk> 
 # changing the initial number infected in 1970
@@ -66,7 +81,8 @@ register.calibration.info(code = "calib.diagnosis.06.30.pk",
 # calibrating to PS total, EL total, Late total, HIV tests
 # only changing Transmission and Testing Parameters
 
-
+# <calib.diagnosis.06.30.pk1> 
+# escluding sti.screening.multiplier.ps from calibration 
 
 # ## TEST for Nick:
 # register.calibration.info('pop.demog.test', 
