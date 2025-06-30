@@ -15,10 +15,10 @@ LOCATION <- 'C.12580'  # Baltimore MSA
 get.jheem.root.directory() #"/Volumes/jheem$"
 # ROOT.DIR="../../files/"
 # set.jheem.root.directory(ROOT.DIR)
-set.jheem.root.directory("/Volumes/jheem$")
+# set.jheem.root.directory("/Volumes/jheem$")
 
 # CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
-CALIBRATION.CODE.TO.RUN <- 'calib.diag.06.17.pk'; DATE <- "2025-06-17"
+CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.06.30.pk'; DATE <- "2025-06-30"
 
 
 
@@ -26,10 +26,10 @@ CALIBRATION.CODE.TO.RUN <- 'calib.diag.06.17.pk'; DATE <- "2025-06-17"
 if (FALSE) {
     load(paste0("/Volumes/jheem$/results/Shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
 }
-if (TRUE) {
+if (FALSE) {
     load(paste0("../jheem_analyses/prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
 }
-if (FALSE) {
+if (TRUE) {
     get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
     simset <- assemble.simulations.from.calibration(
         version = VERSION,
@@ -38,15 +38,10 @@ if (FALSE) {
         allow.incomplete = TRUE
     )
 }
-sim=extract.last.simulation.from.calibration(version,LOCATION,CALIBRATION.CODE.TO.RUN,allow.incomplete = T)
-simset2=simset
 
-
-# save(simset2, file = paste0(get.jheem.root.directory(),"/shield/","calib.diag.06.17.pk1",".Rdata"))
-
-load(paste0(get.jheem.root.directory(),"/shield/","calib.diag.06.17.pk",".Rdata"))
-
-simset=simset1
+simset=simset
+# save(simset, file = paste0(get.jheem.root.directory(),"/shield/","calib.diag.06.17.pk1",".Rdata"))
+# load(paste0(get.jheem.root.directory(),"/shield/","calib.diag.06.17.pk",".Rdata"))
 
 # Quick checkpoint ----
 simset$n.sim
@@ -57,41 +52,31 @@ params.first <- simset$first.sim()$params
 params.last  <- simset$last.sim()$params
 
 
-simset=simset2
-simset$n.sim
-# Extract first and last simulations and their parameters 
-sim.first2    <- simset$first.sim()
-sim.last2     <- simset$last.sim()
-params.first2 <- simset$first.sim()$params
-params.last2  <- simset$last.sim()$params
-
 # REVIEW
 simplot(
-    # sim.first,
-    # sim.last,
     sim.first,
     sim.last,
-    # split.by = "sex",
-    # split.by = "age",
-    # split.by = "race",
     # split.by = "race", facet.by = "sex",
     # split.by = "race", facet.by = "age",
-    # outcomes = c("population"),
-    outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
-     dimension.values = list(year = 1990:2030),
+    # outcomes = c("population"),    split.by = "race", facet.by = "age",
+    outcomes = c("diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified","hiv.testing"),
+    dimension.values = list(year = 1970:2030),
     style.manager = source.style.manager
 )
 
 # MCMC Diagnostics ----
 {
     head(simset$get.mcmc.mixing.statistic())
-    simset$traceplot("trans")
-    cbind(simset$get.params("trans"))
+    simset$traceplot("transmission")
+    cbind(simset$get.params("transmission"))
     cbind(sim.last$get.params("trans"))
     
     simset$traceplot("screen")
-    simset$traceplot("initial")
+    simset$traceplot("diagnoses")
     simset$traceplot("test")
+    simset$traceplot("symptomatic")
+    simset$traceplot("screening")
+    
     
     simset$traceplot("black.aging")
     simset$traceplot("hispanic.aging")
