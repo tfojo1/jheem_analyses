@@ -18,7 +18,7 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 set.jheem.root.directory("/Volumes/jheem$")
 
 # CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
-CALIBRATION.CODE.TO.RUN <- 'calib.diag.06.17.pk1'; DATE <- "2025-06-17"
+CALIBRATION.CODE.TO.RUN <- 'calib.diag.06.17.pk'; DATE <- "2025-06-17"
 
 
 
@@ -38,13 +38,16 @@ if (FALSE) {
         allow.incomplete = TRUE
     )
 }
-# sim=extract.last.simulation.from.calibration(version,LOCATION,CALIBRATION.CODE.TO.RUN,allow.incomplete = T)
+sim=extract.last.simulation.from.calibration(version,LOCATION,CALIBRATION.CODE.TO.RUN,allow.incomplete = T)
 simset2=simset
 
 
 # save(simset2, file = paste0(get.jheem.root.directory(),"/shield/","calib.diag.06.17.pk1",".Rdata"))
 
+load(paste0(get.jheem.root.directory(),"/shield/","calib.diag.06.17.pk",".Rdata"))
+
 simset=simset1
+
 # Quick checkpoint ----
 simset$n.sim
 # Extract first and last simulations and their parameters 
@@ -66,8 +69,8 @@ params.last2  <- simset$last.sim()$params
 simplot(
     # sim.first,
     # sim.last,
-    sim.first2,
-    sim.last2,
+    sim.first,
+    sim.last,
     # split.by = "sex",
     # split.by = "age",
     # split.by = "race",
