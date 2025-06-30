@@ -59,7 +59,15 @@ register.calibration.info(code = "calib.diagnosis.06.30.pk",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = shield.solver
 )
- 
+# Log:
+# <calib.diagnosis.06.30.pk> 
+# changing the initial number infected in 1970
+# adding new transmission multiplier in 1990
+# calibrating to PS total, EL total, Late total, HIV tests
+# only changing Transmission and Testing Parameters
+
+
+
 # ## TEST for Nick:
 # register.calibration.info('pop.demog.test', 
 #                           likelihood.instructions = likelihood.instructions.demographics,
