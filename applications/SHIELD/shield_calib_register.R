@@ -43,22 +43,6 @@ register.calibration.info('calib.demog.06.09.pk',
 # removed screening for PS (muliplier set to 0)
 # took out prenatal care
 # took out contact tracing
-
-register.calibration.info(code = "calib.diagnosis.06.30.pk",
-                          preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
-                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = 
-                            c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                            TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = shield.solver
-)
 register.calibration.info(code = "calib.diagnosis.06.30.pk1",
                           preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
                           likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
@@ -74,15 +58,39 @@ register.calibration.info(code = "calib.diagnosis.06.30.pk1",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = shield.solver
 )
-# Log:
-# <calib.diagnosis.06.30.pk> 
+
+register.calibration.info(code = "calib.diagnosis.07.01.pk",
+                          preceding.calibration.codes = "calib.diagnosis.06.30.pk1", #calibrated demographic model
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = 
+                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER,
+                          thin = 50,
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = shield.solver
+)
+# LOG SUMMARY:
+# <calib.diagnosis.07.01.pk> 
+# revised the prior for EL and LL sti screening multipliers
+# change the diagnosis likelihood to use "autoregressive.1" correlation instead of compund symmetry
+
+
+# <calib.diagnosis.06.30.pk1> 
 # changing the initial number infected in 1970
 # adding new transmission multiplier in 1990
 # calibrating to PS total, EL total, Late total, HIV tests
 # only changing Transmission and Testing Parameters
+# excluding sti.screening.multiplier.ps from calibration
+# >>> The initial peak pre-1990 is gone. Simulations have a hard time catching up with EL diagnoses.
+# >>> Manual try suggested high levels of screening for EL and LL is needed
 
 # <calib.diagnosis.06.30.pk1> 
-# escluding sti.screening.multiplier.ps from calibration 
+#  
 
 # ## TEST for Nick:
 # register.calibration.info('pop.demog.test', 
