@@ -182,12 +182,22 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   
   # STI screening multiplier by stage (defined in specification-no linking needed here)
   # sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #get.intervals(rate.screening.ps.multiplier) #most values between 0.25-0.75
-  sti.screening.multiplier.el = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)), #changing the prior to reflect higher freq of screening among syphilis-infected subgroups (highrisk)
+  sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)),
   sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
 )
-
+# x=Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2))
+# get.intervals(x)
+# calculate.density(x,10)/calculate.density(x,1) #penalty for drawing a point at 10 instead of 1
+# 
+# x=Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2))
+# get.intervals(x)
+# calculate.density(x,10)/calculate.density(x,3)
+# 
+# x=Lognormal.Distribution(meanlog = log(3), sdlog = log(2))
+# get.intervals(x)
+# calculate.density(x,10)/calculate.density(x,3)
 
 ## SYPHILIS.PARAMETERS.PRIOR ----
 # SYPHILIS.PARAMETERS.PRIOR=join.distributions( 
