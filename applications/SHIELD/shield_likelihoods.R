@@ -190,7 +190,7 @@ total.diagnosis.likelihood.instructions =
                                        outcome.for.data = "total.syphilis.diagnoses",  
                                        levels.of.stratification = c(0),
                                        from.year = 1993,
-                                       observation.correlation.form = 'compound.symmetry',
+                                       observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
                                        weights = DIAGNOSIS.WEIGHT ,
@@ -213,7 +213,7 @@ ps.diagnosis.total.likelihood.instructions =
                                        outcome.for.data = "ps.syphilis.diagnoses",  
                                        levels.of.stratification = c(0), 
                                        from.year = 1993,
-                                       observation.correlation.form = 'compound.symmetry',
+                                       observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
                                        weights = DIAGNOSIS.WEIGHT,
@@ -222,13 +222,13 @@ ps.diagnosis.total.likelihood.instructions =
   )
 
 
-ps.diagnosis.likelihood.instructions =
+ps.diagnosis.by.strata.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                        outcome.for.data = "ps.syphilis.diagnoses",  
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2), 
                                        from.year = 1993,
-                                       observation.correlation.form = 'compound.symmetry',
+                                       observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
                                        weights = DIAGNOSIS.WEIGHT,
@@ -251,7 +251,7 @@ early.diagnosis.total.likelihood.instructions =
                                        outcome.for.data = "early.syphilis.diagnoses", 
                                        levels.of.stratification = c(0),
                                        from.year = 1993,
-                                       observation.correlation.form = 'compound.symmetry',
+                                       observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
                                        weights = DIAGNOSIS.WEIGHT,
@@ -260,13 +260,13 @@ early.diagnosis.total.likelihood.instructions =
   )
 
 
-early.diagnosis.likelihood.instructions =
+early.diagnosis.by.strata.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                        outcome.for.data = "early.syphilis.diagnoses", 
                                        dimensions = c("age","race","sex"),
                                        levels.of.stratification = c(0,1,2,3),
                                        from.year = 1993,
-                                       observation.correlation.form = 'compound.symmetry',
+                                       observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
                                        weights = DIAGNOSIS.WEIGHT,
@@ -281,13 +281,12 @@ early.diagnosis.likelihood.instructions =
 # data from 1993-1999 (cdc.pdf.report) for MSA and national (total)
 # data from 1998-2023 for MSA level (cdc.sti) for MSA (total)
 # data from 2000-2023 for MSA level (cdc.sti) for MSA (total; sex; race; age group; age group+sex; race+sex; age group+race; age group+race+sex)
-#
 late.diagnosis.total.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                        outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                        levels.of.stratification = c(0),
                                        from.year = 1993,
-                                       observation.correlation.form = 'compound.symmetry',
+                                       observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
                                        weights = DIAGNOSIS.WEIGHT,
@@ -295,7 +294,7 @@ late.diagnosis.total.likelihood.instructions =
                                        minimum.error.sd = 1
   )
 
-late.diagnosis.likelihood.instructions =
+late.diagnosis.by.strata.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                        outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                        dimensions = c("age","race","sex"),
@@ -309,6 +308,20 @@ late.diagnosis.likelihood.instructions =
                                        minimum.error.sd = 1
   )
 
+##** HIV TESTS ** ----
+hiv.testing.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
+                                       outcome.for.data = "proportion.tested.for.hiv", 
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2),
+                                       from.year = 2014,
+                                       to.year = 2019,
+                                       observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
+                                       error.variance.term = 0.05,
+                                       weights = TESTING.WEIGHT,
+                                       error.variance.type = 'cv'
+  )
+
 ##---- Congenital ----
 #poportion of state level births that are complicated by congenital syphilis 
 # 1) using CDC reported state level targets
@@ -320,7 +333,7 @@ late.diagnosis.likelihood.instructions =
 #                                        dimensions = c("age","race","sex"),
 #                                        levels.of.stratification = c(0,1,2),
 #                                        from.year = 2010,
-#                                        observation.correlation.form = 'compound.symmetry',
+#                                        observation.correlation.form = 'autoregressive.1',
 #                                        error.variance.term = 0.05, 
 #                                        error.variance.type = 'cv'
 #   )
@@ -378,94 +391,80 @@ late.diagnosis.likelihood.instructions =
 # for now we are modeling 4 independant likelihoods. This may overpenalize deviations from a single bin because we are not accounting for the correlation between the 4 categories.)
 # Error estimate: @zoe: what proportion of prenatals were unknown at the national level? we can use that to inform this error here 
 ### source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
-ave.msa.variance= 0.0032 #estimated for all 33 msa combined
-prenatal.care.first.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.first.trimester",
-                                       outcome.for.data = "prenatal.care.initiation.first.trimester",
-                                       
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 2016,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = function(data,details,version, location){
-                                         # browser()
-                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
-                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
-                                         var= (data* (0.05))^2+msa.variance
-                                         return(sqrt(var))
-                                       },
-                                       weights = PRENATAL.WEIGHT,
-                                       error.variance.type = 'function.sd')
-prenatal.care.second.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.second.trimester",
-                                       outcome.for.data = "prenatal.care.initiation.second.trimester",
-                                       
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 2016,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = function(data,details,version, location){
-                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
-                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
-                                         var= (data* (0.05))^2+msa.variance 
-                                         sd=sqrt(var)
-                                         
-                                         return(sd)
-                                       },
-                                       weights = PRENATAL.WEIGHT,
-                                       error.variance.type = 'function.sd')
+# ave.msa.variance= 0.0032 #estimated for all 33 msa combined
+# prenatal.care.first.trimester.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.first.trimester",
+#                                        outcome.for.data = "prenatal.care.initiation.first.trimester",
+#                                        
+#                                        dimensions = c("age","race"),
+#                                        levels.of.stratification = c(0,1),
+#                                        from.year = 2016,
+#                                        observation.correlation.form = 'compound.symmetry', #'@PK: autoregressive.1? 
+#                                        error.variance.term = function(data,details,version, location){
+#                                          # browser()
+#                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+#                                          msa.variance=(1-mean(w))^2 * ave.msa.variance
+#                                          data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+#                                          var= (data* (0.05))^2+msa.variance
+#                                          return(sqrt(var))
+#                                        },
+#                                        weights = PRENATAL.WEIGHT,
+#                                        error.variance.type = 'function.sd')
+# prenatal.care.second.trimester.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.second.trimester",
+#                                        outcome.for.data = "prenatal.care.initiation.second.trimester",
+#                                        
+#                                        dimensions = c("age","race"),
+#                                        levels.of.stratification = c(0,1),
+#                                        from.year = 2016,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = function(data,details,version, location){
+#                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+#                                          msa.variance=(1-mean(w))^2 * ave.msa.variance
+#                                          data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+#                                          var= (data* (0.05))^2+msa.variance 
+#                                          sd=sqrt(var)
+#                                          
+#                                          return(sd)
+#                                        },
+#                                        weights = PRENATAL.WEIGHT,
+#                                        error.variance.type = 'function.sd')
+# 
+# prenatal.care.third.trimester.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.third.trimester",
+#                                        outcome.for.data = "prenatal.care.initiation.third.trimester",
+#                                        
+#                                        dimensions = c("age","race"),
+#                                        levels.of.stratification = c(0,1),
+#                                        from.year = 2016,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = function(data,details,version, location){
+#                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+#                                          msa.variance=(1-mean(w))^2 * ave.msa.variance
+#                                          data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+#                                          var= (data* (0.05))^2+msa.variance
+#                                          return(sqrt(var))
+#                                        },
+#                                        weights = PRENATAL.WEIGHT,
+#                                        error.variance.type = 'function.sd')
+# no.prenatal.care.likelihood.instructions =
+#   create.basic.likelihood.instructions(outcome.for.sim = "prp.no.prenatal.care",
+#                                        outcome.for.data = "no.prenatal.care",
+#                                        
+#                                        dimensions = c("age","race"),
+#                                        levels.of.stratification = c(0,1),
+#                                        from.year = 2016,
+#                                        observation.correlation.form = 'compound.symmetry',
+#                                        error.variance.term = function(data,details,version, location){
+#                                          w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
+#                                          msa.variance=(1-mean(w))^2 * ave.msa.variance
+#                                          data[is.na(data)]<-0 #'@Andrew: to take out after the update 
+#                                          var= (data* (0.05))^2+msa.variance
+#                                          return(sqrt(var))
+#                                        },
+#                                        weights = PRENATAL.WEIGHT,
+#                                        error.variance.type = 'function.sd')
 
-prenatal.care.third.trimester.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.third.trimester",
-                                       outcome.for.data = "prenatal.care.initiation.third.trimester",
-                                       
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 2016,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = function(data,details,version, location){
-                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
-                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
-                                         var= (data* (0.05))^2+msa.variance
-                                         return(sqrt(var))
-                                       },
-                                       weights = PRENATAL.WEIGHT,
-                                       error.variance.type = 'function.sd')
-no.prenatal.care.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.sim = "prp.no.prenatal.care",
-                                       outcome.for.data = "no.prenatal.care",
-                                       
-                                       dimensions = c("age","race"),
-                                       levels.of.stratification = c(0,1),
-                                       from.year = 2016,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = function(data,details,version, location){
-                                         w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
-                                         msa.variance=(1-mean(w))^2 * ave.msa.variance
-                                         data[is.na(data)]<-0 #'@Andrew: to take out after the update 
-                                         var= (data* (0.05))^2+msa.variance
-                                         return(sqrt(var))
-                                       },
-                                       weights = PRENATAL.WEIGHT,
-                                       error.variance.type = 'function.sd')
-
-##** HIV TESTS ** ----
-hiv.testing.likelihood.instructions =
-  create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
-                                       outcome.for.data = "proportion.tested.for.hiv", 
-                                       
-                                       dimensions = c("age","race","sex"),
-                                       levels.of.stratification = c(0,1,2),
-                                       from.year = 2014,
-                                       to.year = 2019,
-                                       observation.correlation.form = 'compound.symmetry',
-                                       error.variance.term = 0.05,
-                                       weights = TESTING.WEIGHT,
-                                       error.variance.type = 'cv'
-  )
 
 
 
@@ -555,3 +554,13 @@ likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instruction
 
 # can we ssume rates of diagnosis among het-male and female are similar and the rest of new diagnosis among male are msm specific 
 # @Zoe: can you please add a mapping for this? male= msm + het_male
+
+# observation.correlation.form 
+# 1- 'AUTOREGRESSIVE', 
+# Better choice for long time spans (data available > 10 years)
+#Correlations decay with time lag:  capturing time-dependent correlation deca
+# 2- 'COMPUND SYMMETRY'
+# constant correlation between all pairs of observations regardeless of time difference
+# Simpler model is preferred (fewer parameters), or the data is sparse.
+
+#better choice for long duration of data, where we dont think that the correlation 
