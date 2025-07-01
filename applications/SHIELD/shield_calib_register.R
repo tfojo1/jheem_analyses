@@ -59,7 +59,22 @@ register.calibration.info(code = "calib.diagnosis.06.30.pk1",
                           solver.metadata = shield.solver
 )
 
-register.calibration.info(code = "calib.diagnosis.07.01.pk",
+register.calibration.info(code = "calib.diagnosis.07.01.pk1",
+                          preceding.calibration.codes = "calib.diagnosis.06.30.pk1", #calibrated demographic model
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = 
+                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER,
+                          thin = 50,
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity",
+                          solver.metadata = shield.solver
+)
+register.calibration.info(code = "calib.diagnosis.07.01.pk2",
                           preceding.calibration.codes = "calib.diagnosis.06.30.pk1", #calibrated demographic model
                           likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
                           data.manager = SURVEILLANCE.MANAGER,
@@ -75,10 +90,12 @@ register.calibration.info(code = "calib.diagnosis.07.01.pk",
                           solver.metadata = shield.solver
 )
 # LOG SUMMARY:
-# <calib.diagnosis.07.01.pk> 
+# <calib.diagnosis.07.01.pk1> 
 # revised the prior for EL and LL sti screening multipliers
 # change the diagnosis likelihood to use "autoregressive.1" correlation instead of compund symmetry
 
+# <calib.diagnosis.07.01.pk2> 
+# downweighting likelihoods to 1/32
 
 # <calib.diagnosis.06.30.pk1> 
 # changing the initial number infected in 1970

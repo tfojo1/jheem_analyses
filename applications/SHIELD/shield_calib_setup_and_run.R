@@ -24,10 +24,9 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 VERSION='shield'
 LOCATION='C.12580' #Baltimore MSA
 # LOCATION='C.35620'#NYC
-
 set.seed(00000)
 
-CALIBRATION.NAME = 'calib.diagnosis.07.01.pk' 
+CALIBRATION.NAME = 'calib.diagnosis.07.01.pk1' 
 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
