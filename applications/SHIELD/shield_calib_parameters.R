@@ -185,7 +185,11 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)), #changing the prior to reflect higher freq of screening among syphilis-infected subgroups (highrisk)
   sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)),
   sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+  sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  
+  # Contact tracing
+  # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
+  prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing) 
 )
 # x=Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2))
 # get.intervals(x)
@@ -635,6 +639,9 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
     "syphilis.screening.multiplier.2000",
     "syphilis.screening.multiplier.2010",
     "syphilis.screening.multiplier.2020"
+  ),
+  contact.tracing=c(
+    "prop.index.cases.reached.for.contact.tracing"
   )
 )
 
