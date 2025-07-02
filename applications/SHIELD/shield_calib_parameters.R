@@ -1,3 +1,7 @@
+b.INFECTIOUSNESS=FALSE
+b.RELAPSE=FALSE
+b.PS.SCREENING=FALSE
+b.CONTACT.TRACING=FALSE
 
 source("applications/SHIELD/shield_base_parameters.R")
 
@@ -181,15 +185,18 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
   
   # STI screening multiplier by stage (defined in specification-no linking needed here)
+  # b.PS.SCREENING
   # sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)), #get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
+  
   sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)), #changing the prior to reflect higher freq of screening among syphilis-infected subgroups (highrisk)
   sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)),
   sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
   
   # Contact tracing
+  # b.CONTACT.TRACING
   # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
-  # prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing) 
+    # prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing) 
 )
 # x=Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2))
 # get.intervals(x)
@@ -623,7 +630,8 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
   ),
   
   sti.screening.by.stage1=c(
-    # "sti.screening.multiplier.ps",
+    # b.PS.SCREENING
+      # "sti.screening.multiplier.ps",
     "sti.screening.multiplier.el",
     "sti.screening.multiplier.ll"),
   
@@ -640,11 +648,16 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
     "syphilis.screening.multiplier.2010",
     "syphilis.screening.multiplier.2020"
   )
+  # b.CONTACT.TRACING
   # contact.tracing=c(
-  #   "prop.index.cases.reached.for.contact.tracing"
-  # )
+  #   "prop.index.cases.reached.for.contact.tracing")
 )
+ 
 
+SHIELD.TESTING.SAMPLING.BLOCKS2=list(
+  contact.tracing=c(
+  "prop.index.cases.reached.for.contact.tracing")
+)
 
 # SUMMARIZE ---- #these will be registered in the specification 
 SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
