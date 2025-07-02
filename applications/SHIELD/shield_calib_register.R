@@ -2,7 +2,7 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
 N.ITER=15000
-# shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
+shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
 # default.solver= create.solver.metadata()
 
 #parameter set for demographic calibration
@@ -101,8 +101,8 @@ for (i in c(2:9)){
                               thin = 50,
                               is.preliminary = T,
                               max.run.time.seconds = 30,
-                              description = "A quick run to get syphilis parameters in the general vicinity"
-                              # solver.metadata = shield.solver
+                              description = "A quick run to get syphilis parameters in the general vicinity",
+                              solver.metadata = shield.solver
     )}
 
 # LOG SUMMARY -----

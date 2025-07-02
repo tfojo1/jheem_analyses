@@ -17,7 +17,7 @@ source('applications/SHIELD/shield_source_code.R')
 # PRENATAL care coverage estiamtes from Wonder 
 # source("applications/SHIELD/inputs/input_cache_prenatal_prior_from_wonder.R")
 
-shield.solver= create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
+# shield.solver= create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
 ##--------------------------------------------------------------------------------------------------------------#
 #*** INITIAL SET-UP *** ----
 SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
