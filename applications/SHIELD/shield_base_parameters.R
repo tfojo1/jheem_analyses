@@ -219,21 +219,17 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests
                                      citation = "input_fraction_hiv_test_by_age.R")
 
 # *** STI SCREENING ---- ##-----
+# these are all changed in calibration 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ps',
-                                      0, 0,0 #'@PK:  temporary change for calibration
-                                      )
+                                      1, 1,1 )
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.el',
-                                      1,1,1  
-)
+                                      1,1,1  )
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ll',
-                                      1,1,1  
-)
+                                      1,1,1  )
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.tertiary',
-                                      1,1,1  
-)
+                                      1,1,1  )
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.cns',
-                                      1,1,1  
-)
+                                      1,1,1  )
 
 
 # *** CONTACT TRACING ---- ## ----

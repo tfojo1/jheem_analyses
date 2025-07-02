@@ -74,7 +74,7 @@ register.calibration.info(code = "calib.diagnosis.07.01.pk1",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = shield.solver
 )
-for (i in c(1:5)){
+for (i in c(1:6)){
     register.calibration.info(code = paste0("calib.diagnosis.07.02.pk",i),
                               preceding.calibration.codes = "calib.diagnosis.07.01.pk1", #calibrated diagnosis model
                               likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
@@ -100,7 +100,8 @@ for (i in c(1:5)){
 
 # <calib.diagnosis.07.02.pk4> # EL transmissibility = ON
 # <calib.diagnosis.07.02.pk5> # EL transmissibility = ON; Relapse=ON
-
+# <calib.diagnosis.07.02.pk6> # EL transmissibility = ON; Relapse=ON, adding sti.screening.multiplier.ps [Range of 0.13-1.9]
+    
 
 # <calib.diagnosis.07.01.pk1> ----
 # w=1/8
