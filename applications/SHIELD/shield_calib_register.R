@@ -2,8 +2,8 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
 N.ITER=15000
-shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
-default.solver= create.solver.metadata()
+# shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
+# default.solver= create.solver.metadata()
 
 #parameter set for demographic calibration
 param.names.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
@@ -74,9 +74,23 @@ register.calibration.info(code = "calib.diagnosis.07.01.pk1",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = shield.solver
 )
-for (i in c(1:8)){
-    register.calibration.info(code = paste0("calib.diagnosis.07.02.pk",i),
-                              preceding.calibration.codes = "calib.diagnosis.07.01.pk1", #calibrated diagnosis model
+register.calibration.info(code = paste0("calib.diag.07.02.pk1",),
+                          preceding.calibration.codes = "calib.diagnosis.07.01.pk1", #calibrated diagnosis model
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = 
+                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER,
+                          thin = 50,
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity")
+
+for (i in c(2:9)){
+    register.calibration.info(code = paste0("calib.diag.07.02.pk",i),
+                              preceding.calibration.codes = "calib.diagnosis.06.30.pk1", #calibrated diagnosis model
                               likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
@@ -87,22 +101,22 @@ for (i in c(1:8)){
                               thin = 50,
                               is.preliminary = T,
                               max.run.time.seconds = 30,
-                              description = "A quick run to get syphilis parameters in the general vicinity",
-                              solver.metadata = shield.solver
+                              description = "A quick run to get syphilis parameters in the general vicinity"
+                              # solver.metadata = shield.solver
     )}
 
 # LOG SUMMARY -----
 
 
-# <calib.diagnosis.07.02.pk1-3> ----
-# repeating calibration from yesterday with weight 1/8, running 3 parallel chains to see if they converge
-# starting calibration from calib.diagnosis.07.01.pk1 
+# <calib.diagnosis.07.02.pk1> ----
+# repeating calibration from yesterday with weight 1/8, running another one with proceeding=calib.diagnosis.07.01.pk1 
 
-# <calib.diagnosis.07.02.pk4> # EL transmissibility = ON
-# <calib.diagnosis.07.02.pk5> # EL transmissibility = ON; Relapse=ON
-# <calib.diagnosis.07.02.pk6> # EL transmissibility = ON; Relapse=ON, PS screening=ON [Range of 0.13-1.9]
-# <calib.diagnosis.07.02.pk7> # EL transmissibility = ON; Relapse=ON, PS screening=ON ; contact tracing=ON
-# <calib.diagnosis.07.02.pk8> same as before, adding a contact.tracing parameter to calibration
+# <calib.diag.07.02.pk[2...*] > using the demographic calibration as the starting point (calib.diagnosis.06.30.pk1)
+# <calib.diag.07.02.pk2> # EL transmissibility = ON
+# <calib.diag.07.02.pk3> # EL transmissibility = ON; Relapse=ON
+# <calib.diag.07.02.pk4> # EL transmissibility = ON; Relapse=ON, PS screening=ON [Range of 0.13-1.9]
+# <calib.diag.07.02.pk5> # EL transmissibility = ON; Relapse=ON, PS screening=ON ; contact tracing=ON
+# <calib.diag.07.02.pk6> same as before, adding a contact.tracing parameter to calibration
 
 
 # <calib.diagnosis.07.01.pk1> ----

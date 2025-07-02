@@ -39,15 +39,15 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 #     )
 # }
 # {
-#     CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk1'; DATE <- "2025-07-01"
-#     get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
-#     simset <- assemble.simulations.from.calibration(
-#         version = VERSION,
-#         location = LOCATION,
-#         calibration.code = CALIBRATION.CODE.TO.RUN,
-#         allow.incomplete = TRUE)
-#     save(simset,file = paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.CODE.TO.RUN,"Rdata"))
-#     simset1=simset
+    # CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.02.pk1'; DATE <- "2025-07-02"
+    # get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
+    # simset <- assemble.simulations.from.calibration(
+    #     version = VERSION,
+    #     location = LOCATION,
+    #     calibration.code = CALIBRATION.CODE.TO.RUN,
+    #     allow.incomplete = TRUE)
+    # save(simset,file = paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.CODE.TO.RUN,"Rdata"))
+    # simset1=simset
 #     
 #     CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk2'; DATE <- "2025-07-01"
 #     get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
@@ -60,7 +60,7 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 #     simset2=simset
 # }
 
-load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk1","Rdata"))
+{load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk1","Rdata"))
 # Quick checkpoint ----
 simset1=simset
 simset$n.sim
@@ -78,7 +78,7 @@ simset$n.sim
 sim.first2    <- simset$first.sim()
 sim.last2     <- simset$last.sim()
 params.first2 <- simset$first.sim()$params
-params.last2  <- simset$last.sim()$params
+params.last2  <- simset$last.sim()$params}
 #
 # engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
 # params.manual <- params.last1
@@ -86,13 +86,31 @@ params.last2  <- simset$last.sim()$params
 # params.manual["sti.screening.multiplier.ll"] <- 10
 # sim.manual <- engine$run(params.manual)
 
+
+CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.02.pk4'; DATE <- "2025-07-02"
+get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
+simset <- assemble.simulations.from.calibration(
+    version = VERSION,
+    location = LOCATION,
+    calibration.code = CALIBRATION.CODE.TO.RUN,
+    allow.incomplete = TRUE)
+# simset4<-simset
+
+simset$n.sim
+# Extract first and last simulations and their parameters 
+sim.first    <- simset$first.sim()
+sim.last     <- simset$last.sim()
+
 # PLOT -----
 simplot(
     # sim.first0,
     # sim.first1,
     sim.last1,
     # sim.first2,
-    sim.last2,
+    # sim.last2,
+    # sim.first,
+    sim.last,
+    
     # sim.manual,
     # split.by = "race", facet.by = "sex",
     # split.by = "race", facet.by = "age",
@@ -137,7 +155,7 @@ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
     simplot(
         # sim.first,
         sim.last,
-        sim.last2,
+        # sim.last2,
         sim.manual,
         # split.by = "sex",
         # split.by = "age",

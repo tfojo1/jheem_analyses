@@ -166,7 +166,8 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
 ## ---- TRANSITION RATES ----
 # RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
-                                      0.25,0,0)
+                                      0,0,0)
+                                      # 0.25,0,0) 
 # Late Latent to Tertiary:
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
                                       0.01049095 ,0,0, #0.00946867 ,0.01151324,  
@@ -221,7 +222,8 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests
 # *** STI SCREENING ---- ##-----
 # these are all changed in calibration 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ps',
-                                      1, 1,1 )
+                                      0,0,0)
+                                      # 1, 1,1 )
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.el',
                                       1,1,1  )
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ll',
@@ -263,8 +265,9 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.miscla
 #*** TREATMENTS INITIATION  **** ## ---- 
 #*#'@PK:double check
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
-                                      0.89,0,0,
-                                      citation = "syphilis_natural_history.docx")
+                                      0,0,0)
+                                      # 0.89,0,0)
+                                      
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.testing.symptomatic', 
                                       0.89,0,0,
                                       citation = "syphilis_natural_history.docx")
