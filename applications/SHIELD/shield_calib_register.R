@@ -74,7 +74,7 @@ register.calibration.info(code = "calib.diagnosis.07.01.pk1",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = shield.solver
 )
-for (i in c(1:3)){
+for (i in c(1:4)){
     register.calibration.info(code = paste0("calib.diagnosis.07.02.pk",i),
                               preceding.calibration.codes = "calib.diagnosis.07.01.pk1", #calibrated diagnosis model
                               likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
@@ -90,7 +90,11 @@ for (i in c(1:3)){
                               description = "A quick run to get syphilis parameters in the general vicinity",
                               solver.metadata = shield.solver
     )}
+
 # LOG SUMMARY -----
+# <calib.diagnosis.07.02.pk4> ----
+# EL transmissibility = ON
+
 # <calib.diagnosis.07.02.pk1-3> ----
 # repeating calibration from yesterday with weight 1/8, running 3 parallel chains to see if they converge
 # starting calibration from calib.diagnosis.07.01.pk1 
@@ -98,7 +102,7 @@ for (i in c(1:3)){
 # <calib.diagnosis.07.01.pk1> ----
 # w=1/8
 # revised the prior for EL and LL sti screening multipliers
-# change the diagnosis likelihood to use "autoregressive.1" correlation instead of compund symmetry
+# change the diagnosis likelihood to use "autoregressive.1" correlation instead of compound symmetry
 # >>> this one works great
 
 # <calib.diagnosis.07.01.pk2> # downweighting likelihoods to w=1/32 to make sure it mixes well

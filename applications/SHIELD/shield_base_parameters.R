@@ -63,15 +63,13 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'el.diagnoses.multi
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'lu.diagnoses.multiplier.1970',
                                       2.2,0,0)
 
-
 # *** INFECTIOUSNESS ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'secondary.transmissibility',  
                                       1,1,1)  # Max value
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
                                       1,1,1)  #assumption
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
-                                      #.25,0,0,
-                                      0,0,0) #'@PK:  temporary change for calibration
+                                      .25,0,0)
 
 ## ---- MIXING BY SEXUAL ORIENTATION ---- ## ----
 #observed to estimated ratio of contacts for females with male who are msm
