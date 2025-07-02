@@ -166,8 +166,8 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
 ## ---- TRANSITION RATES ----
 # RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
-                                      0,0,0)
-                                      # 0.25,0,0) 
+                                      # 0,0,0)
+                                      0.25,0,0)
 # Late Latent to Tertiary:
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.to.tertiary.male',
                                       0.01049095 ,0,0, #0.00946867 ,0.01151324,  
