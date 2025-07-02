@@ -26,7 +26,7 @@ LOCATION='C.12580' #Baltimore MSA
 # LOCATION='C.35620'#NYC
 set.seed(00000)
 
-CALIBRATION.NAME = 'calib.diagnosis.07.01.pk1' 
+CALIBRATION.NAME = 'calib.diagnosis.07.02.pk1' 
 
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
@@ -66,6 +66,10 @@ simset = assemble.simulations.from.calibration(version = VERSION,
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
-filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
-save(simset,file=filename)
+# filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+# save(simset,file=filename)
+
+filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+save(simset,file =filename )
+
 print(paste0("Simet was saved on disk as:   ", filename))

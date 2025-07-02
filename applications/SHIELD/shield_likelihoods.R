@@ -8,7 +8,7 @@
 
 
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
-TOTAL.WEIGHT=1/32
+TOTAL.WEIGHT=1/8
 POPULATION.WEIGHT = TOTAL.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT

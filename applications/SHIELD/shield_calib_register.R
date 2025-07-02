@@ -7,12 +7,12 @@ default.solver= create.solver.metadata()
 
 #parameter set for demographic calibration
 param.names.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
-                           AGING.PARAMETERS.PRIOR@var.names
-                          )
+                     AGING.PARAMETERS.PRIOR@var.names
+)
 
 #parameter set for diagnosis calibration
 param.names.diag<-c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                   TESTING.PARAMETERS.PRIOR@var.names)
+                    TESTING.PARAMETERS.PRIOR@var.names)
 
 #parameter set for demographic & diagnosis calibration
 param.names.all<-c(
@@ -74,30 +74,37 @@ register.calibration.info(code = "calib.diagnosis.07.01.pk1",
                           description = "A quick run to get syphilis parameters in the general vicinity",
                           solver.metadata = shield.solver
 )
-register.calibration.info(code = "calib.diagnosis.07.01.pk2",
-                          preceding.calibration.codes = "calib.diagnosis.06.30.pk1", #calibrated demographic model
-                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = 
-                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = shield.solver
-)
-# LOG SUMMARY:
-# <calib.diagnosis.07.01.pk1> 
+for (i in c(1:3)){
+    register.calibration.info(code = paste0("calib.diagnosis.07.02.pk",i),
+                              preceding.calibration.codes = "calib.diagnosis.07.01.pk1", #calibrated diagnosis model
+                              likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030,
+                              parameter.names = 
+                                  c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                    TESTING.PARAMETERS.PRIOR@var.names),
+                              n.iter = N.ITER,
+                              thin = 50,
+                              is.preliminary = T,
+                              max.run.time.seconds = 30,
+                              description = "A quick run to get syphilis parameters in the general vicinity",
+                              solver.metadata = shield.solver
+    )}
+# LOG SUMMARY -----
+# <calib.diagnosis.07.02.pk1-3> ----
+# repeating calibration from yesterday with weight 1/8, running 3 parallel chains to see if they converge
+# starting calibration from calib.diagnosis.07.01.pk1 
+
+# <calib.diagnosis.07.01.pk1> ----
+# w=1/8
 # revised the prior for EL and LL sti screening multipliers
 # change the diagnosis likelihood to use "autoregressive.1" correlation instead of compund symmetry
+# >>> this one works great
 
-# <calib.diagnosis.07.01.pk2> 
-# downweighting likelihoods to 1/32
+# <calib.diagnosis.07.01.pk2> # downweighting likelihoods to w=1/32 to make sure it mixes well
+# >>> this one didnt work as well
 
-# <calib.diagnosis.06.30.pk1> 
+# <calib.diagnosis.06.30.pk1> ----
 # changing the initial number infected in 1970
 # adding new transmission multiplier in 1990
 # calibrating to PS total, EL total, Late total, HIV tests
@@ -203,4 +210,3 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 # calibrating to total ps; total EL diagnosis and hiv tests targets
 # downweighting the likelihood
 # 1) removed relapse =0 #2) removed infectiousness for EL stage =0 #3) removed screening for PS (muliplier set to 0) #4) took out prenatal care #5) took out contact tracing
- 
