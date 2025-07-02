@@ -234,26 +234,17 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.mult
 
 # *** CONTACT TRACING ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
-                                      # 0.8,0,0,   #0.3, 0.98,
-                                      0,0,0, #'@PK:  temporary change for calibration
-                                      citation = "syphilis_natural_history.docx")
-
+                                      0.8,0,0)   #0.3, 0.98
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
-                                      0.1, 0,0, #.05, 0.2,
-                                      citation = "syphilis_natural_history.docx")
+                                      0.1, 0,0) #.05, 0.2,
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.empirically.treated.infected.per.index.case',
-                                      0.1, 0,0, #0.04, 0.19,
-                                      citation = "syphilis_natural_history.docx")
- 
+                                      0.1, 0,0) #0.04, 0.19,
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.primary',
-                                      0.1425, 0,0,
-                                      citation = "syphilis_natural_history.docx")
+                                      0.1425, 0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.secondary',
-                                      0.4275, 0,0,
-                                      citation = "syphilis_natural_history.docx")
+                                      0.4275, 0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.contacts.in.early.latent',
-                                      0.215, 0,0,
-                                      citation = "syphilis_natural_history.docx")
+                                      0.215, 0,0)
 
 
 #*** MISCLASSIFICATION ERROR **** ## -----
@@ -282,8 +273,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immedi
 #if someone is diagnosed and doesn't receive immediate treatment, what is the rate of treatment
 #'@Todd: should we separate this based on symptoms? or for pregnant women? 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.treatment.after.delay', 
-                                      1.91,0,0
-                                      ) 
+                                      1.91,0,0) 
 
 ## ********** -----
 SHIELD_BASE_PARAMETER_VALUES = SHIELD_BASE_PARAMETER$values
