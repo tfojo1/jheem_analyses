@@ -60,7 +60,7 @@ register.calibration.info(code = "calib.diagnosis.06.30.pk1",
 )
 # a simplified model
 register.calibration.info(code = "calib.diagnosis.07.01.pk1",
-                          preceding.calibration.codes = "calib.diagnosis.06.30.pk1", #calibrated demographic model
+                          preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
                           likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -91,6 +91,20 @@ register.calibration.info(code = "calib.07.03.pk1",
                           description = "A quick run to get syphilis parameters in the general vicinity"
                           )
  
+register.calibration.info(code = "calib.07.02.rf",
+                          preceding.calibration.codes = "calib.demog.06.09.pk",  
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = 
+                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER,
+                          thin = 50,
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity"
+)
 
 # LOG SUMMARY -----
 # <calib.07.03.pk1> ----
