@@ -1,3 +1,8 @@
+# rm(list = ls())  # Clear workspace
+# detach(name = "jheem", unload = TRUE)  # Detach conflicting package if loaded
+# Load deSolve
+# library(deSolve)
+
 # Load Required Libraries and Commoncode----
 library(plotly)
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
@@ -7,6 +12,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager   = create.style.manager( color.data.by = "source",shade.data.by =  "stratum")
 stratum.style.manager  = create.style.manager(color.data.by = "stratum")
+sim.style.manager  = create.style.manager(color.data.by = "simulation")
 
 # Configuration ----
 VERSION <- 'shield'
@@ -19,7 +25,7 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 
 # # CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
 # CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk1'; DATE <- "2025-07-01"
-# CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk2'; DATE <- "2025-07-01"
+# CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.02.pk1'; DATE <- "2025-07-02"
 # 
 # 
 # # Load or Assemble Simulation Set ----
@@ -37,81 +43,58 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 #         calibration.code = CALIBRATION.CODE.TO.RUN,
 #         allow.incomplete = TRUE
 #     )
+#     save(simset,file=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
+# }
+
+CALIBRATION.CODE.TO.RUN <- 'calib.07.02.rf'; DATE <- "2025-07-03"
+load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
+simset.rf=simset;
+
+
+# { #READ data: 
+#     load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk1","Rdata"))
+#     simset1=simset
+#     
+#     CALIBRATION.CODE.TO.RUN <- 'calib.07.02.rf'; DATE <- "2025-07-03"
+#     load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
+#     simset3=simset;
 # }
 # {
-    # CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.02.pk1'; DATE <- "2025-07-02"
-    # get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
-    # simset <- assemble.simulations.from.calibration(
-    #     version = VERSION,
-    #     location = LOCATION,
-    #     calibration.code = CALIBRATION.CODE.TO.RUN,
-    #     allow.incomplete = TRUE)
-    # save(simset,file = paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.CODE.TO.RUN,"Rdata"))
-    # simset1=simset
-#     
-#     CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk2'; DATE <- "2025-07-01"
-#     get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
-#     simset <- assemble.simulations.from.calibration(
-#         version = VERSION,
-#         location = LOCATION,
-#         calibration.code = CALIBRATION.CODE.TO.RUN,
-#         allow.incomplete = TRUE)
-#     save(simset,file = paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.CODE.TO.RUN,"Rdata"))
-#     simset2=simset
+#     # Quick checkpoint ----
+#     simset=simset1
+#     simset$n.sim
+#     # Extract first and last simulations and their parameters 
+#     sim.first1    <- simset$first.sim()
+#     sim.last1     <- simset$last.sim()
+#     params.first1 <- simset$first.sim()$params
+#     params.last1  <- simset$last.sim()$params
+#     # 
+#     simset=simset2
+#     simset$n.sim
+#     # simset$solver.metadata
+#     sim.first2    <- simset$first.sim()
+#     sim.last2     <- simset$last.sim()
+#     params.first2 <- simset$first.sim()$params
+#     params.last2  <- simset$last.sim()$params
 # }
 
-{load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk1","Rdata"))
-# Quick checkpoint ----
-simset1=simset
-simset$n.sim
-# Extract first and last simulations and their parameters 
-sim.first1    <- simset$first.sim()
-sim.last1     <- simset$last.sim()
-params.first1 <- simset$first.sim()$params
-params.last1  <- simset$last.sim()$params
+engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+params.manual <- simset.rf$last.sim()$params
+sim.mac.engine <- engine$run(params.manual)
 
-load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk2","Rdata"))
-# Quick checkpoint ----
-simset2=simset;
-simset$n.sim
-# Extract first and last simulations and their parameters 
-sim.first2    <- simset$first.sim()
-sim.last2     <- simset$last.sim()
-params.first2 <- simset$first.sim()$params
-params.last2  <- simset$last.sim()$params}
-#
-# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-# params.manual <- params.last1
-# params.manual["sti.screening.multiplier.el"] <- 10
-# params.manual["sti.screening.multiplier.ll"] <- 10
-# sim.manual <- engine$run(params.manual)
-
-
-CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.02.pk4'; DATE <- "2025-07-02"
-get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
-simset <- assemble.simulations.from.calibration(
-    version = VERSION,
-    location = LOCATION,
-    calibration.code = CALIBRATION.CODE.TO.RUN,
-    allow.incomplete = TRUE)
-# simset4<-simset
-
-simset$n.sim
-# Extract first and last simulations and their parameters 
-sim.first    <- simset$first.sim()
-sim.last     <- simset$last.sim()
+# load(paste0(get.jheem.root.directory(),"/shield/","calib.07.02.temp_simset_2025-07-02_C.12580",".Rdata"))
+# simset.mac.calib=simset
 
 # PLOT -----
 simplot(
     # sim.first0,
     # sim.first1,
-    sim.last1,
+    # sim.last1,
     # sim.first2,
     # sim.last2,
-    # sim.first,
-    sim.last,
-    
-    # sim.manual,
+    simset.rf$last.sim(),
+    sim.mac.engine,
+    # simset.mac.calib$first.sim(),
     # split.by = "race", facet.by = "sex",
     # split.by = "race", facet.by = "age",
     # outcomes = c("population"),    split.by = "race", facet.by = "age",
@@ -128,7 +111,6 @@ simplot(
     cbind(simset$get.params("transmission"))
     cbind(sim.last$get.params("trans"))
     
-    simset$traceplot("screen")
     simset$traceplot("diagnoses")
     simset$traceplot("test")
     simset$traceplot("symptomatic")
