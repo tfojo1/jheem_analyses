@@ -165,14 +165,19 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 
 TESTING.PARAMETERS.PRIOR=join.distributions( 
-  # for symptomatic testing
-  prp.symptomatic.primary.msm = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']), sdlogit = log(2)/2 ) , 
-  prp.symptomatic.primary.heterosexual_male = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est']), sdlogit = log(2)/2 ) ,
-  prp.symptomatic.primary.female = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est']), sdlogit = log(2)/2 ) ,
-  prp.symptomatic.secondary.msm = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']), sdlogit = log(2)/2 ) ,
-  prp.symptomatic.secondary.heterosexual_male = Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est']), sdlogit = log(2)/2 ) ,
-  prp.symptomatic.secondary.female= Logitnormal.Distribution( meanlogit = logit(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est']), sdlogit = log(2)/2 ) ,
+  # for symptomatic testing (stage X sex and time) 
+   or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) , 
+   or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+   or.symptomatic.primary.female = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+   or.symptomatic.secondary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+   or.symptomatic.secondary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+   or.symptomatic.secondary.female= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ), 
   
+   or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+   or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+   or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+   
+    
   # for HIV screening
   hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
@@ -398,6 +403,33 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = "all")
   }
   
+  for(time in c("1990","2000","2020")){
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "prp.symptomatic.primary",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0("or.symptomatic.",time)],
+                                                     dimension = "all", #recipient
+                                                     applies.to.dimension.values = "all")
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "prp.symptomatic.primary",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0("or.symptomatic.primary.", sexes)],
+                                                     dimension = "sex", #recipient
+                                                     applies.to.dimension.values = sexes)
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "prp.symptomatic.secondary",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0("or.symptomatic.",time)],
+                                                     dimension = "all", #recipient
+                                                     applies.to.dimension.values = "all")
+      set.element.functional.form.main.effect.alphas(model.settings,
+                                                     element.name = "prp.symptomatic.secondary",
+                                                     alpha.name = time,
+                                                     values = parameters[paste0("or.symptomatic.secondary.", sexes)],
+                                                     dimension = "sex", #recipient
+                                                     applies.to.dimension.values = sexes)
+  }
+  
   
 }
 
@@ -615,16 +647,21 @@ SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
 
 
 SHIELD.TESTING.SAMPLING.BLOCKS = list(
-  symptomatic.primary = c(
-    "prp.symptomatic.primary.msm",
-    "prp.symptomatic.primary.heterosexual_male",
-    "prp.symptomatic.primary.female"
-  ),
-  symptomatic.secondary = c(
-    "prp.symptomatic.secondary.msm",
-    "prp.symptomatic.secondary.heterosexual_male",
-    "prp.symptomatic.secondary.female"
-  ),
+    symptomatic.primary = c(
+        "or.symptomatic.primary.msm",
+        "or.symptomatic.primary.heterosexual_male",
+        "or.symptomatic.primary.female"
+    ),
+    symptomatic.secondary = c(
+        "or.symptomatic.secondary.msm",
+        "or.symptomatic.secondary.heterosexual_male",
+        "or.symptomatic.secondary.female"
+    ),
+    symptomatic.time = c(
+        "or.symptomatic.1990",
+        "or.symptomatic.2000",
+        "or.symptomatic.2020"
+    ),
   hiv.testing = c(
     "hiv.testing.or",
     "hiv.testing.slope.or"

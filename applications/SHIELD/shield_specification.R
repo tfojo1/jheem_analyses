@@ -875,54 +875,99 @@ register.transition(SHIELD.SPECIFICATION,
 # Register "Effective" symptomatic proportions for primary and secondary stages
 # We assume 100% care seeking and testing rate for ”symptomatic” cases in Primary&Secondary Stage (effective proportion) 
 # Those who don’t notice the symptoms or don’t seek care based on symptoms are treated as asymptomatic. 
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'prp.symptomatic.primary.heterosexual_male',
+#                        scale = 'proportion',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'])
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'prp.symptomatic.primary.female',
+#                        scale = 'proportion',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'])
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'prp.symptomatic.primary.msm',
+#                        scale = 'proportion',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est'])
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'prp.symptomatic.secondary.heterosexual_male',
+#                        scale = 'proportion',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'])
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'prp.symptomatic.secondary.female',
+#                        scale = 'proportion',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'])
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'prp.symptomatic.secondary.msm',
+#                        scale = 'proportion',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est'])
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = 'prp.symptomatic.primary',
+#                         scale='proportion',
+#                         value = 'prp.symptomatic.primary.heterosexual_male')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'prp.symptomatic.primary',
+#                                applies.to = list(sex='female'),
+#                                value = 'prp.symptomatic.primary.female')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'prp.symptomatic.primary',
+#                                applies.to = list(sex='msm'),
+#                                value = 'prp.symptomatic.primary.msm')
+
+base.prp.symptomatic.primary = array(
+    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'],
+      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'],
+      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']
+    ),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
+
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.primary.heterosexual_male',
+                       name = "prp.symptomatic.primary",
                        scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'])
+                       functional.form.from.time = 1990,
+                       functional.form = create.natural.spline.functional.form(
+                           knot.times = c("1990" = 1990, "2000" = 2000, "2020" = 2020),
+                           knot.values = list("1990" = base.prp.symptomatic.primary, "2000" = base.prp.symptomatic.primary, "2020" =  base.prp.symptomatic.primary),
+                           link = "logit",
+                           knots.are.on.transformed.scale = F,
+                           after.time = 2030,
+                           after.modifier = 0.5,
+                           modifiers.apply.to.change = T
+                           
+                           
+                       ))
+
+base.prp.symptomatic.secondary = array(
+    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
+      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'],
+      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']
+    ),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
+
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.primary.female',
+                       name = "prp.symptomatic.secondary",
                        scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.primary.msm',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.secondary.heterosexual_male',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.secondary.female',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.secondary.msm',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est'])
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'prp.symptomatic.primary',
-                        scale='proportion',
-                        value = 'prp.symptomatic.primary.heterosexual_male')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.symptomatic.primary',
-                               applies.to = list(sex='female'),
-                               value = 'prp.symptomatic.primary.female')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.symptomatic.primary',
-                               applies.to = list(sex='msm'),
-                               value = 'prp.symptomatic.primary.msm')
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'prp.symptomatic.secondary',
-                        scale='proportion',
-                        value = 'prp.symptomatic.secondary.heterosexual_male')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.symptomatic.secondary',
-                               applies.to = list(sex='female'),
-                               value = 'prp.symptomatic.secondary.female')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.symptomatic.secondary',
-                               applies.to = list(sex='msm'),
-                               value = 'prp.symptomatic.secondary.msm')
+                       functional.form.from.time = 1990,
+                       functional.form = create.natural.spline.functional.form(
+                           knot.times = c("1990" = 1990, "2000" = 2000, "2020" = 2020),
+                           knot.values = list("1990" = base.prp.symptomatic.secondary, "2000" = base.prp.symptomatic.secondary, "2020" =  base.prp.symptomatic.secondary),
+                           link = "logit",
+                           knots.are.on.transformed.scale = F,
+                           after.time = 2030,
+                           after.modifier = 0.5,
+                           modifiers.apply.to.change = T
+                           
+                       ))
+
+
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = 'prp.symptomatic.secondary',
+#                         scale='proportion',
+#                         value = 'prp.symptomatic.secondary.heterosexual_male')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'prp.symptomatic.secondary',
+#                                applies.to = list(sex='female'),
+#                                value = 'prp.symptomatic.secondary.female')
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = 'prp.symptomatic.secondary',
+#                                applies.to = list(sex='msm'),
+#                                value = 'prp.symptomatic.secondary.msm')
 
 # We assume 100% care/seeking and testing rate for symptomatic individuals
 # For now, we assume 100% test.sensitivity as well. 
