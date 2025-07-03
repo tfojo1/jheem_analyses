@@ -1,73 +1,20 @@
+# Steps to manage a bad fit:
+# 1- check the fit using simplot()
+# 2- check mixing 
+# >>Mixing issue? downweighting the likelihoods 
+# >>are we using correct variance correlation:  "autoregressive.1" vs "compound symmetry"
+# 3- look at the likelihood.compute(debug=T):
+# >>  are we looking at the correct values in the plot? data points and simulated points align? 
+# 4- look for a manual sim that looks better
+# >> does the likelihood also look better? likelihood.compare()
+# >> how are the parameter values generating this fit compared to prior?
+# >> do we need to revise the prior?
+# 5- check the variable values inside the engine q=engine$extract.quantity.values()        
+# 
+# 6- Simultanous fit is not achieved:can we simplify the model more? 
+#     
+# >>>run a demographic calibration first model    
+# >>>use it as a starting point for the next calibration focusing on total diagnosis (relax the demographic parameters)
+# >>>strip away unrelated model dynamics to simplify the model (e.g., relapse=0)
+# 
  
-engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-
-params.manual <- params.last
-sim.manual0 <- engine$run(params.manual)
-
-
-# params.manual["global.transmission.rate"] <- 3.7870952 * 1
-# params.manual["hiv.testing.or"] <- params.manual["hiv.testing.or    "] *1.8
-# params.manual["syphilis.screening.multiplier.1990"] <- params.manual["syphilis.screening.multiplier.1990"] *1.8
-# params.manual["syphilis.screening.multiplier.2000"] <- params.manual["syphilis.screening.multiplier.2000"] *1.8
-# params.manual["syphilis.screening.multiplier.2010"] <- params.manual["syphilis.screening.multiplier.2010"] *1.8
-# params.manual["syphilis.screening.multiplier.2020"] <- params.manual["syphilis.screening.multiplier.2020"] *1.5
-sim.manual1 <- engine$run(params.manual)
-
-
-simplot(
-    # sim.first,
-    # sim.last,
-    sim.manual0,
-    sim.manual1,
-    # outcomes = c("diagnosis.total"),
-    outcomes = c("incidence",
-                 "diagnosis.total1",  "diagnosis.ps1","diagnosis.el.misclassified1",
-                 # "diagnosis.el.true","diagnosis.ll.true",
-                 "diagnosis.delayed.treatment","diagnosis.immediate.treatment",
-                 "diagnosis.congenital","hiv.testing"),
-    # dimension.values = list(year = 1970:2030),
-    style.manager = source.style.manager
-)
-
-simplot(
-    # sim.first,
-    # sim.last,
-    sim.manual0,
-    sim.manual,
-    # outcomes = c("diagnosis.total"),
-    outcomes = c("incidence",
-                 "diagnosis.total",  "diagnosis.total1",
-                 "diagnosis.ps", "diagnosis.ps1",
-                 "diagnosis.el.misclassified","diagnosis.el.misclassified1",
-                 # "diagnosis.el.misclassified","diagnosis.ll.misclassified",
-                 # "diagnosis.el.true","diagnosis.ll.true",
-                 "diagnosis.congenital","hiv.testing"),
-    # dimension.values = list(year = 1970:2030),
-    style.manager = source.style.manager
-)
-
-cbind(sim.manual$diagnosis.total,sim.manual$diagnosis.total1) #they are close but not the same
-hist(unlist(sim.manual$diagnosis.total-sim.manual$diagnosis.total1))
-
-simplot(
-    # sim.first,
-    sim.last,
-    sim.manual,
-    split.by = "race",# facet.by = "age",
-    outcomes = c("incidence"),
-    # dimension.values = list(year = 1970:2030),
-    style.manager = source.style.manager
-)
-#looking at local variables 
-q=engine$extract.quantity.values() #returns the input values to the model
-
-q$sti.screening.by.stage
-q$rate.sti.screening
-
-q$prop.index.cases.reached.for.contact.tracing #contact tracing
-q$prp.received.prenatal.care #prenatal care
-q$el.rel.secondary.transmissibility #EL infectiousness
-q$prop.early.latent.to.secondary#relapse
-q$prob.vertical.transmission.by.stage #vertical transmission
-
-dimnames(sim.manual$immigration)

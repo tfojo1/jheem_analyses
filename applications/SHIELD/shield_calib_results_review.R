@@ -5,7 +5,7 @@ source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 # Set Plotting Styles ----
 location.style.manager = create.style.manager(color.data.by = "location.type")
-source.style.manager   = create.style.manager( shape.data.by = "source",color.data.by = "stratum")
+source.style.manager   = create.style.manager( color.data.by = "source",shade.data.by =  "stratum")
 stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 
 # Configuration ----
@@ -15,89 +15,134 @@ LOCATION <- 'C.12580'  # Baltimore MSA
 get.jheem.root.directory() #"/Volumes/jheem$"
 # ROOT.DIR="../../files/"
 # set.jheem.root.directory(ROOT.DIR)
-set.jheem.root.directory("/Volumes/jheem$")
+# set.jheem.root.directory("/Volumes/jheem$")
 
-# CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
-CALIBRATION.CODE.TO.RUN <- 'calib.diag.06.17.pk1'; DATE <- "2025-06-17"
+# # CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
+# CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk1'; DATE <- "2025-07-01"
+# CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk2'; DATE <- "2025-07-01"
+# 
+# 
+# # Load or Assemble Simulation Set ----
+# if (FALSE) {
+#     load(paste0("/Volumes/jheem$/results/Shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
+# }
+# if (FALSE) {
+#     load(paste0("../jheem_analyses/prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
+# }
+# if (TRUE) {
+#     get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
+#     simset <- assemble.simulations.from.calibration(
+#         version = VERSION,
+#         location = LOCATION,
+#         calibration.code = CALIBRATION.CODE.TO.RUN,
+#         allow.incomplete = TRUE
+#     )
+# }
+# {
+    # CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.02.pk1'; DATE <- "2025-07-02"
+    # get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
+    # simset <- assemble.simulations.from.calibration(
+    #     version = VERSION,
+    #     location = LOCATION,
+    #     calibration.code = CALIBRATION.CODE.TO.RUN,
+    #     allow.incomplete = TRUE)
+    # save(simset,file = paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.CODE.TO.RUN,"Rdata"))
+    # simset1=simset
+#     
+#     CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk2'; DATE <- "2025-07-01"
+#     get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
+#     simset <- assemble.simulations.from.calibration(
+#         version = VERSION,
+#         location = LOCATION,
+#         calibration.code = CALIBRATION.CODE.TO.RUN,
+#         allow.incomplete = TRUE)
+#     save(simset,file = paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.CODE.TO.RUN,"Rdata"))
+#     simset2=simset
+# }
 
-
-
-# Load or Assemble Simulation Set ----
-if (FALSE) {
-    load(paste0("/Volumes/jheem$/results/Shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
-}
-if (TRUE) {
-    load(paste0("../jheem_analyses/prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
-}
-if (FALSE) {
-    get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
-    simset <- assemble.simulations.from.calibration(
-        version = VERSION,
-        location = LOCATION,
-        calibration.code = CALIBRATION.CODE.TO.RUN,
-        allow.incomplete = TRUE
-    )
-}
-# sim=extract.last.simulation.from.calibration(version,LOCATION,CALIBRATION.CODE.TO.RUN,allow.incomplete = T)
-simset2=simset
-
-
-# save(simset2, file = paste0(get.jheem.root.directory(),"/shield/","calib.diag.06.17.pk1",".Rdata"))
-
-simset=simset1
+{load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk1","Rdata"))
 # Quick checkpoint ----
+simset1=simset
 simset$n.sim
 # Extract first and last simulations and their parameters 
-sim.first    <- simset$first.sim()
-sim.last     <- simset$last.sim()
-params.first <- simset$first.sim()$params
-params.last  <- simset$last.sim()$params
+sim.first1    <- simset$first.sim()
+sim.last1     <- simset$last.sim()
+params.first1 <- simset$first.sim()$params
+params.last1  <- simset$last.sim()$params
 
-
-simset=simset2
+load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk2","Rdata"))
+# Quick checkpoint ----
+simset2=simset;
 simset$n.sim
 # Extract first and last simulations and their parameters 
 sim.first2    <- simset$first.sim()
 sim.last2     <- simset$last.sim()
 params.first2 <- simset$first.sim()$params
-params.last2  <- simset$last.sim()$params
+params.last2  <- simset$last.sim()$params}
+#
+# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+# params.manual <- params.last1
+# params.manual["sti.screening.multiplier.el"] <- 10
+# params.manual["sti.screening.multiplier.ll"] <- 10
+# sim.manual <- engine$run(params.manual)
 
-# REVIEW
+
+CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.02.pk4'; DATE <- "2025-07-02"
+get.calibration.progress('shield', LOCATION, CALIBRATION.CODE.TO.RUN)
+simset <- assemble.simulations.from.calibration(
+    version = VERSION,
+    location = LOCATION,
+    calibration.code = CALIBRATION.CODE.TO.RUN,
+    allow.incomplete = TRUE)
+# simset4<-simset
+
+simset$n.sim
+# Extract first and last simulations and their parameters 
+sim.first    <- simset$first.sim()
+sim.last     <- simset$last.sim()
+
+# PLOT -----
 simplot(
+    # sim.first0,
+    # sim.first1,
+    sim.last1,
+    # sim.first2,
+    # sim.last2,
     # sim.first,
-    # sim.last,
-    sim.first2,
-    sim.last2,
-    # split.by = "sex",
-    # split.by = "age",
-    # split.by = "race",
+    sim.last,
+    
+    # sim.manual,
     # split.by = "race", facet.by = "sex",
     # split.by = "race", facet.by = "age",
-    # outcomes = c("population"),
-    outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
-     dimension.values = list(year = 1990:2030),
+    # outcomes = c("population"),    split.by = "race", facet.by = "age",
+    outcomes = c("diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified","hiv.testing"),
+    # outcomes = c("prevalence"),
+    dimension.values = list(year = 1970:2023),
     style.manager = source.style.manager
 )
 
 # MCMC Diagnostics ----
 {
     head(simset$get.mcmc.mixing.statistic())
-    simset$traceplot("trans")
-    cbind(simset$get.params("trans"))
+    simset$traceplot("transmission")
+    cbind(simset$get.params("transmission"))
     cbind(sim.last$get.params("trans"))
     
     simset$traceplot("screen")
-    simset$traceplot("initial")
+    simset$traceplot("diagnoses")
     simset$traceplot("test")
+    simset$traceplot("symptomatic")
+    simset$traceplot("screening")
+    
     
     simset$traceplot("black.aging")
     simset$traceplot("hispanic.aging")
     simset$traceplot("mortality")
     simset$traceplot("fertility")
 }
+
 #Run Manual Simulation ----
 engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-#
 {
     params.manual <- params.last
     # params.manual["hiv.testing.or"] <- 1.004 
@@ -106,11 +151,11 @@ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
     # params.manual["rate.screening.el.multiplier"] <- 1.
     # 
     sim.manual <- engine$run(params.manual)
-    
+    #
     simplot(
         # sim.first,
         sim.last,
-        sim.last2,
+        # sim.last2,
         sim.manual,
         # split.by = "sex",
         # split.by = "age",
@@ -124,20 +169,27 @@ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
         style.manager = source.style.manager
     )
 }
-
+# Likelihood Review ----
 {
     lik=likelihood.instructions.syphilis.diag.total.no.demog$instantiate.likelihood(VERSION,LOCATION)
-    # lik.ps$compute(sim.last, debug = T)
-    # lik.ps$compute(sim.manual, debug = T)
-    # lik.ps$compare.sims(sim.first, sim.last, piecewise = T)
-    lik$compare.sims(sim.manual, sim.last2, piecewise = T, log = F) #values greater than 1 mean than sim2 is better than sim1, while values less than 1 mean that sim2 is worse than sim1. 
-    lik.total$compare.sims(sim.last, sim.manual, piecewise = F)
-    # 
+    # compare: 
     # Yes, if you add debug=T to either the compute.likelihood or compare.sims functions, you will enter a debug mode in the likelihood. From there, you can view the “lik.summary" (it's just a data frame object that should already be computed), which will have the actual values for each stratum (called "obs"), the sim values ("mean") and the standard deviation I think. There might also be a Z score column that standardizes how far off the sim is from the observed value, though I can't remember off the top of my head. (Note that because compare.sims takes two different sims as the arguments, you will enter the debug mode for whichever sim you have listed first).  
-
+    lik$compare.sims(sim.last1,sim.manual, piecewise = T, log = F) #values greater than 1 mean than sim2 is better than sim1, while values less than 1 mean that sim2 is worse than sim1. 
+    
+    lik.late=late.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
+    lik.late$compare.sims(sim.last1,sim.manual, piecewise = T, log = F) #values greater than 1 mean than sim2 is better than sim1, while values less than 1 mean that sim2 is worse than sim1. 
+    lik.late$compute(sim.manual,debug=T)
+    
+    lik.early=early.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION, LOCATION)
+    lik.early$compare.sims(sim.last1,sim.manual, piecewise = T, log = F) #values greater than 1 mean than sim2 is better than sim1, while values less than 1 mean that sim2 is worse than sim1. 
+    
+    # Compute ----
+    # mask = lik.summary$stratum== "15-19 years __hispanic"
+    # lik.summary[mask]
+    
 }
 
-# Reviewing the engine computation time
+# Reviewing the engine computation time -----
 {
     # engine= create.jheem.engine(VERSION, LOCATION, end.year = 2030)
     # enable.jheem.solver.tracking() #will slow down but track additional data
@@ -156,21 +208,10 @@ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
     # sim2$run.metadata$n.diffeq.evaluations
 }
 
-range(sim$infected-sim2$infected)
 
-
+# compare priors ----
 calculate.density(SHIELD.FULL.PARAMETERS.PRIOR, sim.manual$params) / calculate.density(SHIELD.FULL.PARAMETERS.PRIOR, sim.last$params) 
 
-# # # Plot hiv.testing 
-# simplot(
-#     sim.first,
-#     sim.last,
-#     #sim.manual,
-#     # facet.by = "sex",
-#     # facet.by = "age",
-#     outcomes = c("hiv.testing"),
-#     dimension.values = list(year = 2000:2030)
-# )
 
 
 
@@ -194,31 +235,15 @@ if (1==2){
     lik.fert$compute(sim.last, debug = TRUE)
 }
 
-
-source("applications/SHIELD/shield_likelihoods.R")
-# Likelihood Comparison ----
-lik<- likelihood.instructions.syphilis.diagnoses.psTotal$instantiate.likelihood(VERSION, LOCATION)
-lik$compare.sims( sim.last, sim.manual, piecewise = F)
-lik$compute(sim.last, debug = T)
-
-lik.ps=ps.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION,LOCATION)
-lik.ps$compute(sim.last, debug = T)
-lik.ps$compute(sim.manual, debug = T)
-lik.ps$compare.sims(sim.last, sim.manual, piecewise = T)
-
-# lik$compute(sim,debug=T)
-# mask = lik.summary$stratum== "15-19 years __hispanic"
-# lik.summary[mask]
-# Save simset ----
-# save(simset, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_simset_", Sys.Date(), "_", LOCATION, ".Rdata"))
-# Save sim.manual
-# save(sim.manual, file = paste0("prelim_results/", CALIBRATION.CODE.TO.RUN, "_sim.manual_", Sys.Date(), "_", LOCATION, ".Rdata"))
-
 # Looking inside the engine -----
-q=engine$extract.quantity.values() #returns the input values to the model
-input.fertility = q$fertility.rate[["2020"]]
-dimnames(sim.manual$immigration)
-
+{
+    q=engine$extract.quantity.values() #returns the input values to the model
+    q$rate.sti.screening
+    apply(q$rate.sti.screening[[1]],c("stage","age"),mean)
+    
+    sapply(q$rate.sti.screening[[1]],mean)
+    apply(q$rate.sti.screening[[1]],c("stage","age"),mean)
+}
 # Gaussian Reference Proportions ----
 dnorm(0, mean = 0, sd = 1)
 dnorm(1, 0, 1) / dnorm(0, 0, 1)  # ~60% of peak

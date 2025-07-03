@@ -29,12 +29,12 @@ if(!is.null(ROOT.DIR) && file.exists(file.path(ROOT.DIR, "data_managers", "pwh.q
 # Example 1: US HIV stigma by year
 us_stigma <- qol_manager$pull(
     outcome = "hiv.stigma.pwh",
+    source = "cdc.atlasplus.qol",
+    from.ontology.names = "qol.ontology",
     dimension.values = list(
         location = "US", 
         age = "13+ years", 
-        race = "all races",
-        sex = "all",
-        risk = "all transmission"
+        race = "all races"
     ),
     keep.dimensions = "year"
 )
@@ -45,12 +45,12 @@ print(us_stigma)
 # Example 2: All states for 2022
 states_2022 <- qol_manager$pull(
     outcome = "hiv.stigma.pwh",
+    source = "cdc.atlasplus.qol",
+    from.ontology.names = "qol.ontology",
     dimension.values = list(
         year = "2022",
         age = "13+ years", 
-        race = "all races",
-        sex = "all",
-        risk = "all transmission"
+        race = "all races"
     ),
     keep.dimensions = "location"
 )
@@ -61,12 +61,12 @@ print(head(states_2022, 10))
 # Example 3: Age-stratified data for US, 2022
 us_by_age <- qol_manager$pull(
     outcome = "hiv.stigma.pwh",
+    source = "cdc.atlasplus.qol",
+    from.ontology.names = "qol.ontology",
     dimension.values = list(
         location = "US",
         year = "2022",
-        race = "all races",
-        sex = "all", 
-        risk = "all transmission"
+        race = "all races"
     ),
     keep.dimensions = "age"
 )
@@ -87,13 +87,13 @@ us_2022_summary <- data.frame(
 for(outcome in outcomes) {
     result <- qol_manager$pull(
         outcome = outcome,
+        source = "cdc.atlasplus.qol",
+        from.ontology.names = "qol.ontology",
         dimension.values = list(
             location = "US",
             year = "2022", 
             age = "13+ years", 
-            race = "all races",
-            sex = "all",
-            risk = "all transmission"
+            race = "all races"
         ),
         keep.dimensions = "year"
     )
@@ -111,11 +111,11 @@ print(us_2022_summary)
 # Example 5: Year x Location matrix for one outcome
 food_insecurity_matrix <- qol_manager$pull(
     outcome = "food.insecurity.pwh",
+    source = "cdc.atlasplus.qol",
+    from.ontology.names = "qol.ontology",
     dimension.values = list(
         age = "13+ years", 
-        race = "all races",
-        sex = "all",
-        risk = "all transmission"
+        race = "all races"
     ),
     keep.dimensions = c("year", "location")
 )

@@ -655,7 +655,7 @@
   },
   {
     "id": 280,
-    "name": "Linkage to HIV care",
+    "name": "Linkage to HIV medical care",
     "sortid": 107,
     "vtid": 1
   },
@@ -1104,6 +1104,114 @@
     "vtid": 3,
     "fips": "",
     "geoLevel": 1001,
+    "ehe": 0
+  },
+  {
+    "id": 8459,
+    "name": "Atlanta-Sandy Springs-Roswell, GA",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "1206012054",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8460,
+    "name": "Marietta, GA",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "1206031924",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8461,
+    "name": "Lake County-Porter County-Jasper County, IN",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "1698029414",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8462,
+    "name": "Killeen-Temple, TX",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "2866000000",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8463,
+    "name": "Kiryas Joel-Poughkeepsie-Newburgh, NY",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "2888000000",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8464,
+    "name": "Lakewood-New Brunswick, NJ",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "3562029484",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8465,
+    "name": "Everett, WA",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "4266021794",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8466,
+    "name": "St. Petersburg-Clearwater-Largo, FL",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "4530041304",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8467,
+    "name": "Tampa, FL",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "4530045294",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8468,
+    "name": "Washington, DC-MD",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "4790047764",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8469,
+    "name": "Arlington-Alexandria-Reston, VA-WV",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "4790011694",
+    "geoLevel": 1004,
+    "ehe": 0
+  },
+  {
+    "id": 8470,
+    "name": "Cleveland-Elyria, OH",
+    "sortid": 0,
+    "vtid": 3,
+    "fips": "1741000000",
+    "geoLevel": 1004,
     "ehe": 0
   },
   {
@@ -5529,7 +5637,7 @@
   },
   {
     "id": 8373,
-    "name": "New York-Newark-Jersey City, NY-NJ-PA  ",
+    "name": "New York-Newark-Jersey City, NY-NJ",
     "sortid": 8373,
     "vtid": 3,
     "fips": "3562000000",
@@ -5547,7 +5655,7 @@
   },
   {
     "id": 8375,
-    "name": "Newark, NJ-PA  ",
+    "name": "Newark, NJ",
     "sortid": 8375,
     "vtid": 3,
     "fips": "3562035084",
@@ -5574,7 +5682,7 @@
   },
   {
     "id": 8378,
-    "name": "Ogden-Clearfield, UT  ",
+    "name": "Ogden, UT  ",
     "sortid": 8378,
     "vtid": 3,
     "fips": "3626000000",
