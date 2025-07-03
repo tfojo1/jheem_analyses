@@ -1,12 +1,14 @@
 
 library(ggplot2)
 
-PLOT.DIR = file.path('../../results/ryan_white/figure_survey_results/')
-PLOT.HEIGHT = 1.7
+PLOT.DIR = file.path(RW.ROOT.PLOT.DIR, 'figure_survey_results/')
+PLOT.HEIGHT = 1.7 + 0.35
+CAPTION.HEIGHT = 0.25
 PLOT.WIDTH = 2
 PLOT.DPI = 600
 PLOT.DEVICE = 'png'
 PLOT.TEXT.SIZE = 8
+CAPTION.TEXT.SIZE = 11
 
 
 KERNEL.XLIM = c(0,1)
@@ -75,10 +77,55 @@ print(paste0("    ",  round(mean(rw_survey$q3_support_loss[medicaid.expansion.ma
              " expansion, ", round(mean(rw_survey$q3_support_loss[medicaid.nonexpansion.mask], na.rm=T)),
              " NON-expansion"))
 
+#-- Set up DFs and Summaries --#
+
 df.for.hist = rbind(
     cbind(rw_survey[medicaid.expansion.mask,c(4,6,8)]/100, medicaid='exp'),
     cbind(rw_survey[medicaid.nonexpansion.mask,c(4,6,8)]/100, medicaid='nonexp')
 )
+
+
+df.kernel = as.data.frame(
+    rbind(t(RW.effect.values[1:3,]),
+          t(RW.effect.values[4:6,])))
+df.kernel$medicaid = rep(c('exp','nonexp'), each=ncol(RW.effect.values))
+
+colnames(df.kernel) = colnames(df.for.hist)
+
+
+df.kernel.adj = as.data.frame(
+    rbind(t(adjusted.RW.effect.values[1:3,]),
+          t(adjusted.RW.effect.values[4:6,])))
+df.kernel.adj$medicaid = rep(c('exp','nonexp'), each=ncol(RW.effect.values))
+
+colnames(df.kernel.adj) = colnames(df.for.hist)
+
+dfs = list(survey=df.for.hist, samples=df.kernel, cons_samples=df.kernel.adj)
+questions = colnames(df.for.hist)[1:3]
+
+summaries = sapply(questions, function(q){
+    sapply(dfs, function(df){
+        sapply(c('exp','nonexp'), function(medicaid){
+            
+            values = df[[q]][ df[['medicaid']]==medicaid ]
+            values = values[!is.na(values)]
+            
+            paste0(round(100*mean(values)), '% [',
+                   round(100*quantile(values, probs=.25)), ' - ',
+                   round(100*quantile(values, probs=.75)), "%], n=",
+                   length(values))
+            
+        })
+    })
+})
+
+rownames(summaries) = paste0(rep(names(dfs), each=2), ", ", rep(c('expansion','nonexp'), 3))
+write.csv(summaries, file=file.path(PLOT.DIR, 'summary_stats.csv'))
+
+
+
+
+#-- make row1 panels --#
 
 survey.items = c(adap = 'q1_adap_loss',
                  oahs = 'q2_oahs_loss',
@@ -133,15 +180,18 @@ plot = ggplot(df.for.hist, aes(x=q1_adap_loss, fill=medicaid, group=medicaid)) +
     scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
-    theme_bw(base_size = PLOT.TEXT.SIZE) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[1,1]) +
+    labs(caption=summaries[2,1]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylim(0,Y.LIM) + 
     ylab(NULL); plot
 #    ylab("Number of Respondents"); plot
 
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "survey_q1_adap.png"),
+       filename=file.path(PLOT.DIR, "Figure_1A.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -149,47 +199,38 @@ plot = ggplot(df.for.hist, aes(x=q2_oahs_loss, fill=medicaid, group=medicaid)) +
     scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
-    theme_bw(base_size = PLOT.TEXT.SIZE) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[1,2]) +
+    labs(caption=summaries[2,2]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylim(0,Y.LIM) + 
     ylab(NULL); print(plot)
 #    ylab("Number of Respondents"); plot
 
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "survey_q2_oahs.png"),
+       filename=file.path(PLOT.DIR, "Figure_1B.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
-
 
 
 plot = ggplot(df.for.hist, aes(x=q3_support_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS) +
     scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
-    theme_bw(base_size = PLOT.TEXT.SIZE) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) + # name="Estimated Proportion Who\nWould Lose Suppression") +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[1,3]) +
+    labs(caption=summaries[2,3]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylim(0,Y.LIM) + 
     ylab(NULL); print(plot)
 #    ylab("Number of Respondents"); plot
-
-
-ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "survey_q3_support.png"),
+ 
+ggsave(plot = plot,
+       filename=file.path(PLOT.DIR, "Figure_1C.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
-
-
-plot = ggplot(df.for.hist, aes(x=q3_support_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = T, bins = N.BINS) +
-    scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
-                      labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
-                      name=NULL) +
-    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, name="Estimated Proportion Who\nWould Lose Suppression") +
-    ylab(NULL); plot
-
-ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "dummy_for_legend.png"),
-       height = PLOT.HEIGHT/2, width = PLOT.WIDTH*2, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
 #-- For sampled effects --#
@@ -197,24 +238,21 @@ ggsave(plot = plot,
 N.BINS.KERNEL = 25
 KERNEL.YLIM = c(0,110)
 
-df.kernel = as.data.frame(
-    rbind(t(RW.effect.values[1:3,]),
-          t(RW.effect.values[4:6,])))
-df.kernel$medicaid = rep(c('exp','nonexp'), each=ncol(RW.effect.values))
-
-colnames(df.kernel) = colnames(df.for.hist)
 
 plot = ggplot(df.kernel, aes(x=q1_adap_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS.KERNEL) +
     scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     ylim(KERNEL.YLIM) +
-    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[3,1]) +
+    labs(caption=summaries[4,1]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylab(NULL); plot
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "sampled_q1_adap.png"),
+       filename=file.path(PLOT.DIR, "Figure_1D.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -223,12 +261,15 @@ plot = ggplot(df.kernel, aes(x=q2_oahs_loss, fill=medicaid, group=medicaid)) + g
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     ylim(KERNEL.YLIM) +
-    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[3,2]) +
+    labs(caption=summaries[4,2]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylab(NULL); plot
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "sampled_q2_oahs.png"),
+       filename=file.path(PLOT.DIR, "Figure_1E.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -237,36 +278,36 @@ plot = ggplot(df.kernel, aes(x=q3_support_loss, fill=medicaid, group=medicaid)) 
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     ylim(KERNEL.YLIM) +
-    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[3,3]) +
+    labs(caption=summaries[4,3]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylab(NULL); plot
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "sampled_q3_support.png"),
+       filename=file.path(PLOT.DIR, "Figure_1F.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 #-- For adjusted sampled effects --#
 
 KERNEL.ADJ.YLIM = c(0,420)
 
-df.kernel.adj = as.data.frame(
-    rbind(t(adjusted.RW.effect.values[1:3,]),
-          t(adjusted.RW.effect.values[4:6,])))
-df.kernel.adj$medicaid = rep(c('exp','nonexp'), each=ncol(RW.effect.values))
-
-colnames(df.kernel.adj) = colnames(df.for.hist)
 
 plot = ggplot(df.kernel.adj, aes(x=q1_adap_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = F, bins = N.BINS.KERNEL) +
     scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     ylim(KERNEL.ADJ.YLIM) +
-    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[5,1]) +
+    labs(caption=summaries[6,1]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylab(NULL); plot
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "sampled.adj_q1_adap.png"),
+       filename=file.path(PLOT.DIR, "Figure_1G.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -275,12 +316,15 @@ plot = ggplot(df.kernel.adj, aes(x=q2_oahs_loss, fill=medicaid, group=medicaid))
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     ylim(KERNEL.ADJ.YLIM) +
-    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[5,2]) +
+    labs(caption=summaries[6,2]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylab(NULL); plot
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "sampled.adj_q2_oahs.png"),
+       filename=file.path(PLOT.DIR, "Figure_1H.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -289,36 +333,34 @@ plot = ggplot(df.kernel.adj, aes(x=q3_support_loss, fill=medicaid, group=medicai
                       labels = c(exp="Medicaid Expansion States", nonexp="Medicaid Non-Expansion States"),
                       name=NULL) +
     ylim(KERNEL.ADJ.YLIM) +
-    theme_bw(base_size = PLOT.TEXT.SIZE*1.2) + theme(legend.position = 'bottom') + 
-    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name=NULL) +
+    theme_bw(base_size = PLOT.TEXT.SIZE) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[5,3]) +
+    labs(caption=summaries[6,3]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0)) + 
     ylab(NULL); plot
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "sampled.adj_q3_support.png"),
+       filename=file.path(PLOT.DIR, "Figure_1I.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
 
-#-- Table legends --#
+plot = ggplot(df.kernel.adj, aes(x=q3_support_loss, fill=medicaid, group=medicaid)) + geom_histogram(position='dodge', show.legend = T, bins = N.BINS.KERNEL) +
+    scale_fill_manual(values = c(exp=RW.EXP.COLOR, nonexp=RW.NONEXP.COLOR), 
+                      labels = c(exp="Medicaid Expansion States ", nonexp="Medicaid Non-Expansion States"),
+                      name=NULL) +
+    ylim(KERNEL.ADJ.YLIM) +
+    theme_bw(base_size = PLOT.TEXT.SIZE+3) + 
+    scale_x_continuous(labels=scales::percent, limits = KERNEL.XLIM, name = summaries[5,3]) +
+    labs(caption=summaries[6,3]) +
+    theme(plot.caption = element_text(hjust = 0.5, size = CAPTION.TEXT.SIZE, color = RW.NONEXP.COLOR, face = 'bold'),
+          axis.title.x = element_text(size = CAPTION.TEXT.SIZE, color = RW.EXP.COLOR, face = 'bold', vjust = 0),
+          legend.position = 'bottom') + 
+    ylab(NULL); plot
 
-dfs = list(survey=df.for.hist, samples=df.kernel, cons_samples=df.kernel.adj)
-questions = colnames(df.for.hist)[1:3]
+legend = cowplot::get_plot_component(plot, 'guide-box-bottom', return_all = TRUE)
 
-summaries = sapply(questions, function(q){
-        sapply(dfs, function(df){
-            sapply(c('exp','nonexp'), function(medicaid){
-            
-            values = df[[q]][ df[['medicaid']]==medicaid ]
-            values = values[!is.na(values)]
-            
-            paste0(round(100*mean(values)), '% [',
-                   round(100*quantile(values, probs=.25)), ' - ',
-                   round(100*quantile(values, probs=.75)), "%], n=",
-                   length(values))
-            
-        })
-    })
-})
-
-rownames(summaries) = paste0(rep(names(dfs), each=2), ", ", rep(c('expansion','nonexp'), 3))
-write.csv(summaries, file=file.path(PLOT.DIR, 'summary_stats.csv'))
+ggsave(plot = legend, 
+       filename=file.path(PLOT.DIR, "Figure_1_legend.png"),
+       height = 0.25, width = 4.1, dpi = PLOT.DPI, device = PLOT.DEVICE)

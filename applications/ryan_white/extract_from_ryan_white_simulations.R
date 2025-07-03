@@ -24,6 +24,7 @@ total.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalen
                                                 'rw.clients', 'non.adap.clients','oahs.clients','adap.clients',
                                                 'oahs.suppression', 'adap.suppression',
                                                 'suppression', 'population',
+                                                'hiv.mortality',
                                                 'sexual.transmission.rates','prep.uptake','testing'),
                                    output = 'numerator',
                                    dimension.values=list(year=2010:2035),
@@ -77,6 +78,11 @@ total.new = array.access(total.results, outcome='new', drop = T)
 total.pop = array.access(total.results, outcome='population', drop = T)
 total.sexual.transmission = array.access(total.results, outcome='sexual.transmission.rates', drop = T)
 
+if (RW.IS.STATE.LEVEL)
+    filename = paste0('Q:results/ryan_white/ryan_white_results_state_', Sys.Date(), ".Rdata")
+if (!RW.IS.STATE.LEVEL)
+    filename = paste0('Q:results/ryan_white/ryan_white_results_city_', Sys.Date(), ".Rdata")
+
 save(total.results,
      
      total.incidence,
@@ -94,5 +100,5 @@ save(total.results,
 #     full.results,
      all.parameters,
      
-     file=paste0('Q:results/ryan_white/ryan_white_results_', Sys.Date(), ".Rdata")
+     file=filename
 )

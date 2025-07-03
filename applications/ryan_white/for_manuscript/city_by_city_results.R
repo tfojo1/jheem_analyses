@@ -1,5 +1,5 @@
 YEARS.TO.CONSIDER = as.character(2025:2030)
-PLOT.DIR = file.path(paste0('../../results/ryan_white/shaded_table_boxplot_', tolower(RW.LOCATION.DESCRIPTOR)))
+PLOT.DIR = file.path(RW.ROOT.PLOT.DIR, paste0('shaded_table_boxplot_', tolower(RW.LOCATION.DESCRIPTOR)))
 
 total.infections.continue.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 

@@ -9,16 +9,22 @@ source('../jheem_analyses/applications/ryan_white/ryan_white_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_interventions.R')
 
-RW.IS.STATE.LEVEL = T
+RW.IS.STATE.LEVEL = F
+
+RW.STATES = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
+RW.CITIES = setdiff(MSAS.OF.INTEREST, c(ST.LOUIS.MSA, CINCINATTI.MSA))
 
 if (RW.IS.STATE.LEVEL)
-    RW.LOCATIONS = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
+    RW.LOCATIONS = RW.STATES
 if (!RW.IS.STATE.LEVEL)
-    RW.LOCATIONS = setdiff(MSAS.OF.INTEREST, c(ST.LOUIS.MSA, CINCINATTI.MSA))
+    RW.LOCATIONS = RW.CITIES
     # St Louis is not an EHE city, Cincinatti does not have RW data
 
 RW.LOCATION.DESCRIPTOR = ifelse(RW.IS.STATE.LEVEL, 'State', "City")
 RW.LOCATION.DESCRIPTOR.PLURAL = ifelse(RW.IS.STATE.LEVEL, 'States', "Cities")
+
+RW.ROOT.PLOT.DIR = "../../Ryan White/manuscript/annals revision 1/figures"
+    #"../../results/ryan_white/"
 
 # Run settings
 VERBOSE = T

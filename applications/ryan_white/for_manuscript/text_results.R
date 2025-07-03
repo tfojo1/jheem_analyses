@@ -55,6 +55,17 @@ print(paste0("Relative Increase in Infections 2025-2030 if Ryan White Ends Indef
              format(round(quantile(rel.delta.cessation.tot.inf.noint1, probs=.975, na.rm=T)*100), big.mark=','),
              "%]"))
 
+# total.rw.costs = sum(RW.COSTS)
+# total.rw.costs.cess = 5.5 * total.rw.costs
+# total.rw.costs.cess.per.infection = total.rw.costs.cess / abs.delta.cessation.tot.inf.noint1
+# 
+# print(paste0("Dollars unspent per excess case (Primary Analysis): ", 
+#              "$", format(round(mean(total.rw.costs.cess.per.infection, na.rm=T)), big.mark=','),
+#              " [",
+#              "$", format(round(quantile(total.rw.costs.cess.per.infection, probs=.025, na.rm=T)), big.mark=','),
+#              " - ",
+#              "$", format(round(quantile(total.rw.costs.cess.per.infection, probs=.975, na.rm=T)), big.mark=','),
+#              "]"))
 
 print("")
 print("CESSATION (Conservative): ")
@@ -114,6 +125,34 @@ print(paste0("Largest ", RW.LOCATION.DESCRIPTOR, "-Level Increase in Infections 
              " - ",
              format(round(quantile(mean.ci.rel.total.infections.averted.end.by.city[n.cities,3], probs=.975, na.rm=T)*100), big.mark=','),
              "%]"))
+
+# total.rw.costs.by.city = rowSums(RW.COSTS)[colnames(abs.total.infections.averted.end.by.city)]
+# total.rw.costs.by.city.per.inf = rep(total.rw.costs.by.city, each=nrow(abs.total.infections.averted.end.by.city)) / abs.total.infections.averted.end.by.city
+# mean.ci.cost.per.infection.averted.by.city = cbind(
+#     mean = apply(total.rw.costs.by.city.per.inf, 'location', mean, na.rm=T),
+#     lower = apply(total.rw.costs.by.city.per.inf, 'location', quantile, probs=0.025, na.rm=T),
+#     upper = apply(total.rw.costs.by.city.per.inf, 'location', quantile, probs=0.975, na.rm=T)
+# )
+# mean.ci.cost.per.infection.averted.by.city = mean.ci.cost.per.infection.averted.by.city[order(mean.ci.cost.per.infection.averted.by.city[,'mean']),]
+# 
+# print(paste0("Least ", RW.LOCATION.DESCRIPTOR, "-Level Unspent Funds per Infections 2025-2030 if Ryan White Ends Indefinitely: ", 
+#              get.location.name(rownames(mean.ci.cost.per.infection.averted.by.city)[1]), " - ",
+#              "$", format(round(mean.ci.cost.per.infection.averted.by.city[1,1]), big.mark=','),
+#              " [",
+#              "$", format(round(quantile(mean.ci.cost.per.infection.averted.by.city[1,2], probs=.025, na.rm=T)), big.mark=','),
+#              " - ",
+#              "$", format(round(quantile(mean.ci.cost.per.infection.averted.by.city[1,3], probs=.975, na.rm=T)), big.mark=','),
+#              "]"))
+# 
+# 
+# print(paste0("Greatest ", RW.LOCATION.DESCRIPTOR, "-Level Unspent Funds per Infections 2025-2030 if Ryan White Ends Indefinitely: ", 
+#              get.location.name(rownames(mean.ci.cost.per.infection.averted.by.city)[n.cities]), " - ",
+#              "$", format(round(mean.ci.cost.per.infection.averted.by.city[n.cities,1]*100), big.mark=','),
+#              " [",
+#              "$", format(round(quantile(mean.ci.cost.per.infection.averted.by.city[n.cities,2], probs=.025, na.rm=T)*100), big.mark=','),
+#              " - ",
+#              "$", format(round(quantile(mean.ci.cost.per.infection.averted.by.city[n.cities,3], probs=.975, na.rm=T)*100), big.mark=','),
+#              "]"))
 
 # By medicaid expansion
 total.incidence.medicaid.expansion = total.incidence[,,RW.MEDICAID.EXPANSION.LOCATIONS,]
@@ -439,3 +478,34 @@ print(paste0("Relative Increase in Diagnoses 2025-2030 in Ryan White Brief Inter
              " - ",
              format(round(quantile(rel.delta.p.intr.tot.dx.noint1, probs=.975, na.rm=T)*100), big.mark=','),
              "%]"))
+
+##-- DEATHS (for discussion) --##
+
+print('\n\nDEATHS\n\n')
+
+total.mortality = total.results[,,'hiv.mortality',,]
+
+tot.mort.noint1 = apply(total.mortality[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim'), sum, na.rm=T)
+
+abs.delta.cessation.tot.mort.noint1 = apply(total.mortality[YEARS.TO.CONSIDER,,,'rw.end',drop=F], c('sim'), sum, na.rm=T) - tot.mort.noint1
+rel.delta.cessation.tot.mort.noint1 = abs.delta.cessation.tot.mort.noint1 / tot.mort.noint1
+
+print(paste0("Absolute Increase in Deaths among PWH 2025-2030 if Ryan White Ends Indefinitely: ", 
+             format(round(mean(abs.delta.cessation.tot.mort.noint1, na.rm=T)), big.mark=','),
+             " [",
+             format(round(quantile(abs.delta.cessation.tot.mort.noint1, probs=.025, na.rm=T)), big.mark=','),
+             " - ",
+             format(round(quantile(abs.delta.cessation.tot.mort.noint1, probs=.975, na.rm=T)), big.mark=','),
+             "]"))
+
+print(paste0("Relative Increase in Deaths among PWH 2025-2030 if Ryan White Ends Indefinitely: ", 
+             format(round(mean(rel.delta.cessation.tot.mort.noint1, na.rm=T)*100), big.mark=','),
+             "% [",
+             format(round(quantile(rel.delta.cessation.tot.mort.noint1, probs=.025, na.rm=T)*100), big.mark=','),
+             " - ",
+             format(round(quantile(rel.delta.cessation.tot.mort.noint1, probs=.975, na.rm=T)*100), big.mark=','),
+             "%]"))
+
+mean(abs.delta.cessation.tot.mort.noint1 / abs.delta.cessation.tot.inf.noint1)
+
+mean(abs.delta.cessation.tot.mort.noint1) / mean(abs.delta.cessation.tot.inf.noint1)

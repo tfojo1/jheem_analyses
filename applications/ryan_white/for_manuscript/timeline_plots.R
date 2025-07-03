@@ -1,31 +1,35 @@
 
 #source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-PLOT.DIR = file.path('../../results/ryan_white/timeline_projections/')
-PLOT.HEIGHT = 1.5
-PLOT.WIDTH = 2
+PLOT.DIR = file.path(RW.ROOT.PLOT.DIR, 'timeline_projections/')
+PLOT.HEIGHT = 1.3
+PLOT.WIDTH = 1.9
 PLOT.DPI = 600
 PLOT.DEVICE = 'png'
 
+TIMELINE.COLORS = c('noint'=RW.BASELINE.COLOR,
+                    'rw.end'=RW.END.COLOR,
+                    'rw.b.intr'=RW.B.INTR.COLOR,
+                    'rw.p.intr'=RW.P.INTR.COLOR)
+TIMELINE.LABELS = c('noint'='Continuation',
+                    'rw.end'='Cessation',
+                    'rw.b.intr'='Brief Interruption',
+                    'rw.p.intr'='Prolonged Interruption')
+
 make.time.plot <- function(locations,
-                            intervention.codes,
-                            intervention.colors = c('noint'=RW.BASELINE.COLOR,
-                                                    'rw.end'=RW.END.COLOR,
-                                                    'rw.b.intr'=RW.B.INTR.COLOR,
-                                                    'rw.p.intr'=RW.P.INTR.COLOR),
-                            intervention.labels = c('noint'='Continuation',
-                                                    'rw.end'='Cessation',
-                                                    'rw.b.intr'='Brief Interruption',
-                                                    'rw.p.inter'='Prolonged Interruption'),
-                            outcome = 'incidence',
-                            years = 2010:2035,
+                           intervention.codes,
+                           intervention.colors = TIMELINE.COLORS,
+                           intervention.labels = TIMELINE.LABELS,
+                           outcome = 'incidence',
+                           years = 2017:2030,
                            label.years = 2025:2030,
-                            data.color = RW.DATA.COLOR,
-                            ci.coverage = 0.95,
+                           data.color = RW.DATA.COLOR,
+                           ci.coverage = 0.95,
                            y.label = 'Infections (n)',
                            text.label = 'infections',
                            base.size = 8,
-                           label.size = 2)
+                           label.size = 2,
+                           show.legend = F)
 {
     alpha = (1-ci.coverage)/2
   
@@ -73,7 +77,7 @@ make.time.plot <- function(locations,
       yend = (sim.means[as.character(label.xend.year),1] + sim.means[as.character(label.xend.year),2]) / 2
     )
 
-    ggplot() +
+    plot = ggplot() +
       geom_ribbon(data=sim.df, 
                   aes(year, estimate, ymin=lower, ymax=upper,
                       color=intervention, fill=intervention),
@@ -110,19 +114,19 @@ make.time.plot <- function(locations,
 plot = make.time.plot(location=HOUSTON.MSA, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '1A_houston_inc_end.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2A.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=HOUSTON.MSA, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '1C_houston_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2C.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=HOUSTON.MSA, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '1B_houston_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2B.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -130,19 +134,19 @@ ggsave(plot = plot,
 plot = make.time.plot(location=RW.MEDICAID.EXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '4A_expansion_inc_end.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2J.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.EXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '4C_expansion_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2L.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.EXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '4B_expansion_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2K.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -150,19 +154,19 @@ ggsave(plot = plot,
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '3A_nonexpansion_inc_end.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2H.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '3C_nonexpansion_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2J.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '3B_nonexpansion_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2I.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -170,19 +174,19 @@ ggsave(plot = plot,
 plot = make.time.plot(location=RW.LOCATIONS, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '5A_all_inc_end.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2M.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.LOCATIONS, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '5C_all_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2O.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.LOCATIONS, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '5B_all_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2N.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -192,18 +196,43 @@ texas.msas = RW.LOCATIONS[city.main.state=='TX']
 plot = make.time.plot(location=texas.msas, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '2A_texas_inc_end.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2D.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=texas.msas, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '2C_texas_inc_b.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2F.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=texas.msas, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, '2B_texas_inc_p.intr.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2E.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
+# Legend
+
+df = data.frame(
+    x = rep(c(1,2), each=4),
+    y = rep(1:4, 2),
+    catg = names(TIMELINE.COLORS)
+)
+df$ymax = df$y + 0.25
+df$ymin = df$y - 0.25
+
+df$catg = factor(df$catg, levels=names(TIMELINE.COLORS)[c(1,2,4,3)])
+
+plot = ggplot(df, aes(x,y,ymin=ymin, ymax=ymax, fill=catg, color=catg)) +
+    geom_ribbon(alpha=0.2) + geom_line() +
+    scale_fill_manual(values = TIMELINE.COLORS, labels = TIMELINE.LABELS) +
+    scale_color_manual(values = TIMELINE.COLORS, labels = TIMELINE.LABELS) +
+    theme(text = element_text(size = 12),
+          legend.position = 'bottom',
+          legend.title = element_blank())
+
+legend = cowplot::get_plot_component(plot, 'guide-box-bottom', return_all = TRUE)
+
+ggsave(plot = legend, 
+       filename=file.path(PLOT.DIR, "Figure_2_legend.png"),
+       height = 0.25, width = 5.5, dpi = PLOT.DPI, device = PLOT.DEVICE)
