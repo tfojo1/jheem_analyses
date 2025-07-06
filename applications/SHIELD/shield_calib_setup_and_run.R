@@ -33,11 +33,11 @@ CALIBRATION.NAME = 'calib.diagnosis.07.06.pk1'
 #################
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
-# clear.calibration.cache(version=VERSION,
-#                         location=LOCATION,
-#                        calibration.code = CALIBRATION.NAME,
-#                         allow.remove.incomplete = T)
-# print("Cashe is cleared")
+clear.calibration.cache(version=VERSION,
+                        location=LOCATION,
+                       calibration.code = CALIBRATION.NAME,
+                        allow.remove.incomplete = T)
+print("Cashe is cleared")
 #
 set.up.calibration(version=VERSION,
                    location=LOCATION,
