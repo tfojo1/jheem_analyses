@@ -99,6 +99,10 @@ for (i in (1:3)){
 # <calib.diagnosis.07.06.pk2>
 #revising knots in sti.screening function to be the same : 1970,90,95,2000,2010,2020
 
+# <calib.diagnosis.07.06.pk3>
+#revising the sym.testing spline function to use a knot.link=logit, and use link=identity. 
+
+
 # <calib.07.03.pk1> ----
 # repeating Ryan's run with the last sim as starting point
 # EL infectiousness = ON; Relapse=ON, PS screening=ON ; contact tracing=ON
