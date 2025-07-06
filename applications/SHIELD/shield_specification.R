@@ -487,8 +487,8 @@ register.model.element(SHIELD.SPECIFICATION,
                          link='identity', #linear projections between the knots 
                          #
                          min=0 #even after using log for knots, value can be negative so we need to truncate
-                         )
-                       ) 
+                       )
+) 
 #if we wanted to use a natural spline without log transformation:
 # knot.values = list(time0=1,time1=1,time2=1) , knots.are.on.transformed.scale = F, #on the identity scale
 #use a log(y) transformation, so that all returned values are positive
@@ -884,6 +884,26 @@ base.prp.symptomatic.primary = array(
     SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']
   ),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
 
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = "prp.symptomatic.primary",
+#                        scale = 'proportion',
+#                        functional.form.from.time = 1970, 
+#                        functional.form = create.natural.spline.functional.form(
+#                          knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
+#                          knot.values = list("1970" = base.prp.symptomatic.primary, 
+#                                             "1990" = base.prp.symptomatic.primary, 
+#                                             "1995" = base.prp.symptomatic.primary, 
+#                                             "2000" = base.prp.symptomatic.primary, 
+#                                             "2010" = base.prp.symptomatic.primary, 
+#                                             "2020" =  base.prp.symptomatic.primary),
+#                          #
+#                          knots.are.on.transformed.scale = F,
+#                          link = "logit",
+#                          #
+#                          after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
+#                          after.modifier = 0.5,
+#                          modifiers.apply.to.change = T
+#                        ))
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.primary",
                        scale = 'proportion',
@@ -898,39 +918,64 @@ register.model.element(SHIELD.SPECIFICATION,
                                             "2020" =  base.prp.symptomatic.primary),
                          #
                          knots.are.on.transformed.scale = F,
-                         link = "logit",
+                         knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
+                         link="identity",
+                         #
+                         min=0, #do we need these for the proportion? 
+                         max=1,
                          #
                          after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
                          after.modifier = 0.5,
                          modifiers.apply.to.change = T
                        ))
-
 base.prp.symptomatic.secondary = array(
   c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
     SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'],
     SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']
   ),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
 
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = "prp.symptomatic.secondary",
+#                        scale = 'proportion',
+#                        functional.form.from.time = 1970,
+#                        functional.form = create.natural.spline.functional.form(
+#                          knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
+#                          knot.values = list("1970" = base.prp.symptomatic.secondary, 
+#                                             "1990" = base.prp.symptomatic.secondary, 
+#                                             "1995" = base.prp.symptomatic.secondary,
+#                                             "2000" =  base.prp.symptomatic.secondary,
+#                                             "2010" =  base.prp.symptomatic.secondary,
+#                                             "2020" =  base.prp.symptomatic.secondary),
+#                          knots.are.on.transformed.scale = F,
+#                          link = "logit",
+#                          #
+#                          after.time = 2030,
+#                          after.modifier = 0.5,
+#                          modifiers.apply.to.change = T
+#                        ))
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.secondary",
                        scale = 'proportion',
-                       functional.form.from.time = 1970,
+                       functional.form.from.time = 1970, 
                        functional.form = create.natural.spline.functional.form(
                          knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
                          knot.values = list("1970" = base.prp.symptomatic.secondary, 
-                                            "1990" = base.prp.symptomatic.secondary, 
+                                            "1990" = base.prp.symptomatic.secondary,
                                             "1995" = base.prp.symptomatic.secondary,
                                             "2000" =  base.prp.symptomatic.secondary,
                                             "2010" =  base.prp.symptomatic.secondary,
                                             "2020" =  base.prp.symptomatic.secondary),
                          knots.are.on.transformed.scale = F,
-                         link = "logit",
+                         knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
+                         link="identity",
                          #
-                         after.time = 2030,
+                         min=0, #do we need these for the proportion? 
+                         max=1,
+                         #
+                         after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
                          after.modifier = 0.5,
                          modifiers.apply.to.change = T
                        ))
-
 # We assume 100% care/seeking and testing rate for symptomatic individuals
 # For now, we assume 100% test.sensitivity as well. 
 # proportion of symp.testing that are successfully diagnosed: 
