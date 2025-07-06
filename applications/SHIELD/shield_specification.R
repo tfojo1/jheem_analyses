@@ -1012,7 +1012,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'multiplier.syphilis.screening.to.hiv.tests',
                        scale = 'ratio',
                        functional.form.from.time = 1980,  #the projections remain fix at this year's value for years before.
-                       get.functional.form.function =   create.natural.spline.functional.form(
+                       functional.form =    create.natural.spline.functional.form(
                          knot.times = c("1980"=1980, "1990"=1990, "2000"=2000, "2010"=2010,"2020"=2020),
                          knot.values=list("1980"=0.8, "1990"=0.8, "2000"=0.8, "2010"=0.8,"2020"=0.8), #'@PK: is 80% a good value?
                          knots.are.on.transformed.scale = F,
