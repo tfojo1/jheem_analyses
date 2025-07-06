@@ -58,22 +58,7 @@ register.calibration.info(code = "calib.diagnosis.06.30.pk1",
                           description = "A quick run to get syphilis parameters in the general vicinity"
                           # solver.metadata = shield.solver
 )
-# a simplified model
-register.calibration.info(code = "calib.diagnosis.07.06.pk1",
-                          preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
-                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = 
-                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity"
-                          # solver.metadata = shield.solver
-)
+
 register.calibration.info(code = "calib.07.02.rf",
                           preceding.calibration.codes = "calib.demog.06.09.pk",  
                           likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
@@ -89,11 +74,30 @@ register.calibration.info(code = "calib.07.02.rf",
                           description = "A quick run to get syphilis parameters in the general vicinity"
 )
 
- 
+for (i in (1:3)){
+    register.calibration.info(code = paste0("calib.diagnosis.07.06.pk",i),
+                              preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
+                              likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030,
+                              parameter.names = 
+                                  c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                    TESTING.PARAMETERS.PRIOR@var.names),
+                              n.iter = N.ITER,
+                              thin = 50,
+                              is.preliminary = T,
+                              max.run.time.seconds = 30,
+                              description = "A quick run to get syphilis parameters in the general vicinity"
+                              # solver.metadata = shield.solver
+    )
+}
 
 # LOG SUMMARY -----
 # <calib.diagnosis.07.06.pk1>
-#adding additional knots to symptomatic testing in 1970, 1995 and 2000
+#adding additional knots to symptomatic testing to align with transmission: 1970,90,95,2000,2010,2020
+
+# <calib.diagnosis.07.06.pk2>
+#revising knots in sti.screening function to be the same : 1970,90,95,2000,2010,2020
 
 # <calib.07.03.pk1> ----
 # repeating Ryan's run with the last sim as starting point
