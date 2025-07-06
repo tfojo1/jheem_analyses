@@ -174,7 +174,7 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
   or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
   or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-   or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+  or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
    
     
   # for HIV screening
@@ -182,11 +182,12 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
   
   # STI screening knots multiplier (relative to HIV screening)
-  syphilis.screening.multiplier.1980 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  syphilis.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  syphilis.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  syphilis.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.1995 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
   
   # STI screening multiplier by stage (defined in specification-no linking needed here)
   sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)), #get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
@@ -339,39 +340,39 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  applies.to.dimension.values = c('female'))
   
   ## Transmission ----
-  for(year in c(1970,1990,1995,2000,2010,2020)){
-    #multipliers for msm rates in each knot:
+  for(time in c("1970","1990","1995","2000","2010","2020")){    #multipliers for msm rates in each knot:
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
-                                                   alpha.name = paste0(year),
-                                                   values = parameters[paste0("transmission.rate.multiplier.msm",year)],
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("transmission.rate.multiplier.msm",time)],
                                                    dimension = 'all',
                                                    applies.to.dimension.values = 'all')
     #multipliers for heterosexual rates in each knot:
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.heterosexual",
-                                                   alpha.name = paste0(year),
-                                                   values = parameters[paste0("transmission.rate.multiplier.heterosexual",year)],
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("transmission.rate.multiplier.heterosexual",time)],
                                                    dimension = 'all',
                                                    applies.to.dimension.values = 'all')
     
     #race multipliers, shared for msm and heterosexuals: 
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
-                                                   alpha.name = paste0(year),
-                                                   values = parameters[c("transmission.rate.multiplier.black","transmission.rate.multiplier.hispanic", "transmission.rate.multiplier.other")],
+                                                   alpha.name = time,
+                                                   values = parameters[c("transmission.rate.multiplier.black",
+                                                                         "transmission.rate.multiplier.hispanic", 
+                                                                         "transmission.rate.multiplier.other")],
                                                    dimension = "race.to", #recipient
                                                    applies.to.dimension.values = c("black","hispanic", "other"))
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.heterosexual",
-                                                   alpha.name = paste0(year),
-                                                   values = parameters[c("transmission.rate.multiplier.black","transmission.rate.multiplier.hispanic", "transmission.rate.multiplier.other")],
+                                                   alpha.name = time,
+                                                   values = parameters[c("transmission.rate.multiplier.black",
+                                                                         "transmission.rate.multiplier.hispanic", 
+                                                                         "transmission.rate.multiplier.other")],
                                                    dimension = "race.to", #recipient
                                                    applies.to.dimension.values = c("black","hispanic", "other"))
-    
-  }
-  
-  
+    }
   
   ## STI SCREENING  ----
   # Changing the intercept and slope for HIV tests
@@ -389,13 +390,14 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  applies.to.dimension.values = "all")
   
   # Changing the knot values for retio of STI screening to HIV tests
-  for(time in c("1980","1990","2000","2010","2020")){
+  for(time in c("1970","1990","1995","2000","2010","2020")){
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "multiplier.syphilis.screening.to.hiv.tests",
                                                    alpha.name = time,
-                                                   values = parameters[paste0("syphilis.screening.multiplier.",time)],
+                                                   values = parameters[paste0("sti.screening.multiplier.",time)],
                                                    dimension = "all", #recipient
                                                    applies.to.dimension.values = "all")
+    # sti.screening.multiplier.*by stage are directly linked in the specification
   }
   
   # Symptomatic Testing ----
@@ -671,13 +673,14 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
     "sti.screening.multiplier.cns"
   ),    
   screening.by.time1 = c(
-    "syphilis.screening.multiplier.1980",
-    "syphilis.screening.multiplier.1990"
+    "sti.screening.multiplier.1970",
+    "sti.screening.multiplier.1990",
+    "sti.screening.multiplier.1995"
   ),
   screening.by.time2 = c(
-    "syphilis.screening.multiplier.2000",
-    "syphilis.screening.multiplier.2010",
-    "syphilis.screening.multiplier.2020"
+    "sti.screening.multiplier.2000",
+    "sti.screening.multiplier.2010",
+    "sti.screening.multiplier.2020"
   ),
   contact.tracing=c(
     "prop.index.cases.reached.for.contact.tracing"   

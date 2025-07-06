@@ -1008,22 +1008,36 @@ register.model.quantity(SHIELD.SPECIFICATION,
 
 # defining a STI multiplier over time:
 # function to map the ratio of STI tests relative to hiv.tests in the US (for STI screening)
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'multiplier.syphilis.screening.to.hiv.tests',
+#                        scale = 'ratio',
+#                        functional.form.from.time = 1980,  #the projections remain fix at this year's value for years before.
+#                        functional.form =    create.natural.spline.functional.form(
+#                          knot.times = c("1980"=1980, "1990"=1990, "2000"=2000, "2010"=2010,"2020"=2020),
+#                          knot.values=list("1980"=0.8, "1990"=0.8, "2000"=0.8, "2010"=0.8,"2020"=0.8), #'@PK: is 80% a good value?
+#                          knots.are.on.transformed.scale = F,
+#                          knot.link = "log",
+#                          link = "identity", #linear projections between the knots (avoid exponential growth)
+#                          #
+#                          knot.min = 0, #knot values can not exceed this range
+#                          min=0 #projected spline values should remain within this range
+#                        ) 
+#                        ) 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'multiplier.syphilis.screening.to.hiv.tests',
                        scale = 'ratio',
-                       functional.form.from.time = 1980,  #the projections remain fix at this year's value for years before.
+                       functional.form.from.time = 1970,  #the projections remain fix at this year's value for years before.
                        functional.form =    create.natural.spline.functional.form(
-                         knot.times = c("1980"=1980, "1990"=1990, "2000"=2000, "2010"=2010,"2020"=2020),
-                         knot.values=list("1980"=0.8, "1990"=0.8, "2000"=0.8, "2010"=0.8,"2020"=0.8), #'@PK: is 80% a good value?
+                         knot.times = c("1970"=1970, "1990"=1990,"1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                         knot.values=list("1970"=1, "1990"=1,"1995"=1, "2000"=1, "2010"=1,"2020"=1),  
                          knots.are.on.transformed.scale = F,
                          knot.link = "log",
                          link = "identity", #linear projections between the knots (avoid exponential growth)
                          #
-                         knot.min = 0, #knot values can not exceed this range
-                         min=0 #projected spline values should remain within this range
+                         knot.min = 0, #knot values can not fall below 0
+                         min=0 #projected spline values can not fall below 0
                        ) 
-                       ) 
-
+) 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sti.screening',
                         scale = 'rate',
