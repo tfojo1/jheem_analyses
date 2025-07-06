@@ -1,8 +1,3 @@
-b.INFECTIOUSNESS=FALSE
-b.RELAPSE=FALSE
-b.PS.SCREENING=FALSE
-b.CONTACT.TRACING=FALSE
-
 source("applications/SHIELD/shield_base_parameters.R")
 
 # Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
@@ -165,16 +160,20 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 
 TESTING.PARAMETERS.PRIOR=join.distributions( 
-  # for symptomatic testing (stage X sex and time) 
+  # Odd-Ratio of symptomatic testing (stage X sex and time) 
    or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) , 
    or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
    or.symptomatic.primary.female = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+   #
    or.symptomatic.secondary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
    or.symptomatic.secondary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
    or.symptomatic.secondary.female= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ), 
-  
-   or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-   or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+  #
+  or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+  or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+  or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+  or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
+  or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
    or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
    
     
@@ -190,17 +189,13 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   syphilis.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
   
   # STI screening multiplier by stage (defined in specification-no linking needed here)
-  
-  # b.PS.SCREENING
   sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)), #get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
-  
   sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)), #changing the prior to reflect higher freq of screening among syphilis-infected subgroups (highrisk)
   sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)),
   sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
   # Contact tracing
-  # b.CONTACT.TRACING
   # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
   prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing)
 )
@@ -403,7 +398,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = "all")
   }
   
-  for(time in c("1990","2000","2020")){
+  # Symptomatic Testing ----
+  for(time in c("1970", "1990","1995","2000","2010","2020")){
       set.element.functional.form.main.effect.alphas(model.settings,
                                                      element.name = "prp.symptomatic.primary",
                                                      alpha.name = time,
@@ -429,9 +425,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                      dimension = "sex", #recipient
                                                      applies.to.dimension.values = sexes)
   }
-  
-  
-}
+  }
 
 
 
@@ -609,10 +603,6 @@ SHIELD.AGING.SAMPLING.BLOCKS = list(
 
 ## SHIELD.TRANSMISSION.SAMPLING.BLOCKS ----
 SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
-  # initial.infections = c(
-  #   "initial.infection.multiplier.1970.early",
-  #   "initial.infection.multiplier.1970.late"), 
-  #
   initial.infections=c(
     'ps.diagnoses.multiplier.1970', 
     'el.diagnoses.multiplier.1970', 
@@ -647,33 +637,35 @@ SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
 
 
 SHIELD.TESTING.SAMPLING.BLOCKS = list(
-    symptomatic.primary = c(
+    symptomatic.testing.primary = c(
         "or.symptomatic.primary.msm",
         "or.symptomatic.primary.heterosexual_male",
         "or.symptomatic.primary.female"
     ),
-    symptomatic.secondary = c(
+    symptomatic.testing.secondary = c(
         "or.symptomatic.secondary.msm",
         "or.symptomatic.secondary.heterosexual_male",
         "or.symptomatic.secondary.female"
     ),
-    symptomatic.time = c(
+    symptomatic.testing.time1 = c(
+        "or.symptomatic.1970",
         "or.symptomatic.1990",
-        "or.symptomatic.2000",
-        "or.symptomatic.2020"
+        "or.symptomatic.1995"
+    ),
+    symptomatic.testing.time2 = c(
+      "or.symptomatic.2000",
+      "or.symptomatic.2010",
+      "or.symptomatic.2020"
     ),
   hiv.testing = c(
     "hiv.testing.or",
     "hiv.testing.slope.or"
   ),
-  
   sti.screening.by.stage1=c(
-    
-    "sti.screening.multiplier.ps",    # b.PS.SCREENING
+    "sti.screening.multiplier.ps",     
     "sti.screening.multiplier.el",
     "sti.screening.multiplier.ll"
   ),
-  
   sti.screening.by.stage2=c(
     "sti.screening.multiplier.tertiary",
     "sti.screening.multiplier.cns"
@@ -687,9 +679,8 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
     "syphilis.screening.multiplier.2010",
     "syphilis.screening.multiplier.2020"
   ),
-  
   contact.tracing=c(
-    "prop.index.cases.reached.for.contact.tracing"  # b.CONTACT.TRACING
+    "prop.index.cases.reached.for.contact.tracing"   
   )
 )
 

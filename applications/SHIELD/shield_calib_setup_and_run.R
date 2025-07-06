@@ -27,17 +27,17 @@ set.seed(00000)
 CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-CALIBRATION.NAME = 'calib.07.03.pk1' 
+CALIBRATION.NAME = 'calib.diagnosis.07.06.pk1' 
 
 
 #################
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
-clear.calibration.cache(version=VERSION,
-                        location=LOCATION,
-                       calibration.code = CALIBRATION.NAME,
-                        allow.remove.incomplete = T)
-print("Cashe is cleared")
+# clear.calibration.cache(version=VERSION,
+#                         location=LOCATION,
+#                        calibration.code = CALIBRATION.NAME,
+#                         allow.remove.incomplete = T)
+# print("Cashe is cleared")
 #
 set.up.calibration(version=VERSION,
                    location=LOCATION,

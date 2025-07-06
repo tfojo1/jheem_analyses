@@ -274,12 +274,10 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.conta
 percent.misclassified.el.as.llu=0.096
 percent.misclassified.llu.as.el =  0.272
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
-                                      percent.misclassified.el.as.llu,
-                                      0,0)
+                                      percent.misclassified.el.as.llu, 0,0)
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
-                                      percent.misclassified.llu.as.el,
-                                      0,0)
+                                      percent.misclassified.llu.as.el, 0,0)
 
 
 #*** TREATMENTS INITIATION  **** ## ---- 

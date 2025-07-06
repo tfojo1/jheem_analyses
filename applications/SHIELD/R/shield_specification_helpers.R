@@ -1083,22 +1083,6 @@ get.prp.prenatal.care.functional.form.third.trimester.of.those.not.screened.firs
   get.prp.prenatal.care.functional.form(specification.metadata,"third")
 }
 
-#-- SYPHILIS TO HIV TESTING FUNCTIONAL FORM --# -----
-# function to map the ratio of STI tests relative to hiv.tests in the US (for STI screening)
-get.syphilis.to.hiv.testing.functional.form = function(specification.metadata){
-  #there are 2 scales: the scales that we use to manipulate the knots, and the scales we use to interpolate them 
-  create.natural.spline.functional.form(knot.times = c("1980"=1980, "1990"=1990, "2000"=2000, "2010"=2010,"2020"=2020),
-                                        knot.values=list("1980"=0.8, "1990"=0.8, "2000"=0.8, "2010"=0.8,"2020"=0.8), #'@PK: is 80% a good value?
-                                        knot.min = 0, #knot values can not exceed this range
-                                        #knot.max = 1,#knot values can not exceed this range
-                                        min=0, #projected spline values should remain within this range
-                                        #max=1, #projected spline values should remain within this range
-                                        knots.are.on.transformed.scale = F,
-                                        knot.link = "log",
-                                        link = "identity" #it's safer to use linear extrapolation between knots to avoid exponential growth
-  )
-}
-
 #'@:Todd: need to add an option for the national model ----
 #-- MIGRATION --# ----
 get.immigration.rates.functional.form <- function(location, specification.metadata ){

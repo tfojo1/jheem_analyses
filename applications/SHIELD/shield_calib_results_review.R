@@ -24,10 +24,6 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 # set.jheem.root.directory("/Volumes/jheem$")
 
 # # CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
-# CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.01.pk1'; DATE <- "2025-07-01"
-# CALIBRATION.CODE.TO.RUN <- 'calib.diagnosis.07.02.pk1'; DATE <- "2025-07-02"
-# 
-# 
 # # Load or Assemble Simulation Set ----
 # if (FALSE) {
 #     load(paste0("/Volumes/jheem$/results/Shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
@@ -46,40 +42,51 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 #     save(simset,file=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
 # }
 
-CALIBRATION.CODE.TO.RUN <- 'calib.07.02.rf'; DATE <- "2025-07-03"
+# Load simset from the Q drive
+CALIBRATION.CODE.TO.RUN <- 'calib.07.03.pk1'; DATE <- "2025-07-03"
 load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
-simset.rf=simset;
+simset.rf=simset
+
+# sim.first    <- simset$first.sim()
+# sim.last     <- simset$last.sim()
+# params.first <- simset$first.sim()$params
+# params.last  <- simset$last.sim()$params
 
 
-# { #READ data: 
+# { #READ data:
 #     load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk1","Rdata"))
 #     simset1=simset
-#     
+# 
 #     CALIBRATION.CODE.TO.RUN <- 'calib.07.02.rf'; DATE <- "2025-07-03"
 #     load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
 #     simset3=simset;
 # }
 # {
 #     # Quick checkpoint ----
-#     simset=simset1
-#     simset$n.sim
-#     # Extract first and last simulations and their parameters 
-#     sim.first1    <- simset$first.sim()
-#     sim.last1     <- simset$last.sim()
-#     params.first1 <- simset$first.sim()$params
-#     params.last1  <- simset$last.sim()$params
-#     # 
-#     simset=simset2
-#     simset$n.sim
-#     # simset$solver.metadata
-#     sim.first2    <- simset$first.sim()
-#     sim.last2     <- simset$last.sim()
-#     params.first2 <- simset$first.sim()$params
-#     params.last2  <- simset$last.sim()$params
+    simset=simset.rf
+    simset$n.sim
+    # Extract first and last simulations and their parameters
+    sim.first1    <- simset$first.sim()
+    sim.last1     <- simset$last.sim()
+    params.first1 <- simset$first.sim()$params
+    params.last1  <- simset$last.sim()$params
+    # #
+    # simset=simset2
+    # simset$n.sim
+    # # simset$solver.metadata
+    # sim.first2    <- simset$first.sim()
+    # sim.last2     <- simset$last.sim()
+    # params.first2 <- simset$first.sim()$params
+    # params.last2  <- simset$last.sim()$params
 # }
 
-engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-params.manual <- simset.rf$last.sim()$params
+# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+# params.manual <- simset.rf$last.sim()$params
+# params.manual["or.symptomatic.1990"] <- params.manual["or.symptomatic.1990"]*1# 0.970793 
+# params.manual["or.symptomatic.1995"] <- params.manual["or.symptomatic.2000"]*.85 #1.101602 
+# params.manual["or.symptomatic.2010"] <- params.manual["or.symptomatic.2000"]*1.1
+# params.manual["or.symptomatic.2020"] <- params.manual["or.symptomatic.2020"] #0.6944672 
+
 sim.mac.engine <- engine$run(params.manual)
 
 # load(paste0(get.jheem.root.directory(),"/shield/","calib.07.02.temp_simset_2025-07-02_C.12580",".Rdata"))
@@ -89,19 +96,20 @@ sim.mac.engine <- engine$run(params.manual)
 simplot(
     # sim.first0,
     # sim.first1,
-    # sim.last1,
+    sim.last1,
     # sim.first2,
     # sim.last2,
-    simset.rf$last.sim(),
-    sim.mac.engine,
+    # simset.rf$last.sim(),
+    # sim.mac.engine,
     # simset.mac.calib$first.sim(),
     # split.by = "race", facet.by = "sex",
     # split.by = "race", facet.by = "age",
     # outcomes = c("population"),    split.by = "race", facet.by = "age",
-    outcomes = c("diagnosis.ps","diagnosis.el.misclassified","diagnosis.late.misclassified","hiv.testing"),
+    outcomes = c("diagnosis.ps","diagnosis.el.misclassified",
+                 "diagnosis.late.misclassified","hiv.testing"),
     # outcomes = c("prevalence"),
-    dimension.values = list(year = 1970:2023),
-    style.manager = source.style.manager
+    dimension.values = list(year = 1970:2023) 
+    # style.manager = source.style.manager
 )
 
 # MCMC Diagnostics ----
