@@ -904,6 +904,30 @@ base.prp.symptomatic.primary = array(
 #                          after.modifier = 0.5,
 #                          modifiers.apply.to.change = T
 #                        ))
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = "prp.symptomatic.primary",
+#                        scale = 'proportion',
+#                        functional.form.from.time = 1970, 
+#                        functional.form = create.natural.spline.functional.form(
+#                          knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
+#                          knot.values = list("1970" = base.prp.symptomatic.primary, 
+#                                             "1990" = base.prp.symptomatic.primary, 
+#                                             "1995" = base.prp.symptomatic.primary, 
+#                                             "2000" = base.prp.symptomatic.primary, 
+#                                             "2010" = base.prp.symptomatic.primary, 
+#                                             "2020" =  base.prp.symptomatic.primary),
+#                          #
+#                          knots.are.on.transformed.scale = F,
+#                          knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
+#                          link="identity",
+#                          #
+#                          min=0, #do we need these for the proportion? 
+#                          max=1,
+#                          #
+#                          after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
+#                          after.modifier = 0.5,
+#                          modifiers.apply.to.change = T
+#                        ))
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.primary",
                        scale = 'proportion',
@@ -919,7 +943,7 @@ register.model.element(SHIELD.SPECIFICATION,
                          #
                          knots.are.on.transformed.scale = F,
                          knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
-                         link="identity",
+                         link="logit",
                          #
                          min=0, #do we need these for the proportion? 
                          max=1,
@@ -953,6 +977,29 @@ base.prp.symptomatic.secondary = array(
 #                          after.modifier = 0.5,
 #                          modifiers.apply.to.change = T
 #                        ))
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = "prp.symptomatic.secondary",
+#                        scale = 'proportion',
+#                        functional.form.from.time = 1970, 
+#                        functional.form = create.natural.spline.functional.form(
+#                          knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
+#                          knot.values = list("1970" = base.prp.symptomatic.secondary, 
+#                                             "1990" = base.prp.symptomatic.secondary,
+#                                             "1995" = base.prp.symptomatic.secondary,
+#                                             "2000" =  base.prp.symptomatic.secondary,
+#                                             "2010" =  base.prp.symptomatic.secondary,
+#                                             "2020" =  base.prp.symptomatic.secondary),
+#                          knots.are.on.transformed.scale = F,
+#                          knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
+#                          link="identity",
+#                          #
+#                          min=0, #do we need these for the proportion? 
+#                          max=1,
+#                          #
+#                          after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
+#                          after.modifier = 0.5,
+#                          modifiers.apply.to.change = T
+#                        ))
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.secondary",
                        scale = 'proportion',
@@ -967,7 +1014,7 @@ register.model.element(SHIELD.SPECIFICATION,
                                             "2020" =  base.prp.symptomatic.secondary),
                          knots.are.on.transformed.scale = F,
                          knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
-                         link="identity",
+                         link="logit",
                          #
                          min=0, #do we need these for the proportion? 
                          max=1,

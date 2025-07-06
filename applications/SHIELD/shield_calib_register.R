@@ -74,7 +74,7 @@ register.calibration.info(code = "calib.07.02.rf",
                           description = "A quick run to get syphilis parameters in the general vicinity"
 )
 
-for (i in (1:3)){
+for (i in (1:4)){
     register.calibration.info(code = paste0("calib.diagnosis.07.06.pk",i),
                               preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
                               likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
@@ -101,6 +101,9 @@ for (i in (1:3)){
 
 # <calib.diagnosis.07.06.pk3>
 #revising the sym.testing spline function to use a knot.link=logit, and use link=identity. 
+# <calib.diagnosis.07.06.pk4>
+#revising the sym.testing spline function to use a knot.link=logit, and use link=logit 
+
 
 
 # <calib.07.03.pk1> ----
