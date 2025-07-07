@@ -825,7 +825,7 @@ get.location.mortality.rates <- function(location,
                                          backup.locations = c(AL='TN', MS='TN'))
   
 {
-    if (get.location.type(location)=='state')
+    if (get.location.type(location)=='STATE')
     {
         counties = locations::get.contained.locations(location, 'county')
         deaths = CENSUS.MANAGER$pull(outcome = 'state.deaths', location = location, year= year.ranges, keep.dimensions = c('year','age','race', 'ethnicity', 'sex', 'location'))
