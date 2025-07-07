@@ -73,11 +73,30 @@ register.calibration.info(code = "calib.07.02.rf",
                           max.run.time.seconds = 30,
                           description = "A quick run to get syphilis parameters in the general vicinity"
 )
-
+# calib.diagnosis.07.06.pk*
 for (i in (1:4)){
     register.calibration.info(code = paste0("calib.diagnosis.07.06.pk",i),
                               preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
-                              likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                              likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests statified
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030,
+                              parameter.names = 
+                                  c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                    TESTING.PARAMETERS.PRIOR@var.names),
+                              n.iter = N.ITER,
+                              thin = 50,
+                              is.preliminary = T,
+                              max.run.time.seconds = 30,
+                              description = "A quick run to get syphilis parameters in the general vicinity"
+                              # solver.metadata = shield.solver
+    )
+}
+
+#calib.diagnosis.07.07.pk*
+for (i in (1:4)){
+    register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
+                              preceding.calibration.codes = "calib.diagnosis.07.06.pk4", #calibrated diagnosis model
+                              likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests Total
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
                               parameter.names = 
@@ -93,17 +112,19 @@ for (i in (1:4)){
 }
 
 # LOG SUMMARY -----
+# <calib.diagnosis.07.07.pk1>
+# rerunning *4 from yesterday after revising the HIV likelihood to use the "TOTALS" only.
+
+
 # <calib.diagnosis.07.06.pk1>
 #adding additional knots to symptomatic testing to align with transmission: 1970,90,95,2000,2010,2020
-
+# >>> this is a good fit, and it captures the tails of late diagnosis well
 # <calib.diagnosis.07.06.pk2>
 #revising knots in sti.screening function to be the same : 1970,90,95,2000,2010,2020
-
-# <calib.diagnosis.07.06.pk3>
-#revising the sym.testing spline function to use a knot.link=logit, and use link=identity. 
-# <calib.diagnosis.07.06.pk4>
-#revising the sym.testing spline function to use a knot.link=logit, and use link=logit 
-
+# <calib.diagnosis.07.06.pk3> #revising the sym.testing spline function to use a knot.link=logit, and use link=identity. 
+# >>> using identity link for probabilities doesnt make sense. Ignore this run
+# <calib.diagnosis.07.06.pk4> #revising the sym.testing spline function to use a knot.link=logit, and use link=logit 
+# >>> this is exactly the same as *2. why? #'@Todd? 
 
 
 # <calib.07.03.pk1> ----
