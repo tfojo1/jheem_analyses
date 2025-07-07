@@ -309,11 +309,11 @@ late.diagnosis.by.strata.likelihood.instructions =
   )
 
 ##** HIV TESTS ** ----
-hiv.testing.likelihood.instructions =
+hiv.testing.total.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
                                        outcome.for.data = "proportion.tested.for.hiv", 
-                                       dimensions = c("age","race","sex"),
-                                       levels.of.stratification = c(0,1,2),
+                                       # dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0),
                                        from.year = 2014,
                                        to.year = 2019,
                                        observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
@@ -321,11 +321,11 @@ hiv.testing.likelihood.instructions =
                                        weights = TESTING.WEIGHT,
                                        error.variance.type = 'cv'
   )
-hiv.testing.total.likelihood.instructions =
+hiv.testing.by.strata.likelihood.instructions =
   create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
                                        outcome.for.data = "proportion.tested.for.hiv", 
-                                       # dimensions = c("age","race","sex"),
-                                       levels.of.stratification = c(0),
+                                       dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0,1,2),
                                        from.year = 2014,
                                        to.year = 2019,
                                        observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
@@ -502,9 +502,17 @@ lik.inst.diag.total.no.demog=join.likelihood.instructions(
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
   late.diagnosis.total.likelihood.instructions,
-  hiv.testing.total.likelihood.instructions
+  hiv.testing.by.strata.likelihood.instructions
 )
 
+# All total diagnosis+HIV test
+lik.inst.diag.by.strata.no.demog=join.likelihood.instructions(
+  total.diagnosis.likelihood.instructions,
+  ps.diagnosis.by.strata.likelihood.instructions,
+  early.diagnosis.by.strata.likelihood.instructions,
+  late.diagnosis.by.strata.likelihood.instructions,
+  hiv.testing.total.likelihood.instructions
+)
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
 #   create.basic.likelihood.instructions(outcome.for.data = "neurosyphilis", 

@@ -93,7 +93,7 @@ for (i in (1:4)){
 }
 
 #calib.diagnosis.07.07.pk*
-i=1
+i=1 #likelihoods Total
 register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
                           preceding.calibration.codes = "calib.diagnosis.07.06.pk4", #calibrated diagnosis model
                           likelihood.instructions = lik.inst.diag.total.no.demog, # Total Diag, PS total, EL total, Late total, HIV tests Total
@@ -109,7 +109,22 @@ register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
                           description = "A quick run to get syphilis parameters in the general vicinity"
                           # solver.metadata = shield.solver
 )
-
+i=2 #likelihoods by strata
+register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
+                          preceding.calibration.codes = "calib.diagnosis.07.06.pk4", #calibrated diagnosis model
+                          likelihood.instructions = lik.inst.diag.by.strata.no.demog, # BY Strata
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = 
+                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER,
+                          thin = 50,
+                          is.preliminary = T,
+                          max.run.time.seconds = 30,
+                          description = "A quick run to get syphilis parameters in the general vicinity"
+                          # solver.metadata = shield.solver
+)
 
 # LOG SUMMARY -----
 # <calib.diagnosis.07.07.pk1>
