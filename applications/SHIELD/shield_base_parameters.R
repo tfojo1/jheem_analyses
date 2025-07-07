@@ -1,8 +1,9 @@
-b.INFECTIOUSNESS=FALSE
-b.RELAPSE=FALSE
-b.PS.SCREENING=FALSE
-b.CONTACT.TRACING=FALSE
-
+b.INFECTIOUSNESS=T
+b.RELAPSE=T
+b.PS.SCREENING=T
+b.CONTACT.TRACING=T
+b.CONGENITAL=FALSE
+b.PRENATALCARE=FALSE
 # made from SHIELD_BASE_PARAMETERS.R
 
 # what are the citation numbers?
@@ -106,19 +107,28 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
 
 # *** CONGENITAL SYPHILIS ---- ##----
 # Boolean variable to control prenatal care as a switch
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
-                                      # 1,1,1
-                                      0,0,0 #'@PK:  temporary change for calibration
-                                      ) 
+if (b.PRENATALCARE){
+  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
+                                      1,1,1)
+}else{
+  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
+                                        0,0,0)
+}
+  
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
-                                      # 0.5,0.3,0.6,
-                                      0,0,0, #'@PK:  temporary change for calibration
+if (b.CONGENITAL){
+  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
+                                      0.5,0.3,0.6,
                                       citation = "syphilis_natural_history.docx") 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
-                                      # 0.1,0.05,0.15,
-                                      0,0,0, #'@PK:  temporary change for calibration
-                                      citation = "syphilis_natural_history.docx") 
+  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
+                                        0.1,0.05,0.15,
+                                        citation = "syphilis_natural_history.docx") 
+}else{
+  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
+                                        0,0,0)
+  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
+                                        0,0,0)
+}
 
 ## ---- Risk Ratios Based on Prenatal Cares timing  ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.no.prenatal.care',
@@ -264,19 +274,16 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.infected.conta
 percent.misclassified.el.as.llu=0.096
 percent.misclassified.llu.as.el =  0.272
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.el.misclassified.ll',
-                                      percent.misclassified.el.as.llu,
-                                      0,0)
+                                      percent.misclassified.el.as.llu, 0,0)
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.misclassified.el',
-                                      percent.misclassified.llu.as.el,
-                                      0,0)
+                                      percent.misclassified.llu.as.el, 0,0)
 
 
 #*** TREATMENTS INITIATION  **** ## ---- 
 #*#'@PK:double check
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
-                                      0,0,0)
-                                      # 0.89,0,0)
+                                      0.89,0,0)
                                       
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.testing.symptomatic', 
                                       0.89,0,0,

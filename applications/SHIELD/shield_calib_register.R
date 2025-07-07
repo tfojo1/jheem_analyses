@@ -2,7 +2,7 @@ cat("*** Running Shiled_register_calibration.R ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
 N.ITER=15000
-shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
+# shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
 # default.solver= create.solver.metadata()
 
 #parameter set for demographic calibration
@@ -31,8 +31,8 @@ register.calibration.info('calib.demog.06.09.pk',
                           thin = 50, 
                           is.preliminary = T, 
                           max.run.time.seconds = 30, 
-                          description = "A quick run to get population parameters in the general vicinity",
-                          solver.metadata = shield.solver
+                          description = "A quick run to get population parameters in the general vicinity"
+                          # solver.metadata = shield.solver
 )
 
 #############
@@ -55,12 +55,12 @@ register.calibration.info(code = "calib.diagnosis.06.30.pk1",
                           thin = 50,
                           is.preliminary = T,
                           max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = shield.solver
+                          description = "A quick run to get syphilis parameters in the general vicinity"
+                          # solver.metadata = shield.solver
 )
 
-register.calibration.info(code = "calib.diagnosis.07.01.pk1",
-                          preceding.calibration.codes = "calib.diagnosis.06.30.pk1", #calibrated demographic model
+register.calibration.info(code = "calib.07.02.rf",
+                          preceding.calibration.codes = "calib.demog.06.09.pk",  
                           likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -71,27 +71,13 @@ register.calibration.info(code = "calib.diagnosis.07.01.pk1",
                           thin = 50,
                           is.preliminary = T,
                           max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity",
-                          solver.metadata = shield.solver
+                          description = "A quick run to get syphilis parameters in the general vicinity"
 )
-register.calibration.info(code = paste0("calib.diag.07.02.pk1",),
-                          preceding.calibration.codes = "calib.diagnosis.07.01.pk1", #calibrated diagnosis model
-                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = 
-                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity")
-
-for (i in c(2:9)){
-    register.calibration.info(code = paste0("calib.diag.07.02.pk",i),
-                              preceding.calibration.codes = "calib.diagnosis.06.30.pk1", #calibrated diagnosis model
-                              likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+# calib.diagnosis.07.06.pk*
+for (i in (1:4)){
+    register.calibration.info(code = paste0("calib.diagnosis.07.06.pk",i),
+                              preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
+                              likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests statified
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
                               parameter.names = 
@@ -101,11 +87,49 @@ for (i in c(2:9)){
                               thin = 50,
                               is.preliminary = T,
                               max.run.time.seconds = 30,
-                              description = "A quick run to get syphilis parameters in the general vicinity",
-                              solver.metadata = shield.solver
-    )}
+                              description = "A quick run to get syphilis parameters in the general vicinity"
+                              # solver.metadata = shield.solver
+    )
+}
+
+#calib.diagnosis.07.07.pk*
+for (i in (1:4)){
+    register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
+                              preceding.calibration.codes = "calib.diagnosis.07.06.pk4", #calibrated diagnosis model
+                              likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests Total
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030,
+                              parameter.names = 
+                                  c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                    TESTING.PARAMETERS.PRIOR@var.names),
+                              n.iter = N.ITER,
+                              thin = 50,
+                              is.preliminary = T,
+                              max.run.time.seconds = 30,
+                              description = "A quick run to get syphilis parameters in the general vicinity"
+                              # solver.metadata = shield.solver
+    )
+}
 
 # LOG SUMMARY -----
+# <calib.diagnosis.07.07.pk1>
+# rerunning *4 from yesterday after revising the HIV likelihood to use the "TOTALS" only.
+
+
+# <calib.diagnosis.07.06.pk1>
+#adding additional knots to symptomatic testing to align with transmission: 1970,90,95,2000,2010,2020
+# >>> this is a good fit, and it captures the tails of late diagnosis well
+# <calib.diagnosis.07.06.pk2>
+#revising knots in sti.screening function to be the same : 1970,90,95,2000,2010,2020
+# <calib.diagnosis.07.06.pk3> #revising the sym.testing spline function to use a knot.link=logit, and use link=identity. 
+# >>> using identity link for probabilities doesnt make sense. Ignore this run
+# <calib.diagnosis.07.06.pk4> #revising the sym.testing spline function to use a knot.link=logit, and use link=logit 
+# >>> this is exactly the same as *2. why? #'@Todd? 
+
+
+# <calib.07.03.pk1> ----
+# repeating Ryan's run with the last sim as starting point
+# EL infectiousness = ON; Relapse=ON, PS screening=ON ; contact tracing=ON
 
 
 # <calib.diagnosis.07.02.pk1> ----
@@ -234,3 +258,19 @@ cat("*** Shiled_register_calibration.R completed!***\n")
 # calibrating to total ps; total EL diagnosis and hiv tests targets
 # downweighting the likelihood
 # 1) removed relapse =0 #2) removed infectiousness for EL stage =0 #3) removed screening for PS (muliplier set to 0) #4) took out prenatal care #5) took out contact tracing
+
+
+# # a temporary local calibration to test the HIV numbers 
+# register.calibration.info(code = "calib.07.02.temp",
+#                           preceding.calibration.codes = "calib.diagnosis.07.01.pk1", #calibrated diagnosis model
+#                           likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,
+#                           parameter.names = 
+#                               c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                 TESTING.PARAMETERS.PRIOR@var.names),
+#                           n.iter = 10, ###!!! MAke sure to
+#                           thin =1,###!!!
+#                           is.preliminary = T,
+#                           max.run.time.seconds = 30,
+#                           description = "A quick run to get syphilis parameters in the general vicinity")

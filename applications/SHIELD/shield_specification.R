@@ -27,26 +27,26 @@ SHIELD.SPECIFICATION = create.jheem.specification(version = 'shield',
                                                   start.year = DEFAULT.START.YEAR,
                                                   age.endpoints=c(0,15,20,25,30,35,40,45,50,55,65,Inf), #11 agegroups, similar to atlas [0-15][16-20];
                                                   compartments.for.infected.only = list(
-                                                      continuum = c('undiagnosed', 'diagnosed.untreated'),
-                                                      stage = c('primary','secondary', 'early.latent','late.latent','tertiary','cns')                                                 
+                                                    continuum = c('undiagnosed', 'diagnosed.untreated'),
+                                                    stage = c('primary','secondary', 'early.latent','late.latent','tertiary','cns')                                                 
                                                   ),
                                                   
                                                   compartments.for.uninfected.only = list(
-                                                      profile=c('susceptible','diagnosed.treated')),
+                                                    profile=c('susceptible','diagnosed.treated')),
                                                   
                                                   compartments.for.infected.and.uninfected = list(
-                                                      location = 'location',
-                                                      age = 'all.ages',
-                                                      race=c('black','hispanic','other'),
-                                                      sex= c('heterosexual_male', 'msm', 'female')
+                                                    location = 'location',
+                                                    age = 'all.ages',
+                                                    race=c('black','hispanic','other'),
+                                                    sex= c('heterosexual_male', 'msm', 'female')
                                                   ),
                                                   compartment.value.aliases = list(
-                                                      #try using aliases so that if we change the specification up here, the rest of the code doesnt break
-                                                      # helps to define specifications for groups of compartments later on
-                                                      ps.stages=c('primary','secondary'),
-                                                      early.stages=c('primary','secondary','early.latent'),
-                                                      late.stages=c('late.latent','tertiary','cns'),
-                                                      location=function(location){location}
+                                                    #try using aliases so that if we change the specification up here, the rest of the code doesnt break
+                                                    # helps to define specifications for groups of compartments later on
+                                                    ps.stages=c('primary','secondary'),
+                                                    early.stages=c('primary','secondary','early.latent'),
+                                                    late.stages=c('late.latent','tertiary','cns'),
+                                                    location=function(location){location}
                                                   )                                                  
                                                   
 )
@@ -237,9 +237,9 @@ register.initial.population(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.infected.all.stages',
                         value = expression((prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .25+
-                                               prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .75+
-                                               prp.el.diag.1997 * el.diagnoses.multiplier.1970+
-                                               prp.lu.diag.1997 * lu.diagnoses.multiplier.1970) * n.initial.population)
+                                              prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .75+
+                                              prp.el.diag.1997 * el.diagnoses.multiplier.1970+
+                                              prp.lu.diag.1997 * lu.diagnoses.multiplier.1970) * n.initial.population)
 )
 
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -442,14 +442,14 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact',
                         value = expression(global.transmission.rate *
-                                               rate.sexual.transmission *
-                                               sexual.contact.matrix))
+                                             rate.sexual.transmission *
+                                             sexual.contact.matrix))
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'sexual.contact.matrix',
                         value = expression(sexual.contact.by.age*
-                                               sexual.contact.by.sex*
-                                               sexual.contact.by.race ))
+                                             sexual.contact.by.sex*
+                                             sexual.contact.by.race ))
 
 ##---- Sexual Contact: Transmission Rates ----
 # probability of transmission through sexual act, it depends on the recipient, person getting infected
@@ -477,15 +477,18 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming th
 # Future Expnasions: msm.trate.by.race #add more alphas #if we assume the multiplier by black vs other remain the sma over time we only ned 2
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.msm',
-                       functional.form = create.natural.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
-                                                                               knot.values =list("1970"=0,"1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
-                                                                               knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
-                                                                               #
-                                                                               min=0, #even after using log for knots, value can be negative so we need to truncate
-                                                                               knot.link = 'log',
-                                                                               link='identity'), #knots on the log-scale and values on the identity scale
+                       scale='rate',
                        functional.form.from.time = 1970, 
-                       scale='rate') 
+                       functional.form = create.natural.spline.functional.form(
+                         knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                         knot.values =list("1970"=0,"1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
+                         knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
+                         knot.link = 'log', 
+                         link='identity', #linear projections between the knots 
+                         #
+                         min=0 #even after using log for knots, value can be negative so we need to truncate
+                       )
+) 
 #if we wanted to use a natural spline without log transformation:
 # knot.values = list(time0=1,time1=1,time2=1) , knots.are.on.transformed.scale = F, #on the identity scale
 #use a log(y) transformation, so that all returned values are positive
@@ -598,8 +601,8 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'fraction.male.male.that.are.with.msm',
                         value = expression(prp.msm.of.male /
-                                               (prp.msm.of.male +
-                                                    (1-prp.msm.of.male) * fraction.heterosexual_male.pairings.with.male))
+                                             (prp.msm.of.male +
+                                                (1-prp.msm.of.male) * fraction.heterosexual_male.pairings.with.male))
 )
 ###
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -611,8 +614,8 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to=list(sex.from='heterosexual_male',
                                                sex.to='female'),
                                value = expression((1-prp.msm.of.male)/
-                                                      (1-prp.msm.of.male +
-                                                           prp.msm.of.male * oe.female.pairings.with.msm))
+                                                    (1-prp.msm.of.male +
+                                                       prp.msm.of.male * oe.female.pairings.with.msm))
 )
 # To female from msm
 register.model.quantity.subset(SHIELD.SPECIFICATION,
@@ -620,8 +623,8 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to=list(sex.from='msm',
                                                sex.to='female'),
                                value = expression(prp.msm.of.male * oe.female.pairings.with.msm/
-                                                      (1-prp.msm.of.male +
-                                                           prp.msm.of.male * oe.female.pairings.with.msm))
+                                                    (1-prp.msm.of.male +
+                                                       prp.msm.of.male * oe.female.pairings.with.msm))
 )
 # To MSM from female, msm, het male
 register.model.quantity.subset(SHIELD.SPECIFICATION,
@@ -634,13 +637,13 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to=list(sex.from='msm',
                                                sex.to='msm'),
                                value = expression((1-fraction.msm.pairings.with.female) *
-                                                      fraction.male.male.that.are.with.msm))
+                                                    fraction.male.male.that.are.with.msm))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
                                applies.to=list(sex.from='heterosexual_male',
                                                sex.to='msm'),
                                value = expression((1-fraction.msm.pairings.with.female) *
-                                                      (1-fraction.male.male.that.are.with.msm))
+                                                    (1-fraction.male.male.that.are.with.msm))
 )
 # To heterosexual male from female and msm and other het male
 register.model.quantity.subset(SHIELD.SPECIFICATION,
@@ -654,14 +657,14 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to=list(sex.from='msm',
                                                sex.to='heterosexual_male'),
                                value = expression(fraction.heterosexual_male.pairings.with.male *
-                                                      fraction.male.male.that.are.with.msm)
+                                                    fraction.male.male.that.are.with.msm)
 )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sexual.contact.by.sex',
                                applies.to=list(sex.from='heterosexual_male',
                                                sex.to='heterosexual_male'),
                                value = expression(fraction.heterosexual_male.pairings.with.male *
-                                                      (1-fraction.male.male.that.are.with.msm))
+                                                    (1-fraction.male.male.that.are.with.msm))
 )
 
 
@@ -875,55 +878,65 @@ register.transition(SHIELD.SPECIFICATION,
 # Register "Effective" symptomatic proportions for primary and secondary stages
 # We assume 100% care seeking and testing rate for ”symptomatic” cases in Primary&Secondary Stage (effective proportion) 
 # Those who don’t notice the symptoms or don’t seek care based on symptoms are treated as asymptomatic. 
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.primary.heterosexual_male',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.primary.female',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.primary.msm',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.secondary.heterosexual_male',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.secondary.female',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'prp.symptomatic.secondary.msm',
-                       scale = 'proportion',
-                       value = SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est'])
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'prp.symptomatic.primary',
-                        scale='proportion',
-                        value = 'prp.symptomatic.primary.heterosexual_male')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.symptomatic.primary',
-                               applies.to = list(sex='female'),
-                               value = 'prp.symptomatic.primary.female')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.symptomatic.primary',
-                               applies.to = list(sex='msm'),
-                               value = 'prp.symptomatic.primary.msm')
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'prp.symptomatic.secondary',
-                        scale='proportion',
-                        value = 'prp.symptomatic.secondary.heterosexual_male')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.symptomatic.secondary',
-                               applies.to = list(sex='female'),
-                               value = 'prp.symptomatic.secondary.female')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prp.symptomatic.secondary',
-                               applies.to = list(sex='msm'),
-                               value = 'prp.symptomatic.secondary.msm')
+base.prp.symptomatic.primary = array(
+  c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'],
+    SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'],
+    SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']
+  ),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
 
+register.model.element(SHIELD.SPECIFICATION,
+                       name = "prp.symptomatic.primary",
+                       scale = 'proportion',
+                       functional.form.from.time = 1970, 
+                       functional.form = create.natural.spline.functional.form(
+                         knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
+                         knot.values = list("1970" = base.prp.symptomatic.primary, 
+                                            "1990" = base.prp.symptomatic.primary, 
+                                            "1995" = base.prp.symptomatic.primary, 
+                                            "2000" = base.prp.symptomatic.primary, 
+                                            "2010" = base.prp.symptomatic.primary, 
+                                            "2020" =  base.prp.symptomatic.primary),
+                         #
+                         knots.are.on.transformed.scale = F,
+                         knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
+                         link="logit",
+                         #
+                         min=0, #do we need these for the proportion? 
+                         max=1,
+                         #
+                         after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
+                         after.modifier = 0.5,
+                         modifiers.apply.to.change = T
+                       ))
+base.prp.symptomatic.secondary = array(
+  c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
+    SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'],
+    SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']
+  ),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
+ 
+register.model.element(SHIELD.SPECIFICATION,
+                       name = "prp.symptomatic.secondary",
+                       scale = 'proportion',
+                       functional.form.from.time = 1970, 
+                       functional.form = create.natural.spline.functional.form(
+                         knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
+                         knot.values = list("1970" = base.prp.symptomatic.secondary, 
+                                            "1990" = base.prp.symptomatic.secondary,
+                                            "1995" = base.prp.symptomatic.secondary,
+                                            "2000" =  base.prp.symptomatic.secondary,
+                                            "2010" =  base.prp.symptomatic.secondary,
+                                            "2020" =  base.prp.symptomatic.secondary),
+                         knots.are.on.transformed.scale = F,
+                         knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
+                         link="logit",
+                         #
+                         min=0, #do we need these for the proportion? 
+                         max=1,
+                         #
+                         after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
+                         after.modifier = 0.5,
+                         modifiers.apply.to.change = T
+                       ))
 # We assume 100% care/seeking and testing rate for symptomatic individuals
 # For now, we assume 100% test.sensitivity as well. 
 # proportion of symp.testing that are successfully diagnosed: 
@@ -1000,17 +1013,28 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         value = 'rate.testing.hiv.without.covid')
 
 # defining a STI multiplier over time:
+# function to map the ratio of STI tests relative to hiv.tests in the US (for STI screening)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'multiplier.syphilis.screening.to.hiv.tests',
                        scale = 'ratio',
-                       get.functional.form.function = get.syphilis.to.hiv.testing.functional.form, #starts in 1980 and has 5 knots
-                       functional.form.from.time = DEFAULT.STI.SCREENING.START.YEAR) #1980  #the projections remain fix at this year's value for years before. 
+                       functional.form.from.time = 1970,  #the projections remain fix at this year's value for years before.
+                       functional.form = create.natural.spline.functional.form(
+                         knot.times = c("1970"=1970, "1990"=1990,"1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                         knot.values=list("1970"=1, "1990"=1,"1995"=1, "2000"=1, "2010"=1,"2020"=1),  
+                         knots.are.on.transformed.scale = F,
+                         knot.link = "log",
+                         link = "identity", #linear projections between the knots (avoid exponential growth)
+                         #
+                         knot.min = 0, #knot values can not fall below 0
+                         min=0 #projected spline values can not fall below 0
+                       ) 
+) 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sti.screening',
                         scale = 'rate',
                         value = expression(rate.testing.hiv * 
-                                               multiplier.syphilis.screening.to.hiv.tests *
-                                               sti.screening.by.stage))
+                                             multiplier.syphilis.screening.to.hiv.tests *
+                                             sti.screening.by.stage))
 
 # additional STI multiplier by stage 
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -1038,7 +1062,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'ratio',
                        value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.cns'])
 
-                       
+
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'sti.screening.by.stage',
                                applies.to = list(stage = c("primary", "secondary")),
@@ -1165,16 +1189,16 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.infected.contacts.diagnosed.treated',
                         scale='rate',
                         value = expression(rate.of.contacts.per.case * 
-                                               prop.index.cases.reached.for.contact.tracing* 
-                                               contacts.diagnosed.treated.per.index.case * 
-                                               prp.infected.contacts.by.stage))
+                                             prop.index.cases.reached.for.contact.tracing* 
+                                             contacts.diagnosed.treated.per.index.case * 
+                                             prp.infected.contacts.by.stage))
 register.model.quantity(SHIELD.SPECIFICATION,  
                         name = 'rate.infected.contacts.empirically.treated',
                         scale='rate',
                         value = expression(rate.of.contacts.per.case * 
-                                               prop.index.cases.reached.for.contact.tracing*
-                                               contacts.empirically.treated.infected.per.index.case *
-                                               prp.infected.contacts.by.stage))
+                                             prop.index.cases.reached.for.contact.tracing*
+                                             contacts.empirically.treated.infected.per.index.case *
+                                             prp.infected.contacts.by.stage))
 
 #*** TREATMENT *** --#----
 # a proportion will receive immediate treatment, another group will be delayed
@@ -1194,8 +1218,8 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.diagnosis.immediate.treatment',
                         value = expression(rate.testing.symptomatic * prp.treated.immediately.following.testing.symptomatic + 
-                                               rate.sti.screening * prp.treated.immediately.following.screening + 
-                                               rate.infected.contacts.diagnosed.treated 
+                                             rate.sti.screening * prp.treated.immediately.following.screening + 
+                                             rate.infected.contacts.diagnosed.treated 
                         ))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.diagnosis.immediate.treatment',
@@ -1233,7 +1257,7 @@ register.remission(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.diagnosis.delayed.treatment',
                         value = expression(rate.testing.symptomatic * (1-prp.treated.immediately.following.testing.symptomatic)+
-                                               rate.sti.screening * (1- prp.treated.immediately.following.screening )
+                                             rate.sti.screening * (1- prp.treated.immediately.following.screening )
                         ))
 
 register.transition(SHIELD.SPECIFICATION,
@@ -1538,7 +1562,7 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       # force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify
                                       corresponding.data.outcome = 'proportion.tested.for.hiv'
 )
-                                      
+
 ##---- HIV Testing -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       name = 'hiv.testing',
@@ -1735,7 +1759,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.el.misclassified',
                          value = expression(diagnosis.el.true *(1-fraction.el.misclassified.ll) + 
-                                                diagnosis.ll.true * fraction.ll.misclassified.el),
+                                              diagnosis.ll.true * fraction.ll.misclassified.el),
                          outcome.metadata = create.outcome.metadata(display.name = 'EL (misclass) Diagnosis',#'Number of Individuals with a Diagnosis of Early Latent Syphilis (including misclassification) in the Past Year',
                                                                     description = 'Number of Individuals with a Diagnosis of Early Latent Syphilis (including misclassification) in the Past Year',
                                                                     scale = 'non.negative.number',
@@ -1751,7 +1775,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.ll.misclassified',
                          value = expression( diagnosis.ll.true *(1- fraction.ll.misclassified.el) + 
-                                                 diagnosis.el.true * fraction.el.misclassified.ll),
+                                               diagnosis.el.true * fraction.el.misclassified.ll),
                          outcome.metadata = create.outcome.metadata(display.name = 'LL (misclass) Diagnosis',#'Number of Individuals with a Diagnosis of Late Latent Syphilis (including misclassification) in the Past Year',
                                                                     description = 'Number of Individuals with a Diagnosis of Late Latent Syphilis (including misclassification) in the Past Year',
                                                                     scale = 'non.negative.number',
@@ -1840,10 +1864,10 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  singular.unit = 'person'),
                       scale='non.negative.number',
                       multiply.by = expression(prob.vertical.transmission.by.stage * (
-                          prp.prenatal.care.first.trimester * rr.congenital.syphilis.prenatal.care.first.trimester +
-                              prp.prenatal.care.second.trimester * rr.congenital.syphilis.prenatal.care.second.trimester  +
-                              prp.prenatal.care.third.trimester * rr.congenital.syphilis.prenatal.care.third.trimester +
-                              prp.no.prenatal.care * rr.congenital.syphilis.no.prenatal.care    ) ), #prp of preg that pass on congenital syphilis
+                        prp.prenatal.care.first.trimester * rr.congenital.syphilis.prenatal.care.first.trimester +
+                          prp.prenatal.care.second.trimester * rr.congenital.syphilis.prenatal.care.second.trimester  +
+                          prp.prenatal.care.third.trimester * rr.congenital.syphilis.prenatal.care.third.trimester +
+                          prp.no.prenatal.care * rr.congenital.syphilis.no.prenatal.care    ) ), #prp of preg that pass on congenital syphilis
                       dynamic.quantity.name = 'births.from',  #model has an internal definition for births  #births from is conditional on parent's characteristics
                       corresponding.data.outcome = 'congenital.syphilis.diagnoses' ,
                       keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well

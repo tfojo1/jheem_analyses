@@ -15,6 +15,7 @@ LOCATION <- 'C.12580'  # Baltimore MSA
 get.jheem.root.directory() #"/Volumes/jheem$"
 
 load(paste0(get.jheem.root.directory(),"/shield/","calib.diagnosis.07.01.pk1","Rdata")) #good fit
+
 # Quick checkpoint ----
 simset1=simset
 simset$n.sim
@@ -23,6 +24,7 @@ sim.first1    <- simset$first.sim()
 sim.last1     <- simset$last.sim()
 params.first1 <- simset$first.sim()$params
 params.last1  <- simset$last.sim()$params
+
 
 # MANUAL run to compare
 engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)

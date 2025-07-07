@@ -321,7 +321,18 @@ hiv.testing.likelihood.instructions =
                                        weights = TESTING.WEIGHT,
                                        error.variance.type = 'cv'
   )
-
+hiv.testing.total.likelihood.instructions =
+  create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
+                                       outcome.for.data = "proportion.tested.for.hiv", 
+                                       # dimensions = c("age","race","sex"),
+                                       levels.of.stratification = c(0),
+                                       from.year = 2014,
+                                       to.year = 2019,
+                                       observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
+                                       error.variance.term = 0.05,
+                                       weights = TESTING.WEIGHT,
+                                       error.variance.type = 'cv'
+  )
 ##---- Congenital ----
 #poportion of state level births that are complicated by congenital syphilis 
 # 1) using CDC reported state level targets
@@ -492,12 +503,12 @@ likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(
   
 )
 
-# PS total, EL total, Late total, HIV tests
+# PS total, EL total, Late total, HIV tests total
 likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instructions(
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
   late.diagnosis.total.likelihood.instructions,
-  hiv.testing.likelihood.instructions
+  hiv.testing.total.likelihood.instructions
 )
 
 

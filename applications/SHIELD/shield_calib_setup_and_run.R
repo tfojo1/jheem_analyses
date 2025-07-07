@@ -22,27 +22,29 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 
 #
 VERSION='shield'
-LOCATION='C.12580' #Baltimore MSA
-# LOCATION='C.35620'#NYC
+LOCATION='C.12580' #Baltimore MSA 
 set.seed(00000)
+CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
+UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-CALIBRATION.NAME = 'calib.diag.07.02.pk2' 
+CALIBRATION.NAME = 'calib.diagnosis.07.07.pk1' 
 
+
+#################
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
-# clear.calibration.cache(version=VERSION,
-#                         location=LOCATION,
-#                        calibration.code = CALIBRATION.NAME,
-#                         allow.remove.incomplete = T)
-# print("Cashe is cleared")
+clear.calibration.cache(version=VERSION,
+                        location=LOCATION,
+                       calibration.code = CALIBRATION.NAME,
+                        allow.remove.incomplete = T)
+print("Cashe is cleared")
 #
 set.up.calibration(version=VERSION,
                    location=LOCATION,
                    calibration.code = CALIBRATION.NAME,
-                   cache.frequency = 100 #how often write the results to disk
+                   cache.frequency = CACHE.FREQ #100 #how often write the results to disk
 )
 print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
-
 
 # Run calibration ----
 start.time = Sys.time()
@@ -51,15 +53,18 @@ mcmc = run.calibration(version = VERSION,
                        location = LOCATION,
                        calibration.code = CALIBRATION.NAME,
                        chains = 1,
-                       update.frequency = 50,
+                       update.frequency = UPDATE.FREQ,#50,
                        update.detail = 'med')
 end.time = Sys.time()
 run.time = as.numeric(end.time) - as.numeric(start.time)
+
+# Print run time ----
 print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time/60, 0), " minutes to run ",
              format(N.ITER, big.mark = ","),
              " simulations (",
              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
+
 
 # Save simset
 simset = assemble.simulations.from.calibration(version = VERSION,
