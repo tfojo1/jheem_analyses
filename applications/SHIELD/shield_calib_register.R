@@ -110,7 +110,7 @@ register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
                           # solver.metadata = shield.solver
 )
 i=11 #likelihoods Total; different starting point
-register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
+register.calibration.info(code = paste0("calib.07.07.pk",i),
                           preceding.calibration.codes = "calib.demog.06.09.pk",  #calobrated demographic model
                           likelihood.instructions = lik.inst.diag.total.no.demog,  
                           data.manager = SURVEILLANCE.MANAGER,
@@ -145,7 +145,7 @@ register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
 )
 
 i=22 #likelihoods by strata; different starting point
-register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
+register.calibration.info(code = paste0("calib.07.07.pk",i),
                           preceding.calibration.codes = "calib.demog.06.09.pk", # 
                           likelihood.instructions = lik.inst.diag.by.strata.no.demog, # 
                           data.manager = SURVEILLANCE.MANAGER,
