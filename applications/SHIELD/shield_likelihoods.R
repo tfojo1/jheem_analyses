@@ -480,7 +480,7 @@ hiv.testing.total.likelihood.instructions =
 
 
 
-#-- FULL LIKELIHOODS --# ----
+#-- LIKELIHOODS --# ----
 likelihood.instructions.demographics=join.likelihood.instructions(
   population.likelihood.instructions,
   deaths.likelihood.instructions,
@@ -488,29 +488,22 @@ likelihood.instructions.demographics=join.likelihood.instructions(
   immigration.likelihood.instructions,
   emigration.likelihood.instructions)
 
-#-- LIKELIHOOD INSTRUCTIONS FOR DIAGNOSIS ----
-# calibnames=c("elTotal","psTotal","psElTotal","all.totals")
-likelihood.instructions.syphilis.diagnoses.all.totals=join.likelihood.instructions( #all 4 total values 
-  likelihood.instructions.demographics,  #
-  total.diagnosis.likelihood.instructions,
-  ps.diagnosis.total.likelihood.instructions,
-  early.diagnosis.total.likelihood.instructions,
-  late.diagnosis.total.likelihood.instructions
-)
-likelihood.instructions.syphilis.diagnoses.psTotal=join.likelihood.instructions(#only PS total
-  likelihood.instructions.demographics,  #
-   ps.diagnosis.total.likelihood.instructions
-  
-)
+# Total diagnosis by stage only
+# likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instructions(
+#   ps.diagnosis.total.likelihood.instructions,
+#   early.diagnosis.total.likelihood.instructions,
+#   late.diagnosis.total.likelihood.instructions,
+#   hiv.testing.total.likelihood.instructions
+# )
 
-# PS total, EL total, Late total, HIV tests total
-likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instructions(
+# All total diagnosis+HIV test
+lik.inst.diag.total.no.demog=join.likelihood.instructions(
+  total.diagnosis.likelihood.instructions,
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
   late.diagnosis.total.likelihood.instructions,
   hiv.testing.total.likelihood.instructions
 )
-
 
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
