@@ -489,12 +489,12 @@ likelihood.instructions.demographics=join.likelihood.instructions(
   emigration.likelihood.instructions)
 
 # Total diagnosis by stage only
-# likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instructions(
-#   ps.diagnosis.total.likelihood.instructions,
-#   early.diagnosis.total.likelihood.instructions,
-#   late.diagnosis.total.likelihood.instructions,
-#   hiv.testing.total.likelihood.instructions
-# )
+likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instructions(
+  ps.diagnosis.total.likelihood.instructions,
+  early.diagnosis.total.likelihood.instructions,
+  late.diagnosis.total.likelihood.instructions,
+  hiv.testing.total.likelihood.instructions
+)
 
 # All total diagnosis+HIV test
 lik.inst.diag.total.no.demog=join.likelihood.instructions(
