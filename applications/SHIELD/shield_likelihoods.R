@@ -9,6 +9,7 @@
 
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
 TOTAL.WEIGHT=1/8
+EL.DIAGNOSIS.WEIGHT = 1/4 #increasing EL weight
 POPULATION.WEIGHT = TOTAL.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
@@ -254,7 +255,7 @@ early.diagnosis.total.likelihood.instructions =
                                        observation.correlation.form = 'autoregressive.1',
                                        error.variance.term = 0.05, #'@Ryan: we need to estimate this 
                                        error.variance.type = 'cv',
-                                       weights = DIAGNOSIS.WEIGHT,
+                                       weights = EL.DIAGNOSIS.WEIGHT, # DIAGNOSIS.WEIGHT,
                                        equalize.weight.by.year = T,
                                        minimum.error.sd = 1
   )

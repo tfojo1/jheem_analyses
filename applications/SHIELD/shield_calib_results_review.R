@@ -46,13 +46,31 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 # }
 
 # Load simset from the Q drive
-for (i in c(3:4)){
-    CALIBRATION.CODE.TO.RUN <- paste0('calib.diagnosis.07.06.pk',i); DATE <- "2025-07-06"
+for (i in c(1,2)){
+    CALIBRATION.CODE.TO.RUN <- paste0('calib.diagnosis.07.07.pk',i); DATE <- "2025-07-08"
     load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
     assign(paste0("simset",i),simset) #dynamic assignment
 }
+for (i in c(11,22)){
+    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.07.pk',i); DATE <- "2025-07-08"
+    load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
+    assign(paste0("simset",i),simset) #dynamic assignment
+}
+# 
+# # Ryan's
+# {
+#     CALIBRATION.CODE.TO.RUN <- 'calib.07.03.rf'; DATE <- "2025-07-04"
+#     load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
+#     simset.rf=simset;
+#     simset$n.sim
+#     # Extract first and last simulations and their parameters
+#     sim.first.rf    <- simset$first.sim()
+#     sim.last.rf    <- simset$last.sim()
+#     params.first.rf <- simset$first.sim()$params
+#     params.last.rf  <- simset$last.sim()$params
+# }
 
-for (i in c(1:4)){
+for (i in c(1,2,11,22)){
     simset=get(paste0("simset",i))
     print(simset$n.sim)
     # Extract first and last simulations and their parameters
@@ -60,19 +78,6 @@ for (i in c(1:4)){
     assign(paste0("sim.last",i)   ,simset$last.sim())
     assign(paste0("params.first",i) ,simset$first.sim()$params)
     assign(paste0("params.last",i) ,simset$last.sim()$params)
-}
-
-# Ryan's
-{
-    CALIBRATION.CODE.TO.RUN <- 'calib.07.03.rf'; DATE <- "2025-07-04"
-load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
-simset.rf=simset;
-simset$n.sim
-# Extract first and last simulations and their parameters
-sim.first.rf    <- simset$first.sim()
-sim.last.rf    <- simset$last.sim()
-params.first.rf <- simset$first.sim()$params
-params.last.rf  <- simset$last.sim()$params
 }
 
 # engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
@@ -83,33 +88,35 @@ params.last.rf  <- simset$last.sim()$params
 # params.manual["or.symptomatic.2020"] <- params.manual["or.symptomatic.2020"] #0.6944672 
 # sim.mac.engine <- engine$run(params.manual)
 
-# load(paste0(get.jheem.root.directory(),"/shield/","calib.07.02.temp_simset_2025-07-02_C.12580",".Rdata"))
-# simset.mac.calib=simset
-
 # PLOT -----
 simplot(
     # sim.first0,
     # sim.first1,
-    # sim.last1, #new testing knots (1970,95,2010)
+    # sim.last1,
     # sim.first2,
-    # sim.last2, #new screening knots (1970,...)
-    # sim.last3,
-    # sim.last4, # testing uses: knot.link="logit", link=logit
-    sim.first1,
-    simset1,
-    sim.last1,
+    # simset2, 
+    sim.last2,
+    # sim.last11,
+    # sim.last22,
+    # sim.first1,
+    # simset1,
+    # sim.last1,
     # simset.rf$last.sim(),
     # sim.mac.engine,
     # simset.mac.calib$first.sim(),
     # split.by = "race", facet.by = "sex",
     # split.by = "race", facet.by = "age",
     # outcomes = c("population"),    split.by = "race", facet.by = "age",
-    # outcomes=c("hiv.testing"),  facet.by = "age", #facet.by = "age",
-    # outcomes=c("hiv.testing"),  facet.by = "race", #facet.by = "age",
-    outcomes = c("diagnosis.ps","diagnosis.el.misclassified",
-                 "diagnosis.late.misclassified","hiv.testing"),
-    # outcomes = c("prevalence"),
-    dimension.values = list(year = 1970:2023) 
+    
+    # outcomes=c("diagnosis.total"),   facet.by = "race",
+    # outcomes=c("diagnosis.ps"),     facet.by = "race",
+    # outcomes=c("diagnosis.el.misclassified"),   facet.by = "race",
+    outcomes=c("diagnosis.late.misclassified"),   facet.by = "race",
+    
+    # outcomes = c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified",
+    #              "diagnosis.late.misclassified","hiv.testing"),
+    # # outcomes = c("prevalence"),
+    dimension.values = list(year = 1970:2025) 
     # style.manager = source.style.manager
 )
 
@@ -181,7 +188,7 @@ engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
     lik.hiv$compute(sim.last2,debug = T)
     
     summary.hiv.1
-        summary.hiv.2
+    summary.hiv.2
     lik.early=early.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION, LOCATION)
     lik.early$compare.sims(sim.last1,sim.manual, piecewise = T, log = F) #values greater than 1 mean than sim2 is better than sim1, while values less than 1 mean that sim2 is worse than sim1. 
     
