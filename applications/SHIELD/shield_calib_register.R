@@ -5,15 +5,6 @@ N.ITER=15000
 # shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
 # default.solver= create.solver.metadata()
 
-#parameter set for demographic calibration
-param.names.demog<-c(POPULATION.PARAMETERS.PRIOR@var.names,
-                     AGING.PARAMETERS.PRIOR@var.names
-)
-
-#parameter set for diagnosis calibration
-param.names.diag<-c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                    TESTING.PARAMETERS.PRIOR@var.names)
-
 #parameter set for demographic & diagnosis calibration
 param.names.all<-c(
     POPULATION.PARAMETERS.PRIOR@var.names,
@@ -21,47 +12,30 @@ param.names.all<-c(
     TRANSMISSION.PARAMETERS.PRIOR@var.names,
     TESTING.PARAMETERS.PRIOR@var.names)
 
-# Calibrating to demographic and syphilis diagnoses targets
+# Usedbelow: 06.09.pk*:Calibrating to demographic targets only
 register.calibration.info('calib.demog.06.09.pk', 
                           likelihood.instructions = likelihood.instructions.demographics,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
-                          parameter.names = param.names.demog, 
-                          n.iter = N.ITER,
-                          thin = 50, 
-                          is.preliminary = T, 
-                          max.run.time.seconds = 30, 
-                          description = "A quick run to get population parameters in the general vicinity"
-                          # solver.metadata = shield.solver
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-#############
-# calibrating to total ps; total EL diagnosis and hiv tests targets
-# downweighting the likelihood
-# removed relapse =0 
-# removed infectiousness for EL stage =0
-# removed screening for PS (muliplier set to 0)
-# took out prenatal care
-# took out contact tracing
-register.calibration.info(code = "calib.diagnosis.06.30.pk1",
+# Usedbelow: 07.06.pk*: Adding extra knots to testing and screening to align with transmission knots 
+register.calibration.info(code = ("calib.diagnosis.07.06.pk4"),
                           preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
-                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, #PS total, EL total, Late total, HIV tests statified
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = 
                               c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                 TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity"
-                          # solver.metadata = shield.solver
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-#calib.diagnosis.07.07.pk*
-i=1 #likelihoods Totals, all with w=1/8 weight
-register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
+#Usedbelow: 07.07.pk* #likelihoods Totals, all with w=1/8 weight
+register.calibration.info(code = paste0("calib.diagnosis.07.07.pk1"),
                           preceding.calibration.codes = "calib.diagnosis.07.06.pk4", #calibrated diagnosis model
                           likelihood.instructions = lik.inst.diag.total.no.demog,  
                           data.manager = SURVEILLANCE.MANAGER,
@@ -69,14 +43,10 @@ register.calibration.info(code = paste0("calib.diagnosis.07.07.pk",i),
                           parameter.names = 
                               c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                 TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N.ITER,
-                          thin = 50,
-                          is.preliminary = T,
-                          max.run.time.seconds = 30,
-                          description = "A quick run to get syphilis parameters in the general vicinity"
-                          # solver.metadata = shield.solver
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-
+################################################################################################
+# 07.08 (CURRENT)
 for (i in c(1:4)){
     #1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
     #2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
@@ -89,12 +59,7 @@ for (i in c(1:4)){
                               parameter.names = 
                                   c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
                                     TESTING.PARAMETERS.PRIOR@var.names),
-                              n.iter = N.ITER,
-                              thin = 50,
-                              is.preliminary = T,
-                              max.run.time.seconds = 30,
-                              description = "A quick run to get syphilis parameters in the general vicinity"
-                              # solver.metadata = shield.solver
+                              n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
     )
 }
 
@@ -106,8 +71,8 @@ for (i in c(1:4)){
 #1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
 #2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
 #3-likelihoods Totals, all with w=1/8 weight except for EL (w=1)
-    
-    
+
+
 # <calib.diagnosis.07.07.pk1>
 # rerunning *4 from yesterday after revising the HIV likelihood to use the "TOTALS" only.
 # <<calib.diagnosis.07.07.pk1>> total likelihoods, using the previous calibration as starting point
