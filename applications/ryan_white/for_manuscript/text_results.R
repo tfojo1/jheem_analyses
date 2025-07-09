@@ -72,7 +72,7 @@ print("CESSATION (Conservative): ")
 
 
 print(paste0("Total Suppression post-drop in 2026 (CONSERVATIVE ESTIMATES): ",
-             round(100*mean(total.suppression['2026',,'rw.end'])), '%',
+             round(100*mean(total.suppression['2026',,'rw.end.cons'])), '%',
              " [", round(100*quantile(total.suppression['2026',,'rw.end.cons'], probs=.025)),
              " - ", round(100*quantile(total.suppression['2026',,'rw.end.cons'], probs=.975)),
              "%]"))
