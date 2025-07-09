@@ -21,7 +21,7 @@ make.time.plot <- function(locations,
                            intervention.colors = TIMELINE.COLORS,
                            intervention.labels = TIMELINE.LABELS,
                            outcome = 'incidence',
-                           years = 2017:2030,
+                           years = 2018:2030,
                            label.years = 2025:2030,
                            data.color = RW.DATA.COLOR,
                            ci.coverage = 0.95,
@@ -70,7 +70,7 @@ make.time.plot <- function(locations,
         label = paste0(format(round(mean(abs.delta)), big.mark=','), ' [',
                        format(round(quantile(abs.delta, probs=alpha)), big.mark=','), "-",
                        format(round(quantile(abs.delta, probs=1-alpha)), big.mark=','), "]\nmore ",
-                     text.label),
+                     text.label, "   "),
       x = label.x.year,
       y = (y.max + sim.means[as.character(label.x.year),1]) / 2,
       xend = label.xend.year,
@@ -93,7 +93,7 @@ make.time.plot <- function(locations,
                 aes(label=label, x=x, y=y),
                 hjust = 1,
                 vjust = 0,
-                nudge_x = -0.25,
+                nudge_x = 0.5,
                 size = label.size) +
       scale_fill_manual(name = NULL,
                         values = intervention.colors,
@@ -106,6 +106,7 @@ make.time.plot <- function(locations,
       scale_y_continuous(labels = function(x){format(x, big.mark=',')},
                          limits = c(0,y.max),
                          name = NULL) +
+      scale_x_continuous(breaks = years[years%%5==0]) +
       xlab(NULL) +
       theme_bw(base_size = base.size)
 }
@@ -154,19 +155,19 @@ ggsave(plot = plot,
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.end')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'Figure_2H.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2G.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.b.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'Figure_2J.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2I.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 plot = make.time.plot(location=RW.MEDICAID.NONEXPANSION.CITIES, 
                       intervention.codes = c('noint','rw.p.intr')); print(plot)
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, 'Figure_2I.png'),
+       filename=file.path(PLOT.DIR, 'Figure_2H.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 

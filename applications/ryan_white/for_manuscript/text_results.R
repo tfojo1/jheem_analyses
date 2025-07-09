@@ -480,32 +480,32 @@ print(paste0("Relative Increase in Diagnoses 2025-2030 in Ryan White Brief Inter
              "%]"))
 
 ##-- DEATHS (for discussion) --##
-
-print('\n\nDEATHS\n\n')
-
-total.mortality = total.results[,,'hiv.mortality',,]
-
-tot.mort.noint1 = apply(total.mortality[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim'), sum, na.rm=T)
-
-abs.delta.cessation.tot.mort.noint1 = apply(total.mortality[YEARS.TO.CONSIDER,,,'rw.end',drop=F], c('sim'), sum, na.rm=T) - tot.mort.noint1
-rel.delta.cessation.tot.mort.noint1 = abs.delta.cessation.tot.mort.noint1 / tot.mort.noint1
-
-print(paste0("Absolute Increase in Deaths among PWH 2025-2030 if Ryan White Ends Indefinitely: ", 
-             format(round(mean(abs.delta.cessation.tot.mort.noint1, na.rm=T)), big.mark=','),
-             " [",
-             format(round(quantile(abs.delta.cessation.tot.mort.noint1, probs=.025, na.rm=T)), big.mark=','),
-             " - ",
-             format(round(quantile(abs.delta.cessation.tot.mort.noint1, probs=.975, na.rm=T)), big.mark=','),
-             "]"))
-
-print(paste0("Relative Increase in Deaths among PWH 2025-2030 if Ryan White Ends Indefinitely: ", 
-             format(round(mean(rel.delta.cessation.tot.mort.noint1, na.rm=T)*100), big.mark=','),
-             "% [",
-             format(round(quantile(rel.delta.cessation.tot.mort.noint1, probs=.025, na.rm=T)*100), big.mark=','),
-             " - ",
-             format(round(quantile(rel.delta.cessation.tot.mort.noint1, probs=.975, na.rm=T)*100), big.mark=','),
-             "%]"))
-
-mean(abs.delta.cessation.tot.mort.noint1 / abs.delta.cessation.tot.inf.noint1)
-
-mean(abs.delta.cessation.tot.mort.noint1) / mean(abs.delta.cessation.tot.inf.noint1)
+# 
+# print('\n\nDEATHS\n\n')
+# 
+# total.mortality = total.results[,,'hiv.mortality',,]
+# 
+# tot.mort.noint1 = apply(total.mortality[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim'), sum, na.rm=T)
+# 
+# abs.delta.cessation.tot.mort.noint1 = apply(total.mortality[YEARS.TO.CONSIDER,,,'rw.end',drop=F], c('sim'), sum, na.rm=T) - tot.mort.noint1
+# rel.delta.cessation.tot.mort.noint1 = abs.delta.cessation.tot.mort.noint1 / tot.mort.noint1
+# 
+# print(paste0("Absolute Increase in Deaths among PWH 2025-2030 if Ryan White Ends Indefinitely: ", 
+#              format(round(mean(abs.delta.cessation.tot.mort.noint1, na.rm=T)), big.mark=','),
+#              " [",
+#              format(round(quantile(abs.delta.cessation.tot.mort.noint1, probs=.025, na.rm=T)), big.mark=','),
+#              " - ",
+#              format(round(quantile(abs.delta.cessation.tot.mort.noint1, probs=.975, na.rm=T)), big.mark=','),
+#              "]"))
+# 
+# print(paste0("Relative Increase in Deaths among PWH 2025-2030 if Ryan White Ends Indefinitely: ", 
+#              format(round(mean(rel.delta.cessation.tot.mort.noint1, na.rm=T)*100), big.mark=','),
+#              "% [",
+#              format(round(quantile(rel.delta.cessation.tot.mort.noint1, probs=.025, na.rm=T)*100), big.mark=','),
+#              " - ",
+#              format(round(quantile(rel.delta.cessation.tot.mort.noint1, probs=.975, na.rm=T)*100), big.mark=','),
+#              "%]"))
+# 
+# mean(abs.delta.cessation.tot.mort.noint1 / abs.delta.cessation.tot.inf.noint1)
+# 
+# mean(abs.delta.cessation.tot.mort.noint1) / mean(abs.delta.cessation.tot.inf.noint1)

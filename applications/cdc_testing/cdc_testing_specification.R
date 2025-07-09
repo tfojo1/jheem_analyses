@@ -10,19 +10,31 @@ CDCT.SPECIFICATION = create.jheem.specification(version='cdct',
                                               parent.version = 'ehe')
 
 
-register.model.quantity(CDCT.SPECIFICATION, name = "testing.of.undiagnosed",
-                        value = expression(cdc.funded.testing.of.undiagnosed+cdc.nonfunded.testing.of.undiagnosed))
-
+#-- Basic Building Blocks --#
 register.model.element(CDCT.SPECIFICATION, name = "cdc.effect",
                        value = 1,
                        scale = "proportion")
 
+register.model.element(CDCT.SPECIFICATION, name = "proportion.tested.regardless",
+                       value = 0.5,
+                       scale = "proportion")
+
+
+#-- The Diagnosis Rate --#
+register.model.quantity(CDCT.SPECIFICATION, name = "testing.of.undiagnosed",
+                        value = expression(cdc.funded.testing.of.undiagnosed + cdc.nonfunded.testing.of.undiagnosed))
+
 register.model.quantity(CDCT.SPECIFICATION, name = "cdc.funded.testing.of.undiagnosed",
-                       value = expression(super.testing.of.undiagnosed*fraction.diagnoses.from.cdc),
+                       value = expression(super.testing.of.undiagnosed * fraction.diagnoses.from.cdc * cdc.effect),
                        scale = 'rate')
 
 register.model.quantity(CDCT.SPECIFICATION, name = "cdc.nonfunded.testing.of.undiagnosed",
-                        value = expression(super.testing.of.undiagnosed*(1-fraction.diagnoses.from.cdc)))
+                        value = expression(super.testing.of.undiagnosed * 
+                                               ( (1-fraction.diagnoses.from.cdc) +
+                                                     fraction.diagnoses.from.cdc * (1-cdc.effect) * proportion.tested.regardless) )
+)
+
+#-- The logistic functional forms for key proportions --#
 
 register.model.element(CDCT.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
                        get.functional.form.function = get.fraction.diagnoses.from.cdc.model.spline,
@@ -34,11 +46,28 @@ register.model.element(CDCT.SPECIFICATION, name = "fraction.tests.from.cdc",
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
+#-- The Testing Rate --#
+
 register.model.quantity(CDCT.SPECIFICATION,
                         name = 'cdc.funded.general.population.testing',
                         scale = 'rate',
-                        value = expression(general.population.testing*fraction.tests.from.cdc)
+                        value = expression(super.general.population.testing * fraction.tests.from.cdc * cdc.effect)
 )
+
+register.model.quantity(CDCT.SPECIFICATION,
+                        name = 'cdc.nonfunded.general.population.testing',
+                        scale = 'rate',
+                        value = expression(super.general.population.testing * 
+                                               ( (1-fraction.tests.from.cdc) +
+                                                  fraction.tests.from.cdc * (1-cdc.effect) * proportion.tested.regardless ) )
+)
+
+register.model.quantity(CDCT.SPECIFICATION,
+                        name = 'general.population.testing',
+                        scale = 'rate',
+                        value = expression(cdc.funded.general.population.testing + cdc.nonfunded.general.population.testing))
+
+#-- OUTCOMES --#
 
 track.integrated.outcome(CDCT.SPECIFICATION,
                          name = 'cdc.funded.tests.in.uninfected',

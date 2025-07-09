@@ -6,7 +6,7 @@ source("applications/cdc_testing/cdc_testing_parameters.R")
 source("applications/cdc_testing/likelihood.R")
 source('applications/cdc_testing/cdc_testing_interventions.R')
 
-N.SIMS = 100
+N.SIMS = 1000
 N.CHUNKS = 1
 
 CDC.TESTING.LOCATIONS = c('AL','CA','FL','GA','IL','LA','MO','MS','NY','TX','WI')

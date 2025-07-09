@@ -206,7 +206,8 @@ register.calibration.info(CALIBRATION.CODE.EHE.FINAL,
 register.calibration.info(CALIBRATION.CODE.POP.STATE,
                           likelihood.instructions = pop.state.likelihood.instructions, 
                           special.case.likelihood.instructions = list(
-                              MS = pop.state.upweighted.new.prev.likelihood.instructions
+                              MS = pop.state.upweighted.new.prev.likelihood.instructions,
+                              TN = pop.state.upweighted.new.prev.likelihood.instructions
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = CALIBRATION.END.YEAR, 

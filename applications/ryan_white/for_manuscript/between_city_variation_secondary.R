@@ -69,7 +69,7 @@ pcc.df = df.city.summ[,c('rw.clients',
                  #        'oahs.suppression',
                   #       'adap.suppression',
                          'new.per.pop',
-                   #      'new.per.prev',
+                        # 'new.per.prev',
                          'sexual.transmission',
                          'medicaid',
                          'excess')]
@@ -148,7 +148,7 @@ plot = ggplot() +
             vjust = 1, hjust=1, show.legend = F); print(plot)
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "Figure_5A"),
+       filename=file.path(PLOT.DIR, "Figure_5A.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 # Total Suppression
@@ -204,7 +204,7 @@ plot = ggplot() +
               vjust = 1, hjust=0.5, show.legend = F); print(plot)
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "Figure_5B.png"),
+       filename=file.path(PLOT.DIR, "Figure_5C.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 # For legend
@@ -242,9 +242,12 @@ plot = ggplot() +
     theme_bw(base_size = 10*1.2) + theme(legend.position = 'bottom') +
     guides(fill = guide_legend(override.aes = list(size = 7)));plot
 
-ggsave(plot = plot, 
+
+legend = cowplot::get_plot_component(plot, 'guide-box-bottom', return_all = TRUE)
+
+ggsave(plot = legend, 
        filename=file.path(PLOT.DIR, "Figure_5_legend.png"),
-       height = PLOT.HEIGHT/2, width = PLOT.WIDTH*2, dpi = PLOT.DPI, device = PLOT.DEVICE)
+       height = 0.25, width = 4.1, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
 # Sexual Transmission
@@ -273,7 +276,7 @@ plot = ggplot() +
                aes(sexual.transmission, excess, size=new, fill=medicaid),
                shape=21, show.legend = F) + 
     ylab("Relative Excess HIV Infections") +
-    xlab("Average Sexual Transmission\nRate in 2025") + 
+    xlab("Average Transmission\nRate in 2025") + 
     THEME + CITY.SIZE.SCALE + CITY.COLOR +
     geom_segment(data = df.label, aes(x, y, xend=sexual.transmission, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
     scale_y_continuous(labels = scales::percent, limits = c(0,1.15)) +
@@ -301,7 +304,7 @@ plot = ggplot() +
               vjust = 0, hjust=0.5, show.legend = F); print(plot)
 
 ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, "Figure_5C.png"),
+       filename=file.path(PLOT.DIR, "Figure_5B.png"),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 # Number of new diagnoses
@@ -389,6 +392,35 @@ plot = ggplot() +
 
 ggsave(plot = plot, 
        filename=file.path(PLOT.DIR, "Figure_5E.png"),
+       height = PLOT.HEIGHT/2, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+
+# Legend
+
+df.prcc = data.frame(
+    value = paste0("PRCC: ", round(prccs.est['medicaid'],2)),
+    x = 1.27,
+    y = 7
+)
+
+plot = ggplot() + 
+    geom_histogram(data=df.city.summ, 
+                   aes(excess, fill=medicaid), show.legend = T,
+                   position = 'dodge',
+                   bins = 12) + 
+    xlab("Relative Excess HIV Infections") +
+    ylab("Number of Cities") + 
+    THEME + CITY.SIZE.SCALE + CITY.COLOR +
+    scale_x_continuous(labels = scales::percent, limits=c(0,1.27)) +
+    #    scale_x_continuous(labels = function(x){format(x * 100000, big.mark=',')}, limits = c(7e-05,3e-04)) +
+    geom_label(data=df.prcc,
+               aes(x, y, label=value), size=PRCC.SIZE,
+               vjust = 1, hjust = 1, show.legend = F); print(plot)
+
+
+
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, "Figure_5_legend.png"),
        height = PLOT.HEIGHT/2, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
