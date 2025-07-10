@@ -89,8 +89,8 @@ simplot(
     # sim.first0,
     # sim.first1,
     sim.last0, #w=1/8
-    sim.last1, #w=1/4
-    sim.last2,#w=1/2
+    # sim.last1, #w=1/4
+    # sim.last2,#w=1/2
     sim.last3,#w=1
 
     # sim.mac.engine,
