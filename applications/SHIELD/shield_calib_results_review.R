@@ -17,7 +17,7 @@ sim.style.manager  = create.style.manager(color.data.by = "simulation")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-
+LOCATION <- 'C.12580'  # Baltimore MSA
 # MSAS.OF.INTEREST list of MSAs
 
 
@@ -46,15 +46,15 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 # }
 
 # Load simset from the Q drive
-for (i in c(1,2)){
-    CALIBRATION.CODE.TO.RUN <- paste0('calib.diagnosis.07.07.pk',i); DATE <- "2025-07-08"
+for (i in c(1:4)){
+    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.08.pk',i); DATE <- "2025-07-09"
     load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
     assign(paste0("simset",i),simset) #dynamic assignment
 }
-for (i in c(11,22)){
-    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.07.pk',i); DATE <- "2025-07-08"
+for (i in c(1)){
+    CALIBRATION.CODE.TO.RUN <- paste0('calib.diagnosis.07.07.pk',i); DATE <- "2025-07-08"
     load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
-    assign(paste0("simset",i),simset) #dynamic assignment
+    assign(paste0("simset",0),simset) #dynamic assignment
 }
 # 
 # # Ryan's
@@ -70,7 +70,7 @@ for (i in c(11,22)){
 #     params.last.rf  <- simset$last.sim()$params
 # }
 
-for (i in c(1,2,11,22)){
+for (i in c(0:3)){
     simset=get(paste0("simset",i))
     print(simset$n.sim)
     # Extract first and last simulations and their parameters
@@ -79,29 +79,27 @@ for (i in c(1,2,11,22)){
     assign(paste0("params.first",i) ,simset$first.sim()$params)
     assign(paste0("params.last",i) ,simset$last.sim()$params)
 }
-
+# 
 # engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-# params.manual <- simset.rf$last.sim()$params
-# params.manual["or.symptomatic.1990"] <- params.manual["or.symptomatic.1990"]*1# 0.970793 
-# params.manual["or.symptomatic.1995"] <- params.manual["or.symptomatic.2000"]*.85 #1.101602 
-# params.manual["or.symptomatic.2010"] <- params.manual["or.symptomatic.2000"]*1.1
-# params.manual["or.symptomatic.2020"] <- params.manual["or.symptomatic.2020"] #0.6944672 
+# params.manual <- simset1$last.sim()$params
+# # params.manual["or.symptomatic.1990"] <- params.manual["or.symptomatic.1990"]*1# 0.970793 
+# # params.manual["or.symptomatic.1995"] <- params.manual["or.symptomatic.2000"]*.85 #1.101602 
+# # params.manual["or.symptomatic.2010"] <- params.manual["or.symptomatic.2000"]*1.1
+# # params.manual["or.symptomatic.2020"] <- params.manual["or.symptomatic.2020"] #0.6944672 
 # sim.mac.engine <- engine$run(params.manual)
 
 # PLOT -----
 simplot(
     # sim.first0,
     # sim.first1,
-    # sim.last1,
+    # sim.last0, #w=1/8
+    # sim.last1, #w=1/4
     # sim.first2,
     # simset2, 
-    sim.last2,
+    sim.last2,#w=1/2
     # sim.last11,
-    # sim.last22,
-    # sim.first1,
-    # simset1,
-    # sim.last1,
-    # simset.rf$last.sim(),
+    sim.last3,#w=1
+
     # sim.mac.engine,
     # simset.mac.calib$first.sim(),
     # split.by = "race", facet.by = "sex",
@@ -111,10 +109,10 @@ simplot(
     # outcomes=c("diagnosis.total"),   facet.by = "race",
     # outcomes=c("diagnosis.ps"),     facet.by = "race",
     # outcomes=c("diagnosis.el.misclassified"),   facet.by = "race",
-    outcomes=c("diagnosis.late.misclassified"),   facet.by = "race",
+    # outcomes=c("diagnosis.late.misclassified"),   facet.by = "race",
     
-    # outcomes = c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified",
-    #              "diagnosis.late.misclassified","hiv.testing"),
+    outcomes = c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified",
+                 "diagnosis.late.misclassified","hiv.testing"),
     # # outcomes = c("prevalence"),
     dimension.values = list(year = 1970:2025) 
     # style.manager = source.style.manager
@@ -123,7 +121,7 @@ simplot(
 # x+geom_hline(yintercept = 613)+geom_vline(xintercept = 2022)
 # x+geom_hline(yintercept =  672) +geom_vline(xintercept = 2023)
 # MCMC Diagnostics ----
-simset=simset4
+simset=simset1
 {
     head(simset$get.mcmc.mixing.statistic())
     simset$traceplot("transmission")
@@ -135,7 +133,6 @@ simset=simset4
     simset$traceplot("symptomatic")
     simset$traceplot("screening")
     
-    
     simset$traceplot("black.aging")
     simset$traceplot("hispanic.aging")
     simset$traceplot("mortality")
@@ -143,39 +140,41 @@ simset=simset4
 }
 
 #Run Manual Simulation ----
-engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-{
-    params.manual <- params.last
-    # params.manual["hiv.testing.or"] <- 1.004 
-    # params.manual["hiv.testing.slope.or"] <- 0.9995
-    # params.manual["rate.screening.ps.multiplier"] <- 0.5
-    # params.manual["rate.screening.el.multiplier"] <- 1.
-    # 
-    sim.manual <- engine$run(params.manual)
-    #
-    simplot(
-        # sim.first,
-        sim.last,
-        # sim.last2,
-        sim.manual,
-        # split.by = "sex",
-        # split.by = "age",
-        # split.by = "race",
-        # split.by = "race", facet.by = "sex", #we are matching the totals only for now
-        # split.by = "race", facet.by = "age",
-        # outcomes = c("population"),
-        # outcomes = c("diagnosis.total"),
-        outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
-        # dimension.values = list(year = 1970:2030),
-        style.manager = source.style.manager
-    )
-}
+# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
+# {
+#     params.manual <- params.last
+#     # params.manual["hiv.testing.or"] <- 1.004 
+#     # params.manual["hiv.testing.slope.or"] <- 0.9995
+#     # params.manual["rate.screening.ps.multiplier"] <- 0.5
+#     # params.manual["rate.screening.el.multiplier"] <- 1.
+#     # 
+#     sim.manual <- engine$run(params.manual)
+#     #
+#     simplot(
+#         # sim.first,
+#         sim.last,
+#         # sim.last2,
+#         sim.manual,
+#         # split.by = "sex",
+#         # split.by = "age",
+#         # split.by = "race",
+#         # split.by = "race", facet.by = "sex", #we are matching the totals only for now
+#         # split.by = "race", facet.by = "age",
+#         # outcomes = c("population"),
+#         # outcomes = c("diagnosis.total"),
+#         outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
+#         # dimension.values = list(year = 1970:2030),
+#         style.manager = source.style.manager
+#     )
+# }
 # Likelihood Review ----
 {
-    lik=likelihood.instructions.syphilis.diag.total.no.demog$instantiate.likelihood(VERSION,LOCATION)
+    lik=lik.inst.diag.total.no.demog$instantiate.likelihood(VERSION,LOCATION)
     # compare: 
     # Yes, if you add debug=T to either the compute.likelihood or compare.sims functions, you will enter a debug mode in the likelihood. From there, you can view the “lik.summary" (it's just a data frame object that should already be computed), which will have the actual values for each stratum (called "obs"), the sim values ("mean") and the standard deviation I think. There might also be a Z score column that standardizes how far off the sim is from the observed value, though I can't remember off the top of my head. (Note that because compare.sims takes two different sims as the arguments, you will enter the debug mode for whichever sim you have listed first).  
+    lik$compare.sims(sim.last0,sim.last1, piecewise = T) #values greater than 1 mean than sim2 is better than sim1, while values less than 1 mean that sim2 is worse than sim1. 
     lik$compare.sims(sim.last1,sim.last2, piecewise = T) #values greater than 1 mean than sim2 is better than sim1, while values less than 1 mean that sim2 is worse than sim1. 
+    lik$compare.sims(sim.last2,sim.last3, piecewise = T) #values greater than 1 mean than sim2 is better than sim1, while values less than 1 mean that sim2 is worse than sim1. 
     
     lik.late=late.diagnosis.total.likelihood.instructions$instantiate.likelihood(VERSION, LOCATION)
     lik.late$compute(sim.last1,debug = T)

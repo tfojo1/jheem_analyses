@@ -152,22 +152,24 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   transmission.rate.multiplier.other= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
   ## Sexual Mixing by Age
-  age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)) #directly used in specification helper function
+  age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)), #directly used in specification helper function
   #to control the standard deviation of the contact matrix by age
   
-  
+  # relapse & infectiouness EL
+  prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
+  el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
 ) 
 
 
 TESTING.PARAMETERS.PRIOR=join.distributions( 
   # Odd-Ratio of symptomatic testing (stage X sex and time) 
-   or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) , 
-   or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
-   or.symptomatic.primary.female = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
-   #
-   or.symptomatic.secondary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
-   or.symptomatic.secondary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
-   or.symptomatic.secondary.female= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ), 
+  or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) , 
+  or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+  or.symptomatic.primary.female = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+  #
+  or.symptomatic.secondary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+  or.symptomatic.secondary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
+  or.symptomatic.secondary.female= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ), 
   #
   or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
   or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
@@ -175,8 +177,8 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
   or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
   or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-   
-    
+  
+  
   # for HIV screening
   hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
@@ -372,7 +374,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                                          "transmission.rate.multiplier.other")],
                                                    dimension = "race.to", #recipient
                                                    applies.to.dimension.values = c("black","hispanic", "other"))
-    }
+  }
   
   ## STI SCREENING  ----
   # Changing the intercept and slope for HIV tests
@@ -402,32 +404,32 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   
   # Symptomatic Testing ----
   for(time in c("1970", "1990","1995","2000","2010","2020")){
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "prp.symptomatic.primary",
-                                                     alpha.name = time,
-                                                     values = parameters[paste0("or.symptomatic.",time)],
-                                                     dimension = "all", #recipient
-                                                     applies.to.dimension.values = "all")
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "prp.symptomatic.primary",
-                                                     alpha.name = time,
-                                                     values = parameters[paste0("or.symptomatic.primary.", sexes)],
-                                                     dimension = "sex", #recipient
-                                                     applies.to.dimension.values = sexes)
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "prp.symptomatic.secondary",
-                                                     alpha.name = time,
-                                                     values = parameters[paste0("or.symptomatic.",time)],
-                                                     dimension = "all", #recipient
-                                                     applies.to.dimension.values = "all")
-      set.element.functional.form.main.effect.alphas(model.settings,
-                                                     element.name = "prp.symptomatic.secondary",
-                                                     alpha.name = time,
-                                                     values = parameters[paste0("or.symptomatic.secondary.", sexes)],
-                                                     dimension = "sex", #recipient
-                                                     applies.to.dimension.values = sexes)
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "prp.symptomatic.primary",
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("or.symptomatic.",time)],
+                                                   dimension = "all", #recipient
+                                                   applies.to.dimension.values = "all")
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "prp.symptomatic.primary",
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("or.symptomatic.primary.", sexes)],
+                                                   dimension = "sex", #recipient
+                                                   applies.to.dimension.values = sexes)
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "prp.symptomatic.secondary",
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("or.symptomatic.",time)],
+                                                   dimension = "all", #recipient
+                                                   applies.to.dimension.values = "all")
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "prp.symptomatic.secondary",
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("or.symptomatic.secondary.", sexes)],
+                                                   dimension = "sex", #recipient
+                                                   applies.to.dimension.values = sexes)
   }
-  }
+}
 
 
 
@@ -634,31 +636,39 @@ SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
     "transmission.rate.multiplier.hispanic",
     "transmission.rate.multiplier.other"
   ),
-  age.mixing.transmission=("age.mixing.sd.mult")
+  age.mixing.transmission=(
+    "age.mixing.sd.mult"
+    ),
+  relapse=c(
+    "prop.early.latent.to.secondary"
+    ),
+  infectiousness=c(
+    "el.rel.secondary.transmissibility"
+    )
 )
 
 
 SHIELD.TESTING.SAMPLING.BLOCKS = list(
-    symptomatic.testing.primary = c(
-        "or.symptomatic.primary.msm",
-        "or.symptomatic.primary.heterosexual_male",
-        "or.symptomatic.primary.female"
-    ),
-    symptomatic.testing.secondary = c(
-        "or.symptomatic.secondary.msm",
-        "or.symptomatic.secondary.heterosexual_male",
-        "or.symptomatic.secondary.female"
-    ),
-    symptomatic.testing.time1 = c(
-        "or.symptomatic.1970",
-        "or.symptomatic.1990",
-        "or.symptomatic.1995"
-    ),
-    symptomatic.testing.time2 = c(
-      "or.symptomatic.2000",
-      "or.symptomatic.2010",
-      "or.symptomatic.2020"
-    ),
+  symptomatic.testing.primary = c(
+    "or.symptomatic.primary.msm",
+    "or.symptomatic.primary.heterosexual_male",
+    "or.symptomatic.primary.female"
+  ),
+  symptomatic.testing.secondary = c(
+    "or.symptomatic.secondary.msm",
+    "or.symptomatic.secondary.heterosexual_male",
+    "or.symptomatic.secondary.female"
+  ),
+  symptomatic.testing.time1 = c(
+    "or.symptomatic.1970",
+    "or.symptomatic.1990",
+    "or.symptomatic.1995"
+  ),
+  symptomatic.testing.time2 = c(
+    "or.symptomatic.2000",
+    "or.symptomatic.2010",
+    "or.symptomatic.2020"
+  ),
   hiv.testing = c(
     "hiv.testing.or",
     "hiv.testing.slope.or"
@@ -685,6 +695,7 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
   contact.tracing=c(
     "prop.index.cases.reached.for.contact.tracing"   
   )
+  
 )
 
 
