@@ -17,8 +17,7 @@ sim.style.manager  = create.style.manager(color.data.by = "simulation")
 # Configuration ----
 VERSION <- 'shield'
 LOCATION <- 'C.12580'  # Baltimore MSA
-LOCATION <- 'C.12580'  # Baltimore MSA
-# MSAS.OF.INTEREST list of MSAs
+# MSAS.OF.INTEREST #list of MSAs
 
 
 get.jheem.root.directory() #"/Volumes/jheem$"
@@ -46,17 +45,14 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 # }
 
 # Load simset from the Q drive
-for (i in c(1:4)){
-    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.08.pk',i); DATE <- "2025-07-09"
-    load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
+"/Volumes/jheem$/shield/calib.07.09.pk1_simset_2025-07-10_C.12580.Rdata" 
+for (i in c(2:3)){
+    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.09.pk',i); DATE <- "2025-07-10"
+    filename=  paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata");print(filename) 
+    load(filename)
     assign(paste0("simset",i),simset) #dynamic assignment
 }
-for (i in c(1)){
-    CALIBRATION.CODE.TO.RUN <- paste0('calib.diagnosis.07.07.pk',i); DATE <- "2025-07-08"
-    load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
-    assign(paste0("simset",0),simset) #dynamic assignment
-}
-# 
+
 # # Ryan's
 # {
 #     CALIBRATION.CODE.TO.RUN <- 'calib.07.03.rf'; DATE <- "2025-07-04"
@@ -92,12 +88,9 @@ for (i in c(0:3)){
 simplot(
     # sim.first0,
     # sim.first1,
-    # sim.last0, #w=1/8
-    # sim.last1, #w=1/4
-    # sim.first2,
-    # simset2, 
+    sim.last0, #w=1/8
+    sim.last1, #w=1/4
     sim.last2,#w=1/2
-    # sim.last11,
     sim.last3,#w=1
 
     # sim.mac.engine,
@@ -114,14 +107,14 @@ simplot(
     outcomes = c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified",
                  "diagnosis.late.misclassified","hiv.testing"),
     # # outcomes = c("prevalence"),
-    dimension.values = list(year = 1970:2025) 
+    dimension.values = list(year = 1970:2030) 
     # style.manager = source.style.manager
 )
 
 # x+geom_hline(yintercept = 613)+geom_vline(xintercept = 2022)
 # x+geom_hline(yintercept =  672) +geom_vline(xintercept = 2023)
 # MCMC Diagnostics ----
-simset=simset1
+simset=simset3
 {
     head(simset$get.mcmc.mixing.statistic())
     simset$traceplot("transmission")
@@ -129,9 +122,11 @@ simset=simset1
     cbind(sim.last$get.params("trans"))
     
     simset$traceplot("diagnoses")
-    simset$traceplot("test")
+    simset$traceplot("hiv")
     simset$traceplot("symptomatic")
     simset$traceplot("screening")
+    simset$traceplot("rel")
+    simset$traceplot("prop.early")
     
     simset$traceplot("black.aging")
     simset$traceplot("hispanic.aging")

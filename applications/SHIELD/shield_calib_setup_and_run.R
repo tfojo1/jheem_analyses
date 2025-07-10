@@ -27,7 +27,7 @@ set.seed(00000)
 CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-CALIBRATION.NAME = 'calib.07.09.pk0' 
+CALIBRATION.NAME = 'calib.07.10.pk0' 
 
 
 #################
