@@ -72,7 +72,7 @@ for (i in c(0:3)){
     #2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
     #3-likelihoods Totals, all with w=1/8 weight except for EL (w=1)
     register.calibration.info(code = paste0("calib.07.10.pk",i),
-                              preceding.calibration.codes = "calib.diagnosis.07.09.pk3",  #calibrated demographic model using total likelihoods with w=1 for EL
+                              preceding.calibration.codes = "calib.07.09.pk3",  #calibrated demographic model using total likelihoods with w=1 for EL
                               likelihood.instructions = lik.inst.diag.total.no.demog,  
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
