@@ -100,7 +100,7 @@ proportionDep_likelihood_inst <- create.basic.likelihood.instructions(outcome.fo
                                                                       # e.g., if there are a few years with only the totals 
                                                                       # before the stratifications are available
                                                                       equalize.weight.by.year = F,
-                                                                      weights = 10)
+                                                                      weights = 24)
 
 ##
 prev_ratio_inst <- create.basic.likelihood.instructions.with.specified.outcome(outcome.for.sim = 'prev_ratio_depression',

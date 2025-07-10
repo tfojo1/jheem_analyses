@@ -336,6 +336,24 @@ track.integrated.outcome(DEP.SPECIFICATION, ## HIV+ve individuals with depressio
                          save = F,
                          subset.dimension.values = list(depression='depressed'))
 
+track.point.outcome(DEP.SPECIFICATION, 
+                    name = 'point.uninfected.depressed',
+                    outcome.metadata = NULL,
+                    value = 'uninfected',
+                    keep.dimensions = c('location','age','race','sex','risk'),
+                    scale = 'non.negative.number',
+                    save = F,
+                    subset.dimension.values = list(depression='depressed'))
+
+track.point.outcome(DEP.SPECIFICATION, 
+                    name = 'point.infected.depressed',
+                    outcome.metadata = NULL,
+                    value = 'infected',
+                    keep.dimensions = c('location','age','race','sex','risk'),
+                    scale = 'non.negative.number',
+                    save = F,
+                    subset.dimension.values = list(depression='depressed'))
+
 ## -- Prevalence ratio HIV depressed vs. General Population
 track.cumulative.outcome(DEP.SPECIFICATION,
                          name = 'prev_ratio_depression',
@@ -360,7 +378,7 @@ track.integrated.outcome(DEP.SPECIFICATION,
                                                                     axis.name = 'Prevalent Cases',
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
-                         value.to.integrate = 'infected',
+                         value.to.integrate = 'point.infected.depressed',
                          multiply.by = 'depression.proportion.tx',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          subset.dimension.values = list(depression='depressed'),
@@ -386,7 +404,7 @@ track.integrated.outcome(DEP.SPECIFICATION,
                                                                     axis.name = 'Prevalent Cases',
                                                                     units = 'cases',
                                                                     singular.unit = 'case'),
-                         value.to.integrate = 'uninfected',
+                         value.to.integrate = 'point.uninfected.depressed',
                          multiply.by = 'depression.proportion.tx.gen',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          save = T)
