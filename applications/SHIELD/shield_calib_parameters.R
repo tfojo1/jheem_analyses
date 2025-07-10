@@ -178,7 +178,6 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
   or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
   
-  
   # for HIV screening
   hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
@@ -197,6 +196,13 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)),
   sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  
+  # adding specific knot multipliers for EL to see if it helps #July-10-test
+  sti.screening.multiplier.1990.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.1995.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.2000.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.2010.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
+  sti.screening.multiplier.2020.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
   
   # Contact tracing
   # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
@@ -391,7 +397,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
   
-  # Changing the knot values for retio of STI screening to HIV tests
+  # Changing the knot values for ratio of STI screening to HIV tests
   for(time in c("1970","1990","1995","2000","2010","2020")){
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "multiplier.syphilis.screening.to.hiv.tests",
@@ -399,9 +405,18 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    values = parameters[paste0("sti.screening.multiplier.",time)],
                                                    dimension = "all", #recipient
                                                    applies.to.dimension.values = "all")
-    # sti.screening.multiplier.*by stage are directly linked in the specification
+    
   }
-  
+  # specific knot multipliers for EL #July-10-test
+  for(time in c("1990","1995","2000","2010","2020")){
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = "multiplier.syphilis.screening.to.hiv.tests",
+                                                   alpha.name = time,
+                                                   values = parameters[paste0("sti.screening.multiplier.",time,".el")],
+                                                   dimension = "stage", #recipient
+                                                   applies.to.dimension.values = c("early.latent"))
+  }
+  # sti.screening.multiplier.*by stage are directly linked in the specification
   # Symptomatic Testing ----
   for(time in c("1970", "1990","1995","2000","2010","2020")){
     set.element.functional.form.main.effect.alphas(model.settings,
@@ -429,6 +444,9 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "sex", #recipient
                                                    applies.to.dimension.values = sexes)
   }
+  
+  
+  
 }
 
 
@@ -638,13 +656,13 @@ SHIELD.TRANSMISSION.SAMPLING.BLOCKS = list(
   ),
   age.mixing.transmission=(
     "age.mixing.sd.mult"
-    ),
+  ),
   relapse=c(
     "prop.early.latent.to.secondary"
-    ),
+  ),
   infectiousness=c(
     "el.rel.secondary.transmissibility"
-    )
+  )
 )
 
 
@@ -692,6 +710,18 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
     "sti.screening.multiplier.2010",
     "sti.screening.multiplier.2020"
   ),
+  
+  #EL multipliers #July-10-test
+  screening.by.time.el1 = c(
+    "sti.screening.multiplier.1990.el",
+    "sti.screening.multiplier.1995.el",
+    "sti.screening.multiplier.2000.el"
+  ),
+  screening.by.time.el2 = c(
+    "sti.screening.multiplier.2010.el",
+    "sti.screening.multiplier.2020.el"
+  ),
+  
   contact.tracing=c(
     "prop.index.cases.reached.for.contact.tracing"   
   )

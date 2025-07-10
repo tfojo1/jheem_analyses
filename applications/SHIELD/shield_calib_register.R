@@ -46,7 +46,7 @@ register.calibration.info(code = paste0("calib.diagnosis.07.07.pk1"),
                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 ################################################################################################
-# 07.09 (CURRENT)
+# 07.09 ()
 for (i in c(0:3)){
     #0-likelihoods Totals, all with w=1/8 weight
     #1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
@@ -64,7 +64,24 @@ for (i in c(0:3)){
     )
 }
 
-
+################################################################################################
+# 07.10 (CURRENT)# adding EL specific knots in 1990,95,2000,2010,2020 for screening to see if it works
+for (i in c(0:3)){
+    #0-likelihoods Totals, all with w=1/8 weight
+    #1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
+    #2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
+    #3-likelihoods Totals, all with w=1/8 weight except for EL (w=1)
+    register.calibration.info(code = paste0("calib.07.10.pk",i),
+                              preceding.calibration.codes = "calib.07.09.pk3",  #calibrated demographic model using total likelihoods with w=1 for EL
+                              likelihood.instructions = lik.inst.diag.total.no.demog,  
+                              data.manager = SURVEILLANCE.MANAGER,
+                              end.year = 2030,
+                              parameter.names = 
+                                  c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                    TESTING.PARAMETERS.PRIOR@var.names),
+                              n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+    )
+}
 # LOG SUMMARY -----
 # <calib.diagnosis.07.08.pk>
 # increasing the weight of EL diagnosis to see if it works
