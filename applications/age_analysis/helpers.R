@@ -1,47 +1,77 @@
 
 
-get_stats <- function(arr, round=T, digits=0, is.percentage=F) {
-    arr_data <- apply(arr, 'year', function(one_year) {
-        c(quantile(one_year, probs=0.025), median(one_year), upper = quantile(one_year, probs=0.975))
+get_stats <- function(arr, keep.dimensions='year', round=T, digits=0, include.mean=T, include.quartiles=F) {
+    arr_data <- apply(arr, keep.dimensions, function(x) {
+        rv <- c(lower = quantile(x, probs=0.025), median = median(x), upper = quantile(x, probs=0.975))
+        if (include.quartiles) rv <- c(rv,
+                                       lowermid = quantile(x, probs=0.25),
+                                       uppermid = quantile(x, probs=0.75))
+        if (include.mean) rv <- c(rv, mean = mean(x))
+        rv
     })
     if (round) arr_data <- round(arr_data, digits=digits)
-    if (is.percentage) arr_data <- arr_data * 100
+    # if (is.percentage) arr_data <- arr_data * 100
+    metric_dimension = c("lower", "median", "upper")
+    if (include.quartiles) metric_dimension <- c(metric_dimension, "lowermid", "uppermid")
+    if (include.mean) metric_dimension <- c(metric_dimension, "mean")
+    final_dimnames <- c(list(metric=metric_dimension),
+                        dimnames(arr)[keep.dimensions])
     array(
         arr_data,
-        dim = sapply(stats_dimnames, length),
-        dimnames = stats_dimnames)
+        dim = sapply(final_dimnames, length),
+        dimnames = final_dimnames)
 }
 
 #' @description
 #' Pads out the age dimension so that 'restratify.age.counts' acts reasonably
 #' 
 do_prepare_for_restratify <- function(arr) {
-    arr_reordered <- apply(arr, c('year', 'sim', 'age'), function(x) {x})
+    original_dimensions <- names(dim(arr))
+    reordered_dimensions <- c(original_dimensions[original_dimensions!="age"], "age")
+    arr_reordered <- apply(arr, reordered_dimensions, function(x) {x})
     new_dimnames <- dimnames(arr_reordered)
     new_dimnames$age[5] <- "55-100 years"
     new_dimnames$age <- c(new_dimnames$age, "101-110 years")
     arr_reordered <- c(arr_reordered, rep(0, dim(arr_reordered)["year"] * dim(arr_reordered)["sim"]))
     arr_restored <- array(arr_reordered, sapply(new_dimnames, length), new_dimnames)
-    apply(arr_restored, c('year', 'age', 'sim'), function(x) {x})
+    apply(arr_restored, original_dimensions, function(x) {x})
 }
 
-get_med_age <- function(data) {
-    apply(do_prepare_for_restratify(data), c('year', 'sim'), function(one_year_sim) {
+get_restratified_ages <- function(data) {
+    rv=apply(do_prepare_for_restratify(data), c('year', 'sim'), function(one_year_sim) {
+        restratify.age.counts(one_year_sim, desired.age.brackets = 13:100)
+
+    })
+    new_dimnames <- dimnames(rv)
+    names(new_dimnames) <- c('age', 'year', 'sim')
+    dim(rv) <- sapply(new_dimnames, length)
+    dimnames(rv) <- new_dimnames
+    rv
+}
+
+get_med_age <- function(data, keep.dimensions='year') {
+    apply(do_prepare_for_restratify(data), c(keep.dimensions, 'sim'), function(one_year_sim) {
         restratified <- restratify.age.counts(one_year_sim, desired.age.brackets = 13:100)
         transformed <- cumsum(restratified)/sum(restratified)
         med_age <- names(sort(abs(0.5 - transformed)))[1]
         as.numeric(strsplit(med_age, " years")[[1]][1])
     })
 }
-get_num_over_55 <- function(data) {
-    apply(data, c('year', 'sim'), function(one_year_sim) {
+get_num_over_55 <- function(data, keep.dimensions="year") {
+    apply(data, c(keep.dimensions, 'sim'), function(one_year_sim) {
         one_year_sim["55+ years"]
     })
 }
 
-get_prop_over_55 <- function(data) {
-    apply(data, c('year', 'sim'), function(one_year_sim) {
-        one_year_sim["55+ years"] / sum(one_year_sim)
+get_prop_over_55 <- function(data, keep.dimensions="year", digits=0) {
+    apply(data, c(keep.dimensions, 'sim'), function(one_year_sim) {
+        round(100 * one_year_sim["55+ years"] / sum(one_year_sim), digits=digits)
+    })
+}
+
+get_prop_under_35 <- function(data, keep.dimensions="year", digits=0) {
+    apply(data, c(keep.dimensions, 'sim'), function(one_year_sim) {
+        round(100 * sum(one_year_sim[c("13-24 years", "25-34 years")]) / sum(one_year_sim), digits=digits)
     })
 }
 
@@ -73,4 +103,18 @@ convert_to_double_rows <- function(mat) {
     
     new_mat <- mat[new_indices]
     matrix(new_mat, ncol=n)
+}
+
+map_sex <- function(arr) {
+    non_sex_non_sim_dims <- setdiff(names(dim(arr)), c("sex", "sim")) # assume sex last of middle dims
+    het_arr <- array.access(arr, list(sex=c("heterosexual_male", "female")))
+    msm_arr <- array.access(arr, list(sex="msm"))
+    het_arr <- apply(het_arr, c(non_sex_non_sim_dims, "sim"), sum)
+    msm_arr <- apply(msm_arr, c(non_sex_non_sim_dims, "sim", "sex"), function(x) {x})
+    new_arr_dimnames <- dimnames(arr)[c(non_sex_non_sim_dims, "sim", "sex")]
+    new_arr_dimnames$sex <- c("msm", "non_msm")
+    new_arr <- array(c(msm_arr, het_arr),
+                     sapply(new_arr_dimnames, length),
+                     new_arr_dimnames)
+    apply(new_arr, names(dim(arr)), function(x) {x})
 }
