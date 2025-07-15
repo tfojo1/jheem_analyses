@@ -339,64 +339,72 @@ hiv.testing.by.strata.likelihood.instructions =
 # 1) using CDC reported state level targets
 # 2) estimating MSA level diagnoses from local health department and estiamteign proporiton of MSA level births 
 #'@TODD: to add the nested likelihood for prop of births with congenital 
-# congenital.diagnosis.likelihood.instructions =
+
+# congenital.diagnosis.basic.likelihood.instructions =
 #   create.basic.likelihood.instructions(outcome.for.data = "congenital.syphilis.diagnoses", #fix type
 #                                        outcome.for.sim = "diagnosis.congenital",
-#                                        dimensions = c("age","race","sex"),
 #                                        levels.of.stratification = c(0,1,2),
 #                                        from.year = 2010,
 #                                        observation.correlation.form = 'autoregressive.1',
-#                                        error.variance.term = 0.05, 
+#                                        error.variance.term = 0.05,
 #                                        error.variance.type = 'cv'
 #   )
+# 
+# 
+congenital.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
+                                                 dimensions = c("age","race"),
+                                                 levels.of.stratification = c(0,1),
+                                                 outcome.for.p = "proportion.of.congenital.syphilis.births",
+                                                 outcome.for.n = "births.denominator.for.congenital.syphilis.proportion",
+                                                 sub.location.type = NULL, #if you had MSA level data
+                                                 super.location.type = "STATE",
+                                                 main.location.type = "CBSA"
+)
+# 
+SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
+    # Intentionally do nothing:
+    return(arr)
+}
 
-# congenital.nested.likelihood.instructions.trans =
-#   create.nested.proportion.likelihood.instructions( outcome.for.sim = "proportion.births.congenital",
-#                                                     outcome.for.data = "proportion.births.congenital",
-# 
-#                                                    denominator.outcome.for.data = 'births.from', #should be avialable at the county level <births.numerator.for.fertility.rate>
-# 
-#                                                    location.types = c('STATE',"CBSA"), #CBSA is MSA level
-#                                                    minimum.geographic.resolution.type = 'COUNTY',
-# 
-#                                                    dimensions = character(),
-#                                                    levels.of.stratification = c(0),
-#                                                    from.year = 2008,
-# 
-#                                                    # p.bias.inside.location = 0,
-#                                                    # p.bias.outside.location = cocaine.bias.estimates$out.mean, #to be calculated using Todd's code
-#                                                    # p.bias.sd.inside.location = cocaine.bias.estimates$out.sd,
-#                                                    # p.bias.sd.outside.location = cocaine.bias.estimates$out.sd,
-# 
-#                                                    within.location.p.error.correlation = 0.5, #Default assumption #correlation from one year to other in the bias in the city and outside the city
-#                                                    within.location.n.error.correlation = 0.5, #Default assumption #ratio of births outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
-#                                                    #
-# 
-#                                                    observation.correlation.form = 'compound.symmetry',
-#                                                    p.error.variance.term = 0.42, # NSDUH calcs doubled value (0.21); see NSDUH IDU Data_updated.xlsx in input_managers
-#                                                    p.error.variance.type = "cv",
-# 
-#                                                    partitioning.function = EHE.PARTITIONING.FUNCTION,# we use for unknown outcomes (e.g., number of IDUs by age race in Baltimore) (not needed here)
-# 
-#                                                    weights = (1*DIAGNOSIS.WEIGHT),
-#                                                    equalize.weight.by.year = T
-#   )
+congenital.nested.likelihood.instructions.trans =
+    create.nested.proportion.likelihood.instructions( outcome.for.sim = "proportion.births.congenital",
+                                                      outcome.for.data = "proportion.of.congenital.syphilis.births",
+                                                      
+                                                      denominator.outcome.for.data = 'population', # re-evaluate, we need better outcome denominator 
+                                                      
+                                                      location.types = c('STATE',"CBSA"), #CBSA is MSA level
+                                                      minimum.geographic.resolution.type = 'COUNTY',
+                                                      
+                                                      dimensions = character(),
+                                                      levels.of.stratification = c(0),
+                                                      from.year = 2008,
+                                                      
+                                                      p.bias.inside.location = 0,
+                                                      p.bias.outside.location = congenital.bias.estimates$out.mean, #to be calculated using Todd's code
+                                                      p.bias.sd.inside.location = congenital.bias.estimates$out.sd,
+                                                      p.bias.sd.outside.location = congenital.bias.estimates$out.sd,
+                                                      
+                                                      within.location.p.error.correlation = 0.5, #Default assumption #correlation from one year to other in the bias in the city and outside the city
+                                                      within.location.n.error.correlation = 0.5, #Default assumption #ratio of births outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+                                                      #
+                                                      
+                                                      observation.correlation.form = 'autoregressive.1',
+                                                      p.error.variance.term = 0.05, # update with cdc sti + surv. reports
+                                                      p.error.variance.type = "cv",
+                                                      
+                                                      partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION,# we use for unknown outcomes (e.g., number of IDUs by age race in Baltimore) (not needed here)
+                                                      
+                                                      weights = (1*DIAGNOSIS.WEIGHT),
+                                                      equalize.weight.by.year = T
+    )
 
-# congenital.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
-#                                                   dimensions = c("age","race" ),
-#                                                   levels.of.stratification = c(0,1),
-#                                                   outcome.for.p = "proportion.births.congenital",
-#                                                   outcome.for.n = "births",
-#                                                   sub.location.type = NULL, #if you had MSA level data
-#                                                   super.location.type = "STATE",
-#                                                   main.location.type = "CBSA"
-#                                                   # main.location.type.p.source = "cdc.aggregated.proportion", #specific source of data that should be used here
-#                                                   # main.location.type.n.source = "cdc.hiv" 
-#                                                   )
-# cache.object.for.version(object = suppression.bias.estimates, 
-#                          name = "suppression.bias.estimates", 
-# version = 'ehe', overwrite=T)  
-
+#  
+#  congenital.diagnosis.likelihood.instructions = 
+#      create.location.based.ifelse.likelihood.instructions(
+#          congenital.diagnosis.basic.likelihood.instructions,
+#          congenital.nested.likelihood.instructions.trans,
+#          locations.list = list(c(locations::get.all.for.type("state")))  # anything not in this list will use second instructions
+#      )
 
 ##** PRENATAL CARE COVERAGE ** ----
 # we have 4 Categories representing a multinomial likelihood . 
