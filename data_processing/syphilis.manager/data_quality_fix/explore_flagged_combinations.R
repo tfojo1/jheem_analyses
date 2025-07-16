@@ -1,14 +1,12 @@
-# Interactive Exploration of Flagged Problematic Stratifications
-# Shows raw county-level data to understand WHY each combination was flagged
-# Allows team to assess whether removals are justified
+# Explore Flagged Combinations - Simple Cases-Based Analysis
+# Shows why each combination was flagged using direct case coverage comparison
 
 library(jheem2)
 library(locations)
 
 # Load data
 load("cached/syphilis.manager.rdata")
-census.manager <- get(load("cached/census.manager.rdata"))
-load("cached/stratification_analysis_results.rdata")
+load("cached/stratification_analysis_results_cases_based.rdata")
 
 # Helper function to analyze a specific problematic combination
 analyze_flagged_combination <- function(combo_index = NULL, msa = NULL, year = NULL, outcome = NULL) {
@@ -36,169 +34,154 @@ analyze_flagged_combination <- function(combo_index = NULL, msa = NULL, year = N
   cat("================================================================================\n")
   cat(sprintf("ANALYZING FLAGGED COMBINATION %d/%d\n", combo_index, length(problematic_combinations)))
   cat(sprintf("%s %s %s [%s stratification]\n", combo$msa_name, combo$year, combo$outcome, combo$stratification))
-  cat(sprintf("Population coverage: %.1f%% (< 90%% threshold)\n", combo$coverage * 100))
+  cat(sprintf("Case coverage: %.1f%% (< 90%% threshold)\n", combo$case_coverage * 100))
   cat("================================================================================\n\n")
+  
+  # Show the core calculation
+  cat("CORE ANALYSIS:\n")
+  cat("--------------------------------------------------\n")
+  cat(sprintf("MSA total cases: %d\n", combo$total_cases))
+  cat(sprintf("Cases with race data: %d\n", combo$race_cases))
+  cat(sprintf("Case coverage: %.1f%% (%d/%d)\n", 
+              combo$case_coverage * 100, combo$race_cases, combo$total_cases))
+  cat(sprintf("Threshold: 90%%\n"))
+  cat(sprintf("Result: %.1f%% < 90%% → FLAGGED FOR REMOVAL\n", combo$case_coverage * 100))
+  
+  # Show the detailed race breakdown
+  cat("\nRACE STRATIFICATION BREAKDOWN:\n")
+  cat("--------------------------------------------------\n")
+  
+  msa_strat_data <- syphilis.manager$data[[combo$outcome]]$estimate$cdc.aggregated.county[[combo$ontology]][[combo$stratification]][combo$year, combo$msa, ]
+  
+  missing_cases <- combo$total_cases - combo$race_cases
+  
+  cat("Race category breakdown:\n")
+  for (i in seq_along(msa_strat_data)) {
+    race_name <- names(msa_strat_data)[i]
+    value <- msa_strat_data[i]
+    if (is.nan(value)) {
+      cat(sprintf("  %s: NaN ⚠️ (missing data)\n", race_name))
+    } else {
+      cat(sprintf("  %s: %d\n", race_name, value))
+    }
+  }
+  
+  cat(sprintf("\nSummary:\n"))
+  cat(sprintf("  Cases with race data: %d\n", combo$race_cases))
+  cat(sprintf("  Cases missing race data: %d\n", missing_cases))
+  cat(sprintf("  Total cases: %d\n", combo$total_cases))
+  
+  if (missing_cases > 0) {
+    cat(sprintf("\nImpact: %d cases (%.1f%%) are missing race information, making\n", 
+                missing_cases, missing_cases/combo$total_cases*100))
+    cat("race-stratified modeling targets unreliable for this MSA/year/outcome.\n")
+  }
+  
+  # Add county-level breakdown to understand WHY data is missing
+  cat("\nCOUNTY-LEVEL BREAKDOWN (underlying cause):\n")
+  cat("--------------------------------------------------\n")
   
   # Get all counties in this MSA
   all_counties <- locations::get.contained.locations(combo$msa, "COUNTY")
   cat(sprintf("MSA contains %d counties: %s\n\n", length(all_counties), paste(all_counties, collapse = ", ")))
   
-  # Get the county-level data
+  # Get county-level data
   county_source <- "cdc.sti"
   
-  # Get stratified data
-  strat_data <- syphilis.manager$data[[combo$outcome]]$estimate[[county_source]][[combo$ontology]][[combo$stratification]]
-  total_data <- syphilis.manager$data[[combo$outcome]]$estimate[[county_source]][[combo$ontology]]$year__location
+  # Determine which ontology to use for county data
+  county_ontology <- if (combo$outcome == "ps.syphilis.diagnoses") "cdc.sti" else "cdc.sti.two"
   
-  if (is.null(strat_data) || is.null(total_data)) {
-    cat("ERROR: Could not find county-level data for this combination\n")
-    return(invisible())
-  }
+  # Get county-level stratified and total data
+  county_strat_data <- syphilis.manager$data[[combo$outcome]]$estimate[[county_source]][[county_ontology]][[combo$stratification]]
+  county_total_data <- syphilis.manager$data[[combo$outcome]]$estimate[[county_source]][[county_ontology]]$year__location
   
-  # Check which counties have data for this year
-  counties_with_any_data <- intersect(all_counties, dimnames(strat_data)$location)
-  counties_with_any_data <- counties_with_any_data[counties_with_any_data %in% dimnames(total_data)$location]
-  
-  cat("COUNTY-LEVEL BREAKDOWN:\n")
-  cat("--------------------------------------------------\n")
-  
-  county_details <- list()
-  total_cases_msa <- 0
-  total_strat_cases_msa <- 0
-  sufficient_data_counties <- character(0)
-  
-  for (county in counties_with_any_data) {
-    if (!(combo$year %in% dimnames(strat_data)$year) || !(combo$year %in% dimnames(total_data)$year)) {
-      next
-    }
+  if (!is.null(county_strat_data) && !is.null(county_total_data)) {
+    # Check which counties have data for this year
+    counties_with_data <- intersect(all_counties, dimnames(county_strat_data)$location)
+    counties_with_data <- counties_with_data[counties_with_data %in% dimnames(county_total_data)$location]
     
-    # Get total cases for this county/year
-    county_total <- total_data[combo$year, county]
-    
-    if (is.na(county_total) || is.nan(county_total)) {
-      cat(sprintf("%s: No total data\n", county))
-      next
-    }
-    
-    # Get stratified cases
-    county_strat_data <- strat_data[combo$year, county, ]
-    county_strat_sum <- sum(county_strat_data, na.rm = TRUE)
-    
-    # Calculate coverage
-    coverage <- if (county_total > 0) county_strat_sum / county_total else 0
-    
-    # Check if this county has sufficient stratification coverage (≥80%)
-    sufficient <- coverage >= 0.8
-    if (sufficient) {
-      sufficient_data_counties <- c(sufficient_data_counties, county)
-    }
-    
-    # Store details
-    county_details[[county]] <- list(
-      total = county_total,
-      strat_sum = county_strat_sum,
-      coverage = coverage,
-      sufficient = sufficient
-    )
-    
-    total_cases_msa <- total_cases_msa + county_total
-    total_strat_cases_msa <- total_strat_cases_msa + county_strat_sum
-    
-    # Display
-    status <- if (sufficient) "✅ SUFFICIENT" else "❌ INSUFFICIENT"
-    cat(sprintf("%s: %d total, %d stratified (%.1f%% coverage) %s\n", 
-                county, county_total, county_strat_sum, coverage * 100, status))
-  }
-  
-  cat("--------------------------------------------------\n")
-  cat(sprintf("MSA TOTALS: %d total cases, %d stratified cases (%.1f%% overall coverage)\n", 
-              total_cases_msa, total_strat_cases_msa, total_strat_cases_msa/total_cases_msa*100))
-  
-  cat(sprintf("Counties with sufficient data (≥80%% coverage): %d/%d\n", 
-              length(sufficient_data_counties), length(counties_with_any_data)))
-  
-  # Population analysis
-  cat("\nPOPULATION COVERAGE ANALYSIS:\n")
-  cat("--------------------------------------------------\n")
-  
-  # Get population data
-  tryCatch({
-    total_pop_data <- census.manager$pull(
-      outcome = "population",
-      source = "census.population", 
-      from.ontology.names = "census",
-      dimension.values = list(location = all_counties, year = combo$year),
-      keep.dimensions = c("location"),
-      na.rm = TRUE
-    )
-    
-    sufficient_pop <- if (length(sufficient_data_counties) > 0) {
-      census.manager$pull(
-        outcome = "population",
-        source = "census.population",
-        from.ontology.names = "census", 
-        dimension.values = list(location = sufficient_data_counties, year = combo$year),
-        keep.dimensions = c("location"),
-        na.rm = TRUE
-      )
+    if (combo$year %in% dimnames(county_strat_data)$year && combo$year %in% dimnames(county_total_data)$year) {
+      
+      county_details <- list()
+      
+      for (county in counties_with_data) {
+        # Get total cases for this county/year
+        county_total <- county_total_data[combo$year, county]
+        
+        if (!is.na(county_total) && !is.nan(county_total) && county_total > 0) {
+          # Get stratified cases
+          county_strat_values <- county_strat_data[combo$year, county, ]
+          county_strat_sum <- sum(county_strat_values, na.rm = TRUE)
+          
+          # Calculate coverage
+          coverage <- county_strat_sum / county_total
+          
+          # Assess data quality
+          quality_status <- if (coverage >= 0.9) "✅ EXCELLENT" else if (coverage >= 0.8) "✅ GOOD" else if (coverage >= 0.5) "⚠️ POOR" else "❌ VERY POOR"
+          
+          county_details[[county]] <- list(
+            total = county_total,
+            strat_sum = county_strat_sum,
+            coverage = coverage,
+            status = quality_status
+          )
+          
+          cat(sprintf("%s: %d total, %d race (%.1f%% coverage) %s\n", 
+                      county, county_total, county_strat_sum, coverage * 100, quality_status))
+        } else if (!is.na(county_total)) {
+          cat(sprintf("%s: %s total cases\n", county, county_total))
+        }
+      }
+      
+      # Show which counties are driving the problem
+      cat("\nPROBLEM ANALYSIS:\n")
+      poor_counties <- names(county_details)[sapply(county_details, function(x) x$coverage < 0.8)]
+      good_counties <- names(county_details)[sapply(county_details, function(x) x$coverage >= 0.8)]
+      
+      if (length(poor_counties) > 0) {
+        poor_cases <- sum(sapply(county_details[poor_counties], function(x) x$total))
+        poor_missing <- sum(sapply(county_details[poor_counties], function(x) x$total - x$strat_sum))
+        cat(sprintf("Counties with poor race reporting (%d): %s\n", length(poor_counties), paste(poor_counties, collapse = ", ")))
+        cat(sprintf("  Cases from poor counties: %d\n", poor_cases))
+        cat(sprintf("  Missing race data from these counties: %d\n", poor_missing))
+      }
+      
+      if (length(good_counties) > 0) {
+        good_cases <- sum(sapply(county_details[good_counties], function(x) x$total))
+        cat(sprintf("Counties with good race reporting (%d): %s\n", length(good_counties), paste(good_counties, collapse = ", ")))
+        cat(sprintf("  Cases from good counties: %d\n", good_cases))
+      }
+      
+      # Summary insight
+      total_cases_analyzed <- sum(sapply(county_details, function(x) x$total))
+      if (length(poor_counties) > 0 && total_cases_analyzed > 0) {
+        poor_contribution <- poor_cases / total_cases_analyzed
+        cat(sprintf("\nKey insight: %.1f%% of cases come from counties with poor race reporting.\n", poor_contribution * 100))
+      }
+      
     } else {
-      0
+      cat("County-level data not available for this year.\n")
     }
-    
-    total_population <- sum(total_pop_data, na.rm = TRUE)
-    population_with_sufficient_data <- sum(sufficient_pop, na.rm = TRUE)
-    pop_coverage <- population_with_sufficient_data / total_population
-    
-    cat(sprintf("Total MSA population (%s): %s\n", combo$year, format(total_population, big.mark = ",")))
-    cat(sprintf("Population in counties with sufficient data: %s\n", format(population_with_sufficient_data, big.mark = ",")))
-    cat(sprintf("Population coverage: %.1f%% (threshold: 90%%)\n", pop_coverage * 100))
-    
-    if (pop_coverage < 0.9) {
-      cat("❌ FLAGGED FOR REMOVAL: Population coverage below 90% threshold\n")
-    } else {
-      cat("✅ WOULD BE PRESERVED: Population coverage above 90% threshold\n")
-    }
-    
-  }, error = function(e) {
-    cat("ERROR getting population data:", e$message, "\n")
-  })
-  
-  # Show the resulting MSA-level aggregated data issue
-  cat("\nMSA-LEVEL AGGREGATED DATA (what models see):\n")
-  cat("--------------------------------------------------\n")
-  
-  msa_total <- syphilis.manager$data[[combo$outcome]]$estimate$cdc.aggregated.county[[combo$ontology]]$year__location[combo$year, combo$msa]
-  msa_strat_data <- syphilis.manager$data[[combo$outcome]]$estimate$cdc.aggregated.county[[combo$ontology]][[combo$stratification]][combo$year, combo$msa, ]
-  
-  cat(sprintf("MSA total: %s\n", msa_total))
-  cat("MSA stratification breakdown:\n")
-  for (i in seq_along(msa_strat_data)) {
-    strat_name <- names(msa_strat_data)[i]
-    value <- msa_strat_data[i]
-    if (is.nan(value)) {
-      cat(sprintf("  %s: NaN ⚠️\n", strat_name))
-    } else {
-      cat(sprintf("  %s: %s\n", strat_name, value))
-    }
+  } else {
+    cat("County-level data not available for this outcome/ontology combination.\n")
   }
-  msa_strat_sum <- sum(msa_strat_data, na.rm = TRUE)
-  cat(sprintf("MSA stratification sum: %s (missing: %s cases)\n", 
-              msa_strat_sum, msa_total - msa_strat_sum))
   
   cat("\n================================================================================\n\n")
   
-  return(invisible(county_details))
+  return(invisible())
 }
 
 # Quick overview of all flagged combinations
 show_all_flagged_summary <- function() {
   cat("ALL FLAGGED COMBINATIONS SUMMARY:\n")
   cat("================================================================================\n")
+  cat("Using simple cases-based analysis: race_cases / total_cases < 90%\n\n")
   
   for (i in seq_along(problematic_combinations)) {
     combo <- problematic_combinations[[i]]
-    cat(sprintf("%2d. %s %s %s [%.1f%% pop coverage]\n", 
-                i, combo$msa_name, combo$year, combo$outcome, combo$coverage * 100))
+    cat(sprintf("%2d. %s %s %s [%.1f%% coverage, %d/%d cases]\n", 
+                i, combo$msa_name, combo$year, combo$outcome, 
+                combo$case_coverage * 100, combo$race_cases, combo$total_cases))
   }
   
   cat("\nTo analyze a specific combination, run:\n")
@@ -208,26 +191,126 @@ show_all_flagged_summary <- function() {
   cat("================================================================================\n\n")
 }
 
-cat("PROBLEMATIC STRATIFICATIONS EXPLORATION TOOL\n")
+# Show borderline cases (close to threshold)
+show_borderline_cases <- function(threshold_buffer = 0.05) {
+  borderline_threshold <- 0.9 + threshold_buffer  # e.g., 0.95 for 5% buffer above 90%
+  
+  cat("BORDERLINE CASES (close to 90% threshold):\n")
+  cat("================================================================================\n")
+  
+  # Find cases that are flagged but close to the threshold
+  borderline_flagged <- problematic_combinations[sapply(problematic_combinations, function(x) x$case_coverage >= 0.9 - threshold_buffer && x$case_coverage < 0.9)]
+  
+  # Find cases that are preserved but close to the threshold  
+  borderline_preserved <- analysis_summary[analysis_summary$case_coverage >= 0.9 & analysis_summary$case_coverage <= borderline_threshold & !analysis_summary$needs_removal, ]
+  
+  if (length(borderline_flagged) > 0) {
+    cat("FLAGGED cases close to threshold:\n")
+    for (i in seq_along(borderline_flagged)) {
+      combo <- borderline_flagged[[i]]
+      cat(sprintf("  %s %s %s: %.1f%% coverage (%d/%d cases) - FLAGGED\n",
+                  combo$msa_name, combo$year, combo$outcome, 
+                  combo$case_coverage * 100, combo$race_cases, combo$total_cases))
+    }
+  }
+  
+  if (nrow(borderline_preserved) > 0) {
+    cat("\nPRESERVED cases close to threshold:\n")
+    for (i in 1:nrow(borderline_preserved)) {
+      row <- borderline_preserved[i, ]
+      cat(sprintf("  %s %s %s: %.1f%% coverage (%d/%d cases) - PRESERVED\n",
+                  row$msa_name, row$year, row$outcome,
+                  row$case_coverage * 100, row$race_cases, row$total_cases))
+    }
+  }
+  
+  cat("================================================================================\n\n")
+}
+
+# Compare with a different threshold
+test_different_threshold <- function(test_threshold = 0.85) {
+  cat(sprintf("COMPARISON: What if threshold was %.0f%% instead of 90%%?\n", test_threshold * 100))
+  cat("================================================================================\n")
+  
+  current_flagged <- sum(analysis_summary$needs_removal)
+  test_flagged <- sum(analysis_summary$case_coverage < test_threshold)
+  
+  cat(sprintf("Current (90%% threshold): %d combinations flagged\n", current_flagged))
+  cat(sprintf("Test (%.0f%% threshold): %d combinations would be flagged\n", test_threshold * 100, test_flagged))
+  cat(sprintf("Difference: %+d combinations\n", test_flagged - current_flagged))
+  
+  if (test_threshold < 0.9) {
+    # Show what would be newly preserved
+    newly_preserved <- analysis_summary[analysis_summary$case_coverage >= test_threshold & analysis_summary$case_coverage < 0.9, ]
+    if (nrow(newly_preserved) > 0) {
+      cat(sprintf("\nCombinations that would be NEWLY PRESERVED with %.0f%% threshold:\n", test_threshold * 100))
+      for (i in 1:nrow(newly_preserved)) {
+        row <- newly_preserved[i, ]
+        cat(sprintf("  %s %s %s: %.1f%% coverage\n", row$msa_name, row$year, row$outcome, row$case_coverage * 100))
+      }
+    }
+  } else {
+    # Show what would be newly flagged
+    newly_flagged <- analysis_summary[analysis_summary$case_coverage < test_threshold & analysis_summary$case_coverage >= 0.9, ]
+    if (nrow(newly_flagged) > 0) {
+      cat(sprintf("\nCombinations that would be NEWLY FLAGGED with %.0f%% threshold:\n", test_threshold * 100))
+      for (i in 1:nrow(newly_flagged)) {
+        row <- newly_flagged[i, ]
+        cat(sprintf("  %s %s %s: %.1f%% coverage\n", row$msa_name, row$year, row$outcome, row$case_coverage * 100))
+      }
+    }
+  }
+  
+  cat("================================================================================\n\n")
+}
+show_detailed_results <- function() {
+  cat("DETAILED ANALYSIS RESULTS:\n")
+  cat("================================================================================\n")
+  
+  if (nrow(analysis_summary) == 0) {
+    cat("No analysis results found\n")
+    return(invisible())
+  }
+  
+  # Add a formatted coverage column
+  analysis_summary$coverage_formatted <- sprintf("%.1f%%", analysis_summary$case_coverage * 100)
+  analysis_summary$status <- ifelse(analysis_summary$needs_removal, "REMOVE", "PRESERVE")
+  
+  # Show summary by MSA
+  cat("BY MSA:\n")
+  for (msa in unique(analysis_summary$msa)) {
+    msa_data <- analysis_summary[analysis_summary$msa == msa, ]
+    msa_name <- msa_data$msa_name[1]
+    removals <- sum(msa_data$needs_removal)
+    total <- nrow(msa_data)
+    cat(sprintf("  %s: %d/%d flagged (%.1f%%)\n", 
+                msa_name, removals, total, removals/total*100))
+  }
+  
+  cat("\nFULL RESULTS TABLE:\n")
+  print(analysis_summary[, c("msa_name", "year", "outcome", "total_cases", "race_cases", "coverage_formatted", "status")])
+  
+  cat("================================================================================\n\n")
+}
+
+cat("SIMPLE CASES-BASED ANALYSIS EXPLORATION TOOL\n")
 cat("================================================================================\n")
-cat("This script helps you understand WHY each combination was flagged for removal.\n\n")
+cat("This tool shows why combinations were flagged using direct case coverage comparison.\n")
+cat("Logic: race_cases / total_cases < 90% → flag for removal\n\n")
 
 cat("Available functions:\n")
-cat("1. show_all_flagged_summary()           - Overview of all 15 flagged combinations\n")
-cat("2. analyze_flagged_combination(N)       - Detailed analysis of combination N\n")
-cat("3. analyze_flagged_combination(msa=..., year=..., outcome=...)  - Find by parameters\n\n")
+cat("1. show_all_flagged_summary()           - Overview of all flagged combinations\n")
+cat("2. analyze_flagged_combination(N)       - Detailed analysis with county breakdown\n") 
+cat("3. show_detailed_results()              - Full analysis table\n")
+cat("4. show_borderline_cases()              - Cases close to 90% threshold\n")
+cat("5. test_different_threshold(0.85)       - Compare with different threshold\n\n")
 
 cat("EXAMPLE USAGE:\n")
-cat("show_all_flagged_summary()                    # See all flagged combinations\n")
-cat("analyze_flagged_combination(1)                # Analyze Baltimore 2022 PS syphilis\n")
-cat("analyze_flagged_combination(14)               # Analyze Atlanta 2022 Unknown duration\n\n")
+cat("show_all_flagged_summary()              # See all flagged combinations\n")
+cat("analyze_flagged_combination(1)          # Deep dive with county breakdown\n")
+cat("show_borderline_cases()                 # Cases close to threshold\n")
+cat("test_different_threshold(0.85)          # Test 85% threshold\n")
+cat("show_detailed_results()                 # See full results table\n\n")
 
 # Show summary by default
 show_all_flagged_summary()
-
-# Example: Analyze a few key cases
-cat("SAMPLE ANALYSIS - Baltimore 2022 PS Syphilis (most problematic?):\n")
-analyze_flagged_combination(1)
-
-cat("SAMPLE ANALYSIS - Atlanta 2022 Unknown Duration (lowest coverage):\n")
-analyze_flagged_combination(14)

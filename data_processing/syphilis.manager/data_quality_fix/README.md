@@ -1,95 +1,54 @@
 # Syphilis Data Quality Fix
 
-This folder contains scripts to address **stratification data quality issues** in MSA-level syphilis diagnosis data. While discovered through race stratification analysis, this is a **generic problem** that can affect any stratification (age, sex, race, combinations).
+This folder contains scripts to address **stratification data quality issues** in MSA-level syphilis diagnosis data. The core problem: race stratification data shows significant undercounting compared to total diagnoses, making stratified targets unreliable for model calibration.
 
 ## The Core Problem
 
 ### What We Found
-Stratification data for key MSAs shows significant undercounting compared to total diagnoses, making stratified targets unreliable for model calibration.
+Stratification data for key MSAs shows significant undercounting compared to total diagnoses.
 
 **Example**: Baltimore MSA 2022 PS syphilis
 - Total diagnoses: 525 cases ✅
 - Race-stratified sum: 265 cases ❌ (only 50.5% coverage)
-- **265 cases missing** from race stratification
+- **260 cases missing** from race stratification
 
-### Root Cause: Incomplete County-Level Data + Aggregation Logic
+### Root Cause
+Some MSAs have systematic gaps in race reporting, creating unreliable stratifications that produce NaN values during aggregation while total counts remain accurate.
 
-**The Problem Chain**:
-1. **County level**: Some counties have complete total counts but incomplete stratified data
-   - Baltimore City: 306 total cases, but only 48 with race data (15.7% coverage)
-   - Other counties: Complete race data (100% coverage)
-
-2. **MSA aggregation**: The aggregation script treats missing stratified data as zeros
-   - Sums available race data: 48 (Baltimore City) + 217 (other counties) = 265
-   - **Ignores** the 258 cases with missing race data in Baltimore City
-   - But correctly sums total data: 306 + 219 = 525
-
-3. **Result**: MSA shows NaN values in race stratification, indicating the aggregation couldn't account for all cases
-
-### Why This is Generic
-This problem can occur with **any stratification** whenever:
-- Counties have complete total data but incomplete stratified data (age, sex, race, etc.)
-- The incomplete stratification represents a significant population/case load
-- MSA aggregation treats the missing stratified data as negligible
-
-**The race analysis revealed the pattern, but age, sex, or combined stratifications could have similar issues.**
-
-## Our Solution: Population Coverage Analysis
+## Our Solution: Simple Cases-Based Analysis
 
 ### Approach
-Two-level analysis to identify unreliable stratifications:
+Direct comparison at MSA level: **race_cases / total_cases < 90%** → flag for removal
 
-1. **County-level filter**: Only count counties with ≥80% stratification coverage as "having sufficient data"
-   - Baltimore City (15.7% race coverage) → excluded
-   - Other counties (100% race coverage) → included
-
-2. **MSA-level check**: Only preserve stratifications where counties with sufficient data represent ≥90% of MSA population
-   - Baltimore: 6 counties with good data represent 79.9% of MSA population
-   - 79.9% < 90% threshold → **flag for removal**
-
-### Why This Works
-- **Catches significant data gaps**: When major population centers have poor stratification coverage
-- **Preserves good data**: When NaN values represent normal suppression (small counts)
-- **Generalizable**: Works for any stratification type (age, sex, race, combinations)
-- **Conservative**: Better to remove unreliable data than propagate errors
-
-### Data Flow
-```
-County Data (cdc.sti source)
-├── Baltimore City: 306 total, 48 race (15.7% coverage) → EXCLUDED
-├── Other 6 counties: 219 total, 217 race (99% coverage) → INCLUDED
-│
-└── Population Coverage Check:
-    Counties with good data = 79.9% of MSA population
-    79.9% < 90% threshold → FLAG MSA STRATIFICATION FOR REMOVAL
-
-MSA Data (cdc.aggregated.county source)
-├── Total: 525 cases → PRESERVE (accurate)
-└── Race stratification → REMOVE (unreliable)
-```
+### Why This Approach
+1. **Epidemiologically appropriate**: Focus on where disease cases are, not population distribution
+2. **Simple and defensible**: Direct comparison is intuitive and easy to explain  
+3. **Conservative for model quality**: Better to have fewer, reliable targets than questionable ones
+4. **Addresses the core issue**: Removes stratifications that don't sum to totals
 
 ## Scripts
 
 ### Core Tools
-- **`identify_problematic_stratifications.R`** - Main identification tool
-  - Finds MSA/year/outcome/stratification combinations with insufficient population coverage
-  - Uses county-level data to assess coverage, flags MSA-level data for removal
-  - Configurable thresholds (80% county, 90% MSA)
+- **`identify_problematic_stratifications.R`** - Main identification tool using simple cases-based analysis
+  - Flags MSA/year/outcome combinations where race_cases/total_cases < 90%
+  - Simple, direct logic: focus on case coverage, not population distribution
 
-- **`simple_problem_demo.R`** - Enhanced problem demonstration
-  - Shows raw NaN values in MSA aggregated data
-  - Explains county-level breakdown causing the problem
-  - Demonstrates aggregation math that creates inconsistencies
+- **`explore_flagged_combinations.R`** - Interactive exploration tool
+  - Shows why each combination was flagged
+  - Displays case coverage calculations and race breakdowns
 
-### Total Diagnosis Creation
-- **`test_total_with_restratification.R`** - **RECOMMENDED** total diagnosis script
+### Implementation Tools  
+- **`implement_removals.R`** - Removes flagged stratifications from manager
+  - Creates clean manager with problematic race data removed
+  - Preserves all total counts (unchanged and accurate)
+
+- **`test_total_with_restratification.R`** - **RECOMMENDED** total diagnosis creation
   - Creates `total.syphilis.diagnoses` = PS + Early + Unknown duration
-  - Handles ontology mismatch between PS (cdc.sti, 10 age groups) and Early/Unknown (cdc.sti.two, 7 age groups)
-  - Uses `jheem2::restratify.age.counts()` for proper age harmonization
+  - Handles ontology differences with proper age harmonization
 
-- **`test_total_diagnosis.R`** - Alternative total diagnosis approach
-- **`total_diagnosis_addition.R`** - Another total diagnosis method  
-- **`validate_total_diagnosis.R`** - Validation and quality checks
+### Archive
+- **`archive/population_based_approach/`** - Original population-weighted approach
+  - Preserved for reference but replaced with simpler cases-based method
 
 ## Results: Widespread Issue
 

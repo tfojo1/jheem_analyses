@@ -1,32 +1,27 @@
-# Identify Problematic Stratifications - Population Coverage Analysis
-# Finds MSA/year/outcome/stratification combinations with insufficient population coverage
-# Uses county-level data to assess coverage, applies removal to MSA-level aggregated data
+# Identify Problematic Stratifications - Simple Cases-Based Analysis
+# Flags MSA/year/outcome/stratification combinations where race data coverage is insufficient
+# Uses direct comparison: race_sum / total_cases < threshold
 
 library(jheem2)
-library(locations)
 
 # Load data managers
 cat("Loading data managers...\n")
 load("cached/syphilis.manager.rdata")
-census.manager <- get(load("cached/census.manager.rdata"))
 
 # Configuration
-POPULATION_COVERAGE_THRESHOLD <- 0.9  # Require 90% population coverage
-COUNTY_STRATIFICATION_THRESHOLD <- 0.8  # Require 80% stratification coverage within each county
+CASE_COVERAGE_THRESHOLD <- 0.9  # Require 90% case coverage in race stratification
 TARGET_MSAS <- c("C.12580", "C.35620", "C.33100", "C.12060")  # Baltimore, NYC, Miami, Atlanta
 MSA_NAMES <- c("Baltimore", "NYC", "Miami", "Atlanta")
 names(MSA_NAMES) <- TARGET_MSAS
 
 TARGET_OUTCOMES <- c("ps.syphilis.diagnoses", "early.syphilis.diagnoses", "unknown.duration.or.late.syphilis.diagnoses")
-COUNTY_SOURCE_NAME <- "cdc.sti"  # County-level data for coverage analysis
-MSA_SOURCE_NAME <- "cdc.aggregated.county"  # MSA-level data to potentially remove
+MSA_SOURCE_NAME <- "cdc.aggregated.county"  # MSA-level data to analyze
 
-# Start with race stratifications, but make extensible
+# Target stratifications
 TARGET_STRATIFICATIONS <- c("year__location__race")
-# Future: c("year__location__race", "year__location__age", "year__location__sex", "year__location__age__race", etc.)
 
-# Check what years are actually available first
-sample_data <- syphilis.manager$data$ps.syphilis.diagnoses$estimate[[COUNTY_SOURCE_NAME]]$cdc.sti$year__location__race
+# Check what years are available
+sample_data <- syphilis.manager$data$ps.syphilis.diagnoses$estimate[[MSA_SOURCE_NAME]]$cdc.sti$year__location__race
 available_years <- dimnames(sample_data)$year
 cat(sprintf("Available years: %s\n", paste(tail(available_years, 10), collapse=", ")))
 
@@ -39,108 +34,13 @@ if (length(TARGET_YEARS) == 0) {
 }
 cat(sprintf("Using years: %s\n", paste(TARGET_YEARS, collapse=", ")))
 
-cat("\n=== POPULATION COVERAGE ANALYSIS ===\n")
-cat(sprintf("Threshold: %.0f%% population coverage required\n", POPULATION_COVERAGE_THRESHOLD * 100))
+cat("\n=== SIMPLE CASES-BASED ANALYSIS ===\n")
+cat(sprintf("Threshold: %.0f%% case coverage required\n", CASE_COVERAGE_THRESHOLD * 100))
+cat(sprintf("Logic: race_sum / total_cases >= %.0f%%\n", CASE_COVERAGE_THRESHOLD * 100))
 cat(sprintf("Target MSAs: %s\n", paste(MSA_NAMES, collapse=", ")))
 cat(sprintf("Target years: %s\n", paste(TARGET_YEARS, collapse=", ")))
 cat(sprintf("Target stratifications: %s\n", paste(TARGET_STRATIFICATIONS, collapse=", ")))
 cat("\n")
-
-# Function to get counties with sufficient stratified data from county-level source
-get_counties_with_sufficient_data <- function(outcome, ontology, stratification, msa, year) {
-  
-  # Get all counties in MSA
-  all_counties <- locations::get.contained.locations(msa, "COUNTY")
-  
-  # Get the county-level data arrays
-  strat_data <- syphilis.manager$data[[outcome]]$estimate[[COUNTY_SOURCE_NAME]][[ontology]][[stratification]]
-  total_data <- syphilis.manager$data[[outcome]]$estimate[[COUNTY_SOURCE_NAME]][[ontology]]$year__location
-  
-  if (is.null(strat_data) || is.null(total_data)) return(character(0))
-  
-  # Check which counties have sufficient stratification coverage for this year
-  if (!"year" %in% names(dim(strat_data))) return(character(0))
-  if (!(year %in% dimnames(strat_data)$year)) return(character(0))
-  if (!"location" %in% names(dim(strat_data))) return(character(0))
-  
-  counties_with_sufficient_data <- character(0)
-  for (county in intersect(all_counties, dimnames(strat_data)$location)) {
-    # Get stratified data for this county/year
-    county_strat_data <- strat_data[year, county, ]
-    
-    # Get total data for this county/year
-    if (county %in% dimnames(total_data)$location && year %in% dimnames(total_data)$year) {
-      county_total <- total_data[year, county]
-      
-      if (!is.na(county_total) && county_total > 0) {
-        # Calculate stratification coverage within this county
-        strat_sum <- sum(county_strat_data, na.rm = TRUE)
-        county_coverage <- strat_sum / county_total
-        
-        # County needs ≥80% stratification coverage to count as "having sufficient data"
-        if (county_coverage >= COUNTY_STRATIFICATION_THRESHOLD) {
-          counties_with_sufficient_data <- c(counties_with_sufficient_data, county)
-        }
-      }
-    }
-  }
-  
-  return(counties_with_sufficient_data)
-}
-
-# Function to check population coverage
-check_population_coverage <- function(msa, year, counties_with_sufficient_data) {
-  
-  all_counties <- locations::get.contained.locations(msa, "COUNTY")
-  
-  tryCatch({
-    # Get total population
-    total_pop_data <- census.manager$pull(
-      outcome = "population",
-      source = "census.population",
-      from.ontology.names = "census",
-      dimension.values = list(location = all_counties, year = year),
-      keep.dimensions = c("location"),
-      na.rm = TRUE
-    )
-    
-    # Get population for counties with sufficient data
-    counties_with_sufficient_data_in_msa <- intersect(counties_with_sufficient_data, all_counties)
-    if (length(counties_with_sufficient_data_in_msa) == 0) {
-      return(list(coverage = 0, total_population = 0, population_with_data = 0, error = "No counties with sufficient data"))
-    }
-    
-    pop_with_data <- census.manager$pull(
-      outcome = "population",
-      source = "census.population",
-      from.ontology.names = "census",
-      dimension.values = list(location = counties_with_sufficient_data_in_msa, year = year),
-      keep.dimensions = c("location"),
-      na.rm = TRUE
-    )
-    
-    total_population <- sum(total_pop_data, na.rm = TRUE)
-    population_with_data <- sum(pop_with_data, na.rm = TRUE)
-    
-    if (total_population == 0) {
-      return(list(coverage = 0, total_population = 0, population_with_data = 0, error = "No population data"))
-    }
-    
-    coverage <- population_with_data / total_population
-    
-    return(list(
-      coverage = coverage,
-      total_population = total_population,
-      population_with_data = population_with_data,
-      counties_total = length(all_counties),
-      counties_with_sufficient_data = length(counties_with_sufficient_data_in_msa),
-      missing_counties = setdiff(all_counties, counties_with_sufficient_data_in_msa)
-    ))
-    
-  }, error = function(e) {
-    return(list(coverage = 0, error = e$message))
-  })
-}
 
 # Main analysis loop
 problematic_combinations <- list()
@@ -156,12 +56,6 @@ for (outcome in TARGET_OUTCOMES) {
     ontology <- "cdc.sti.two"  # Early and Unknown use different ontology
   }
   
-  # Check if county-level data exists for this outcome/source/ontology
-  if (is.null(syphilis.manager$data[[outcome]]$estimate[[COUNTY_SOURCE_NAME]][[ontology]])) {
-    cat(sprintf("  No county-level data found for %s/%s/%s\n", outcome, COUNTY_SOURCE_NAME, ontology))
-    next
-  }
-  
   # Check if MSA-level data exists for this outcome/source/ontology
   if (is.null(syphilis.manager$data[[outcome]]$estimate[[MSA_SOURCE_NAME]][[ontology]])) {
     cat(sprintf("  No MSA-level data found for %s/%s/%s\n", outcome, MSA_SOURCE_NAME, ontology))
@@ -170,36 +64,46 @@ for (outcome in TARGET_OUTCOMES) {
   
   for (stratification in TARGET_STRATIFICATIONS) {
     
-    # Check if this stratification exists in county-level data
-    if (!(stratification %in% names(syphilis.manager$data[[outcome]]$estimate[[COUNTY_SOURCE_NAME]][[ontology]]))) {
-      cat(sprintf("  Stratification %s not found in county-level data for %s\n", stratification, outcome))
-      next
-    }
-    
     # Check if this stratification exists in MSA-level data
     if (!(stratification %in% names(syphilis.manager$data[[outcome]]$estimate[[MSA_SOURCE_NAME]][[ontology]]))) {
       cat(sprintf("  Stratification %s not found in MSA-level data for %s\n", stratification, outcome))
       next
     }
     
+    # Check if total data exists
+    if (!("year__location" %in% names(syphilis.manager$data[[outcome]]$estimate[[MSA_SOURCE_NAME]][[ontology]]))) {
+      cat(sprintf("  Total data (year__location) not found for %s\n", outcome))
+      next
+    }
+    
     for (msa in TARGET_MSAS) {
       for (year in TARGET_YEARS) {
         
-        # Get counties with sufficient stratified data from county-level source
-        counties_with_sufficient_data <- get_counties_with_sufficient_data(outcome, ontology, stratification, msa, year)
-        
-        if (length(counties_with_sufficient_data) == 0) {
-          # No counties have sufficient stratified data - skip
+        # Get MSA total data
+        total_data <- syphilis.manager$data[[outcome]]$estimate[[MSA_SOURCE_NAME]][[ontology]]$year__location
+        if (!(year %in% dimnames(total_data)$year) || !(msa %in% dimnames(total_data)$location)) {
           next
         }
         
-        # Check population coverage
-        coverage_result <- check_population_coverage(msa, year, counties_with_sufficient_data)
-        
-        if (!is.null(coverage_result$error)) {
-          cat(sprintf("  Error for %s %s %s: %s\n", MSA_NAMES[msa], year, outcome, coverage_result$error))
+        msa_total <- total_data[year, msa]
+        if (is.na(msa_total) || is.nan(msa_total) || msa_total <= 0) {
           next
         }
+        
+        # Get MSA stratified data
+        strat_data <- syphilis.manager$data[[outcome]]$estimate[[MSA_SOURCE_NAME]][[ontology]][[stratification]]
+        if (!(year %in% dimnames(strat_data)$year) || !(msa %in% dimnames(strat_data)$location)) {
+          next
+        }
+        
+        msa_race_data <- strat_data[year, msa, ]
+        msa_race_sum <- sum(msa_race_data, na.rm = TRUE)
+        
+        # Calculate case coverage
+        case_coverage <- msa_race_sum / msa_total
+        
+        # Determine if problematic
+        needs_removal <- case_coverage < CASE_COVERAGE_THRESHOLD
         
         # Record results
         analysis_row <- data.frame(
@@ -209,19 +113,17 @@ for (outcome in TARGET_OUTCOMES) {
           msa = msa,
           msa_name = MSA_NAMES[msa],
           year = year,
-          coverage = coverage_result$coverage,
-          counties_total = coverage_result$counties_total,
-          counties_with_sufficient_data = coverage_result$counties_with_sufficient_data,
-          population_total = coverage_result$total_population,
-          population_with_data = coverage_result$population_with_data,
-          needs_removal = coverage_result$coverage < POPULATION_COVERAGE_THRESHOLD,
+          total_cases = msa_total,
+          race_cases = msa_race_sum,
+          case_coverage = case_coverage,
+          needs_removal = needs_removal,
           stringsAsFactors = FALSE
         )
         
         analysis_summary <- rbind(analysis_summary, analysis_row)
         
         # Track problematic combinations
-        if (coverage_result$coverage < POPULATION_COVERAGE_THRESHOLD) {
+        if (needs_removal) {
           key <- paste(outcome, ontology, stratification, msa, year, sep = "|")
           problematic_combinations[[key]] <- list(
             outcome = outcome,
@@ -230,14 +132,14 @@ for (outcome in TARGET_OUTCOMES) {
             msa = msa,
             msa_name = MSA_NAMES[msa],
             year = year,
-            coverage = coverage_result$coverage,
-            missing_counties = coverage_result$missing_counties,
-            counties_with_sufficient_data = coverage_result$counties_with_sufficient_data,
-            counties_total = coverage_result$counties_total
+            total_cases = msa_total,
+            race_cases = msa_race_sum,
+            case_coverage = case_coverage
           )
           
-          cat(sprintf("  ❌ %s %s %s [%s]: %.1f%% population coverage\n",
-                     MSA_NAMES[msa], year, outcome, stratification, coverage_result$coverage * 100))
+          cat(sprintf("  ❌ %s %s %s [%s]: %.1f%% case coverage (%d/%d cases)\n",
+                     MSA_NAMES[msa], year, outcome, stratification, 
+                     case_coverage * 100, msa_race_sum, msa_total))
         }
       }
     }
@@ -281,24 +183,23 @@ if (nrow(analysis_summary) == 0) {
     cat("\nPROBLEMATIC COMBINATIONS (need removal):\n")
     for (i in seq_along(problematic_combinations)) {
       combo <- problematic_combinations[[i]]
-      cat(sprintf("  %s %s %s [%s]: %.1f%% coverage (%d/%d counties)\n",
+      cat(sprintf("  %s %s %s [%s]: %.1f%% coverage (%d/%d cases)\n",
                  combo$msa_name, combo$year, combo$outcome, combo$stratification, 
-                 combo$coverage * 100, combo$counties_with_sufficient_data, combo$counties_total))
+                 combo$case_coverage * 100, combo$race_cases, combo$total_cases))
     }
   }
   
   cat("\nDETAILED RESULTS:\n")
-  print(analysis_summary[, c("msa_name", "year", "outcome", "stratification", "coverage", "counties_with_sufficient_data", "counties_total", "needs_removal")])
+  print(analysis_summary[, c("msa_name", "year", "outcome", "stratification", "total_cases", "race_cases", "case_coverage", "needs_removal")])
 }
 
 # Save results for later use
 cat(sprintf("\nSaving analysis results...\n"))
 save(analysis_summary, problematic_combinations, 
-     file = "cached/stratification_analysis_results.rdata")
+     file = "cached/stratification_analysis_results_cases_based.rdata")
 
-cat(sprintf("\nNote: Analysis uses county-level data (%s) to assess coverage.\n", COUNTY_SOURCE_NAME))
-cat(sprintf("Counties need ≥%.0f%% stratification coverage to count as 'having sufficient data'.\n", COUNTY_STRATIFICATION_THRESHOLD * 100))
-cat(sprintf("MSAs need ≥%.0f%% population coverage to preserve stratifications.\n", POPULATION_COVERAGE_THRESHOLD * 100))
-cat(sprintf("Removal will be applied to MSA-level data (%s).\n", MSA_SOURCE_NAME))
+cat(sprintf("\nApproach: Simple cases-based analysis\n"))
+cat(sprintf("Threshold: Cases with race data must be ≥%.0f%% of total cases\n", CASE_COVERAGE_THRESHOLD * 100))
+cat(sprintf("Logic: Directly compare race_sum / total_cases at MSA level\n"))
 
 cat("\n=== ANALYSIS COMPLETE ===\n")
