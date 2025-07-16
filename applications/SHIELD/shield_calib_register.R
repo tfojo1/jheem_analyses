@@ -79,7 +79,7 @@ for (i in c(0:3)){
 # starting from demog.calibration again
 # this run doesnt have the 2023 data points for diagnosis
 for (i in c(0)){
-    register.calibration.info(code = paste0("calib.07.10.pk",i),
+    register.calibration.info(code = paste0("calib.07.16.pk",i),
                               preceding.calibration.codes = "calib.demog.06.09.pk",  #calibrated demographic model using total likelihoods with w=1 for EL
                               likelihood.instructions = lik.inst.diag.total.no.demog,  
                               data.manager = SURVEILLANCE.MANAGER,
