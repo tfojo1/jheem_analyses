@@ -45,9 +45,15 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 # }
 
 # Load simset from the Q drive
-"/Volumes/jheem$/shield/calib.07.09.pk1_simset_2025-07-10_C.12580.Rdata" 
-for (i in c(2:3)){
-    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.09.pk',i); DATE <- "2025-07-10"
+#07.10: These models have 5 additional knots for EL screening in 1990-95-2000-2010-2020
+for (i in c(0)){
+    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.10.pk',i); DATE <- "2025-07-10" 
+    filename=  paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata");print(filename) 
+    load(filename)
+    assign(paste0("simset",i),simset) #dynamic assignment
+}
+for (i in c(1:3)){
+    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.10.pk',i); DATE <- "2025-07-11" 
     filename=  paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata");print(filename) 
     load(filename)
     assign(paste0("simset",i),simset) #dynamic assignment
@@ -91,7 +97,7 @@ simplot(
     sim.last0, #w=1/8
     # sim.last1, #w=1/4
     # sim.last2,#w=1/2
-    sim.last3,#w=1
+    # sim.last3,#w=1
 
     # sim.mac.engine,
     # simset.mac.calib$first.sim(),
@@ -114,7 +120,9 @@ simplot(
 # x+geom_hline(yintercept = 613)+geom_vline(xintercept = 2022)
 # x+geom_hline(yintercept =  672) +geom_vline(xintercept = 2023)
 # MCMC Diagnostics ----
-simset=simset3
+simset=simset0
+cbind(simset$get.params())
+
 {
     head(simset$get.mcmc.mixing.statistic())
     simset$traceplot("transmission")
@@ -125,6 +133,7 @@ simset=simset3
     simset$traceplot("hiv")
     simset$traceplot("symptomatic")
     simset$traceplot("screening")
+    simset$traceplot(".el")
     simset$traceplot("rel")
     simset$traceplot("prop.early")
     

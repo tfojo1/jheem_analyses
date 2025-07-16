@@ -1740,7 +1740,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'early.syphilis.diagnoses',#<just for comparison>
                          keep.dimensions = c('location','age','race','sex') 
 )
-### Late Latent Syphilis: True Estimate  ----
+###  Late Latent Syphilis: True Estimate  ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.ll.true', 
                          value = expression(diagnosis.total),
@@ -1851,7 +1851,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex') 
 )
 
-### Congenital Diagnoses -----
+###  Congenital Diagnoses -----
 track.dynamic.outcome(SHIELD.SPECIFICATION,
                       name='diagnosis.congenital',
                       groups = 'infected',
