@@ -496,7 +496,7 @@ lik.inst.diag.total.no.demog=join.likelihood.instructions(
   ps.diagnosis.total.likelihood.instructions,
   early.diagnosis.total.likelihood.instructions,
   late.diagnosis.total.likelihood.instructions,
-  hiv.testing.by.strata.likelihood.instructions
+  hiv.testing.total.likelihood.instructions
 )
 
 # All total diagnosis+HIV test
@@ -505,7 +505,7 @@ lik.inst.diag.by.strata.no.demog=join.likelihood.instructions(
   ps.diagnosis.by.strata.likelihood.instructions,
   early.diagnosis.by.strata.likelihood.instructions,
   late.diagnosis.by.strata.likelihood.instructions,
-  hiv.testing.total.likelihood.instructions
+  hiv.testing.by.strata.likelihood.instructions
 )
 ##--OPTIONAL:CNS ----
 # cns.diagnosis.likelihood.instructions =
