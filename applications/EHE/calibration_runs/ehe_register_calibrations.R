@@ -223,9 +223,9 @@ register.calibration.info(CALIBRATION.CODE.POP.STATE,
 
 register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
                           likelihood.instructions = trans.state.likelihood.instructions,
-                          # special.case.likelihood.instructions = list(
-                          #     AL = trans.state.halfx.likelihood.instructions
-                          # ),
+                          special.case.likelihood.instructions = list(
+                              SC = trans.state.overweighted.prevalence.likelihood.instructions
+                          ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = CALIBRATION.END.YEAR, 
                           parameter.names = c(par.names.transmission), 
@@ -242,6 +242,9 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
 # state-level full calibration - removed AIDS deaths 
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,
                           likelihood.instructions = full.state.likelihood.instructions,
+                          special.case.likelihood.instructions = list(
+                              SC = full.state.overweighted.prev.vs.new.likelihood.instructions
+                          ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = CALIBRATION.END.YEAR, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 
@@ -256,6 +259,9 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE,
 # state-level final calibration 
 register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
                           likelihood.instructions = full.state.likelihood.instructions.half.weight,
+                          special.case.likelihood.instructions = list(
+                              SC = full.state.overweighted.prev.vs.new.likelihood.instructions.half.weight
+                          ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = CALIBRATION.END.YEAR, 
                           parameter.names = EHE.PARAMETERS.PRIOR@var.names, 

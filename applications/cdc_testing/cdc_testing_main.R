@@ -9,7 +9,9 @@ source('applications/cdc_testing/cdc_testing_interventions.R')
 N.SIMS = 1000
 N.CHUNKS = 1
 
-CDC.TESTING.LOCATIONS = c('AL','CA','FL','GA','IL','LA','MO','MS','NY','TX','WI')
+CDC.TESTING.LOCATIONS = c('AL','CA','FL','GA','IL','LA','MO','MS','NY','TX','WI',
+                          'AZ','MD','OH','WA')
+CDC.TESTING.EXTRA.LOCATIONS = c('AR','AZ','CO','KY','MD','OK','OH','PA','SC','TN','WA')
 CDC.TESTING.INTERVENTION.CODES = c('noint', 'cdct.end', 'cdct.pintr', 'cdct.bintr')
 CALIBRATION.CODE = 'final.ehe.state'
 VERBOSE = T

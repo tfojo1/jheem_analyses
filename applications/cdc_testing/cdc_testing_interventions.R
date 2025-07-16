@@ -38,7 +38,7 @@ cdc.testing.cessation = create.intervention(WHOLE.POPULATION,
 
 #Return 2027
 
-cdc.testing.brief.interruption.effect = create.intervention.effect(quantity.name = "cdc.funded.testing.of.undiagnosed",
+cdc.testing.brief.interruption.effect = create.intervention.effect(quantity.name = "cdc.effect",
                                                           start.time = CDC.TESTING.START.YEAR,
                                                           effect.values = c(0,0),
                                                           times = c(CDC.TESTING.START.YEAR + CDC.TESTING.LOSS.LAG, CDC.TESTING.EARLY.END.YEAR),
@@ -57,7 +57,7 @@ cdc.testing.cessation.brief.interruption = create.intervention(WHOLE.POPULATION,
 
 #Return 2029 
 
-cdc.testing.prolonged.interruption.effect = create.intervention.effect(quantity.name = "cdc.funded.testing.of.undiagnosed",
+cdc.testing.prolonged.interruption.effect = create.intervention.effect(quantity.name = "cdc.effect",
                                                                    start.time = CDC.TESTING.START.YEAR,
                                                                    effect.values = c(0,0),
                                                                    times = c(CDC.TESTING.START.YEAR + CDC.TESTING.LOSS.LAG, CDC.TESTING.LATE.END.YEAR),

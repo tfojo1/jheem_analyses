@@ -1,10 +1,9 @@
 
-LOCATIONS = LOCATION
+#LOCATIONS = LOCATION
 print(paste0("Running interventions for locations: ", paste0(LOCATIONS, collapse=', ')))
 
 
 source("applications/cdc_testing/cdc_testing_main.R")
-
 
 
 coll = create.simset.collection('cdct', 
@@ -13,4 +12,4 @@ coll = create.simset.collection('cdct',
                                 interventions = CDC.TESTING.INTERVENTION.CODES,
                                 n.sim = N.SIMS)
 
-coll$run(start.year=2025, end.year=2035, verbose = T, overwrite.prior = F, stop.for.errors = T)
+coll$run(start.year=2025, keep.from.year = 2024, end.year=2035, verbose = T, overwrite.prior = T, stop.for.errors = T)

@@ -1,5 +1,5 @@
 
-LOCATIONS = LOCATION
+LOCATIONS = c("OH")
 print(paste0("Running locations: ", paste0(LOCATIONS, collapse=', ')))
 
 

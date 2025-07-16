@@ -2541,6 +2541,24 @@ trans.state.halfx.likelihood.instructions =
                                  additional.weights = 0.5
                                  
     )
+
+trans.state.overweighted.prevalence.likelihood.instructions = 
+    join.likelihood.instructions(race.risk.halfx.cv.new.diagnoses.likelihood.instructions.state,
+                                 race.risk.halfx.cv.prevalence.likelihood.instructions.state,
+                                 total.new.diagnoses.10x.cv.likelihood.instructions.state,
+                                 join.likelihood.instructions(total.prevalence.10x.cv.instructions.state, additional.weights = 4),
+                                 #race.risk.suppression.basic.likelihood.instructions.state,
+                                 non.age.aids.diagnoses.16x.likelihood.instructions.state,
+                                 population.likelihood.instructions.trans,
+                                 heroin.basic.likelihood.instructions.state,
+                                 cocaine.basic.likelihood.instructions.state,
+                                 biased.hiv.mortality.likelihood.instructions.full,
+                                 future.new.incidence.change.likelihood.instructions,
+                                 idu.active.prior.ratio.likelihood.instructions,
+                                 proportion.msm.likelihood.instructions
+                                 
+    )
+
     
 # For backward compatibility in registration
 trans.state.likelihood.instructions.2 = trans.state.likelihood.instructions
@@ -2652,6 +2670,67 @@ full.state.likelihood.instructions = join.likelihood.instructions(
     proportion.msm.likelihood.instructions
 )
 
+full.state.overweighted.prev.vs.new.likelihood.instructions = join.likelihood.instructions(
+    # POPULATION LIKELIHOODS
+    # join.likelihood.instructions(
+    #     population.likelihood.instructions.full, 
+    #     additional.weights = 1/16),
+    # 
+    # join.likelihood.instructions(
+    #     immigration.likelihood.instructions.full, 
+    #     emigration.likelihood.instructions.full,
+    #     additional.weights = 1/4),
+    
+    population.likelihood.instructions.full,
+    immigration.likelihood.instructions.full,
+    emigration.likelihood.instructions.full,
+    
+    # TRANSMISSION LIKELIHOODS
+    join.likelihood.instructions(
+        total.new.diagnoses.84x.cv.likelihood.instructions.state,
+        new.diagnoses.halfx.cv.likelihood.instructions.state,
+        additional.weights = 1/4),
+    
+    join.likelihood.instructions(
+        total.prevalence.84x.cv.likelihood.instructions.state,
+        prevalence.halfx.cv.likelihood.instructions.state,
+        additional.weights = 4),
+    
+    # MORTALITY LIKELIHOODS
+    biased.hiv.mortality.likelihood.instructions.full,
+    general.mortality.likelihood.instructions.full,
+    
+    # AIDS DIAGNOSES LIKELIHOOD
+    non.age.aids.diagnoses.16x.likelihood.instructions.state,
+    # state.aids.diagnoses.proportions.instructions,
+    
+    # CONTINUUM LIKELIHOODS
+    proportion.tested.basic.likelihood.instructions,
+    hiv.test.positivity.basic.likelihood.instructions, 
+    awareness.basic.likelihood.instructions,
+    suppression.basic.likelihood.instructions.state,
+    
+    # PREP LIKELIHOODS
+    prep.uptake.likelihood.instructions,
+    prep.indications.likelihood.instructions,
+    
+    # IDU LIKELIHOODS
+    heroin.basic.likelihood.instructions.state,
+    cocaine.basic.likelihood.instructions.state,
+    idu.active.prior.ratio.likelihood.instructions,
+    
+    # COVID LIKELIHOODS
+    number.of.tests.year.on.year.change.likelihood.instructions,
+    gonorrhea.year.on.year.change.likelihood.instructions,
+    ps.syphilis.year.on.year.change.likelihood.instructions,
+    
+    # FUTURE INCIDENCE PENALTY
+    future.new.incidence.change.likelihood.instructions,
+    
+    # PROPORTION MSM
+    proportion.msm.likelihood.instructions
+)
+
 # For backward compatibility for now
 full.state.weighted.likelihood.instructions.2 = full.state.likelihood.instructions
 
@@ -2659,6 +2738,10 @@ full.state.likelihood.instructions.half.weight = join.likelihood.instructions(
     full.state.likelihood.instructions, 
     additional.weights = 1/2)
 
+full.state.overweighted.prev.vs.new.likelihood.instructions.half.weight = join.likelihood.instructions(
+    full.state.overweighted.prev.vs.new.likelihood.instructions,
+    additional.weights = 1/2
+)
 
 FULL.likelihood.instructions.8x.new.prev = join.likelihood.instructions(
   # POPULATION LIKELIHOODS

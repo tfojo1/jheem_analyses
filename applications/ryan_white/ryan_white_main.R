@@ -23,8 +23,13 @@ if (!RW.IS.STATE.LEVEL)
 RW.LOCATION.DESCRIPTOR = ifelse(RW.IS.STATE.LEVEL, 'State', "City")
 RW.LOCATION.DESCRIPTOR.PLURAL = ifelse(RW.IS.STATE.LEVEL, 'States', "Cities")
 
-RW.ROOT.PLOT.DIR = "../../Ryan White/manuscript/annals revision 1/figures"
-    #"../../results/ryan_white/"
+if (RW.IS.STATE.LEVEL)
+    RW.ROOT.PLOT.DIR = "../../results/ryan_white"
+if (!RW.IS.STATE.LEVEL)
+    RW.ROOT.PLOT.DIR = "../../Ryan White/manuscript/annals revision 1/figures"
+
+if (!dir.exists(RW.ROOT.PLOT.DIR))
+    dir.create(RW.ROOT.PLOT.DIR)
 
 # Run settings
 VERBOSE = T

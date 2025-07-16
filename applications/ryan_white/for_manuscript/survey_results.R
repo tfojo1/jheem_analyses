@@ -364,3 +364,10 @@ legend = cowplot::get_plot_component(plot, 'guide-box-bottom', return_all = TRUE
 ggsave(plot = legend, 
        filename=file.path(PLOT.DIR, "Figure_1_legend.png"),
        height = 0.25, width = 4.1, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+
+# Quick summary of adjusted results
+flattened.expansion = cbind(adjusted.RW.effect.values[1:3,], adjusted.RW.effect.values[4:6,])
+round(100*cbind(rowMeans(flattened.expansion),
+                apply(flattened.expansion, 1, quantile, probs=0.25),
+                apply(flattened.expansion, 1, quantile, probs=0.75)))

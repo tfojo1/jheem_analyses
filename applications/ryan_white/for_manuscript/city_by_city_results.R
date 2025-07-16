@@ -1,11 +1,25 @@
+DO.FOR.CONSERVATIVE.ANALYSIS = T
+
 YEARS.TO.CONSIDER = as.character(2025:2030)
-PLOT.DIR = file.path(RW.ROOT.PLOT.DIR, paste0('shaded_table_boxplot_', tolower(RW.LOCATION.DESCRIPTOR)))
+PLOT.DIR = file.path(RW.ROOT.PLOT.DIR, paste0('shaded_table_boxplot_', tolower(RW.LOCATION.DESCRIPTOR), 
+                                              ifelse(DO.FOR.CONSERVATIVE.ANALYSIS, '_conservative', '')))
 
 total.infections.continue.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 
 
+END.NAME = 'rw.end'
+P.INTR.NAME = 'rw.p.intr'
+B.INTR.NAME = 'rw.b.intr'
+
+if (DO.FOR.CONSERVATIVE.ANALYSIS)
+{
+    END.NAME = 'rw.end.cons'
+    P.INTR.NAME = 'rw.p.intr.cons'
+    B.INTR.NAME = 'rw.b.intr.cons'
+}
+
 # End vs Continue
-abs.total.infections.averted.end.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.end',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+abs.total.infections.averted.end.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,END.NAME,drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 rel.total.infections.averted.end.by.city = abs.total.infections.averted.end.by.city  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 mean.ci.rel.total.infections.averted.end.by.city = cbind(
   mean = apply(rel.total.infections.averted.end.by.city, 'location', mean),
@@ -98,7 +112,7 @@ mean.ci.total.infections.continue.by.city = rbind(
 
 # Brief Interruption vs Continue
 
-abs.total.infections.averted.b.intr.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.b.intr',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+abs.total.infections.averted.b.intr.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,B.INTR.NAME,drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 rel.total.infections.averted.b.intr.by.city = abs.total.infections.averted.b.intr.by.city  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 mean.ci.rel.total.infections.averted.b.intr.by.city = cbind(
   mean = apply(rel.total.infections.averted.b.intr.by.city, 'location', mean),
@@ -159,7 +173,7 @@ mean.ci.abs.total.infections.averted.b.intr.by.city = rbind(
 
 # Prolonged Interruption vs Continue
 
-abs.total.infections.averted.p.intr.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,'rw.p.intr',drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+abs.total.infections.averted.p.intr.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,P.INTR.NAME,drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 rel.total.infections.averted.p.intr.by.city = abs.total.infections.averted.p.intr.by.city  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
 mean.ci.rel.total.infections.averted.p.intr.by.city = cbind(
   mean = apply(rel.total.infections.averted.p.intr.by.city, 'location', mean),
@@ -243,21 +257,21 @@ table.city = data.frame(
                                        round(100*mean.ci.rel.total.infections.averted.end.by.city[,2]), "-",
                                        round(100*mean.ci.rel.total.infections.averted.end.by.city[,3]), "%]"),
     
-    excess.infections.b.intr = paste0(format(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,1]), big.mark = ','),
-                                   " [", format(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,2]), big.mark = ','),
-                                   "-", format(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,3]), big.mark = ','),
-                                   "]"),
-    rel.excess.infections.b.intr = paste0(round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,1]), "% [",
-                                       round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,2]), "-",
-                                       round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,3]), "%]"),
-    
     excess.infections.p.intr = paste0(format(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,1]), big.mark = ','),
                                       "[", format(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,2]), big.mark = ','),
                                       "-", format(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,3]), big.mark = ','),
                                       "]"),
     rel.excess.infections.p.intr = paste0(round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,1]), "% [",
                                           round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,2]), "-",
-                                          round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,3]), "%]")
+                                          round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,3]), "%]"),
+    
+    excess.infections.b.intr = paste0(format(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,1]), big.mark = ','),
+                                   " [", format(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,2]), big.mark = ','),
+                                   "-", format(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,3]), big.mark = ','),
+                                   "]"),
+    rel.excess.infections.b.intr = paste0(round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,1]), "% [",
+                                       round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,2]), "-",
+                                       round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,3]), "%]")
 )
 
 # Make table
@@ -290,22 +304,22 @@ table.city = data.frame(
                                                 round(100*mean.ci.rel.total.infections.averted.end.by.city[,3]), "%]")),
   
   
+  excess.infections.p.intr = interleave(format(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,1]), big.mark = ','),
+                                        paste0("[", sapply(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,2]), format, big.mark = ','),
+                                               "-", sapply(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,3]), format, big.mark = ','),
+                                               "]")),
+  rel.excess.infections.p.intr = interleave(paste0(round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,1]), "%"),
+                                            paste0("[",round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,2]), "-",
+                                                   round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,3]), "%]")),
+  
+  
   excess.infections.b.intr = interleave(format(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,1]), big.mark = ','),
                                      paste0("[", sapply(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,2]), format, big.mark = ','),
                                             "-", sapply(round(mean.ci.abs.total.infections.averted.b.intr.by.city[,3]), format, big.mark = ','),
                                             "]")),
   rel.excess.infections.b.intr = interleave(paste0(round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,1]), "%"),
                                          paste0("[",round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,2]), "-",
-                                                round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,3]), "%]")),
-  
-  
-  excess.infections.p.intr = interleave(format(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,1]), big.mark = ','),
-                                     paste0("[", sapply(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,2]), format, big.mark = ','),
-                                            "-", sapply(round(mean.ci.abs.total.infections.averted.p.intr.by.city[,3]), format, big.mark = ','),
-                                            "]")),
-  rel.excess.infections.p.intr = interleave(paste0(round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,1]), "%"),
-                                         paste0("[",round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,2]), "-",
-                                                round(100*mean.ci.rel.total.infections.averted.p.intr.by.city[,3]), "%]"))
+                                                round(100*mean.ci.rel.total.infections.averted.b.intr.by.city[,3]), "%]"))
 )
 
 
