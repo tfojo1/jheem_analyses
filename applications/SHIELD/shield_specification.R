@@ -1873,6 +1873,24 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well
 )
 
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'proportion.births.congenital',
+                         value = 'diagnosis.congenital',
+                         value.is.numerator = T,
+                         denominator.outcome = 'births.from',
+                         keep.dimensions = 'location',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Congenital Syphilis Diagnosis in the Past Year',
+                                                                    description = 'Proportion of Congenital Syphilis Diagnosis in the Past Year',
+                                                                    scale = 'proportion',
+                                                                    axis.name = 'proportion',
+                                                                    units = 'percent',
+                                                                    singular.unit = 'percent')
+                         
+                         
+                         
+                         
+)
+
 ##---- Prenatal.care.coverage.by trimester ---- 
 track.integrated.outcome(SHIELD.SPECIFICATION,
                          name = 'prp.prenatal.care.first.trimester',
