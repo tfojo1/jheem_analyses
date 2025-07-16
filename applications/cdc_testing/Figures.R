@@ -11,9 +11,11 @@ library(ggrepel)
 library(purrr)
 library(ggforce)
 library(tidytext)
+library(forcats)
+
 #load simulation set
 
-load('/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/cdc_testing_results_2025-06-19.Rdata')
+load('/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/cdc_testing_results_2025-07-13.Rdata')
 
 #stratified
 dimnames(full.incidence)
@@ -197,7 +199,6 @@ ggplot(excess_data.cdct.bintr, aes(x = year, y = excess_mean)) +
 
 #State by state relative incidence Box Plots
 
-
 # List of interventions to include
 interventions <- c("cdct.end", "cdct.pintr", "cdct.bintr")
 
@@ -242,6 +243,14 @@ plot_data <- do.call(rbind, plot_data_list)
 # Remove trailing dots in state names
 plot_data$state <- gsub("\\.*$", "", plot_data$state)
 
+# OPTIONAL: Convert state abbreviations to full names (except "Total")
+state_lookup <- setNames(state.name, state.abb)
+plot_data$state <- ifelse(
+    plot_data$state %in% names(state_lookup),
+    state_lookup[plot_data$state],
+    plot_data$state
+)
+
 # Sort states by mean relative incidence of 'cdct.end' (excluding "Total")
 sorted_states <- plot_data %>%
     filter(intervention == "cdct.end", state != "Total") %>%
@@ -253,28 +262,58 @@ sorted_states <- plot_data %>%
 # Set factor levels with "Total" at the top
 plot_data$state <- factor(plot_data$state, levels = c("Total", sorted_states))
 
-# Set factor order for interventions
-plot_data$intervention <- factor(plot_data$intervention, levels = c("cdct.bintr", "cdct.pintr", "cdct.end"))
+# Set factor order for interventions with descriptive labels
+plot_data$intervention <- factor(
+    plot_data$intervention,
+    levels = c("cdct.end", "cdct.pintr", "cdct.bintr"),
+    labels = c("Cessation", "Prolonged Interruption", "Brief Interruption")
+)
 
-# Plot
-ggplot(plot_data, aes(x = relative_incidence, y = state, fill = intervention)) +
-    geom_boxplot(position = position_dodge(width = 0.8), outlier.shape = NA) +
-    scale_x_continuous(labels = scales::percent_format(scale = 1)) +
+# Flag outliers above 40%
+plot_data$relative_incidence_capped <- ifelse(
+    plot_data$relative_incidence > 40,
+    40,
+    plot_data$relative_incidence
+)
+plot_data$asterisk <- plot_data$relative_incidence > 40
+
+# --- Plot ---
+
+ggplot(plot_data, aes(x = relative_incidence_capped, y = state, fill = intervention)) +
+    geom_boxplot(
+        position = position_dodge(width = 0.8),
+        outlier.shape = NA
+    ) +
+    geom_text(
+        data = subset(plot_data, asterisk),
+        aes(label = "*"),
+        x = 40.5,  # just past truncation
+        size = 5,
+        hjust = 0
+    ) +
+    scale_x_continuous(
+        labels = function(x) paste0(x, "%"),
+        limits = c(0, 45),
+        expand = expansion(mult = c(0, 0.1))  # give space for asterisk
+    ) +
     scale_fill_manual(
         values = c(
-            "cdct.bintr" = "#00A1D5",
-            "cdct.pintr" = "#DF8F44",
-            "cdct.end"   = "#374E55"
+            "Cessation" = "#374E55",
+            "Prolonged Interruption" = "#DF8F44",
+            "Brief Interruption" = "#00A1D5"
         )
     ) +
     labs(
-        title = "Relative Incidence by State and Intervention (2025–2030)",
-        x = "Relative Incidence (%)",
-        y = "State",
-        fill = "Intervention"
+        x = "Relative Excess HIV Infections from 2025–2030",
+        y = NULL,
+        fill = NULL
     ) +
-    theme_minimal()
-
+    theme_minimal(base_size = 14) +
+    theme(
+        legend.position = "bottom",
+        legend.text = element_text(size = 14),
+        axis.text = element_text(size = 13)
+    )
 
 #Texas Plots, LA Plots, IL Plots
 # Subset and label TX
@@ -311,58 +350,113 @@ il_bintr$intervention <- "Brief Interruption"
 combined <- rbind(tx_end, tx_pintr, tx_bintr,
                   la_end, la_pintr, la_bintr,
                   il_end, il_pintr, il_bintr)
-
+# Factor levels
 combined$intervention <- factor(combined$intervention,
                                 levels = c("Brief Interruption", "Prolonged Interruption", "CDC Testing Cessation"))
+combined$scenario <- factor(combined$scenario,
+                            levels = c("noint", "cdct.bintr", "cdct.pintr", "cdct.end"))
+combined$state <- factor(combined$state, levels = c("IL", "TX", "LA"))
 
-combined$scenario <- factor(
-    combined$scenario,
-    levels = c("noint", "cdct.bintr", "cdct.pintr", "cdct.end")
-)
-
-combined$state <- factor(combined$state, levels = c("IL", "TX", "LA"))  # desired facet order
-
-# Custom colors
+# Colors
 jama_colors <- c(
-    "noint"      = "purple",
-    "cdct.bintr" = "#00A1D5",
-    "cdct.pintr" = "#DF8F44",
-    "cdct.end"   = "#374E55"
+    "noint" = "#1b7837",      # Continuation (green)
+    "cdct.bintr" = "#00A1D5", # Brief Interruption (blue)
+    "cdct.pintr" = "#DF8F44", # Prolonged Interruption (orange)
+    "cdct.end" = "#374E55"    # Cessation (dark gray)
 )
 
+# Intervention year markers
 vline_data <- data.frame(
     intervention = c("Brief Interruption", "Prolonged Interruption"),
     year = c(2027, 2029)
 )
 
-# Plot
-p <- ggplot(combined, aes(x = year, y = mean, color = scenario, fill = scenario)) +
-    geom_line(size = 1) +
-    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, color = NA) +
-    facet_grid(state ~ intervention)+  
-    scale_x_continuous(breaks = 2025:2035) +
-    scale_y_continuous(limits = c(0, 6500)) +
-    scale_color_manual(values = jama_colors) +
-    scale_fill_manual(values = jama_colors) +
-    labs(
-        title = "Excess HIV Incidence Across States and Interventions",
-        x = "Year",
-        y = "Incidence",
-        color = "Scenario",
-        fill = "Scenario"
-    ) +
-    theme_minimal() +
-    geom_vline(
-        data = vline_data,
-        aes(xintercept = year),
-        linetype = "dashed",
-        color = "red",
-        inherit.aes = FALSE
+# Y-axis limits by state
+y_max_by_state <- list(
+    IL = 2000,
+    TX = 6000,
+    LA = 3500
+)
+
+# Annotation text
+annotations <- data.frame(
+    state = rep(c("IL", "TX", "LA"), each = 3),
+    intervention = rep(c("CDC Testing Cessation", "Prolonged Interruption", "Brief Interruption"), 3),
+    year = c(2032, 2031, 2030, 2032, 2031, 2030, 2032, 2031, 2030),
+    value = c(900, 800, 700, 3000, 2500, 2000, 1800, 1500, 1200),
+    label = c(
+        "178 (64–324)", "153 (55–278)", "78 (28–140)",             # IL
+        "2304 (835–4120)", "1868 (693–3305)", "838 (328–1424)",    # TX
+        "1388 (429–2823)", "1082 (349–2138)", "432 (155–780)"      # LA
     )
+)
 
-print(p)
+# Output folder
+dir.create("individual_panels", showWarnings = FALSE)
 
+# Split and plot
+plot_data_list <- split(combined, list(combined$state, combined$intervention), drop = TRUE)
 
+for (name in names(plot_data_list)) {
+    df <- plot_data_list[[name]]
+    
+    this_state <- as.character(unique(df$state))
+    this_intervention <- as.character(unique(df$intervention))
+    ymax <- y_max_by_state[[this_state]]
+    
+    ann <- annotations %>%
+        filter(state == this_state, intervention == this_intervention)
+    
+    vline <- vline_data %>%
+        filter(intervention == this_intervention)
+    
+    p <- ggplot(df, aes(x = year, y = mean, color = scenario, fill = scenario)) +
+        geom_line(size = 1.2) +
+        geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, color = NA) +
+        geom_vline(data = vline, aes(xintercept = year), linetype = "dashed", color = "red") +
+        geom_text_repel(data = ann,
+                        aes(x = year, y = value, label = paste(label, "excess infections")),
+                        inherit.aes = FALSE,
+                        nudge_y = 300,
+                        size = 5,
+                        box.padding = 0.5,
+                        point.padding = 0.5,
+                        segment.color = "gray30",
+                        max.overlaps = 10) +
+        scale_x_continuous(breaks = 2025:2035) +
+        scale_y_continuous(limits = c(0, ymax)) +
+        scale_color_manual(values = jama_colors,
+                           labels = c("Continuation", "Brief Interruption", "Prolonged Interruption", "Cessation")) +
+        scale_fill_manual(values = jama_colors,
+                          labels = c("Continuation", "Brief Interruption", "Prolonged Interruption", "Cessation")) +
+        labs(
+            title = paste(this_state, "-", this_intervention),
+            x = "Year",
+            y = "Incidence"
+        ) +
+        theme_bw(base_size = 18) +
+        theme(
+            panel.grid.major = element_line(color = "black", size = 0.2),
+            panel.grid.minor = element_line(color = "black", size = 0.1),
+            legend.position = "bottom",
+            legend.title = element_blank(),
+            legend.text = element_text(size = 14),
+            legend.direction = "horizontal",
+            plot.title = element_text(face = "bold")
+        ) +
+        guides(
+            color = guide_legend(nrow = 1),
+            fill = guide_legend(nrow = 1)
+        )
+    
+    ggsave(
+        filename = paste0("individual_panels/", gsub(" ", "_", paste(this_state, this_intervention)), ".png"),
+        plot = p,
+        width = 7,
+        height = 6,
+        dpi = 300
+    )
+}
 #Lolliplot sensitivity 
 
 int <- "cdct.end"
@@ -645,79 +739,71 @@ heatmap_data <- bind_rows(heatmap_data_main, heatmap_data_total) %>%
 
 #Scatter plot Fraction CDC HIV Testing
     
-    #Metric of urbancity from 2020 US census
+
+    # Load or define urbanicity metric (preprocessed)
     urbanicity <- read.csv("/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/urbanicity.csv", header = TRUE)
-    urbanicity<- urbanicity[,-1]
-    
-    urbanicity_numeric <- as.data.frame(
-        lapply(urbanicity, function(col) as.numeric(gsub(",", "", col)))
-    )
-    
-    urbanicity_numeric[4,] <- urbanicity_numeric[2,]/urbanicity_numeric[1,]
-    
-    urban_metric <- urbanicity_numeric[4, c("Alabama","California","Florida","Georgia",
-                                            "Illinois","Louisiana","Missouri",
-                                            "Mississippi","New.York","Texas","Wisconsin")]
-    
-    save(urban_metric, file = "urban_metric.RData")
-    
+    urbanicity <- urbanicity[, -1]
+    urbanicity_numeric <- as.data.frame(lapply(urbanicity, function(col) as.numeric(gsub(",", "", col))))
+    urbanicity_numeric[4, ] <- urbanicity_numeric[2, ] / urbanicity_numeric[1, ]
+    urban_metric <- urbanicity_numeric[4, c("Alabama", "California", "Florida", "Georgia",
+                                            "Illinois", "Louisiana", "Missouri", "Mississippi",
+                                            "New.York", "Texas", "Wisconsin")]
     colnames(urban_metric) <- NULL
     rownames(urban_metric) <- NULL
     
-    
+    # Prepare the data for plotting
     intervention <- "cdct.end"
-    # Loop through interventions and states to collect results
+    cdc_effect_scatter_data_list_cdct.end <- list()
+    
     for (a in 1:length(states)) {
         ri <- (colSums(total.results[as.character(2025:2030), , "incidence", states[a], intervention]) -
                    colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])) /
             colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
         
-        HIV.tests <- mean(total.results[as.character(2025),,"cdc.funded.tests",states[a],intervention]/total.results[as.character(2025),,"total.hiv.tests",states[a],intervention])
-        HIV.suppression <- mean(total.results[as.character(2025),,"suppression",states[a],intervention]/total.results[as.character(2025),,"diagnosed.prevalence",states[a],intervention])
-        HIV.transmission <- mean(total.results[as.character(2025),,"new",states[a],intervention]/total.results[as.character(2025),,"diagnosed.prevalence",states[a],intervention])
-        HIV.diagnoses <- mean(total.results[as.character(2025),,"total.cdc.hiv.test.positivity",states[a],intervention]/total.results[as.character(2025),,"new",states[a],intervention])
-        incidence <- mean(total.results[as.character(2025),,"incidence",states[a],intervention])
-        
+        HIV.tests <- mean(total.results["2025", , "cdc.funded.tests", states[a], intervention] /
+                              total.results["2025", , "total.hiv.tests", states[a], intervention])
+        HIV.suppression <- mean(total.results["2025", , "suppression", states[a], intervention] /
+                                    total.results["2025", , "diagnosed.prevalence", states[a], intervention])
+        HIV.transmission <- mean(total.results["2025", , "new", states[a], intervention] /
+                                     total.results["2025", , "diagnosed.prevalence", states[a], intervention])
+        HIV.diagnoses <- mean(total.results["2025", , "total.cdc.hiv.test.positivity", states[a], intervention] /
+                                  total.results["2025", , "new", states[a], intervention])
+        incidence <- mean(total.results["2025", , "incidence", states[a], intervention])
         
         temp_df <- data.frame(
             state = states[a],
             intervention = intervention,
-            relative_incidence = mean(ri*100),
+            relative_incidence = mean(ri * 100),
             cdc.effect.test = HIV.tests,
             cdc.effect.supp = HIV.suppression,
             cdc.effect.transmission = HIV.transmission, 
             cdc.effect.diagnoses = HIV.diagnoses,
             total.incidence = incidence,
             urban = urban_metric[a]
-            
         )
+        
         cdc_effect_scatter_data_list_cdct.end[[a]] <- temp_df
     }
     
-    scatter_plot.cdct.end <- do.call(rbind, cdc_effect_scatter_data_list_cdct.end)
+    scatter_df <- do.call(rbind, cdc_effect_scatter_data_list_cdct.end)
     
-    # Keep only cdct.end data
-    scatter_df <- scatter_plot.cdct.end
-    
-    # Pivot to long format for x-axis effects
+    # Pivot to long format for plotting
     scatter_long <- scatter_df %>%
         pivot_longer(
             cols = c(cdc.effect.test, cdc.effect.supp, cdc.effect.transmission, cdc.effect.diagnoses),
             names_to = "EffectType",
             values_to = "EffectValue"
-        )
+        ) %>%
+        mutate(EffectType = recode(EffectType,
+                                   "cdc.effect.test" = "CDC HIV Tests",
+                                   "cdc.effect.supp" = "Viral Suppression",
+                                   "cdc.effect.transmission" = "Transmission Rate",
+                                   "cdc.effect.diagnoses" = "CDC Diagnoses"
+        ))
     
-    # Rename facets for clarity
-    scatter_long$EffectType <- recode(scatter_long$EffectType,
-                                      "cdc.effect.test" = "CDC HIV Tests",
-                                      "cdc.effect.supp" = "Viral Suppression",
-                                      "cdc.effect.transmission" = "Transmission Rate",
-                                      "cdc.effect.diagnoses" = "CDC Diagnoses")
-    
-    #Calculate PRCC
-    
+    # PRCC calculations
     pcor_data <- scatter_df %>%
-        dplyr::select(
+        select(
             relative_incidence,
             cdc.effect.test,
             cdc.effect.supp,
@@ -727,13 +813,11 @@ heatmap_data <- bind_rows(heatmap_data_main, heatmap_data_total) %>%
             total.incidence
         )
     
-    
     pcor_results <- pcor(pcor_data, method = "spearman")$estimate["relative_incidence", -1]
     
-    
-    prcc_df <- tibble::tibble(
+    prcc_df <- tibble(
         EffectType = c("cdc.effect.test", "cdc.effect.supp", "cdc.effect.transmission", "cdc.effect.diagnoses"),
-        PRCC = round(as.numeric(pcor_results[1:4]),3)
+        PRCC = round(as.numeric(pcor_results[1:4]), 3)
     ) %>%
         mutate(
             EffectType = recode(EffectType,
@@ -743,38 +827,78 @@ heatmap_data <- bind_rows(heatmap_data_main, heatmap_data_total) %>%
                                 "cdc.effect.diagnoses" = "CDC Diagnoses"
             ),
             label = paste0("Correlation = ", PRCC),
-            x = -Inf,  
-            y = Inf    
+            x = -Inf,
+            y = Inf
         )
     
+    # Define custom x-axis titles
+    x_labels <- c(
+        "CDC Diagnoses" = "Proportion of HIV Diagnoses Made with CDC-Funded Tests in 2025",
+        "CDC HIV Tests" = "Proportion of HIV Tests Funded by the CDC in 2025",
+        "Transmission Rate" = "Average Transmission Rate in 2025",
+        "Viral Suppression" = "Proportion of All HIV+ Residents Virally Suppressed in 2025"
+    )
     
-    
-    # Plot
-    ggplot(scatter_long, aes(x = EffectValue, y = relative_incidence, label = state)) +
-        geom_point(aes(size = total.incidence, color = urban), alpha = 0.8) +
-        geom_text_repel(size = 3, max.overlaps = 100) +
-        facet_wrap(~ EffectType, scales = "free_x") +
-        scale_size_continuous(name = "Total Incidence") +
-        scale_color_gradient(name = "% Urban Population", low = "yellow", high = "red") +
-        labs(
-            title = "Drivers of Relative Excess Incidence (Cessation Intervention)",
-            x = "CDC Effect Value",
-            y = "Relative Excess Incidence (%)"
-        ) +
-        theme_minimal(base_size = 12) +
-        theme(
-            panel.border = element_rect(color = "black", fill = NA),
-            strip.background = element_rect(color = "black", fill = "lightgray"),
-            strip.text = element_text(face = "bold")
-        ) + geom_text(
-            data = prcc_df,
-            mapping = aes(x = x, y = y, label = label),
-            hjust = -0.1, vjust = 1.3,
-            inherit.aes = FALSE,
-            size = 4, fontface = "italic"
+    # Create and save individual plots
+    for (effect in unique(scatter_long$EffectType)) {
+        temp_data <- scatter_long %>% filter(EffectType == effect)
+        temp_prcc <- prcc_df %>% filter(EffectType == effect)
+        
+        p <- ggplot(temp_data, aes(x = EffectValue, y = relative_incidence, label = state)) +
+            geom_point(aes(size = total.incidence, fill = urban), shape = 21, color = "black", alpha = 0.8) +
+            geom_text_repel(size = 4.5, max.overlaps = 100) +
+            geom_text(data = temp_prcc, aes(x = x, y = y, label = label),
+                      hjust = -0.1, vjust = 1.3, inherit.aes = FALSE,
+                      size = 5, fontface = "italic") +
+            labs(
+                x = x_labels[effect],
+                y = "Relative Excess Incidence (%)",
+                fill = "Urbanicity, 2020",
+                size = "Incidence, 2025"
+            ) +
+            guides(
+                fill = guide_colorbar(
+                    title.position = "top",
+                    barwidth = 10,
+                    barheight = 0.7,
+                    label.position = "bottom",
+                    ticks.colour = "black"
+                ),
+                size = guide_legend(
+                    title.position = "top",
+                    nrow = 1
+                )
+            ) +
+            scale_fill_gradient(labels = percent_format(accuracy = 1), low = "yellow", high = "red") +
+            scale_size_continuous(labels = comma) +
+            theme_bw(base_size = 16) +
+            theme(
+                legend.position = "bottom",
+                legend.direction = "horizontal",
+                legend.box = "vertical",
+                legend.title.align = 0.5,
+                legend.text = element_text(size = 12),
+                legend.title = element_text(size = 14),
+                axis.title.x = element_text(size = 10), 
+                axis.title.y = element_text(size = ), 
+                plot.margin = margin(t = 10, r = 10, b = 50, l = 10), 
+                panel.border = element_rect(color = "black", fill = NA),
+                strip.background = element_blank(),
+                strip.text = element_blank(),
+                plot.title = element_blank()
+            )
+        if (effect %in% c("CDC Diagnoses", "CDC HIV Tests", "Viral Suppression")) {
+            p <- p + scale_x_continuous(labels = percent_format(accuracy = 1))
+        }
+        
+        ggsave(
+            filename = paste0("scatter_", gsub(" ", "_", tolower(effect)), ".png"),
+            plot = p,
+            width = 6,
+            height = 5,
+            dpi = 300
         )
-    
-    
+    }
 #Urbancity vs RI 
     
     ggplot(scatter_df, aes(x = urban, y = relative_incidence, label = state)) +
@@ -885,45 +1009,62 @@ for (state_name in unique(plot_df$state)) {
 }
 
 #Additional Infections per Test Saved
-
-test_averted <- function(int,state){
+test_averted <- function(int, state) {
+    infections_noint <- colSums(total.results[as.character(2025:2030), , "incidence", state, "noint"])
+    infections_int <- colSums(total.results[as.character(2025:2030), , "incidence", state, int])
+    test_noint <- colSums(total.results[as.character(2025:2030), , "cdc.funded.tests", state, "noint"])
+    test_int <- colSums(total.results[as.character(2025:2030), , "cdc.funded.tests", state, int])
     
-    infections_noint <- mean(colSums(total.results[as.character(2025:2030),,"incidence",state,"noint"]))
-    infections_int <- mean(colSums(total.results[as.character(2025:2030),,"incidence",state,int]))
-    test_noint <- mean(colSums(total.results[as.character(2025:2030),,"total.hiv.tests",state,"noint"]))
-    test_int <- mean(colSums(total.results[as.character(2025:2030),,"total.hiv.tests",state,int]))
+    # Vector of estimates
+    tests_per_infection <- (test_noint - test_int) / (infections_int - infections_noint)
     
-    infections_per_test_saved <- (infections_int-infections_noint)/(test_noint-test_int)
-    return(infections_per_test_saved)
+    # Summary statistics
+    mean_val <- mean(tests_per_infection, na.rm = TRUE)
+    ci_lower <- quantile(tests_per_infection, 0.025, na.rm = TRUE)
+    ci_upper <- quantile(tests_per_infection, 0.975, na.rm = TRUE)
     
+    return(c(mean = mean_val, lower = ci_lower, upper = ci_upper))
 }
 
+# Define your interventions and states vectors first
+# interventions <- c("cdct.end", "cdct.pintr", "cdct.bintr")
+# states <- c("AL", "CA", "TX", ...)  # Your list of states
 
+# Build combinations
 combos <- expand.grid(int = interventions, state = states, stringsAsFactors = FALSE)
 
-combos$value <- mapply(test_averted, combos$int, combos$state)
+# Apply test_averted to all combinations
+results_matrix <- mapply(test_averted, combos$int, combos$state)
+
+# Combine results into the combos data frame
+combos <- cbind(combos, as.data.frame(t(results_matrix)))
 
 # Ensure intervention order is correct
 combos$int <- factor(combos$int, levels = c("cdct.end", "cdct.pintr", "cdct.bintr"))
 
-# Order states by decreasing infection-per-test-saved
+# Order states by decreasing mean value
 state_order <- combos %>%
     group_by(state) %>%
-    summarize(avg_value = mean(value, na.rm = TRUE)) %>%
+    summarize(avg_value = mean(mean, na.rm = TRUE)) %>%
     arrange(desc(avg_value)) %>%
     pull(state)
 
 combos$state <- factor(combos$state, levels = state_order)
 
-# Round values for labels
-combos$label <- round(combos$value, 2)
+# Round values to nearest whole number
+combos$mean <- round(combos$mean)
+combos$lower <- round(combos$lower)
+combos$upper <- round(combos$upper)
 
-# Plot
-ggplot(combos, aes(x = state, y = int, fill = value)) +
-    geom_tile(color = "white") +
+# Create label: "mean [lower, upper]"
+combos$label <- paste0(combos$mean, " [", combos$lower, ", ", combos$upper, "]")
+
+# Plot (no shading)
+ggplot(combos, aes(x = state, y = int)) +
+    geom_tile(fill = "white", color = "black") +
     geom_text(aes(label = label), size = 3, color = "black") +
-    scale_fill_gradient(low = "yellow", high = "red", name = "Infections / Test Saved") +
-    labs(x = "State", y = "Intervention", title = "Infections per Test Saved (2025–2030)") +
+    labs(x = "State", y = "Intervention",
+         title = "Tests per Infection Averted (2025–2030)") +
     theme_minimal() +
     theme(axis.text.x = element_text(angle = 45, hjust = 1),
           axis.text = element_text(size = 10),
@@ -970,3 +1111,98 @@ for (state in states) {
 
 #simplot(results,"total.cdc.hiv.test.positivity",dimension.values = list(year = 2010:2030))
 #simplot(results,"cdc.funded.tests",dimension.values = list(year = 2010:2030))
+
+#Dodged boxplots for proportion tested regardless
+
+# Define scenarios and years
+scenarios <- c("cdct.end", "cdct.pintr", "cdct.bintr")
+years <- as.character(2025:2030)
+
+# Define final scenario labels and matching JAMA colors
+scenario_labels <- c(
+    "cdct.end" = "Cessation",
+    "cdct.pintr" = "Prolonged Interruption",
+    "cdct.bintr" = "Brief Interruption"
+)
+
+jama_colors_labeled <- c(
+    "Cessation" = "#374E55",
+    "Prolonged Interruption" = "#DF8F44",
+    "Brief Interruption" = "#00A1D5"
+)
+
+# Create list to store boxplot data
+boxplot_data <- list()
+
+# Loop over states and scenarios
+for (state in states) {
+    # Get baseline incidence (noint)
+    baseline_incidence <- colSums(total.results[years, , "incidence", state, "noint"])
+    
+    # Get 1000 draws of proportion.tested.regardless for cdct.end
+    prop_vals <- all.parameters["proportion.tested.regardless", , state, "cdct.end"]
+    
+    # Robust quantile binning
+    quintiles <- quantile(prop_vals, probs = seq(0, 1, 0.2), na.rm = TRUE)
+    quintiles <- unique(quintiles)
+    
+    if (length(quintiles) > 1) {
+        quintile_labels <- paste0(
+            round(100 * head(quintiles, -1), 1), "%–",
+            round(100 * tail(quintiles, -1), 1), "%"
+        )
+        
+        prop_quintile <- cut(
+            prop_vals,
+            breaks = quintiles,
+            include.lowest = TRUE,
+            labels = quintile_labels
+        )
+    } else {
+        # If distribution is flat
+        prop_quintile <- factor(rep("Identical", length(prop_vals)))
+    }
+    
+    for (scenario in scenarios) {
+        scen_incidence <- colSums(total.results[years, , "incidence", state, scenario])
+        abs_excess <- scen_incidence - baseline_incidence
+        
+        temp_df <- data.frame(
+            excess_infections = abs_excess,
+            quintile = prop_quintile,
+            scenario = scenario,
+            state = state
+        )
+        
+        boxplot_data[[length(boxplot_data) + 1]] <- temp_df
+    }
+}
+
+# Combine all data
+plot_df <- do.call(rbind, boxplot_data)
+
+# Convert scenario codes to labeled factors
+plot_df$scenario <- factor(plot_df$scenario,
+                           levels = names(scenario_labels),
+                           labels = scenario_labels)
+
+# Final ggplot
+ggplot(plot_df, aes(x = excess_infections, y = fct_rev(quintile), fill = scenario)) +
+    geom_boxplot(position = position_dodge(width = 0.8), outlier.alpha = 0.2) +
+    scale_x_continuous(labels = comma) +
+    scale_fill_manual(values = jama_colors_labeled, name = "Intervention Scenario") +
+    labs(
+        x = "Absolute Excess Infections (2025–2030)",
+        y = "Proportion Tested Regardless (Quintile)"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.title = element_text(size = 13),
+        legend.text = element_text(size = 12),
+        panel.border = element_rect(color = "black", fill = NA),
+        axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.margin = margin(t = 10, r = 10, b = 40, l = 10)
+    )
