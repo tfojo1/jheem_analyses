@@ -163,7 +163,7 @@ tryCatch({
 
 # Save test result
 cat("\nSaving test result...\n")
-save(syphilis.manager, file="cached/syphilis.manager_with_total_RESTRATIFIED_TEST.rdata")
-cat("Saved to: cached/syphilis.manager_with_total_RESTRATIFIED_TEST.rdata\n")
+save(syphilis.manager, file="cached/syphilis.manager.rdata")
+cat("Saved to: cached/syphilis.manager.rdata\n")
 
 cat("\n=== TEST COMPLETED ===\n")

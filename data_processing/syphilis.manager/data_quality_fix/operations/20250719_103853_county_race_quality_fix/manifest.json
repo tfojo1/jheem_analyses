@@ -1,0 +1,14 @@
+{
+  "operation_id": "20250719_103853_county_race_quality_fix",
+  "operation_name": "county_race_quality_fix",
+  "description": "County race coverage < 90% threshold",
+  "created": "2025-07-19 10:38:53",
+  "status": "initialized",
+  "files": {
+    "summary": "summary.txt",
+    "removed_data": "removed_data.csv",
+    "metadata": "metadata.json",
+    "backup": "backup.rdata",
+    "operation_log": "operation_log.txt"
+  }
+}
