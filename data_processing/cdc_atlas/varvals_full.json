@@ -37983,55 +37983,55 @@
     },
     {
       "id": 674,
-      "name": "13–19",
+      "name": "13<U+2013>19",
       "sortid": 0,
       "vtid": 7
     },
     {
       "id": 675,
-      "name": "20–24",
+      "name": "20<U+2013>24",
       "sortid": 0,
       "vtid": 7
     },
     {
       "id": 676,
-      "name": "50–54",
+      "name": "50<U+2013>54",
       "sortid": 0,
       "vtid": 7
     },
     {
       "id": 677,
-      "name": "55–59",
+      "name": "55<U+2013>59",
       "sortid": 0,
       "vtid": 7
     },
     {
       "id": 678,
-      "name": "60–64",
+      "name": "60<U+2013>64",
       "sortid": 0,
       "vtid": 7
     },
     {
       "id": 679,
-      "name": "65–69",
+      "name": "65<U+2013>69",
       "sortid": 0,
       "vtid": 7
     },
     {
       "id": 680,
-      "name": "70–74",
+      "name": "70<U+2013>74",
       "sortid": 0,
       "vtid": 7
     },
     {
       "id": 681,
-      "name": "75–79",
+      "name": "75<U+2013>79",
       "sortid": 0,
       "vtid": 7
     },
     {
       "id": 682,
-      "name": "80–84",
+      "name": "80<U+2013>84",
       "sortid": 0,
       "vtid": 7
     },
@@ -38085,7 +38085,7 @@
     },
     {
       "id": 816,
-      "name": "Non-U.S.–born",
+      "name": "Non-U.S.<U+2013>born",
       "sortid": 2,
       "vtid": 8
     },
@@ -59128,7 +59128,7 @@
     },
     {
       "id": 6865,
-      "name": "Doña Ana County, NM",
+      "name": "Do<U+00F1>a Ana County, NM",
       "sortid": 35013,
       "vtid": 3,
       "parentid": 5032,
@@ -72637,7 +72637,7 @@
     },
     {
       "id": 8215,
-      "name": "Añasco Municipio, PR",
+      "name": "A<U+00F1>asco Municipio, PR",
       "sortid": 72011,
       "vtid": 3,
       "parentid": 5055,
@@ -72687,7 +72687,7 @@
     },
     {
       "id": 8220,
-      "name": "Bayamón Municipio, PR",
+      "name": "Bayam<U+00F3>n Municipio, PR",
       "sortid": 72021,
       "vtid": 3,
       "parentid": 5055,
@@ -72727,7 +72727,7 @@
     },
     {
       "id": 8224,
-      "name": "Canóvanas Municipio, PR",
+      "name": "Can<U+00F3>vanas Municipio, PR",
       "sortid": 72029,
       "vtid": 3,
       "parentid": 5055,
@@ -72747,7 +72747,7 @@
     },
     {
       "id": 8226,
-      "name": "Cataño Municipio, PR",
+      "name": "Cata<U+00F1>o Municipio, PR",
       "sortid": 72033,
       "vtid": 3,
       "parentid": 5055,
@@ -72807,7 +72807,7 @@
     },
     {
       "id": 8232,
-      "name": "Comerío Municipio, PR",
+      "name": "Comer<U+00ED>o Municipio, PR",
       "sortid": 72045,
       "vtid": 3,
       "parentid": 5055,
@@ -72867,7 +72867,7 @@
     },
     {
       "id": 8238,
-      "name": "Guánica Municipio, PR",
+      "name": "Gu<U+00E1>nica Municipio, PR",
       "sortid": 72055,
       "vtid": 3,
       "parentid": 5055,
@@ -72967,7 +72967,7 @@
     },
     {
       "id": 8248,
-      "name": "Juana Díaz Municipio, PR",
+      "name": "Juana D<U+00ED>az Municipio, PR",
       "sortid": 72075,
       "vtid": 3,
       "parentid": 5055,
@@ -73007,7 +73007,7 @@
     },
     {
       "id": 8252,
-      "name": "Las Marías Municipio, PR",
+      "name": "Las Mar<U+00ED>as Municipio, PR",
       "sortid": 72083,
       "vtid": 3,
       "parentid": 5055,
@@ -73027,7 +73027,7 @@
     },
     {
       "id": 8254,
-      "name": "Loíza Municipio, PR",
+      "name": "Lo<U+00ED>za Municipio, PR",
       "sortid": 72087,
       "vtid": 3,
       "parentid": 5055,
@@ -73047,7 +73047,7 @@
     },
     {
       "id": 8256,
-      "name": "Manatí Municipio, PR",
+      "name": "Manat<U+00ED> Municipio, PR",
       "sortid": 72091,
       "vtid": 3,
       "parentid": 5055,
@@ -73077,7 +73077,7 @@
     },
     {
       "id": 8259,
-      "name": "Mayagüez Municipio, PR",
+      "name": "Mayag<U+00FC>ez Municipio, PR",
       "sortid": 72097,
       "vtid": 3,
       "parentid": 5055,
@@ -73147,7 +73147,7 @@
     },
     {
       "id": 8266,
-      "name": "Peñuelas Municipio, PR",
+      "name": "Pe<U+00F1>uelas Municipio, PR",
       "sortid": 72111,
       "vtid": 3,
       "parentid": 5055,
@@ -73177,7 +73177,7 @@
     },
     {
       "id": 8269,
-      "name": "Rincón Municipio, PR",
+      "name": "Rinc<U+00F3>n Municipio, PR",
       "sortid": 72117,
       "vtid": 3,
       "parentid": 5055,
@@ -73187,7 +73187,7 @@
     },
     {
       "id": 8270,
-      "name": "Río Grande Municipio, PR",
+      "name": "R<U+00ED>o Grande Municipio, PR",
       "sortid": 72119,
       "vtid": 3,
       "parentid": 5055,
@@ -73217,7 +73217,7 @@
     },
     {
       "id": 8273,
-      "name": "San Germán Municipio, PR",
+      "name": "San Germ<U+00E1>n Municipio, PR",
       "sortid": 72125,
       "vtid": 3,
       "parentid": 5055,
@@ -73247,7 +73247,7 @@
     },
     {
       "id": 8276,
-      "name": "San Sebastián Municipio, PR",
+      "name": "San Sebasti<U+00E1>n Municipio, PR",
       "sortid": 72131,
       "vtid": 3,
       "parentid": 5055,
