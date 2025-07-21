@@ -3,7 +3,7 @@
 
 
 urbanicity.data = read.csv(file = 'applications/cdc_testing/2020_UA_COUNTY.csv', stringsAsFactors = F)
-ALL.COUNTY.URBANICITY = as.numeric(gsub("%", '', urbanicity.data[,3])) / 100
+ALL.COUNTY.URBANICITY = as.numeric(gsub("%", '', urbanicity.data[,13])) / 100
 names(ALL.COUNTY.URBANICITY) = paste0(
     formatC(urbanicity.data[,1], width = 2, format = 'd', flag = "0"), 
     formatC(urbanicity.data[,2], width = 3, format = 'd', flag = "0")
