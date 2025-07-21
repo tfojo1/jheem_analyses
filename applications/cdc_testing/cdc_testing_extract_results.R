@@ -7,7 +7,9 @@ LOCATIONS = CDC.TESTING.LOCATIONS
 
 
 sim.collection=create.simset.collection(version="cdct", calibration.code = CALIBRATION.CODE,
-                                        locations = LOCATIONS, interventions = CDC.TESTING.INTERVENTION.CODES, n.sim=N.SIMS)
+                                        locations = LOCATIONS, 
+                                        interventions = c('baseline', CDC.TESTING.INTERVENTION.CODES),
+                                        n.sim=N.SIMS)
 
 print("PULLING TOTALS...")
 total.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalence', 'new',
@@ -17,6 +19,7 @@ total.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalen
                                    output = 'numerator',
                                    dimension.values=list(year=2010:2035),
                                    keep.dimensions=c('year'),
+                                   aggregate.total = T,
                                    verbose = VERBOSE)
 
 
@@ -26,6 +29,7 @@ full.incidence = sim.collection$get(outcomes = 'incidence',
                                     output = 'numerator',
                                     dimension.values=list(year=2020:2035),
                                     keep.dimensions=c('year','age','race','sex','risk'),
+                                    aggregate.total = T,
                                     verbose = VERBOSE)
 
 print("PULLING PARAMETERS...")
@@ -34,8 +38,6 @@ all.parameters = sim.collection$get.parameters(verbose = VERBOSE)
 
 print("DONE - SAVING...")
 save(total.results,
-     
-     total.results,
      full.incidence,
      all.parameters,
      

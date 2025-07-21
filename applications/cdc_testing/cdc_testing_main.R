@@ -10,8 +10,7 @@ N.SIMS = 1000
 N.CHUNKS = 1
 
 CDC.TESTING.LOCATIONS = c('AL','CA','FL','GA','IL','LA','MO','MS','NY','TX','WI',
-                          'AZ','MD','OH','WA')
-CDC.TESTING.EXTRA.LOCATIONS = c('AR','AZ','CO','KY','MD','OK','OH','PA','SC','TN','WA')
+                          'AZ','KY','MD','OH','SC','TN','WA')
 CDC.TESTING.INTERVENTION.CODES = c('noint', 'cdct.end', 'cdct.pintr', 'cdct.bintr')
 CALIBRATION.CODE = 'final.ehe.state'
 VERBOSE = T
@@ -25,3 +24,10 @@ register.transmute.calibration.info(transmute.code = 'cdct',
                                     prior.distribution = CDC.TESTING.PARAMETERS.PRIOR,
                                     sampling.blocks = CDC.TESTING.PARAMETER.SAMPLING.BLOCKS)
                          
+
+# Web tool stuff
+CDCT.N.SIM.FOR.WEB = 80
+CDCT.WEB.FROM.YEAR = 2015
+CDCT.WEB.TO.YEAR = 2030
+CDCT.WEB.SEED.FROM.YEAR = CDCT.WEB.FROM.YEAR
+CDCT.WEB.SEED.TO.YEAR = 2025

@@ -1,7 +1,7 @@
 
 source('applications/cdc_testing/cdc_testing_main.R')
 
-LOCATIONS = CDC.TESTING.LOCATIONS[6+1:2]
+LOCATIONS = CDC.TESTING.LOCATIONS[4*4 + 1:4]
 print(paste0("Re-running interventions for locations: ", paste0(LOCATIONS, collapse=', ')))
 
 

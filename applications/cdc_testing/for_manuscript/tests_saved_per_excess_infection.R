@@ -1,27 +1,65 @@
 
-load("Q:results/cdc_testing/cdc_testing_results_2025-07-16.Rdata")
+source('commoncode/results_helpers.R')
+source('presentation/make_pretty_table.R')
+
 
 YEARS = as.character(2025:2030)
+INT.CODES = c('cdct.end','cdct.pintr','cdct.bintr')
 
-abs.excess.inc.end = apply(total.results[YEARS,,'incidence',,'cdct.end'] - total.results[YEARS,,'incidence',,'noint'], c('sim', 'location'), sum)
-abs.excess.cdc.tests.end = apply(total.results[YEARS,,'cdc.funded.tests',,'noint'] - total.results[YEARS,,'cdc.funded.tests',,'cdct.end'], c('sim', 'location'), sum)
+abs.excess.inc = apply(total.results[YEARS,,'incidence',,INT.CODES] - as.numeric(total.results[YEARS,,'incidence',,'noint']), c('sim', 'location', 'intervention'), sum)
+abs.cdc.tests.saved = -apply(total.results[YEARS,,'cdc.funded.tests',,INT.CODES] - as.numeric(total.results[YEARS,,'cdc.funded.tests',,'noint']), c('sim', 'location', 'intervention'), sum)
 
-tests.per.excess.inf.end = abs.excess.cdc.tests.end / abs.excess.inc.end
-sort(apply(tests.per.excess.inf.end, 'location', mean))
+tests.per.excess.inf = abs.cdc.tests.saved / abs.excess.inc
 
-
-abs.excess.inc.bintr = apply(total.results[YEARS,,'incidence',,'cdct.bintr'] - total.results[YEARS,,'incidence',,'noint'], c('sim', 'location'), sum)
-abs.excess.cdc.tests.bintr = apply(total.results[YEARS,,'cdc.funded.tests',,'noint'] - total.results[YEARS,,'cdc.funded.tests',,'cdct.bintr'], c('sim', 'location'), sum)
-
-tests.per.excess.inf.bintr = abs.excess.cdc.tests.bintr / abs.excess.inc.bintr
-sort(apply(tests.per.excess.inf.bintr, 'location', mean))
+tests.per.excess.inf.means = apply(tests.per.excess.inf, c('location','intervention'), mean)
+tests.per.excess.inf.lowers = apply(tests.per.excess.inf, c('location','intervention'), quantile, probs=0.025)
+tests.per.excess.inf.uppers = apply(tests.per.excess.inf, c('location','intervention'), quantile, probs=0.975)
 
 
+#-- Order them --#
 
-abs.excess.inc = apply(total.results[YEARS,,'incidence',,] - as.numeric(total.results[YEARS,,'incidence',,'noint']), c('sim', 'location','intervention'), sum)
-abs.excess.cdc.tests = apply(as.numeric(total.results[YEARS,,'cdc.funded.tests',,'noint']) - total.results[YEARS,,'cdc.funded.tests',,], c('sim', 'location','intervention'), sum)
-tests.per.excess.inf = abs.excess.cdc.tests / abs.excess.cdc.tests
+n.states = dim(tests.per.excess.inf)['location'] - 1
+total.index = n.states + 1
+o = c(order(tests.per.excess.inf.means[1:n.states,1], decreasing = F), total.index)
 
-apply(tests.per.excess.inf, c('location','intervention'), mean)
+#-- Make formatted means --#
 
+formatted.means = sapply(round(tests.per.excess.inf.means), format, big.mark=',')
+dim(formatted.means) = dim(tests.per.excess.inf.means)
+dimnames(formatted.means) = dimnames(tests.per.excess.inf.means)
 
+#-- Make formatted CIs --#
+
+formatted.cis = paste0(
+    "(",
+    sapply(round(tests.per.excess.inf.lowers), format, big.mark=','),
+    " - ",
+    sapply(round(tests.per.excess.inf.uppers), format, big.mark=','),
+    ")"
+)
+dim(formatted.cis) = dim(tests.per.excess.inf.lowers)
+dimnames(formatted.cis) = dimnames(tests.per.excess.inf.lowers)
+
+#-- Put it together --#
+
+formatted.means.and.cis = interleave.rows(formatted.means[o,], formatted.cis[o,])
+
+#-- Make color.by table --#
+
+tsfx = log
+
+color.by = tsfx(interleave.rows(tests.per.excess.inf.means[o,], tests.per.excess.inf.means[o,]))
+
+#-- Write it --#
+
+LEAST.EFFICIENT.COLOR = paste0("#", rgb.to.hex(c(222,237,207)))
+MOST.EFFICIENT.COLOR = paste0("#", rgb.to.hex(c(10,47,81)))
+
+# LEAST.EFFICIENT.COLOR = paste0("#", rgb.to.hex(c(226,230,226)))
+# MOST.EFFICIENT.COLOR = paste0("#", rgb.to.hex(c(142,19,59)))
+
+write.shaded.table(tab = formatted.means.and.cis,
+                   color.by = color.by,
+                   colors = c(MOST.EFFICIENT.COLOR, LEAST.EFFICIENT.COLOR),
+                   thresholds = tsfx(c(75,4500)),
+                   file = '../../results/cdc_testing/tests_per_excess_infection.xlsx')

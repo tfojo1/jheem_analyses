@@ -83,6 +83,7 @@ track.integrated.outcome(CDCT.SPECIFICATION,
                          outcome.metadata = NULL,
                          scale = 'proportion',
                          value.to.integrate = 'fraction.diagnoses.from.cdc',
+                         multiply.by = 'cdc.effect',
                          denominator.outcome = 'new',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          save = F)
@@ -121,6 +122,52 @@ track.cumulative.outcome(CDCT.SPECIFICATION,
                          value.is.numerator = T,
                          denominator.outcome = 'cdc.funded.tests',
                          keep.dimensions = 'location')
+
+
+
+##-- ADD THE WEB SUB-VERSION --##
+
+add.sub.version(CDCT.SPECIFICATION, 
+                sub.version = 'w',
+                description = "Web Tool version of CDC Testing model",
+                inherit.outcomes = F,
+                can.seed.new.engine = F)
+
+add.sub.version(CDCT.SPECIFICATION, 
+                sub.version = 'ws',
+                description = "Seed for Custom Scenarios for Web Tool version of CDC Testing model",
+                inherit.outcomes = F,
+                can.seed.new.engine = T)
+
+
+# General Outcomes
+track.sub.version.outcomes(CDCT.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = 'awareness',
+                           keep.dimensions = character())
+
+track.sub.version.outcomes(CDCT.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = c(
+                               'new',
+                               'diagnosed.prevalence',
+                               'incidence'))
+
+track.sub.version.outcomes(CDCT.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = c(
+                               'testing',
+                               'total.hiv.tests'),
+                           keep.dimensions = c('age','race','sex'))
+
+#CDC Testing Outcomes
+track.sub.version.outcomes(CDCT.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = c('cdc.funded.tests',
+                                             'total.cdc.hiv.test.positivity'),
+                           keep.dimensions = character())
+
+
 
 ##-- REGISTER IT! --##
 
