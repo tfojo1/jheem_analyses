@@ -43,6 +43,8 @@ sort(CDC.TESTING.LOCATIONS.URBANICITY)
 #@ Ruchita - example for how I'm getting the correlation
 if (1==2)
 {
+    #@ Ruchita - load your results
+    
     YEARS = as.character(2025:2030)
     INT.CODES = c('cdct.end','cdct.pintr','cdct.bintr')
     
