@@ -259,7 +259,7 @@ CONGENITAL.PARAMETERS.PRIOR=join.distributions(
     age25.29.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     age30.34.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     age35.39.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    age40.44.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age40.44.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
 )
 
 
@@ -885,10 +885,6 @@ SHIELD.CONGENITAL.SAMPLING.BLOCKS=list(
                     "age35.39.third.trimester.odds.mult",
                     "age40.44.third.trimester.odds.mult")
 )
-
-SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS <- c(
-    SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS,
-    SHIELD.PRENATAL.SAMPLING.BLOCKS)
 
 
 
