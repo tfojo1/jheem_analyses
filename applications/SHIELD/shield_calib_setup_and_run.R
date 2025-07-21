@@ -12,7 +12,8 @@
 # }
 # setwd(JHEEM.DIR)
 # cat("Working directory set to:", getwd(), "\n")
-
+setwd("jheem/code/jheem_analyses")
+cat("Working directory set to:", getwd(), "\n")
 
 ##----
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
@@ -22,7 +23,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 
 #
 VERSION='shield'
-LOCATION='C.12580' #Baltimore MSA 
+LOCATION='C.12580' 
 set.seed(00000)
 CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
