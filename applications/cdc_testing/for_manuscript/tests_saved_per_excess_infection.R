@@ -9,6 +9,10 @@ INT.CODES = c('cdct.end','cdct.pintr','cdct.bintr')
 abs.excess.inc = apply(total.results[YEARS,,'incidence',,INT.CODES] - as.numeric(total.results[YEARS,,'incidence',,'noint']), c('sim', 'location', 'intervention'), sum)
 abs.cdc.tests.saved = -apply(total.results[YEARS,,'cdc.funded.tests',,INT.CODES] - as.numeric(total.results[YEARS,,'cdc.funded.tests',,'noint']), c('sim', 'location', 'intervention'), sum)
 
+cbind(colMeans(abs.cdc.tests.saved)['Total',],
+      apply(abs.cdc.tests.saved, 2:3, quantile, probs=0.025)['Total',],
+      apply(abs.cdc.tests.saved, 2:3, quantile, probs=0.975)['Total',]) / 1000000
+
 tests.per.excess.inf = abs.cdc.tests.saved / abs.excess.inc
 
 tests.per.excess.inf.means = apply(tests.per.excess.inf, c('location','intervention'), mean)

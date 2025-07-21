@@ -38,7 +38,23 @@ CDC.TESTING.LOCATIONS.URBANICITY = get.urbanicity.metric(locations = CDC.TESTING
 #CDC.TESTING.LOCATIONS.URBANICITY = get.urbanicity.metric(locations = CDC.TESTING.LOCATIONS, years=2021, outcome='diagnoses')
 sort(CDC.TESTING.LOCATIONS.URBANICITY)
 
-# rel.increase = rel.excess.inc.means[,1][CDC.TESTING.LOCATIONS]
-# 
-# qplot(CDC.TESTING.LOCATIONS.URBANICITY, rel.increase)
-# cor(CDC.TESTING.LOCATIONS.URBANICITY, rel.increase, method='spearman')
+
+
+#@ Ruchita - example for how I'm getting the correlation
+if (1==2)
+{
+    YEARS = as.character(2025:2030)
+    INT.CODES = c('cdct.end','cdct.pintr','cdct.bintr')
+    
+    abs.inc.noint = apply(total.results[YEARS,,'incidence',,'noint'], c('sim', 'location'), sum)
+    
+    abs.excess.inc = apply(total.results[YEARS,,'incidence',,INT.CODES] - as.numeric(total.results[YEARS,,'incidence',,'noint']), c('sim', 'location', 'intervention'), sum)
+    rel.excess.inc = abs.excess.inc / as.numeric(apply(total.results[YEARS,,'incidence',,'noint'], c('sim', 'location'), sum))
+    rel.excess.inc.means = apply(rel.excess.inc, c('location','intervention'), mean)
+    
+    rel.increase = rel.excess.inc.means[,1][CDC.TESTING.LOCATIONS]
+
+    qplot(CDC.TESTING.LOCATIONS.URBANICITY, rel.increase)
+    cor(CDC.TESTING.LOCATIONS.URBANICITY, rel.increase, method='spearman')
+    
+}
