@@ -1686,8 +1686,6 @@ track.integrated.outcome(
 
 
 
-
-
 ##---- Syphilis Incidence ---- 
 # (new infections + reinfections)
 track.dynamic.outcome(SHIELD.SPECIFICATION,
