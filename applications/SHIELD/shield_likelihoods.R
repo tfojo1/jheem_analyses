@@ -192,7 +192,7 @@ total.diagnosis.likelihood.instructions =
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, 
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT ,
                                          equalize.weight.by.year = T,
@@ -215,7 +215,7 @@ ps.diagnosis.total.likelihood.instructions =
                                          levels.of.stratification = c(0), 
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -229,7 +229,7 @@ ps.diagnosis.total.likelihood.instructions.N =
                                          from.year = 1993,
                                          to.year = 2022 ,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -244,7 +244,7 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          levels.of.stratification = c(0,1,2), 
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -263,7 +263,7 @@ peak_to_historical_baseline.penalty.instructions <-
             years <- data$years
             
             idx1990  <- which(years == 1990)
-            baseline <- data$national.values[idx1990]
+            baseline <- vals[idx1990]
             peak     <- max(vals, na.rm = TRUE)
             ratio    <- baseline / peak
             
@@ -308,7 +308,7 @@ peak_to_historical_baseline.penalty.instructions <-
                 years           = hist_df$year,
                 national.values = hist_df$value,
                 max.ratio    = max_ratio_hist,
-                min.ratio    = min_ratio_hist,
+                min.ratio   = min_ratio_hist,
                 sdlog           = sdlog_hist
             )
         }
@@ -332,7 +332,7 @@ early.diagnosis.total.likelihood.instructions =
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = EL.DIAGNOSIS.WEIGHT, # DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -346,7 +346,7 @@ early.diagnosis.total.likelihood.instructions.N =
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = EL.DIAGNOSIS.WEIGHT, # DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -360,7 +360,7 @@ early.diagnosis.by.strata.likelihood.instructions =
                                          levels.of.stratification = c(0,1,2,3),
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -384,13 +384,51 @@ late.diagnosis.total.likelihood.instructions =
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
 
+late.diagnosis.total.likelihood.instructions.M =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                         levels.of.stratification = c(0),
+                                         from.year = 1993,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.type = 'cv',
+                                         weights = DIAGNOSIS.WEIGHT*2.42,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
+
+late.diagnosis.total.likelihood.instructions.A =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                         levels.of.stratification = c(0),
+                                         from.year = 1993,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.type = 'cv',
+                                         weights = DIAGNOSIS.WEIGHT*5.10,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
+
+late.diagnosis.total.likelihood.instructions.N =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                         levels.of.stratification = c(0),
+                                         from.year = 1993,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.type = 'cv',
+                                         weights = DIAGNOSIS.WEIGHT*1.73,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
 
 late.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
@@ -399,7 +437,7 @@ late.diagnosis.by.strata.likelihood.instructions =
                                          levels.of.stratification = c(0,1,2,3),
                                          from.year = 1993,
                                          observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = 0.0764791209420945,
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -451,8 +489,8 @@ proportion.tested.nested.likelihood.instructions =
                                                      location.types = c('STATE','CBSA'),
                                                      minimum.geographic.resolution.type = 'COUNTY',
                                                      
-                                                     dimensions = c("age","sex","race"),
-                                                     levels.of.stratification = c(0,1),
+                                                     #dimensions = c("age","sex"),
+                                                     levels.of.stratification = c(0),
                                                      from.year = 2010,
                                                      
                                                      p.bias.inside.location = 0,
@@ -476,7 +514,8 @@ proportion.tested.nested.likelihood.instructions =
 state.HIV.tested.likelihood.instructions =
     create.ifelse.likelihood.instructions(
         hiv.testing.total.likelihood.instructions,
-        proportion.tested.nested.likelihood.instructions)
+        proportion.tested.nested.likelihood.instructions
+    )
 
 
 ##---- Congenital ----
@@ -536,7 +575,7 @@ congenital.nested.likelihood.instructions.trans =
                                                       #
                                                       
                                                       observation.correlation.form = 'autoregressive.1',
-                                                      p.error.variance.term = 0.05, # update with cdc sti + surv. reports
+                                                      p.error.variance.term = 0.08617235 , 
                                                       p.error.variance.type = "cv",
                                                       
                                                       partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION,# we use for unknown outcomes (e.g., number of IDUs by age race in Baltimore) (not needed here)
@@ -656,63 +695,17 @@ likelihood.instructions.demographics=join.likelihood.instructions(
 
 
 
-# Total diagnosis by stage only
-likelihood.instructions.syphilis.diag.total.no.demog=join.likelihood.instructions(
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions,
+# Total + strata diagnosis by stage only
+likelihood.instructions.syphilis.diag.strata.no.demog=join.likelihood.instructions(
+    ps.diagnosis.by.strata.likelihood.instructions,
+    early.diagnosis.by.strata.likelihood.instructions,
+    late.diagnosis.by.strata.likelihood.instructions,
     hiv.testing.by.strata.likelihood.instructions
 )
 
 
-# likelihood.instructions.complete.no.demog = join.likelihood.instructions(
-#     likelihood.instructions.syphilis.diag.total.no.demog,
-#     congenital.diagnosis.likelihood.instructions,
-#     likelihood.instructions.PNC
-# )
 
-
-# All total diagnosis+HIV test
-lik.inst.diag.total.no.demog.M=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions.M,
-    hiv.testing.by.strata.likelihood.instructions
-)
-
-lik.inst.diag.total.no.demog.A=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions.A,
-    hiv.testing.by.strata.likelihood.instructions
-)
-
-lik.inst.diag.total.no.demog.N=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions.N,
-    early.diagnosis.total.likelihood.instructions.N,
-    late.diagnosis.total.likelihood.instructions,
-    peak_to_historical_baseline.penalty.instructions,
-    state.HIV.tested.likelihood.instructions
-)
-
-lik.inst.diag.total.no.demog.N.W=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions.N
-    #hiv.testing.state.likelihood.instructions
-)
-
-lik.inst.diag.total.no.demog=join.likelihood.instructions(
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions,
-    hiv.testing.by.strata.likelihood.instructions
-)
-# 
+# penalty 
 lik.inst.diag.only.totals.no.demog=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     ps.diagnosis.total.likelihood.instructions,
@@ -722,15 +715,26 @@ lik.inst.diag.only.totals.no.demog=join.likelihood.instructions(
     peak_to_historical_baseline.penalty.instructions
 )
 
-lik.inst.diag.prenatal.no.demog=join.likelihood.instructions(
+# No Penalty
+lik.inst.diag.only.totals.no.demog.no.penalty=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     ps.diagnosis.total.likelihood.instructions,
     early.diagnosis.total.likelihood.instructions,
     late.diagnosis.total.likelihood.instructions,
-    hiv.testing.total.likelihood.instructions,
+    hiv.testing.total.likelihood.instructions
+)
+
+#Congential + Penalty
+likelihood.instructions.complete.no.demog = join.likelihood.instructions(
+    lik.inst.diag.only.totals.no.demog,
     congenital.nested.likelihood.instructions.trans,
     likelihood.instructions.PNC
-    
+)
+#Congential + No Penalty
+likelihood.instructions.complete.no.demog.no.penalty = join.likelihood.instructions(
+    lik.inst.diag.only.totals.no.demog.no.penalty,
+    congenital.nested.likelihood.instructions.trans,
+    likelihood.instructions.PNC
 )
 
 # All total diagnosis+HIV-test+CNS+prenatal care
