@@ -197,6 +197,81 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
   prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing)
 )
+
+
+
+CONGENITAL.PARAMETERS.PRIOR=join.distributions(
+    
+    # First‑trimester 
+    first.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    first.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
+    
+    black.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    hispanic.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    other.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    age15.19.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age20.24.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age25.29.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age30.34.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age35.39.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age40.44.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    # Second‑trimester 
+    second.trimester.intercept.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    second.trimester.slope.mult         = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
+    
+    black.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    hispanic.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    other.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    age15.19.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age20.24.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age25.29.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age30.34.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age35.39.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age40.44.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    # Third‑trimester 
+    third.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    third.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
+    
+    black.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    hispanic.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    other.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    age15.19.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age20.24.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age25.29.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age30.34.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age35.39.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age40.44.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    ## non fertile ages ##
+    # First‑trimester
+    age0.14.first.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age45.49.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age50.54.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age55.64.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age65.plus.first.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    # Second‑trimester
+    age0.14.second.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age45.49.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age50.54.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age55.64.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age65.plus.second.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    # Third‑trimester
+    age0.14.third.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age45.49.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age50.54.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age55.64.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age65.plus.third.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
+    
+)
+
+
 # x=Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2))
 # get.intervals(x)
 # calculate.density(x,10)/calculate.density(x,1) #penalty for drawing a point at 10 instead of 1
@@ -424,6 +499,55 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = sexes)
   }
   
+  races=ages=model.settings$specification.metadata$dim.names$race
+  all.age.ranges <- c("0.14","15.19","20.24","25.29","30.34","35.39",
+                      "40.44","45.49","50.54","55.64","65.plus")
+  all.ages <- model.settings$specification.metadata$dim.names$age
+  
+  
+  for (tr in trimesters) {
+      
+      elem <- tr$element
+      pre  <- tr$prefix
+      
+      ## global OR 
+      set.element.functional.form.main.effect.alphas(
+          model.settings, 
+          element.name = elem, 
+          alpha.name = "intercept",
+          values = parameters[paste0(pre, ".intercept.mult")],
+          dimension = "all",
+          applies.to.dimension.values = "all")
+      
+      ##  global slope 
+      set.element.functional.form.main.effect.alphas(
+          model.settings, 
+          element.name = elem, 
+          alpha.name = "slope",
+          values = parameters[paste0(pre, ".slope.mult")],
+          dimension = "all",
+          applies.to.dimension.values = "all")
+      
+      ## 3. race‑specific OR
+      race.parms <- paste0(races, ".", pre, ".odds.mult")
+      set.element.functional.form.main.effect.alphas(
+          model.settings, 
+          element.name = elem, 
+          alpha.name = "intercept",
+          values = parameters[race.parms],
+          dimension = "race",
+          applies.to.dimension.values = races)
+      
+      ## 4. age‑specific OR
+      age.parms <- paste0("age", all.age.ranges, ".", pre, ".odds.mult")
+      set.element.functional.form.main.effect.alphas(
+          model.settings,
+          element.name = elem,
+          alpha.name = "intercept",
+          values = parameters[age.parms],
+          dimension = "age",
+          applies.to.dimension.values = all.ages)
+  }
   
   
 }
@@ -701,17 +825,91 @@ SHIELD.TESTING.SAMPLING.BLOCKS2=list(
     "prop.index.cases.reached.for.contact.tracing")
 )
 
+# ## SHIELD.PRENATAL.SAMPLING.BLOCKS ----
+SHIELD.CONGENITAL.SAMPLING.BLOCKS=list(
+    
+    # First trimester
+    pnc1.global = c("first.trimester.intercept.mult",
+                    "first.trimester.slope.mult"),
+    
+    pnc1.race   = c("black.first.trimester.odds.mult",
+                    "hispanic.first.trimester.odds.mult",
+                    "other.first.trimester.odds.mult"),
+    
+    pnc1.age.A  = c("age15.19.first.trimester.odds.mult",
+                    "age20.24.first.trimester.odds.mult",
+                    "age25.29.first.trimester.odds.mult"),
+    
+    pnc1.age.B  = c("age30.34.first.trimester.odds.mult",
+                    "age35.39.first.trimester.odds.mult",
+                    "age40.44.first.trimester.odds.mult"),
+    
+    pnc1.age.C = c("age0.14.first.trimester.odds.mult",
+                   "age45.49.first.trimester.odds.mult",
+                   "age50.54.first.trimester.odds.mult",
+                   "age55.64.first.trimester.odds.mult",
+                   "age65.plus.first.trimester.odds.mult"),
+    
+    
+    # Second trimester
+    pnc2.global = c("second.trimester.intercept.mult",
+                    "second.trimester.slope.mult"),
+    
+    pnc2.race   = c("black.second.trimester.odds.mult",
+                    "hispanic.second.trimester.odds.mult",
+                    "other.second.trimester.odds.mult"),
+    
+    pnc2.age.A  = c("age15.19.second.trimester.odds.mult",
+                    "age20.24.second.trimester.odds.mult",
+                    "age25.29.second.trimester.odds.mult"),
+    
+    pnc2.age.B  = c("age30.34.second.trimester.odds.mult",
+                    "age35.39.second.trimester.odds.mult",
+                    "age40.44.second.trimester.odds.mult"),
+    
+    pnc2.age.C = c("age0.14.second.trimester.odds.mult",
+                   "age45.49.second.trimester.odds.mult",
+                   "age50.54.second.trimester.odds.mult",
+                   "age55.64.second.trimester.odds.mult",
+                   "age65.plus.second.trimester.odds.mult"),
+    
+    # Third trimester
+    pnc3.global = c("third.trimester.intercept.mult",
+                    "third.trimester.slope.mult"),
+    
+    pnc3.race   = c("black.third.trimester.odds.mult",
+                    "hispanic.third.trimester.odds.mult",
+                    "other.third.trimester.odds.mult"),
+    
+    pnc3.age.A  = c("age15.19.third.trimester.odds.mult",
+                    "age20.24.third.trimester.odds.mult",
+                    "age25.29.third.trimester.odds.mult"),
+    
+    pnc3.age.B  = c("age30.34.third.trimester.odds.mult",
+                    "age35.39.third.trimester.odds.mult",
+                    "age40.44.third.trimester.odds.mult"),
+    
+    pnc3.age.C = c("age0.14.third.trimester.odds.mult",
+                   "age45.49.third.trimester.odds.mult",
+                   "age50.54.third.trimester.odds.mult",
+                   "age55.64.third.trimester.odds.mult",
+                   "age65.plus.third.trimester.odds.mult")
+)
+
 # SUMMARIZE ---- #these will be registered in the specification 
 SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
-  POPULATION.PARAMETERS.PRIOR,
-  AGING.PARAMETERS.PRIOR,
-  TRANSMISSION.PARAMETERS.PRIOR,
-  TESTING.PARAMETERS.PRIOR
+    POPULATION.PARAMETERS.PRIOR,
+    AGING.PARAMETERS.PRIOR,
+    TRANSMISSION.PARAMETERS.PRIOR,
+    TESTING.PARAMETERS.PRIOR,
+    CONGENITAL.PARAMETERS.PRIOR
 )
 
 SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
-  SHIELD.POPULATION.SAMPLING.BLOCKS,
-  SHIELD.AGING.SAMPLING.BLOCKS,
-  SHIELD.TRANSMISSION.SAMPLING.BLOCKS,
-  SHIELD.TESTING.SAMPLING.BLOCKS
+    SHIELD.POPULATION.SAMPLING.BLOCKS,
+    SHIELD.AGING.SAMPLING.BLOCKS,
+    SHIELD.TRANSMISSION.SAMPLING.BLOCKS,
+    SHIELD.TESTING.SAMPLING.BLOCKS,
+    SHIELD.CONGENITAL.SAMPLING.BLOCKS
+    
 )
