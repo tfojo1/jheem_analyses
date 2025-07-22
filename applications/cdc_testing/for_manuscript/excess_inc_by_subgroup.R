@@ -1,4 +1,3 @@
-
 YEARS = as.character(2025:2030)
 
 total.inc.by.age = apply(full.incidence[YEARS,,,,,,,], c('age','sim','intervention'), sum)
@@ -19,8 +18,8 @@ rbind(
                  lower=quantile(total.rel.excess.inc.under.35, probs=0.025),
                  upper=quantile(total.rel.excess.inc.under.35, probs=0.975)),
     over.35 = c(mean=mean(total.rel.excess.inc.over.35),
-                 lower=quantile(total.rel.excess.inc.over.35, probs=0.025),
-                 upper=quantile(total.rel.excess.inc.over.35, probs=0.975))
+                lower=quantile(total.rel.excess.inc.over.35, probs=0.025),
+                upper=quantile(total.rel.excess.inc.over.35, probs=0.975))
 )
 
 total.inc.by.race = apply(full.incidence[YEARS,,,,,,,], c('race','sim','intervention'), sum)
