@@ -28,8 +28,8 @@ year  value
 ", header = T)
 
 # 2. Compute baseline, max ratio, and sd(log ratio)
-baseline_1990 <- hist_df$value[hist_df$year == 1990]
-hist_df$ratio <- baseline_1990 / hist_df$value 
+national_1990 <- hist_df$value[hist_df$year == 1990]
+hist_df$ratio <- hist_df$value / national_1990 
 
 hist_df$log_ratio <- log(hist_df$ratio)
 
