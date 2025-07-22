@@ -117,11 +117,7 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
-    # Initial infection multipliers:
-    # initial.infection.multiplier.1970.early = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ps and EL stages
-    # initial.infection.multiplier.1970.late = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #ll and tertiary
-    # 
-    # multipliers in 1970 (relative diagnoses in 1970 to the peak diagnoses between 1993-99)
+    # Infection multipliers in 1970 (relative diagnoses in 1970 to the peak diagnoses between 1993-99)
     ps.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
     el.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
     lu.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
@@ -132,7 +128,6 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     #12 independant params
     # msm multipliers by time
     transmission.rate.multiplier.msm1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    #transmission.rate.multiplier.msm1980 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     transmission.rate.multiplier.msm1990 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     transmission.rate.multiplier.msm1995 = Lognormal.Distribution(meanlog = log(1.2), sdlog = 0.5*log(2)),#1995 #increasing the peak value
     transmission.rate.multiplier.msm2000 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)), 
@@ -141,7 +136,6 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     # heterosexual multipliers by time
     transmission.rate.multiplier.heterosexual1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    #transmission.rate.multiplier.heterosexual1980 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     transmission.rate.multiplier.heterosexual1990 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     transmission.rate.multiplier.heterosexual1995 = Lognormal.Distribution(meanlog = log(1.2), sdlog = 0.5*log(2)),#1995 #increasing the peak value
     transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)), 
@@ -157,7 +151,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)), #directly used in specification helper function
     #to control the standard deviation of the contact matrix by age
     
-    # relapse & infectiouness EL
+    # relapse & infectiousness for EL
     prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
     el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
 ) 
@@ -174,7 +168,6 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     or.symptomatic.secondary.female= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ), 
     #
     or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-    #or.symptomatic.1980 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
     or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
     or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
     or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
@@ -187,7 +180,6 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     
     # STI screening knots multiplier (relative to HIV screening)
     sti.screening.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    #sti.screening.multiplier.1980 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     sti.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     sti.screening.multiplier.1995 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
     sti.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
@@ -201,24 +193,18 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
-    # # adding specific knot multipliers for EL to see if it helps #July-10-test
-    # sti.screening.multiplier.1990.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    # sti.screening.multiplier.1995.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    # sti.screening.multiplier.2000.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    # sti.screening.multiplier.2010.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    # sti.screening.multiplier.2020.el = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-    
     # Contact tracing
     # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
     prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing)
 )
 
 
+
 CONGENITAL.PARAMETERS.PRIOR=join.distributions(
     
     # First‑trimester 
     first.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    first.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    first.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
     black.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hispanic.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
@@ -233,7 +219,7 @@ CONGENITAL.PARAMETERS.PRIOR=join.distributions(
     
     # Second‑trimester 
     second.trimester.intercept.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    second.trimester.slope.mult         = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    second.trimester.slope.mult         = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
     black.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hispanic.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
@@ -248,7 +234,7 @@ CONGENITAL.PARAMETERS.PRIOR=join.distributions(
     
     # Third‑trimester 
     third.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    third.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    third.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
     black.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hispanic.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
@@ -259,9 +245,31 @@ CONGENITAL.PARAMETERS.PRIOR=join.distributions(
     age25.29.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     age30.34.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     age35.39.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    age40.44.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
+    age40.44.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    ## non fertile ages ##
+    # First‑trimester
+    age0.14.first.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age45.49.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age50.54.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age55.64.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age65.plus.first.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    # Second‑trimester
+    age0.14.second.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age45.49.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age50.54.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age55.64.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age65.plus.second.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    
+    # Third‑trimester
+    age0.14.third.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age45.49.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age50.54.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age55.64.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    age65.plus.third.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
+    
 )
-
 
 
 # x=Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2))
@@ -321,8 +329,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                                applies.to.dimension.values =list(age = agegroup, race = race))
             }}}                                      
     
-    ## Fertility rates by race/age to time1/time2 knots----
-    # Fertility multipliers by race (applied to both time1 and time2)
+    ## Fertility rates by race to time1/time2 knots----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "fertility.rate",
                                                    alpha.name = "time1",
@@ -337,7 +344,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "race",
                                                    applies.to.dimension.values = races)
     
-    # Fertility multipliers by age ----
+    # Fertility multipliers by age to time1/time2 knots ----
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "fertility.rate",
                                                    alpha.name = "time1",
@@ -351,8 +358,6 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    values = parameters[paste0("age", fertile.age.ranges, ".fertility.rate.multiplier")],
                                                    dimension = "age",
                                                    applies.to.dimension.values = fertile.ages)
-    
-    
     
     ## Immigration rate multipliers by race for time1/time2 knots ----
     set.element.functional.form.main.effect.alphas(model.settings,
@@ -404,7 +409,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = c('female'))
     
     ## Transmission ----
-    for(time in c("1970","1990","1995","2000","2010","2020")){    #multipliers for msm rates in each knot:
+    #multipliers for msm rates in each knot:
+    for(time in c("1970","1990","1995","2000","2010","2020")){    
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
@@ -463,16 +469,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        applies.to.dimension.values = "all")
         
     }
-    # # specific knot multipliers for EL #July-10-test
-    # for(time in c("1990","1995","2000","2010","2020")){
-    #   set.element.functional.form.main.effect.alphas(model.settings,
-    #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
-    #                                                  alpha.name = time,
-    #                                                  values = parameters[paste0("sti.screening.multiplier.",time,".el")],
-    #                                                  dimension = "stage", #recipient
-    #                                                  applies.to.dimension.values = c("early.latent"))
-    # }
-    # sti.screening.multiplier.*by stage are directly linked in the specification
+    #Note: sti.screening.multiplier.*by stage are directly linked in the specification
+    
     # Symptomatic Testing ----
     for(time in c("1970", "1990","1995","2000","2010","2020")){
         set.element.functional.form.main.effect.alphas(model.settings,
@@ -501,58 +499,70 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        applies.to.dimension.values = sexes)
     }
     
-    ## Congenital Diagnosis  ----
-    
     trimesters <- list(
         list(element = "prp.prenatal.care.first.trimester",  prefix = "first.trimester"),
-        list(element = "prp.prenatal.care.second.trimester", prefix = "second.trimester"),
-        list(element = "prp.prenatal.care.third.trimester",  prefix = "third.trimester")
+        list(element = "prp.prenatal.care.second.trimester.of.those.not.screened.first", prefix = "second.trimester"),
+        list(element = "prp.prenatal.care.third.trimester.of.those.not.screened.first.second",  prefix = "third.trimester")
     )
     
-    races <- c("black", "hispanic", "other")
-    ages  <- c("15.19", "20.24", "25.29", "30.34", "35.39", "40.44")
+    # races=ages=model.settings$specification.metadata$dim.names$race
+    # all.age.ranges <- c("0.14","15.19","20.24","25.29","30.34","35.39",
+    #                     "40.44","45.49","50.54","55.64","65.plus")
+    # all.ages <- model.settings$specification.metadata$dim.names$age
+    
     
     for (tr in trimesters) {
         
         elem <- tr$element
         pre  <- tr$prefix
         
-        ## global intercept shift 
+        ## global OR 
         set.element.functional.form.main.effect.alphas(
-            model.settings, elem, "intercept",
+            model.settings, 
+            element.name = elem, 
+            alpha.name = "intercept",
             values = parameters[paste0(pre, ".intercept.mult")],
-            dimension = "all")
+            dimension = "all",
+            applies.to.dimension.values = "all")
         
-        ##  global slope multiplier
+        ##  global slope 
         set.element.functional.form.main.effect.alphas(
-            model.settings, elem, "slope",
+            model.settings, 
+            element.name = elem, 
+            alpha.name = "slope",
             values = parameters[paste0(pre, ".slope.mult")],
-            dimension = "all")
+            dimension = "all",
+            applies.to.dimension.values = "all")
         
-        ## 3. race‑specific intercept shifts
-        race.parms <- paste0(races, ".", pre, ".odds.mult")
-        set.element.functional.form.main.effect.alphas(
-            model.settings, elem, "intercept",
-            values = parameters[race.parms],
-            dimension = "race",
-            applies.to.dimension.values = races)
+        ## 3. race‑specific OR
+        # #race.parms <- paste0(races, ".", pre, ".odds.mult")
+        # set.element.functional.form.main.effect.alphas(
+        #     model.settings, 
+        #     element.name = elem, 
+        #     alpha.name = "intercept",
+        #     values = parameters[race.parms],
+        #     dimension = "race",
+        #     applies.to.dimension.values = races)
         
-        ## 4. age‑specific intercept shifts
-        age.parms <- paste0("age", ages, ".", pre, ".odds.mult")
-        set.element.functional.form.main.effect.alphas(
-            model.settings, elem, "intercept",
-            values = parameters[age.parms],
-            dimension = "age",
-            applies.to.dimension.values = ages)
+        ## 4. age‑specific OR
+        # age.parms <- paste0("age", all.age.ranges, ".", pre, ".odds.mult")
+        # set.element.functional.form.main.effect.alphas(
+        #     model.settings,
+        #     element.name = elem,
+        #     alpha.name = "intercept",
+        #     values = parameters[age.parms],
+        #     dimension = "age",
+        #     applies.to.dimension.values = all.ages)
     }
+    
     
 }
 
 
 
 #3- SAMPLING BLOCKS: ----
-# classic mcmc samples one param at a time, adaptive mcms samples multiple params
-#could add more params here (1-5 per block)
+# classic mcmc samples one param at a time, adaptive mcms samples multiple params (1-5 per block)
+
 ## SHIELD.POPULATION.SAMPLING.BLOCKS ----
 SHIELD.POPULATION.SAMPLING.BLOCKS = list(
     # Fertility ---- 
@@ -809,18 +819,6 @@ SHIELD.TESTING.SAMPLING.BLOCKS = list(
         "sti.screening.multiplier.2010",
         "sti.screening.multiplier.2020"
     ),
-    
-    # #EL multipliers #July-10-test
-    # screening.by.time.el1 = c(
-    #   "sti.screening.multiplier.1990.el",
-    #   "sti.screening.multiplier.1995.el",
-    #   "sti.screening.multiplier.2000.el"
-    # ),
-    # screening.by.time.el2 = c(
-    #   "sti.screening.multiplier.2010.el",
-    #   "sti.screening.multiplier.2020.el"
-    # ),
-    
     contact.tracing=c(
         "prop.index.cases.reached.for.contact.tracing"   
     )
@@ -833,60 +831,76 @@ SHIELD.TESTING.SAMPLING.BLOCKS2=list(
         "prop.index.cases.reached.for.contact.tracing")
 )
 
-
-## SHIELD.PRENATAL.SAMPLING.BLOCKS ----
+# ## SHIELD.PRENATAL.SAMPLING.BLOCKS ----
 SHIELD.CONGENITAL.SAMPLING.BLOCKS=list(
     
-    # First trimester 
+    # First trimester
     pnc1.global = c("first.trimester.intercept.mult",
                     "first.trimester.slope.mult"),
     
-    pnc1.race   = c("black.first.trimester.odds.mult",
-                    "hispanic.first.trimester.odds.mult",
-                    "other.first.trimester.odds.mult"),
+    # pnc1.race   = c("black.first.trimester.odds.mult",
+    #                 "hispanic.first.trimester.odds.mult",
+    #                 "other.first.trimester.odds.mult"),
+    # 
+    # pnc1.age.A  = c("age15.19.first.trimester.odds.mult",
+    #                 "age20.24.first.trimester.odds.mult",
+    #                 "age25.29.first.trimester.odds.mult"),
+    # 
+    # pnc1.age.B  = c("age30.34.first.trimester.odds.mult",
+    #                 "age35.39.first.trimester.odds.mult",
+    #                 "age40.44.first.trimester.odds.mult"),
+    # 
+    # pnc1.age.C = c("age0.14.first.trimester.odds.mult",
+    #                "age45.49.first.trimester.odds.mult",
+    #                "age50.54.first.trimester.odds.mult",
+    #                "age55.64.first.trimester.odds.mult",
+    #                "age65.plus.first.trimester.odds.mult"),
     
-    pnc1.age.A  = c("age15.19.first.trimester.odds.mult",
-                    "age20.24.first.trimester.odds.mult",
-                    "age25.29.first.trimester.odds.mult"),
-    
-    pnc1.age.B  = c("age30.34.first.trimester.odds.mult",
-                    "age35.39.first.trimester.odds.mult",
-                    "age40.44.first.trimester.odds.mult"),
     
     # Second trimester
     pnc2.global = c("second.trimester.intercept.mult",
                     "second.trimester.slope.mult"),
     
-    pnc2.race   = c("black.second.trimester.odds.mult",
-                    "hispanic.second.trimester.odds.mult",
-                    "other.second.trimester.odds.mult"),
-    
-    pnc2.age.A  = c("age15.19.second.trimester.odds.mult",
-                    "age20.24.second.trimester.odds.mult",
-                    "age25.29.second.trimester.odds.mult"),
-    
-    pnc2.age.B  = c("age30.34.second.trimester.odds.mult",
-                    "age35.39.second.trimester.odds.mult",
-                    "age40.44.second.trimester.odds.mult"),
+    # pnc2.race   = c("black.second.trimester.odds.mult",
+    #                 "hispanic.second.trimester.odds.mult",
+    #                 "other.second.trimester.odds.mult"),
+    # 
+    # pnc2.age.A  = c("age15.19.second.trimester.odds.mult",
+    #                 "age20.24.second.trimester.odds.mult",
+    #                 "age25.29.second.trimester.odds.mult"),
+    # 
+    # pnc2.age.B  = c("age30.34.second.trimester.odds.mult",
+    #                 "age35.39.second.trimester.odds.mult",
+    #                 "age40.44.second.trimester.odds.mult"),
+    # 
+    # pnc2.age.C = c("age0.14.second.trimester.odds.mult",
+    #                "age45.49.second.trimester.odds.mult",
+    #                "age50.54.second.trimester.odds.mult",
+    #                "age55.64.second.trimester.odds.mult",
+    #                "age65.plus.second.trimester.odds.mult"),
     
     # Third trimester
     pnc3.global = c("third.trimester.intercept.mult",
-                    "third.trimester.slope.mult"),
+                    "third.trimester.slope.mult")#,
     
-    pnc3.race   = c("black.third.trimester.odds.mult",
-                    "hispanic.third.trimester.odds.mult",
-                    "other.third.trimester.odds.mult"),
-    
-    pnc3.age.A  = c("age15.19.third.trimester.odds.mult",
-                    "age20.24.third.trimester.odds.mult",
-                    "age25.29.third.trimester.odds.mult"),
-    
-    pnc3.age.B  = c("age30.34.third.trimester.odds.mult",
-                    "age35.39.third.trimester.odds.mult",
-                    "age40.44.third.trimester.odds.mult")
+    # pnc3.race   = c("black.third.trimester.odds.mult",
+    #                 "hispanic.third.trimester.odds.mult",
+    #                 "other.third.trimester.odds.mult"),
+    # 
+    # pnc3.age.A  = c("age15.19.third.trimester.odds.mult",
+    #                 "age20.24.third.trimester.odds.mult",
+    #                 "age25.29.third.trimester.odds.mult"),
+    # 
+    # pnc3.age.B  = c("age30.34.third.trimester.odds.mult",
+    #                 "age35.39.third.trimester.odds.mult",
+    #                 "age40.44.third.trimester.odds.mult"),
+    # 
+    # pnc3.age.C = c("age0.14.third.trimester.odds.mult",
+    #                "age45.49.third.trimester.odds.mult",
+    #                "age50.54.third.trimester.odds.mult",
+    #                "age55.64.third.trimester.odds.mult",
+    #                "age65.plus.third.trimester.odds.mult")
 )
-
-
 
 # SUMMARIZE ---- #these will be registered in the specification 
 SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
