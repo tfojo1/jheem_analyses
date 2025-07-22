@@ -263,33 +263,42 @@ peak_to_historical_baseline.penalty.instructions <-
             years <- data$years
             
             idx1990  <- which(years == 1990)
-            baseline <- vals[idx1990]
-            peak     <- max(vals, na.rm = TRUE)
-            ratio    <- baseline / peak
+            peak_1990 <- vals[idx1990]
+            ratio <- vals[1:(idx1990-1)]/peak_1990
+            
             
             # unpack two thresholds and spreads
             min_r   <-  data$min.ratio
             max_r   <-  data$max.ratio  
-            σ_low   <- log(2)/2      # tune: how sharply to punish too-flat
+            σ_low   <- log(2)/2      # tune: how sharply to punish below 1/2 1990 val
             σ_high  <- log(2)/2      # tune: how sharply to punish too-spiky
             
             # piecewise penalty
-            if (ratio <= min_r) {
-                # too flat: penalize with a lognormal centered at min_r
-                μ_low <- log(min_r)
-                logp  <- dlnorm(ratio, meanlog = μ_low, sdlog = σ_low, log = TRUE)
-                
-            } else if (ratio >= max_r) {
-                # too spiky: penalize with a lognormal centered at max_r
-                μ_high <- log(max_r)
-                logp   <- dlnorm(ratio, meanlog = μ_high, sdlog = σ_high, log = TRUE)
-                
-            } else {
-                # “just right”: no penalty
-                logp <- 0
-            }
+            logp_low = 0
+            logp_high = 0
             
-            if (log) logp else exp(logp)
+            lik.penalty = lapply(ratio, function(r){
+                if (r  < min_r) {
+                    # penalize with a lognormal centered at min_r
+                    μ_low <- log(min_r)
+                    logp_low  <- dlnorm(r, meanlog = μ_low, sdlog = σ_low, log = TRUE)
+                    
+                }
+                
+                if (r > max_r) {
+                    # too spiky: penalize with a lognormal centered at max_r
+                    μ_high <- log(max_r)
+                    logp_high   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high, log = TRUE)
+                    
+                }
+                
+                logp = (logp_low + logp_high)
+            })
+            
+            lik.penalty.total = sum(unlist(lik.penalty))
+            if (log) lik.penalty.total else exp(lik.penalty.total)
+            
+            
         },
         get.data.function = function(version, location) {
             sim.meta <- get.simulation.metadata(version = version, location = location)
