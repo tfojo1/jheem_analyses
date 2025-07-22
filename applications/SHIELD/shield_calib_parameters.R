@@ -499,6 +499,12 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = sexes)
   }
   
+  trimesters <- list(
+      list(element = "prp.prenatal.care.first.trimester",  prefix = "first.trimester"),
+      list(element = "prp.prenatal.care.second.trimester.of.those.not.screened.first", prefix = "second.trimester"),
+      list(element = "prp.prenatal.care.third.trimester.of.those.not.screened.first.second",  prefix = "third.trimester")
+  )
+  
   races=ages=model.settings$specification.metadata$dim.names$race
   all.age.ranges <- c("0.14","15.19","20.24","25.29","30.34","35.39",
                       "40.44","45.49","50.54","55.64","65.plus")
