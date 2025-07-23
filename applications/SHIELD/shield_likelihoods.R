@@ -295,7 +295,7 @@ peak_to_historical_baseline.penalty.instructions <-
                 logp = (logp_low + logp_high)
             })
             
-            lik.penalty.total = sum(unlist(lik.penalty))
+            lik.penalty.total = sum(unlist(lik.penalty))/length(unlist(lik.penalty))
             if (log) lik.penalty.total else exp(lik.penalty.total)
             
             
@@ -570,7 +570,7 @@ congenital.nested.likelihood.instructions.trans =
                                                       location.types = c('STATE',"CBSA"), #CBSA is MSA level
                                                       minimum.geographic.resolution.type = 'COUNTY',
                                                       
-                                                      dimensions = character(),
+                                                      dimensions = c("age","race"),
                                                       levels.of.stratification = c(0),
                                                       from.year = 2008,
                                                       
@@ -617,7 +617,7 @@ prenatal.care.first.trimester.likelihood.instructions =
                                          outcome.for.data = "prenatal.care.initiation.first.trimester",
                                          
                                          dimensions = c("age","race"),
-                                         levels.of.stratification = c(0,1),
+                                         levels.of.stratification = c(0),
                                          from.year = 2016,
                                          observation.correlation.form = 'compound.symmetry', #'@PK: autoregressive.1?
                                          error.variance.term = function(data,details,version, location){
@@ -721,6 +721,15 @@ lik.inst.diag.only.totals.no.demog=join.likelihood.instructions(
     early.diagnosis.total.likelihood.instructions,
     late.diagnosis.total.likelihood.instructions,
     hiv.testing.total.likelihood.instructions,
+    peak_to_historical_baseline.penalty.instructions
+)
+
+lik.inst.diag.only.totals.no.demog.NYC=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    ps.diagnosis.total.likelihood.instructions,
+    early.diagnosis.total.likelihood.instructions,
+    late.diagnosis.total.likelihood.instructions,
+    proportion.tested.nested.likelihood.instructions,
     peak_to_historical_baseline.penalty.instructions
 )
 

@@ -23,12 +23,12 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 
 #
 VERSION='shield'
-LOCATION='C.12580' 
+LOCATION='C.12060' 
 set.seed(00000)
 CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-CALIBRATION.NAME = 'calib.07.16.pk0' 
+CALIBRATION.NAME = 'calib.MIA.07.23'
 
 
 #################
@@ -36,7 +36,7 @@ print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locati
 #
 clear.calibration.cache(version=VERSION,
                         location=LOCATION,
-                       calibration.code = CALIBRATION.NAME,
+                        calibration.code = CALIBRATION.NAME,
                         allow.remove.incomplete = T)
 print("Cashe is cleared")
 #

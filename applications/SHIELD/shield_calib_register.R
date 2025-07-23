@@ -10,7 +10,8 @@ param.names.all<-c(
     POPULATION.PARAMETERS.PRIOR@var.names,
     AGING.PARAMETERS.PRIOR@var.names,
     TRANSMISSION.PARAMETERS.PRIOR@var.names,
-    TESTING.PARAMETERS.PRIOR@var.names)
+    TESTING.PARAMETERS.PRIOR@var.names
+)
 
 #Demographic
 register.calibration.info('calib.demog.07.08.rf', 
@@ -63,31 +64,8 @@ register.calibration.info('calib.ATL.07.21',
                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-###### with congenital, no penalty
 
-register.calibration.info('calib.MIA.07.21.2', 
-                          preceding.calibration.codes = 'calib.demog.miami',
-                          likelihood.instructions = likelihood.instructions.complete.no.demog.no.penalty,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              TESTING.PARAMETERS.PRIOR@var.names), 
-                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-
-register.calibration.info('calib.ATL.07.21.2', 
-                          preceding.calibration.codes = 'calib.demog.atlanta',
-                          likelihood.instructions = likelihood.instructions.complete.no.demog.no.penalty,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              TESTING.PARAMETERS.PRIOR@var.names), 
-                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-
-###### with congenital and penalty
-
-register.calibration.info('calib.MIA.07.21.3', 
+register.calibration.info('calib.MIA.07.23', 
                           preceding.calibration.codes = 'calib.demog.miami',
                           likelihood.instructions = lik.inst.diag.only.totals.no.demog,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -97,8 +75,7 @@ register.calibration.info('calib.MIA.07.21.3',
                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-
-register.calibration.info('calib.ATL.07.21.3', 
+register.calibration.info('calib.ATL.07.23', 
                           preceding.calibration.codes = 'calib.demog.atlanta',
                           likelihood.instructions = lik.inst.diag.only.totals.no.demog,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -108,6 +85,40 @@ register.calibration.info('calib.ATL.07.21.3',
                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
+register.calibration.info('calib.NYC.07.22', 
+                          preceding.calibration.codes = 'calib.demog.07.08.rf',
+                          likelihood.instructions = lik.inst.diag.only.totals.no.demog.NYC,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+###### with congenital
+
+
+register.calibration.info('calib.MIA.07.22.2', 
+                          preceding.calibration.codes = 'calib.demog.miami',
+                          likelihood.instructions = likelihood.instructions.complete.no.demog,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names,
+                                              CONGENITAL.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.07.22.2', 
+                          preceding.calibration.codes = 'calib.demog.atlanta',
+                          likelihood.instructions = likelihood.instructions.complete.no.demog,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names,
+                                              CONGENITAL.PARAMETERS.PRIOR@var.names),  
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
 
 # LOG SUMMARY -----
 # <calib.07.10.pk*> adding EL specific knots in 1990,95,2000,2010,2020 for screening to see if it works
