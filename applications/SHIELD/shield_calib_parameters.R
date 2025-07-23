@@ -234,7 +234,7 @@ CONGENITAL.PARAMETERS.PRIOR=join.distributions(
     # 
     # Third‑trimester
     third.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    third.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5)#,
+    third.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
     # black.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     # hispanic.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
@@ -268,6 +268,12 @@ CONGENITAL.PARAMETERS.PRIOR=join.distributions(
     # age50.54.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     # age55.64.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     # age65.plus.third.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
+    
+    ## vertical transmission ##
+    prob.vertical.transmission.mothers.early.syphilis = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    prob.vertical.transmission.mothers.late.syphilis = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+    
+    
     
 )
 
@@ -881,7 +887,7 @@ SHIELD.CONGENITAL.SAMPLING.BLOCKS=list(
     
     # Third trimester
     pnc3.global = c("third.trimester.intercept.mult",
-                    "third.trimester.slope.mult")#,
+                    "third.trimester.slope.mult"),
     
     # pnc3.race   = c("black.third.trimester.odds.mult",
     #                 "hispanic.third.trimester.odds.mult",
@@ -900,6 +906,8 @@ SHIELD.CONGENITAL.SAMPLING.BLOCKS=list(
     #                "age50.54.third.trimester.odds.mult",
     #                "age55.64.third.trimester.odds.mult",
     #                "age65.plus.third.trimester.odds.mult")
+    vertical.trans = c("prob.vertical.transmission.mothers.early.syphilis",
+                       "prob.vertical.transmission.mothers.late.syphilis")
 )
 
 # SUMMARIZE ---- #these will be registered in the specification 
