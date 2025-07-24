@@ -98,7 +98,7 @@ register.calibration.info('calib.NYC.07.22',
 ###### with congenital
 
 
-register.calibration.info('calib.MIA.07.22.2', 
+register.calibration.info('calib.MIA.07.23.2', 
                           preceding.calibration.codes = 'calib.demog.miami',
                           likelihood.instructions = likelihood.instructions.complete.no.demog,
                           data.manager = SURVEILLANCE.MANAGER,
@@ -109,7 +109,7 @@ register.calibration.info('calib.MIA.07.22.2',
                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-register.calibration.info('calib.ATL.07.22.2', 
+register.calibration.info('calib.ATL.07.23.2', 
                           preceding.calibration.codes = 'calib.demog.atlanta',
                           likelihood.instructions = likelihood.instructions.complete.no.demog,
                           data.manager = SURVEILLANCE.MANAGER,

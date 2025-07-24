@@ -270,8 +270,8 @@ CONGENITAL.PARAMETERS.PRIOR=join.distributions(
     # age65.plus.third.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
     
     ## vertical transmission ##
-    prob.vertical.transmission.mothers.early.syphilis = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    prob.vertical.transmission.mothers.late.syphilis = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+    prob.vertical.transmission.mothers.early.syphilis = Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),
+    prob.vertical.transmission.mothers.late.syphilis = Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
     
     
     
