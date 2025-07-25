@@ -14,7 +14,7 @@ POPULATION.WEIGHT = TOTAL.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
-
+PEAK.WEIGHT = TOTAL.WEIGHT
 
 # Population weights: 
 # the census runs population count every 10 years, in 2010, and 2020.
@@ -192,7 +192,7 @@ total.diagnosis.likelihood.instructions =
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.term = 0.0764791209420945, 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT ,
                                          equalize.weight.by.year = T,
@@ -215,7 +215,7 @@ ps.diagnosis.total.likelihood.instructions =
                                          levels.of.stratification = c(0), 
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.term = 0.0764791209420945,  
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -229,7 +229,7 @@ ps.diagnosis.total.likelihood.instructions.N =
                                          from.year = 1993,
                                          to.year = 2022 ,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.term = 0.0764791209420945, 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -244,7 +244,7 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          levels.of.stratification = c(0,1,2), 
                                          from.year = 1993,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.term = 0.0764791209420945, 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
@@ -295,7 +295,7 @@ peak_to_historical_baseline.penalty.instructions <-
                 logp = (logp_low + logp_high)
             })
             
-            lik.penalty.total = sum(unlist(lik.penalty))/length(unlist(lik.penalty))
+            lik.penalty.total = sum(unlist(lik.penalty))*PEAK.WEIGHT
             if (log) lik.penalty.total else exp(lik.penalty.total)
             
             
@@ -570,7 +570,7 @@ congenital.nested.likelihood.instructions.trans =
                                                       location.types = c('STATE',"CBSA"), #CBSA is MSA level
                                                       minimum.geographic.resolution.type = 'COUNTY',
                                                       
-                                                      dimensions = c("age","race"),
+                                                      dimensions = character(),
                                                       levels.of.stratification = c(0),
                                                       from.year = 2008,
                                                       
@@ -617,7 +617,7 @@ prenatal.care.first.trimester.likelihood.instructions =
                                          outcome.for.data = "prenatal.care.initiation.first.trimester",
                                          
                                          dimensions = c("age","race"),
-                                         levels.of.stratification = c(0),
+                                         levels.of.stratification = c(0,1),
                                          from.year = 2016,
                                          observation.correlation.form = 'compound.symmetry', #'@PK: autoregressive.1?
                                          error.variance.term = function(data,details,version, location){
@@ -709,7 +709,8 @@ likelihood.instructions.syphilis.diag.strata.no.demog=join.likelihood.instructio
     ps.diagnosis.by.strata.likelihood.instructions,
     early.diagnosis.by.strata.likelihood.instructions,
     late.diagnosis.by.strata.likelihood.instructions,
-    hiv.testing.by.strata.likelihood.instructions
+    hiv.testing.by.strata.likelihood.instructions,
+    hiv.testing.total.likelihood.instructions,
 )
 
 
@@ -720,16 +721,7 @@ lik.inst.diag.only.totals.no.demog=join.likelihood.instructions(
     ps.diagnosis.total.likelihood.instructions,
     early.diagnosis.total.likelihood.instructions,
     late.diagnosis.total.likelihood.instructions,
-    hiv.testing.total.likelihood.instructions,
-    peak_to_historical_baseline.penalty.instructions
-)
-
-lik.inst.diag.only.totals.no.demog.NYC=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions,
-    proportion.tested.nested.likelihood.instructions,
+    state.HIV.tested.likelihood.instructions,
     peak_to_historical_baseline.penalty.instructions
 )
 
