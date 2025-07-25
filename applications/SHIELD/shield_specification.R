@@ -1087,7 +1087,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
 # prop of pregnant women receiving 'successful' prenatal screening 
-# TBD: How to model treatment failures that still result in congenital syphilis? 
+#'@PK:TBD: How to model treatment failures that still result in congenital syphilis? 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'b.model.prenatal.care',
                        scale = 'non.negative.number',
@@ -1911,10 +1911,12 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  singular.unit = 'person'),
                       scale='non.negative.number',
                       multiply.by = expression(prob.vertical.transmission.by.stage * (
+                        #prp of infected pregnant women whp pass on congenital syphilis to newborn
                           prp.prenatal.care.first.trimester * rr.congenital.syphilis.prenatal.care.first.trimester +
                               prp.prenatal.care.second.trimester * rr.congenital.syphilis.prenatal.care.second.trimester  +
                               prp.prenatal.care.third.trimester * rr.congenital.syphilis.prenatal.care.third.trimester +
-                              prp.no.prenatal.care * rr.congenital.syphilis.no.prenatal.care    ) ), #prp of preg that pass on congenital syphilis
+                              prp.no.prenatal.care * rr.congenital.syphilis.no.prenatal.care    
+                          ) ), 
                       dynamic.quantity.name = 'births.from',  #model has an internal definition for births  #births from is conditional on parent's characteristics
                       corresponding.data.outcome = 'congenital.syphilis.diagnoses' ,
                       keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well
@@ -1925,17 +1927,14 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          value = 'diagnosis.congenital',
                          value.is.numerator = T,
                          denominator.outcome = 'births.from',
-                         keep.dimensions = 'location',
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Congenital Syphilis Diagnosis in the Past Year',
                                                                     description = 'Proportion of Congenital Syphilis Diagnosis in the Past Year',
                                                                     scale = 'proportion',
                                                                     axis.name = 'proportion',
                                                                     units = 'percent',
-                                                                    singular.unit = 'percent')
-                         
-                         
-                         
-                         
+                                                                    singular.unit = 'percent'),
+                         corresponding.data.outcome = "proportion.of.congenital.syphilis.births",
+                         keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well
 )
 
 ##---- Prenatal.care.coverage.by trimester ---- 
