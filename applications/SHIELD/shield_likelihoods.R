@@ -14,7 +14,7 @@ POPULATION.WEIGHT = TOTAL.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
-
+PENALTY.WEIGHT = 
 
 # Population weights: 
 # the census runs population count every 10 years, in 2010, and 2020.
@@ -223,7 +223,7 @@ historical.diagnosis.likelihood.instructions <-
                 logp_annual
             })
             #
-            total.logp = sum(unlist(total.logp))
+            total.logp = sum(unlist(total.logp))*PENALTY.WEIGHT
             if (log) total.logp else exp(total.logp)
         },
         get.data.function = function(version, location) {
@@ -494,6 +494,7 @@ proportion.tested.nested.likelihood.instructions =
                                                      #dimensions = c("age","sex"),
                                                      levels.of.stratification = c(0),
                                                      from.year = 2010,
+                                                     to.year = 2019,
                                                      #
                                                      p.bias.inside.location = 0,
                                                      p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
