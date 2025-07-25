@@ -14,7 +14,7 @@ POPULATION.WEIGHT = TOTAL.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
-PENALTY.WEIGHT = 
+PENALTY.WEIGHT = TOTAL.WEIGHT
 
 # Population weights: 
 # the census runs population count every 10 years, in 2010, and 2020.
@@ -257,6 +257,7 @@ total.diagnosis.likelihood.instructions =
                                          outcome.for.data = "total.syphilis.diagnoses",  
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
@@ -279,6 +280,7 @@ ps.diagnosis.total.likelihood.instructions =
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          levels.of.stratification = c(0), 
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
@@ -287,19 +289,6 @@ ps.diagnosis.total.likelihood.instructions =
                                          minimum.error.sd = 1  
     )
 
-ps.diagnosis.total.likelihood.instructions.N =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         levels.of.stratification = c(0), 
-                                         from.year = 1993,
-                                         to.year = 2022 ,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1  
-    )
 
 
 ps.diagnosis.by.strata.likelihood.instructions =
@@ -308,6 +297,7 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          dimensions = c("age","race","sex"),
                                          levels.of.stratification = c(0,1,2), 
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
@@ -332,19 +322,6 @@ early.diagnosis.total.likelihood.instructions =
                                          outcome.for.data = "early.syphilis.diagnoses", 
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = EL.DIAGNOSIS.WEIGHT, # DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-early.diagnosis.total.likelihood.instructions.N =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
-                                         outcome.for.data = "early.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
@@ -354,12 +331,14 @@ early.diagnosis.total.likelihood.instructions.N =
                                          minimum.error.sd = 1
     )
 
+
 early.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
                                          dimensions = c("age","race","sex"),
                                          levels.of.stratification = c(0,1,2,3),
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
@@ -384,49 +363,11 @@ late.diagnosis.total.likelihood.instructions =
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-late.diagnosis.total.likelihood.instructions.M =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = DIAGNOSIS.WEIGHT*2.42,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-late.diagnosis.total.likelihood.instructions.A =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = DIAGNOSIS.WEIGHT*5.10,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-late.diagnosis.total.likelihood.instructions.N =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = DIAGNOSIS.WEIGHT*1.73,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
@@ -437,6 +378,7 @@ late.diagnosis.by.strata.likelihood.instructions =
                                          dimensions = c("age","race","sex"),
                                          levels.of.stratification = c(0,1,2,3),
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'compound.symmetry',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
@@ -477,6 +419,7 @@ hiv.testing.by.strata.likelihood.instructions =
 
 ### State-level ----
 # for situations where MSA level data is not available 
+# need to figure out how to write this for MSM and Heterosexual
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
     # Intentionally do nothing:
     return(arr)
