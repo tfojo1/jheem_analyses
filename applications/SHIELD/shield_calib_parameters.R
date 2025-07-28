@@ -147,6 +147,9 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   transmission.rate.multiplier.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.other= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
+  ### future change
+  transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
+  
   ## Sexual Mixing by Age
   age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)), #directly used in specification helper function
   #to control the standard deviation of the contact matrix by age
@@ -409,6 +412,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = 'all',
                                                    applies.to.dimension.values = 'all')
     
+    
     #race multipliers, shared for msm and heterosexuals: 
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
@@ -427,6 +431,21 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "race.to", #recipient
                                                    applies.to.dimension.values = c("black","hispanic", "other"))
   }
+  
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "transmission.rate.heterosexual",
+                                                 alpha.name = "after.modifier",
+                                                 values = parameters["transmission.rate.future.change.mult"],
+                                                 applies.to.dimension.values = "all",
+                                                 dimension = "all"
+                                                 )
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "transmission.rate.msm",
+                                                 alpha.name = "after.modifier",
+                                                 values = parameters["transmission.rate.future.change.mult"],
+                                                 applies.to.dimension.values = "all",
+                                                 dimension = "all"
+  )
   
   ## STI SCREENING  ----
   # Changing the intercept and slope for HIV tests
@@ -741,6 +760,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     "transmission.rate.multiplier.hispanic",
     "transmission.rate.multiplier.other"
   ),
+  future.change=c("transmission.rate.future.change.mult"),
   age.mixing.transmission=(
     "age.mixing.sd.mult"
   ),
