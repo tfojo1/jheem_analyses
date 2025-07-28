@@ -464,6 +464,106 @@ state.HIV.tested.likelihood.instructions =
     )
 
 
+
+
+
+SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
+{
+    # We only do anything if:
+    #  (a) there is a "sex" dimension,
+    #  (b) both "msm" and "heterosexual_male" are present as sex levels, and
+    #  (c) the two male slices are IDENTICAL everywhere (i.e., they are a duplicated slab).
+    # This matches the EHE pattern: only redistribute when the two male strata are copies.
+    if ("sex" %in% names(dim(arr)) &&
+        all(c("msm","heterosexual_male") %in% dimnames(arr)$sex) &&
+        all(array.access(arr, sex = "msm") == array.access(arr, sex = "heterosexual_male")))
+    {
+        # ---- Pull metadata needed by the helper that returns MSM proportions ----
+        # specification.metadata informs how to shape (age/race) the MSM proportion array.
+        specification.metadata <- get.specification.metadata(version = version, location = location)
+        
+        # ---- Get best-guess MSM proportions for this location ----
+        # keep.age/keep.race tell the helper to return proportions stratified to match 'arr'
+        # (only if those dimensions exist). 'ages' pins the age ordering to arr's dimnames.
+        # The result 'proportion.msm' is typically an array over year/age/race (subset thereof).
+        proportion.msm <- get.best.guess.msm.proportions(
+            location,
+            specification.metadata = specification.metadata,
+            keep.age  = any(names(dim(arr)) == "age"),
+            keep.race = any(names(dim(arr)) == "race"),
+            ages      = dimnames(arr)$age
+        )
+        
+        # ---- Build a partition array over sex = {msm, heterosexual_male} ----
+        # Concatenate p(MSM) and 1 - p(MSM), then give it the same non-sex dimnames as
+        # 'proportion.msm', plus a two-level 'sex' dimension ordered c("msm","heterosexual_male").
+        sex.partition.arr <- c(as.numeric(proportion.msm), 1 - as.numeric(proportion.msm))
+        sex.partition.dimnames <- c(dimnames(proportion.msm), list(sex = c("msm", "heterosexual_male")))
+        dim(sex.partition.arr)    <- sapply(sex.partition.dimnames, length)
+        dimnames(sex.partition.arr) <- sex.partition.dimnames
+        
+        # ---- Select the portion of 'arr' that aligns with the partition dims ----
+        # This pulls the slab of 'arr' whose dimensions match sex.partition.dimnames.
+        sex.modified <- array.access(arr, sex.partition.dimnames)
+        
+        # ---- Apply the partition to split the duplicated male mass ----
+        # expand.array broadcasts the partition over any remaining dims in sex.modified.
+        # Multiplying implements: new(msm) = total_male * p_msm; new(hetero) = total_male * (1 - p_msm).
+        sex.modified <- sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
+        
+        # ---- Write the modified slab back into the original array ----
+        array.access(arr, dimnames(sex.modified)) <- sex.modified
+    }
+    
+    # Return the (possibly) modified array. If the condition above didn't hold,
+    # we return 'arr' unchanged (again, matching EHE behavior).
+    arr
+}
+
+
+
+proportion.tested.by.strata.nested.likelihood.instructions =
+    create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv",
+                                                     outcome.for.sim = "hiv.testing",
+                                                     denominator.outcome.for.data = "adult.population",
+                                                     #
+                                                     location.types = c('STATE','CBSA'),
+                                                     minimum.geographic.resolution.type = 'COUNTY',
+                                                     #
+                                                     dimensions = c("age","sex"),
+                                                     levels.of.stratification = c(0,1),
+                                                     from.year = 2010,
+                                                     to.year = 2019,
+                                                     #
+                                                     p.bias.inside.location = 0,
+                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
+                                                     #
+                                                     within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
+                                                     within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+                                                     #
+                                                     observation.correlation.form = 'compound.symmetry',
+                                                     p.error.variance.term = 0.5,
+                                                     p.error.variance.type = 'cv', 
+                                                     #
+                                                     partitioning.function = SHIELD.PARTITIONING.FUNCTION,
+                                                     #
+                                                     weights = (TESTING.WEIGHT),
+                                                     equalize.weight.by.year = T
+    )
+
+state.HIV.tested.by.strata.likelihood.instructions =
+    create.ifelse.likelihood.instructions(
+        hiv.testing.by.strata.likelihood.instructions,
+        proportion.tested.by.strata.nested.likelihood.instructions
+    )
+
+
+
+
+
+
 ##**Congenital ** ----
 #poportion of state level births that are complicated by congenital syphilis 
 # 1) using CDC reported state level targets
