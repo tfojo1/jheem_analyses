@@ -3,8 +3,8 @@
 # anywhere that we have a MSA level data, we should have a national level data with the same stratification and ontology names
 # we can have more national level estimates if we can pull them directly 
 # in the surveillance manager, we only need to have MSA level and national level data
-
 # we should bound agegroups at 85+
+source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 
 
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
@@ -14,7 +14,7 @@ POPULATION.WEIGHT = TOTAL.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
-PEAK.WEIGHT = TOTAL.WEIGHT
+PENALTY.WEIGHT = TOTAL.WEIGHT
 
 # Population weights: 
 # the census runs population count every 10 years, in 2010, and 2020.
@@ -182,6 +182,72 @@ emigration.likelihood.instructions =
 
 
 #** SYPHILIS DIAGNOSIS ** ----
+## Historical ----
+#using national level data on total diagnosis, we estimated the min and max value of the ratio between annual diagnosis relative to the peak in 1990
+# for each year between 1970-1990 in the model, we calculate a similar ratio and bound the values to fall within this min/max threshold (to align with national trend)
+# if the values fall below min, we penalize the likelihood by dlnorm. 
+# if they fall between min and max, they likelihood is 1
+# if the value falls over max, we penalize it by dlnorm
+historical.diagnosis.likelihood.instructions <-
+    create.custom.likelihood.instructions(
+        name = "historical.diagnosis.likelihood",
+        compute.function = function(sim, data, log = T) {
+            vals  <- sim$optimized.get(data$get.instr) #get simulated values
+            years <- data$years #get years
+            # ratio of total diagnosis from 1970-1989 to diagnosis in 1990:
+            idx1990  <- which(years == 1990)
+            peak_1990 <- vals[idx1990]
+            ratio <- vals[1:(idx1990-1)]/peak_1990
+            #
+            # unpack two nationa thresholds:
+            min_r   <-  data$min.ratio
+            max_r   <-  data$max.ratio  
+            σ_low   <- log(2)/2      # tune: how sharply to punish below 1/2 1990 val
+            σ_high  <- log(2)/2      # tune: how sharply to punish too-spiky
+            #
+            # piecewise penalty
+            logp_annual = 0 #by default
+            #
+            total.logp = lapply(ratio, function(r){
+                # if fall below min threshold: penalize with a lognormal centered at min_r
+                if (r  < min_r) {
+                    μ_low <- log(min_r)
+                    logp_annual  <- dlnorm(r, meanlog = μ_low, sdlog = σ_low, log = TRUE)
+                }
+                # if fall over max threshold:  penalize with a lognormal centered at max_r
+                if (r > max_r) {
+                    μ_high <- log(max_r)
+                    logp_annual   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high, log = TRUE)
+                }
+                #
+                logp_annual
+            })
+            #
+            total.logp = sum(unlist(total.logp))*PENALTY.WEIGHT
+            if (log) total.logp else exp(total.logp)
+        },
+        get.data.function = function(version, location) {
+            sim.meta <- get.simulation.metadata(version = version, location = location)
+            #
+            # instruction to fetch your outcome over time
+            get.instr <- sim.meta$prepare.optimized.get.instructions(
+                outcome             = "diagnosis.total",
+                dimension.values          = list(year = seq(1970, 1990)),
+                keep.dimensions           = "year",
+                drop.single.sim.dimension = TRUE
+            )
+            #
+            # supply the historical vectors and computed params
+            list(
+                get.instr       = get.instr,
+                years           = hist_df$year,
+                national.values = hist_df$value,
+                max.ratio    = max_ratio_hist,
+                min.ratio   = min_ratio_hist,
+                sdlog           = sdlog_hist
+            )
+        }
+    )
 ##---- Total ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
 # data from 1993-1999 (cdc.pdf.report) for MSA and national (total)
@@ -191,8 +257,9 @@ total.diagnosis.likelihood.instructions =
                                          outcome.for.data = "total.syphilis.diagnoses",  
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, 
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT ,
                                          equalize.weight.by.year = T,
@@ -208,121 +275,37 @@ total.diagnosis.likelihood.instructions =
 # data from 1998-2023 for MSA level (cdc.sti) for MSA (total)
 # data from 2000-2023 for MSA level (cdc.sti) for MSA (total; sex; race; age group)
 # data from 2000-2023 for MSA level (cdc.sti) for MSA (age group+sex; age group + race; race+sex)
-
 ps.diagnosis.total.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          levels.of.stratification = c(0), 
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,  
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
 
-ps.diagnosis.total.likelihood.instructions.N =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         levels.of.stratification = c(0), 
-                                         from.year = 1993,
-                                         to.year = 2022 ,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, 
-                                         error.variance.type = 'cv',
-                                         weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1  
-    )
 
 
 ps.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
-                                         dimensions = c("age","race","sex"),
-                                         levels.of.stratification = c(0,1,2), 
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex"),
+                                         levels.of.stratification = c(0,1), 
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, 
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
-
-
-source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
-
-peak_to_historical_baseline.penalty.instructions <-
-    create.custom.likelihood.instructions(
-        name = "peak_to_historical_baseline_penalty",
-        
-        compute.function = function(sim, data, log = T) {
-            vals  <- sim$optimized.get(data$get.instr)
-            years <- data$years
-            
-            idx1990  <- which(years == 1990)
-            peak_1990 <- vals[idx1990]
-            ratio <- vals[1:(idx1990-1)]/peak_1990
-            
-            
-            # unpack two thresholds and spreads
-            min_r   <-  data$min.ratio
-            max_r   <-  data$max.ratio  
-            σ_low   <- log(2)/2      # tune: how sharply to punish below 1/2 1990 val
-            σ_high  <- log(2)/2      # tune: how sharply to punish too-spiky
-            
-            # piecewise penalty
-            logp_low = 0
-            logp_high = 0
-            
-            lik.penalty = lapply(ratio, function(r){
-                if (r  < min_r) {
-                    # penalize with a lognormal centered at min_r
-                    μ_low <- log(min_r)
-                    logp_low  <- dlnorm(r, meanlog = μ_low, sdlog = σ_low, log = TRUE)
-                    
-                }
-                
-                if (r > max_r) {
-                    # too spiky: penalize with a lognormal centered at max_r
-                    μ_high <- log(max_r)
-                    logp_high   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high, log = TRUE)
-                    
-                }
-                
-                logp = (logp_low + logp_high)
-            })
-            
-            lik.penalty.total = sum(unlist(lik.penalty))*PEAK.WEIGHT
-            if (log) lik.penalty.total else exp(lik.penalty.total)
-            
-            
-        },
-        get.data.function = function(version, location) {
-            sim.meta <- get.simulation.metadata(version = version, location = location)
-            
-            # instruction to fetch your outcome over time
-            get.instr <- sim.meta$prepare.optimized.get.instructions(
-                outcome             = "diagnosis.total",
-                dimension.values          = list(year = seq(1970, 1990)),
-                keep.dimensions           = "year",
-                drop.single.sim.dimension = TRUE
-            )
-            
-            # supply the historical vectors and computed params
-            list(
-                get.instr       = get.instr,
-                years           = hist_df$year,
-                national.values = hist_df$value,
-                max.ratio    = max_ratio_hist,
-                min.ratio   = min_ratio_hist,
-                sdlog           = sdlog_hist
-            )
-        }
-    )
-
 
 ##---- EARLY ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
@@ -340,19 +323,6 @@ early.diagnosis.total.likelihood.instructions =
                                          outcome.for.data = "early.syphilis.diagnoses", 
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = EL.DIAGNOSIS.WEIGHT, # DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-early.diagnosis.total.likelihood.instructions.N =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
-                                         outcome.for.data = "early.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
@@ -362,12 +332,15 @@ early.diagnosis.total.likelihood.instructions.N =
                                          minimum.error.sd = 1
     )
 
+
 early.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("age","race","sex"),
-                                         levels.of.stratification = c(0,1,2,3),
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex"),
+                                         levels.of.stratification = c(0,1),
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
@@ -392,6 +365,7 @@ late.diagnosis.total.likelihood.instructions =
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                          levels.of.stratification = c(0),
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
@@ -400,51 +374,14 @@ late.diagnosis.total.likelihood.instructions =
                                          minimum.error.sd = 1
     )
 
-late.diagnosis.total.likelihood.instructions.M =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = DIAGNOSIS.WEIGHT*2.42,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-late.diagnosis.total.likelihood.instructions.A =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = DIAGNOSIS.WEIGHT*5.10,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-late.diagnosis.total.likelihood.instructions.N =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 1993,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
-                                         weights = DIAGNOSIS.WEIGHT*1.73,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
 late.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("age","race","sex"),
-                                         levels.of.stratification = c(0,1,2,3),
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex"),
+                                         levels.of.stratification = c(0,1),
                                          from.year = 1993,
+                                         to.year = 2022,
                                          observation.correlation.form = 'compound.symmetry',
                                          error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
                                          error.variance.type = 'cv',
@@ -454,6 +391,7 @@ late.diagnosis.by.strata.likelihood.instructions =
     )
 
 ##** HIV TESTS ** ----
+### MSA-level ----
 hiv.testing.total.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
                                          outcome.for.data = "proportion.tested.for.hiv", 
@@ -466,13 +404,12 @@ hiv.testing.total.likelihood.instructions =
                                          weights = TESTING.WEIGHT,
                                          error.variance.type = 'cv',
     )
-
-
 hiv.testing.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
                                          outcome.for.data = "proportion.tested.for.hiv", 
-                                         dimensions = c("age","race","sex"),
-                                         levels.of.stratification = c(0,1,2,3),
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex"),
+                                         levels.of.stratification = c(0,1),
                                          from.year = 2014,
                                          to.year = 2019,
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
@@ -483,43 +420,47 @@ hiv.testing.by.strata.likelihood.instructions =
                                          minimum.error.sd = 1
     )
 
+
+### State-level ----
+# for situations where MSA level data is not available 
+# need to figure out how to write this for MSM and Heterosexual
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
     # Intentionally do nothing:
     return(arr)
 }
-
 proportion.tested.bias.estimates = get.cached.object.for.version(name = "proportion.tested.bias.estimates", 
                                                                  version = 'ehe')
 proportion.tested.nested.likelihood.instructions =
     create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv",
                                                      outcome.for.sim = "hiv.testing",
                                                      denominator.outcome.for.data = "adult.population",
-                                                     
+                                                     #
                                                      location.types = c('STATE','CBSA'),
                                                      minimum.geographic.resolution.type = 'COUNTY',
-                                                     
+                                                     #
                                                      #dimensions = c("age","sex"),
                                                      levels.of.stratification = c(0),
                                                      from.year = 2010,
-                                                     
+                                                     to.year = 2019,
+                                                     #
                                                      p.bias.inside.location = 0,
                                                      p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
                                                      p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
                                                      p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
-                                                     
-                                                     within.location.p.error.correlation = 0.5,
-                                                     within.location.n.error.correlation = 0.5,
-                                                     
+                                                     #
+                                                     within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
+                                                     within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+                                                     #
                                                      observation.correlation.form = 'compound.symmetry',
                                                      p.error.variance.term = 0.5,
                                                      p.error.variance.type = 'cv', 
-                                                     
+                                                     #
                                                      partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION,
-                                                     
+                                                     #
                                                      weights = (TESTING.WEIGHT),
                                                      equalize.weight.by.year = T
     )
-
+### Nested likelihood ----
 state.HIV.tested.likelihood.instructions =
     create.ifelse.likelihood.instructions(
         hiv.testing.total.likelihood.instructions,
@@ -527,29 +468,111 @@ state.HIV.tested.likelihood.instructions =
     )
 
 
-##---- Congenital ----
+
+SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
+{
+    # We only do anything if:
+    #  (a) there is a "sex" dimension,
+    #  (b) both "msm" and "heterosexual_male" are present as sex levels, and
+    #  (c) the two male slices are IDENTICAL everywhere (i.e., they are a duplicated slab).
+    # This matches the EHE pattern: only redistribute when the two male strata are copies.
+    if ("sex" %in% names(dim(arr)) &&
+        all(c("msm","heterosexual_male") %in% dimnames(arr)$sex) &&
+        all(array.access(arr, sex = "msm") == array.access(arr, sex = "heterosexual_male")))
+    {
+        # ---- Pull metadata needed by the helper that returns MSM proportions ----
+        # specification.metadata informs how to shape (age/race) the MSM proportion array.
+        specification.metadata <- get.specification.metadata(version = version, location = location)
+        
+        # ---- Get best-guess MSM proportions for this location ----
+        # keep.age/keep.race tell the helper to return proportions stratified to match 'arr'
+        # (only if those dimensions exist). 'ages' pins the age ordering to arr's dimnames.
+        # The result 'proportion.msm' is typically an array over year/age/race (subset thereof).
+        proportion.msm <- get.best.guess.msm.proportions(
+            location,
+            specification.metadata = specification.metadata,
+            keep.age  = any(names(dim(arr)) == "age"),
+            keep.race = any(names(dim(arr)) == "race"),
+            ages      = dimnames(arr)$age
+        )
+        
+        # ---- Build a partition array over sex = {msm, heterosexual_male} ----
+        # Concatenate p(MSM) and 1 - p(MSM), then give it the same non-sex dimnames as
+        # 'proportion.msm', plus a two-level 'sex' dimension ordered c("msm","heterosexual_male").
+        sex.partition.arr <- c(as.numeric(proportion.msm), 1 - as.numeric(proportion.msm))
+        sex.partition.dimnames <- c(dimnames(proportion.msm), list(sex = c("msm", "heterosexual_male")))
+        dim(sex.partition.arr)    <- sapply(sex.partition.dimnames, length)
+        dimnames(sex.partition.arr) <- sex.partition.dimnames
+        
+        # ---- Select the portion of 'arr' that aligns with the partition dims ----
+        # This pulls the slab of 'arr' whose dimensions match sex.partition.dimnames.
+        sex.modified <- array.access(arr, sex.partition.dimnames)
+        
+        # ---- Apply the partition to split the duplicated male mass ----
+        # expand.array broadcasts the partition over any remaining dims in sex.modified.
+        # Multiplying implements: new(msm) = total_male * p_msm; new(hetero) = total_male * (1 - p_msm).
+        sex.modified <- sex.modified * expand.array(sex.partition.arr, dimnames(sex.modified))
+        
+        # ---- Write the modified slab back into the original array ----
+        array.access(arr, dimnames(sex.modified)) <- sex.modified
+    }
+    
+    # Return the (possibly) modified array. If the condition above didn't hold,
+    # we return 'arr' unchanged (again, matching EHE behavior).
+    arr
+}
+
+
+
+proportion.tested.by.strata.nested.likelihood.instructions =
+    create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv",
+                                                     outcome.for.sim = "hiv.testing",
+                                                     denominator.outcome.for.data = "adult.population",
+                                                     #
+                                                     location.types = c('STATE','CBSA'),
+                                                     minimum.geographic.resolution.type = 'COUNTY',
+                                                     #
+                                                     #dimensions = c("age","sex"),
+                                                     dimensions = c("sex"),
+                                                     levels.of.stratification = c(0,1),
+                                                     from.year = 2010,
+                                                     to.year = 2019,
+                                                     #
+                                                     p.bias.inside.location = 0,
+                                                     p.bias.outside.location = proportion.tested.bias.estimates$out.mean,
+                                                     p.bias.sd.inside.location = proportion.tested.bias.estimates$out.sd,
+                                                     p.bias.sd.outside.location = proportion.tested.bias.estimates$out.sd,
+                                                     #
+                                                     within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
+                                                     within.location.n.error.correlation = 0.5, #Default: ratio of tests outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+                                                     #
+                                                     observation.correlation.form = 'compound.symmetry',
+                                                     p.error.variance.term = 0.5,
+                                                     p.error.variance.type = 'cv', 
+                                                     #
+                                                     partitioning.function = SHIELD.PARTITIONING.FUNCTION,
+                                                     #
+                                                     weights = (TESTING.WEIGHT),
+                                                     equalize.weight.by.year = T
+    )
+
+state.HIV.tested.by.strata.likelihood.instructions =
+    create.ifelse.likelihood.instructions(
+        hiv.testing.by.strata.likelihood.instructions,
+        proportion.tested.by.strata.nested.likelihood.instructions
+    )
+
+##**Congenital ** ----
 #poportion of state level births that are complicated by congenital syphilis 
 # 1) using CDC reported state level targets
-# 2) estimating MSA level diagnoses from local health department and estiamteign proporiton of MSA level births 
-#'@TODD: to add the nested likelihood for prop of births with congenital 
+# 2) estimating MSA level diagnoses from local health department and estimating proportion of MSA level births 
 
-# congenital.diagnosis.basic.likelihood.instructions =
-#   create.basic.likelihood.instructions(outcome.for.data = "congenital.syphilis.diagnoses", #fix type
-#                                        outcome.for.sim = "diagnosis.congenital",
-#                                        levels.of.stratification = c(0,1,2),
-#                                        from.year = 2010,
-#                                        observation.correlation.form = 'autoregressive.1',
-#                                        error.variance.term = 0.05,
-#                                        error.variance.type = 'cv'
-#   )
-# 
-# 
 congenital.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
                                                  dimensions = c("age","race"),
                                                  levels.of.stratification = c(0,1),
                                                  outcome.for.p = "proportion.of.congenital.syphilis.births",
                                                  outcome.for.n = "births.denominator.for.congenital.syphilis.proportion",
-                                                 sub.location.type = NULL, #if you had MSA level data
+                                                 sub.location.type = NULL, #if we had county level data
                                                  super.location.type = "STATE",
                                                  main.location.type = "CBSA"
                                                  # main.location.type.p.source = "cdc.aggregated.proportion", #specific source of data that should be used here
@@ -557,71 +580,55 @@ congenital.bias.estimates = get.p.bias.estimates(SURVEILLANCE.MANAGER,
 )
 # 
 SHIELD.DUMMY.PARTITIONING.FUNCTION <- function(arr, version = 'shield', location) {
-    # Intentionally do nothing:
     return(arr)
 }
 
-congenital.nested.likelihood.instructions.trans =
+congenital.nested.likelihood.instructions =
     create.nested.proportion.likelihood.instructions( outcome.for.sim = "proportion.births.congenital",
                                                       outcome.for.data = "proportion.of.congenital.syphilis.births",
-                                                      
-                                                      denominator.outcome.for.data = 'population', # evaluate , we need better outcome denominator 
-                                                      
+                                                      denominator.outcome.for.data = 'population', #'@Ryan: we need better outcome denominator here for fertile women
+                                                      #
                                                       location.types = c('STATE',"CBSA"), #CBSA is MSA level
                                                       minimum.geographic.resolution.type = 'COUNTY',
-                                                      
+                                                      #
                                                       dimensions = character(),
                                                       levels.of.stratification = c(0),
                                                       from.year = 2008,
-                                                      
+                                                      to.year= 2019,
+                                                      #
                                                       p.bias.inside.location = 0,
                                                       p.bias.outside.location = congenital.bias.estimates$out.mean, #to be calculated using Todd's code
                                                       p.bias.sd.inside.location = congenital.bias.estimates$out.sd,
                                                       p.bias.sd.outside.location = congenital.bias.estimates$out.sd,
-                                                      
-                                                      within.location.p.error.correlation = 0.5, #Default assumption #correlation from one year to other in the bias in the city and outside the city
-                                                      within.location.n.error.correlation = 0.5, #Default assumption #ratio of births outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
+                                                      #                                                     #
+                                                      within.location.p.error.correlation = 0.5, #Default: correlation from one year to other in the bias in the city and outside the city
+                                                      within.location.n.error.correlation = 0.5, #Default: ratio of births outside MSA to those inside MSA (for MSA we usually dont have fully stratified numbers)
                                                       #
-                                                      
                                                       observation.correlation.form = 'autoregressive.1',
                                                       p.error.variance.term = 0.08617235 , 
                                                       p.error.variance.type = "cv",
-                                                      
+                                                      #
                                                       partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION,# we use for unknown outcomes (e.g., number of IDUs by age race in Baltimore) (not needed here)
-                                                      
+                                                      #
                                                       weights = (1*DIAGNOSIS.WEIGHT),
                                                       equalize.weight.by.year = T
     )
 
-#  
-#  congenital.diagnosis.likelihood.instructions = 
-#      create.location.based.ifelse.likelihood.instructions(
-#          congenital.diagnosis.basic.likelihood.instructions,
-#          congenital.nested.likelihood.instructions.trans,
-#          locations.list = list(c(locations::get.all.for.type("state")))  # anything not in this list will use second instructions
-#      )
-
-# cache.object.for.version(object = suppression.bias.estimates,
-#                          name = "suppression.bias.estimates",
-# version = 'ehe', overwrite=T)
-
 
 ##** PRENATAL CARE COVERAGE ** ----
 # we have 4 Categories representing a multinomial likelihood . 
-# for now we are modeling 4 independant likelihoods. This may overpenalize deviations from a single bin because we are not accounting for the correlation between the 4 categories.)
-# Error estimate: @zoe: what proportion of prenatals were unknown at the national level? we can use that to inform this error here 
+# for now we are modeling 4 independent likelihoods. This may over penalize deviations from a single bin because we are not accounting for the correlation between the 4 categories.)
+#'@Zoe: Error estimate: what proportion of prenatal were unknown at the national level? we can use that to inform this error here 
 ## source("applications/SHIELD/inputs/input_prenatal_msa_variance.R")
 ave.msa.variance= 0.0032 #estimated for all 33 msa combined
 prenatal.care.first.trimester.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.first.trimester",
                                          outcome.for.data = "prenatal.care.initiation.first.trimester",
-                                         
                                          dimensions = c("age","race"),
                                          levels.of.stratification = c(0,1),
                                          from.year = 2016,
-                                         observation.correlation.form = 'compound.symmetry', #'@PK: autoregressive.1?
+                                         observation.correlation.form = 'autoregressive.1',  
                                          error.variance.term = function(data,details,version, location){
-                                             # browser()
                                              w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
                                              msa.variance=(1-mean(w))^2 * ave.msa.variance
                                              data[is.na(data)]<-0 #'@Andrew: to take out after the update
@@ -633,18 +640,16 @@ prenatal.care.first.trimester.likelihood.instructions =
 prenatal.care.second.trimester.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.second.trimester",
                                          outcome.for.data = "prenatal.care.initiation.second.trimester",
-                                         
                                          dimensions = c("age","race"),
                                          levels.of.stratification = c(0,1),
                                          from.year = 2016,
-                                         observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = function(data,details,version, location){
                                              w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
                                              msa.variance=(1-mean(w))^2 * ave.msa.variance
                                              data[is.na(data)]<-0 #'@Andrew: to take out after the update
                                              var= (data* (0.05))^2+msa.variance
                                              sd=sqrt(var)
-                                             
                                              return(sd)
                                          },
                                          weights = PRENATAL.WEIGHT,
@@ -653,11 +658,10 @@ prenatal.care.second.trimester.likelihood.instructions =
 prenatal.care.third.trimester.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "prp.prenatal.care.third.trimester",
                                          outcome.for.data = "prenatal.care.initiation.third.trimester",
-                                         
                                          dimensions = c("age","race"),
                                          levels.of.stratification = c(0,1),
                                          from.year = 2016,
-                                         observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = function(data,details,version, location){
                                              w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
                                              msa.variance=(1-mean(w))^2 * ave.msa.variance
@@ -670,11 +674,10 @@ prenatal.care.third.trimester.likelihood.instructions =
 no.prenatal.care.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "prp.no.prenatal.care",
                                          outcome.for.data = "no.prenatal.care",
-                                         
                                          dimensions = c("age","race"),
                                          levels.of.stratification = c(0,1),
                                          from.year = 2016,
-                                         observation.correlation.form = 'compound.symmetry',
+                                         observation.correlation.form = 'autoregressive.1',
                                          error.variance.term = function(data,details,version, location){
                                              w=SURVEILLANCE.MANAGER$data$completeness.prenatal.care.initiation.first.trimester$estimate$cdc.wonder.natality$cdc.fertility$year__location[,location]
                                              msa.variance=(1-mean(w))^2 * ave.msa.variance
@@ -686,6 +689,60 @@ no.prenatal.care.likelihood.instructions =
                                          error.variance.type = 'function.sd')
 
 
+
+
+#-- LIKELIHOODS --# ----
+## Demographics only ----
+lik.inst.demog=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions,
+    fertility.likelihood.instructions,
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions)
+
+## Adult syphilis diagnosis only / HIV tests ----- 
+#Total + strata diagnosis by stage only
+lik.inst.diag.strata.no.demog=join.likelihood.instructions(
+    ps.diagnosis.by.strata.likelihood.instructions,
+    early.diagnosis.by.strata.likelihood.instructions,
+    late.diagnosis.by.strata.likelihood.instructions,
+    hiv.testing.by.strata.likelihood.instructions
+)
+## Total adult syphilis diagnosis / HIV tests ----
+lik.inst.diag.totals.no.demog=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    ps.diagnosis.total.likelihood.instructions,
+    early.diagnosis.total.likelihood.instructions,
+    late.diagnosis.total.likelihood.instructions,
+    hiv.testing.total.likelihood.instructions
+)
+## Total adult syphilis diagnosis / HIV tests + Historical diagnosis ----- 
+lik.inst.diag.totals.no.demog.w.historical=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    ps.diagnosis.total.likelihood.instructions,
+    early.diagnosis.total.likelihood.instructions,
+    late.diagnosis.total.likelihood.instructions,
+    create.ifelse.likelihood.instructions(
+        hiv.testing.total.likelihood.instructions,
+        proportion.tested.nested.likelihood.instructions
+    ),
+    historical.diagnosis.likelihood.instructions
+)
+
+## Total + strata adult syphilis diagnosis / HIV tests + Historical diagnosis ----- 
+lik.inst.diag.strata.no.demog.w.historical=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    ps.diagnosis.by.strata.likelihood.instructions,
+    early.diagnosis.by.strata.likelihood.instructions,
+    late.diagnosis.by.strata.likelihood.instructions,
+    create.ifelse.likelihood.instructions(
+        hiv.testing.total.likelihood.instructions,
+        proportion.tested.by.strata.nested.likelihood.instructions
+    ),
+    historical.diagnosis.likelihood.instructions
+)
+
+## Prenatal care ----
 likelihood.instructions.PNC = join.likelihood.instructions(
     prenatal.care.first.trimester.likelihood.instructions,
     prenatal.care.second.trimester.likelihood.instructions,
@@ -693,78 +750,13 @@ likelihood.instructions.PNC = join.likelihood.instructions(
     no.prenatal.care.likelihood.instructions
 )
 
-
-#-- LIKELIHOODS --# ----
-likelihood.instructions.demographics=join.likelihood.instructions(
-    population.likelihood.instructions,
-    deaths.likelihood.instructions,
-    fertility.likelihood.instructions,
-    immigration.likelihood.instructions,
-    emigration.likelihood.instructions)
-
-
-
-# Total + strata diagnosis by stage only
-likelihood.instructions.syphilis.diag.strata.no.demog=join.likelihood.instructions(
-    ps.diagnosis.by.strata.likelihood.instructions,
-    early.diagnosis.by.strata.likelihood.instructions,
-    late.diagnosis.by.strata.likelihood.instructions,
-    hiv.testing.by.strata.likelihood.instructions,
-    hiv.testing.total.likelihood.instructions,
-)
-
-
-
-# penalty 
-lik.inst.diag.only.totals.no.demog=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions,
-    state.HIV.tested.likelihood.instructions,
-    peak_to_historical_baseline.penalty.instructions
-)
-
-# No Penalty
-lik.inst.diag.only.totals.no.demog.no.penalty=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions,
-    early.diagnosis.total.likelihood.instructions,
-    late.diagnosis.total.likelihood.instructions,
-    hiv.testing.total.likelihood.instructions
-)
-
-#Congential + Penalty
-likelihood.instructions.complete.no.demog = join.likelihood.instructions(
-    lik.inst.diag.only.totals.no.demog,
-    congenital.nested.likelihood.instructions.trans,
-    likelihood.instructions.PNC
-)
-#Congential + No Penalty
-likelihood.instructions.complete.no.demog.no.penalty = join.likelihood.instructions(
-    lik.inst.diag.only.totals.no.demog.no.penalty,
-    congenital.nested.likelihood.instructions.trans,
+## Total adult syphilis diagnosis / HIV tests + Historical diagnosis + congenital and PNC----
+lik.inst.diag.totals.no.demog.w.hist.w.cong = join.likelihood.instructions(
+    lik.inst.diag.totals.no.demog.w.historical,
+    congenital.nested.likelihood.instructions,
     likelihood.instructions.PNC
 )
 
-# All total diagnosis+HIV-test+CNS+prenatal care
-# lik.inst.diag.by.strata.no.demog=join.likelihood.instructions(
-#     total.diagnosis.likelihood.instructions,
-#     ps.diagnosis.by.strata.likelihood.instructions,
-#     early.diagnosis.by.strata.likelihood.instructions,
-#     late.diagnosis.by.strata.likelihood.instructions,
-#     hiv.testing.total.likelihood.instructions
-#     
-# )
-# 
-# # All total diagnosis+CNS+prenatal care
-# lik.inst.diag.by.strata.no.demog=join.likelihood.instructions(
-#     total.diagnosis.likelihood.instructions,
-#     ps.diagnosis.by.strata.likelihood.instructions,
-#     early.diagnosis.by.strata.likelihood.instructions,
-#     late.diagnosis.by.strata.likelihood.instructions,
-#     
-# )
 
 
 ##--OPTIONAL:CNS ----

@@ -484,7 +484,11 @@ register.model.element(SHIELD.SPECIFICATION,
                            knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
                            knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                            knot.link = 'log', 
-                           link='identity', #linear projections between the knots 
+                           after.time = 2030,
+                           after.modifier = 0.5,
+                           after.modifier.increasing.change.link = 'identity',
+                           after.modifier.decreasing.change.link = 'log',
+                           link='identity', #linear projections between the knots   
                            #
                            min=0 #even after using log for knots, value can be negative so we need to truncate
                        )
@@ -496,12 +500,16 @@ register.model.element(SHIELD.SPECIFICATION,
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.heterosexual',
-                       functional.form = create.linear.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
-                                                                              knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
-                                                                              knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
-                                                                              min=0,
-                                                                              knot.link = 'log',
-                                                                              link='identity') ,
+                       functional.form = create.natural.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                                                                               knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
+                                                                               knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
+                                                                               min=0,
+                                                                               after.time = 2030,
+                                                                               after.modifier = 0.5,
+                                                                               after.modifier.increasing.change.link = 'identity',
+                                                                               after.modifier.decreasing.change.link = 'log',
+                                                                               knot.link = 'log',
+                                                                               link='identity') ,
                        functional.form.from.time = 1970, 
                        scale='rate')
 
@@ -1087,7 +1095,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
 # prop of pregnant women receiving 'successful' prenatal screening 
-# TBD: How to model treatment failures that still result in congenital syphilis? 
+#'@PK:TBD: How to model treatment failures that still result in congenital syphilis? 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'b.model.prenatal.care',
                        scale = 'non.negative.number',
@@ -1686,6 +1694,8 @@ track.integrated.outcome(
 
 
 
+
+
 ##---- Syphilis Incidence ---- 
 # (new infections + reinfections)
 track.dynamic.outcome(SHIELD.SPECIFICATION,
@@ -1909,10 +1919,12 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                                                                  singular.unit = 'person'),
                       scale='non.negative.number',
                       multiply.by = expression(prob.vertical.transmission.by.stage * (
+                          #prp of infected pregnant women whp pass on congenital syphilis to newborn
                           prp.prenatal.care.first.trimester * rr.congenital.syphilis.prenatal.care.first.trimester +
                               prp.prenatal.care.second.trimester * rr.congenital.syphilis.prenatal.care.second.trimester  +
                               prp.prenatal.care.third.trimester * rr.congenital.syphilis.prenatal.care.third.trimester +
-                              prp.no.prenatal.care * rr.congenital.syphilis.no.prenatal.care    ) ), #prp of preg that pass on congenital syphilis
+                              prp.no.prenatal.care * rr.congenital.syphilis.no.prenatal.care    
+                      ) ), 
                       dynamic.quantity.name = 'births.from',  #model has an internal definition for births  #births from is conditional on parent's characteristics
                       corresponding.data.outcome = 'congenital.syphilis.diagnoses' ,
                       keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well
@@ -1923,17 +1935,14 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          value = 'diagnosis.congenital',
                          value.is.numerator = T,
                          denominator.outcome = 'births.from',
-                         keep.dimensions = 'location',
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion of Congenital Syphilis Diagnosis in the Past Year',
                                                                     description = 'Proportion of Congenital Syphilis Diagnosis in the Past Year',
                                                                     scale = 'proportion',
                                                                     axis.name = 'proportion',
                                                                     units = 'percent',
-                                                                    singular.unit = 'percent')
-                         
-                         
-                         
-                         
+                                                                    singular.unit = 'percent'),
+                         corresponding.data.outcome = "proportion.of.congenital.syphilis.births",
+                         keep.dimensions = c('location') #collapse on stage and continuum for infected and on profile as well
 )
 
 ##---- Prenatal.care.coverage.by trimester ---- 
