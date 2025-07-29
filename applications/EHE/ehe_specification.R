@@ -57,6 +57,8 @@ EHE.SPECIFICATION = create.jheem.specification(version = 'ehe',
                                                    msm_idu = 'MSM/PWID'
                                                ),
                                                
+                                               order.locations.by.outcomes = 'diagnosed.prevalence',
+                                               
                                                default.solver.metadata = create.solver.metadata()
                                                )
 

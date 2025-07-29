@@ -5,6 +5,7 @@ CDC.TESTING.LOSS.LAG = 0.25
 CDC.TESTING.EARLY.END.YEAR = 2027 
 CDC.TESTING.RETURN.LAG = 1 
 CDC.TESTING.LATE.END.YEAR = 2029 
+CDC.TESTING.END.YEAR = 2027.75
 
 set.seed(1234)
 proportion.tested.regardless.values = rbeta(1000, shape1 = 4.84, shape2 = 4.84)
@@ -73,3 +74,18 @@ cdc.testing.cessation.prolonged.interruption = create.intervention(WHOLE.POPULAT
                                                                    code = "cdct.pintr",
                                                                    parameters = proportion.tested.regardless.values)
 
+# Return Fiscal Year 2028 (ie, Oct 2027)
+cdc.testing.interruption.effect = create.intervention.effect(quantity.name = "cdc.effect",
+                                                             start.time = CDC.TESTING.START.YEAR,
+                                                             effect.values = c(0,0),
+                                                             times = c(CDC.TESTING.START.YEAR + CDC.TESTING.LOSS.LAG, CDC.TESTING.END.YEAR),
+                                                             end.time = CDC.TESTING.END.YEAR + CDC.TESTING.RETURN.LAG,
+                                                             scale = "proportion",
+                                                             apply.effects.as = "value",
+                                                             allow.values.less.than.otherwise = T,
+                                                             allow.values.greater.than.otherwise = F)
+
+cdc.testing.interruption = create.intervention(WHOLE.POPULATION,
+                                               cdc.testing.prolonged.interruption.effect,
+                                               code = "cdct.intr",
+                                               parameters = proportion.tested.regardless.values)

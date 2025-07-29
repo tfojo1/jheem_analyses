@@ -1,6 +1,7 @@
 
+LOCATION = 'SC'
 
-simset.full = assemble.simulations.from.calibration('ehe','TN','final.ehe.state')
+simset.full = assemble.simulations.from.calibration('ehe', LOCATION,'final.ehe.state')
 
 simset = simset.full$burn(keep=1000)
 
