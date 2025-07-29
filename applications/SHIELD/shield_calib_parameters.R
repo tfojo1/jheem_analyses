@@ -123,22 +123,22 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   lu.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
   
   ## Transmission
-  global.transmission.rate = Lognormal.Distribution(meanlog = log(3.5), sdlog = 0.5*log(2)), #directly used in specification (will need sth uch larger) 
+  global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 100), #directly used in specification (will need sth uch larger) 
   
   #12 independant params
   # msm multipliers by time
   transmission.rate.multiplier.msm1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.msm1990 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm1995 = Lognormal.Distribution(meanlog = log(1.2), sdlog = 0.5*log(2)),#1995 #increasing the peak value
-  transmission.rate.multiplier.msm2000 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)), 
+  transmission.rate.multiplier.msm1995 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),#1995 #increasing the peak value
+  transmission.rate.multiplier.msm2000 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
   transmission.rate.multiplier.msm2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
   transmission.rate.multiplier.msm2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
   
   # heterosexual multipliers by time
   transmission.rate.multiplier.heterosexual1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   transmission.rate.multiplier.heterosexual1990 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.heterosexual1995 = Lognormal.Distribution(meanlog = log(1.2), sdlog = 0.5*log(2)),#1995 #increasing the peak value
-  transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = log(0.9), sdlog = 0.5*log(2)), 
+  transmission.rate.multiplier.heterosexual1995 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),#1995 #increasing the peak value
+  transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
   transmission.rate.multiplier.heterosexual2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
   transmission.rate.multiplier.heterosexual2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
   
