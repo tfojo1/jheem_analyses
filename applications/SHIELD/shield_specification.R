@@ -914,6 +914,8 @@ register.model.element(SHIELD.SPECIFICATION,
                            #
                            after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
                            after.modifier = 0.5,
+                           # after.modifier.increasing.change.link = 'identity',
+                           # after.modifier.decreasing.change.link = 'log',
                            modifiers.apply.to.change = T,
                        ))
 base.prp.symptomatic.secondary = array(
@@ -943,6 +945,8 @@ register.model.element(SHIELD.SPECIFICATION,
                            #
                            after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
                            after.modifier = 0.5,
+                           # after.modifier.increasing.change.link = 'identity',
+                           # after.modifier.decreasing.change.link = 'log',
                            modifiers.apply.to.change = T
                        ))
 # We assume 100% care/seeking and testing rate for symptomatic individuals
@@ -1033,6 +1037,10 @@ register.model.element(SHIELD.SPECIFICATION,
                            knot.link = "log",
                            link = "identity", #linear projections between the knots (avoid exponential growth)
                            #
+                           after.time = 2030,
+                           after.modifier = 0.5,
+                           after.modifier.increasing.change.link = 'identity',
+                           after.modifier.decreasing.change.link = 'log',
                            knot.min = 0, #knot values can not fall below 0
                            min=0 #projected spline values can not fall below 0
                        ) 
