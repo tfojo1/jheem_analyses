@@ -487,7 +487,7 @@ register.model.element(SHIELD.SPECIFICATION,
                            after.time = 2030,
                            after.modifier = 0.5,
                            after.modifier.increasing.change.link = 'identity',
-                           after.modifier.decreasing.change.link = 'log',
+                           after.modifier.decreasing.change.link = 'log', # turn this on to replicate exponential growth issue 
                            link='identity', #linear projections between the knots   
                            #
                            min=0 #even after using log for knots, value can be negative so we need to truncate
@@ -507,7 +507,7 @@ register.model.element(SHIELD.SPECIFICATION,
                                                                               after.time = 2030,
                                                                               after.modifier = 0.5,
                                                                               after.modifier.increasing.change.link = 'identity',
-                                                                              after.modifier.decreasing.change.link = 'log',
+                                                                              after.modifier.decreasing.change.link = 'log',  # turn this on to replicate exponential growth issue
                                                                               knot.link = 'log',
                                                                               link='identity') ,
                        functional.form.from.time = 1970, 
