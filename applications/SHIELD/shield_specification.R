@@ -190,17 +190,39 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = SHIELD_BASE_PARAMETER_VALUES['prp.lu.diag.1997'])
 
 # relative new diagnosis in 1970 to that peak
+# --- Sex/risk–specific initial diagnosis multipliers (1970) ---
+
+# Primary/Secondary
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'ps.diagnoses.multiplier.1970',
-                       scale = 'non.negative.number',
+                       name = 'ps.diagnoses.msm.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['ps.diagnoses.multiplier.1970'])
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'el.diagnoses.multiplier.1970',
-                       scale = 'non.negative.number',
+                       name = 'ps.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
+                       value = SHIELD_BASE_PARAMETER_VALUES['ps.diagnoses.multiplier.1970'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'ps.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
+                       value = SHIELD_BASE_PARAMETER_VALUES['ps.diagnoses.multiplier.1970'])
+
+# Early latent
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'el.diagnoses.msm.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['el.diagnoses.multiplier.1970'])
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'lu.diagnoses.multiplier.1970',
-                       scale = 'non.negative.number',
+                       name = 'el.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
+                       value = SHIELD_BASE_PARAMETER_VALUES['el.diagnoses.multiplier.1970'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'el.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
+                       value = SHIELD_BASE_PARAMETER_VALUES['el.diagnoses.multiplier.1970'])
+
+# Late latent
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'lu.diagnoses.msm.multiplier.1970', scale = 'non.negative.number',
+                       value = SHIELD_BASE_PARAMETER_VALUES['lu.diagnoses.multiplier.1970'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'lu.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
+                       value = SHIELD_BASE_PARAMETER_VALUES['lu.diagnoses.multiplier.1970'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'lu.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['lu.diagnoses.multiplier.1970'])
 
 # Estimating size of infected population
@@ -208,39 +230,109 @@ register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prop.initial.population.infected',
                         value = 0)
 
+# ---- PRIMARY (25% of PS) ----
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prop.initial.population.infected',
-                               applies.to = list(continuum='undiagnosed', stage='primary'),
-                               value = expression(prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .25  ))
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='primary', sex='msm'),
+                               value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * 0.25))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prop.initial.population.infected',
-                               applies.to = list(continuum='undiagnosed', stage='secondary'),
-                               value = expression(prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .75  ))
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='primary', sex='heterosexual_male'),
+                               value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * 0.25))
 register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prop.initial.population.infected',
-                               applies.to = list(continuum='undiagnosed', stage='early.latent'),
-                               value = expression(prp.el.diag.1997 * el.diagnoses.multiplier.1970  ))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'prop.initial.population.infected',
-                               applies.to = list(continuum='undiagnosed', stage='late.latent'),
-                               value = expression(prp.lu.diag.1997 * lu.diagnoses.multiplier.1970   ))
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='primary', sex='female'),
+                               value=expression(prp.ps.diag.1997 * ps.diagnoses.female.multiplier.1970 * 0.25))
 
+# ---- SECONDARY (75% of PS) ----
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='msm'),
+                               value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * 0.75))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='heterosexual_male'),
+                               value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * 0.75))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='female'),
+                               value=expression(prp.ps.diag.1997 * ps.diagnoses.female.multiplier.1970 * 0.75))
+
+# ---- EARLY LATENT ----
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='msm'),
+                               value=expression(prp.el.diag.1997 * el.diagnoses.msm.multiplier.1970))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='heterosexual_male'),
+                               value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='female'),
+                               value=expression(prp.el.diag.1997 * el.diagnoses.female.multiplier.1970))
+# ---- LATE LATENT ----
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='msm'),
+                               value=expression(prp.lu.diag.1997 * lu.diagnoses.msm.multiplier.1970))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='heterosexual_male'),
+                               value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='prop.initial.population.infected',
+                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='female'),
+                               value=expression(prp.lu.diag.1997 * lu.diagnoses.female.multiplier.1970))
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.infected',
                         value = expression(n.initial.population *prop.initial.population.infected))
+
 #register the infected population:
 register.initial.population(SHIELD.SPECIFICATION,
                             group = 'infected',
                             value = 'n.initial.population.infected')
 ##---- Uninfected ----
 # we need this quantity to calculate the uninfected population without the infected dimensions (stage, continuum)
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = 'n.initial.population.infected.all.stages',
+#                         value = expression((prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .25+
+#                                                 prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .75+
+#                                                 prp.el.diag.1997 * el.diagnoses.multiplier.1970+
+#                                                 prp.lu.diag.1997 * lu.diagnoses.multiplier.1970) * n.initial.population)
+# )
+
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.infected.all.stages',
-                        value = expression((prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .25+
-                                                prp.ps.diag.1997 * ps.diagnoses.multiplier.1970 * .75+
-                                                prp.el.diag.1997 * el.diagnoses.multiplier.1970+
-                                                prp.lu.diag.1997 * lu.diagnoses.multiplier.1970) * n.initial.population)
-)
+                        value = 0)
+
+# MSM
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='n.initial.population.infected.all.stages',
+                               applies.to=list(sex='msm'),
+                               value=expression(
+                                   (prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 +
+                                        prp.el.diag.1997 * el.diagnoses.msm.multiplier.1970 +
+                                        prp.lu.diag.1997 * lu.diagnoses.msm.multiplier.1970) * n.initial.population))
+
+# Heterosexual male
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='n.initial.population.infected.all.stages',
+                               applies.to=list(sex='heterosexual_male'),
+                               value=expression(
+                                   (prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 +
+                                        prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 +
+                                        prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970) * n.initial.population))
+
+# Female
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name='n.initial.population.infected.all.stages',
+                               applies.to=list(sex='female'),
+                               value=expression(
+                                   (prp.ps.diag.1997 * ps.diagnoses.female.multiplier.1970 +
+                                        prp.el.diag.1997 * el.diagnoses.female.multiplier.1970 +
+                                        prp.lu.diag.1997 * lu.diagnoses.female.multiplier.1970) * n.initial.population))
+
 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.uninfected',
@@ -487,7 +579,7 @@ register.model.element(SHIELD.SPECIFICATION,
                            after.time = 2030,
                            after.modifier = 0.5,
                            after.modifier.increasing.change.link = 'identity',
-                           after.modifier.decreasing.change.link = 'log',
+                           after.modifier.decreasing.change.link = 'log', # turn this on to replicate exponential growth issue 
                            link='identity', #linear projections between the knots   
                            #
                            min=0 #even after using log for knots, value can be negative so we need to truncate
@@ -507,7 +599,7 @@ register.model.element(SHIELD.SPECIFICATION,
                                                                                after.time = 2030,
                                                                                after.modifier = 0.5,
                                                                                after.modifier.increasing.change.link = 'identity',
-                                                                               after.modifier.decreasing.change.link = 'log',
+                                                                               after.modifier.decreasing.change.link = 'log',  # turn this on to replicate exponential growth issue
                                                                                knot.link = 'log',
                                                                                link='identity') ,
                        functional.form.from.time = 1970, 
@@ -914,8 +1006,6 @@ register.model.element(SHIELD.SPECIFICATION,
                            #
                            after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
                            after.modifier = 0.5,
-                           # after.modifier.increasing.change.link = 'identity',
-                           # after.modifier.decreasing.change.link = 'log',
                            modifiers.apply.to.change = T,
                        ))
 base.prp.symptomatic.secondary = array(
@@ -945,8 +1035,6 @@ register.model.element(SHIELD.SPECIFICATION,
                            #
                            after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
                            after.modifier = 0.5,
-                           # after.modifier.increasing.change.link = 'identity',
-                           # after.modifier.decreasing.change.link = 'log',
                            modifiers.apply.to.change = T
                        ))
 # We assume 100% care/seeking and testing rate for symptomatic individuals
@@ -1037,10 +1125,6 @@ register.model.element(SHIELD.SPECIFICATION,
                            knot.link = "log",
                            link = "identity", #linear projections between the knots (avoid exponential growth)
                            #
-                           after.time = 2030,
-                           after.modifier = 0.5,
-                           after.modifier.increasing.change.link = 'identity',
-                           after.modifier.decreasing.change.link = 'log',
                            knot.min = 0, #knot values can not fall below 0
                            min=0 #projected spline values can not fall below 0
                        ) 
