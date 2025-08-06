@@ -117,11 +117,24 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
-  # Infection multipliers in 1970 (relative diagnoses in 1970 to the peak diagnoses between 1993-99)
-  ps.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  el.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  lu.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  
+  # # Infection multipliers in 1970 (relative diagnoses in 1970 to the peak diagnoses between 1993-99)
+  # ps.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+  # el.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+  # lu.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
+  ## Initial diagnosis multipliers in 1970 by sex/risk group
+  ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  ps.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    
+  el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  el.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
+  el.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
+    
+  lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    
+      
   ## Transmission
   global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 100), #directly used in specification (will need sth uch larger) 
   
