@@ -9,6 +9,7 @@ CDCP.SPECIFICATION = create.jheem.specification(version='cdcp',
 
 
 #-- Basic Building Blocks --#
+
 register.model.element(CDCP.SPECIFICATION, name = "cdc.prep.effect", #proportionate scaling of cdc effect
                        value = 1,
                        scale = "proportion")
@@ -56,12 +57,12 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.unique",
                        functional.form.from.time = 2010)
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.eligible",
-                       get.functional.form.function = get.fraction.eligible.from.cdc.model,
+                       get.functional.form.function = create.logistic.linear.functional.form(intercept = log(0.88)-log(0.88), slope = 0, anchor.year = 2021, parameters.are.on.logit.scale = TRUE),
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.reffered",
-                       get.functional.form.function = get.fraction.reffered.from.cdc.model,
+                       get.functional.form.function = create.logistic.linear.functional.form(intercept = log(0.35)-log(0.35), slope = 0, anchor.year = 2021, parameters.are.on.logit.scale = TRUE),
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
