@@ -572,14 +572,10 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale='rate',
                        functional.form.from.time = 1970, 
                        functional.form = create.natural.spline.functional.form(
-                           knot.times =c("1970"=1970, "1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
-                           knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
+                           knot.times =c("1970"=1970, "1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020, "2030"=2030),
+                           knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0, "2030"=0),
                            knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
-                           knot.link = 'log', 
-                           after.time = 2030,
-                           after.modifier = 0.5,
-                           after.modifier.increasing.change.link = 'identity',
-                           after.modifier.decreasing.change.link = 'log', # turn this on to replicate exponential growth issue 
+                           knot.link = 'log',
                            link='identity', #linear projections between the knots   
                            #
                            min=0 #even after using log for knots, value can be negative so we need to truncate
@@ -592,14 +588,10 @@ register.model.element(SHIELD.SPECIFICATION,
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.heterosexual',
-                       functional.form = create.natural.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
-                                                                               knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
+                       functional.form = create.natural.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020, "2030"=2030),
+                                                                               knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0, "2030"=0),
                                                                                knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                                min=0,
-                                                                               after.time = 2030,
-                                                                               after.modifier = 0.5,
-                                                                               after.modifier.increasing.change.link = 'identity',
-                                                                               after.modifier.decreasing.change.link = 'log',  # turn this on to replicate exponential growth issue
                                                                                knot.link = 'log',
                                                                                link='identity') ,
                        functional.form.from.time = 1970, 
@@ -989,24 +981,23 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'proportion',
                        functional.form.from.time = 1970, 
                        functional.form = create.natural.spline.functional.form(
-                           knot.times = c("1970"=1970,  "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
+                           knot.times = c("1970"=1970,  "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020, "2030" = 2030),
                            knot.values = list("1970" = base.prp.symptomatic.primary,
                                               "1990" = base.prp.symptomatic.primary,
                                               "1995" = base.prp.symptomatic.primary,
                                               "2000" =  base.prp.symptomatic.primary,
                                               "2010" =  base.prp.symptomatic.primary,
-                                              "2020" =  base.prp.symptomatic.primary),
+                                              "2020" =  base.prp.symptomatic.primary,
+                                              "2030" =  base.prp.symptomatic.primary),
                            #
                            knots.are.on.transformed.scale = F,
                            knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
                            link="logit",
                            #
                            min=0, #do we need these for the proportion? 
-                           max=1,
+                           max=1
                            #
-                           after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
-                           after.modifier = 0.5,
-                           modifiers.apply.to.change = T,
+                           
                        ))
 base.prp.symptomatic.secondary = array(
     c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
@@ -1019,23 +1010,20 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'proportion',
                        functional.form.from.time = 1970, 
                        functional.form = create.natural.spline.functional.form(
-                           knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
+                           knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020, "2030" = 2030),
                            knot.values = list("1970" = base.prp.symptomatic.secondary,
                                               "1990" = base.prp.symptomatic.secondary,
                                               "1995" = base.prp.symptomatic.secondary,
                                               "2000" =  base.prp.symptomatic.secondary,
                                               "2010" =  base.prp.symptomatic.secondary,
-                                              "2020" =  base.prp.symptomatic.secondary),
+                                              "2020" =  base.prp.symptomatic.secondary,
+                                              "2030" =  base.prp.symptomatic.secondary),
                            knots.are.on.transformed.scale = F,
                            knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
                            link="logit",
                            #
                            min=0, #do we need these for the proportion? 
-                           max=1,
-                           #
-                           after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
-                           after.modifier = 0.5,
-                           modifiers.apply.to.change = T
+                           max=1
                        ))
 # We assume 100% care/seeking and testing rate for symptomatic individuals
 # For now, we assume 100% test.sensitivity as well. 
@@ -1119,8 +1107,8 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'ratio',
                        functional.form.from.time = 1970,  #the projections remain fix at this year's value for years before.
                        functional.form = create.natural.spline.functional.form(
-                           knot.times = c("1970"=1970, "1990"=1990,"1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
-                           knot.values=list("1970"=1, "1990"=1,"1995"=1, "2000"=1, "2010"=1,"2020"=1),  
+                           knot.times = c("1970"=1970, "1990"=1990,"1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020, "2030"=2030),
+                           knot.values=list("1970"=1, "1990"=1,"1995"=1, "2000"=1, "2010"=1,"2020"=1,"2030"=1),  
                            knots.are.on.transformed.scale = F,
                            knot.link = "log",
                            link = "identity", #linear projections between the knots (avoid exponential growth)

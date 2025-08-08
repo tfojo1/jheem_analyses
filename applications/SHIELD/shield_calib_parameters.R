@@ -118,17 +118,17 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
     ## Initial diagnosis multipliers in 1970 by sex/risk group
-    ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    ps.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3.75), sdlog = 0.5*log(2)),
+    ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = log(1.25), sdlog = 0.5*log(2)),
+    ps.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = log(1.25), sdlog = 0.5*log(2)),
     
-    el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
     el.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
     el.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
     
-    lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(9), sdlog = 0.5*log(2)),
+    lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
+    lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
     
     ## Transmission
     #global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 100), #directly used in specification (will need sth uch larger) 
@@ -137,28 +137,30 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     #12 independant params
     # msm multipliers by time
-    transmission.rate.multiplier.msm1970 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.msm1990 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.msm1995 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),#1995 #increasing the peak value
-    transmission.rate.multiplier.msm2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    transmission.rate.multiplier.msm2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    transmission.rate.multiplier.msm2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
+    transmission.rate.multiplier.msm1970 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)/2),
+    transmission.rate.multiplier.msm1990 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)/2),
+    transmission.rate.multiplier.msm1995 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)/2),#1995 #increasing the peak value
+    transmission.rate.multiplier.msm2000 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)/2), 
+    transmission.rate.multiplier.msm2010 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)/2), 
+    transmission.rate.multiplier.msm2020 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)/2),
+    transmission.rate.multiplier.msm2030 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)/2),
     
     # heterosexual multipliers by time
-    transmission.rate.multiplier.heterosexual1970 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.heterosexual1990 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.heterosexual1995 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),#1995 #increasing the peak value
-    transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    transmission.rate.multiplier.heterosexual2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    transmission.rate.multiplier.heterosexual2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
+    transmission.rate.multiplier.heterosexual1970 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    transmission.rate.multiplier.heterosexual1990 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    transmission.rate.multiplier.heterosexual1995 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),#1995 #increasing the peak value
+    transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), 
+    transmission.rate.multiplier.heterosexual2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), 
+    transmission.rate.multiplier.heterosexual2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), 
+    transmission.rate.multiplier.heterosexual2030 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), 
     
     ### race multipliers (shared for msm and het):
-    transmission.rate.multiplier.black= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.other= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    transmission.rate.multiplier.black= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    transmission.rate.multiplier.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+    transmission.rate.multiplier.other= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     
     ### future change
-    transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
+    #transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
     
     ## Sexual Mixing by Age
     age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)), #directly used in specification helper function
@@ -186,6 +188,7 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
+    or.symptomatic.2030 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     
     # for HIV screening
     hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
@@ -198,6 +201,7 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     sti.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     sti.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     sti.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    sti.screening.multiplier.2030 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
     # STI screening multiplier by stage (defined in specification-no linking needed here)
     sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)), #get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
@@ -205,6 +209,8 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
     sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    
+    # STI screening multiplier by sex 
     
     # Contact tracing
     # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
@@ -407,7 +413,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     
     ## Transmission ----
     #multipliers for msm rates in each knot:
-    for(time in c("1970","1990","1995","2000","2010","2020")){    
+    for(time in c("1970","1990","1995","2000","2010","2020","2030")){    
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
@@ -442,20 +448,20 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        applies.to.dimension.values = c("black","hispanic", "other"))
     }
     
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "transmission.rate.heterosexual",
-                                                   alpha.name = "after.modifier",
-                                                   values = parameters["transmission.rate.future.change.mult"],
-                                                   applies.to.dimension.values = "all",
-                                                   dimension = "all"
-    )
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "transmission.rate.msm",
-                                                   alpha.name = "after.modifier",
-                                                   values = parameters["transmission.rate.future.change.mult"],
-                                                   applies.to.dimension.values = "all",
-                                                   dimension = "all"
-    )
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "transmission.rate.heterosexual",
+    #                                                alpha.name = "after.modifier",
+    #                                                values = parameters["transmission.rate.future.change.mult"],
+    #                                                applies.to.dimension.values = "all",
+    #                                                dimension = "all"
+    # )
+    # set.element.functional.form.main.effect.alphas(model.settings,
+    #                                                element.name = "transmission.rate.msm",
+    #                                                alpha.name = "after.modifier",
+    #                                                values = parameters["transmission.rate.future.change.mult"],
+    #                                                applies.to.dimension.values = "all",
+    #                                                dimension = "all"
+    # )
     
     ## STI SCREENING  ----
     # Changing the intercept and slope for HIV tests
@@ -473,7 +479,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    applies.to.dimension.values = "all")
     
     # Changing the knot values for ratio of STI screening to HIV tests
-    for(time in c("1970","1990","1995","2000","2010","2020")){
+    for(time in c("1970","1990","1995","2000","2010","2020","2030")){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "multiplier.syphilis.screening.to.hiv.tests",
                                                        alpha.name = time,
@@ -485,7 +491,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     #Note: sti.screening.multiplier.*by stage are directly linked in the specification
     
     # Symptomatic Testing ----
-    for(time in c("1970", "1990","1995","2000","2010","2020")){
+    for(time in c("1970", "1990","1995","2000","2010","2020","2030")){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "prp.symptomatic.primary",
                                                        alpha.name = time,
@@ -765,7 +771,8 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     msm.transmission.block2=c(
         "transmission.rate.multiplier.msm2000",
         "transmission.rate.multiplier.msm2010",
-        "transmission.rate.multiplier.msm2020"),
+        "transmission.rate.multiplier.msm2020",
+        "transmission.rate.multiplier.msm2030"),
     #
     het.transmission.block1 =c(
         "transmission.rate.multiplier.heterosexual1970",
@@ -774,13 +781,14 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     het.transmission.block2=c(
         "transmission.rate.multiplier.heterosexual2000",
         "transmission.rate.multiplier.heterosexual2010",
-        "transmission.rate.multiplier.heterosexual2020"),
+        "transmission.rate.multiplier.heterosexual2020",
+        "transmission.rate.multiplier.heterosexual2030"),
     race.transmission = c(
         "transmission.rate.multiplier.black",
         "transmission.rate.multiplier.hispanic",
         "transmission.rate.multiplier.other"
     ),
-    future.change=c("transmission.rate.future.change.mult"),
+    #future.change=c("transmission.rate.future.change.mult"),
     age.mixing.transmission=(
         "age.mixing.sd.mult"
     ),
@@ -812,7 +820,8 @@ TESTING.SAMPLING.BLOCKS = list(
     symptomatic.testing.time2 = c(
         "or.symptomatic.2000",
         "or.symptomatic.2010",
-        "or.symptomatic.2020"
+        "or.symptomatic.2020",
+        "or.symptomatic.2030"
     ),
     hiv.testing = c(
         "hiv.testing.or",
@@ -835,7 +844,8 @@ TESTING.SAMPLING.BLOCKS = list(
     screening.by.time2 = c(
         "sti.screening.multiplier.2000",
         "sti.screening.multiplier.2010",
-        "sti.screening.multiplier.2020"
+        "sti.screening.multiplier.2020",
+        "sti.screening.multiplier.2030"
     ),
     contact.tracing=c(
         "prop.index.cases.reached.for.contact.tracing"   
