@@ -1,4 +1,6 @@
-b.INFECTIOUSNESS=T
+b.INTIAL=T
+b.INFECTIOUSNESS = T
+b.INFECTIOUSNESS.REL=T
 b.RELAPSE=T
 b.PS.SCREENING=T
 b.CONTACT.TRACING=T
@@ -13,13 +15,13 @@ add.parameter <- function(params, param.name,
                           ci.upper,
                           citation=NA,
                           comment=NA){
-  params$values[param.name] = value
-  params$ci.lower[param.name] = ci.lower
-  params$ci.upper[param.name] = ci.upper
-  params$citation[[param.name]] = list(citation)
-  params$comment[param.name] = comment
-  
-  params
+    params$values[param.name] = value
+    params$ci.lower[param.name] = ci.lower
+    params$ci.upper[param.name] = ci.upper
+    params$citation[[param.name]] = list(citation)
+    params$comment[param.name] = comment
+    
+    params
 }
 SHIELD_BASE_PARAMETER = list(values=numeric(),
                              ci.lower=numeric(),
@@ -42,14 +44,25 @@ prp.ps.diag.1997= SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.s
 prp.el.diag.1997= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[max.ps.year,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[max.ps.year,'C.12580']
 prp.lu.diag.1997= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[max.ps.year,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[max.ps.year,'C.12580']
 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.ps.diag.1997',
-                                      prp.ps.diag.1997,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.el.diag.1997',
-                                      prp.el.diag.1997,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.lu.diag.1997',
-                                      prp.lu.diag.1997,0,0)
+if (b.INTIAL){
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.ps.diag.1997',
+                                          prp.ps.diag.1997,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.el.diag.1997',
+                                          prp.el.diag.1997,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.lu.diag.1997',
+                                          prp.lu.diag.1997,0,0)
+} else{
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.ps.diag.1997',
+                                          0,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.el.diag.1997',
+                                          0,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.lu.diag.1997',
+                                          0,0,0)
+    
+}
 
 # ratio of syphilis diagnoses rate in 1970 to diagnosis rate in 1990 (peak of national data)
+
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ps.diagnoses.multiplier.1970',
                                       0.5,0,0)
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'el.diagnoses.multiplier.1970',
@@ -58,16 +71,24 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'lu.diagnoses.multi
                                       2.2,0,0)
 
 # *** INFECTIOUSNESS ---- ## ----
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'secondary.transmissibility',  
-                                      1,1,1)  # Max value
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
-                                      1,1,1)  #assumption
 if (b.INFECTIOUSNESS){
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
-                                      .25,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'secondary.transmissibility',  
+                                          1,1,1)  # Max value
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
+                                          1,1,1) 
+} else{
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'secondary.transmissibility',  
+                                          0,0,0)  # Max value
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
+                                          0,0,0)  #assumption
+}
+
+if (b.INFECTIOUSNESS.REL){
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
+                                          .25,0,0)
 }else{
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
-                                        0,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
+                                          0,0,0)
 }
 
 ## ---- MIXING BY SEXUAL ORIENTATION ---- ## ----
@@ -108,26 +129,26 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
 # *** CONGENITAL SYPHILIS ---- ##----
 # Boolean variable to control prenatal care as a switch
 if (b.PRENATALCARE){
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
-                                      1,1,1)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
+                                          1,1,1)
 }else{
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
-                                        0,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
+                                          0,0,0)
 }
-  
+
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
 if (b.CONGENITAL){
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
-                                      0.5,0.3,0.6,
-                                      citation = "syphilis_natural_history.docx") 
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
-                                        0.1,0.05,0.15,
-                                        citation = "syphilis_natural_history.docx") 
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
+                                          0.5,0.3,0.6,
+                                          citation = "syphilis_natural_history.docx") 
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
+                                          0.1,0.05,0.15,
+                                          citation = "syphilis_natural_history.docx") 
 }else{
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
-                                        0,0,0)
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
-                                        0,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.early.syphilis',
+                                          0,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prob.vertical.transmission.mothers.late.syphilis',
+                                          0,0,0)
 }
 
 ## ---- Risk Ratios Based on Prenatal Cares timing  ----
@@ -174,8 +195,8 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'duration.cns',
 ## ---- TRANSITION RATES ----
 # RELAPSE: 25% of persons leaving EL go to secondary, the rest go to LL
 if (b.RELAPSE){
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
-                                      0.25,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
+                                          0.25,0,0)
 }else{SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.early.latent.to.secondary',
                                             0,0,0)
 }
@@ -227,17 +248,17 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.se
 # *** HIV TESTING ---- ##-----
 # what fraction of tests reported in 15-19 agegroup are carried among 18-19 year olds
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests.18.19.among.15.19',
-                                     0.62, 0,0,
-                                     citation = "input_fraction_hiv_test_by_age.R")
+                                      0.62, 0,0,
+                                      citation = "input_fraction_hiv_test_by_age.R")
 
 # *** STI SCREENING ---- ##-----
 # these are all changed in calibration 
 if(b.PS.SCREENING){
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ps',
-                                        1,1,1)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ps',
+                                          1,1,1)
 }else{
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ps',
-                                      0,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ps',
+                                          0,0,0)
 }
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.el',
                                       1,1,1  )
@@ -251,11 +272,11 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.mult
 
 # *** CONTACT TRACING ---- ## ----
 if (b.CONTACT.TRACING){
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
-                                      0.8,0,0)   #0.3, 0.98
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
+                                          0.8,0,0)   #0.3, 0.98
 }else{
-  SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
-                                        0,0,0)
+    SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
+                                          0,0,0)
 }
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
                                       0.1, 0,0) #.05, 0.2,
@@ -284,7 +305,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.ll.miscla
 #*#'@PK:double check
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.screening', 
                                       0.89,0,0)
-                                      
+
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.treated.immediately.following.testing.symptomatic', 
                                       0.89,0,0,
                                       citation = "syphilis_natural_history.docx")
