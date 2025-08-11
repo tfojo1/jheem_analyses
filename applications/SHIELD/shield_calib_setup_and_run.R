@@ -12,7 +12,7 @@
 # }
 # setwd(JHEEM.DIR)
 # cat("Working directory set to:", getwd(), "\n")
-setwd("jheem/code/jheem_analyses")
+setwd("/home/rforste3/jheem/code/jheem_analyses")
 cat("Working directory set to:", getwd(), "\n")
 
 ##----
@@ -23,13 +23,13 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 
 #
 VERSION='shield'
-LOCATION='C.35620' 
+LOCATION='C.12580' 
 set.seed(00000)
 CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
 
-CALIBRATION.NAME = 'calib.NYC.07.30.1way.sex'
+CALIBRATION.NAME = 'calib.demog.BLT.08.11'
 
 
 #################
