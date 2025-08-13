@@ -199,9 +199,9 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'ps.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['ps.diagnoses.multiplier.1970'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'ps.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
-                       value = SHIELD_BASE_PARAMETER_VALUES['ps.diagnoses.multiplier.1970'])
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'ps.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['ps.diagnoses.multiplier.1970'])
 
 # Early latent
 register.model.element(SHIELD.SPECIFICATION,
@@ -210,9 +210,9 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'el.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['el.diagnoses.multiplier.1970'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'el.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
-                       value = SHIELD_BASE_PARAMETER_VALUES['el.diagnoses.multiplier.1970'])
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'el.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['el.diagnoses.multiplier.1970'])
 
 # Late latent
 register.model.element(SHIELD.SPECIFICATION,
@@ -221,9 +221,9 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'lu.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['lu.diagnoses.multiplier.1970'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'lu.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
-                       value = SHIELD_BASE_PARAMETER_VALUES['lu.diagnoses.multiplier.1970'])
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'lu.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
+#                        value = SHIELD_BASE_PARAMETER_VALUES['lu.diagnoses.multiplier.1970'])
 
 # Estimating size of infected population
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -242,7 +242,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
                                applies.to=list(continuum='undiagnosed', stage='primary', sex='female'),
-                               value=expression(prp.ps.diag.1997 * ps.diagnoses.female.multiplier.1970 * 0.25))
+                               value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * 0.25))
 
 # ---- SECONDARY (75% of PS) ----
 register.model.quantity.subset(SHIELD.SPECIFICATION,
@@ -256,7 +256,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='female'),
-                               value=expression(prp.ps.diag.1997 * ps.diagnoses.female.multiplier.1970 * 0.75))
+                               value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * 0.75))
 
 # ---- EARLY LATENT ----
 register.model.quantity.subset(SHIELD.SPECIFICATION,
@@ -270,7 +270,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='female'),
-                               value=expression(prp.el.diag.1997 * el.diagnoses.female.multiplier.1970))
+                               value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970))
 # ---- LATE LATENT ----
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
@@ -283,7 +283,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='female'),
-                               value=expression(prp.lu.diag.1997 * lu.diagnoses.female.multiplier.1970))
+                               value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970))
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'n.initial.population.infected',
                         value = expression(n.initial.population *prop.initial.population.infected))
@@ -329,9 +329,9 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='n.initial.population.infected.all.stages',
                                applies.to=list(sex='female'),
                                value=expression(
-                                   (prp.ps.diag.1997 * ps.diagnoses.female.multiplier.1970 +
-                                        prp.el.diag.1997 * el.diagnoses.female.multiplier.1970 +
-                                        prp.lu.diag.1997 * lu.diagnoses.female.multiplier.1970) * n.initial.population))
+                                   (prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 +
+                                        prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 +
+                                        prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970) * n.initial.population))
 
 
 register.model.quantity(SHIELD.SPECIFICATION,

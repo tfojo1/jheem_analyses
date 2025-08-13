@@ -118,17 +118,17 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
     ## Initial diagnosis multipliers in 1970 by sex/risk group
-    ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3.75), sdlog = 0.5*log(2)),
-    ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = log(1.25), sdlog = 0.5*log(2)),
-    ps.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = log(1.25), sdlog = 0.5*log(2)),
+    ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
+    ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+    #ps.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     
     el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
     el.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-    el.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
+    #el.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
     
-    lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(9), sdlog = 0.5*log(2)),
-    lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
-    lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
+    lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
+    lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
+    #lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
     
     ## Transmission
     #global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 100), #directly used in specification (will need sth uch larger) 
@@ -757,11 +757,11 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
         'el.diagnoses.heterosexual_male.multiplier.1970',
         'lu.diagnoses.heterosexual_male.multiplier.1970'
     ),
-    initial.infections.Females=c(
-        'ps.diagnoses.female.multiplier.1970',
-        'el.diagnoses.female.multiplier.1970',
-        'lu.diagnoses.female.multiplier.1970'
-    ),
+    #' initial.infections.Females=c(
+    #'     'ps.diagnoses.female.multiplier.1970',
+    #'     'el.diagnoses.female.multiplier.1970'#,
+    #'     'lu.diagnoses.female.multiplier.1970'
+    #' ),
     global.transmission.rate=c("global.transmission.rate"),
     #
     msm.transmission.block1 = c(
