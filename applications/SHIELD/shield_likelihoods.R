@@ -291,6 +291,70 @@ ps.diagnosis.total.likelihood.instructions =
 
 
 
+library(zoo)
+sma.growth.deviation.after2022.likelihood.instructions <-
+    create.custom.likelihood.instructions(
+        name = "sma.growth.deviation.after2022",
+        compute.function = function(sim, data, log = TRUE) {
+            
+            # --- pull series ---
+            y   <- sim$optimized.get(data$get.instr)
+            yrs <- data$yrs
+            eps <- data$eps
+            k   <- data$k
+            
+            # --- 1y log growth ---
+            g <- c(NA_real_, diff(log(pmax(y, eps))))
+            
+            # --- trailing SMA/SD of growth (exclude current) ---
+            sma <- rollapply(g, width = k + 1, FUN = function(x) mean(x[-1], na.rm = TRUE),
+                             align = "right", fill = NA)
+            sdc <- rollapply(g, width = k + 1, FUN = function(x) sd(x[-1], na.rm = TRUE),
+                             align = "right", fill = NA)
+            z   <- (g - sma) / pmax(sdc, data$sd_floor)
+            
+            # --- historical band ---
+            hmask <- yrs >= data$hist_start & yrs <= data$hist_end & is.finite(z)
+            q     <- quantile(z[hmask], data$probs, na.rm = TRUE)
+            
+            # --- penalize future only ---
+            fmask <- yrs >= data$future_start & yrs <= data$future_end & is.finite(z)
+            zz    <- z[fmask]
+            logp  <- numeric(length(zz))
+            logp[zz < q[1]] <- dnorm(zz[zz < q[1]], mean = q[1], sd = data$sd_tail, log = TRUE)
+            logp[zz > q[2]] <- dnorm(zz[zz > q[2]], mean = q[2], sd = data$sd_tail, log = TRUE)
+            
+            total <- sum(logp) * data$weight
+            if (log) total else exp(total)
+        },
+        
+        get.data.function = function(version, location) {
+            sm  <- get.simulation.metadata(version = version, location = location)
+            yrs <- 1996:2030
+            
+            list(
+                get.instr = sm$prepare.optimized.get.instructions(
+                    outcome = "diagnosis.ps",
+                    dimension.values = list(year = yrs),
+                    keep.dimensions = "year",
+                    drop.single.sim.dimension = TRUE
+                ),
+                yrs          = yrs,
+                k            = 3,                # trailing window length
+                probs        = c(0.10, 0.90),
+                hist_start   = 1998,
+                hist_end     = 2022,
+                future_start = 2023,
+                future_end   = 2030,
+                sd_tail      = 0.5,
+                sd_floor     = 1e-6,
+                eps          = 1e-9,
+                weight       = PENALTY.WEIGHT
+            )
+        }
+    )
+
+
 ps.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
@@ -739,7 +803,8 @@ lik.inst.diag.strata.no.demog.w.historical=join.likelihood.instructions(
         hiv.testing.total.likelihood.instructions,
         proportion.tested.by.strata.nested.likelihood.instructions
     ),
-    historical.diagnosis.likelihood.instructions
+    historical.diagnosis.likelihood.instructions,
+    sma.growth.deviation.after2022.likelihood.instructions
 )
 
 ## Prenatal care ----
