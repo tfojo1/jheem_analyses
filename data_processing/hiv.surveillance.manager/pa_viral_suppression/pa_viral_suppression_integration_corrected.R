@@ -253,6 +253,11 @@ for (strat_name in available_strats) {
   }
 }
 
+# Save the modified manager
+cat("\nSaving modified manager...\n")
+save(manager, file = working_file)
+cat("Manager saved to:", working_file, "\n")
+
 # Final report
 cat("\n", paste(rep("=", 80), collapse=""), "\n")
 cat("FINAL INTEGRATION REPORT\n")
