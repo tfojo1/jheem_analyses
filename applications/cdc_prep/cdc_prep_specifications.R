@@ -4,90 +4,129 @@ source('../jheem_analyses/applications/cdc_testing/cdc_prep_parameters.R') #to c
 
 CDCP.SPECIFICATION = create.jheem.specification(version='cdcp',
                                                 iteration = '1',
-                                                description='Model to study the impacts of cuts to CDC-funded PrEP referrals in non health-care settings',
+                                                description='Model to study the impacts of cuts to CDC Prevention Programs',
                                                 parent.version = 'ehe')
 
 
-#-- Basic Building Blocks --#
+#CDC Effect 
 
-register.model.element(CDCP.SPECIFICATION, name = "cdc.prep.effect", #proportionate scaling of cdc effect
+register.model.element(CDCP.SPECIFICATION, name = "cdc.effect",
                        value = 1,
                        scale = "proportion")
 
-register.model.element(CDCP.SPECIFICATION, name = "prep", #proportion of population on prep (set?)
-                       value = 1, #change 
+
+
+##----------##
+##-- PrEP --##
+##----------##
+
+register.model.element(CDCP.SPECIFICATION,
+                       name = "fraction.prep.from.cdc",
+                       functional.form = create.logistic.linear.functional.form(intercept = log(0.2)-log(0.2), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
+                       scale = "proportion",
+                       functional.form.from.time = 2010)
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'fraction.prep.not.from.cdc',
+                        value = expression(1-fraction.prep.from.cdc))
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'oral.prep.coverage',
+                        value = expression(super.oral.prep.coverage * (fraction.prep.not.from.cdc + fraction.prep.from.cdc * cdc.effect)) )
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'lai.prep.coverage',
+                        value = expression(super.lai.prep.coverage * (fraction.prep.not.from.cdc + fraction.prep.from.cdc * cdc.effect)) )
+
+##-------------##
+##-- Testing --##
+##-------------##
+
+register.model.element(CDCP.SPECIFICATION, name = "proportion.tested.regardless",
+                       value = 0.5,
                        scale = "proportion")
 
-register.model.element(CDCP.SPECIFICATION, name = "prep.efficiacy", #efficacy of prep (set?)
-                       value = 1, #change 
-                       scale = "proportion")
 
+#-- The Diagnosis Rate --#
+register.model.quantity(CDCP.SPECIFICATION, name = "testing.of.undiagnosed",
+                        value = expression(cdc.funded.testing.of.undiagnosed + cdc.nonfunded.testing.of.undiagnosed))
 
-register.model.quantity(CDCP.SPECIFICATION, name = "susceptibility", 
-                        value = expression((prep*proportion.prep.cdc*cdc.prep.effect + prep*(1-proportion.prep.cdc))*(1-prep.efficacy) + (1-prep))) #necessary?
+register.model.quantity(CDCP.SPECIFICATION, name = "cdc.funded.testing.of.undiagnosed",
+                        value = expression(super.testing.of.undiagnosed * fraction.diagnoses.from.cdc * cdc.effect),
+                        scale = 'rate')
 
-register.model.quantity(CDCP.SPECIFICATION, name = "prep",
-                        value = expression(proportion.prep.cdc + proportion.prep.non.cdc)) #define proportion.prep.non.cdc? 
-
-register.model.quantity(CDCT.SPECIFICATION, name = "testing.of.undiagnosed",
-                        value = expression(cdc.funded.testing.of.undiagnosed + cdc.nonfunded.testing.of.undiagnosed),
-                        scale = "rate") #all should be rates? 
-
-register.model.quantity(CDCT.SPECIFICATION, name = "cdc.funded.testing.of.undiagnosed",
-                        value = expression(super.testing.of.undiagnosed * fraction.diagnoses.from.cdc * cdc.prep.effect), 
-                        scale = "rate") # should this effect be applied here?
-
-register.model.quantity(CDCT.SPECIFICATION, name = "cdc.nonfunded.testing.of.undiagnosed",
+register.model.quantity(CDCP.SPECIFICATION, name = "cdc.nonfunded.testing.of.undiagnosed",
                         value = expression(super.testing.of.undiagnosed * 
-                                                (1-fraction.diagnoses.from.cdc) ),
-                        scale = "rate")  #all should be rates? 
+                                               ( (1-fraction.diagnoses.from.cdc) +
+                                                     fraction.diagnoses.from.cdc * (1-cdc.effect) * proportion.tested.regardless) )
+)
+
+
+
 
 
 #-- The logistic functional forms for key proportions --#
 
 
-register.model.element(CDCP.SPECIFICATION, name = "proportion.prep.cdc",
-                       get.functional.form.function = get.proportion.prep.cdc.from.cdc.model,
+register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
+                       get.functional.form.function = get.fraction.diagnoses.from.cdc.model.spline,
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
+register.model.element(CDCP.SPECIFICATION, name = "fraction.tests.from.cdc",
+                       functional.form = create.logistic.linear.functional.form(intercept = log(0.092800629)-log(0.9071994), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
+                       scale = "proportion",
+                       functional.form.from.time = 2010)
+
+
 register.model.element(CDCP.SPECIFICATION, name = "fraction.unique",
-                       get.functional.form.function = get.fraction.unique.from.cdc.model,
+                       get.functional.form.function = get.fraction.unique.from.cdc.model, #to specify 
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.eligible",
-                       get.functional.form.function = create.logistic.linear.functional.form(intercept = log(0.88)-log(0.88), slope = 0, anchor.year = 2021, parameters.are.on.logit.scale = TRUE),
+                       get.functional.form.function = create.logistic.linear.functional.form(intercept = log(0.57)-log(0.57), slope = 0, anchor.year = 2021, parameters.are.on.logit.scale = TRUE),
+                       scale = "proportion",
+                       functional.form.from.time = 2010) 
+
+register.model.element(CDCP.SPECIFICATION, name = "fraction.referred",
+                       get.functional.form.function = create.logistic.linear.functional.form(intercept = log(0.54)-log(0.54), slope = 0, anchor.year = 2021, parameters.are.on.logit.scale = TRUE),
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
-register.model.element(CDCP.SPECIFICATION, name = "fraction.reffered",
-                       get.functional.form.function = create.logistic.linear.functional.form(intercept = log(0.35)-log(0.35), slope = 0, anchor.year = 2021, parameters.are.on.logit.scale = TRUE),
-                       scale = "proportion",
-                       functional.form.from.time = 2010)
 
-register.model.element(CDCT.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
-                       get.functional.form.function = get.fraction.diagnoses.from.cdc.model,
-                       scale = "proportion",
-                       functional.form.from.time = 2010)
+#-- The Testing Rate --#
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'cdc.funded.general.population.testing',
+                        scale = 'rate',
+                        value = expression(super.general.population.testing * fraction.tests.from.cdc * cdc.effect)
+)
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'cdc.nonfunded.general.population.testing',
+                        scale = 'rate',
+                        value = expression(super.general.population.testing * 
+                                               ( (1-fraction.tests.from.cdc) +
+                                                     fraction.tests.from.cdc * (1-cdc.effect) * proportion.tested.regardless ) )
+)
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'general.population.testing',
+                        scale = 'rate',
+                        value = expression(cdc.funded.general.population.testing + cdc.nonfunded.general.population.testing))
+
 
 
 #-- OUTCOMES --#
 
-track.integrated.outcome(CDCP.SPECIFICATION,
-                         name = 'Prep',
-                         outcome.metadata = NULL,
-                         scale = 'non.negative.number',
-                         value.to.integrate = 'prep', #unsure if prep is already tracked in the model 
-                         keep.dimensions = c('location'),
-                         save = F)
 
 track.integrated.outcome(CDCP.SPECIFICATION,
-                         name = 'cdc.funded.tests.in.uninfected.non.healthcare',
+                         name = 'cdc.funded.tests.in.uninfected',
                          outcome.metadata = NULL,
                          scale = 'non.negative.number',
-                         value.to.integrate = 'proportion.prep.cdc',
-                         multiply.by = expression(proportion.prep.cdc*1/fraction.unique* 1/fraction.eligible * 1/fraction.reffered), #correct way to add? 
+                         value.to.integrate = 'uninfected',
+                         multiply.by = 'cdc.funded.general.population.testing',
                          keep.dimensions = c('location'),
                          save = F)
 
@@ -96,6 +135,7 @@ track.integrated.outcome(CDCP.SPECIFICATION,
                          outcome.metadata = NULL,
                          scale = 'proportion',
                          value.to.integrate = 'fraction.diagnoses.from.cdc',
+                         multiply.by = 'cdc.effect',
                          denominator.outcome = 'new',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          save = F)
@@ -117,7 +157,7 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
                                                                     units = 'tests',
                                                                     singular.unit = 'test'),
                          scale = 'non.negative.number',
-                         value = expression(cdc.funded.diagnoses + cdc.funded.tests.in.uninfected.non.healthcare/fraction.cdc.non.healthcare),#define fraction.cdc.non.healthcare? 
+                         value = expression(cdc.funded.diagnoses + cdc.funded.tests.in.uninfected),
                          keep.dimensions = c('location'),
                          corresponding.data.outcome = "hiv.tests")
 
@@ -136,7 +176,38 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
                          keep.dimensions = 'location')
 
 
+track.integrated.outcome(CDCP.SPECIFICATION,
+                         name = 'Prep',
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'prep', #unsure if prep is already tracked in the model 
+                         keep.dimensions = c('location'),
+                         save = F)
 
+track.integrated.outcome(CDCP.SPECIFICATION,
+                         name = 'cdc.funded.tests.in.uninfected.non.healthcare',
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'population',
+                         multiply.by = expression(Prep*proportion.prep.cdc*1/fraction.unique* 1/fraction.eligible * 1/fraction.referred), #correct way to add? 
+                         keep.dimensions = c('location'),
+                         save = F)
+
+
+##-- ADD THE WEB SUB-VERSION --##
+
+
+add.sub.version(CDCP.SPECIFICATION, 
+                sub.version = 'w',
+                description = "Web Tool version of CDC Testing model",
+                inherit.outcomes = F,
+                can.seed.new.engine = F)
+
+add.sub.version(CDCP.SPECIFICATION, 
+                sub.version = 'ws',
+                description = "Seed for Custom Scenarios for Web Tool version of CDC Testing model",
+                inherit.outcomes = F,
+                can.seed.new.engine = T)
 
 
 
