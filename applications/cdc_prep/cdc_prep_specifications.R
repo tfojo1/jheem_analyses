@@ -1,5 +1,6 @@
 source('../jheem_analyses/applications/ehe/ehe_specification.R')
 source('../jheem_analyses/applications/cdc_testing/cdc_prep_parameters.R') #to create 
+source('../jheem_analyses/applications/cdc_testing/odds_ratio_model.R') 
 
 
 CDCP.SPECIFICATION = create.jheem.specification(version='cdcp',
@@ -90,7 +91,7 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.eligible",
                        functional.form.from.time = 2010) 
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.referred",
-                       get.functional.form.function = create.logistic.linear.functional.form(intercept = log(0.54)-log(0.54), slope = 0, anchor.year = 2021, parameters.are.on.logit.scale = TRUE),
+                       get.functional.form.function = get.fraction.prep.referred,
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
