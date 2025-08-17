@@ -1,85 +1,139 @@
-# Pennsylvania Viral Suppression Integration
+# Pennsylvania Viral Suppression Data Integration
 
-## Problem Statement
+## Overview
+This folder contains scripts and documentation for integrating Pennsylvania (PA) viral suppression data from CDC Atlas Plus into the JHEEM surveillance data manager. This integration was necessary because PA had no existing viral suppression data, preventing EHE model calibration.
 
-The JHEEM surveillance manager was missing comprehensive Pennsylvania HIV viral suppression data for 2022-2023, particularly the detailed demographic and transmission risk factor stratifications needed for modeling work. Previous integration attempts had failed due to data structure incompatibilities and incomplete stratification handling.
+## Problem Solved
+The initial integration attempt caused likelihood instantiation failures due to an ontology mismatch. PA data was inadvertently added using the `cdc.new` ontology (6 age groups) while the likelihood system expected the `cdc` ontology (5 age groups). This incompatibility caused NULL returns when pulling age-stratified data, resulting in array construction errors.
 
-## Key Challenges Solved
+## Solution Implemented
+We re-integrated the PA data following JHEEM's established patterns:
+- Used `cdc` ontology with 5 age groups (matching all other state-level data)
+- Combined 55-64 and 65+ age groups into 55+ using population-weighted averages
+- Converted state FIPS code "42" to standard abbreviation "PA"
+- Preserved all county-level data with 5-digit FIPS codes
 
-1. **Multi-dimensional stratification preservation** - Raw CDC data contains 15 different stratification types (total, age-only, age+race+risk, etc.) that were being collapsed into single dimensions
-2. **Location dimension expansion** - Manager needed to accept both PA state-level and county FIPS codes as new location values
-3. **Data validation issues** - Standard validation methods (`pull()`) failed due to ontology mapping conflicts
+## Data Summary
 
-## Deliverables
+### Source
+- **File**: `viral_suppression_comprehensive_Pennsylvania_20250727_120208.csv`
+- **Source**: CDC Atlas Plus API
+- **Years**: 2022 and 2023
+- **Records**: 18,820 total rows → 6,532 integrated data points
 
-### Data Retrieval
-- **`atlas_plus_viral_suppression_comprehensive.R`** - Pulls comprehensive PA viral suppression data from CDC Atlas Plus API
-- **Output**: `data_raw/hiv_surveillance/viral_suppression_comprehensive_Pennsylvania_20250727_120208.csv` (18,820 records, 8,541 available)
+### Coverage
+- **Geography**: PA state + 67 counties (42001-42133)
+- **Stratifications**: Total, age, race, sex, risk, and all 2-way combinations
+- **Integration Rate**: 100% of usable data (some 3-way/4-way stratifications had no numeric values in source)
 
-### Data Integration  
-- **`pa_viral_suppression_integration_corrected.R`** - Main integration script that successfully processes and integrates data
-- **Features**:
-  - Preserves all 15 stratification types with proper multi-dimensional relationships
-  - Handles both state (PA) and county-level (FIPS codes) data
-  - Maps 8,005 valid records across 12 successful stratifications
-  - Uses direct access validation to bypass `pull()` method issues
+### Key Values (2022)
+- PA Total: 63.1%
+- Philadelphia County: 62.3%
+- Age 55+ (combined): 65.2%
 
-### Supporting Files
-- **`pa_viral_suppression_processing.R`** - Helper functions for data transformation (not used by main scripts)
-- **`session_handoff_analysis_2025_08_10.md`** - Complete technical documentation of problem analysis and solution
-- **`archive_pa_scripts/`** - Previous development iterations for reference
+## Scripts in This Folder
 
-## Current Outputs
+### Main Scripts (5 files)
+1. **`pa_viral_suppression_integration_5age.R`** - Main integration script using 5 age groups
+2. **`atlas_plus_viral_suppression_comprehensive.R`** - Atlas Plus data retrieval script
+3. **`example_data_pulls.R`** - Examples of accessing PA data using $ syntax
+4. **`verify_pa_integration_final.R`** - Verification tool to check PA data integrity
+5. **`README.md`** - This documentation
 
-### Successfully Integrated Data
-**File**: `cached/surveillance.manager_PA_corrected_20250810_115826.rdata`
-- **Status**: Test copy with successfully integrated PA data
-- **Contents**: 8,005 PA viral suppression records (2022-2023)
-- **Coverage**: 
-  - State-level: PA data across all stratifications
-  - County-level: 42-65 PA counties depending on stratification
-  - Stratifications: 12 of 15 types successfully integrated (3 had no valid data due to CDC suppression)
+### Archive Folder
+**`archive_pa_scripts/`** - Contains diagnostic scripts and earlier attempts from the debugging process (21 files). These are kept for reference but are not needed for normal operations.
 
-### Data Completeness
-- **Total raw records**: 18,820
-- **Available records**: 8,541 (CDC marked as available)
-- **Integrated records**: 8,005 (valid data after quality filters)
-- **Missing 536 records**: Marked "Available" but contain "Data suppressed" text values
+## How to Use
 
-### Manager Stratifications Created
-✅ Successful integrations:
-- `year__location` (total: 131 records)
-- `year__location__age` (age-only: 571 records)
-- `year__location__race` (race-only: 526 records)
-- `year__location__sex` (sex-only: 216 records)
-- `year__location__risk` (transmission-only: 480 records)
-- `year__location__age__race` (age+race: 1,434 records)
-- `year__location__age__sex` (age+sex: 740 records)  
-- `year__location__age__risk` (age+transmission: 1,434 records)
-- `year__location__race__sex` (race+sex: 647 records)
-- `year__location__race__risk` (race+transmission: 1,274 records)
-- `year__location__sex__risk` (sex+transmission: 492 records)
-- `year__location__age__race__risk` (age+race+transmission: 60 records)
+### Accessing PA Data
+```r
+# Load manager
+manager <- load.data.manager("cached/surveillance.manager.rdata")
 
-## Next Steps for Production Use
+# Get PA 2022 total suppression
+pa_total <- manager$data$suppression$estimate$cdc.hiv$cdc[["year__location"]]["2022", "PA"]
+# Returns: 0.631 (63.1%)
 
-1. **Apply integration to production manager**:
-   ```r
-   # Run the corrected integration script on production manager
-   # This will update cached/surveillance.manager.rdata
-   ```
+# Get age-stratified data
+age_data <- manager$data$suppression$estimate$cdc.hiv$cdc[["year__location__age"]]["2022", "PA", ]
+# Returns values for all 5 age groups
 
-2. **Future data updates**:
-   - Use `atlas_plus_viral_suppression_comprehensive.R` to pull new years
-   - Run `pa_viral_suppression_integration_corrected.R` to integrate
+# Get county data (e.g., Philadelphia)
+phila <- manager$data$suppression$estimate$cdc.hiv$cdc[["year__location"]]["2022", "42101"]
+# Returns: 0.623 (62.3%)
+```
 
-3. **Scaling to other states**:
-   - Modify state parameter in data retrieval script
-   - Integration script handles any state/county combination
+### Re-running the Integration (if needed)
+```r
+# Only needed if starting from scratch
+source("data_processing/hiv.surveillance.manager/pa_viral_suppression/pa_viral_suppression_integration_5age.R")
+```
 
-## Technical Notes
+### Example Data Pulls
+```r
+# For comprehensive examples, run:
+source("data_processing/hiv.surveillance.manager/pa_viral_suppression/example_data_pulls.R")
+```
 
-- **Dependencies**: Requires `jheem2`, CDC Atlas Plus API access, and existing surveillance manager
-- **Performance**: Processes ~8,000 records in under 30 seconds
-- **Validation**: Uses direct array access instead of problematic `manager$pull()` method
-- **Data quality**: Automatically filters invalid/suppressed values while preserving all valid CDC data
+### Verify PA Data Integrity
+```r
+# Check that PA data is properly integrated
+source("data_processing/hiv.surveillance.manager/pa_viral_suppression/verify_pa_integration_final.R")
+```
+
+## Technical Details
+
+### Age Group Mapping
+The integration combines Atlas Plus's 6 age groups into JHEEM's standard 5:
+```r
+Atlas Plus → JHEEM
+13-24     → 13-24 years
+25-34     → 25-34 years  
+35-44     → 35-44 years
+45-54     → 45-54 years
+55-64 ┐
+      ├─→ 55+ years (weighted average)
+65+   ┘
+```
+
+### Ontology Structure
+PA data uses the `cdc` ontology with dimensions:
+- year (incomplete - can expand)
+- location (incomplete - can expand)
+- age: 5 groups (complete)
+- race: 6 categories (complete)
+- sex: male, female (complete)
+- risk: 5 transmission categories (complete)
+
+### Data Processing Pipeline
+1. Read raw CSV (18,820 rows)
+2. Filter to available data (8,541 rows)
+3. Extract numeric values (8,005 rows)
+4. Aggregate age groups 6→5 (~7,298 rows)
+5. Remove NaN values/0 denominators (6,497 rows)
+6. Store in manager (6,532 data points)
+
+## Troubleshooting
+
+### If Likelihood Still Fails
+1. Verify manager has PA data: Check `"PA" %in% dimnames(data)$location`
+2. Confirm ontology: Data should be in `$cdc` not `$cdc.new`
+3. Check age groups: Should see exactly 5 age groups ending with "55+ years"
+
+### Common Issues
+- **NaN values**: Some stratifications have 0 cases and 0 population (0/0 = NaN)
+- **Missing stratifications**: 3-way/4-way combos often fully suppressed in source
+- **Location codes**: State uses "PA", counties use 5-digit FIPS (e.g., "42001")
+
+## Contact
+For questions about this integration, refer to the session handoff document:
+`session_handoff_pa_viral_suppression_2025_08_15.md`
+
+## References
+- [CDC Atlas Plus](https://gis.cdc.gov/grasp/nchhstpatlas/tables.html)
+- JHEEM Data Manager Documentation (see parent directories)
+- Original request: PA viral suppression for 2022-2023 to enable EHE calibration
+
+---
+*Last updated: 2025-08-15*
+*Integration completed successfully with 6,532 PA data points across all available stratifications*
