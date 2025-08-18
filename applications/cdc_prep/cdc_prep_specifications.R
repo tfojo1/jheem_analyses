@@ -86,7 +86,7 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.unique",
                        functional.form.from.time = 2010)
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.eligible",
-                       get.functional.form.function = create.logistic.linear.functional.form(intercept = log(0.57)-log(0.57), slope = 0, anchor.year = 2021, parameters.are.on.logit.scale = TRUE),
+                       get.functional.form.function = get.fraction.prep.eligible,
                        scale = "proportion",
                        functional.form.from.time = 2010) 
 
