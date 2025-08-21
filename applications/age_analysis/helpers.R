@@ -1,6 +1,6 @@
 
 
-get_stats <- function(arr, keep.dimensions='year', round=T, digits=0, include.mean=T, include.quartiles=F) {
+get_stats <- function(arr, keep.dimensions='year', round=T, digits=0, include.mean=T, include.quartiles=F, multiply.by.100=F, floor=F) {
     arr_data <- apply(arr, keep.dimensions, function(x) {
         rv <- c(lower = quantile(x, probs=0.025), median = median(x), upper = quantile(x, probs=0.975))
         if (include.quartiles) rv <- c(rv,
@@ -9,8 +9,9 @@ get_stats <- function(arr, keep.dimensions='year', round=T, digits=0, include.me
         if (include.mean) rv <- c(rv, mean = mean(x))
         rv
     })
+    if (floor) arr_data <- floor(arr_data)
     if (round) arr_data <- round(arr_data, digits=digits)
-    # if (is.percentage) arr_data <- arr_data * 100
+    if (multiply.by.100) arr_data <- arr_data * 100
     metric_dimension = c("lower", "median", "upper")
     if (include.quartiles) metric_dimension <- c(metric_dimension, "lowermid", "uppermid")
     if (include.mean) metric_dimension <- c(metric_dimension, "mean")
@@ -25,22 +26,21 @@ get_stats <- function(arr, keep.dimensions='year', round=T, digits=0, include.me
 #' @description
 #' Pads out the age dimension so that 'restratify.age.counts' acts reasonably
 #' 
-do_prepare_for_restratify <- function(arr) {
+do_prepare_for_restratify <- function(arr, top.age=100) {
     original_dimensions <- names(dim(arr))
     reordered_dimensions <- c(original_dimensions[original_dimensions!="age"], "age")
     arr_reordered <- apply(arr, reordered_dimensions, function(x) {x})
     new_dimnames <- dimnames(arr_reordered)
-    new_dimnames$age[5] <- "55-100 years"
-    new_dimnames$age <- c(new_dimnames$age, "101-110 years")
+    new_dimnames$age[5] <- paste0("55-", as.character(top.age), " years")
+    new_dimnames$age <- c(new_dimnames$age, paste0(as.character(top.age+1), "-", as.character(top.age+10), " years"))
     arr_reordered <- c(arr_reordered, rep(0, dim(arr_reordered)["year"] * dim(arr_reordered)["sim"]))
     arr_restored <- array(arr_reordered, sapply(new_dimnames, length), new_dimnames)
     apply(arr_restored, original_dimensions, function(x) {x})
 }
 
-get_restratified_ages <- function(data) {
-    rv=apply(do_prepare_for_restratify(data), c('year', 'sim'), function(one_year_sim) {
-        restratify.age.counts(one_year_sim, desired.age.brackets = 13:100)
-
+get_restratified_ages <- function(data, top.age=100) {
+    rv=apply(do_prepare_for_restratify(data, top.age=top.age), c('year', 'sim'), function(one_year_sim) {
+        restratify.age.counts(one_year_sim, desired.age.brackets = 13:top.age)
     })
     new_dimnames <- dimnames(rv)
     names(new_dimnames) <- c('age', 'year', 'sim')
@@ -49,14 +49,24 @@ get_restratified_ages <- function(data) {
     rv
 }
 
-get_med_age <- function(data, keep.dimensions='year') {
-    apply(do_prepare_for_restratify(data), c(keep.dimensions, 'sim'), function(one_year_sim) {
-        restratified <- restratify.age.counts(one_year_sim, desired.age.brackets = 13:100)
+get_med_age <- function(data, keep.dimensions='year', top.age=100) {
+    apply(do_prepare_for_restratify(data, top.age=top.age), c(keep.dimensions, 'sim'), function(one_year_sim) {
+        restratified <- restratify.age.counts(one_year_sim, desired.age.brackets = 13:top.age)
         transformed <- cumsum(restratified)/sum(restratified)
         med_age <- names(sort(abs(0.5 - transformed)))[1]
         as.numeric(strsplit(med_age, " years")[[1]][1])
     })
 }
+
+get_65_estimates <- function(data, keep.dimensions="year", top.age=100) {
+    apply(do_prepare_for_restratify(data, top.age=top.age), c(keep.dimensions, 'sim'), function(one_year_sim) {
+        restratified <- restratify.age.counts(one_year_sim, desired.age.brackets = 13:top.age)
+        c("under_65" = sum(restratified[paste0(as.character(13:64), " years")]),
+          "65_plus" = sum(restratified[paste0(as.character(65:(top.age-1)), " years")]))
+    })
+}
+
+
 get_num_over_55 <- function(data, keep.dimensions="year") {
     apply(data, c(keep.dimensions, 'sim'), function(one_year_sim) {
         one_year_sim["55+ years"]

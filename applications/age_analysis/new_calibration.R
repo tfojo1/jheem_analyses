@@ -1,5 +1,8 @@
 
-my_states <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
+# my_states <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
+new_states <- c("AR", "AZ", "CO", "IN", "KY", "MA", "MD", "MI", "NC", "NJ", "NV", "OH", "OK", "PA", "SC", "TN", "VA", "WA")
+# NOT: IN, MA
+# my_states <- new_states[1:3]
 
 if (1==2) {
     source("../jheem_analyses/applications/EHE/ehe_specification.R")
@@ -20,10 +23,10 @@ if (1==2) {
     names(noint_list) <- my_states
     cat("Finished!")
     
-    save(noint_list, file="../jheem_analyses/applications/age_analysis/state_simset_list.Rdata")
+    save(noint_list, file=paste0("../jheem_analyses/applications/age_analysis/Rdata Objects/new_state_simset_list_", i, ".Rdata"))
 }
 
-noint_list <- get(load("../jheem_analyses/applications/age_analysis/state_simset_list.Rdata"))
+noint_list <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/state_simset_list.Rdata"))
 
 years=c('2025', '2040')
 source("../jheem_analyses/applications/age_analysis/helpers.R")
@@ -106,3 +109,6 @@ save(age_results, file="../jheem_analyses/applications/age_analysis/age_results.
 save(race_results, file="../jheem_analyses/applications/age_analysis/race_results.Rdata")
 save(race_risk_results, file="../jheem_analyses/applications/age_analysis/race_risk_results.Rdata")
 save(race_sex_results, file="../jheem_analyses/applications/age_analysis/race_sex_results.Rdata")
+
+total_results <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/total_results.Rdata"))
+age_results <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/age_results.Rdata"))

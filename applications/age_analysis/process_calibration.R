@@ -47,3 +47,10 @@ race_sex_results <- simset_collection$get(outcomes = c('incidence', 'diagnosed.p
                                           keep.dimensions=c('year', 'age', 'race', 'sex'),
                                           verbose = T)
 save(race_sex_results, file="../jheem_analyses/applications/age_analysis/Rdata Objects/race_sex_results.Rdata")
+
+# For calibration plot, want individual state
+chosen_state <- "GA"
+intervention_simset <- load.simulation.set("Q:/simulations/ehe/final.ehe.state-1000/GA/ehe_final.ehe.state-1000_GA_noint.Rdata")
+save(intervention_simset, file="../jheem_analyses/applications/age_analysis/Rdata Objects/ga_simset.Rdata")
+baseline_simset <- load.simulation.set("Q:/simulations/ehe/final.ehe.state-1000/GA/ehe_final.ehe.state-1000_GA_baseline.Rdata")
+save(baseline_simset, file="../jheem_analyses/applications/age_analysis/Rdata Objects/ga_baseline_simset.Rdata")

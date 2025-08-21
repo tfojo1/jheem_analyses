@@ -9,6 +9,8 @@
 # - urbanicity of states
 # - general population prop55
 
+library(smplot2)
+
 make_scatterplot <- function(x.param, x.lab, y.param="deltaProp", y.lab="Delta Proportion 55+") {
     ggplot(data=scatterplot_df,
            mapping=aes(y=!!sym(y.param), x=!!sym(x.param))) +
@@ -58,8 +60,11 @@ deltaGenProp_df <- reshape2::melt(get_stats(genProp_arr["2040",,,drop=F]-genProp
 
 num_arr <- get_num_over_55(age_results[c("2025", "2040"),,,"diagnosed.prevalence",,],
                            keep.dimensions=c("year", "location"))
+genPop_arr <- apply(total_results[c("2025", "2040"),,"population",,],
+                    c("year", "location", "sim"),
+                    function(x) {x})
 
-num_df <- reshape2::melt(get_stats(num_arr[c("2025", "2040"),,],
+num_df <- reshape2::melt(get_stats(num_arr[c("2025", "2040"),,] / genPop_arr,
                                    keep.dimensions = c("year", "location"),
                                    round = F)) %>%
     filter(metric == "mean") %>%
@@ -89,7 +94,7 @@ popProp_df <- reshape2::melt(get_stats(popProp_arr[c("2025", "2040"),,],
     select(popProp25, popProp40, location)
 
 # Had to fix up what I received over email to add location column
-urbanicity_df <- get(load("../jheem_analyses/applications/age_analysis/urban_metric.RData"))
+urbanicity_df <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/urban_metric.RData"))
 
 scatterplot_df <- prev_df %>%
     merge(deltaProp_df, by="location") %>%
@@ -107,7 +112,7 @@ scatterplot_df <- prev_df %>%
 #           make_scatterplot("urbanicity", "Urbanicity Metric"),)
 make_scatterplot("prop25", "Proportion 55+ in 2025")
 make_scatterplot("ratio25", "Ratio new diagnoses to prevalence in 2025")
-make_scatterplot("num25", "Prevalence 55+ in 2025")
+make_scatterplot("num25", "Prevalence 55+ vs. General Population in 2025")
 make_scatterplot("popProp25", "Proportion 55+ in General Population 2025")
 make_scatterplot("urbanicity", "Urbanicity Metric")
 
@@ -119,7 +124,7 @@ urbanicity_scatter_figure_df <- scatter_figure_df %>%
     pivot_wider(names_from = name, values_from = value) %>%
     pivot_longer(cols = c(deltaProp:deltaGenProp, -urbanicity))
 
-labeller_labels <- c(num25 = "Diagnosed Prevalence in 2025 (cases)",
+labeller_labels <- c(num25 = "Prevalence 55+ vs. General Population in 2025",
                      popProp25 = "Proportion General Population 55+ in 2025 (%)",
                      prop25 = "Proportion 55+ in 2025 (%)",
                      ratio25 = "Ratio New Diagnoses to Prevalence in 2025 (%)",

@@ -1,4 +1,7 @@
 library(smplot2)
+library(tidyverse)
+library(xlsx)
+source("../jheem_analyses/presentation/make_pretty_table.R")
 
 # Stacked Area Plots----
 stacked_area_total_arr <- apply(age_results[as.character(2025:2040),,,"diagnosed.prevalence",,], c("year", "age", "sim"), sum)
@@ -52,6 +55,7 @@ med_age_delta_data <- reshape2::melt(get_stats(med_age_delta_arr,
                                                include.mean=T)) %>%
     pivot_wider(names_from="metric") %>%
     mutate(stateName = factor(get.location.name(location), levels=state_order_names))
+save(med_age_delta_data, file="../jheem_analyses/applications/age_analysis/Rdata Objects/med_age_delta_data.Rdata")
 med_age_timeline_data <- reshape2::melt(get_stats(med_age_timeline_arr,
                                         keep.dimensions=c("year", "location"),
                                         include.mean=T, include.quartiles=T)) %>%
@@ -77,6 +81,8 @@ make_med_age_timeline(c(my_states, "total"))
 # Table----
 state_order <- c(names(sort(apply(total_results['2025',,"diagnosed.prevalence",,], "location", mean), decreasing = T)), "total")
 state_order_names <- c(get.location.name(state_order[1:11]), total="Total")
+save(state_order, file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order.Rdata")
+save(state_order_names, file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order_names.Rdata")
 do_conversion_operations <- function(df, is.percentage=F) {
     rv <-  df %>%
         mutate(stats=paste(mean, lower, upper)) %>%
@@ -181,6 +187,7 @@ write.shaded.table(csv_double_rows,
                    thresholds = c(-1, 0, 1),
                    colors = c("#2171b5", "white", "#fd8d3c"))
 
+
 # Scatterplot for GA----
 
 make_scatterplot <- function(x.param, y.param, x.lab, y.lab) {
@@ -239,3 +246,7 @@ make_scatterplot("deltaProp55", "deltaMedAge", "Delta Proportion 55+", "Delta Me
 make_scatterplot("prop55in25", "medAge2025",  "Proportion Diagnosed Prevalence 55+ in 2025", "Median Age 2025")
 make_scatterplot("prop55in40", "medAge2040",  "Proportion Diagnosed Prevalence 55+ in 2040", "Median Age 2040")
 
+# Total prevalence all ages
+total_results <- get(load("../jheem_analyses/applications/age_analysis/total_results.Rdata"))
+total_prev_arr <- apply(total_results[c("2025", "2040"),,"diagnosed.prevalence",,], c("year", "sim"), sum)
+total_prev_stats <- get_stats(total_prev_arr)
