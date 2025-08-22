@@ -39,3 +39,10 @@ fraction_medicare_eligible_diagnosed <- get_stats(apply(sixty_five_plus_estimate
                                                       medicare_eligible_population["65_plus",,],
                                                   digits = 4,
                                                   multiply.by.100 = T)
+
+# Why we used these 24 states - show percent national prevalence covered
+region_total_prevalence = sum(SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.hiv$cdc$year__location["2021",my_states])
+
+national_prevalence = sum(SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.hiv$cdc.national$year__location__age__race__sex__risk["2021",,,,,],na.rm = T)
+
+region_total_prevalence / national_prevalence # 86%

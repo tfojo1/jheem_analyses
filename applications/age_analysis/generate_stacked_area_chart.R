@@ -3,6 +3,7 @@
 
 library(tidyverse)
 library("scales")
+library(locations)
 
 # Source necessary files
 source("../jheem_analyses/applications/age_analysis/helpers.R")
@@ -21,13 +22,15 @@ stacked_area_raw_arr <- array(c(age_results[as.character(2025:2040),,,"diagnosed
                               dim=c(year=length(2025:2040), age=5, sim=1000, location=length(state_order)),
                               dimnames=list(year=2025:2040, age=dimnames(age_results)[["age"]], sim=1:1000, location=c(my_states, "total")))
 
+my_states <- setdiff(sort(state_order), "total")
+
 stacked_area_plot_data <- reshape2::melt(get_stats(stacked_area_raw_arr,
                                                    keep.dimensions = c('year', 'age', 'location'))) %>%
     pivot_wider(names_from="metric") %>%
     group_by(year, location) %>%
     mutate(percentage=100*median/sum(median)) %>%
     ungroup() %>%
-    mutate(stateName = factor(get.location.name(location), levels=state_order_names))
+    mutate(stateName = factor(get.location.name(location), levels=c(state_order_names[my_states], total="Total")))
 stacked_area_plot_data[stacked_area_plot_data$location == "total", "stateName"] <- "Total"
 
 # Use "absolute", but have option to show by percentage instead.
@@ -46,6 +49,8 @@ make_stacked_area_plots <- function(states, type=c("absolute", "percentage")[1])
         theme(legend.position="bottom")
 }
 
-make_stacked_area_plots(c(my_states, "total"))
+plot <- make_stacked_area_plots(c(my_states, "total"))
+ggsave(filename = "../jheem_analyses/applications/age_analysis/stacked_area_chart.png",
+       plot=plot,width = 10, height=10)
 
 # Do I want this saved in a particular size? Number of pixels? ?
