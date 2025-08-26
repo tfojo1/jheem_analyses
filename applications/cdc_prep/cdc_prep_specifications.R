@@ -1,5 +1,5 @@
 source('../jheem_analyses/applications/ehe/ehe_specification.R')
-source('../jheem_analyses/applications/cdc_testing/cdc_prep_parameters.R') #to create 
+source('../jheem_analyses/applications/cdc_testing/cdc_prep_parameters.R') 
 source('../jheem_analyses/applications/cdc_testing/odds_ratio_model.R') 
 
 
@@ -81,7 +81,7 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.tests.from.cdc",
 
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.unique",
-                       get.functional.form.function = get.fraction.unique.from.cdc.model, #to specify 
+                       get.functional.form.function = get.fraction.unique, #called from parameters? 
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
