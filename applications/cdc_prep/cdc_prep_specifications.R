@@ -131,6 +131,7 @@ track.integrated.outcome(CDCP.SPECIFICATION,
                          keep.dimensions = c('location'),
                          save = F)
 
+
 track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cumulative.fraction.diagnoses.from.cdc',
                          outcome.metadata = NULL,
@@ -162,6 +163,22 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
                          keep.dimensions = c('location'),
                          corresponding.data.outcome = "hiv.tests")
 
+
+track.cumulative.outcome(CDCP.SPECIFICATION,
+                         name = 'cdc.funded.tests.nonhealthcare',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Number of CDC-Funded HIV Tests in Non Health Care Settings',
+                                                                    description = "Number of CDC-Funded cleaHIV Tests Done in the past year in non health care settings",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Tests',
+                                                                    units = 'tests',
+                                                                    singular.unit = 'test'),
+                         scale = 'non.negative.number',
+                         value = expression(cdc.funded.tests*proportion.non.healthcare),
+                         keep.dimensions = c('location'),
+                         corresponding.data.outcome = "hiv.tests")
+
+
+
 track.cumulative.outcome(CDCP.SPECIFICATION,
                          name = 'total.cdc.hiv.test.positivity',
                          corresponding.data.outcome = 'cdc.hiv.test.positivity',
@@ -190,9 +207,57 @@ track.integrated.outcome(CDCP.SPECIFICATION,
                          outcome.metadata = NULL,
                          scale = 'non.negative.number',
                          value.to.integrate = 'population',
-                         multiply.by = expression(Prep*proportion.prep.cdc*1/fraction.unique* 1/fraction.eligible * 1/fraction.referred), #correct way to add? 
+                         multiply.by = expression(Prep*proportion.prep.cdc*1/fraction.unique* 1/fraction.eligible * 1/fraction.referred), 
                          keep.dimensions = c('location'),
                          save = F)
+
+track.integrated.outcome(CDCT.SPECIFICATION,
+                         name = 'cumulative.prep.referrals',
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'population',
+                         multiply.by = expression(Prep*proportion.prep.cdc*1/fraction.unique* 1/fraction.eligible), 
+                         keep.dimensions = c('location'),
+                         save = F)
+
+
+track.integrated.outcome(CDCT.SPECIFICATION,
+                         name = 'cumulative.prep.eligible',
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'population',
+                         multiply.by = expression(Prep*proportion.prep.cdc*1/fraction.unique), 
+                         keep.dimensions = c('location'),
+                         save = F)
+
+
+track.integrated.outcome(CDCT.SPECIFICATION,
+                         name = 'cumulative.prep',
+                         outcome.metadata = NULL,
+                         scale = 'non.negative.number',
+                         value.to.integrate = 'population',
+                         multiply.by = expression(Prep*proportion.prep), 
+                         keep.dimensions = c('location'),
+                         save = F)
+
+track.integrated.outcome(CDCT.SPECIFICATION,
+                         name = 'cumulative.fraction.referred',
+                         outcome.metadata = NULL,
+                         scale = 'proportion',
+                         value.to.integrate = 'cumulative.prep.referrals',
+                         denominator.outcome = 'cumulative.prep.eligible',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = F)
+
+track.integrated.outcome(CDCT.SPECIFICATION,
+                         name = 'cumulative.fraction.eligible',
+                         outcome.metadata = NULL,
+                         scale = 'proportion',
+                         value.to.integrate = 'cumulative.prep.eligible',
+                         denominator.outcome = 'cumulative.prep',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = F)
+
 
 
 ##-- ADD THE WEB SUB-VERSION --##
@@ -237,6 +302,13 @@ track.sub.version.outcomes(CDCP.SPECIFICATION,
                            sub.versions = c('w','ws'),
                            outcome.names = c('cdc.funded.tests',
                                              'total.cdc.hiv.test.positivity'),
+                           keep.dimensions = character())
+
+#CDC PrEP 
+track.sub.version.outcomes(CDCP.SPECIFICATION,
+                           sub.versions = c('w','ws'),
+                           outcome.names = c('cdc.funded.tests',
+                                             'total.cdc.hiv.test.positivity','cumulative.fraction.referred','cumulative.fraction.eligible','cdc.funded.tests.nonhealthcare'),
                            keep.dimensions = character())
 
 
