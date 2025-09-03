@@ -1,5 +1,8 @@
 
-LOCATION = 'SC'
+LOCATION = 'NV'
+
+
+print(paste0("Assmeble for location = ", LOCATION))
 
 simset.full = assemble.simulations.from.calibration('ehe', LOCATION,'final.ehe.state')
 

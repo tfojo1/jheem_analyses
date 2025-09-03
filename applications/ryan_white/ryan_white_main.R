@@ -11,7 +11,15 @@ source('../jheem_analyses/applications/ryan_white/ryan_white_interventions.R')
 
 RW.IS.STATE.LEVEL = T
 
-RW.STATES = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
+#RW.STATES = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
+
+# To pull what we have calibrated
+if (1==2)
+{
+    cat(paste0("'", list.files('Q:simulations/rw/final.ehe.state-1000'), "'", collapse=', '))
+}
+
+RW.STATES = c('AL', 'AR', 'AZ', 'CA', 'CO', 'FL', 'GA', 'IL', 'KY', 'LA', 'MD', 'MI', 'MN', 'MO', 'MS', 'NC', 'NY', 'OH', 'OK', 'SC', 'TN', 'TX', 'WA', 'WI')
 RW.CITIES = setdiff(MSAS.OF.INTEREST, c(ST.LOUIS.MSA, CINCINATTI.MSA))
 
 if (RW.IS.STATE.LEVEL)

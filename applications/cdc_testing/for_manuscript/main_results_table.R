@@ -3,7 +3,7 @@ source('commoncode/results_helpers.R')
 source('presentation/make_pretty_table.R')
 
 
-YEARS = as.character(2025:2030)
+YEARS = as.character(2025:2035)
 INT.CODES = c('cdct.end','cdct.pintr','cdct.bintr')
 
 abs.inc.noint = apply(total.results[YEARS,,'incidence',,'noint'], c('sim', 'location'), sum)
@@ -101,6 +101,6 @@ write.shaded.table(tab = means.and.cis.table,
                    color.by = color.by,
                    colors = c('white','yellow','red'),
                    thresholds = c(-1,0,0.3),
-                   file = '../../results/cdc_testing/main_table.xlsx')
+                   file = paste0('../../results/cdc_testing/main_table_', YEARS[length(YEARS)], '.xlsx'))
 
 

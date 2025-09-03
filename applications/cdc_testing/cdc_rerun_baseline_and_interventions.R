@@ -1,22 +1,24 @@
 
 source('applications/cdc_testing/cdc_testing_main.R')
 
-LOCATIONS = CDC.TESTING.LOCATIONS[4*4 + 1:4]
+#LOCATIONS = CDC.TESTING.LOCATIONS[5*3 + 1:3]
 print(paste0("Re-running interventions for locations: ", paste0(LOCATIONS, collapse=', ')))
 
-
-source("applications/cdc_testing/cdc_testing_main.R")
+RESUME.FIRST = F
 
 for (loc in LOCATIONS)
 {
-    print(paste0("RE-RUNNING ", loc))
-    
-    orig.simset = retrieve.simulation.set('cdct', loc, 'final.ehe.state', N.SIMS)
-    simset = rerun.simulations(orig.simset)
-    
-    simset$save()
-    
-    print(paste0("DONE re-running ", loc))
+    if (!RESUME.FIRST || loc!=LOCATIONS[1])
+    {
+        print(paste0("RE-RUNNING ", loc))
+        
+        orig.simset = retrieve.simulation.set('cdct', loc, 'final.ehe.state', N.SIMS)
+        simset = rerun.simulations(orig.simset)
+        
+        simset$save()
+        
+        print(paste0("DONE re-running ", loc))
+    }
     
     for (int.code in CDC.TESTING.INTERVENTION.CODES)
     {

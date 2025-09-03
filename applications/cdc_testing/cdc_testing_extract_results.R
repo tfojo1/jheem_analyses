@@ -6,6 +6,10 @@ source('../jheem_analyses/applications/cdc_testing/cdc_testing_main.R')
 LOCATIONS = CDC.TESTING.LOCATIONS
 
 
+# print('sleeping')
+# Sys.sleep(2*60*60)
+# print('waking up')
+
 sim.collection=create.simset.collection(version="cdct", calibration.code = CALIBRATION.CODE,
                                         locations = LOCATIONS, 
                                         interventions = c('baseline', CDC.TESTING.INTERVENTION.CODES),

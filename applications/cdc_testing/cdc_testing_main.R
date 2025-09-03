@@ -11,7 +11,7 @@ N.CHUNKS = 1
 
 CDC.TESTING.LOCATIONS = c('AL','CA','FL','GA','IL','LA','MO','MS','NY','TX','WI',
                           'AZ','KY','MD','OH','SC','TN','WA')
-CDC.TESTING.INTERVENTION.CODES = c('noint', 'cdct.end', 'cdct.pintr', 'cdct.bintr','cdc.intr')
+CDC.TESTING.INTERVENTION.CODES = c('noint', 'cdct.end', 'cdct.pintr', 'cdct.bintr')#,'cdc.intr')
 CALIBRATION.CODE = 'final.ehe.state'
 VERBOSE = T
 

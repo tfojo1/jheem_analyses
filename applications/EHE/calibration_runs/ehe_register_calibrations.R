@@ -243,7 +243,8 @@ register.calibration.info(CALIBRATION.CODE.TRANS.STATE,
 register.calibration.info(CALIBRATION.CODE.FULL.STATE,
                           likelihood.instructions = full.state.likelihood.instructions,
                           special.case.likelihood.instructions = list(
-                              SC = full.state.overweighted.prev.vs.new.likelihood.instructions
+                              SC = full.state.overweighted.prev.vs.new.likelihood.instructions,
+                              NJ = full.state.overweighted.prev.vs.new.likelihood.instructions
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = CALIBRATION.END.YEAR, 
@@ -260,7 +261,8 @@ register.calibration.info(CALIBRATION.CODE.FULL.STATE,
 register.calibration.info(CALIBRATION.CODE.EHE.FINAL.STATE,
                           likelihood.instructions = full.state.likelihood.instructions.half.weight,
                           special.case.likelihood.instructions = list(
-                              SC = full.state.overweighted.prev.vs.new.likelihood.instructions.half.weight
+                              SC = full.state.overweighted.prev.vs.new.likelihood.instructions.half.weight,
+                              NJ = full.state.overweighted.prev.vs.new.likelihood.instructions.half.weight
                           ),
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = CALIBRATION.END.YEAR, 
