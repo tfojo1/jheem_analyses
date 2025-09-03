@@ -1,18 +1,28 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
+source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
 location.style.manager = create.style.manager(color.data.by = "location.type") 
 source.style.manager = create.style.manager(color.data.by = "source") 
 stratum.style.manager = create.style.manager(color.data.by = "stratum") # this is the default right now 
 
+LOCATION = 'WI'
+
+CALIBRATION.CODE.TO.PULL = 'final.ehe.state'
+
+# simset = assemble.simulations.from.calibration(version = 'ehe',
+#                                                location = LOCATION,
+#                                                allow.incomplete = T,
+#                                                chains = c(1:4),
+#                                                calibration.code = CALIBRATION.CODE.TO.PULL)
+
+simset = retrieve.simulation.set('ehe', LOCATION, CALIBRATION.CODE.TO.PULL, n.sim=1000)
+#save(simset,file=paste0("prelim_results/",CALIBRATION.CODE.TO.PULL,"_simset_",Sys.Date(),"_",LOCATION,".Rdata"))
+
 # range(simset$get.mcmc.mixing.statistic(NULL))
 # cbind(head(simset$get.mcmc.mixing.statistic(NULL),20))
 
-# Need to have this file locally
-#load("../jheem_analyses/prelim_results/full.with.aids_simset_2024-05-30_C.12580.Rdata")
-
-#simset = retrieve.simulation.set('ehe',ST.LOUIS.MSA,'final.ehe',n.sim = 1000)
 
 ## --- ANDREW TO LOOK AT ---- ## 
 
@@ -203,3 +213,4 @@ simplot(simset$last.sim(),
         outcomes = c("total.hiv.tests.per.population"), 
         style.manager = location.style.manager,plot.year.lag.ratio = T,
         dimension.values = list(year = 2000:2030)) 
+
