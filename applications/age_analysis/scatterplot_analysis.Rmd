@@ -1,0 +1,104 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+source("../jheem_analyses/applications/age_analysis/new_corr_plots.R")
+library(tidyverse)
+library(smplot2)
+```
+
+```{r}
+prev25 <- apply(total_results["2025",,"diagnosed.prevalence",,], "location", mean)
+transmission25 <- apply(total_results["2025",,"new",,]/total_results["2025",,"diagnosed.prevalence",,],
+                        "location", mean)
+transmission30 <- apply(total_results["2030",,"new",,]/total_results["2030",,"diagnosed.prevalence",,],
+                        "location", mean)
+prevPerPop25 <- apply(total_results["2025",,"diagnosed.prevalence",,]/total_results["2025",,"population",,],
+                        "location", mean)
+sexTransRt <- apply(total_results["2025",,"sexual.transmission.rates",,], "location", mean)
+
+scatter_df0 <- med_age_timeline_data %>%
+    filter(year=="2025") %>%
+    select(location, mean, stateName)
+
+scatter_df1 <- merge(scatter_df0,
+                    select(med_age_delta_data, location, mean),
+                    by="location") %>%
+    rename(medAge2025 = mean.x,
+           deltaMedAge = mean.y) %>%
+    filter(location != "total") %>%
+    cbind(pointSize = sqrt(prev25) / 100) %>%
+    cbind(transmission = transmission25) %>%
+    cbind(futureTransmission = transmission30) %>%
+    cbind(prevPerPop = prevPerPop25) %>%
+    cbind(sexTransRate = sexTransRt)
+(make_scatterplot("medAge2025", "Median Age in 2025", data=scatter_df1))
+```
+Looking at urbanicity. For a mysterious reason, the first line won't work unless
+I try it out of the notebook.
+```{r}
+# load("../jheem_analyses/applications/age_analysis/Rdata Objects/urbanicity.Rdata")
+urbanicity_df <- data.frame(location=names(AGING_ANALYSIS_URBANICITY), urbanicity=AGING_ANALYSIS_URBANICITY, row.names = NULL)
+scatter_df2 <- merge(scatter_df1, urbanicity_df, by="location")
+(make_scatterplot("medAge2025", "Median Age in 2025", color.by = "urbanicity", data=scatter_df2))
+```
+Find clusters?
+```{r}
+library(factoextra)
+library(cluster)
+cluster_df_original <- scatter_df2 %>%
+    mutate(prev25 = (100*pointSize)**2) %>%
+    select(medAge2025, deltaMedAge, prev25, urbanicity, transmission, prevPerPop)
+rownames(cluster_df_original) <- scatter_df2$location
+cluster_df <- scale(cluster_df_original)
+```
+Figure out optimal number of clusters... I guess 2 or 3?
+```{r}
+fviz_nbclust(cluster_df, kmeans, method="wss")
+```
+Well this makes it look like I should use 11... but that's crazy for only 24 records!
+```{r}
+fviz_gap_stat(clusGap(cluster_df,
+                      FUN = kmeans,
+                      nstart = 25,
+                      K.max=12,
+                      B = 50))
+```
+I'll use 3 because that's what the data seem to support.
+```{r}
+(km = kmeans(cluster_df, centers=3, nstart=25))
+```
+```{r}
+fviz_cluster(km, data = cluster_df)
+```
+```{r}
+aggregate(cluster_df_original, by=list(cluster=km$cluster), mean)
+```
+Let's see if the clusters make sense on my original scatterplot.
+```{r}
+(make_scatterplot("medAge2025", "Median Age in 2025", data=mutate(scatter_df1, cluster=as.factor(km$cluster)), color.by="cluster"))
+```
+```{r}
+(make_scatterplot("urbanicity", "Urbanicity", data=mutate(scatter_df2, cluster=as.factor(km$cluster)), color.by="cluster"))
+```
+```{r}
+(make_scatterplot("prevPerPop", "Prevalence Per Population", data=mutate(scatter_df2, cluster=as.factor(km$cluster)), color.by="cluster"))
+```
+```{r}
+(make_scatterplot("transmission", "New Diagnoses Per Prevalent Cases in 2025", data=mutate(scatter_df2, cluster=as.factor(km$cluster)), color.by="cluster", show.state.labels = T))
+```
+```{r}
+my_model <- lm(deltaMedAge ~ prev25 + transmission, data=scatter_df2)
+# pairs(scatter_df2)
+# select(medAge2025, deltaMedAge, prev25, urbanicity, transmission, prevPerPop)
+summary(my_model)
+```
+
+```{r}
+(make_scatterplot("sexTransRate", "Sexual Transmission Rate in 2025", data=mutate(scatter_df2, cluster=as.factor(km$cluster)), color.by="cluster", show.state.labels = T))
+```
+```{r}
+(make_scatterplot("futureTransmission", "New vs. Prevalence in 2030", data=mutate(scatter_df2, cluster=as.factor(km$cluster)), color.by="cluster", show.state.labels = T))
+```
+
