@@ -95,6 +95,7 @@ source("../jheem_analyses/applications/ryan_white/for_manuscript/text_results.R"
 
 # Scatter plots 
 {
+    print("use new urbanicity data: applications/cdc_testing/urbanicity_calculations.R")
     urbanicity <- get(load("../../cached/urban_metric.RData"))
     names(urbanicity) = c("Alabama","California","Florida","Georgia","Illinois","Louisiana","Missouri",
                           "Mississippi","New.York","Texas","Wisconsin")
