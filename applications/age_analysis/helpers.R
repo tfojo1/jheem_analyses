@@ -1,4 +1,4 @@
-
+# source("../jheem_analyses/source_code.R")
 
 get_stats <- function(arr, keep.dimensions='year', round=T, digits=0, include.mean=T, include.quartiles=F, multiply.by.100=F, floor=F) {
     arr_data <- apply(arr, keep.dimensions, function(x) {
@@ -49,21 +49,43 @@ get_restratified_ages <- function(data, top.age=100) {
     rv
 }
 
-get_med_age <- function(data, keep.dimensions='year', top.age=100) {
-    apply(do_prepare_for_restratify(data, top.age=top.age), c(keep.dimensions, 'sim'), function(one_year_sim) {
-        restratified <- restratify.age.counts(one_year_sim, desired.age.brackets = 13:top.age)
+get_med_age <- function(data, keep.dimensions='year', top.age=100, report.duration=F, method="pclm") {
+    if (report.duration) begin_time <- Sys.time()
+    result <- apply(do_prepare_for_restratify(data, top.age=top.age), c(keep.dimensions, 'sim'), function(one_year_sim) {
+        restratified <- restratify.age.counts(one_year_sim, desired.age.brackets = 13:top.age,method = method)
         transformed <- cumsum(restratified)/sum(restratified)
         med_age <- names(sort(abs(0.5 - transformed)))[1]
         as.numeric(strsplit(med_age, " years")[[1]][1])
     })
+    if (report.duration) {
+        end_time <- Sys.time()
+        print(paste0("Took ",
+                     signif(difftime(end_time, begin_time, units = "secs")*60/length(data)/5,3),
+                     " seconds per iteration for ",
+                     length(data)/5, " iterations. Total time: ",
+                     signif(difftime(end_time, begin_time, units = "mins"), 3),
+                     " minutes"))
+    }
+    result
 }
 
-get_65_estimates <- function(data, keep.dimensions="year", top.age=100) {
-    apply(do_prepare_for_restratify(data, top.age=top.age), c(keep.dimensions, 'sim'), function(one_year_sim) {
-        restratified <- restratify.age.counts(one_year_sim, desired.age.brackets = 13:top.age)
+get_65_estimates <- function(data, keep.dimensions="year", top.age=100, report.duration=F, method="pclm") {
+    if (report.duration) begin_time <- Sys.time()
+    result <- apply(do_prepare_for_restratify(data, top.age=top.age), c(keep.dimensions, 'sim'), function(one_year_sim) {
+        restratified <- restratify.age.counts(one_year_sim, desired.age.brackets = 13:top.age, method=method)
         c("under_65" = sum(restratified[paste0(as.character(13:64), " years")]),
           "65_plus" = sum(restratified[paste0(as.character(65:(top.age-1)), " years")]))
     })
+    if (report.duration) {
+        end_time <- Sys.time()
+        print(paste0("Took ",
+                     signif(difftime(end_time, begin_time, units = "secs")*60/length(data)/5,3),
+                     " seconds per iteration for ",
+                     length(data)/5, " iterations. Total time: ",
+                     signif(difftime(end_time, begin_time, units = "mins"), 3),
+                     " minutes"))
+    }
+    result
 }
 
 

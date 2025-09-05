@@ -1,15 +1,17 @@
 library(ggplot2)
 library("scales")
 
-chosen_state <- "GA"
-
 source("../jheem2/R/PLOTS_simplot.R")
 
-# Get data manager
-source("../jheem_analyses/source_code.R")
+# # Get data manager
+# source("../jheem_analyses/source_code.R")
+ 
+state_code <- "TX"
+intervention_filename <- paste0("simset_2025-08-26_", state_code, ".Rdata")
+baseline_filename <- paste0("simset_baseline_2025-08-27_", state_code,".Rdata")
 
-intervention_simset <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/ga_simset.Rdata"))
-baseline_simset <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/ga_baseline_simset.Rdata"))
+intervention_simset <- get(load(paste0("../jheem_analyses/applications/age_analysis/Rdata Objects/eleven but again/", intervention_filename)))
+baseline_simset <- get(load(paste0("../jheem_analyses/applications/age_analysis/Rdata Objects/eleven but again/", baseline_filename)))
 
 # See all facets at once for inspection,
 # but figure will use each individually
@@ -79,7 +81,7 @@ make_calibration_plot <- function(sim.df, data.df, this.outcome, age.group.num=N
 prepared_total_plot_data <- prepare.plot(list(baseline_simset = baseline_simset,
                                               intervention_simset = intervention_simset),
                                          outcomes,,
-                                         dimension.values = list(year=1990:2040),
+                                         dimension.values = list(year=2010:2040),
                                          summary.type = "mean.and.interval")
 total_sim_df <- prepared_total_plot_data$df.sim
 total_data_df <- prepared_total_plot_data$df.truth
@@ -111,7 +113,7 @@ prepared_plot_data <- prepare.plot(list(baseline_simset = baseline_simset,
                                         intervention_simset = intervention_simset),
                                    outcomes,
                                    facet.by = "age",
-                                   dimension.values = list(year=1990:2040),
+                                   dimension.values = list(year=2010:2040),
                                    summary.type = "mean.and.interval")
 
 sim_df <- prepared_plot_data$df.sim
