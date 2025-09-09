@@ -327,7 +327,7 @@ CDC.PREP.PARAMETER.SAMPLING.BLOCKS = list(
     prep.referred.by.risk = c("prep.referred.msm.or","prep.referred.msm.idu.or","prep.referred.idu.male.or","prep.referred.idu.female.or","prep.referred.heterosexual.male.or","prep.referred.heterosexual.female.or"),
     prep.referred.by.rage = c("prep.referred.age1.or","prep.referred.age2.or","prep.referred.age3.or","prep.referred.age4.or","prep.referred.age5.or"),
     prep.referred = c("prep.referred.or","prep.referred.slope.or"),
-    prep.unique.total = prep.unique
+    prep.unique.total = 'prep.unique'
     
 )
 

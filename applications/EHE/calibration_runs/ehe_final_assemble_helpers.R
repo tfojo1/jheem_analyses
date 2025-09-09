@@ -1,5 +1,5 @@
 
-LOCATION = 'NV'
+LOCATION = 'MA'
 
 
 print(paste0("Assmeble for location = ", LOCATION))
