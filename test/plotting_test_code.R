@@ -7,7 +7,7 @@ location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager = create.style.manager(color.data.by = "source") 
 stratum.style.manager = create.style.manager(color.data.by = "stratum") # this is the default right now 
 
-LOCATION = 'WI'
+LOCATION = 'MI'
 
 CALIBRATION.CODE.TO.PULL = 'final.ehe.state'
 
@@ -162,22 +162,25 @@ simplot(simset$last.sim(),
 simplot(simset$last.sim(),
         simset,
         outcomes = c("suppression"), 
+        summary.type = "median.and.interval",
         style.manager = source.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+        dimension.values = list(year = 2000:2040)) 
 
 simplot(simset$last.sim(),
         simset,
         facet.by = "race", # age, sex, race, risk; 1-way 
         outcomes = c("suppression"), 
+        summary.type = "median.and.interval",
         style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+        dimension.values = list(year = 2000:2040)) 
 
 simplot(simset$last.sim(),
         simset,
         facet.by = "risk", # age, sex, race, risk; 1-way 
         outcomes = c("suppression"), 
+        summary.type = "median.and.interval",
         style.manager = location.style.manager,
-        dimension.values = list(year = 2000:2030)) 
+        dimension.values = list(year = 2000:2040)) 
 
 simplot(simset$last.sim(),
         simset,
