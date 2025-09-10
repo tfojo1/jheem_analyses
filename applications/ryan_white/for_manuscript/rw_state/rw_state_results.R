@@ -7,11 +7,12 @@ print(paste0("RW.IS.STATE.LEVEL is set to ",RW.IS.STATE.LEVEL))
 # text results 
 source("../jheem_analyses/applications/ryan_white/for_manuscript/text_results.R")
 
+View(table.city)
 # figures 
 {
     source("../jheem_analyses/applications/ryan_white/for_manuscript/city_by_city_results_horizontal.R")
     # this won't work until I fix the xlsx issue (I think I need to fix java setup?)
-    # for now, just run all lines except 336-349, will save a figure in the directory ../../Ryan White..."
+    # for now, just run all lines except 355-368, will save a figure in the directory ../../Ryan White..."
     
     # this makes the scatterplot figures, but they won't be labeled since these labels are for cities; use code below
     source("../jheem_analyses/applications/ryan_white/for_manuscript/between_city_variation_secondary.R")
