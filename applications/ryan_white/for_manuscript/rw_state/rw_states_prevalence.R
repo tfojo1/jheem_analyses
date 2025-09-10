@@ -1,8 +1,7 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
-RW.STATES = c("AL","AR","AZ","CA","CO","FL","GA","IL",
-              "KY","LA","MD","MI","MN","MO","MS","NC","NV",
-              "NY","OH","OK","SC","TN","TX","VA","WA","WI")
+RW.STATES = c("AL","AR","AZ","CA","CO","FL","GA","IL","KY","LA","MA","MD","MI","MN",
+              "MO","MS","NC","NV","NY","OH","OK","SC","TN","TX","VA","WA","WI","NJ","PA")
 
 
 rw.total.prevalence = 
