@@ -1,15 +1,19 @@
 
+RW.IS.STATE.LEVEL = T
+RW.ANCHOR.YEAR = 2026
+
 
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_specification.R')
 RW.DATA.MANAGER = load.data.manager('../../cached/ryan.white.data.manager.rdata', set.as.default = F)
+RW.DATA.MANAGER$remove_data('oahs.clients', source='ryan.white.program', ontology.name = 'ryan.white.pdfs', 
+                            dimension.values = list(year='2022', location='IN', 
+                                                    age=c("13-24 years", "25-34 years", "35-44 years", "45-54 years", "55-64 years", "65+ years")))
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_mcmc.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_likelihoods.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_interventions.R')
-
-RW.IS.STATE.LEVEL = T
 
 
 # To pull what we have calibrated
@@ -19,7 +23,12 @@ if (1==2)
 }
 
 #RW.STATES = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
-RW.STATES = c('AL', 'AR', 'AZ', 'CA', 'CO', 'FL', 'GA', 'IL', 'KY', 'LA', 'MA', 'MD', 'MI', 'MN', 'MO', 'MS', 'NC', 'NV', 'NY', 'OH', 'OK', 'SC', 'TN', 'TX', 'VA', 'WA', 'WI')
+RW.STATES = c('AL', 'AR', 'AZ', 'CA', 'CO', 
+              'FL', 'GA', 'IL', 'IN', 'KY',
+              'LA', 'MA', 'MD', 'MI', 'MN',
+              'MO', 'MS', 'NC', 'NJ', 'NV',
+              'NY', 'OH', 'OK', 'PA', 'SC',
+              'TN', 'TX', 'VA', 'WA', 'WI')
 RW.CITIES = setdiff(MSAS.OF.INTEREST, c(ST.LOUIS.MSA, CINCINATTI.MSA))
 
 if (RW.IS.STATE.LEVEL)
@@ -50,22 +59,32 @@ if (RW.IS.STATE.LEVEL)
 if (!RW.IS.STATE.LEVEL)
     CALIBRATION.CODE = 'final.ehe'
 
-RW.INTERVENTION.CODES = c('noint', 
-                          'rw.end', 'rw.b.intr', 'rw.p.intr',
-                          'rw.end.cons', 'rw.b.intr.cons', 'rw.p.intr.cons')
+if (RW.ANCHOR.YEAR == 2025)
+{
+    RW.INTERVENTION.CODES = c('noint', 
+                              'rw.end', 'rw.b.intr', 'rw.p.intr',
+                              'rw.end.cons', 'rw.b.intr.cons', 'rw.p.intr.cons')
+}
 
-RW.INT.RUN.TO.YEAR = 2035
-RW.INT.RUN.FROM.YEAR = 2025
+if (RW.ANCHOR.YEAR)
+{
+    RW.INTERVENTION.CODES = c('noint', 
+                              'rw.end.26', 'rw.p.intr.26',
+                              'rw.end.cons.26', 'rw.p.intr.cons.26')
+}
+
+RW.INT.RUN.TO.YEAR = RW.ANCHOR.YEAR + 10
+RW.INT.RUN.FROM.YEAR = RW.ANCHOR.YEAR
 
 RW.INT.KEEP.TO.YEAR = RW.INT.RUN.TO.YEAR
 RW.NOINT.KEEP.FROM.YEAR = 2010
-RW.INT.KEEP.FROM.YEAR = 2024
+RW.INT.KEEP.FROM.YEAR = RW.ANCHOR.YEAR - 1
 
 RW.N.SIM.FOR.WEB = 80
-RW.WEB.FROM.YEAR = 2015
-RW.WEB.TO.YEAR = 2035
+RW.WEB.FROM.YEAR = RW.ANCHOR.YEAR - 10
+RW.WEB.TO.YEAR = RW.ANCHOR.YEAR + 10
 RW.WEB.SEED.FROM.YEAR = RW.WEB.FROM.YEAR
-RW.WEB.SEED.TO.YEAR = 2025
+RW.WEB.SEED.TO.YEAR = RW.ANCHOR.YEAR
 
 # Other medicaid stuff
 

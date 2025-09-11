@@ -240,7 +240,16 @@ if (1==2) # for checking the simulated distribution approximates the observed on
                  c(apply(rw.survey.expansion, 2, quantile, probs=p), apply(rw.survey.nonexpansion, 2, quantile, probs=p)))
 }
 #Interventions are scaled up linearly from July 1st of START.YEAR to October 1st of IMPLEMENTED.BY.YEAR
-START.YEAR = 2025.5
+if (RW.ANCHOR.YEAR==2026)
+{
+    rw.intervention.suffix = '.26'
+    START.YEAR = 2026.5
+}
+if (RW.ANCHOR.YEAR==2025)
+{
+    rw.intervention.suffix = ''
+    START.YEAR = 2025.5
+}
 LOSS.LAG = 0.25
 BRIEF.INTERRUPTION.RESTART.YEAR = 2027
 PROLONGED.INTERRUPTION.RESTART.YEAR = 2029
@@ -314,7 +323,7 @@ rw.cessation = create.intervention(adap.cessation.expansion.effect,
                                    rw.support.cessation.nonexpansion.effect, 
                                    parameters = RW.effect.values, 
                                    WHOLE.POPULATION, 
-                                   code = "rw.end")
+                                   code = paste0("rw.end",rw.intervention.suffix))
 
 rw.cessation.conservative = create.intervention(adap.cessation.expansion.effect,
                                                 adap.cessation.nonexpansion.effect,
@@ -324,7 +333,7 @@ rw.cessation.conservative = create.intervention(adap.cessation.expansion.effect,
                                                 rw.support.cessation.nonexpansion.effect, 
                                                 parameters = adjusted.RW.effect.values, 
                                                 WHOLE.POPULATION, 
-                                                code = "rw.end.cons")
+                                                code = paste0("rw.end.cons",rw.intervention.suffix))
 
 # Temporary Lapse of ADAP
 adap.brief.interruption.expansion.effect = create.intervention.effect(quantity.name = 'adap.suppression.expansion.effect',
@@ -397,7 +406,7 @@ rw.brief.interruption = create.intervention(adap.brief.interruption.expansion.ef
                                             rw.support.brief.interruption.nonexpansion.effect,
                                             parameters = RW.effect.values, 
                                             WHOLE.POPULATION,
-                                            code = "rw.b.intr")
+                                            code = paste0("rw.b.intr",rw.intervention.suffix))
 
 rw.brief.interruption.conservative = create.intervention(adap.brief.interruption.expansion.effect,
                                                          adap.brief.interruption.nonexpansion.effect,
@@ -407,7 +416,7 @@ rw.brief.interruption.conservative = create.intervention(adap.brief.interruption
                                                          rw.support.brief.interruption.nonexpansion.effect,
                                                          parameters = adjusted.RW.effect.values, 
                                                          WHOLE.POPULATION,
-                                                         code = "rw.b.intr.cons")
+                                                         code = paste0("rw.b.intr.cons",rw.intervention.suffix))
 
 # Temporary Lapse of ADAP
 adap.prolonged.interruption.expansion.effect = create.intervention.effect(quantity.name = 'adap.suppression.expansion.effect',
@@ -480,7 +489,7 @@ rw.prolonged.interruption = create.intervention(adap.prolonged.interruption.expa
                                                 rw.support.prolonged.interruption.nonexpansion.effect,
                                                 parameters = RW.effect.values, 
                                                 WHOLE.POPULATION,
-                                                code = "rw.p.intr")
+                                                code = paste0("rw.p.intr",rw.intervention.suffix))
 
 rw.prolonged.interruption.conservative = create.intervention(adap.prolonged.interruption.expansion.effect,
                                                 adap.prolonged.interruption.nonexpansion.effect,
@@ -490,4 +499,4 @@ rw.prolonged.interruption.conservative = create.intervention(adap.prolonged.inte
                                                 rw.support.prolonged.interruption.nonexpansion.effect,
                                                 parameters = adjusted.RW.effect.values, 
                                                 WHOLE.POPULATION,
-                                                code = "rw.p.intr.cons")
+                                                code = paste0("rw.p.intr.cons",rw.intervention.suffix))

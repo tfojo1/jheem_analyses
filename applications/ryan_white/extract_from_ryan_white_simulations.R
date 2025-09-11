@@ -79,9 +79,9 @@ total.pop = array.access(total.results, outcome='population', drop = T)
 total.sexual.transmission = array.access(total.results, outcome='sexual.transmission.rates', drop = T)
 
 if (RW.IS.STATE.LEVEL)
-    filename = paste0('Q:results/ryan_white/ryan_white_results_state_', Sys.Date(), ".Rdata")
+    filename = paste0('Q:results/ryan_white/ryan_white_results_state_', RW.ANCHOR.YEAR, "_", Sys.Date(), ".Rdata")
 if (!RW.IS.STATE.LEVEL)
-    filename = paste0('Q:results/ryan_white/ryan_white_results_city_', Sys.Date(), ".Rdata")
+    filename = paste0('Q:results/ryan_white/ryan_white_results_city_', RW.ANCHOR.YEAR, "_", Sys.Date(), ".Rdata")
 
 save(total.results,
      

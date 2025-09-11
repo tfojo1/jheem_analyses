@@ -579,7 +579,7 @@ fit.rw.simset <- function(simset,
     adjust.by.or = ( mean.p.non.adap / (1-mean.p.non.adap) ) / ( sim.p.adap / (1-sim.p.adap) )
     
     default.start.values['non.adap.or'] = default.start.values['non.adap.or'] * adjust.by.or
-    
+
     # Pull it together in MCMC settings
     mcmc.settings$start.values = default.start.values
     mcmc.settings$ctrl = bayesian.simulations::create.adaptive.blockwise.metropolis.control(
@@ -647,7 +647,15 @@ fit.rw.simset <- function(simset,
             look.back.i.sims.for.parameters = look.back.i.sims.for.parameters + 1
             look.back.to.sim.i = i - look.back.i.sims.for.parameters
             if (look.back.i.sims.for.parameters > 1)
-                mcmc.settings$start.values = sim.list[[look.back.to.sim.i]]$params[names(mcmc.settings$start.values)]
+            {
+                if (look.back.to.sim.i==0 || max.lookback.attempts==(look.back.i.sims.for.parameters-1))
+                    mcmc.settings$start.values = default.start.values
+                else if (look.back.to.sim.i < 0)
+                    stop(paste0("Even after looking back to first sim and default values, could not find a set of parameter values that did not give a -Inf likelihood for the ", 
+                                get.ordinal(i), " sim"))
+                else
+                    mcmc.settings$start.values = sim.list[[look.back.to.sim.i]]$params[names(mcmc.settings$start.values)]
+            }
             
             # Run the first sim and make sure the likelihood evaluates
             sim = transmute.simulation(mcmc.settings$start.values)
@@ -669,7 +677,12 @@ fit.rw.simset <- function(simset,
             }
             
            
-            successful.first.sim = likelihood$compute(sim, use.optimized.get=T)!=-Inf
+            successful.first.sim = likelihood$compute(sim)!=-Inf
+            if (!successful.first.sim)
+            {
+                print(paste0("attempt ", look.back.i.sims.for.parameters+1, " generated a -Inf likelihood"))
+               # browser()
+            }   
         }
         
         if (!successful.first.sim)

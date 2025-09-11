@@ -2,6 +2,8 @@ source('../jheem_analyses/applications/EHE/ehe_likelihoods.R')
 
 RW.DIFFERENT.YEARS.CORRELATION = 0.1
 RW.CALIBRATE.FROM.YEAR = 2017
+RW.WEIGHT = 1
+OAHS.WEIGHT = 1
 
 rw.non.adap.likelihood.instructions = create.basic.likelihood.instructions(
   outcome.for.data = "non.adap.clients", 
@@ -19,7 +21,7 @@ rw.non.adap.likelihood.instructions = create.basic.likelihood.instructions(
   error.variance.term = 0.05,
   error.variance.type = 'cv',
   
-  weights = 1,
+  weights = RW.WEIGHT,
   
   # if there are more datapoints for certain years, this will normalize
   # e.g., if there are a few years with only the totals 
@@ -44,7 +46,7 @@ rw.total.non.adap.likelihood.instructions = create.basic.likelihood.instructions
   error.variance.term = 0.05,
   error.variance.type = 'cv',
   
-  weights = 1,
+  weights = RW.WEIGHT,
   
   # if there are more datapoints for certain years, this will normalize
   # e.g., if there are a few years with only the totals 
@@ -75,7 +77,7 @@ rw.non.adap.sex.risk.proportion.likelihood.instructions = create.custom.likeliho
             })
         })
         
-        sigma = sim.sigma + data$obs.cov.mat * sim.denominators %*% t(sim.denominators)
+        sigma = sim.sigma + data$obs.cov.mat * sim.denominators %*% t(sim.denominators) * 1/RW.WEIGHT^2
         lik.summary = cbind(
             data$obs.metadata,
             obs.p = data$obs.vector,
@@ -185,7 +187,7 @@ rw.oahs.likelihood.instructions = create.basic.likelihood.instructions(
   error.variance.term = 0.05,
   error.variance.type = 'cv',
   
-  weights = 1,
+  weights = RW.WEIGHT,
   
   # if there are more datapoints for certain years, this will normalize
   # e.g., if there are a few years with only the totals 
@@ -209,7 +211,7 @@ rw.oahs.suppression.likelihood.instructions = create.basic.likelihood.instructio
   error.variance.term = 0.05,
   error.variance.type = 'cv',
   
-  weights = 1,
+  weights = RW.WEIGHT * OAHS.WEIGHT,
   
   # if there are more datapoints for certain years, this will normalize
   # e.g., if there are a few years with only the totals 
@@ -400,7 +402,7 @@ rw.adap.suppression.likelihood.instructions =
 
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION,
 
-                                                   weights = 1,
+                                                   weights = RW.WEIGHT,
                                                    equalize.weight.by.year = T
   )
 
@@ -436,7 +438,7 @@ rw.adap.likelihood.instructions =
                                                    
                                                    partitioning.function = EHE.PARTITIONING.FUNCTION, 
                                                    
-                                                   weights = 1,
+                                                   weights = RW.WEIGHT,
                                                    equalize.weight.by.year = T
   )
 
@@ -490,7 +492,7 @@ rw.adap.likelihood.instructions.state = create.basic.likelihood.instructions(
     error.variance.term = 0.05,
     error.variance.type = 'cv',
     
-    weights = 1,
+    weights = RW.WEIGHT,
     
     # if there are more datapoints for certain years, this will normalize
     # e.g., if there are a few years with only the totals 
@@ -515,7 +517,7 @@ rw.adap.suppression.likelihood.instructions.state = create.basic.likelihood.inst
     error.variance.term = 0.05,
     error.variance.type = 'cv',
     
-    weights = 1,
+    weights = RW.WEIGHT,
     
     # if there are more datapoints for certain years, this will normalize
     # e.g., if there are a few years with only the totals 
