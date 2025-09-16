@@ -1,6 +1,11 @@
 
+CDC.TESTING.INTERVENTION.SUFFIX
 
-CDC.TESTING.START.YEAR = 2025.75
+if (CDC.TESTING.ANCHOR.YEAR == 2025)
+    CDC.TESTING.START.YEAR = 2025.75
+if (CDC.TESTING.ANCHOR.YEAR == 2026)
+    CDC.TESTING.START.YEAR = 2026 + 1/12
+
 CDC.TESTING.LOSS.LAG = 0.25
 CDC.TESTING.EARLY.END.YEAR = 2027 
 CDC.TESTING.RETURN.LAG = 1 
@@ -34,7 +39,7 @@ cdc.testing.cessation.effect = create.intervention.effect(quantity.name = "cdc.e
 cdc.testing.cessation = create.intervention(WHOLE.POPULATION,
                                             cdc.testing.cessation.effect,
    #                                         proportion.tested.regardless.effect,
-                                            code = "cdct.end",
+                                            code = paste0("cdct.end", CDC.TESTING.INTERVENTION.SUFFIX),
                                             parameters = proportion.tested.regardless.values)
 
 #Return 2027
@@ -52,7 +57,7 @@ cdc.testing.brief.interruption.effect = create.intervention.effect(quantity.name
 cdc.testing.cessation.brief.interruption = create.intervention(WHOLE.POPULATION,
                                                                cdc.testing.brief.interruption.effect,
                                                        #        proportion.tested.regardless.effect,
-                                                               code = "cdct.bintr",
+                                                               code = paste0("cdct.bintr", CDC.TESTING.INTERVENTION.SUFFIX),
                                                                parameters = proportion.tested.regardless.values)
 
 
@@ -71,7 +76,7 @@ cdc.testing.prolonged.interruption.effect = create.intervention.effect(quantity.
 cdc.testing.cessation.prolonged.interruption = create.intervention(WHOLE.POPULATION,
                                                                    cdc.testing.prolonged.interruption.effect,
                                                               #     proportion.tested.regardless.effect,
-                                                                   code = "cdct.pintr",
+                                                                   code = paste0("cdct.pintr", CDC.TESTING.INTERVENTION.SUFFIX),
                                                                    parameters = proportion.tested.regardless.values)
 
 # Return Fiscal Year 2028 (ie, Oct 2027)
@@ -87,5 +92,5 @@ cdc.testing.interruption.effect = create.intervention.effect(quantity.name = "cd
 
 cdc.testing.interruption = create.intervention(WHOLE.POPULATION,
                                                cdc.testing.prolonged.interruption.effect,
-                                               code = "cdct.intr",
+                                               code = paste0("cdct.intr", CDC.TESTING.INTERVENTION.SUFFIX),
                                                parameters = proportion.tested.regardless.values)
