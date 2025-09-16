@@ -12,7 +12,7 @@ LOCATIONS = CDC.TESTING.LOCATIONS
 
 sim.collection=create.simset.collection(version="cdct", calibration.code = CALIBRATION.CODE,
                                         locations = LOCATIONS, 
-                                        interventions = c('baseline', CDC.TESTING.INTERVENTION.CODES),
+                                        interventions = CDC.TESTING.INTERVENTION.CODES,
                                         n.sim=N.SIMS)
 
 print("PULLING TOTALS...")
@@ -21,7 +21,7 @@ total.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalen
                                                 'suppression', 'population',
                                                 'sexual.transmission.rates','prep.uptake','testing'),
                                    output = 'numerator',
-                                   dimension.values=list(year=2010:2035),
+                                   dimension.values=list(year=2010:(CDC.TESTING.ANCHOR.YEAR+10)),
                                    keep.dimensions=c('year'),
                                    aggregate.total = T,
                                    verbose = VERBOSE)
@@ -31,7 +31,7 @@ total.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalen
 print("PULLING FULL INCIDENCE...")
 full.incidence = sim.collection$get(outcomes = 'incidence',
                                     output = 'numerator',
-                                    dimension.values=list(year=2020:2035),
+                                    dimension.values=list(year=2020:(CDC.TESTING.ANCHOR.YEAR+10)),
                                     keep.dimensions=c('year','age','race','sex','risk'),
                                     aggregate.total = T,
                                     verbose = VERBOSE)
