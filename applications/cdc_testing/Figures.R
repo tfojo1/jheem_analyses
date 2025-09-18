@@ -15,14 +15,14 @@ library(forcats)
 
 #load simulation set
 
-load('/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/cdc_testing_results_2025-07-21.Rdata')
+load('/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/cdc_testing_results_2025-09-16.Rdata')
 
 #stratified
 dimnames(full.incidence)
 
 dimnames(all.parameters)
 
-total.results[as.character(2015:2030),,"incidence",,"noint"]
+total.results[as.character(2025:2035),,"incidence","Total","noint"]
 
 total.results[as.character(2015:2030),,"incidence",,"cdct.end"]
 
@@ -223,10 +223,8 @@ for (intervention in interventions) {
 # Combine all data into one dataframe
 plot_data <- do.call(rbind, plot_data_list)
 
-# Remove trailing dots in state names
+# Clean state names
 plot_data$state <- gsub("\\.*$", "", plot_data$state)
-
-# OPTIONAL: Convert state abbreviations to full names (except "Total")
 state_lookup <- setNames(state.name, state.abb)
 plot_data$state <- ifelse(
     plot_data$state %in% names(state_lookup),
@@ -234,7 +232,7 @@ plot_data$state <- ifelse(
     plot_data$state
 )
 
-# Sort states by mean relative incidence of 'cdct.end' (excluding "Total")
+# Sort states by mean relative incidence for cdct.end
 sorted_states <- plot_data %>%
     filter(intervention == "cdct.end", state != "Total") %>%
     group_by(state) %>%
@@ -242,43 +240,47 @@ sorted_states <- plot_data %>%
     arrange(mean_ri) %>%
     pull(state)
 
-# Set factor levels with "Total" at the top
+# Set factor levels
 plot_data$state <- factor(plot_data$state, levels = c("Total", sorted_states))
-
-# Set factor order for interventions with descriptive labels
 plot_data$intervention <- factor(
     plot_data$intervention,
     levels = c("cdct.bintr", "cdct.pintr", "cdct.end"),
     labels = c("Brief Interruption", "Prolonged Interruption", "Cessation")
 )
 
-
-# Flag outliers above 40%
+# Cap values at 40 for visualization
 plot_data$relative_incidence_capped <- ifelse(
     plot_data$relative_incidence > 40,
     40,
     plot_data$relative_incidence
 )
-plot_data$asterisk <- plot_data$relative_incidence > 40
 
-# --- Plot ---
+# Create asterisk annotation dataframe: one row per state only
+asterisk_states <- c("Louisiana", "Missouri", "Mississippi")
+asterisk_data <- plot_data %>%
+    filter(state %in% asterisk_states) %>%
+    group_by(state) %>%
+    slice(1) %>%
+    mutate(label = "*") %>%
+    ungroup()
 
+# ----- Plot -----
 ggplot(plot_data, aes(x = relative_incidence_capped, y = state, fill = intervention)) +
     geom_boxplot(
-        position = position_dodge(width = 0.8),
+        aes(group = interaction(state, intervention)),
+        position = position_dodge2(width = 0.8, preserve = "single"),
         outlier.shape = NA
     ) +
     geom_text(
-        data = subset(plot_data, asterisk),
-        aes(label = "*"),
-        x = 40.5,  # just past truncation
+        data = asterisk_data,
+        aes(x = 40.5, label = label),
         size = 5,
         hjust = 0
     ) +
     scale_x_continuous(
         labels = function(x) paste0(x, "%"),
-        limits = c(0, 45),
-        expand = expansion(mult = c(0, 0.1))  # give space for asterisk
+        limits = c(0, 47),
+        expand = expansion(mult = c(0, 0.1))
     ) +
     scale_fill_manual(
         values = c(
@@ -295,9 +297,10 @@ ggplot(plot_data, aes(x = relative_incidence_capped, y = state, fill = intervent
     theme_minimal(base_size = 14) +
     theme(
         legend.position = "bottom",
-        legend.text = element_text(size = 14),
-        axis.text = element_text(size = 13)
+        legend.text = element_text(size = 18),
+        axis.text = element_text(size = 18)
     )
+
 
 #Texas Plots, LA Plots, IL Plots
 # Subset and label TX
@@ -359,7 +362,7 @@ vline_data <- data.frame(
 y_max_by_state <- list(
     IL = 1500,
     TX = 6000,
-    LA = 2000
+    LA = 2200
 )
 
 # Annotation text
@@ -369,9 +372,9 @@ annotations <- data.frame(
     year = c(2032, 2031, 2030, 2032, 2031, 2030, 2032, 2031, 2030),
     value = c(900, 800, 700, 3000, 2500, 2000, 1800, 1500, 1200),
     label = c(
-        "178 (64–324)", "153 (55–278)", "78 (28–140)",             # IL
-        "2304 (835–4120)", "1868 (693–3305)", "838 (328–1424)",    # TX
-        "1388 (429–2823)", "1082 (349–2138)", "432 (155–780)"      # LA
+        "174 (62–320)", "150 (53–274)", "77 (28–138)",             # IL
+        "2303 (835–4120)", "1867 (693–3305)", "837 (328–1424)",    # TX
+        "1387 (429–2823)", "1081 (349–2138)", "432 (155–780)"      # LA
     )
 )
 
@@ -402,47 +405,50 @@ for (name in names(plot_data_list)) {
                         aes(x = year, y = value, label = paste(label, "excess infections")),
                         inherit.aes = FALSE,
                         nudge_y = 300,
-                        size = 5,
-                        box.padding = 0.5,
-                        point.padding = 0.5,
-                        segment.color = "gray30",
-                        max.overlaps = 10) +
-        scale_x_continuous(breaks = 2020:2035) +
+                        size = 9,  # Increased size ~1.5x (default was 7)
+                        box.padding = 0.6,
+                        point.padding = 0.6,
+                        segment.color = NA,  # Remove lines
+                        max.overlaps = 20) +
+        scale_x_continuous(breaks = c(2020, 2025, 2030, 2035)) +
         scale_y_continuous(limits = c(0, ymax)) +
         scale_color_manual(values = jama_colors,
                            labels = c("Continuation", "Brief Interruption", "Prolonged Interruption", "Cessation")) +
         scale_fill_manual(values = jama_colors,
                           labels = c("Continuation", "Brief Interruption", "Prolonged Interruption", "Cessation")) +
         labs(
-            title = paste(this_state, "-", this_intervention),
             x = "Year",
-            y = "Incidence"
+            y = "Infections"
         ) +
-        theme_bw(base_size = 18) +
+        theme_bw(base_size = 22) +  # Increased base font size
         theme(
-            panel.grid.major = element_line(color = "black", size = 0.2),
-            panel.grid.minor = element_line(color = "black", size = 0.1),
+            panel.grid = element_blank(),
             legend.position = "none",
-            plot.title = element_text(face = "bold"),
-            axis.text.x = element_text(angle = 45, hjust = 1)
+            plot.title = element_blank(),
+            axis.text.x = element_text(angle = 45, hjust = 1, face = "bold", size = 18),  # Enlarged
+            axis.text.y = element_text(size = 18),
+            axis.title.x = element_text(size = 24, face = "bold"),
+            axis.title.y = element_text(size = 24, face = "bold")
         ) +
         guides(
             color = guide_legend(nrow = 1),
             fill = guide_legend(nrow = 1)
         )
-    
     ggsave(
         filename = paste0("/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/individual_panels/", gsub(" ", "_", paste(this_state, this_intervention)), ".png"),
         plot = p,
         width = 7,
         height = 6,
-        dpi = 300
+        dpi = 300,
+        limitsize = FALSE
     )
+    
 }
 #Lolliplot sensitivity 
 
 int <- "cdct.end"
 param_names <- dimnames(all.parameters)$parameter[389:423]  # all CDC parameters
+param_names <- c("CDC Funded Diagnoses OR Spline Point 1", "CDC Funded Diagnoses OR Spline Point 2", "CDC Funded Diagnoses OR Spline Point 3", "CDC Funded Diagnoses Change in Projection","CDC Funded Diagnoses OR MSM","CDC Funded Diagnoses OR MSM IDU", "CDC Funded Diagnoses OR IDU Male", "CDC Funded Diagnoses OR IDU Female", "CDC Funded Diagnoses OR Hetersoexual Male","CDC Funded Diagnoses OR Heterosexual Female","CDC Funded Diagnoses OR Black","CDC Funded Diagnoses OR Hispanic","CDC Funded Diagnoses OR Other Races","CDC Funded Diagnoses OR 13-24","CDC Funded Diagnoses OR 25-34","CDC Funded Diagnoses OR 35-44","CDC Funded Diagnoses OR 45-54","CDC Funded Diagnoses OR 55+","CDC Funded Tests OR", "CDC Funded Tests Slope OR","CDC Funded Tests OR MSM", "CDC Funded Tests OR MSM IDU","CDC Funded Tests OR IDU Male","CDC Funded Tests OR IDU Female","CDC Funded Tests OR Heterosexual Male","CDC Funded Tests OR Heterosexual Female","CDC Funded Tests OR Black","CDC Funded Tests OR Hispanic","CDC Funded Tests OR Other Races","CDC Funded Tests OR 13-24","CDC Funded Tests OR 25-34","CDC Funded Tests OR 35-44","CDC Funded Tests OR 45-54","CDC Funded Tests OR 55+","Proportion Tested Regardless")
 states <- dimnames(all.parameters)[[3]]
 
 # Extract parameter values per state
@@ -524,261 +530,18 @@ ggplot(all_prcc_combined, aes(x = PRCC, y = parameter)) +
     facet_wrap(~ state, scales = "free_y") +
     scale_color_manual(values = c("Positive" = "#1f78b4", "Negative" = "#d95f02")) +
     labs(
-        title = paste0("PRCC of Parameters on Relative Incidence by State (", int, ")"),
+        title = paste0("PRCC of Parameters on Relative Incidence by State (Cessation)"),
         x = "Partial Rank Correlation Coefficient (PRCC)",
         y = "Parameter",
         color = "Direction"
     ) +
     theme_minimal() +
     theme(
-        axis.text.y = element_text(size = 6),
+        axis.text.y = element_text(size = 4),
         strip.text = element_text(face = "bold"),
         legend.position = "bottom"
     )
-#Table 1 Results 
 
-# --- Step 1: Extract data per state for each intervention ---
-
-states <- dimnames(total.results)[[4]]
-
-# Cdct.end
-plot_data_list_cdct.end <- vector("list", length(states))
-names(plot_data_list_cdct.end) <- states
-
-intervention <- "cdct.end"
-for (a in 1:length(states)) {
-    abs_diff <- colSums(total.results[as.character(2025:2030), , "incidence", states[a], intervention]) -
-        colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
-    
-    ri <- abs_diff /
-        colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
-    
-    temp_df <- data.frame(
-        state = states[a],
-        intervention = intervention,
-        relative_incidence = ri * 100,
-        abs_incidence = abs_diff
-    )
-    plot_data_list_cdct.end[[a]] <- temp_df
-}
-
-# Cdct.bintr
-plot_data_list_cdct.bintr <- vector("list", length(states))
-names(plot_data_list_cdct.bintr) <- states
-
-intervention <- "cdct.bintr"
-for (a in 1:length(states)) {
-    abs_diff <- colSums(total.results[as.character(2025:2030), , "incidence", states[a], intervention]) -
-        colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
-    
-    ri <- abs_diff /
-        colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
-    
-    temp_df <- data.frame(
-        state = states[a],
-        intervention = intervention,
-        relative_incidence = ri * 100,
-        abs_incidence = abs_diff
-    )
-    plot_data_list_cdct.bintr[[a]] <- temp_df
-}
-
-# Cdct.pintr
-plot_data_list_cdct.pintr <- vector("list", length(states))
-names(plot_data_list_cdct.pintr) <- states
-
-intervention <- "cdct.pintr"
-for (a in 1:length(states)) {
-    abs_diff <- colSums(total.results[as.character(2025:2030), , "incidence", states[a], intervention]) -
-        colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
-    
-    ri <- abs_diff /
-        colSums(total.results[as.character(2025:2030), , "incidence", states[a], "noint"])
-    
-    temp_df <- data.frame(
-        state = states[a],
-        intervention = intervention,
-        relative_incidence = ri * 100,
-        abs_incidence = abs_diff
-    )
-    plot_data_list_cdct.pintr[[a]] <- temp_df
-}
-
-# --- Step 2: Extract summary stats ---
-extract_summary <- function(df_list, intervention_name) {
-    do.call(rbind, lapply(seq_along(df_list), function(i) {
-        rel_x <- df_list[[i]]$relative_incidence
-        abs_x <- df_list[[i]]$abs_incidence
-        tibble(
-            State = states[i],
-            Intervention = intervention_name,
-            Mean = mean(rel_x),
-            Lower = quantile(rel_x, 0.025),
-            Upper = quantile(rel_x, 0.975),
-            AbsMean = mean(abs_x),
-            AbsLower = quantile(abs_x, 0.025),
-            AbsUpper = quantile(abs_x, 0.975)
-        )
-    }))
-}
-
-summary_data <- bind_rows(
-    extract_summary(plot_data_list_cdct.end, "Cessation"),
-    extract_summary(plot_data_list_cdct.bintr, "Brief Interruption"),
-    extract_summary(plot_data_list_cdct.pintr, "Prolonged Interruption")
-)
-
-# --- Step 3: Add TOTAL row for each intervention ---
-total_rows <- list()
-interventions <- c("cdct.end", "cdct.pintr", "cdct.bintr")
-intervention_labels <- c("Cessation", "Prolonged Interruption", "Brief Interruption")
-
-for (i in seq_along(interventions)) {
-    intervention <- interventions[i]
-    label <- intervention_labels[i]
-    
-    total_int <- apply(total.results[as.character(2025:2030), , "incidence", , intervention], 2, sum)
-    total_noint <- apply(total.results[as.character(2025:2030), , "incidence", , "noint"], 2, sum)
-    
-    abs_diff <- total_int - total_noint
-    ri_total <- abs_diff / total_noint
-    
-    total_rows[[i]] <- tibble(
-        State = "Total",
-        Intervention = label,
-        Mean = mean(ri_total) * 100,
-        Lower = quantile(ri_total, 0.025) * 100,
-        Upper = quantile(ri_total, 0.975) * 100,
-        AbsMean = mean(abs_diff),
-        AbsLower = quantile(abs_diff, 0.025),
-        AbsUpper = quantile(abs_diff, 0.975)
-    )
-}
-summary_data_total <- bind_rows(total_rows)
-
-# --- Step 4: Combine state + total summaries ---
-summary_data <- bind_rows(summary_data, summary_data_total)
-
-# --- Step 5: Format labels ---
-summary_data <- summary_data %>%
-    mutate(
-        across(c(Mean, Lower, Upper), round, 1),
-        across(c(AbsMean, AbsLower, AbsUpper), round, 0),
-        AbsMean_fmt = format(AbsMean, big.mark = ","),
-        AbsLower_fmt = format(AbsLower, big.mark = ","),
-        AbsUpper_fmt = format(AbsUpper, big.mark = ","),
-        abs_label = paste0(AbsMean_fmt, " [", AbsLower_fmt, "–", AbsUpper_fmt, "]"),
-        label = paste0(abs_label, "\n", Mean, "% [", Lower, "–", Upper, "]")
-    )
-
-# --- Step 6: Prepare final data for heatmap ---
-# Separate 'Total' from the rest
-heatmap_data_main <- summary_data %>%
-    filter(State != "Total") %>%
-    arrange(Mean)  # Worst (highest Mean) to best
-
-# Set factor levels based on ordered states
-ordered_states <- unique(heatmap_data_main$State)
-
-# Append Total
-heatmap_data_total <- summary_data %>%
-    filter(State == "Total")
-
-# Combine data back
-heatmap_data <- bind_rows(heatmap_data_main, heatmap_data_total) %>%
-    mutate(
-        State = factor(State, levels = c(ordered_states, "Total")),
-        Intervention = factor(Intervention, levels = c("Cessation", "Prolonged Interruption", "Brief Interruption"))
-    )
-
-# --- Step 7: Plot heatmap with TOTAL row at bottom ---
-    ggplot(heatmap_data, aes(x = Intervention, y = State, fill = Mean)) +
-    geom_tile(color = "white") +
-    geom_text(
-        aes(label = label),
-        color = "black", size = 4.2, lineheight = 1.1
-    ) +
-    scale_fill_gradient2(
-        low = "yellow",
-        mid = "orange",
-        high = "red",
-        midpoint = 10,
-        limits = range(heatmap_data$Mean, na.rm = TRUE),
-        space = "Lab"
-    ) +
-    labs(
-        title = "Relative and Absolute Excess Incidence by State and Intervention (2025–2030)",
-        x = "Intervention",
-        y = "State",
-        fill = "Mean %"
-    ) +
-    theme_minimal() +
-    theme(
-        axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12, angle = 30, hjust = 1),
-        plot.title = element_text(size = 14, face = "bold")
-    )
-    
-    # --- Step 8: Format table with baseline incidence and 95% CIs ---
-    
-    # Get mean incidence if CDC-funded tests continue (column a)
-    baseline_incidence <- sapply(states, function(state) {
-        mean(colSums(total.results[as.character(2025:2030), , "incidence", state, "noint"]))
-    })
-    
-    baseline_df <- tibble(
-        State = names(baseline_incidence),
-        `Incidence if CDC-funded Tests Continue` = format(round(baseline_incidence, 0), big.mark = ",")
-    )
-    
-    # Format existing summary_data for 95% CIs
-    summary_data_formatted <- summary_data %>%
-        mutate(
-            AbsMean_fmt = format(round(AbsMean, 0), big.mark = ","),
-            AbsLower_fmt = format(round(AbsLower, 0), big.mark = ","),
-            AbsUpper_fmt = format(round(AbsUpper, 0), big.mark = ","),
-            Mean_fmt = round(Mean, 1),
-            Lower_fmt = round(Lower, 1),
-            Upper_fmt = round(Upper, 1),
-            
-            AbsLabel = paste0(AbsMean_fmt, " [", AbsLower_fmt, "–", AbsUpper_fmt, "]"),
-            RelLabel = paste0(Mean_fmt, "% [", Lower_fmt, "–", Upper_fmt, "]")
-        ) %>%
-        select(State, Intervention, AbsLabel, RelLabel)
-    
-    # Pivot wide for columns b–g
-    summary_labels_wide <- summary_data_formatted %>%
-        pivot_wider(
-            names_from = Intervention,
-            values_from = c(AbsLabel, RelLabel),
-            names_glue = "{Intervention}_{.value}"
-        )
-    
-    # Combine with baseline incidence to create final table
-    final_table_with_cis <- baseline_df %>%
-        left_join(summary_labels_wide, by = "State") %>%
-        select(
-            State,
-            `Incidence if CDC-funded Tests Continue`,
-            `Cessation_AbsLabel`,
-            `Cessation_RelLabel`,
-            `Prolonged Interruption_AbsLabel`,
-            `Prolonged Interruption_RelLabel`,
-            `Brief Interruption_AbsLabel`,
-            `Brief Interruption_RelLabel`
-        ) %>%
-        rename(
-            `Cessation - Number of Excess Infections` = `Cessation_AbsLabel`,
-            `Cessation - Relative Excess Infections` = `Cessation_RelLabel`,
-            `Prolonged Interruption - Number of Excess Infections` = `Prolonged Interruption_AbsLabel`,
-            `Prolonged Interruption - Relative Excess Infections` = `Prolonged Interruption_RelLabel`,
-            `Brief Interruption - Number of Excess Infections` = `Brief Interruption_AbsLabel`,
-            `Brief Interruption - Relative Excess Infections` = `Brief Interruption_RelLabel`
-        )
-    
-    
-    write.table(final_table_with_cis, "Final_Excess_Infections_Table.txt", row.names = FALSE)
-    
 
 #Scatter plot Fraction CDC HIV Testing
     
@@ -894,7 +657,7 @@ heatmap_data <- bind_rows(heatmap_data_main, heatmap_data_total) %>%
                       aes(x = x, y = y, label = label),
                       inherit.aes = FALSE,
                       hjust = -0.1, vjust = 1.3,
-                      size = 4, fontface = "italic") +
+                      size = 5, fontface = "italic") +
             labs(
                 x = x_labels_all[effect_vars[[var]]],
                 y = "Relative Excess Incidence (%)",
@@ -902,20 +665,17 @@ heatmap_data <- bind_rows(heatmap_data_main, heatmap_data_total) %>%
                 size = "New Infections\nin 2025"
             ) +
             scale_fill_gradient(
-                limits = c(0, 0.9),
+                limits = c(0,1),
                 labels = percent_format(accuracy = 1),
                 low = "yellow", high = "red"
             ) +
             scale_size_continuous(labels = comma) +
             theme_bw(base_size = 14) +
             theme(
-                legend.position = "bottom",
-                legend.box = "horizontal",
-                legend.title = element_text(size = 9),
-                legend.text = element_text(size = 8),
-                axis.title.x = element_text(size = 10),
-                axis.title.y = element_text(size = 10),
-                axis.text = element_text(size = 9),
+                legend.position = "none",
+                axis.title.x = element_text(size = 12),
+                axis.title.y = element_text(size = 12),
+                axis.text = element_text(size = 10),
                 plot.margin = margin(t = 10, r = 10, b = 60, l = 10),
                 panel.border = element_rect(color = "black", fill = NA),
                 strip.background = element_blank(),
@@ -958,7 +718,7 @@ heatmap_data <- bind_rows(heatmap_data_main, heatmap_data_total) %>%
 
 # -- Setup --
 int <- "cdct.end"
-param_names <- dimnames(all.parameters)$parameter[389:423]
+param_names <- c("CDC Funded Diagnoses OR Spline Point 1", "CDC Funded Diagnoses OR Spline Point 2", "CDC Funded Diagnoses OR Spline Point 3", "CDC Funded Diagnoses Change in Projection","CDC Funded Diagnoses OR MSM","CDC Funded Diagnoses OR MSM IDU", "CDC Funded Diagnoses OR IDU Male", "CDC Funded Diagnoses OR IDU Female", "CDC Funded Diagnoses OR Hetersoexual Male","CDC Funded Diagnoses OR Heterosexual Female","CDC Funded Diagnoses OR Black","CDC Funded Diagnoses OR Hispanic","CDC Funded Diagnoses OR Other Races","CDC Funded Diagnoses OR 13-24","CDC Funded Diagnoses OR 25-34","CDC Funded Diagnoses OR 35-44","CDC Funded Diagnoses OR 45-54","CDC Funded Diagnoses OR 55+","CDC Funded Tests OR", "CDC Funded Tests Slope OR","CDC Funded Tests OR MSM", "CDC Funded Tests OR MSM IDU","CDC Funded Tests OR IDU Male","CDC Funded Tests OR IDU Female","CDC Funded Tests OR Heterosexual Male","CDC Funded Tests OR Heterosexual Female","CDC Funded Tests OR Black","CDC Funded Tests OR Hispanic","CDC Funded Tests OR Other Races","CDC Funded Tests OR 13-24","CDC Funded Tests OR 25-34","CDC Funded Tests OR 35-44","CDC Funded Tests OR 45-54","CDC Funded Tests OR 55+","Proportion Tested Regardless")
 states <- dimnames(all.parameters)[[3]]
 
 # -- Extract parameter values per state (list of dataframes) --
@@ -1039,7 +799,8 @@ plot_by_state <- function(state_name) {
         scale_y_reordered() +
         theme_minimal(base_size = 12) +
         theme(
-            axis.text.y = element_text(size = 6),
+            axis.text.y = element_text(size = 10),
+            axis.text.x = element_text(size = 20),
             plot.title = element_text(face = "bold", size = 14),
             legend.position = "bottom"
         )
@@ -1189,13 +950,13 @@ for (state in states) {
 #Dodged boxplots for proportion tested regardless
 # Define constants
 state <- "Total"
-scenarios <- c("cdct.end", "cdct.pintr", "cdct.bintr")
+scenarios <- c("cdct.end.26", "cdct.pintr.26", "cdct.bintr.26")
 years <- as.character(2025:2030)
 
 scenario_labels <- c(
-    "cdct.end" = "Cessation",
-    "cdct.pintr" = "Prolonged Interruption",
-    "cdct.bintr" = "Brief Interruption"
+    "cdct.end.26" = "Cessation",
+    "cdct.pintr.26" = "Prolonged Interruption",
+    "cdct.bintr.26" = "Brief Interruption"
 )
 
 jama_colors_labeled <- c(
@@ -1208,7 +969,7 @@ jama_colors_labeled <- c(
 baseline_incidence <- colSums(total.results[years, , "incidence", state, "noint"])
 
 # Get 1000 draws of proportion.tested.regardless for cdct.end
-prop_vals <- all.parameters["proportion.tested.regardless", , "AL", "cdct.end"]
+prop_vals <- all.parameters["proportion.tested.regardless", , "AL", "cdct.end.26"]
 
 # Robust quantile binning
 quintiles <- quantile(prop_vals, probs = seq(0, 1, 0.2), na.rm = TRUE)
@@ -1254,7 +1015,7 @@ plot_df <- do.call(rbind, boxplot_data)
 # Convert scenario codes to labeled factors
 plot_df$scenario <- factor(
     plot_df$scenario,
-    levels = c("cdct.bintr", "cdct.pintr", "cdct.end"),
+    levels = c("cdct.bintr.26", "cdct.pintr.26", "cdct.end.26"),
     labels = c("Brief Interruption", "Prolonged Interruption", "Cessation")
 )
 
@@ -1262,20 +1023,20 @@ plot_df$scenario <- factor(
 ggplot(plot_df, aes(x = excess_infections, y = fct_rev(quintile), fill = scenario)) +
     geom_boxplot(position = position_dodge(width = 0.8), outlier.alpha = 0.2) +
     scale_x_continuous(labels = comma) +
-    scale_fill_manual(values = jama_colors_labeled, name = "Intervention Scenario") +
+    scale_fill_manual(values = jama_colors_labeled, name = NULL) +
     labs(
-        x = "Absolute Excess Infections (2025–2030)",
+        x = "Number of Excess Infections (2025–2030)",
         y = "Proportion Tested Regardless (Quintile)"
     ) +
     theme_minimal(base_size = 14) +
     theme(
         legend.position = "bottom",
         legend.direction = "horizontal",
-        legend.title = element_text(size = 13),
-        legend.text = element_text(size = 12),
+        legend.title = element_text(size = 15),
+        legend.text = element_text(size = 15),
         panel.border = element_rect(color = "black", fill = NA),
-        axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
         plot.margin = margin(t = 10, r = 10, b = 40, l = 10)
     )
 
@@ -1288,3 +1049,270 @@ summary_df <- plot_df %>%
         iqr_upper = quantile(excess_infections, 0.75, na.rm = TRUE),
         .groups = 'drop'
     )
+
+
+
+#CROI Abstract Results, Updated Intervention 2026 
+
+# ---- Make a copy and remove MN + NC, recompute Total ----
+total.results.noMNNC <- total.results
+
+# Get all location names
+locs <- dimnames(total.results.noMNNC)$location
+
+# States to include in the recomputed Total (exclude MN, NC, and the existing Total)
+states_noMNNC <- setdiff(locs, c("MN", "NC", "Total"))
+
+# Recompute Total across those states (dims: year x sim x outcome x intervention)
+total_noMNNC <- apply(
+    total.results.noMNNC[ , , , states_noMNNC, , drop = FALSE],
+    c(1, 2, 3, 5),
+    sum,
+    na.rm = TRUE
+)
+
+# Replace the Total slice in the copy
+total.results.noMNNC[ , , , "Total", ] <- total_noMNNC
+
+# Drop MN and NC entirely from the structure
+total.results.noMNNC <- total.results.noMNNC[ , , , setdiff(locs, c("MN", "NC")), , drop = FALSE]
+
+# ---- Derived results based on the updated object ----
+states <- dimnames(total.results.noMNNC)$location
+years  <- as.character(2025:2030)
+
+# Relative incidence (cdct.end.26 vs noint)
+rel_incidence_list_end <- lapply(states, function(state) {
+    (colSums(total.results.noMNNC[years, , "incidence", state, "cdct.end.26"]) -
+         colSums(total.results.noMNNC[years, , "incidence", state, "noint"])) /
+        colSums(total.results.noMNNC[years, , "incidence", state, "noint"])
+})
+names(rel_incidence_list_end) <- states
+
+# Relative incidence (cdct.pintr.26 vs noint)
+rel_incidence_list_pintr <- lapply(states, function(state) {
+    (colSums(total.results.noMNNC[years, , "incidence", state, "cdct.pintr.26"]) -
+         colSums(total.results.noMNNC[years, , "incidence", state, "noint"])) /
+        colSums(total.results.noMNNC[years, , "incidence", state, "noint"])
+})
+names(rel_incidence_list_pintr) <- states
+
+# Absolute differences
+abs_incidence_list_end <- lapply(states, function(state) {
+    colSums(total.results.noMNNC[years, , "incidence", state, "cdct.end.26"]) -
+        colSums(total.results.noMNNC[years, , "incidence", state, "noint"])
+})
+names(abs_incidence_list_end) <- states
+
+abs_incidence_list_pintr <- lapply(states, function(state) {
+    colSums(total.results.noMNNC[years, , "incidence", state, "cdct.pintr.26"]) -
+        colSums(total.results.noMNNC[years, , "incidence", state, "noint"])
+})
+names(abs_incidence_list_pintr) <- states
+
+# Helper to summarise a *named* list of numeric vectors (each vector = 1000 sims)
+summarise_list <- function(x_list, scenario, metric, to_percent = FALSE) {
+    purrr::imap_dfr(x_list, ~{
+        v <- .x
+        tibble(
+            state    = .y,
+            scenario = scenario,
+            metric   = metric,
+            mean     = mean(v, na.rm = TRUE),
+            lo95     = quantile(v, 0.025, na.rm = TRUE, names = FALSE),
+            hi95     = quantile(v, 0.975, na.rm = TRUE, names = FALSE)
+        )
+    }) %>%
+        { if (to_percent) dplyr::mutate(., dplyr::across(c(mean, lo95, hi95), ~ . * 100)) else . }
+}
+
+# --- Relative (proportions; switch to_percent=TRUE for %)
+summary_rel_end   <- summarise_list(rel_incidence_list_end,   "cdct.end.26",   "relative", to_percent = FALSE)
+summary_rel_pintr <- summarise_list(rel_incidence_list_pintr, "cdct.pintr.26", "relative", to_percent = FALSE)
+
+# Optional percent versions
+summary_rel_end_pct   <- summarise_list(rel_incidence_list_end,   "cdct.end.26",   "relative", to_percent = TRUE)
+summary_rel_pintr_pct <- summarise_list(rel_incidence_list_pintr, "cdct.pintr.26", "relative", to_percent = TRUE)
+
+# --- Absolute (counts)
+summary_abs_end   <- summarise_list(abs_incidence_list_end,   "cdct.end.26",   "absolute")
+summary_abs_pintr <- summarise_list(abs_incidence_list_pintr, "cdct.pintr.26", "absolute")
+
+# --- Combined table (uses proportions for relative; swap in *_pct if you prefer %)
+summary_all <- dplyr::bind_rows(
+    summary_rel_end,
+    summary_rel_pintr,
+    summary_abs_end,
+    summary_abs_pintr
+)
+
+# ---- Boxplots setup using the updated Total ----
+state <- "Total"
+scenarios <- c("cdct.end.26", "cdct.pintr.26")
+
+scenario_labels <- c(
+    "cdct.end.26"   = "Cessation",
+    "cdct.pintr.26" = "Prolonged Interruption"
+)
+
+jama_colors_labeled <- c(
+    "Cessation" = "#374E55",
+    "Prolonged Interruption" = "#DF8F44"
+)
+
+# Baseline incidence (noint) using the recomputed Total
+baseline_incidence <- colSums(total.results.noMNNC[years, , "incidence", state, "noint"])
+
+# Example quintiles based on AL parameter draws (unchanged)
+prop_vals <- all.parameters["proportion.tested.regardless", , "AL", "cdct.end.26"]
+
+quintiles <- unique(quantile(prop_vals, probs = seq(0, 1, 0.2), na.rm = TRUE))
+if (length(quintiles) > 1) {
+    quintile_labels <- paste0(round(100 * head(quintiles, -1)), "%–", round(100 * tail(quintiles, -1)), "%")
+    prop_quintile <- cut(prop_vals, breaks = quintiles, include.lowest = TRUE, labels = quintile_labels)
+} else {
+    prop_quintile <- factor(rep("Identical", length(prop_vals)))
+}
+
+# Build plotting df
+boxplot_data <- list()
+for (scenario in scenarios) {
+    scen_incidence <- colSums(total.results.noMNNC[years, , "incidence", state, scenario])
+    abs_excess <- scen_incidence - baseline_incidence
+    boxplot_data[[length(boxplot_data) + 1]] <- data.frame(
+        excess_infections = abs_excess,
+        quintile = prop_quintile,
+        scenario = scenario,
+        state = state
+    )
+}
+plot_df <- do.call(rbind, boxplot_data)
+
+# Labeled factors for fill
+plot_df$scenario <- factor(
+    plot_df$scenario,
+    levels = c("cdct.pintr.26", "cdct.end.26"),
+    labels = c("Prolonged Interruption", "Cessation")
+)
+
+# Plot
+ggplot(plot_df, aes(x = excess_infections, y = forcats::fct_rev(quintile), fill = scenario)) +
+    geom_boxplot(position = position_dodge(width = 0.8), outlier.alpha = 0.2) +
+    scale_x_continuous(labels = scales::comma) +
+    scale_fill_manual(values = jama_colors_labeled, name = NULL) +
+    labs(
+        x = "Number of Excess Infections (2025–2030)",
+        y = "Proportion Tested Regardless (Quintile)"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.title = element_text(size = 15),
+        legend.text = element_text(size = 15),
+        panel.border = element_rect(color = "black", fill = NA),
+        axis.text.y = element_text(size = 15),
+        axis.text.x = element_text(size = 15),
+        plot.margin = margin(t = 10, r = 10, b = 40, l = 10)
+    )
+
+summary_df <- plot_df %>%
+    group_by(scenario, quintile) %>%
+    summarise(
+        mean_excess = mean(excess_infections, na.rm = TRUE),
+        iqr_lower = quantile(excess_infections, 0.25, na.rm = TRUE),
+        iqr_upper = quantile(excess_infections, 0.75, na.rm = TRUE),
+        .groups = 'drop'
+    )
+
+
+#Boxplot figure
+
+# List of interventions to include
+interventions <- c("cdct.end.26", "cdct.pintr.26")
+
+# Create an empty list to hold data.frames
+plot_data_list <- list()
+
+# Loop through interventions and states to collect state-level results 
+for (intervention in interventions) {
+    for (state in states) {
+        ri <- (colSums(total.results.noMNNC[as.character(2025:2030), , "incidence", state, intervention]) -
+                   colSums(total.results.noMNNC[as.character(2025:2030), , "incidence", state, "noint"])) /
+            colSums(total.results.noMNNC[as.character(2025:2030), , "incidence", state, "noint"])
+        
+        temp_df <- data.frame(
+            state = state,
+            intervention = intervention,
+            relative_incidence = ri * 100  # convert to percent
+        )
+        plot_data_list[[length(plot_data_list) + 1]] <- temp_df
+    }
+}
+
+# Combine all data into one dataframe
+plot_data <- do.call(rbind, plot_data_list)
+
+# Clean state names
+plot_data$state <- gsub("\\.*$", "", plot_data$state)
+state_lookup <- setNames(state.name, state.abb)
+plot_data$state <- ifelse(
+    plot_data$state %in% names(state_lookup),
+    state_lookup[plot_data$state],
+    plot_data$state
+)
+
+# Sort states by mean relative incidence for cdct.end
+sorted_states <- plot_data %>%
+    filter(intervention == "cdct.end.26", state != "Total") %>%
+    group_by(state) %>%
+    summarise(mean_ri = mean(relative_incidence, na.rm = TRUE)) %>%
+    arrange(mean_ri) %>%
+    pull(state)
+
+# Set factor levels
+plot_data$state <- factor(plot_data$state, levels = c("Total", sorted_states))
+plot_data$intervention <- factor(
+    plot_data$intervention,
+    levels = c( "cdct.pintr.26", "cdct.end.26"),
+    labels = c("Prolonged Interruption", "Cessation")
+)
+
+# Cap values at 40 for visualization
+plot_data$relative_incidence_capped <- ifelse(
+    plot_data$relative_incidence > 40,
+    40,
+    plot_data$relative_incidence
+)
+
+
+# ----- Plot -----
+ggplot(plot_data, aes(x = relative_incidence_capped, y = state, fill = intervention)) +
+    geom_boxplot(
+        aes(group = interaction(state, intervention)),
+        position = position_dodge2(width = 0.8, preserve = "single"),
+        outlier.shape = NA
+    ) +
+    scale_x_continuous(
+        labels = function(x) paste0(x, "%"),
+        limits = c(0, 47),
+        expand = expansion(mult = c(0, 0.1))
+    ) +
+    scale_fill_manual(
+        values = c(
+            "Cessation" = "#374E55",
+            "Prolonged Interruption" = "#DF8F44"
+        )
+    ) +
+    labs(
+        x = "Relative Excess HIV Infections from 2025–2030",
+        y = NULL,
+        fill = NULL
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(
+        legend.position = "bottom",
+        legend.text = element_text(size = 18),
+        axis.text = element_text(size = 18)
+    )
+
