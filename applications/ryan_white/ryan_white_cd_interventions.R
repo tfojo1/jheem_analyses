@@ -46,6 +46,6 @@ cd.rw.cessation = create.intervention(cd.oahs.cessation.expansion.effect,
                                       cd.oahs.cessation.nonexpansion.effect,
                                       cd.rw.support.cessation.expansion.effect, 
                                       cd.rw.support.cessation.nonexpansion.effect, 
-                                      parameters = rbind(RW.effect.values[c(2,3,5,6)], cd.fraction.values), 
+                                      parameters = rbind(RW.effect.values[c(2,3,5,6),], cd.fraction.values), 
                                       WHOLE.POPULATION, 
                                       code = paste0("cd.rw.end",rw.intervention.suffix))
