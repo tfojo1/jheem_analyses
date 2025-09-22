@@ -1,11 +1,16 @@
-# Multi-threaded generate sixty-five plus estimates
+#!/usr/bin/env Rscript
+args <- commandArgs(trailingOnly = TRUE)
+THREAD_NUMBER <- as.numeric(args[1])
 
-# DEFINE THREAD NUMBER IN CONSOLE
-# THREAD_NUMBER <- 1
+# Multi-threaded generate sixty-five plus estimates
 
 print(paste0("Starting thread ", THREAD_NUMBER, " at ", Sys.time()))
 
 library(tidyverse)
+setwd("C:/Users/azalesa1/Documents/JHEEM/code/jheem_analyses")
+
+print(paste0("Starting thread ", THREAD_NUMBER, " at ", Sys.time()))
+
 source("../jheem_analyses/applications/age_analysis/helpers.R")
 source('../jheem2/R/tests/source_jheem2_package.R')
 load("../jheem_analyses/applications/age_analysis/Rdata Objects/age_results.Rdata")
@@ -23,10 +28,10 @@ med_age_timeline_raw_arr <- array(c(age_results[as.character(2025:2040),,,"diagn
 this_thread_input <- med_age_timeline_raw_arr[,,,THREAD_NUMBER,drop=F]
 print(paste0("Beginning sixty-five plus estimation at ", Sys.time()))
 # This creates an array where the first dimension is the subset - "under_65" and "over_65"
-this_thread_output <- get_65_estimates(age_results[c("2025", "2040"),,,"diagnosed.prevalence",,],
-                                              c("year", "location"),
-                                              top.age=100,
-                                              report.duration=T)
+this_thread_output <- get_65_estimates(this_thread_input,
+                                       c("year", "location"),
+                                       top.age=100,
+                                       report.duration=T)
 save(this_thread_output,
      file = paste0("../jheem_analyses/applications/age_analysis/Rdata Objects/sixty_five_plus_estimates/thread_",
                    THREAD_NUMBER, ".Rdata"))

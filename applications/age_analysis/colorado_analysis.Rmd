@@ -1,0 +1,255 @@
+---
+title: "Colorado Analysis"
+output: html_notebook
+---
+
+Driving Question: Why is Colorado an outlier that has a decreasing median age yet
+only a moderate ratio of new diagnoses to prevalence in 2025?
+
+Both IL and CO have a median age in 2025 of ~50 years old.
+But IL's rises to 62 by 2040 while CO's falls to 46.
+
+They both start with around the same proportion 55+ (~45%), but CO's stays the
+same while IL's rises to 56%.
+
+That CO's prop 55+ is staying constant despite aging implies a lot of new
+diagnoses among younger people. 
+
+What I see here: Whereas CO has dramatically rising # infections, IL has falling.
+Why might they both have a 2025 ratio of new:diagnosed ~0.026?
+Their ratio in 2040 is ~0.013 for CO and also ~0.013 for IL...
+BUT -- Colorado prevalence is rising while Illinois' is falling.
+
+I'm assuming that when the new:prevalence is high in 2025, that prevalence will
+keep rising, but IL defies that.
+
+What seems to matter in IL is that the prevalence is starting to level off
+before 2025, whereas for CO, it is shooting up.
+
+AL has the same prevalence as CO in 2025 (~15,000), but has much higher # new
+diagnoses that year (~580), therefore higher new:diagnosed ~0.039.
+
+Unlike CO and IL, WI's new:diagnosed only falls a bit by 2040.
+```{r}
+# CO <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/eleven but again/simset_noint_2025-09-04_CO.Rdata"))
+# IL <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/eleven but again/simset_2025-08-26_IL.Rdata"))
+# AL <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/eleven but again/simset_2025-08-26_AL.Rdata"))
+# WI <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/eleven but again/simset_2025-08-26_WI.Rdata"))
+# 
+# source("../jheem_analyses/source_code.R")
+```
+
+```{r}
+simplot(CO, c("diagnosed.prevalence", "new", "population"),
+        summary.type = "mean.and.interval")
+simplot(IL, c("diagnosed.prevalence", "new", "population"),
+        summary.type = "mean.and.interval")
+simplot(AL, c("diagnosed.prevalence", "new", "population"),
+        summary.type = "mean.and.interval")
+simplot(WI, c("diagnosed.prevalence", "new", "population"),
+        summary.type = "mean.and.interval")
+```
+
+The diagnosed prevalence by age looks most different.
+IL has falling prevalence in nearly all groups except 35-44 and 55+, which are
+leveling off.
+CO, however, has a much more upward trend in its 25-34 and 35-44 groups.
+This is consistent with CO's falling median age.
+```{r}
+simplot(CO,"diagnosed.prevalence",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(IL,"diagnosed.prevalence",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(AL,"diagnosed.prevalence",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(WI,"diagnosed.prevalence",facet.by="age",
+        summary.type = "mean.and.interval")
+```
+So the question becomes, "why is prevalence rising in the younger ages in CO?"
+First, some verification that there are more new diagnoses.
+```{r}
+simplot(CO,"new",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(IL,"new",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(AL,"new",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(WI,"new",facet.by="age",
+        summary.type = "mean.and.interval")
+```
+Ohhh! Fascinating! Colorado's population is rising, while Illinois' is falling!
+```{r}
+simplot(CO,"population",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(IL,"population",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(AL,"population",facet.by="age",
+        summary.type = "mean.and.interval")
+simplot(WI,"population",facet.by="age",
+        summary.type = "mean.and.interval")
+```
+I need to see the new:prev broken down by age group.
+```{r}
+co_new <- melt(CO$get(outcomes = "new",keep.dimensions = c("year", "age"),summary.type = "mean.and.interval")["mean",,],value.name = "new")
+il_new <- melt(IL$get(outcomes = "new",keep.dimensions = c("year", "age"),summary.type = "mean.and.interval")["mean",,],value.name = "new")
+co_prev <- melt(CO$get(outcomes = "diagnosed.prevalence",keep.dimensions = c("year", "age"),summary.type = "mean.and.interval")["mean",,],value.name = "prev")
+il_prev <- melt(IL$get(outcomes = "diagnosed.prevalence",keep.dimensions = c("year", "age"),summary.type = "mean.and.interval")["mean",,],value.name = "prev")
+ggplot(co_new, mapping=aes(x=year,y=new,color=age))+geom_line()+
+    ggplot(il_new, mapping=aes(x=year,y=new,color=age))+geom_line(linetype="dashed")
+```
+Hmm... the below doesn't show much.
+```{r}
+npp <- rbind(merge(co_new, co_prev, by=c("year", "age")) %>% mutate(location="CO"),
+             merge(il_new, il_prev, by=c("year", "age")) %>% mutate(location="IL")) %>%
+    mutate(npp = new/prev)
+ggplot(npp, mapping=aes(x=year, y=npp, color=age)) +
+    geom_line() +
+    facet_wrap(vars(location))
+ggplot(npp, mapping=aes(x=year, y=npp, color=location)) +
+    geom_line() +
+    facet_wrap(vars(age), scales="free_y")
+    
+```
+What about prevalence per population?
+```{r}
+co_pop <- melt(CO$get(outcomes = "population",keep.dimensions = c("year", "age"),summary.type = "mean.and.interval")["mean",,],value.name = "pop")
+il_pop <- melt(IL$get(outcomes = "population",keep.dimensions = c("year", "age"),summary.type = "mean.and.interval")["mean",,],value.name = "pop")
+```
+```{r}
+df <- merge(npp,
+            rbind(co_pop %>% mutate(location="CO"),
+                  il_pop %>% mutate(location="IL")),
+            by=c("year", "location", "age"))
+ggplot(df, mapping=aes(x=year, y=prev/pop, color=location)) +
+    geom_line() +
+    facet_wrap(vars(age), scales="free_y")
+ggplot(df, mapping=aes(x=year, y=new/pop, color=location)) +
+    geom_line() +
+    facet_wrap(vars(age), scales="free_y")
+```
+I'd like to try a regression of delta med age ~ npp + population.
+Perhaps I want a delta population, or percent change in population?
+And maybe among a certain age group?
+```{r}
+meddelta <- select(med_age_delta_data, location, mean) %>%
+    rename(deltaMedAge = mean)
+dPopTotal <- melt((totals["2040","population",]-totals["2025","population",])/
+                      totals["2025","population",],
+                  value.name = "dPop") %>%
+    mutate(location=rownames(dPopTotal))
+dPopAge <- melt((aged["2040",,"population",]-aged["2025",,"population",])/
+                    aged["2025",,"population",],
+                value.name = "dPop")
+newPerPrev <- melt(totals["2025","new",]/totals["2025","diagnosed.prevalence",],
+                   value.name="newPerPrev") %>%
+    mutate(location=rownames(newPerPrev))
+scdf <- merge(meddelta,
+              filter(dPopAge, age=="35-44 years") %>%
+                  mutate(dPop35 = dPop),
+              by="location") %>%
+    merge(newPerPrev, by="location")
+my_model <- lm(deltaMedAge ~ dPop35 + newPerPrev, data=scdf)
+(summary(my_model))
+```
+Hmm... it's true that CO and IL are on opposite ends of the axis for
+percent change in population of 35-44 year olds.
+But Wisconsin is very different. Perhaps Wisconsin has a different age group
+that's rising?
+```{r}
+ggplot(scdf, mapping=aes(x=dPop35, y=deltaMedAge)) +
+    geom_point() +
+    geom_text(aes(label=location),vjust=1.5, hjust=1.5)
+```
+```{r}
+scdf <- merge(meddelta,
+              filter(dPopAge, age=="25-34 years") %>%
+                  mutate(dPop25 = dPop),
+              by="location") %>%
+    merge(newPerPrev, by="location")
+my_model <- lm(deltaMedAge ~ dPop25 + newPerPrev, data=scdf)
+(summary(my_model))
+ggplot(scdf, mapping=aes(x=dPop25, y=deltaMedAge)) +
+    geom_point() +
+    geom_text(aes(label=location),vjust=1.5, hjust=1.5)
+```
+Totals?
+```{r}
+scdf <- merge(meddelta,
+              dPopTotal,
+              by="location") %>%
+    merge(newPerPrev, by="location")
+my_model <- lm(deltaMedAge ~ dPop + newPerPrev, data=scdf)
+(summary(my_model))
+ggplot(scdf, mapping=aes(x=dPop, y=deltaMedAge)) +
+    geom_point() +
+    geom_text(aes(label=location),vjust=1.5, hjust=1.5)
+```
+Time to look at sexual transmission rates.
+Hmm... by themselves, they don't show much. Maybe age stratify it?
+```{r}
+simplot(CO, c("sexual.transmission.rates"),
+        summary.type = "mean.and.interval")
+simplot(IL, c("sexual.transmission.rates"),
+        summary.type = "mean.and.interval")
+simplot(AL, c("sexual.transmission.rates"),
+        summary.type = "mean.and.interval")
+```
+```{r}
+simplot(CO, c("sexual.transmission.rates"), facet.by = "age",
+        summary.type = "mean.and.interval")
+simplot(IL, c("sexual.transmission.rates"), facet.by = "age",
+        summary.type = "mean.and.interval")
+simplot(AL, c("sexual.transmission.rates"), facet.by = "age",
+        summary.type = "mean.and.interval")
+simplot(WI, c("sexual.transmission.rates"), facet.by = "age",
+        summary.type = "mean.and.interval")
+```
+Hmm... CO and WI have a lot less testing than IL or AL (10+% vs ~5%)...
+Does this imply a greater discrepancy between infections and new diagnoses?
+```{r}
+simplot(CO, c("awareness","suppression","testing"),
+        summary.type = "mean.and.interval")
+simplot(IL, c("awareness","suppression","testing"),
+        summary.type = "mean.and.interval")
+simplot(AL, c("awareness","suppression","testing"),
+        summary.type = "mean.and.interval")
+simplot(WI, c("awareness","suppression","testing"),
+        summary.type = "mean.and.interval")
+```
+Hmm... seems like nothing I guess.
+```{r}
+simplot(CO, c("new","incidence"),
+        summary.type = "mean.and.interval")
+simplot(IL, c("new","incidence"),
+        summary.type = "mean.and.interval")
+simplot(AL, c("new","incidence"),
+        summary.type = "mean.and.interval")
+simplot(WI, c("new","incidence"),
+        summary.type = "mean.and.interval")
+```
+
+Well, CO has lots of net immigration,
+while IL has lots of net emigration.
+AL has some net immigration.
+```{r}
+simplot(CO, c("emigration","immigration","population"),
+        summary.type = "mean.and.interval")
+simplot(IL, c("emigration","immigration","population"),
+        summary.type = "mean.and.interval")
+simplot(AL, c("emigration","immigration","population"),
+        summary.type = "mean.and.interval")
+```
+What about a graph of new per prev over time? And maybe med age over time?
+```{r}
+states_to_show <- setdiff(my_states, c("AR", "AZ", "KY", "MO", "NC", "SC", "WA", "TN", "MI", "OK","VA"))
+ggplot(filter(med_age_timeline_data, location %in% states_to_show), mapping=aes(x=year, y=mean, group=location, color=location)) +
+    geom_line()
+
+```
+```{r}
+newPerPrevAll <- melt(totals[as.character(2025:2040),"new",]/totals[as.character(2025:2040),"diagnosed.prevalence",],
+                   value.name="newPerPrev")
+ggplot(filter(newPerPrevAll, location %in% states_to_show), mapping=aes(x=year, y=newPerPrev, group=location, color=location)) +
+    geom_line()
+```
+

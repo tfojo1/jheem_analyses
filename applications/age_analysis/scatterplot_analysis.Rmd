@@ -6,6 +6,8 @@ output: html_notebook
 source("../jheem_analyses/applications/age_analysis/new_corr_plots.R")
 library(tidyverse)
 library(smplot2)
+# tt <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/total_results_to_save.Rdata"))
+# aa <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/age_results_to_save.Rdata"))
 ```
 
 ```{r}
@@ -89,7 +91,7 @@ Let's see if the clusters make sense on my original scatterplot.
 (make_scatterplot("transmission", "New Diagnoses Per Prevalent Cases in 2025", data=mutate(scatter_df2, cluster=as.factor(km$cluster)), color.by="cluster", show.state.labels = T))
 ```
 ```{r}
-my_model <- lm(deltaMedAge ~ prev25 + transmission, data=scatter_df2)
+my_model <- lm(deltaMedAge ~ prevPerPop + transmission, data=scatter_df2)
 # pairs(scatter_df2)
 # select(medAge2025, deltaMedAge, prev25, urbanicity, transmission, prevPerPop)
 summary(my_model)
@@ -101,4 +103,45 @@ summary(my_model)
 ```{r}
 (make_scatterplot("futureTransmission", "New vs. Prevalence in 2030", data=mutate(scatter_df2, cluster=as.factor(km$cluster)), color.by="cluster", show.state.labels = T))
 ```
+```{r}
+# Ageprev25 <- aa["2025",,"diagnosed.prevalence",]
+# Agetransmission25 <- aa["2025",,"new",]/aa["2025",,"diagnosed.prevalence",]
+# Agetransmission30 <- aa["2030",,"new",]/aa["2030",,"diagnosed.prevalence",]
+# AgeprevPerPop25 <- aa["2025",,"diagnosed.prevalence",]/aa["2025",,"population",]
+# AgesexTransRt <- aa["2025",,"sexual.transmission.rates",]
+
+new <- aa["2025",,"new",]
+prev <- aa["2025",,"diagnosed.prevalence",]
+
+scatterdf <- reshape2::melt(new, value.name = "new") %>%
+    merge(reshape2::melt(prev, value.name = "prev"),
+          by=c("location", "age")) %>%
+    merge(med_age_delta_data %>%
+              select(location, mean) %>%
+              filter(location != "total") %>%
+              rename(deltaMedAge = mean),
+          by="location") %>%
+    mutate(isYoungHalf = age %in% c("13-24 years", "25-34 years")) %>%
+    group_by(location, isYoungHalf) %>%
+    mutate(groupNewPerPrev = sum(new)/sum(prev)) %>%
+    ungroup() %>%
+    group_by(location) %>%
+    mutate(pointSize = sqrt(sum(prev)))
+    # pivot_wider(names_from = isYoungHalf, values_from = groupNewPerPrev) %>%
+    # mutate(nppRatio = mean(`FALSE`, na.rm=T)/mean(`TRUE`, na.rm=T))
+    
+    
+(make_scatterplot("groupNewPerPrev", "New Per Prevalence Among Young",
+                  data=filter(scatterdf %>%
+                                  filter(age=="13-24 years"))))
+# (make_scatterplot("nppRatio", "New Per Prevalence Among Young Divided By Same for Old",
+#                   data=filter(scatterdf)))
+
+```
+```{r}
+(make_scatterplot("groupNewPerPrev", "New Per Prevalence Among Older",
+                  data=filter(scatterdf %>%
+                                  filter(age=="35-44 years"))))
+```
+
 

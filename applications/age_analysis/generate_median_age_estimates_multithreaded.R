@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 args <- commandArgs(trailingOnly = TRUE)
-THREAD_NUMBER <- args[1]
+THREAD_NUMBER <- as.numeric(args[1])
 
 # Multi-threaded generate median age estimates
 
@@ -23,7 +23,7 @@ med_age_timeline_raw_arr <- array(c(age_results[as.character(2025:2040),,,"diagn
                                   dimnames=list(year=2025:2040, age=dimnames(age_results)[["age"]], sim=1:1000, location=c(my_states, "total")))
 
 # One location per thread. Will need 25... estimated 30 minutes or so each?
-this_thread_input <- med_age_timeline_raw_arr[,,,as.numeric(THREAD_NUMBER),drop=F]
+this_thread_input <- med_age_timeline_raw_arr[,,,THREAD_NUMBER,drop=F]
 print(paste0("Beginning median age estimation at ", Sys.time()))
 this_thread_output <- get_med_age(this_thread_input,
                                   keep.dimensions = c("year", "location"),
