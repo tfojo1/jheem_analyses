@@ -2,6 +2,11 @@
 *.Rhistory
 *.Ruserdata
 *.csv
+*.docx
+*.xlsx
+*.png
+*.pptx
+*.html
 # local testing
 local_testing
 # Project-specific
