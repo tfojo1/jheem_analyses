@@ -97,7 +97,10 @@ CDC.PREP.PARAMETERS.PRIOR = join.distributions(
     prep.referred.age4.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
     prep.referred.age5.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
     
-    prep.unique = Beta.Distribution(7.2,7.2)
+    prep.unique = Beta.Distribution(7.2,7.2),
+    
+    prep.index.positive = ifelse(location ="AL",Beta.Distribution(3,97),ifelse(location = "LA",Beta.Distribution(6,994),NA))
+        
 )
 
 cdc.testing.apply.set.parameters <- function(model.settings, parameters)

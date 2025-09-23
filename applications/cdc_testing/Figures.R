@@ -1275,7 +1275,7 @@ plot_data$state <- factor(plot_data$state, levels = c("Total", sorted_states))
 plot_data$intervention <- factor(
     plot_data$intervention,
     levels = c( "cdct.pintr.26", "cdct.end.26"),
-    labels = c("Prolonged Interruption", "Cessation")
+    labels = c("3-Year Interruption", "Cessation")
 )
 
 # Cap values at 40 for visualization
@@ -1301,11 +1301,11 @@ ggplot(plot_data, aes(x = relative_incidence_capped, y = state, fill = intervent
     scale_fill_manual(
         values = c(
             "Cessation" = "#374E55",
-            "Prolonged Interruption" = "#DF8F44"
+            "3-Year Interruption" = "#DF8F44"
         )
     ) +
     labs(
-        x = "Relative Excess HIV Infections from 2025–2030",
+        x = "Relative Excess HIV Infections until 2030",
         y = NULL,
         fill = NULL
     ) +
