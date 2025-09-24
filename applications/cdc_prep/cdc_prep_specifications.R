@@ -46,7 +46,7 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
 #-- Relating Testing to PrEP --#
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tests.unique",
-                       get.functional.form.function = get.fraction.unique, #called from parameters? 
+                       value = 0.5, 
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
@@ -62,9 +62,15 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.referred.to.prep
 
 #-- Contact Tracing --#
 
-register.model.element(CDCP.SPECIFICATION, name='fraction.new.diagnoses.that.yield.a.positive.contact',
-                       value = 0.03,
-                       scale = 'proportion')
+register.model.element(
+    CDCP.SPECIFICATION,
+    name = 'fraction.index.diagnoses.that.yield.a.positive.contact',
+    value = expression(
+        ifelse(location == "AL", 0.03,
+               ifelse(location == "LA", 0.006, NA))
+    ),
+    scale = 'proportion'
+)
 
 #-- CDC Effects --#
 
@@ -116,7 +122,7 @@ register.model.quantity(CDCP.SPECIFICATION, name = "cdc.funded.testing.of.undiag
 
 register.model.quantity(CDCP.SPECIFICATION, name = 'fraction.diagnoses.from.contact.tracing',
                         scale = 'proportion',
-                        value = expression(fraction.new.diagnoses.that.yield.a.positive.contact / (1+fraction.new.diagnoses.that.yield.a.positive.contact)))
+                        value = expression(fraction.index.diagnoses.that.yield.a.positive.contact / (1+fraction.index.diagnoses.that.yield.a.positive.contact)))
 
 register.model.quantity(CDCP.SPECIFICATION, name = "cdc.nonfunded.testing.of.undiagnosed",
                         value = expression(super.testing.of.undiagnosed * 

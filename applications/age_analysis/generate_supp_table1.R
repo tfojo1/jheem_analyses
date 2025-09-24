@@ -3,10 +3,10 @@
 # Total prevalence, num 55+, and num 65+
 
 library(tidyverse)
+library(locations)
 
 # Source necessary files
 source("../jheem_analyses/applications/age_analysis/helpers.R")
-source("../jheem_analyses/presentation/make_pretty_table.R")
 
 # Source necessary objects ----
 load("../jheem_analyses/applications/age_analysis/Rdata Objects/total_results.Rdata")
@@ -17,6 +17,29 @@ sixty_five_plus_estimates <- apply(sixty_five_plus_estimates, c("", "year", "sim
 load(file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order.Rdata")
 load(file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order_names.Rdata")
 
+# MUST REMOVE TOTAL FROM 65+ or it messes with aggregation later. AND NEED TO SHRINK ITS YEARS!
+sixty_five_plus_estimates <- sixty_five_plus_estimates[,c("2025", "2040"),,
+                                                       setdiff(dimnames(sixty_five_plus_estimates)$location,
+                                                               "total")]
+
+# # For HIV & Aging Conference, which uses only 11----
+original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
+
+total_results_og <- total_results
+total_results <- total_results[,,,original_eleven,,drop=F]
+age_results_og <- age_results
+age_results <- age_results[,,,,original_eleven,,drop=F]
+
+state_order_og <- state_order
+state_order <- c(intersect(state_order_og, original_eleven), "total")
+state_order_names_og <- state_order_names
+state_order_names <- state_order_names_og[state_order]
+
+# Do NOT use the total from this set, because it's made with 24!
+sixty_five_plus_estimates_og <- sixty_five_plus_estimates
+sixty_five_plus_estimates <- sixty_five_plus_estimates_og[,,,c(original_eleven)]
+
+# Code ----
 do_conversion_operations <- function(df, is.percentage=F) {
     rv <-  df %>%
         mutate(stats=paste(mean, lower, upper)) %>%
@@ -67,7 +90,7 @@ total_prev_df <- reshape2::melt(total_prev_by_loc) %>%
 total_prev_column <- do_total_conversion_operations(total_prev_df)
 
 # Num 55+ ----
-
+my_states <- setdiff(sort(state_order), "total")
 num_totals <- apply(age_results[c("2025", "2040"),,,"diagnosed.prevalence",,], c("year", "age", "sim"), sum)
 num_raw_arr <- array(c(age_results[c("2025", "2040"),,,"diagnosed.prevalence",,],
                        num_totals),
@@ -89,12 +112,13 @@ table_num_over_55 <- cbind(do_conversion_operations(reshape2::melt(get_stats(num
 # Num 65+ ----
 
 over_65_totals <- apply(sixty_five_plus_estimates["65_plus",,,], c("year", "sim"), sum)
-under_65_totals <- apply(sixty_five_plus_estimates["under_65",,,], c("year", "sim"), sum)
-
 num_65_raw_arr <- array(c(sixty_five_plus_estimates["65_plus",,,],
                           over_65_totals),
-                        dim=c(year=2, sim=1000, location=length(state_order_names)), # WRONG ORDER!
+                        dim=c(year=2, sim=1000, location=length(state_order_names)),
                         dimnames=list(year=c("2025", "2040"), sim=1:1000, location=c(my_states, "total")))
+
+
+num_65_raw_arr <- sixty_five_plus_estimates["65_plus",,,]
 num_65_delta <- num_65_raw_arr["2040",,] - num_65_raw_arr["2025",,]
 
 table_num_over_65 <- cbind(do_conversion_operations(reshape2::melt(get_stats(num_65_raw_arr,
@@ -109,5 +133,5 @@ table_num_over_65 <- cbind(do_conversion_operations(reshape2::melt(get_stats(num
 # Combine to make full table ----
 csv_double_rows <- convert_to_double_rows(as.matrix(cbind(total_prev_column, table_num_over_55, table_num_over_65)))
 
-write.table(csv_double_rows, file="../jheem_analyses/applications/age_analysis/supp_table1.csv", sep=",", row.names=F, col.names=F)
-# save(csv_double_rows, file="../jheem_analyses/applications/age_analysis/table1.Rdata")
+# write.table(csv_double_rows, file="../jheem_analyses/applications/age_analysis/supp_table1X.csv", sep=",", row.names=F, col.names=F)
+write.table(csv_double_rows, file = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/supp_table1X.xlsx", sep=",", row.names=F, col.names=F)

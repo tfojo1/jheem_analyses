@@ -1,8 +1,10 @@
 
 # From County-level Urban and Rural information for the 2020 Census
 
+CDC.TESTING.LOCATIONS = c('AL','CA','FL','GA','IL','LA','MO','MS','NY','TX','WI',
+                          'AZ','KY','MD','OH','SC','TN','WA')
 
-urbanicity.data = read.csv(file = 'applications/cdc_testing/2020_UA_COUNTY.csv', stringsAsFactors = F)
+urbanicity.data = read.csv(file = '../jheem_analyses/applications/cdc_testing/2020_UA_COUNTY.csv', stringsAsFactors = F)
 ALL.COUNTY.URBANICITY = as.numeric(gsub("%", '', urbanicity.data[,'POPPCT_URB'])) / 100
 names(ALL.COUNTY.URBANICITY) = paste0(
     formatC(urbanicity.data[,1], width = 2, format = 'd', flag = "0"), 

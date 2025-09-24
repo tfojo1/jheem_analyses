@@ -25,4 +25,4 @@ new_dimnames$location <- c(my_states, "total")
 sixty_five_plus_estimates <- array(Reduce(`c`, all_threads),
                                    sapply(new_dimnames, length),
                                    new_dimnames)
-save(med_age_timeline_arr, file="../jheem_analyses/applications/age_analysis/Rdata Objects/sixty_five_plus_estimates.Rdata")
+save(sixty_five_plus_estimates, file="../jheem_analyses/applications/age_analysis/Rdata Objects/sixty_five_plus_estimates.Rdata")

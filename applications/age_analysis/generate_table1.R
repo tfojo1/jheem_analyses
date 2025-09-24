@@ -4,6 +4,7 @@
 
 library(xlsx)
 library(tidyverse)
+library(locations)
 
 # Source necessary files
 source("../jheem_analyses/applications/age_analysis/helpers.R")
@@ -17,6 +18,29 @@ sixty_five_plus_estimates <- apply(sixty_five_plus_estimates, c("", "year", "sim
 
 load(file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order.Rdata")
 load(file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order_names.Rdata")
+
+# MUST REMOVE TOTAL FROM 65+ or it messes with aggregation later. AND NEED TO SHRINK ITS YEARS!
+sixty_five_plus_estimates <- sixty_five_plus_estimates[,c("2025", "2040"),,
+                                                       setdiff(dimnames(sixty_five_plus_estimates)$location,
+                                                               "total")]
+
+# # For HIV & Aging Conference, which uses only 11
+# original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
+# 
+# total_results_og <- total_results
+# total_results <- total_results[,,,original_eleven,,drop=F]
+# age_results_og <- age_results
+# age_results <- age_results[,,,,original_eleven,,drop=F]
+# 
+# state_order_og <- state_order
+# state_order <- c(intersect(state_order_og, original_eleven), "total")
+# state_order_names_og <- state_order_names
+# state_order_names <- state_order_names_og[state_order]
+# 
+# # Do NOT use the total from this set, because it's made with 24!
+# sixty_five_plus_estimates_og <- sixty_five_plus_estimates
+# sixty_five_plus_estimates <- sixty_five_plus_estimates_og[,,,c(original_eleven)]
+
 
 do_conversion_operations <- function(df, is.percentage=F) {
     rv <-  df %>%
@@ -68,7 +92,7 @@ total_prev_df <- reshape2::melt(total_prev_by_loc) %>%
 total_prev_column <- do_total_conversion_operations(total_prev_df)
 
 # Prop 55+ ----
-
+my_states <- setdiff(sort(state_order), "total")
 num_totals <- apply(age_results[c("2025", "2040"),,,"diagnosed.prevalence",,], c("year", "age", "sim"), sum)
 num_raw_arr <- array(c(age_results[c("2025", "2040"),,,"diagnosed.prevalence",,],
                        num_totals),
@@ -87,7 +111,6 @@ table_prop_over_55 <- cbind(do_conversion_operations(reshape2::melt(get_stats(pr
                                                                pivot_wider(names_from="metric"), is.percentage=T))
 
 # Prop 65+ ----
-
 over_65_totals <- apply(sixty_five_plus_estimates["65_plus",,,], c("year", "sim"), sum)
 under_65_totals <- apply(sixty_five_plus_estimates["under_65",,,], c("year", "sim"), sum)
 
@@ -158,6 +181,7 @@ table_colors <- do_create_table_colors(csv_double_rows)
 # save(table_colors, file="../jheem_analyses/applications/age_analysis/table1_colors.Rdata")
 write.shaded.table(csv_double_rows,
                    file = "../jheem_analyses/applications/age_analysis/shaded_table.xlsx",
+                   # file = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/shaded_table.xlsx",
                    color.by = table_colors,
                    thresholds = c(-1, 0, 1),
                    colors = c("#2171b5", "white", "#fd8d3c"),

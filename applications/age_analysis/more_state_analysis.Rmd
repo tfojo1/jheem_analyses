@@ -1,0 +1,62 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# col <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/eleven but again/simset_noint_2025-09-04_CO.Rdata"))
+# 
+# tt <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/total_results_to_save.Rdata"))
+# aa <- get(load("../jheem_analyses/applications/age_analysis/Rdata Objects/age_results_to_save.Rdata"))
+
+npp <- tt[as.character(2025:2040),"new",] / tt[as.character(2025:2040), "diagnosed.prevalence",]
+nppage <- aa[as.character(2025:2040),,"new",] / aa[as.character(2025:2040),, "diagnosed.prevalence",]
+
+library(tidyverse)
+library(geomtextpath)
+library(reshape2)
+npp_df <- reshape2::melt(npp)
+nppage_df <- reshape2::melt(nppage)
+```
+```{r}
+ggplot(npp_df, mapping=aes(x=year, y=value, group=location, color=location)) +
+    theme_bw() +
+    # geom_line(linetype="dashed") +
+    labs(y = "new per prev")+
+    geom_text(aes(label=location), position="dodge")
+```
+```{r}
+gg <- round(aa["2025",,"new",]/aa["2025",,"diagnosed.prevalence",],3)
+hh <- apply(gg, "age", function(x) {dimnames(gg)$location[order(x)]})
+```
+
+```{r}
+gg <- round(aa["2025",,"new",]/aa["2025",,"diagnosed.prevalence",],3)
+# hh <- apply(gg, "age", function(x) {dimnames(gg)$location[order(x)]})
+gg_df <- melt(gg)
+ggplot(filter(gg_df, age!="13-24 years"), mapping=aes(x=location, y=value, group=age, color=age)) +
+    theme_bw() +
+    geom_bar(stat="identity", position="dodge")
+
+```
+How far from mean for each age?
+```{r}
+# agewise_mean <- apply(gg, "age", mean)
+# agewise_mean <- gg_df %>% group_by(age) %>% summarize(mean=mean(value)) %>%
+#     ungroup()
+
+agewise_mean <- apply(gg, "age", mean)
+agewise_sd <- apply(gg, "age", sd)
+
+gg_df <- gg_df %>% group_by(age) %>%
+    mutate(mean = mean(value), sd = sd(value)) %>%
+    ungroup() %>%
+    mutate(zScore = (value - mean)/sd)
+ggplot(data=gg_df, mapping=aes(x=age, y=zScore))+
+    theme_bw() +
+    geom_bar(stat="identity", position="dodge") +
+    labs(y = "z-Score for New / Prevalent Cases") +
+    facet_wrap(vars(location))
+
+```
+
