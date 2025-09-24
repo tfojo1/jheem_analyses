@@ -12,7 +12,7 @@ N.CHUNKS = 1
 #                           'AZ','KY','MD','OH','SC','TN','WA')
 # CDC.TESTING.INTERVENTION.CODES = c('noint', 'cdct.end', 'cdct.pintr', 'cdct.bintr')#,'cdc.intr')
 
-CDC.TESTING.LOCATIONS = c('AL', 'AZ', 'CA', 'FL', 'GA', 'IL', 'IN', 'KY', 'LA', 'MA', 'MD', 'MI', 'MN', 'MO', 'MS', 'NC', 'NJ', 'NV', 'NY', 'OH', 'PA', 'SC', 'TN', 'TX', 'VA', 'WA', 'WI')
+CDC.TESTING.LOCATIONS = c('AL', 'AZ', 'CA', 'FL', 'GA', 'IL', 'IN', 'KY', 'LA', 'MA', 'MD', 'MI', 'MO', 'MS', 'NV', 'NY', 'OH', 'PA', 'SC', 'TN', 'TX', 'VA', 'WA', 'WI')
 
 CDC.TESTING.ANCHOR.YEAR = 2026
 if (CDC.TESTING.ANCHOR.YEAR==2025)

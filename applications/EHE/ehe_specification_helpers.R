@@ -529,6 +529,8 @@ get.best.guess.msm.proportions <- function(location,
     # Estimate a proportion msm for each race
     if (length(states)==1 && states=='AL')
         states.for.p.msm = 'MS'
+    else  if (length(states)==1 && states=='DC')
+        states.for.p.msm = c('MD','VA')
     else
         states.for.p.msm = states
     
@@ -822,7 +824,7 @@ get.location.mortality.rates.functional.form = function(location, specification.
 get.location.mortality.rates <- function(location,
                                          specification.metadata,
                                          year.ranges = c('2001-2010','2011-2020'),
-                                         backup.locations = c(AL='TN', MS='TN'))
+                                         backup.locations = c(AL='TN', MS='TN', DC='MD'))
   
 {
     if (get.location.type(location)=='STATE')
@@ -853,8 +855,24 @@ get.location.mortality.rates <- function(location,
         mapped.population = map.value.ontology(value = population, target.dim.names = target.dim.names)
         
         rv = mapped.deaths / mapped.population
-        if (any(rv==0))
-            stop("getting zero's in the calculated mortality rates from get.location.mortality.rates() for state")
+
+        if (any(is.na(rv)) || any(rv==0))
+        {
+            if (any(location==names(backup.locations)))
+            {
+                backup.rates = get.location.mortality.rates(location = backup.locations[location][1],
+                                                            specification.metadata = specification.metadata,
+                                                            year.ranges = year.ranges)
+                
+                mask = is.na(rv) | rv==0
+                rv[mask] = backup.rates[mask]
+            }
+            
+            if (any(is.na(rv)))
+                stop("getting NAs in the calculated mortality rates from get.location.mortality.rates() for state")
+            if (any(rv==0))
+                stop("getting zero's in the calculated mortality rates from get.location.mortality.rates() for state")
+        }
         
         rv
     }

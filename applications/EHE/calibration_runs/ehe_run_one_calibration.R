@@ -1,12 +1,21 @@
 
-CHAIN = 4
+CHAIN = 1
+LOCATION = 'VA'
+
+
+
+print(paste0("run for location = ", LOCATION, ", chain = ", CHAIN))
+
+# print('sleeping')
+# Sys.sleep(10*60)
+# print('waking up')
+
 
 source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/EHE/calibration_runs/ehe_register_calibrations.R')
 
-LOCATION = BOSTON.MSA
 
-CALIBRATION.CODES.TO.RUN = CALIBRATION.CODE.EHE.FINAL
+CALIBRATION.CODES.TO.RUN = 'final.ehe.state'
 
 print(paste0("Running chain ", CHAIN, " for ", LOCATION, " - ", locations::get.location.name(LOCATION)))
 
