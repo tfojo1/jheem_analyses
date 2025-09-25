@@ -1,5 +1,5 @@
 
-LOCATION.INDICES = (1-1) * 3 + 1:3
+LOCATION.INDICES = (6-1) * 5 + 1:5
 print(paste0("Doing location indices: ",
              paste0(LOCATION.INDICES, collapse=', ')))
 
@@ -9,7 +9,7 @@ source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
 LOCATIONS = RW.LOCATIONS[LOCATION.INDICES]
 FORCE.OVERWRITE = FORCE.REDO
-INTERVENTION.CODES = c('cd.rw.end.26')
+INTERVENTION.CODES = c('nanb.rw.intr.26')
 
 print(paste0("Doing locations: ",
              paste0(LOCATIONS, collapse=', ')))

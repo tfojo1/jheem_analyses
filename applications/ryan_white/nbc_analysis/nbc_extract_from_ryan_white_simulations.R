@@ -8,7 +8,7 @@ FORCE.OVERWRITE = FORCE.REDO
 
 
 sim.collection=create.simset.collection(version="rw", calibration.code = CALIBRATION.CODE,
-                                        locations = LOCATIONS, interventions = c('noint','cd.rw.end.26'), n.sim=N.SIM)
+                                        locations = LOCATIONS, interventions = c('noint','nanb.rw.end.26'), n.sim=N.SIM)
 
 # full.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalence', 'new',
 #                                                'rw.clients', 'non.adap.clients','oahs.clients','adap.clients',

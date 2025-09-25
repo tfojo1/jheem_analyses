@@ -24,7 +24,7 @@ tab = data.frame(
     Upper = paste0(round(100*rel.delta.uppers[o], 1), '%')
 )
 
-write.csv(tab, file='../../results/nbc/ryan_white_end_cd_incidence_relative_increase.csv', row.names = F)
+write.csv(tab, file='../../results/nbc/ryan_white_end_nanb_incidence_relative_increase.csv', row.names = F)
 
 
 o = c(order(rel.delta.means[-length(rel.delta.means)], decreasing = T),
@@ -38,5 +38,5 @@ tab2 = data.frame(
 )
 
 
-write.csv(tab2, file='../../results/nbc/ryan_white_end_cd_incidence_absolute_increase.csv', row.names = F)
+write.csv(tab2, file='../../results/nbc/ryan_white_end_nanb_incidence_absolute_increase.csv', row.names = F)
 
