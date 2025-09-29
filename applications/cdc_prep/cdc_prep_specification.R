@@ -47,8 +47,7 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tests.unique",
                        value = 0.5, 
-                       scale = "proportion",
-                       functional.form.from.time = 2010)
+                       scale = "proportion")
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tested.prep.eligible",
                        get.functional.form.function = get.fraction.prep.eligible,
@@ -64,11 +63,29 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.referred.to.prep
 
 register.model.element(
     CDCP.SPECIFICATION,
+    name = 'mean.fraction.index.diagnoses.that.yield.a.positive.contact',
+    get.value.function = function(location){
+        if (location=="AL")
+            0.03
+        else if (location=='LA')
+            0.006
+        else
+            stop("We are only set up to accomodate LA or AL at this time")
+    },
+    scale = 'proportion'
+)
+
+register.model.element(
+    CDCP.SPECIFICATION,
+    name = 'rr.fraction.index.diagnoses.that.yield.a.positive.contact',
+    value = 1,
+    scale = 'ratio'
+)
+
+register.model.quantity(
+    CDCP.SPECIFICATION,
     name = 'fraction.index.diagnoses.that.yield.a.positive.contact',
-    value = expression(
-        ifelse(location == "AL", 0.03,
-               ifelse(location == "LA", 0.006, NA))
-    ),
+    value = expression(mean.fraction.index.diagnoses.that.yield.a.positive.contact * rr.fraction.index.diagnoses.that.yield.a.positive.contact),
     scale = 'proportion'
 )
 
@@ -156,8 +173,6 @@ register.model.quantity(CDCP.SPECIFICATION, name = 'cdc.funded.testing.rate',
                         scale = 'rate', # per person per year,
                         value = expression(cdc.funded.non.healthcare.testing.rate / fraction.cdc.funded.tests.in.non.healthcare.settings))
 
-register.model.quantity(CDCP.SPECIFICATION, name = "fraction.tests.from.cdc",
-                        value = expression())
 
 #-- The Testing Rate --#
 
@@ -182,6 +197,7 @@ register.model.quantity(CDCP.SPECIFICATION,
 
 ##--------------##
 ##-- OUTCOMES --##
+##--------------##
 
 
 track.integrated.outcome(CDCP.SPECIFICATION,
@@ -199,7 +215,7 @@ track.integrated.outcome(CDCP.SPECIFICATION,
                          outcome.metadata = NULL,
                          scale = 'proportion',
                          value.to.integrate = 'fraction.diagnoses.from.cdc',
-                         multiply.by = 'cdc.effect',
+                         multiply.by = 'cdc.testing.effect',
                          denominator.outcome = 'new',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          save = F)
@@ -227,9 +243,11 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
 
 track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cumulative.fraction.cdc.funded.tests.in.non.healthcare.settings',
+                         outcome.metadata = NULL,
                          value.to.integrate = 'fraction.cdc.funded.tests.in.non.healthcare.settings',
                          scale = 'proportion',
                          keep.dimensions = c('location'),
+                         denominator.outcome = 'cdc.funded.tests',
                          save = F)
 
 
@@ -260,7 +278,7 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
                          denominator.outcome = 'cdc.funded.tests',
                          keep.dimensions = 'location')
 
-track.integrated.outcome(CDCT.SPECIFICATION,
+track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cumulative.cdc.prep.referrals',
                          outcome.metadata = NULL,
                          scale = 'non.negative.number',
@@ -269,7 +287,7 @@ track.integrated.outcome(CDCT.SPECIFICATION,
                          keep.dimensions = c('location'),
                          save = F)
 
-track.integrated.outcome(CDCT.SPECIFICATION,
+track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cumulative.cdc.prep.eligible',
                          outcome.metadata = NULL,
                          scale = 'non.negative.number',
@@ -278,21 +296,20 @@ track.integrated.outcome(CDCT.SPECIFICATION,
                          keep.dimensions = c('location'),
                          save = F)
 
-track.integrated.outcome(CDCT.SPECIFICATION,
+track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cdc.prep.uptake',
                          outcome.metadata = create.outcome.metadata(display.name = 'PrEP Uptake from CDC',
                                                                     description = "Number of Individuals who Start PrEP After a CDC-funded Referral",
-                                                                    scale = 'proportion',
+                                                                    scale = 'non.negative.number',
                                                                     axis.name = 'Uptake',
-                                                                    units = '%',
-                                                                    singular.unit = '%'),
-                         scale = 'non.negative.number',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
                          value.to.integrate = 'uninfected',
                          multiply.by = 'cdc.prep.uptake.rate', 
                          keep.dimensions = c('location'),
                          save = T)
 
-track.cumulative.outcome(CDCT.SPECIFICATION,
+track.cumulative.outcome(CDCP.SPECIFICATION,
                          name = 'cdc.fraction.prep.referred.of.eligible',
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion Referred for PrEP',
                                                                     description = "Proportion Eligible Individuals Referred for PrEP After CDC-Funded HIV Testing",
@@ -306,7 +323,7 @@ track.cumulative.outcome(CDCT.SPECIFICATION,
                          keep.dimensions = c('location'),
                          save = T)
 
-track.cumulative.outcome(CDCT.SPECIFICATION,
+track.cumulative.outcome(CDCP.SPECIFICATION,
                          name = 'cdc.fraction.prep.eligible.of.tested',
                          outcome.metadata = create.outcome.metadata(display.name = 'Proportion Eligible for PrEP',
                                                                     description = "Proportion Individuals Receiving CDC-Funded HIV Testing Who Are Eligible for PrEP",

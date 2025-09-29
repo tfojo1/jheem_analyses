@@ -57,6 +57,8 @@ PREP.REFERRED.SD = log(1.5)/2
 
 CDC.PREP.PARAMETERS.PRIOR = join.distributions(
     
+    CDC.TESTING.PARAMETERS.PRIOR,
+    
     prep.eligible.or = Lognormal.Distribution(0, PREP.ELIGIBLE.TOTAL.SD),
     prep.eligible.slope.or = Lognormal.Distribution(0, PREP.ELIGIBLE.TOTAL.SD),
     
@@ -99,11 +101,11 @@ CDC.PREP.PARAMETERS.PRIOR = join.distributions(
     
     prep.unique = Beta.Distribution(7.2,7.2),
     
-    prep.index.positive = ifelse(location ="AL",Beta.Distribution(3,97),ifelse(location = "LA",Beta.Distribution(6,994),NA))
+    rr.fraction.index.diagnoses.that.yield.a.positive.contact = Lognormal.Distribution(0, log(2)/2)
         
 )
 
-cdc.testing.apply.set.parameters <- function(model.settings, parameters)
+cdc.prep.apply.set.parameters <- function(model.settings, parameters)
 {
     specification.metadata = model.settings$specification.metadata
     
@@ -321,16 +323,17 @@ CDC.TESTING.PARAMETER.SAMPLING.BLOCKS = list(
 )
 
 
-CDC.PREP.PARAMETER.SAMPLING.BLOCKS = list(
-    prep.eligible.by.race = c("prep.eligible.black.or","prep.eligible.hispanic.or","prep.eligible.other.or"),
-    prep.eligible.by.risk = c("prep.eligible.msm.or","prep.eligible.msm.idu.or","prep.eligible.idu.male.or","prep.eligible.idu.female.or","prep.eligible.heterosexual.male.or","prep.eligible.heterosexual.female.or"),
-    prep.eligible.by.rage = c("prep.eligible.age1.or","prep.eligible.age2.or","prep.eligible.age3.or","prep.eligible.age4.or","prep.eligible.age5.or"),
-    prep.eligible = c("prep.eligible.or","prep.eligible.slope.or"),
-    prep.referred.by.race = c("prep.referred.black.or","prep.referred.hispanic.or","prep.referred.other.or"),
-    prep.referred.by.risk = c("prep.referred.msm.or","prep.referred.msm.idu.or","prep.referred.idu.male.or","prep.referred.idu.female.or","prep.referred.heterosexual.male.or","prep.referred.heterosexual.female.or"),
-    prep.referred.by.rage = c("prep.referred.age1.or","prep.referred.age2.or","prep.referred.age3.or","prep.referred.age4.or","prep.referred.age5.or"),
-    prep.referred = c("prep.referred.or","prep.referred.slope.or"),
-    prep.unique.total = 'prep.unique'
-    
-)
+CDC.PREP.PARAMETER.SAMPLING.BLOCKS = c(
+    CDC.TESTING.PARAMETER.SAMPLING.BLOCKS,
+    list(
+        prep.eligible.by.race = c("prep.eligible.black.or","prep.eligible.hispanic.or","prep.eligible.other.or"),
+        prep.eligible.by.risk = c("prep.eligible.msm.or","prep.eligible.msm.idu.or","prep.eligible.idu.male.or","prep.eligible.idu.female.or","prep.eligible.heterosexual.male.or","prep.eligible.heterosexual.female.or"),
+        prep.eligible.by.rage = c("prep.eligible.age1.or","prep.eligible.age2.or","prep.eligible.age3.or","prep.eligible.age4.or","prep.eligible.age5.or"),
+        prep.eligible = c("prep.eligible.or","prep.eligible.slope.or"),
+        prep.referred.by.race = c("prep.referred.black.or","prep.referred.hispanic.or","prep.referred.other.or"),
+        prep.referred.by.risk = c("prep.referred.msm.or","prep.referred.msm.idu.or","prep.referred.idu.male.or","prep.referred.idu.female.or","prep.referred.heterosexual.male.or","prep.referred.heterosexual.female.or"),
+        prep.referred.by.rage = c("prep.referred.age1.or","prep.referred.age2.or","prep.referred.age3.or","prep.referred.age4.or","prep.referred.age5.or"),
+        prep.referred = c("prep.referred.or","prep.referred.slope.or"),
+        prep.unique.total = 'prep.unique'
+))
 
