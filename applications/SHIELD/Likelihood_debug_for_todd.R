@@ -1,3 +1,12 @@
+
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
+source('../jheem_analyses/commoncode/locations_of_interest.R')
+
+# Configuration ----
+VERSION <- 'shield'
+LOCATION <- 'C.35620'  # NYC
+
 # --------------------------------------------------------------------
 # 1) Load calibration simsets (NYC.26 and NYC.27)
 # --------------------------------------------------------------------
