@@ -36,8 +36,12 @@ LOCATION <- 'C.35620'  # NYC
     params.last.NYC.27   <- simset.NYC.27$last.sim()$params
 }
 
+
+save(simset.NYC.26, file = "/Users/ryanforster/simset.NYC.26.rdata")
+save(simset.NYC.27, file = "/Users/ryanforster/simset.NYC.27.rdata")
+
 # --------------------------------------------------------------------
-# 2) Likelihood instruction blocks (one-way & two-way)
+# 2) Likelihood instruction blocks (one-way, two-way, totals)
 # --------------------------------------------------------------------
 
 # --- Primary/Secondary (PS) ---
@@ -221,7 +225,51 @@ two.way.sex.race.ll.diagnosis.likelihood.instructions =
         equalize.weight.by.year = TRUE,
         minimum.error.sd = 1
     )
+# --- Totals (no stratification) --
 
+ps.diagnosis.total.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                         outcome.for.data = "ps.syphilis.diagnoses",  
+                                         levels.of.stratification = c(0), 
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.type = 'cv',
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1  
+    )
+
+
+early.diagnosis.total.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
+                                         outcome.for.data = "early.syphilis.diagnoses", 
+                                         levels.of.stratification = c(0),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.type = 'cv',
+                                         weights = EL.DIAGNOSIS.WEIGHT, # DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
+
+
+late.diagnosis.total.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                         levels.of.stratification = c(0),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.0764791209420945, 
+                                         error.variance.type = 'cv',
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
 
 # --------------------------------------------------------------------
 # 3) Instantiate and compare (no stratification + complete)
