@@ -1,925 +1,1429 @@
-source("applications/SHIELD/shield_base_parameters.R")
+cat("*** Running Shiled_register_calibration.R ***\n")
+source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 
-# Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
+N.ITER=15000
+# shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
+# default.solver= create.solver.metadata()
 
-logit = function(p){
-  log(p) - log(1-p)
-}
-
-#my best guess for this parameter is different in different locations, so we formulate prior as a multiply of the best guess
-# Defining the calibration parameters and prior distributions
-
-#1- PARAMETER PRIORS:----
-
-## POPULATION.PARAMETERS.PRIOR ----
-POPULATION.PARAMETERS.PRIOR=join.distributions( 
-  # Fertility rates ----
-  # (6 agegroups, 3 race, 2 knots)-> max 36 params
-  # we start with 6 age, and 3 race, parameters applied to both knots -> 9 total
-  # Race-level fertility rate multipliers
-  black.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  hispanic.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  other.fertility.rate.multiplier    = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  # Age-level fertility rate multipliers
-  age15.19.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  age20.24.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  age25.29.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  age30.34.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  age35.39.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  age40.44.fertility.rate.multiplier = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  
-  # Mortality rates ----
-  # By Race:
-  black.general.mortality.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  hispanic.general.mortality.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  other.general.mortality.rate.multiplier= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  # by Sex:
-  male.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)), 
-  female.general.mortality.rate.multiplier = Lognormal.Distribution(meanlog = 0,sdlog = 0.5*log(2)),
-  
-  # Immigration by race ----
-  black.immigration.rate.multiplier.1= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  hispanic.immigration.rate.multiplier.1= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  other.immigration.rate.multiplier.1= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  black.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  hispanic.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  other.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
-)
-## AGING.PARAMETERS.PRIOR ----
-AGING.PARAMETERS.PRIOR=join.distributions( 
-  # By age, race, sex for 2 knots:
-  age14.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age19.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age24.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age29.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age34.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age39.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age44.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age49.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age54.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.black.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  #
-  age14.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age19.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age24.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age29.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age34.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age39.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age44.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age49.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age54.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.hispanic.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  #
-  age14.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age19.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age24.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age29.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age34.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age39.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age44.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age49.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age54.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.other.aging.rate.multiplier.1=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  
-  age14.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age19.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age24.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age29.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age34.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age39.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age44.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age49.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age54.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.black.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  #
-  age14.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age19.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age24.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age29.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age34.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age39.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age44.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age49.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age54.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.hispanic.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  #
-  age14.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age19.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age24.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age29.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age34.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age39.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age44.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age49.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age54.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  age64.other.aging.rate.multiplier.2=Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+#parameter set for demographic & diagnosis calibration
+param.names.all<-c(
+    POPULATION.PARAMETERS.PRIOR@var.names,
+    AGING.PARAMETERS.PRIOR@var.names,
+    TRANSMISSION.PARAMETERS.PRIOR@var.names,
+    TESTING.PARAMETERS.PRIOR@var.names
 )
 
-## TRANSMISSION.PARAMETERS.PRIOR ----
-TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
-  # # Infection multipliers in 1970 (relative diagnoses in 1970 to the peak diagnoses between 1993-99)
-  # ps.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  # el.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  # lu.diagnoses.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  ## Initial diagnosis multipliers in 1970 by sex/risk group
-  ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  ps.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    
-  el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  el.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-  el.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-    
-  lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    
-      
-  ## Transmission
-  global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 100), #directly used in specification (will need sth uch larger) 
-  
-  #12 independant params
-  # msm multipliers by time
-  transmission.rate.multiplier.msm1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm1990 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.msm1995 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),#1995 #increasing the peak value
-  transmission.rate.multiplier.msm2000 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  transmission.rate.multiplier.msm2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  transmission.rate.multiplier.msm2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  
-  # heterosexual multipliers by time
-  transmission.rate.multiplier.heterosexual1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.heterosexual1990 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.heterosexual1995 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),#1995 #increasing the peak value
-  transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  transmission.rate.multiplier.heterosexual2010 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  transmission.rate.multiplier.heterosexual2020 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), 
-  
-  ### race multipliers (shared for msm and het):
-  transmission.rate.multiplier.black= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.hispanic= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  transmission.rate.multiplier.other= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  
-  ### future change
-  transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
-  
-  ## Sexual Mixing by Age
-  age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)), #directly used in specification helper function
-  #to control the standard deviation of the contact matrix by age
-  
-  # relapse & infectiousness for EL
-  prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
-  el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
-) 
+#Demographic
 
-## TESTING.PARAMETERS.PRIOR ----
-TESTING.PARAMETERS.PRIOR=join.distributions( 
-  # Odd-Ratio of symptomatic testing (stage X sex and time) 
-  or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) , 
-  or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
-  or.symptomatic.primary.female = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
-  #
-  or.symptomatic.secondary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
-  or.symptomatic.secondary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ) ,
-  or.symptomatic.secondary.female= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2 ), 
-  #
-  or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-  or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-  or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-  or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-  or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-  or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2),
-  
-  # for HIV screening
-  hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
-  
-  # STI screening knots multiplier (relative to HIV screening)
-  sti.screening.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  sti.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  sti.screening.multiplier.1995 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  sti.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  sti.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  sti.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)),
-  
-  # STI screening multiplier by stage (defined in specification-no linking needed here)
-  sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)), #get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
-  sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)), #changing the prior to reflect higher freq of screening among syphilis-infected subgroups (highrisk)
-  sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = 0.75 *log(2)),
-  sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-  
-  # Contact tracing
-  # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
-  prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing)
+register.calibration.info('calib.demog.atlanta', 
+                          likelihood.instructions = lik.inst.demog,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.ATL.08.08', 
+                          likelihood.instructions = lik.inst.demog,
+                          #preceding.calibration.codes = "calib.demog.atlanta",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.ATL.08.18.v2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = "calib.demog.atlanta",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
 
-## PRENATAL.PARAMETER.PRIOR ----
-PRENATAL.PARAMETERS.PRIOR=join.distributions(
-    # First‑trimester 
-    first.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    first.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5), #'@Ryan:why are u using /5 denom? 
-    
-    # black.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # hispanic.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # other.first.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # 
-    # age15.19.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age20.24.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age25.29.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age30.34.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age35.39.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age40.44.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    
-    # Second‑trimester 
-    second.trimester.intercept.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), 
-    second.trimester.slope.mult         = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
-    
-    # black.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # hispanic.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # other.second.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # 
-    # age15.19.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age20.24.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age25.29.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age30.34.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age35.39.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age40.44.second.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # 
-    # Third‑trimester 
-    third.trimester.intercept.mult      = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    third.trimester.slope.mult          = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5)
-    
-    # black.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # hispanic.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # other.third.trimester.odds.mult     = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # 
-    # age15.19.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age20.24.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age25.29.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age30.34.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age35.39.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age40.44.third.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    
-    # ## non fertile ages ##
-    # # First‑trimester
-    # age0.14.first.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age45.49.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age50.54.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age55.64.first.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age65.plus.first.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # 
-    # # Second‑trimester
-    # age0.14.second.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age45.49.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age50.54.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age55.64.second.trimester.odds.mult  = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age65.plus.second.trimester.odds.mult= Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # 
-    # # Third‑trimester
-    # age0.14.third.trimester.odds.mult    = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age45.49.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age50.54.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age55.64.third.trimester.odds.mult   = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # age65.plus.third.trimester.odds.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
-    
+register.calibration.info('calib.demog.ATL.08.29', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = "calib.demog.atlanta",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-# Notes: 
-# x=Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2))
-# get.intervals(x)
-# calculate.density(x,10)/calculate.density(x,1) #penalty for drawing a point at 10 instead of 1
+register.calibration.info('calib.demog.ATL.09.10', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = "calib.demog.atlanta",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.ATL.09.11.1', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = "calib.demog.atlanta",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.ATL.09.11.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = "calib.demog.atlanta",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.ATL.09.11.3', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = "calib.demog.atlanta",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.ATL.09.11.4', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = "calib.demog.atlanta",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.06.09.pk', 
+                          likelihood.instructions = lik.inst.demog,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.BLT.08.08', 
+                          likelihood.instructions = lik.inst.demog,
+                          #preceding.calibration.codes = 'calib.demog.06.09.pk',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.BLT.08.18.v2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.06.09.pk',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.BLT.08.29', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.06.09.pk',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.BLT.09.10', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.06.09.pk',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.BLT.09.11.1', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.BLT.09.11.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.BLT.09.11.3', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.06.09.pk',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.BLT.09.11.4', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.06.09.pk',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.miami', 
+                          likelihood.instructions = lik.inst.demog,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.MIA.08.08', 
+                          likelihood.instructions = lik.inst.demog,
+                          #preceding.calibration.codes = 'calib.demog.miami',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.MIA.08.18.v2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          preceding.calibration.codes = 'calib.demog.miami',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.MIA.08.29', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.miami',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.MIA.09.10', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.miami',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.MIA.09.11.1', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.miami',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.MIA.09.11.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.miami',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.MIA.09.11.3', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.miami',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.MIA.09.11.4', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = 'calib.demog.miami',
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"), 
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.07.08.rf', 
+                          likelihood.instructions = lik.inst.demog,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.08.08', 
+                          likelihood.instructions = lik.inst.demog,
+                          #preceding.calibration.codes = "calib.demog.07.08.rf",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.08.18.v2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          #preceding.calibration.codes = "calib.demog.07.08.rf",
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.NYC.08.29', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.NYC.09.10', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.11.1', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.11.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.11.3', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.11.4', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+##########
+
+register.calibration.info('calib.demog.MIA.09.18.1', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.ATL.09.18.1', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.18.1', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.BTL.09.18.1', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+############
+
+register.calibration.info('calib.demog.MIA.09.18.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.ATL.09.18.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.18.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.BTL.09.18.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+###################
+
+register.calibration.info('calib.demog.MIA.09.18.3', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.8),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.ATL.09.18.3', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.8),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.18.3', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.8),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.BTL.09.18.3', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.8),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+###############################
+
+
+register.calibration.info('calib.demog.MIA.09.24', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.ATL.09.24', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.24', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.BLT.09.24', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+######################
+
+
+register.calibration.info('calib.demog.MIA.09.24.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.demog.ATL.09.24.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.NYC.09.24.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.demog.BLT.09.24.2', 
+                          likelihood.instructions = lik.inst.demog.TD,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,  
+                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.6),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+###### with penalty only (no congenital added)
+# register.calibration.info('calib.MIA.08.04', 
+#                           preceding.calibration.codes = 'calib.demog.miami',
+#                           likelihood.instructions = lik.inst.diag.totals.no.demog.w.historical,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,  
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               TESTING.PARAMETERS.PRIOR@var.names), 
+#                           fixed.initial.parameter.values = c(global.transmission.rate=1.7),
+#                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+# )
 # 
-# x=Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2))
-# get.intervals(x)
-# calculate.density(x,10)/calculate.density(x,3)
+# register.calibration.info('calib.ATL.08.04', 
+#                           preceding.calibration.codes = 'calib.demog.atlanta',
+#                           likelihood.instructions = lik.inst.diag.totals.no.demog.w.historical,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,  
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               TESTING.PARAMETERS.PRIOR@var.names), 
+#                           fixed.initial.parameter.values = c(global.transmission.rate=1.75),
+#                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+# )
 # 
-# x=Lognormal.Distribution(meanlog = log(3), sdlog = log(2))
-# get.intervals(x)
-# calculate.density(x,10)/calculate.density(x,3)
- 
-
-
-#### ----
-#2- LINKING PARAMETERS TO FUNCTIONAL FORMS....  -----
-SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){ 
-  ages=model.settings$specification.metadata$dim.names$age
-  sexes=model.settings$specification.metadata$dim.names$sex
-  races=model.settings$specification.metadata$dim.names$race
-  
-  fertile.ages=model.settings$specification.metadata$dim.names$age[2:7]
-  fertile.age.ranges= c("15.19","20.24","25.29","30.34","35.39","40.44") 
-  #buckets of aging from:
-  q=model.settings$specification.metadata$age.upper.bounds
-  aging.from=q[1: (length(q)-1)]-1
-  
-  ## Aging Rates ----
-  #10 (ages) * 3 (races) * 3 sexes= 90 for 2 knots = 180
-  for(i in c(1,2)){ #spline with 2 knots
-    for(age.index in 1:length(aging.from)) {
-      for(race in races){
-        # for(s in sexes){
-        agegroup=ages[age.index]
-        paramName=paste0("age",aging.from[age.index],".",race,".aging.rate.multiplier.",i)
-        set.element.functional.form.interaction.alphas(model.settings,
-                                                       element.name = "rate.general.aging",
-                                                       alpha.name = paste0("time",i),
-                                                       value = parameters[paramName],
-                                                       applies.to.dimension.values =list(age = agegroup, race = race))
-      }}}                                      
-  
-  ## Fertility rates by race to time1/time2 knots----
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "fertility.rate",
-                                                 alpha.name = "time1",
-                                                 values = parameters[paste0(races, ".fertility.rate.multiplier")],
-                                                 dimension = "race",
-                                                 applies.to.dimension.values = races)
-  
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "fertility.rate",
-                                                 alpha.name = "time2",
-                                                 values = parameters[paste0(races, ".fertility.rate.multiplier")],
-                                                 dimension = "race",
-                                                 applies.to.dimension.values = races)
-  
-  # Fertility multipliers by age to time1/time2 knots ----
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "fertility.rate",
-                                                 alpha.name = "time1",
-                                                 values = parameters[paste0("age", fertile.age.ranges, ".fertility.rate.multiplier")],
-                                                 dimension = "age",
-                                                 applies.to.dimension.values = fertile.ages)
-  
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "fertility.rate",
-                                                 alpha.name = "time2",
-                                                 values = parameters[paste0("age", fertile.age.ranges, ".fertility.rate.multiplier")],
-                                                 dimension = "age",
-                                                 applies.to.dimension.values = fertile.ages)
-  
-  ## Immigration rate multipliers by race for time1/time2 knots ----
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.immigration",
-                                                 alpha.name = "time.1",
-                                                 values = parameters[paste0(races,".immigration.rate.multiplier.1")],
-                                                 dimension = "race",
-                                                 applies.to.dimension.values = races)
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.immigration",
-                                                 alpha.name = "time.2",
-                                                 values = parameters[paste0(races,".immigration.rate.multiplier.2")],
-                                                 dimension = "race",
-                                                 applies.to.dimension.values = races)
-  
-  ## Emigration coefficients  by race for time1/time2 knots ----
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.emigration",
-                                                 alpha.name = "time.1",
-                                                 values = 1/parameters[paste0(races,".immigration.rate.multiplier.1")],
-                                                 dimension = "race",
-                                                 applies.to.dimension.values = races)
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.emigration",
-                                                 alpha.name = "time.2",
-                                                 values = 1/parameters[paste0(races,".immigration.rate.multiplier.2")],
-                                                 dimension = "race",
-                                                 applies.to.dimension.values = races)
-  ## Mortality rates by race ----
-  races=model.settings$specification.metadata$dim.names$race
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.general.mortality",
-                                                 alpha.name = 'value',
-                                                 values = parameters[paste0(races,".general.mortality.rate.multiplier")],
-                                                 dimension = "race",
-                                                 applies.to.dimension.values = races)
-  ## Mortality rates by sex ----
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.general.mortality",
-                                                 alpha.name = 'value',
-                                                 values = parameters["male.general.mortality.rate.multiplier"],
-                                                 dimension = "sex",
-                                                 applies.to.dimension.values = c('heterosexual_male','msm'))
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.general.mortality",
-                                                 alpha.name = 'value',
-                                                 values = parameters["female.general.mortality.rate.multiplier"],
-                                                 dimension = "sex",
-                                                 applies.to.dimension.values = c('female'))
-  
-  ## Transmission ----
-  #multipliers for msm rates in each knot:
-  for(time in c("1970","1990","1995","2000","2010","2020")){    
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "transmission.rate.msm",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("transmission.rate.multiplier.msm",time)],
-                                                   dimension = 'all',
-                                                   applies.to.dimension.values = 'all')
-    #multipliers for heterosexual rates in each knot:
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "transmission.rate.heterosexual",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("transmission.rate.multiplier.heterosexual",time)],
-                                                   dimension = 'all',
-                                                   applies.to.dimension.values = 'all')
-    
-    
-    #race multipliers, shared for msm and heterosexuals: 
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "transmission.rate.msm",
-                                                   alpha.name = time,
-                                                   values = parameters[c("transmission.rate.multiplier.black",
-                                                                         "transmission.rate.multiplier.hispanic", 
-                                                                         "transmission.rate.multiplier.other")],
-                                                   dimension = "race.to", #recipient
-                                                   applies.to.dimension.values = c("black","hispanic", "other"))
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "transmission.rate.heterosexual",
-                                                   alpha.name = time,
-                                                   values = parameters[c("transmission.rate.multiplier.black",
-                                                                         "transmission.rate.multiplier.hispanic", 
-                                                                         "transmission.rate.multiplier.other")],
-                                                   dimension = "race.to", #recipient
-                                                   applies.to.dimension.values = c("black","hispanic", "other"))
-  }
-  
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "transmission.rate.heterosexual",
-                                                 alpha.name = "after.modifier",
-                                                 values = parameters["transmission.rate.future.change.mult"],
-                                                 applies.to.dimension.values = "all",
-                                                 dimension = "all"
-                                                 )
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "transmission.rate.msm",
-                                                 alpha.name = "after.modifier",
-                                                 values = parameters["transmission.rate.future.change.mult"],
-                                                 applies.to.dimension.values = "all",
-                                                 dimension = "all"
-  )
-  
-  ## STI SCREENING  ----
-  # Changing the intercept and slope for HIV tests
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.testing.hiv.without.covid.over.14",
-                                                 alpha.name = "intercept",
-                                                 values = parameters["hiv.testing.or"],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.testing.hiv.without.covid.over.14",
-                                                 alpha.name = "slope",
-                                                 values = parameters["hiv.testing.slope.or"],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
-  
-  # Changing the knot values for ratio of STI screening to HIV tests
-  for(time in c("1970","1990","1995","2000","2010","2020")){
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("sti.screening.multiplier.",time)],
-                                                   dimension = "all", #recipient
-                                                   applies.to.dimension.values = "all")
-    
-  }
-  #Note: sti.screening.multiplier.*by stage are directly linked in the specification
-  
-  # Symptomatic Testing ----
-  for(time in c("1970", "1990","1995","2000","2010","2020")){
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.primary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.",time)],
-                                                   dimension = "all", #recipient
-                                                   applies.to.dimension.values = "all")
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.primary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.primary.", sexes)],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = sexes)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.secondary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.",time)],
-                                                   dimension = "all", #recipient
-                                                   applies.to.dimension.values = "all")
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.secondary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.secondary.", sexes)],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = sexes)
-  }
-  
-  # Prenatal care ----
-  trimesters <- list(
-      list(element = "prp.prenatal.care.first.trimester",  prefix = "first.trimester"),
-      list(element = "prp.prenatal.care.second.trimester.of.those.not.screened.first", prefix = "second.trimester"),
-      list(element = "prp.prenatal.care.third.trimester.of.those.not.screened.first.second",  prefix = "third.trimester")
-  )
-  for (tr in trimesters) {
-      elem <- tr$element
-      pre  <- tr$prefix
-      
-      ## global OR 
-      set.element.functional.form.main.effect.alphas(
-          model.settings, 
-          element.name = elem, 
-          alpha.name = "intercept",
-          values = parameters[paste0(pre, ".intercept.mult")],
-          dimension = "all",
-          applies.to.dimension.values = "all")
-      
-      ##  global slope 
-      set.element.functional.form.main.effect.alphas(
-          model.settings, 
-          element.name = elem, 
-          alpha.name = "slope",
-          values = parameters[paste0(pre, ".slope.mult")],
-          dimension = "all",
-          applies.to.dimension.values = "all")
-      
-      # ## 3. race‑specific OR
-      # race.parms <- paste0(races, ".", pre, ".odds.mult")
-      # set.element.functional.form.main.effect.alphas(
-      #     model.settings, 
-      #     element.name = elem, 
-      #     alpha.name = "intercept",
-      #     values = parameters[race.parms],
-      #     dimension = "race",
-      #     applies.to.dimension.values = races)
-      # 
-      # ## 4. age‑specific OR
-      # age.parms <- paste0("age", ages, ".", pre, ".odds.mult")
-      # set.element.functional.form.main.effect.alphas(
-      #     model.settings,
-      #     element.name = elem,
-      #     alpha.name = "intercept",
-      #     values = parameters[age.parms],
-      #     dimension = "age",
-      #     applies.to.dimension.values = ages)
-  }
-  
-  
-}
-
-
-
-#### ----
-#3- SAMPLING BLOCKS: ----
-# classic mcmc samples one param at a time, adaptive mcms samples multiple params (1-5 per block)
-
-## POPULATION.SAMPLING.BLOCKS ----
-POPULATION.SAMPLING.BLOCKS = list(
-  # Fertility ---- 
-  fertility.rates.by.race = c(
-    "black.fertility.rate.multiplier",
-    "hispanic.fertility.rate.multiplier",
-    "other.fertility.rate.multiplier"
-  ),
-  fertility.rates.by.age.1 = c(
-    "age15.19.fertility.rate.multiplier",
-    "age20.24.fertility.rate.multiplier",
-    "age25.29.fertility.rate.multiplier"
-  ),
-  fertility.rates.by.age.2 = c(
-    "age30.34.fertility.rate.multiplier",
-    "age35.39.fertility.rate.multiplier",
-    "age40.44.fertility.rate.multiplier"
-  ),
-  # Mortality ----
-  mortality.rates.by.race=c("black.general.mortality.rate.multiplier",
-                            "hispanic.general.mortality.rate.multiplier",
-                            "other.general.mortality.rate.multiplier"),
-  moratlity.rates.by.sex=c("male.general.mortality.rate.multiplier",
-                           "female.general.mortality.rate.multiplier"),
-  # Immigration ----
-  black.immigration = c("black.immigration.rate.multiplier.1",
-                        "black.immigration.rate.multiplier.2"),
-  hispanic.immigration = c("hispanic.immigration.rate.multiplier.1",
-                           "hispanic.immigration.rate.multiplier.2"),
-  other.immigration = c("other.immigration.rate.multiplier.1",
-                        "other.immigration.rate.multiplier.2")
-)
-## AGING.SAMPLING.BLOCKS ---- 
-AGING.SAMPLING.BLOCKS = list(
-  aging.black.group1=c(
-    "age14.black.aging.rate.multiplier.1",
-    "age14.black.aging.rate.multiplier.2",
-    "age19.black.aging.rate.multiplier.1",
-    "age19.black.aging.rate.multiplier.2"),
-  aging.black.group2=c(
-    "age19.black.aging.rate.multiplier.1",
-    "age19.black.aging.rate.multiplier.2",
-    "age24.black.aging.rate.multiplier.1",
-    "age24.black.aging.rate.multiplier.2"  ),
-  aging.black.group3=c(
-    "age24.black.aging.rate.multiplier.1",
-    "age24.black.aging.rate.multiplier.2" ,
-    "age29.black.aging.rate.multiplier.1",
-    "age29.black.aging.rate.multiplier.2"),
-  aging.black.group4=c(
-    "age29.black.aging.rate.multiplier.1",
-    "age29.black.aging.rate.multiplier.2",
-    "age34.black.aging.rate.multiplier.1",
-    "age34.black.aging.rate.multiplier.2" ),
-  aging.black.group5=c(
-    "age34.black.aging.rate.multiplier.1",
-    "age34.black.aging.rate.multiplier.2",
-    "age39.black.aging.rate.multiplier.1",
-    "age39.black.aging.rate.multiplier.2"),
-  aging.black.group6=c(
-    "age39.black.aging.rate.multiplier.1",
-    "age39.black.aging.rate.multiplier.2",
-    "age44.black.aging.rate.multiplier.1",
-    "age44.black.aging.rate.multiplier.2"),
-  aging.black.group7=c(
-    "age44.black.aging.rate.multiplier.1",
-    "age44.black.aging.rate.multiplier.2",
-    "age49.black.aging.rate.multiplier.1",
-    "age49.black.aging.rate.multiplier.2"),
-  aging.black.group8=c(
-    "age49.black.aging.rate.multiplier.1",
-    "age49.black.aging.rate.multiplier.2",
-    "age54.black.aging.rate.multiplier.1",
-    "age54.black.aging.rate.multiplier.2"),
-  aging.black.group9=c(
-    "age64.black.aging.rate.multiplier.1",
-    "age64.black.aging.rate.multiplier.2"),
-  
-  ###
-  aging.hispanic.group1=c(
-    "age14.hispanic.aging.rate.multiplier.1",
-    "age14.hispanic.aging.rate.multiplier.2",
-    "age19.hispanic.aging.rate.multiplier.1",
-    "age19.hispanic.aging.rate.multiplier.2"),
-  aging.hispanic.group2=c(
-    "age19.hispanic.aging.rate.multiplier.1",
-    "age19.hispanic.aging.rate.multiplier.2",
-    "age24.hispanic.aging.rate.multiplier.1",
-    "age24.hispanic.aging.rate.multiplier.2"  ),
-  aging.hispanic.group3=c(
-    "age24.hispanic.aging.rate.multiplier.1",
-    "age24.hispanic.aging.rate.multiplier.2" ,
-    "age29.hispanic.aging.rate.multiplier.1",
-    "age29.hispanic.aging.rate.multiplier.2"),
-  aging.hispanic.group4=c(
-    "age29.hispanic.aging.rate.multiplier.1",
-    "age29.hispanic.aging.rate.multiplier.2",
-    "age34.hispanic.aging.rate.multiplier.1",
-    "age34.hispanic.aging.rate.multiplier.2" ),
-  aging.hispanic.group5=c(
-    "age34.hispanic.aging.rate.multiplier.1",
-    "age34.hispanic.aging.rate.multiplier.2",
-    "age39.hispanic.aging.rate.multiplier.1",
-    "age39.hispanic.aging.rate.multiplier.2"),
-  aging.hispanic.group6=c(
-    "age39.hispanic.aging.rate.multiplier.1",
-    "age39.hispanic.aging.rate.multiplier.2",
-    "age44.hispanic.aging.rate.multiplier.1",
-    "age44.hispanic.aging.rate.multiplier.2"),
-  aging.hispanic.group7=c(
-    "age44.hispanic.aging.rate.multiplier.1",
-    "age44.hispanic.aging.rate.multiplier.2",
-    "age49.hispanic.aging.rate.multiplier.1",
-    "age49.hispanic.aging.rate.multiplier.2"),
-  aging.hispanic.group8=c(
-    "age49.hispanic.aging.rate.multiplier.1",
-    "age49.hispanic.aging.rate.multiplier.2",
-    "age54.hispanic.aging.rate.multiplier.1",
-    "age54.hispanic.aging.rate.multiplier.2"),
-  aging.hispanic.group9=c(
-    "age64.hispanic.aging.rate.multiplier.1",
-    "age64.hispanic.aging.rate.multiplier.2"),
-  
-  ##
-  aging.other.group1=c(
-    "age14.other.aging.rate.multiplier.1",
-    "age14.other.aging.rate.multiplier.2",
-    "age19.other.aging.rate.multiplier.1",
-    "age19.other.aging.rate.multiplier.2"),
-  aging.other.group2=c(
-    "age19.other.aging.rate.multiplier.1",
-    "age19.other.aging.rate.multiplier.2",
-    "age24.other.aging.rate.multiplier.1",
-    "age24.other.aging.rate.multiplier.2"  ),
-  aging.other.group3=c(
-    "age24.other.aging.rate.multiplier.1",
-    "age24.other.aging.rate.multiplier.2" ,
-    "age29.other.aging.rate.multiplier.1",
-    "age29.other.aging.rate.multiplier.2"),
-  aging.other.group4=c(
-    "age29.other.aging.rate.multiplier.1",
-    "age29.other.aging.rate.multiplier.2",
-    "age34.other.aging.rate.multiplier.1",
-    "age34.other.aging.rate.multiplier.2" ),
-  aging.other.group5=c(
-    "age34.other.aging.rate.multiplier.1",
-    "age34.other.aging.rate.multiplier.2",
-    "age39.other.aging.rate.multiplier.1",
-    "age39.other.aging.rate.multiplier.2"),
-  aging.other.group6=c(
-    "age39.other.aging.rate.multiplier.1",
-    "age39.other.aging.rate.multiplier.2",
-    "age44.other.aging.rate.multiplier.1",
-    "age44.other.aging.rate.multiplier.2"),
-  aging.other.group7=c(
-    "age44.other.aging.rate.multiplier.1",
-    "age44.other.aging.rate.multiplier.2",
-    "age49.other.aging.rate.multiplier.1",
-    "age49.other.aging.rate.multiplier.2"),
-  aging.other.group8=c(
-    "age49.other.aging.rate.multiplier.1",
-    "age49.other.aging.rate.multiplier.2",
-    "age54.other.aging.rate.multiplier.1",
-    "age54.other.aging.rate.multiplier.2"),
-  aging.other.group9=c(
-    "age64.other.aging.rate.multiplier.1",
-    "age64.other.aging.rate.multiplier.2")
+# 
+# register.calibration.info('calib.NYC.08.04', 
+#                           preceding.calibration.codes = 'calib.demog.07.08.rf',
+#                           likelihood.instructions = lik.inst.diag.totals.no.demog.w.historical,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,  
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               TESTING.PARAMETERS.PRIOR@var.names), 
+#                           fixed.initial.parameter.values = c(global.transmission.rate=1.72),
+#                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+# )
+# 
+# register.calibration.info('calib.BLT.08.04', 
+#                           preceding.calibration.codes = 'calib.demog.06.09.pk',
+#                           likelihood.instructions = lik.inst.diag.totals.no.demog.w.historical,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,  
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               TESTING.PARAMETERS.PRIOR@var.names), 
+#                           fixed.initial.parameter.values = c(global.transmission.rate=1.79),
+#                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+# )
+# 
+# ###### with penalty and stratified diagnoses (no congenital added)
+####
+register.calibration.info('calib.MIA.09.13.2way.1',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.11.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.7),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-## TRANSMISSION.SAMPLING.BLOCKS ----
-TRANSMISSION.SAMPLING.BLOCKS = list(
-  initial.infections=c(
-    'ps.diagnoses.multiplier.1970', 
-    'el.diagnoses.multiplier.1970', 
-    'lu.diagnoses.multiplier.1970'
-  ),
-  global.transmission.rate=c("global.transmission.rate"),
-  #
-  msm.transmission.block1 = c(
-    "transmission.rate.multiplier.msm1970",
-    "transmission.rate.multiplier.msm1990",
-    "transmission.rate.multiplier.msm1995"),
-  msm.transmission.block2=c(
-    "transmission.rate.multiplier.msm2000",
-    "transmission.rate.multiplier.msm2010",
-    "transmission.rate.multiplier.msm2020"),
-  #
-  het.transmission.block1 =c(
-    "transmission.rate.multiplier.heterosexual1970",
-    "transmission.rate.multiplier.heterosexual1990",
-    "transmission.rate.multiplier.heterosexual1995"),
-  het.transmission.block2=c(
-    "transmission.rate.multiplier.heterosexual2000",
-    "transmission.rate.multiplier.heterosexual2010",
-    "transmission.rate.multiplier.heterosexual2020"),
-  race.transmission = c(
-    "transmission.rate.multiplier.black",
-    "transmission.rate.multiplier.hispanic",
-    "transmission.rate.multiplier.other"
-  ),
-  future.change=c("transmission.rate.future.change.mult"),
-  age.mixing.transmission=(
-    "age.mixing.sd.mult"
-  ),
-  relapse=c(
-    "prop.early.latent.to.secondary"
-  ),
-  infectiousness=c(
-    "el.rel.secondary.transmissibility"
-  )
+register.calibration.info('calib.ATL.09.13.2way.1',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.11.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.75),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-# TESTING.SAMPLING.BLOCKS ----
-TESTING.SAMPLING.BLOCKS = list(
-  symptomatic.testing.primary = c(
-    "or.symptomatic.primary.msm",
-    "or.symptomatic.primary.heterosexual_male",
-    "or.symptomatic.primary.female"
-  ),
-  symptomatic.testing.secondary = c(
-    "or.symptomatic.secondary.msm",
-    "or.symptomatic.secondary.heterosexual_male",
-    "or.symptomatic.secondary.female"
-  ),
-  symptomatic.testing.time1 = c(
-    "or.symptomatic.1970",
-    "or.symptomatic.1990",
-    "or.symptomatic.1995"
-  ),
-  symptomatic.testing.time2 = c(
-    "or.symptomatic.2000",
-    "or.symptomatic.2010",
-    "or.symptomatic.2020"
-  ),
-  hiv.testing = c(
-    "hiv.testing.or",
-    "hiv.testing.slope.or"
-  ),
-  sti.screening.by.stage1=c(
-    "sti.screening.multiplier.ps",     
-    "sti.screening.multiplier.el",
-    "sti.screening.multiplier.ll"
-  ),
-  sti.screening.by.stage2=c(
-    "sti.screening.multiplier.tertiary",
-    "sti.screening.multiplier.cns"
-  ),    
-  screening.by.time1 = c(
-    "sti.screening.multiplier.1970",
-    "sti.screening.multiplier.1990",
-    "sti.screening.multiplier.1995"
-  ),
-  screening.by.time2 = c(
-    "sti.screening.multiplier.2000",
-    "sti.screening.multiplier.2010",
-    "sti.screening.multiplier.2020"
-  ),
-  contact.tracing=c(
-    "prop.index.cases.reached.for.contact.tracing"   
-  )
+register.calibration.info('calib.NYC.09.13.2way.1',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.11.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.72),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-## PRENATAL.SAMPLING.BLOCKS ----
-PRENATAL.SAMPLING.BLOCKS=list(
-    # First trimester
-    pnc1.global = c("first.trimester.intercept.mult",
-                    "first.trimester.slope.mult"),
-    # pnc1.race   = c("black.first.trimester.odds.mult",
-    #                 "hispanic.first.trimester.odds.mult",
-    #                 "other.first.trimester.odds.mult"),
-    # 
-    # pnc1.age.A  = c("age15.19.first.trimester.odds.mult",
-    #                 "age20.24.first.trimester.odds.mult",
-    #                 "age25.29.first.trimester.odds.mult"),
-    # 
-    # pnc1.age.B  = c("age30.34.first.trimester.odds.mult",
-    #                 "age35.39.first.trimester.odds.mult",
-    #                 "age40.44.first.trimester.odds.mult"),
-    # 
-    # pnc1.age.C = c("age0.14.first.trimester.odds.mult",
-    #                "age45.49.first.trimester.odds.mult",
-    #                "age50.54.first.trimester.odds.mult",
-    #                "age55.64.first.trimester.odds.mult",
-    #                "age65.plus.first.trimester.odds.mult"),
-    # 
-    
-    # Second trimester
-    pnc2.global = c("second.trimester.intercept.mult",
-                    "second.trimester.slope.mult"),
-    
-    # pnc2.race   = c("black.second.trimester.odds.mult",
-    #                 "hispanic.second.trimester.odds.mult",
-    #                 "other.second.trimester.odds.mult"),
-    # 
-    # pnc2.age.A  = c("age15.19.second.trimester.odds.mult",
-    #                 "age20.24.second.trimester.odds.mult",
-    #                 "age25.29.second.trimester.odds.mult"),
-    # 
-    # pnc2.age.B  = c("age30.34.second.trimester.odds.mult",
-    #                 "age35.39.second.trimester.odds.mult",
-    #                 "age40.44.second.trimester.odds.mult"),
-    # 
-    # pnc2.age.C = c("age0.14.second.trimester.odds.mult",
-    #                "age45.49.second.trimester.odds.mult",
-    #                "age50.54.second.trimester.odds.mult",
-    #                "age55.64.second.trimester.odds.mult",
-    #                "age65.plus.second.trimester.odds.mult"),
-    
-    # Third trimester
-    pnc3.global = c("third.trimester.intercept.mult",
-                    "third.trimester.slope.mult")
-    
-    # pnc3.race   = c("black.third.trimester.odds.mult",
-    #                 "hispanic.third.trimester.odds.mult",
-    #                 "other.third.trimester.odds.mult"),
-    # 
-    # pnc3.age.A  = c("age15.19.third.trimester.odds.mult",
-    #                 "age20.24.third.trimester.odds.mult",
-    #                 "age25.29.third.trimester.odds.mult"),
-    # 
-    # pnc3.age.B  = c("age30.34.third.trimester.odds.mult",
-    #                 "age35.39.third.trimester.odds.mult",
-    #                 "age40.44.third.trimester.odds.mult"),
-    # 
-    # pnc3.age.C = c("age0.14.third.trimester.odds.mult",
-    #                "age45.49.third.trimester.odds.mult",
-    #                "age50.54.third.trimester.odds.mult",
-    #                "age55.64.third.trimester.odds.mult",
-    #                "age65.plus.third.trimester.odds.mult")
+
+register.calibration.info('calib.BLT.09.13.2way.1',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.11.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.79),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-#### ----
-# SUMMARIZE ---- 
-#these will be registered in the specification 
-SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
-    POPULATION.PARAMETERS.PRIOR,
-    AGING.PARAMETERS.PRIOR,
-    TRANSMISSION.PARAMETERS.PRIOR,
-    TESTING.PARAMETERS.PRIOR,
-    PRENATAL.PARAMETERS.PRIOR
+register.calibration.info('calib.MIA.09.13.2way.2',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.11.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.7),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
-    POPULATION.SAMPLING.BLOCKS,
-    AGING.SAMPLING.BLOCKS,
-    TRANSMISSION.SAMPLING.BLOCKS,
-    TESTING.SAMPLING.BLOCKS,
-    PRENATAL.SAMPLING.BLOCKS
-    
+register.calibration.info('calib.ATL.09.13.2way.2',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.11.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.75),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+
+register.calibration.info('calib.NYC.09.13.2way.2',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.11.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.72),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.13.2way.2',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.11.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.79),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.MIA.09.13.2way.3',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.11.3',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.7),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.13.2way.3',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.11.3',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.75),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.13.2way.3',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.11.3',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.13.2way.3',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.11.3',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.MIA.09.13.2way.4',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.11.4',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.13.2way.4',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.11.4',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.75),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.13.2way.4',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.11.4',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.72),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.13.2way.4',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.11.4',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.79),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+
+register.calibration.info('calib.MIA.09.16.2way.1',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.11.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.16.2way.1',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.11.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          #fixed.initial.parameter.values = c(global.transmission.rate=1.75),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.16.2way.1',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.11.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.16.2way.1',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.11.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+#############################################################
+
+
+register.calibration.info('calib.MIA.09.19.2way.1',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.18.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.678068),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.19.2way.1',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.18.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.727956),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.19.2way.1',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.18.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.676484),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.19.2way.1',
+                          preceding.calibration.codes = 'calib.demog.BTL.09.18.1',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7811071),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.MIA.09.19.2way.2',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.18.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.674147),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.19.2way.2',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.18.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.727466),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.19.2way.2',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.18.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.675589),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.19.2way.2',
+                          preceding.calibration.codes = 'calib.demog.BTL.09.18.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7814630),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.MIA.09.19.2way.3',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.18.3',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.677685),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.19.2way.3',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.18.3',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.729292),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.19.2way.3',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.18.3',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.677518),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.19.2way.3',
+                          preceding.calibration.codes = 'calib.demog.BTL.09.18.3',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7816136),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+###################################
+
+
+
+register.calibration.info('calib.MIA.09.25.2way.1',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.678068),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.25.2way.1',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.727956),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.25.2way.1',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.676484),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.25.2way.1',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7811071),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.MIA.09.25.2way.2',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.24.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.674147),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.25.2way.2',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.24.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.727466),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.25.2way.2',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.24.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.675589),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.25.2way.2',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.24.2',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7814630),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+############################################################
+
+register.calibration.info('calib.MIA.09.29.2way.1',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.678068),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.29.2way.1',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.727956),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.29.2way.1',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.676484),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.29.2way.1',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7811071),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+############################################
+
+
+register.calibration.info('calib.MIA.09.29.2way.2',
+                          preceding.calibration.codes = 'calib.demog.MIA.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.678068),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.ATL.09.29.2way.2',
+                          preceding.calibration.codes = 'calib.demog.ATL.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.727956),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+register.calibration.info('calib.NYC.09.29.2way.2',
+                          preceding.calibration.codes = 'calib.demog.NYC.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.676484),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+register.calibration.info('calib.BLT.09.29.2way.2',
+                          preceding.calibration.codes = 'calib.demog.BLT.09.24',
+                          likelihood.instructions = lik.inst.diag.strata.no.demog.w.future,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              TESTING.PARAMETERS.PRIOR@var.names),
+                          fixed.initial.parameter.values = c(global.transmission.rate=1.7811071),
+                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+
+
+
+
+
+
+# LOG SUMMARY -----
+# <calib.07.10.pk*> adding EL specific knots in 1990,95,2000,2010,2020 for screening to see if it works
+#0-likelihoods Totals, all with w=1/8 weight
+#1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
+#2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
+#3-likelihoods Totals, all with w=1/8 weight except for EL (w=1)
+
+# <calib.07.09.pk*> running with different weights for EL
+#0-likelihoods Totals, all with w=1/8 weight
+#1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
+#2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
+#3-likelihoods Totals, all with w=1/8 weight except for EL (w=1) >>> Best fit
+
+# <calib.diagnosis.07.08.pk>
+# increasing the weight of EL diagnosis to see if it works
+# <calib.diagnosis.07.08.pk1> using total likelihoods, all with w=1/8 except for EL
+#1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
+#2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
+#3-likelihoods Totals, all with w=1/8 weight except for EL (w=1)
+
+
+# <calib.diagnosis.07.07.pk1>
+# rerunning *4 from yesterday after revising the HIV likelihood to use the "TOTALS" only.
+# <<calib.diagnosis.07.07.pk1>> total likelihoods, using the previous calibration as starting point
+# <<calib.diagnosis.07.07.pk2>> stratified likelihoods, using the previous calibration as starting point
+# <<calib.diagnosis.07.07.pk11>> total likelihoods, using the demog calibration as starting point
+# <<calib.diagnosis.07.07.pk22>> stratified likelihoods, using the demog calibration as starting point
+# The starting point from demographic wasnt good, dismissing *11, *22
+# stratified diagnosis data are problematic (dismissing *2)
+# <calib.diagnosis.07.06.pk1>
+#adding additional knots to symptomatic testing to align with transmission: 1970,90,95,2000,2010,2020
+# >>> this is a good fit, and it captures the tails of late diagnosis well
+# <calib.diagnosis.07.06.pk2>
+#revising knots in sti.screening function to be the same : 1970,90,95,2000,2010,2020
+# <calib.diagnosis.07.06.pk3> #revising the sym.testing spline function to use a knot.link=logit, and use link=identity. 
+# >>> using identity link for probabilities doesnt make sense. Ignore this run
+# <calib.diagnosis.07.06.pk4> #revising the sym.testing spline function to use a knot.link=logit, and use link=logit 
+# >>> this is exactly the same as *2. why? #'@Todd? 
+
+
+# <calib.07.03.pk1> ----
+# repeating Ryan's run with the last sim as starting point
+# EL infectiousness = ON; Relapse=ON, PS screening=ON ; contact tracing=ON
+
+
+# <calib.diagnosis.07.02.pk1> ----
+# repeating calibration from yesterday with weight 1/8, running another one with proceeding=calib.diagnosis.07.01.pk1 
+
+# <calib.diag.07.02.pk[2...*] > using the demographic calibration as the starting point (calib.diagnosis.06.30.pk1)
+# <calib.diag.07.02.pk2> # EL transmissibility = ON
+# <calib.diag.07.02.pk3> # EL transmissibility = ON; Relapse=ON
+# <calib.diag.07.02.pk4> # EL transmissibility = ON; Relapse=ON, PS screening=ON [Range of 0.13-1.9]
+# <calib.diag.07.02.pk5> # EL transmissibility = ON; Relapse=ON, PS screening=ON ; contact tracing=ON
+# <calib.diag.07.02.pk6> same as before, adding a contact.tracing parameter to calibration
+
+
+# <calib.diagnosis.07.01.pk1> ----
+# w=1/8
+# revised the prior for EL and LL sti screening multipliers
+# change the diagnosis likelihood to use "autoregressive.1" correlation instead of compound symmetry
+# >>> this one works great
+
+# <calib.diagnosis.07.01.pk2> # downweighting likelihoods to w=1/32 to make sure it mixes well
+# >>> this one didnt work as well
+
+# <calib.diagnosis.06.30.pk1> ----
+# changing the initial number infected in 1970
+# adding new transmission multiplier in 1990
+# calibrating to PS total, EL total, Late total, HIV tests
+# only changing Transmission and Testing Parameters
+# excluding sti.screening.multiplier.ps from calibration
+# >>> The initial peak pre-1990 is gone. Simulations have a hard time catching up with EL diagnoses.
+# >>> Manual try suggested high levels of screening for EL and LL is needed
+
+# <calib.diagnosis.06.30.pk1> 
+#  
+
+# ## TEST for Nick:
+# register.calibration.info('pop.demog.test', 
+#                           likelihood.instructions = likelihood.instructions.demographics,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,  
+#                           parameter.names = c(
+#                               POPULATION.PARAMETERS.PRIOR@var.names,
+#                               AGING.PARAMETERS.PRIOR@var.names 
+#                           ), 
+#                           n.iter = 10,
+#                           thin = 1, 
+#                           is.preliminary = T, 
+#                           max.run.time.seconds = 30, 
+#                           description = "A quick run to get population parameters in the general vicinity",
+#                           solver.metadata = solver
+# )
+cat("*** Shiled_register_calibration.R completed!***\n")
+
+
+# fixed.initial.parameter.values = c(global.transmission.rate=3), #change the initial value for a parameter
+# is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
+# max.run.time.seconds = 30,  # If solving the differential equations takes longer than this, it returns a ‘degenerate’ sim where all outcomes are NA and the likelihood evaluates to -Inf.
+# get.contained.locations('US', 'CBSA')
+
+#LOG -----
+# simsets are saved in: /Volumes/jheem$/shield/pop.demog.1.Rdata
+
+#######
+#05.13: <syphilis.diagnoses.5>  calibrating to total diagnosis by stage again to make sure we can hit the one peak in 1995
+# >> 51%, parameters were mixing well, but couldnt fit the peak in 1995
+
+#05.14: <syphilis.diagnoses.6.RF> add the weight param to likelihood and set to 0.5 to weaken the likelihoods 
+
+#05.15: <syphilis.diagnoses.7.pk> reducing atol to 0.1, using 0.5 weight to loosen the likelihoods # >> the chain is not mixing well.
+#05.15: <syphilis.diagnoses.7.pk1> reverting changes in rtol/atol and weight to check that model performs as expected# >> model is working well and parameters are mixing at 40% completion. 
+#05.15: <syphilis.diagnoses.7.RF> reducing atol to 0.1, using 0.8 weight to loosen the likelihoods
+
+#05.15: <syphilis.diagnoses.8.RF> using 0.8 weight to loosen the likelihoods. atol restored to default >> running
+# 05.16: <syphilis.diagnoses.8.pk> using rtol=0.01, atol=0.1, and Total.weight=0.8; starting from priors:
+# ROCKFISH >> 83%complete, params not mixing at all (could this be an issue with starting priors? Ryan's chain is mixing well)
+
+# 5.19: <syphilis.diag.9.pk.***> Total.weight=0.8:  starting from pop.demog.8's model, trying diagnosis likelihoods one a time
+# >> at 70% complete, we are getting closer to the peark and it's mixing well. 
+# >>> seems like the chain need more time
+# >>> we can help the priors to have a better strarting point
+# >>> to speeup the model, we can change the start year to 1970
+
+# 5.20: <syphilis.10.pk.psTotal> Total.weight=0.8:  starting from pop.demog.8's model, trying ps.total diagnosis with dynamic weights 
+# >> ongoing 
+
+# 5.21: <syphilis.11.pk.psTotal> same settings, revising the prior for transmission in 1995 & 2000, reducing number of outputs to speed up the model
+# >> in progress
+
+# 5.23: <syphilis.11.rf.psElTotal> now includes likelihood for PS and EL stages
+
+# 5.27: <syphilis.12.rf.psElTotal> Includes testing parameters for calibration
+
+# 5.30: <syphilis.13.rf.psElTotal> adding likelihood for HIV testing
+
+# 6.02: <syphilis.14.rf.psElTotal> added scenond transition route for latent 
+
+# 6.03: <syphilis.15.rf.psElTotal> reverted to 5.30 model, modified to have multiplier for ps screening 
+
+# 6.04: <syphilis.16.rf.psElTotal> included  multiplier for el screening
+
+# 6.06: <syphilis.6.06.rf.psElTotal> added 1970s calibratable params, changed default year to 1970s
+
+# 6.09: revising the symp.testing logic. Now it occurs during the stages. 
+# 6.09: <calib.demog.06.09.pk>: running a demographic calibration to fit the targets with 1970 start date
+# >> this run worked well. will be using this simset as the starting one for next calibrations
+
+#6.09 <calib.diagnosis.06.09.pk>: running a calibration with demographic, total ps, total EL and hiv test likelihoods
+# >> we still cant generate the peak in 1997 for the EL
+
+#6.10 <calib.diagnosis.06.10.rf>: Added tunable screening sti knot values for 1990 and 2000 
+
+#6.11 <calib.diagnosis.06.11.2.rf>: 1) set contact tracing prp reached to 0
+# 2) set prenatal care to zero
+# 3) Diagnosis LH weight set to 0.8
+# 4) Removed likelihood for demographics
+
+#6.12 <calib.diagnosis.06.12.rf>: 1) fixed values for ps and el screening multi
+# 2) removed max knot values in sti screening functional form
+
+#06.17:  <calib.diag.06.17.pk> using a weight of 1/8
+# calibrating to total ps; total EL diagnosis and hiv tests targets
+# downweighting the likelihood
+# 1) removed relapse =0 #2) removed infectiousness for EL stage =0 #3) removed screening for PS (muliplier set to 0) #4) took out prenatal care #5) took out contact tracing
+##### calib.diag.06.17.pk1# changing the weight to 1/16
+
+#06.19:  <calib.diag.06.19.pk> using a weight of 1/8
+# calibrating to total ps; total EL diagnosis and hiv tests targets
+# downweighting the likelihood
+# 1) removed relapse =0 #2) removed infectiousness for EL stage =0 #3) removed screening for PS (muliplier set to 0) #4) took out prenatal care #5) took out contact tracing
+
+
+# # a temporary local calibration to test the HIV numbers 
+# register.calibration.info(code = "calib.07.02.temp",
+#                           preceding.calibration.codes = "calib.diagnosis.07.01.pk1", #calibrated diagnosis model
+#                           likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, # PS total, EL total, Late total, HIV tests
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,
+#                           parameter.names = 
+#                               c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                 TESTING.PARAMETERS.PRIOR@var.names),
+#                           n.iter = 10, ###!!! MAke sure to
+#                           thin =1,###!!!
+#                           is.preliminary = T,
+#                           max.run.time.seconds = 30,
+#                           description = "A quick run to get syphilis parameters in the general vicinity")
