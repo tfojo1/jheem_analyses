@@ -217,13 +217,13 @@ historical.diagnosis.likelihood.instructions <-
                 # if fall over max threshold:  penalize with a lognormal centered at max_r
                 if (r > max_r) {
                     μ_high <- log(max_r)
-                    logp_annual   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high, log = TRUE)
+                    logp_annual   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high/sqrt(PENALTY.WEIGHT), log = TRUE)
                 }
                 #
                 logp_annual
             })
             #
-            total.logp = sum(unlist(total.logp))*PENALTY.WEIGHT
+            total.logp = sum(unlist(total.logp))
             if (log) total.logp else exp(total.logp)
         },
         get.data.function = function(version, location) {
@@ -291,76 +291,12 @@ ps.diagnosis.total.likelihood.instructions =
 
 
 
-library(zoo)
-sma.growth.deviation.after2022.likelihood.instructions <-
-    create.custom.likelihood.instructions(
-        name = "sma.growth.deviation.after2022",
-        compute.function = function(sim, data, log = TRUE) {
-            
-            # --- pull series ---
-            y   <- sim$optimized.get(data$get.instr)
-            yrs <- data$yrs
-            eps <- data$eps
-            k   <- data$k
-            
-            # --- 1y log growth ---
-            g <- c(NA_real_, diff(log(pmax(y, eps))))
-            
-            # --- trailing SMA/SD of growth (exclude current) ---
-            sma <- rollapply(g, width = k + 1, FUN = function(x) mean(x[-1], na.rm = TRUE),
-                             align = "right", fill = NA)
-            sdc <- rollapply(g, width = k + 1, FUN = function(x) sd(x[-1], na.rm = TRUE),
-                             align = "right", fill = NA)
-            z   <- (g - sma) / pmax(sdc, data$sd_floor)
-            
-            # --- historical band ---
-            hmask <- yrs >= data$hist_start & yrs <= data$hist_end & is.finite(z)
-            q     <- quantile(z[hmask], data$probs, na.rm = TRUE)
-            
-            # --- penalize future only ---
-            fmask <- yrs >= data$future_start & yrs <= data$future_end & is.finite(z)
-            zz    <- z[fmask]
-            logp  <- numeric(length(zz))
-            logp[zz < q[1]] <- dnorm(zz[zz < q[1]], mean = q[1], sd = data$sd_tail, log = TRUE)
-            logp[zz > q[2]] <- dnorm(zz[zz > q[2]], mean = q[2], sd = data$sd_tail, log = TRUE)
-            
-            total <- sum(logp) * data$weight
-            if (log) total else exp(total)
-        },
-        
-        get.data.function = function(version, location) {
-            sm  <- get.simulation.metadata(version = version, location = location)
-            yrs <- 1996:2030
-            
-            list(
-                get.instr = sm$prepare.optimized.get.instructions(
-                    outcome = "diagnosis.ps",
-                    dimension.values = list(year = yrs),
-                    keep.dimensions = "year",
-                    drop.single.sim.dimension = TRUE
-                ),
-                yrs          = yrs,
-                k            = 3,                # trailing window length
-                probs        = c(0.10, 0.90),
-                hist_start   = 1998,
-                hist_end     = 2022,
-                future_start = 2023,
-                future_end   = 2030,
-                sd_tail      = 0.5,
-                sd_floor     = 1e-6,
-                eps          = 1e-9,
-                weight       = PENALTY.WEIGHT
-            )
-        }
-    )
-
-
 ps.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
                                          #dimensions = c("age","race","sex"),
-                                         dimensions = c("sex"),
-                                         levels.of.stratification = c(0,1), 
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
@@ -369,6 +305,184 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
+    )
+
+
+future.change.likelihood.instructions =
+    create.custom.likelihood.instructions(
+        name = "future.change.likelihood",
+        compute.function = function(sim, data, log = TRUE) {
+            
+            get.instr   = data$get.instr
+            years       = data$years
+            start_year  = data$start_year
+            end_year    = data$end_year
+            window_len  = data$window_len
+            meanlog     = data$meanlog 
+            sdlog       = data$sdlog 
+            sd.width   = data$sd.width             # ±2 SD band (ln space)
+            weight =  data$weight
+            
+            
+            vals  <- sim$optimized.get(get.instr)
+            years <- years
+            
+            # rolling 5-yr ratios
+            ratio <- vals / dplyr::lag(vals, window_len)
+            ratio <- ratio[names(ratio) %in% as.character(years)]
+            
+            # use windows whose *start* year >= 2020 and *end* year <= 2030
+            use <- years >= (start_year + window_len) &
+                years <=  end_year &
+                is.finite(ratio) & (ratio > 0)
+            
+            if (!any(use)) return(if (log) 0 else 1)
+            
+            ratio <- ratio[use]
+            
+            
+            
+            # band edges on the ratio scale corresponding to μ ± k·σ in ln-space
+            lo <- exp(meanlog - sd.width*sdlog)
+            hi <- exp(meanlog + sd.width*sdlog)
+            
+            # make the penalty 0 at the band edges 
+            lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
+            lp_hi <- dlnorm(hi, meanlog = meanlog, sdlog = sdlog, log = TRUE)
+            
+            pen <- numeric(length(ratio))
+            below <- ratio < lo
+            above <- ratio > hi
+            if (any(below)) pen[below] <- dlnorm(ratio[below], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_lo
+            if (any(above)) pen[above] <- dlnorm(ratio[above], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_hi
+            # inside [lo, hi] => 0
+            #inverse variance weighting
+            ivar <- 1 / (sdlog^2)
+            w    <- weight * ivar
+            total.logp <- w*sum(pen, na.rm = TRUE)   # ≤ 0; more negative = stronger penalty
+            if (log) total.logp else exp(total.logp)
+        },
+        
+        get.data.function = function(version, location) {
+            sim.meta <- get.simulation.metadata(version = version, location = location)
+            
+            start_year  <- 2020L
+            end_year    <- 2030L
+            window_len  <- 5L
+            # need years 2020..2030 so t=2025..2030 ratios are computable
+            years <- seq(start_year, end_year)
+            
+            get.instr <- sim.meta$prepare.optimized.get.instructions(
+                outcome                   = "diagnosis.ps",
+                dimension.values          = list(year = years),
+                keep.dimensions           = "year",
+                drop.single.sim.dimension = TRUE
+            )
+            
+            list(
+                get.instr   = get.instr,
+                years       = years,
+                start_year  = start_year,
+                end_year    = end_year,
+                window_len  = window_len,
+                meanlog     = 0.455, # hard coded
+                sdlog       = 0.476,
+                sd.width.   = 2,
+                weight = PENALTY.WEIGHT  
+            )
+        }
+    )
+
+
+
+U.turn.likelihood.instructions =
+    create.custom.likelihood.instructions(
+        name = "U.turn.likelihood",
+        compute.function = function(sim, data, log = TRUE) {
+            
+            get.instr  <- data$get.instr
+            years      <- data$years
+            start_year <- data$start_year
+            end_year   <- data$end_year
+            h          <- data$window_len        # = 5
+            meanlog    <- data$meanlog
+            sdlog      <- data$sdlog
+            sd.width   <- data$sd.width          # ±k·sd band in ln-space
+            weight     <- data$weight
+            
+            # pull yearly values (named by year)
+            vals <- sim$optimized.get(get.instr)
+            
+            # 5-yr backward ratio: R_t = v_t / v_{t-5}
+            R <- vals / dplyr::lag(vals, h)
+            
+            # 5-yr double-delta at anchor t: DD5_t = R_{t+5} / R_t
+            dd5 <- dplyr::lead(R, h) / R
+            
+            # align to requested years
+            dd5 <- dd5[as.character(years)]
+            
+            # use anchors with both legs present: t in [start+h, end-h]
+            use <- years >= (start_year + h) &
+                years <= (end_year   - h) &
+                is.finite(dd5) & (dd5 > 0)
+            
+            if (!any(use)) return(if (log) 0 else 1)
+            
+            dd5 <- dd5[use]
+            
+            # lognormal band edges on DD5 scale
+            lo <- exp(meanlog - sd.width * sdlog)
+            hi <- exp(meanlog + sd.width * sdlog)
+            
+            # make penalty 0 at the band edges
+            lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
+            lp_hi <- dlnorm(hi, meanlog = meanlog, sdlog = sdlog, log = TRUE)
+            
+            pen <- numeric(length(dd5))
+            below <- dd5 < lo
+            above <- dd5 > hi
+            if (any(below))
+                pen[below] <- dlnorm(dd5[below], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_lo
+            if (any(above))
+                pen[above] <- dlnorm(dd5[above], meanlog = meanlog, sdlog = sdlog, log = TRUE) - lp_hi
+            # inside [lo, hi] => 0
+            
+            # inverse-variance weighting
+            ivar <- 1 / (sdlog^2)
+            w    <- weight * ivar
+            
+            total.logp <- w * sum(pen, na.rm = TRUE)  # ≤ 0
+            if (log) total.logp else exp(total.logp)
+        },
+        
+        get.data.function = function(version, location) {
+            sim.meta <- get.simulation.metadata(version = version, location = location)
+            
+            start_year <- 2017L
+            end_year   <- 2030L
+            window_len <- 5L
+            years <- seq(start_year, end_year)
+            
+            get.instr <- sim.meta$prepare.optimized.get.instructions(
+                outcome                   = "diagnosis.ps",
+                dimension.values          = list(year = years),
+                keep.dimensions           = "year",
+                drop.single.sim.dimension = TRUE
+            )
+            
+            list(
+                get.instr   = get.instr,
+                years       = years,
+                start_year  = start_year,
+                end_year    = end_year,
+                window_len  = window_len,
+                meanlog     = 0.280,   
+                sdlog       = 0.630,   
+                sd.width    = 2,
+                weight      = PENALTY.WEIGHT
+            )
+        }
     )
 
 ##---- EARLY ----
@@ -401,8 +515,8 @@ early.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
                                          #dimensions = c("age","race","sex"),
-                                         dimensions = c("sex"),
-                                         levels.of.stratification = c(0,1),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
@@ -442,8 +556,8 @@ late.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
                                          #dimensions = c("age","race","sex"),
-                                         dimensions = c("sex"),
-                                         levels.of.stratification = c(0,1),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'compound.symmetry',
@@ -472,8 +586,8 @@ hiv.testing.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
                                          outcome.for.data = "proportion.tested.for.hiv", 
                                          #dimensions = c("age","race","sex"),
-                                         dimensions = c("sex"),
-                                         levels.of.stratification = c(0,1),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
                                          from.year = 2014,
                                          to.year = 2019,
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
@@ -597,8 +711,8 @@ proportion.tested.by.strata.nested.likelihood.instructions =
                                                      minimum.geographic.resolution.type = 'COUNTY',
                                                      #
                                                      #dimensions = c("age","sex"),
-                                                     dimensions = c("sex"),
-                                                     levels.of.stratification = c(0,1),
+                                                     dimensions = c("sex","race"),
+                                                     levels.of.stratification = c(0,1,2),
                                                      from.year = 2010,
                                                      to.year = 2019,
                                                      #
@@ -757,12 +871,25 @@ no.prenatal.care.likelihood.instructions =
 
 #-- LIKELIHOODS --# ----
 ## Demographics only ----
+
 lik.inst.demog=join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,
     fertility.likelihood.instructions,
     immigration.likelihood.instructions,
-    emigration.likelihood.instructions)
+    emigration.likelihood.instructions
+)
+lik.inst.demog.TD=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions,
+    fertility.likelihood.instructions,
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions,
+    total.diagnosis.likelihood.instructions,
+    historical.diagnosis.likelihood.instructions,
+    ps.diagnosis.total.likelihood.instructions
+    
+)
 
 ## Adult syphilis diagnosis only / HIV tests ----- 
 #Total + strata diagnosis by stage only
@@ -803,8 +930,36 @@ lik.inst.diag.strata.no.demog.w.historical=join.likelihood.instructions(
         hiv.testing.total.likelihood.instructions,
         proportion.tested.by.strata.nested.likelihood.instructions
     ),
+    historical.diagnosis.likelihood.instructions
+)
+
+lik.inst.diag.strata.no.demog.w.future=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    ps.diagnosis.by.strata.likelihood.instructions,
+    early.diagnosis.by.strata.likelihood.instructions,
+    late.diagnosis.by.strata.likelihood.instructions,
+    create.ifelse.likelihood.instructions(
+        hiv.testing.total.likelihood.instructions,
+        proportion.tested.by.strata.nested.likelihood.instructions
+    ),
     historical.diagnosis.likelihood.instructions,
-    sma.growth.deviation.after2022.likelihood.instructions
+    future.change.likelihood.instructions,
+    U.turn.likelihood.instructions
+)
+
+
+
+
+lik.PS.strata.no.demog.w.historical=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    ps.diagnosis.by.strata.likelihood.instructions,
+    #early.diagnosis.by.strata.likelihood.instructions,
+    #late.diagnosis.by.strata.likelihood.instructions,
+    create.ifelse.likelihood.instructions(
+        hiv.testing.total.likelihood.instructions,
+        proportion.tested.by.strata.nested.likelihood.instructions
+    ),
+    historical.diagnosis.likelihood.instructions
 )
 
 ## Prenatal care ----
