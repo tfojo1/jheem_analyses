@@ -301,6 +301,29 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
     
     rv
   }
+  else if (output=='cv.and.sd')
+  {
+      optim.result = optim(
+          par = c(1, .05),
+          fn = function(par){
+              
+              - sum(dnorm(e, mean=0, sd=sqrt( par[1]^2 + (x*par[2])^2 ), log=T))
+              
+          },
+          lower = c(0,0),
+          upper = c(500,2),
+          method = 'L-BFGS-B'
+      )
+      
+      rv = list(cv=as.numeric(optim.result$par[2]),
+                sd=as.numeric(optim.result$par[1]))
+      
+      log.l = sum(dnorm(e, mean=0, sd=sqrt(rv$sd^2 + (x*rv$cv)^2), log=T))
+      
+      print(paste0("With CV = ", rv$cv, " and SD = ", rv$sd, ", log L = ", log.l))
+      
+      rv
+  }
   else
       stop(paste0("Invalid 'output' for variance parameters: '", output, "'"))
 }
