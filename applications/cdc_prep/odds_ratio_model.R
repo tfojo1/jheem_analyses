@@ -10,7 +10,7 @@ get.fraction.diagnoses.from.cdc.model.spline <- function(specification.metadata)
     
     #Set reference categories
     
-    specification.metadata = get.specification.metadata("cdct","MD")
+    specification.metadata = get.specification.metadata("cdcp","MD")
     dim.names = specification.metadata$dim.names[c("age","race","sex")]
     
     df$race <- relevel(factor(df$race), ref = "all")

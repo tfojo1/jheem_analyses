@@ -1305,6 +1305,7 @@ ggplot(plot_data, aes(x = relative_incidence_capped, y = state, fill = intervent
         )
     ) +
     labs(
+        title = "Figure 1. Projected Excess HIV Infections if CDC-funded HIV Testing is Disrupted",
         x = "Relative Excess HIV Infections until 2030",
         y = NULL,
         fill = NULL
