@@ -282,13 +282,28 @@ ps.diagnosis.total.likelihood.instructions =
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
+                                         error.variance.term = list(0.0764791209420945, 20 ),  
+                                         error.variance.type = c('cv','sd'),
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
 
+ps.diagnosis.by.strata.old.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                         outcome.for.data = "ps.syphilis.diagnoses",  
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = list(0.0764791209420945),  
+                                         error.variance.type = c('cv'),
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1  
+    )
 
 
 ps.diagnosis.by.strata.likelihood.instructions =
@@ -300,13 +315,27 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
+                                         error.variance.term = 0.62617012189868, #list(0.0764791209420945, 460.36),  
+                                         error.variance.type = "exp.of.variance", #c('cv', 'sd'),
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
 
+ps.diagnosis.by.strata.late.era.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                         outcome.for.data = "ps.syphilis.diagnoses",  
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
+                                         from.year = 2015,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.0764791209420945, 
+                                         error.variance.type = 'cv',
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1  
+    )
 
 future.change.likelihood.instructions =
     create.custom.likelihood.instructions(
@@ -503,13 +532,29 @@ early.diagnosis.total.likelihood.instructions =
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
+                                         error.variance.term = 0.0764791209420945,
                                          error.variance.type = 'cv',
                                          weights = EL.DIAGNOSIS.WEIGHT, # DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
 
+
+early.diagnosis.by.strata.old.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
+                                         outcome.for.data = "early.syphilis.diagnoses", 
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.0764791209420945, 
+                                         error.variance.type = 'cv',
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
 
 early.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
@@ -520,8 +565,8 @@ early.diagnosis.by.strata.likelihood.instructions =
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
+                                         error.variance.term = list(0.0764791209420945, 709.639386189259),
+                                         error.variance.type = c('cv','sd'),
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
@@ -552,6 +597,24 @@ late.diagnosis.total.likelihood.instructions =
                                          minimum.error.sd = 1
     )
 
+late.diagnosis.by.strata.old.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'compound.symmetry',
+                                         error.variance.term = 0.0764791209420945, 
+                                         error.variance.type = 'cv',
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
+
+
+
 late.diagnosis.by.strata.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
@@ -561,13 +624,12 @@ late.diagnosis.by.strata.likelihood.instructions =
                                          from.year = 1993,
                                          to.year = 2022,
                                          observation.correlation.form = 'compound.symmetry',
-                                         error.variance.term = 0.0764791209420945, #'@Ryan: we need to estimate this 
-                                         error.variance.type = 'cv',
+                                         error.variance.term = list(0.0764791209420945, 1424.82432432432), 
+                                         error.variance.type = c('cv','sd'),
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
-
 ##** HIV TESTS ** ----
 ### MSA-level ----
 hiv.testing.total.likelihood.instructions =

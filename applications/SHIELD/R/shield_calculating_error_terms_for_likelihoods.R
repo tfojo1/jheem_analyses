@@ -492,3 +492,4 @@ calculate.error.terms.pop = function(stratification,
     rv
     
 }
+
