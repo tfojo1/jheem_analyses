@@ -2,6 +2,7 @@
 df.a = read.csv('applications/ryan_white/ryan_white_data/costs/FY23/FY23_part_a_costs_by_location.csv')
 df.a = df.a[-nrow(df.a),] # remove total row
 df.a$state = substr(df.a[,1], nchar(df.a[,1])-1, nchar(df.a[,1]))
+df.a$minority.cost = as.numeric(gsub("[$, ]", "", df.a$FY.2023.Final.MAI.Award))
 df.a$cost = as.numeric(gsub("[$, ]", "", df.a$Total.FY.2023.Part.A.Award))
 
 df.b = read.csv('applications/ryan_white/ryan_white_data/costs/FY23/FY23_part_b_costs_by_location.csv')
@@ -32,6 +33,7 @@ df.ehe$state.from.name = unlist(locations::get.location.code(df.ehe[,1], types =
 df.ehe$state.from.city = substr(df.ehe[,1], nchar(df.ehe[,1])-5, nchar(df.ehe[,1])-4)
 df.ehe$state = df.ehe$state.from.city
 df.ehe$state[!is.na(df.ehe$state.from.name)] = df.ehe$state.from.name[!is.na(df.ehe$state.from.name)]
+df.ehe$cost = as.numeric(gsub("[$, ]", "", df.ehe$Award.Amount))
 
 states = unique(c(
     df.a$state,
@@ -44,6 +46,7 @@ states = unique(c(
 
 state.rw.costs = cbind(
     part.a = sapply(states, function(st){sum(df.a$cost[df.a$state==st])}),
+    part.a.minority = sapply(states, function(st){sum(df.a$cost[df.a$minority.cost==st])}),
     part.b = sapply(states, function(st){sum(df.b$total.cost[df.b$state==st])}),
     part.b.adap = sapply(states, function(st){sum(df.b$adap.cost[df.b$state==st])}),
     part.b.non.adap = sapply(states, function(st){sum(df.b$non.adap.cost[df.b$state==st])}),
@@ -57,5 +60,7 @@ state.rw.costs = cbind(
 state.rw.costs = cbind(state.rw.costs,
                        total = rowSums(state.rw.costs[,c('part.a','part.b','part.c.eis','part.c.capacity','part.d','ehe')]))
 
-state.rw.fraction.c.d.ehe.minority.of.non.adap = rowSums(state.rw.costs[,c('part.b.minority','part.c.eis','part.c.capacity','part.d','ehe')]) /
+state.rw.fraction.c.d.ehe.minority.of.non.adap = rowSums(state.rw.costs[,c('part.a.minority','part.b.minority','part.c.eis','part.c.capacity','part.d','ehe')]) /
     (state.rw.costs[,'total'] - state.rw.costs[,'part.b.adap'])
+
+state.rw.fraction.ehe.of.non.adap = state.rw.costs[,'ehe'] / (state.rw.costs[,'total'] - state.rw.costs[,'part.b.adap'])
