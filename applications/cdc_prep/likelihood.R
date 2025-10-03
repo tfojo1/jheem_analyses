@@ -37,15 +37,15 @@ cdc.test.positivity.likelihood.instructions = create.basic.likelihood.instructio
 
 
 
-cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "proportion.referred", 
-                                                                                   outcome.for.sim = "cumulative.fraction.referred",
+cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "number.referred", 
+                                                                                   outcome.for.sim = "cumulative.cdc.prep.referrals",
                                                                                    dimensions = character(), #total
                                                                                    levels.of.stratification = 0,
                                                                                    from.year = 2020,
-                                                                                   to.year = 2022,
+                                                                                   to.year = 2025,
                                                                                    observation.correlation.form = 'compound.symmetry',
                                                                                    correlation.different.years = 0.5,
-                                                                                   error.variance.term = 0.147,
+                                                                                   error.variance.term = 0.147, #how mis-measured is the target? 
                                                                                    error.variance.type = c('sd')
 ) 
 
