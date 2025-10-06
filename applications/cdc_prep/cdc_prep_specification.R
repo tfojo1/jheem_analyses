@@ -44,20 +44,6 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
                        functional.form.from.time = 2010)
 
 
-#-- The logistic functional forms for key proportions --#
-
-register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
-                       get.functional.form.function = get.fraction.diagnoses.from.cdc.model.spline,
-                       scale = "proportion",
-                       functional.form.from.time = 2010)
-
-register.model.element(CDCP.SPECIFICATION, name = "fraction.tests.from.cdc",
-                       functional.form = create.logistic.linear.functional.form(intercept = log(0.092800629)-log(0.9071994), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
-                       scale = "proportion",
-                       functional.form.from.time = 2010)
-
-
-
 #-- Relating Testing to PrEP --#
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tests.unique",
