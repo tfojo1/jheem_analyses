@@ -45,8 +45,8 @@ cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions
                                                                                    to.year = 2025,
                                                                                    observation.correlation.form = 'compound.symmetry',
                                                                                    correlation.different.years = 0.5,
-                                                                                   error.variance.term = 0.147, #how mis-measured is the target? 
-                                                                                   error.variance.type = c('sd')
+                                                                                   error.variance.term = .015, 
+                                                                                   error.variance.type = c('cv')
 ) 
 
 
