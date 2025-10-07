@@ -276,7 +276,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     ## Sexual Mixing by Risk
     oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(4)/2),
-    
+    fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
+    fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
     
     # relapse & infectiousness for EL
     prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
@@ -358,6 +359,9 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
                          logsd.delta20 = log(1.5)/2#, 
                          #logsd.delta30 = log(1.5)/2
     ),
+    
+    
+    
     sti.screening.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
     
     # STI screening multiplier by stage (defined in specification-no linking needed here)
@@ -675,6 +679,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
     
     # Changing the knot values for ratio of STI screening to HIV tests
     for(time in c("1970","1990","1995","2000","2010","2020")){
+        
+        
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "multiplier.syphilis.screening.to.hiv.tests",
                                                        alpha.name = time,
@@ -690,6 +696,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         #         applies.to.dimension.values = list(race = r, sex = s)
         #     )
         # }
+        
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "multiplier.syphilis.screening.to.hiv.tests",
                                                        alpha.name = time,
@@ -699,7 +706,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "multiplier.syphilis.screening.to.hiv.tests",
                                                        alpha.name = time,
-                                                       values = parameters[paste0("sti.screening.multiplier.",sexes)],
+                                                       values = parameters[paste0("sti.screening.multiplier.", sexes)],
                                                        dimension = "sex", #recipient
                                                        applies.to.dimension.values = sexes)
     }
@@ -1081,7 +1088,9 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
                                 "hispanic.hispanic.sexual.multi", 
                                 "other.other.sexual.multi"
     ),
-    risk.mixing.transmission= c("oe.female.pairings.with.msm"),
+    risk.mixing.transmission= c("oe.female.pairings.with.msm",
+                                "fraction.heterosexual_male.pairings.with.male",
+                                "fraction.msm.pairings.with.female"),
     relapse=c(
         "prop.early.latent.to.secondary"
     ),
