@@ -37,8 +37,8 @@ cdc.test.positivity.likelihood.instructions = create.basic.likelihood.instructio
 
 
 
-cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "number.referred", 
-                                                                                   outcome.for.sim = "cumulative.cdc.prep.referrals",
+cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "number.eligible", 
+                                                                                   outcome.for.sim = "cumulative.cdc.prep.eligible",
                                                                                    dimensions = character(), #total
                                                                                    levels.of.stratification = 0,
                                                                                    from.year = 2020,
@@ -51,8 +51,8 @@ cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions
 
 
 
-cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "proportion.eligible", 
-                                                                                   outcome.for.sim = "cumulative.fraction.eligible",
+cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "proportion.referred", 
+                                                                                   outcome.for.sim = "cumulative.fraction.referred",
                                                                                    dimensions = character(), #total
                                                                                    levels.of.stratification = 0,
                                                                                    from.year = 2020,
@@ -64,7 +64,7 @@ cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions
 )
 
 
-cdc.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcaretests.likelihood.instructions,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions)
+cdc.prep.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcaretests.likelihood.instructions,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions)
 
 
 

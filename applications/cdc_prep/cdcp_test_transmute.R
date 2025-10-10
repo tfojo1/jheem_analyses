@@ -1,4 +1,5 @@
 
+SURVEILLANCE
 
 load("/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_prep/test.AL.sim.Rdata")
 
@@ -34,6 +35,6 @@ results.by.state[[results$location]] = results
 
 simplot(results$last.sim(),results,"total.cdc.hiv.test.positivity",dimension.values = list(year = 2010:2030))
 simplot(results$last.sim(),results,"cdc.funded.tests",dimension.values = list(year = 2010:2030))
-simplot(simset$last.sim(),simset,"cumulative.cdc.prep.referrals",dimension.values = list(year = 2010:2030))
+simplot(simset$last.sim(),simset,"cumulative.cdc.prep.eligible",dimension.values = list(year = 2010:2030))
 simplot(simset$last.sim(),simset,"cdc.funded.tests.nonhealthcare",dimension.values = list(year = 2010:2030))
-simplot(simset$last.sim(),simset,"cumulative.fraction.eligible",dimension.values = list(year = 2010:2030))
+simplot(simset$last.sim(),simset,"cumulative.fraction.referred",dimension.values = list(year = 2010:2030))
