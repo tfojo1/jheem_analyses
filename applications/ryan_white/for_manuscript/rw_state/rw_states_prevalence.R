@@ -1,7 +1,13 @@
 source('../jheem_analyses/applications/EHE/ehe_specification.R')
 
-RW.STATES = c("AL","AR","AZ","CA","CO","FL","GA","IL","KY","LA","MA","MD","MI","MN",
-              "MO","MS","NC","NV","NY","OH","OK","SC","TN","TX","VA","WA","WI","NJ","PA")
+# if using the 11-state version
+RW.STATES = c("AL","CA","FL","GA","IL","LA","MS",
+              "MO","NY","TX","WI")
+
+# if using the updated version: 
+# RW.STATES = c("AL","AR","AZ","CA","CO","FL","GA","IL","IN","KY","LA","MA","MD","MI","MN",
+#               "MO","MS","NC","NJ","NV","NY","OH","OK","PA","SC","TN","TX","VA","WA","WI")
+#RW.STATES == dimnames(total.incidence)$location
 
 
 rw.total.prevalence = 

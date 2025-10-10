@@ -1,15 +1,16 @@
 
 #total.dx = apply(full.results[,,,,,,'new',,], c('year','sim','location','intervention'), sum, na.rm=T)
 
-YEARS.TO.CONSIDER = as.character(2026:2031)
+#YEARS.TO.CONSIDER = as.character(2026:2031)
+YEARS.TO.CONSIDER = as.character(2025:2030) # OLD VERSION - FOR AJPH (text labels will be wrong)
 YEARS.TO.CONSIDER2 = as.character(2025:2035)
 
-END.NAME = 'rw.end.26'
-CONS.END.NAME = 'rw.end.cons.26'
-P.INTR.NAME = 'rw.p.intr.26'
-P.INTR.CONS.NAME = 'rw.p.intr.cons.26'
+END.NAME = 'rw.end' # rw.end.26
+CONS.END.NAME = 'rw.end.cons' # rw.end.cons.26
+P.INTR.NAME = 'rw.p.intr' # rw.p.intr.26
+P.INTR.CONS.NAME = 'rw.p.intr.cons' # rw.p.intr.cons.26
 
-USE.B.INTR = F # to remove brief interruption
+USE.B.INTR = T # to remove brief interruption
 
 #-- Description if RW Continues --#
 

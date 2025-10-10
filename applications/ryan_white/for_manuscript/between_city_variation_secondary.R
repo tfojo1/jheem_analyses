@@ -55,7 +55,10 @@ df.city.summ = cbind(data.frame(
 #  sexual.transmission = apply(total.sexual.transmission[BASELINE.YEAR,,,'noint'] / total.pop[BASELINE.YEAR,,,'noint'], 'location', mean, na.rm=T) 
 ),
 as.data.frame(t(baseline.totals.by.city)))
-df.city.summ$medicaid[city.main.state.medicaid.expansion] = "Expansion State"
+if(!RW.IS.STATE.LEVEL)
+    df.city.summ$medicaid[city.main.state.medicaid.expansion] = "Expansion State"
+if(RW.IS.STATE.LEVEL)
+    df.city.summ$medicaid[sapply(df.city.summ$location,function(loc){any(loc==RW.MEDICAID.EXPANSION.LOCATIONS)}) ] = "Expansion State"
 df.city.summ$name = get.location.name(rownames(df.city.summ))
 df.city.summ$new.per.pop = df.city.summ$new / df.city.summ$population
 df.city.summ$new.per.prev = df.city.summ$new / df.city.summ$diagnosed.prevalence
@@ -337,8 +340,8 @@ plot = ggplot() +
     xlab("New HIV Diagnoses in 2025\nper 100,000 population") + 
     THEME + CITY.SIZE.SCALE + CITY.COLOR +
     geom_segment(data = df.label, aes(x, y, xend=new.per.pop, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
-    scale_y_continuous(labels = scales::percent, limits = c(0,1.15)) +
-    scale_x_continuous(labels = function(x){format(x * 100000, big.mark=',')}, limits = c(7e-05,3e-04)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.5)) +
+    scale_x_continuous(labels = function(x){format(x * 100000, big.mark=',')}, limits = c(7e-06,3e-04)) +
     geom_label(data=df.prcc,
                aes(x, y, label=value), size=PRCC.SIZE,
                vjust = 0.5, hjust = 1, show.legend = F) +
@@ -448,7 +451,7 @@ plot = ggplot() +
   xlab("Proportion of AIDS Drug Assistance\nClients Virally Suppressed in 2025") + 
   THEME + CITY.SIZE.SCALE + CITY.COLOR +
   geom_segment(data = df.label, aes(x, y, xend=adap.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
-    scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.5)) +
   scale_x_continuous(labels = scales::percent, limits = c(0.72,0.95)) +
   geom_label(data=df.prcc,
             aes(x, y, label=value), size=PRCC.SIZE,
@@ -484,7 +487,7 @@ plot = ggplot() +
   xlab("Proportion of Outpatient Ambulatory\nClients Virally Suppressed in 2025") + 
   THEME + CITY.SIZE.SCALE + CITY.COLOR +
   geom_segment(data = df.label, aes(x, y, xend=oahs.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
-    scale_y_continuous(labels = scales::percent, limits = c(0,1.1)) +
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.5)) +
   scale_x_continuous(labels = scales::percent, limits = c(0.84,0.94)) +
   geom_label(data=df.prcc,
             aes(x, y, label=value), size=PRCC.SIZE,

@@ -4,6 +4,23 @@ library(ggrepel)
 source("../jheem_analyses/applications/ryan_white/for_manuscript/load_survey_results.R")
 print(paste0("RW.IS.STATE.LEVEL is set to ",RW.IS.STATE.LEVEL))
 
+# check and load the right file 
+files
+file = files[4] # this was the last one before we revised the timeframe - I think
+load(file)
+
+RW.STATES = c("AL","CA","FL","GA","IL","LA","MS",
+              "MO","NY","TX","WI")
+
+# select only the 11 states if those are the ones we're using
+total.results = total.results[,,,RW.STATES,]
+total.incidence = total.incidence[,,RW.STATES,]
+total.new = total.new[,,RW.STATES,]
+total.suppression = total.suppression[,,RW.STATES,]
+total.sexual.transmission = total.sexual.transmission[,,RW.STATES,]
+RW.MEDICAID.EXPANSION.LOCATIONS = RW.STATES[RW.STATES %in% RW.MEDICAID.EXPANSION.LOCATIONS]
+RW.MEDICAID.NONEXPANSION.LOCATIONS = RW.STATES[!RW.STATES %in% RW.MEDICAID.EXPANSION.LOCATIONS]
+
 # text results 
 source("../jheem_analyses/applications/ryan_white/for_manuscript/text_results.R")
 
@@ -11,9 +28,11 @@ View(table.city)
 # figures 
 {
     source("../jheem_analyses/applications/ryan_white/for_manuscript/city_by_city_results_horizontal.R")
-    # this won't work until I fix the xlsx issue (I think I need to fix java setup?)
-    # for now, just run all lines except 355-368, will save a figure in the directory ../../Ryan White..."
+        # commented out lines 355-368 (xlsx issue), will save a figure in the directory results/ryan_white/shaded_table_boxplot_state
+    source("../jheem_analyses/applications/ryan_white/for_manuscript/city_by_city_results.R")
+        # same but vertical
     
+        
     # this makes the scatterplot figures, but they won't be labeled since these labels are for cities; use code below
     source("../jheem_analyses/applications/ryan_white/for_manuscript/between_city_variation_secondary.R")
 }
