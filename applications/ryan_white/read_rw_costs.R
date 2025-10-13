@@ -1,4 +1,3 @@
-
 df.a = read.csv('applications/ryan_white/ryan_white_data/costs/FY23/FY23_part_a_costs_by_location.csv')
 df.a = df.a[-nrow(df.a),] # remove total row
 df.a$state = substr(df.a[,1], nchar(df.a[,1])-1, nchar(df.a[,1]))
@@ -46,7 +45,7 @@ states = unique(c(
 
 state.rw.costs = cbind(
     part.a = sapply(states, function(st){sum(df.a$cost[df.a$state==st])}),
-    part.a.minority = sapply(states, function(st){sum(df.a$cost[df.a$minority.cost==st])}),
+    part.a.minority = sapply(states, function(st){sum(df.a$minority.cost[df.a$state==st])}),
     part.b = sapply(states, function(st){sum(df.b$total.cost[df.b$state==st])}),
     part.b.adap = sapply(states, function(st){sum(df.b$adap.cost[df.b$state==st])}),
     part.b.non.adap = sapply(states, function(st){sum(df.b$non.adap.cost[df.b$state==st])}),
