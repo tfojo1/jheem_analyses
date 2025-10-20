@@ -26,6 +26,15 @@ sd_PS_2 <- calculate.error.terms(
     data.type    = "ps.syphilis.diagnoses",
     data.source.1 = "cdc.aggregated.county",
     data.source.2 = "lhd",
+    #years = 1990:2000,
+    output       = "sd"
+) 
+
+
+sd_total_2 <- calculate.error.terms(
+    data.type    = "total.diagnoses",
+    data.source.1 = "cdc.aggregated.county",
+    data.source.2 = "lhd",
     output       = "exponent.of.variance"
 ) 
 

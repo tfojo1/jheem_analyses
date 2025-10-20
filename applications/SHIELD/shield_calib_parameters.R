@@ -106,6 +106,8 @@ POPULATION.PARAMETERS.PRIOR=join.distributions(
     black.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     hispanic.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     other.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+    
+    
 )
 ## AGING.PARAMETERS.PRIOR ----
 AGING.PARAMETERS.PRIOR=join.distributions( 
@@ -240,7 +242,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # transmission.rate.multiplier.heterosexual2030 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
     # 
     
-    make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", logmean00 = 0,logsd00 = log(2), 
+    make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", logmean00 = 0,logsd00 = log(2)/2, 
                          logsd.delta95 = log(sqrt(1.5))/2, 
                          logsd.delta90 = log(sqrt(1.5))/2, 
                          logsd.delta70 = log(1.5^2)/2,
@@ -276,7 +278,13 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     ## Sexual Mixing by Risk
     oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(4)/2),
+    fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
+    fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
     
+    # Proportion MSM ----
+    black.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    other.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
     
     # relapse & infectiousness for EL
     prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
@@ -609,6 +617,15 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "sex",
                                                    applies.to.dimension.values = c('female'))
     
+    ## Proportion MSM by race ----
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = 'prp.msm.of.male',
+                                                   alpha.name = 'value',
+                                                   values = parameters[paste0(races, '.proportion.msm.of.male.mult')],
+                                                   applies.to.dimension.values = races,
+                                                   dimension = 'race')
+    
+    
     ## Transmission ----
     #multipliers for msm rates in each knot:
     for(time in c("1970","1990","1995","2000","2010","2020")){    
@@ -695,6 +712,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         #         applies.to.dimension.values = list(race = r, sex = s)
         #     )
         # }
+        
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "multiplier.syphilis.screening.to.hiv.tests",
                                                        alpha.name = time,
@@ -1086,7 +1104,14 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
                                 "hispanic.hispanic.sexual.multi", 
                                 "other.other.sexual.multi"
     ),
-    risk.mixing.transmission= c("oe.female.pairings.with.msm"),
+    risk.mixing.transmission= c("oe.female.pairings.with.msm",
+                                "fraction.heterosexual_male.pairings.with.male",
+                                "fraction.msm.pairings.with.female"),
+    
+    proportion.msm.of.male = c(
+        'black.proportion.msm.of.male.mult',
+        'hispanic.proportion.msm.of.male.mult',
+        'other.proportion.msm.of.male.mult'),
     relapse=c(
         "prop.early.latent.to.secondary"
     ),

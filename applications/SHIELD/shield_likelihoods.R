@@ -406,14 +406,120 @@ future.change.likelihood.instructions =
                 start_year  = start_year,
                 end_year    = end_year,
                 window_len  = window_len,
-                meanlog     = 0.455, # hard coded
-                sdlog       = 0.476,
-                sd.width.   = 2,
+                meanlog     = 0.522, # hard coded for years 2010 - 2022
+                sdlog       = 0.357,
+                sd.width   = 2,
                 weight = PENALTY.WEIGHT  
             )
         }
     )
 
+
+future.change.strata.likelihood.instructions =
+    create.custom.likelihood.instructions(
+        name = "future.change.5y.strata.counts",
+        
+        compute.function = function(sim, data, log = TRUE) {
+            get.instr  <- data$get.instr
+            years      <- data$years
+            start_year <- data$start_year
+            end_year   <- data$end_year
+            h          <- data$window_len       # = 5
+            meanlog    <- data$meanlog
+            sdlog      <- data$sdlog
+            sd.width   <- data$sd.width         # ±k·sd band (ln space)
+            weight     <- data$weight
+            min_count  <- data$min_count
+            
+            # vals expected dims: [year, sex, race] in counts
+            vals <- sim$optimized.get(get.instr)
+            
+            # Ensure YEAR is first dimension
+            dn <- names(dimnames(vals))
+            year_idx <- match("year", dn)
+            if (!is.na(year_idx) && year_idx != 1L) {
+                ord <- c(year_idx, setdiff(seq_along(dn), year_idx))
+                vals <- aperm(vals, ord)
+                dn <- dn[ord]
+            }
+            
+            # Per (sex,race) time-series penalty on 5y backward ratio of COUNTS
+            per_vec_pen <- function(v, yrs) {
+                v <- as.numeric(v); names(v) <- yrs
+                
+                R1 <- v / dplyr::lag(v, h)              
+                
+                v_lag <- dplyr::lag(v, h)
+                use <- yrs >= (start_year + h) &
+                    yrs <=  end_year &
+                    is.finite(R1) & (R1 > 0) &
+                    is.finite(v) & is.finite(v_lag) &
+                    (v >= min_count) & (v_lag >= min_count)
+                
+                if (!any(use)) return(0)
+                R1 <- R1[use]
+                
+                # Lognormal band edges on R1 scale; zero penalty at edges
+                lo <- exp(meanlog - sd.width*sdlog)
+                hi <- exp(meanlog + sd.width*sdlog)
+                lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
+                lp_hi <- dlnorm(hi, meanlog = meanlog, sdlog = sdlog, log = TRUE)
+                
+                pen <- numeric(length(R1))
+                below <- R1 < lo; above <- R1 > hi
+                if (any(below)) pen[below] <- dlnorm(R1[below], meanlog, sdlog, log = TRUE) - lp_lo
+                if (any(above)) pen[above] <- dlnorm(R1[above], meanlog, sdlog, log = TRUE) - lp_hi
+                
+                sum(pen, na.rm = TRUE)
+            }
+            
+            # Sum penalties over sex×race strata (if present)
+            margin_idx <- match(c("sex","race"), dn, nomatch = 0L)
+            margin_idx <- margin_idx[margin_idx > 0L]
+            
+            total_pen <-
+                if (length(margin_idx) == 0L) {
+                    per_vec_pen(drop(vals), years)
+                } else {
+                    sum(apply(vals, margin_idx, per_vec_pen, yrs = years), na.rm = TRUE)
+                }
+            
+            # Inverse-variance weighting (same as your other likelihoods)
+            ivar <- 1 / (sdlog^2)
+            w    <- weight * ivar
+            total.logp <- w * total_pen
+            if (log) total.logp else exp(total.logp)
+        },
+        
+        get.data.function = function(version, location) {
+            sim.meta   <- get.simulation.metadata(version = version, location = location)
+            
+            start_year <- 2020L     # pick your window; must allow t-1 within range
+            end_year   <- 2030L
+            window_len <- 5L
+            years      <- seq(start_year, end_year)
+            
+            get.instr <- sim.meta$prepare.optimized.get.instructions(
+                outcome                   = "diagnosis.ps",            # COUNTS
+                dimension.values          = list(year = years),
+                keep.dimensions           = c("year","sex","race"),    # stratified
+                drop.single.sim.dimension = TRUE
+            )
+            
+            list(
+                get.instr   = get.instr,
+                years       = years,
+                start_year  = start_year,
+                end_year    = end_year,
+                window_len  = window_len,
+                meanlog     =  0.522,   
+                sdlog       =  0.357,   
+                sd.width    =  2,
+                weight      = PENALTY.WEIGHT,
+                min_count   = 30L
+            )
+        }
+    )
 
 
 U.turn.likelihood.instructions =
@@ -428,7 +534,8 @@ U.turn.likelihood.instructions =
             h          <- data$window_len        # = 5
             meanlog    <- data$meanlog
             sdlog      <- data$sdlog
-            sd.width   <- data$sd.width          # ±k·sd band in ln-space
+            Q25        <- data$Q25 
+            Q75        <- data$Q75    
             weight     <- data$weight
             
             # pull yearly values (named by year)
@@ -453,8 +560,8 @@ U.turn.likelihood.instructions =
             dd5 <- dd5[use]
             
             # lognormal band edges on DD5 scale
-            lo <- exp(meanlog - sd.width * sdlog)
-            hi <- exp(meanlog + sd.width * sdlog)
+            lo <- Q25
+            hi <- Q75
             
             # make penalty 0 at the band edges
             lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
@@ -499,16 +606,17 @@ U.turn.likelihood.instructions =
                 end_year    = end_year,
                 window_len  = window_len,
                 meanlog     = 0.280,   
-                sdlog       = 0.630,   
-                sd.width    = 2,
+                sdlog       = 0.630,   # 2*SD [0.3753111-4.66459]
+                Q25         = 0.6590209,
+                Q75         = 1.879489,
                 weight      = PENALTY.WEIGHT
             )
         }
     )
 
 
-u.turn.strata.1y.likelihood.instructions = create.custom.likelihood.instructions(
-    name = "u.turn.strata.1y",
+U.turn.strata.likelihood.instructions = create.custom.likelihood.instructions(
+    name = "u.turn.strata.5y",
     
     compute.function = function(sim, data, log = TRUE) {
         get.instr  <- data$get.instr
@@ -518,7 +626,8 @@ u.turn.strata.1y.likelihood.instructions = create.custom.likelihood.instructions
         h          <- data$window_len        
         meanlog    <- data$meanlog           
         sdlog      <- data$sdlog             
-        sd.width   <- data$sd.width          
+        Q25        <- data$Q25 
+        Q75        <- data$Q75         
         weight     <- data$weight
         min_count  <- data$min_count         
         
@@ -545,8 +654,8 @@ u.turn.strata.1y.likelihood.instructions = create.custom.likelihood.instructions
             dd1 <- dd1[as.character(yrs)]
             
             # require both legs present and count guardrail on v, v_{t-1}, v_{t+1}
-            v_lag  <- dplyr::lag(v, 1)
-            v_lead <- dplyr::lead(v, 1)
+            v_lag  <- dplyr::lag(v, 5)
+            v_lead <- dplyr::lead(v, 5)
             use <- yrs >= (start_year + h) &
                 yrs <= (end_year   - h) &
                 is.finite(dd1) & (dd1 > 0) &
@@ -557,8 +666,8 @@ u.turn.strata.1y.likelihood.instructions = create.custom.likelihood.instructions
             dd1 <- dd1[use]
             
             # lognormal band edges on DD1 scale
-            lo <- exp(meanlog - sd.width * sdlog)
-            hi <- exp(meanlog + sd.width * sdlog)
+            lo <- Q25
+            hi <- Q75
             lp_lo <- dlnorm(lo, meanlog = meanlog, sdlog = sdlog, log = TRUE)
             lp_hi <- dlnorm(hi, meanlog = meanlog, sdlog = sdlog, log = TRUE)
             
@@ -591,9 +700,9 @@ u.turn.strata.1y.likelihood.instructions = create.custom.likelihood.instructions
     get.data.function = function(version, location) {
         sim.meta <- get.simulation.metadata(version = version, location = location)
         
-        start_year <- 2020     
-        end_year   <- 2030
-        window_len <- 1L        
+        start_year <- 2010L    
+        end_year   <- 2030L
+        window_len <- 5L        
         years <- seq(start_year, end_year)
         
         get.instr <- sim.meta$prepare.optimized.get.instructions(
@@ -609,9 +718,10 @@ u.turn.strata.1y.likelihood.instructions = create.custom.likelihood.instructions
             start_year  = start_year,
             end_year    = end_year,
             window_len  = window_len,
-            meanlog     = -0.0119,   
-            sdlog       = 0.375,     
-            sd.width    = 2,                 
+            meanlog     = 0.280,   
+            sdlog       = 0.630,  
+            Q25         = 0.6590209,
+            Q75         = 1.879489,               
             weight      = PENALTY.WEIGHT,       
             min_count   = 30L                   
         )
@@ -1177,7 +1287,9 @@ lik.inst.diag.strata.no.demog.w.future.totals=join.likelihood.instructions(
     ),
     historical.diagnosis.likelihood.instructions,
     future.change.likelihood.instructions,
-    U.turn.likelihood.instructions
+    future.change.strata.likelihood.instructions,
+    U.turn.likelihood.instructions,
+    U.turn.strata.likelihood.instructions
 )
 
 
