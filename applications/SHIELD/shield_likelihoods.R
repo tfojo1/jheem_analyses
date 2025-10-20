@@ -268,6 +268,23 @@ total.diagnosis.by.strata.likelihood.instructions =
     )
 
 
+
+total.diagnosis.by.strata.EoV.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
+                                         outcome.for.data = "total.syphilis.diagnoses",  
+                                         levels.of.stratification = c(0,1,2),
+                                         dimensions = c("sex","race"),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.62617012189868,
+                                         error.variance.type = 'exp.of.variance',
+                                         weights = DIAGNOSIS.WEIGHT ,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1 #
+    )
+
+
 total.diagnosis.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
                                          outcome.for.data = "total.syphilis.diagnoses",  
@@ -325,6 +342,23 @@ ps.diagnosis.by.strata.likelihood.instructions =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
+
+ps.diagnosis.by.strata.EoV.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                         outcome.for.data = "ps.syphilis.diagnoses",  
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.62617012189868,
+                                         error.variance.type = 'exp.of.variance',
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1  
+    )
+
 
 
 
@@ -728,85 +762,6 @@ U.turn.strata.likelihood.instructions = create.custom.likelihood.instructions(
     }
 )
 
-
-
-# Exponential run-length likelihood  
-RunLengthExpSDBand.likelihood.instructions =
-    create.custom.likelihood.instructions(
-        name = "RunLengthExpSDBand.likelihood",
-        compute.function = function(sim, data, log = TRUE) {
-            
-            # --- unpack ---
-            get.instr <- data$get.instr
-            years     <- as.integer(data$years)
-            
-            lambda   <- as.numeric(data$lambda)                  # exp rate from history
-            sd_width <- if (!is.null(data$sd.width)) as.numeric(data$sd.width) else 2.0
-            weight   <- as.numeric(data$weight)
-            
-            # --- simulated series → log levels → down-runs ---
-            vals <- sim$optimized.get(get.instr)
-            lv   <- log(pmax(as.numeric(vals[as.character(years)]), 1e-12))
-            d1   <- diff(lv)
-            down <- is.finite(d1) & (d1 < 0)
-            r    <- rle(down)
-            if (!any(r$values)) return(if (log) 0 else 1)
-            
-            Ls <- r$lengths[r$values]
-            
-            # --- exponential PMF (discrete, geometric equivalent) ---
-            log1m_exp_neg_lambda <- log1p(-exp(-lambda))
-            log_p <- function(L) {
-                L <- pmax(1L, as.integer(L))
-                log1m_exp_neg_lambda - lambda * (L - 1)
-            }
-            
-            # --- implied mean & SD of geometric (for cutoff band) ---
-            p_end <- 1 - exp(-lambda)
-            mu    <- 1 / p_end
-            sd    <- sqrt((1 - p_end)) / p_end
-            
-            # --- upper cutoff band only ---
-            L_hi <- max(1L, ceiling(mu + sd_width * sd))
-            log_p_L_hi <- log_p(L_hi)
-            
-            # --- penalties: only if run is longer than band ---
-            ll <- 0
-            for (L in Ls) {
-                if (L > L_hi) {
-                    ll <- ll + (log_p(L) - log_p_L_hi)
-                }
-            }
-            
-            total.logp <- weight * ll
-            if (log) total.logp else exp(total.logp)
-        },
-        
-        get.data.function = function(version, location) {
-            sim.meta <- get.simulation.metadata(version = version, location = location)
-            
-            start_year <- 2023L
-            end_year   <- 2030L
-            years <- seq(start_year, end_year)
-            
-            get.instr <- sim.meta$prepare.optimized.get.instructions(
-                outcome                   = "diagnosis.ps",
-                dimension.values          = list(year = years),
-                keep.dimensions           = "year",
-                drop.single.sim.dimension = TRUE
-            )
-            
-            list(
-                get.instr     = get.instr,
-                years         = years,
-                lambda        = 0.601,
-                sd.width      = 2,
-                weight        = PENALTY.WEIGHT
-            )
-        }
-    )
-
-
 ##---- EARLY ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
 # data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
@@ -850,6 +805,24 @@ early.diagnosis.by.strata.likelihood.instructions =
     )
 
 
+early.diagnosis.by.strata.EoV.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
+                                         outcome.for.data = "early.syphilis.diagnoses", 
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.62617012189868,
+                                         error.variance.type = 'exp.of.variance',
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
+
+
+
 
 ##---- Late/Unknown ---- 
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
@@ -884,6 +857,24 @@ late.diagnosis.by.strata.likelihood.instructions =
                                          observation.correlation.form = 'compound.symmetry',
                                          error.variance.term = list(0.0764791209420945, 10),  
                                          error.variance.type = c('cv', 'sd'),
+                                         weights = DIAGNOSIS.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1
+    )
+
+
+
+late.diagnosis.by.strata.EoV.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
+                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
+                                         #dimensions = c("age","race","sex"),
+                                         dimensions = c("sex","race"),
+                                         levels.of.stratification = c(0,1,2),
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         observation.correlation.form = 'autoregressive.1',
+                                         error.variance.term = 0.62617012189868,
+                                         error.variance.type = 'exp.of.variance',
                                          weights = DIAGNOSIS.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
@@ -1258,11 +1249,10 @@ lik.inst.diag.strata.no.demog.w.historical=join.likelihood.instructions(
 )
 
 lik.inst.diag.strata.no.demog.w.future=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    ps.diagnosis.by.strata.likelihood.instructions,
-    #ps.diagnosis.by.strata.late.era.likelihood.instructions,
-    early.diagnosis.by.strata.likelihood.instructions,
-    late.diagnosis.by.strata.likelihood.instructions,
+    total.diagnosis.by.strata.EoV.likelihood.instructions,
+    ps.diagnosis.by.strata.EoV.likelihood.instructions,
+    early.diagnosis.by.strata.EoV.likelihood.instructions,
+    late.diagnosis.by.strata.EoV.likelihood.instructions,
     create.ifelse.likelihood.instructions(
         hiv.testing.total.likelihood.instructions,
         proportion.tested.by.strata.nested.likelihood.instructions
