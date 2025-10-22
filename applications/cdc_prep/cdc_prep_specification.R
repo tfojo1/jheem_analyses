@@ -1,4 +1,4 @@
-source('../jheem_analyses/applications/ehe/ehe_specification.R')
+source('../jheem_analyses/applications/ehe/ehe_specification.R') 
 # source('../jheem_analyses/applications/cdc_testing/cdc_testing_specification.R')
 source('../jheem_analyses/applications/cdc_prep/cdc_prep_parameters.R') 
 source('../jheem_analyses/applications/cdc_prep/odds_ratio_model.R') 
@@ -290,12 +290,18 @@ track.integrated.outcome(CDCP.SPECIFICATION,
 
 track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cumulative.cdc.prep.eligible',
-                         outcome.metadata = NULL,
+                         outcome.metadata = create.outcome.metadata(display.name = 'Number of Individuals Eligible for PrEP',
+                                                                    description = "Number of Individuals Eligible for PrEP",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'People',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
                          scale = 'non.negative.number',
                          value.to.integrate = 'uninfected',
                          multiply.by = 'cdc.prep.eligible.rate', 
                          keep.dimensions = c('location'),
-                         save = F)
+                         corresponding.data.outcome = "number.eligible"
+                         )
 
 track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cdc.prep.uptake',
@@ -322,6 +328,7 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
                          value.is.numerator = T,
                          denominator.outcome = 'cumulative.cdc.prep.eligible',
                          keep.dimensions = c('location'),
+                         corresponding.data.outcome = "proportion.referred",
                          save = T)
 
 track.cumulative.outcome(CDCP.SPECIFICATION,
@@ -336,6 +343,19 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
                          value.is.numerator = T,
                          denominator.outcome = 'cdc.prep.uptake',
                          keep.dimensions = c('location'),
+                         save = T)
+
+
+
+track.cumulative.outcome(CDCP.SPECIFICATION,
+                         name = 'log.ratio.cdc.funded.hiv.tests.2028.2023',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Log ratio CDC Funded HIV tests',
+                                                                    description = "Log ratio of the number of CDC Funded HIV tests from 2028 to 2023",
+                                                                    scale = 'ratio',
+                                                                    axis.name = 'Log ratio'),
+                         value = expression(cdc.funded.tests["2028", , ]/cdc.funded.tests["2023", , ]), #model sim value
+                         keep.dimensions = c('location'),
+                         corresponding.data.outcome = "5.year.ratio",
                          save = T)
 
 

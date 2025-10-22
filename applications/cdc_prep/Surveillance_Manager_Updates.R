@@ -1,5 +1,5 @@
-source('../jheem2/R/tests/source_jheem2_package.R')
-SURVEILLANCE.MANAGER = load.data.manager("../../cached/surveillance.manager.rdata")
+#source('../jheem2/R/tests/source_jheem2_package.R')
+#SURVEILLANCE.MANAGER = load.data.manager("../../cached/surveillance.manager.rdata")
 
 SURVEILLANCE.MANAGER$register.outcome("number.eligible",
                                       metadata = create.outcome.metadata(display.name = "Number of Eligible PrEP Users", description = "Number of people eligible for PrEP",scale = "non.negative.number", axis.name = "PrEP Referrals", units = "People", singular.unit = "Person"))
@@ -10,7 +10,20 @@ SURVEILLANCE.MANAGER$register.outcome("non.healthcare.hiv.tests",
 
 
 SURVEILLANCE.MANAGER$register.outcome("proportion.referred",
-                                      metadata = create.outcome.metadata(display.name = "Proportion Referred to PrEP", description = "Proportion of individuals referred to PrEP",scale = "proportion", denominator.outcome = cumulative.cdc.prep.eligible, axis.name = "Proportion", units = "Proportion", singular.unit = "Proportion"))
+                                      metadata = create.outcome.metadata(display.name = "Proportion Referred to PrEP", description = "Proportion of individuals referred to PrEP", scale = "proportion", axis.name = "Proportion", units = "Proportion", singular.unit = "Proportion"), denominator.outcome = "adult.population")
+
+
+
+
+SURVEILLANCE.MANAGER$register.outcome("5.year.ratio",
+                                      metadata = create.outcome.metadata(display.name = "Log 5-year ratio of CDC HIV tests", description = "The five year ratio of the number on the log-scale", scale = "ratio", axis.name = "Log Ratio", units = "Ratio", singular.unit = "Ratio"))
+
+
+
+#Log ratio of cdc HIV testing over five years
+
+SURVEILLANCE.MANAGER$put(data = 0.77, outcome = "5.year.ratio", source = "cdc.hiv", ontology.name = "cdc",dimension.values = list(year = "2020", location = "AL"), url = "https://www.cdc.gov/hivpartners/php/state-hiv-profiles/index.html", details = "CDC State Prevention Reports") #to update
+SURVEILLANCE.MANAGER$put(data = 0.979, outcome = "5.year.ratio", source = "cdc.hiv", ontology.name = "cdc",dimension.values = list(year = "2020", location = "LA"), url = "https://www.cdc.gov/hivpartners/php/state-hiv-profiles/index.html", details = "CDC State Prevention Reports") #to update
 
 
 #Number Eligible 
@@ -58,4 +71,4 @@ SURVEILLANCE.MANAGER$put(data = 17882, outcome = "non.healthcare.hiv.tests", sou
 SURVEILLANCE.MANAGER$put(data = 0.54, outcome = "proportion.referred", source = "cdc.hiv", ontology.name = "cdc",dimension.values = list(year = "2022", location = "AL"), url = "www.cdc.gov", details = "Integrated HIV Surveillance and Prevention Programs for Health Departments") 
 SURVEILLANCE.MANAGER$put(data = 0.54, outcome = "proportion.referred", source = "cdc.hiv", ontology.name = "cdc",dimension.values = list(year = "2022", location = "LA"), url = "www.cdc.gov", details = "Integrated HIV Surveillance and Prevention Programs for Health Departments") 
 
-
+set.default.data.manager(SURVEILLANCE.MANAGER)
