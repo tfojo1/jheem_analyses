@@ -16,6 +16,7 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_interventions.R')
 source('../jheem_analyses/applications/ryan_white/read_rw_costs.R')
 source('../jheem_analyses/applications/ryan_white/ryan_white_nanb_interventions.R')
+source('../jheem_analyses/applications/ryan_white/ryan_white_partb_interventions.R')
 
 
 # To pull what we have calibrated

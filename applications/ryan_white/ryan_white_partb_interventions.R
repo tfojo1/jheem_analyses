@@ -1,5 +1,5 @@
 
-source('applications/ryan_white/ryan_white_main.R')
+#source('applications/ryan_white/ryan_white_main.R')
 #source('applications/ryan_white/ryan_white_interventions.R')
 #source('applications/ryan_white/read_rw_costs.R')
 
