@@ -347,18 +347,6 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
 
 
 
-track.cumulative.outcome(CDCP.SPECIFICATION,
-                         name = 'log.ratio.cdc.funded.hiv.tests.2028.2023',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Log ratio CDC Funded HIV tests',
-                                                                    description = "Log ratio of the number of CDC Funded HIV tests from 2028 to 2023",
-                                                                    scale = 'ratio',
-                                                                    axis.name = 'Log ratio'),
-                         value = expression(cdc.funded.tests["2028", , ]/cdc.funded.tests["2023", , ]), #model sim value
-                         keep.dimensions = c('location'),
-                         corresponding.data.outcome = "5.year.ratio",
-                         save = T)
-
-
 ##-- ADD THE WEB SUB-VERSION --##
 
 # 

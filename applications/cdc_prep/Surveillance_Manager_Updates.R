@@ -15,17 +15,6 @@ SURVEILLANCE.MANAGER$register.outcome("proportion.referred",
 
 
 
-SURVEILLANCE.MANAGER$register.outcome("5.year.ratio",
-                                      metadata = create.outcome.metadata(display.name = "Log 5-year ratio of CDC HIV tests", description = "The five year ratio of the number on the log-scale", scale = "ratio", axis.name = "Log Ratio", units = "Ratio", singular.unit = "Ratio"))
-
-
-
-#Log ratio of cdc HIV testing over five years
-
-SURVEILLANCE.MANAGER$put(data = 0.77, outcome = "5.year.ratio", source = "cdc.hiv", ontology.name = "cdc",dimension.values = list(year = "2020", location = "AL"), url = "https://www.cdc.gov/hivpartners/php/state-hiv-profiles/index.html", details = "CDC State Prevention Reports") #to update
-SURVEILLANCE.MANAGER$put(data = 0.979, outcome = "5.year.ratio", source = "cdc.hiv", ontology.name = "cdc",dimension.values = list(year = "2020", location = "LA"), url = "https://www.cdc.gov/hivpartners/php/state-hiv-profiles/index.html", details = "CDC State Prevention Reports") #to update
-
-
 #Number Eligible 
 SURVEILLANCE.MANAGER$put(data = 17146, outcome = "number.eligible", source = "cdc.hiv", ontology.name = "cdc",dimension.values = list(year = "2025", location = "LA"), url = "https://www.cdc.gov/hivpartners/php/state-hiv-profiles/index.html", details = "CDC State Prevention Reports") #to update
 SURVEILLANCE.MANAGER$put(data = 3327, outcome = "number.eligible", source = "cdc.hiv", ontology.name = "cdc",dimension.values = list(year = "2025", location = "AL"), url = "https://www.cdc.gov/hivpartners/php/state-hiv-profiles/index.html", details = "CDC State Prevention Reports") #to update
