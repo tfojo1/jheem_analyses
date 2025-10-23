@@ -403,7 +403,9 @@ mean.ci.rel.delta.cessation.risk.inf.noint1 = cbind(
 )
 
 #incidence.msm = apply(full.results[YEARS.TO.CONSIDER,,,'msm','never_IDU',,'incidence',,], c('sim','location','intervention'), sum)
-incidence.msm = apply(incidence.by.sex.risk[YEARS.TO.CONSIDER,'msm','never_IDU',,,], c('sim','location','intervention'), sum)
+#incidence.msm = apply(incidence.by.sex.risk[YEARS.TO.CONSIDER,'msm','never_IDU',,,], c('sim','location','intervention'), sum)
+incidence.msm = apply(incidence.by.sex.risk[YEARS.TO.CONSIDER,'msm',,,,], c('sim','location','intervention'), sum)
+print("Keeping MSM-IDU with MSM")
 
 inf.msm.noint1 = apply(incidence.msm[,,'noint',drop=F], c('sim'), sum, na.rm=T)
 abs.delta.cessation.msm.inf.noint1 = apply(incidence.msm[,,END.NAME,drop=F], c('sim'), sum, na.rm=T) - inf.msm.noint1

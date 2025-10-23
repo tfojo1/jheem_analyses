@@ -6,7 +6,7 @@ print(paste0("RW.IS.STATE.LEVEL is set to ",RW.IS.STATE.LEVEL))
 
 # check and load the right file 
 files
-file = files[4] # this was the last one before we revised the timeframe - I think
+file = files[4] # this was the last one before we revised the timeframe - I think (9/9 version)
 load(file)
 
 RW.STATES = c("AL","CA","FL","GA","IL","LA","MS",
@@ -15,8 +15,11 @@ RW.STATES = c("AL","CA","FL","GA","IL","LA","MS",
 # select only the 11 states if those are the ones we're using
 total.results = total.results[,,,RW.STATES,]
 total.incidence = total.incidence[,,RW.STATES,]
+incidence.by.sex.risk = incidence.by.sex.risk[,,,,RW.STATES,]
+incidence.by.age = incidence.by.age[,,,RW.STATES,]
+incidence.by.race = incidence.by.race[,,,RW.STATES,]
 total.new = total.new[,,RW.STATES,]
-total.suppression = total.suppression[,,RW.STATES,]
+#total.suppression = total.suppression[,,RW.STATES,]
 total.sexual.transmission = total.sexual.transmission[,,RW.STATES,]
 RW.MEDICAID.EXPANSION.LOCATIONS = RW.STATES[RW.STATES %in% RW.MEDICAID.EXPANSION.LOCATIONS]
 RW.MEDICAID.NONEXPANSION.LOCATIONS = RW.STATES[!RW.STATES %in% RW.MEDICAID.EXPANSION.LOCATIONS]

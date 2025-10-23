@@ -3,7 +3,7 @@ source('commoncode/locations_of_interest.R')
 source('applications/ryan_white/ryan_white_main.R')
 library(ggplot2)
 
-loc = HOUSTON.MSA
+loc = 'CA'#HOUSTON.MSA
 simset.baseline = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM)
 simset.noint = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM, 'noint')
 simset.end = retrieve.simulation.set('rw', loc, CALIBRATION.CODE, N.SIM, 'rw.end')
@@ -72,6 +72,24 @@ plot = simplot(simset.baseline, c('adap.suppression'), data.manager=RW.DATA.MANA
 ggsave(plot = plot, 
        filename=file.path(PLOT.DIR, paste0(loc, "_adap.suppression.png")),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+
+plot = simplot(simset.baseline,c('diagnosed.prevalence'), data.manager=RW.DATA.MANAGER, dimension.values = list(year=PLOT.YEARS)) +
+    PLOT.THEME + PLOT.GUIDES + REMOVE.FACET.STRIP + SCALE.SIZE + 
+    ylab("Diagnosed Prevalence (n)") + xlab("Year") +
+    ggtitle(NULL); plot
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, paste0(loc, "_prevalence.png")),
+       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+plot = simplot(simset.baseline,c('new'), data.manager=PLOT.DATA.MANAGER, dimension.values = list(year=PLOT.YEARS)) +
+    PLOT.THEME + PLOT.GUIDES + REMOVE.FACET.STRIP + SCALE.SIZE + 
+    ylab("New Diagnoses (n)") + xlab("Year") +
+    ggtitle(NULL); plot
+ggsave(plot = plot, 
+       filename=file.path(PLOT.DIR, paste0(loc, "_new.png")),
+       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
 
 
 plot = simplot(simset.baseline, c('non.adap.clients'), split.by='race', data.manager=RW.DATA.MANAGER, dimension.values = list(year=PLOT.YEARS)) +
