@@ -1,15 +1,16 @@
 
 #LOCATION.INDICES = (8-1) * 4 + 1:4
-print(paste0("Doing location indices: ",
-             paste0(LOCATION.INDICES, collapse=', ')))
+# print(paste0("Doing location indices: ",
+#              paste0(LOCATION.INDICES, collapse=', ')))
 
 print("Sourcing code prior to running interventions")
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-LOCATIONS = RW.LOCATIONS[LOCATION.INDICES[LOCATION.INDICES<length(RW.LOCATIONS)]]
+LOCATIONS = 'MS'
+#LOCATIONS = RW.LOCATIONS[LOCATION.INDICES[LOCATION.INDICES<length(RW.LOCATIONS)]]
 FORCE.OVERWRITE = T #FORCE.REDO
-INTERVENTION.CODES = c('nanb.rw.end.26')
+INTERVENTION.CODES = c('part.b.rw.end.26') # nanb.rw.end.26
 
 print(paste0("Doing locations: ",
              paste0(LOCATIONS, collapse=', ')))

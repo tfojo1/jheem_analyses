@@ -9,14 +9,14 @@ FORCE.OVERWRITE = FORCE.REDO
 sim.collection=create.simset.collection(version="rw", calibration.code = CALIBRATION.CODE,
                                         locations = LOCATIONS, interventions = c('noint','part.b.rw.end.26'), n.sim=N.SIM)
 
-# full.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalence', 'new',
-#                                                'rw.clients', 'non.adap.clients','oahs.clients','adap.clients',
-#                                                'oahs.suppression', 'adap.suppression',
-#                                                'suppression', 'population'), 
-#                                   output = 'numerator',
-#                                   dimension.values=list(year=2010:2035), 
-#                                   keep.dimensions=c('year','age','race','sex','risk'), 
-#                                   verbose = VERBOSE)
+full.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalence', 'new',
+                                               'rw.clients', 'non.adap.clients','oahs.clients','adap.clients',
+                                               'oahs.suppression', 'adap.suppression',
+                                               'suppression', 'population'),
+                                  output = 'numerator',
+                                  dimension.values=list(year=2010:2035),
+                                  keep.dimensions=c('year','age','race','sex','risk'),
+                                  verbose = VERBOSE)
 
 print("PULLING TOTALS...")
 total.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalence', 'new',
@@ -39,40 +39,40 @@ total.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalen
 # 
 # total.sexual.transmission = other.totals[,,'sexual.transmission.rates',,]
 
-#print("PULLING PARAMETERS...")
-#all.parameters = sim.collection$get.parameters(verbose = VERBOSE)
+print("PULLING PARAMETERS...")
+all.parameters = sim.collection$get.parameters(verbose = VERBOSE)
 
-# full.incidence = full.results[,,,,,,'incidence',,]
+# full.incidence = full.results[,,,,,,'incidence',,,drop = FALSE]
 # total.incidence = apply(full.incidence, c('year','sim','location','intervention'), sum)
 # incidence.by.race = apply(full.incidence, c('year','race','sim','location','intervention'), sum)
 # incidence.by.age = apply(full.incidence, c('year','age','sim','location','intervention'), sum)
 # incidence.by.sex = apply(full.incidence, c('year','sex','sim','location','intervention'), sum)
 
-# print("PULLING INCIDENCE BY AGE...")
-# incidence.by.age = sim.collection$get(outcomes = 'incidence',
-#                                       output = 'numerator',
-#                                       dimension.values=list(year=2020:2035),
-#                                       keep.dimensions=c('year','age'),
-#                                       verbose = VERBOSE)
+print("PULLING INCIDENCE BY AGE...")
+incidence.by.age = sim.collection$get(outcomes = 'incidence',
+                                      output = 'numerator',
+                                      dimension.values=list(year=2020:2035),
+                                      keep.dimensions=c('year','age'),
+                                      verbose = VERBOSE)
 
 
-# print("PULLING INCIDENCE BY RACE")
-# incidence.by.race = sim.collection$get(outcomes = 'incidence',
-#                                        output = 'numerator',
-#                                        dimension.values=list(year=2020:2035),
-#                                        keep.dimensions=c('year','race'),
-#                                        verbose = VERBOSE)
-# 
-# print("PULLING INCIDENCE BY SEX/RISK...")
-# incidence.by.sex.risk = sim.collection$get(outcomes = 'incidence',
-#                                            output = 'numerator',
-#                                            dimension.values=list(year=2020:2035),
-#                                            keep.dimensions=c('year','sex','risk'),
-#                                            verbose = VERBOSE)
-# 
-# #total.new = apply(full.results[,,,,,,'new',,], c('year','sim','location','intervention'), sum)
-# #total.pop = apply(full.results[,,,,,,'population',,], c('year','sim','location','intervention'), sum)
-# 
+print("PULLING INCIDENCE BY RACE")
+incidence.by.race = sim.collection$get(outcomes = 'incidence',
+                                       output = 'numerator',
+                                       dimension.values=list(year=2020:2035),
+                                       keep.dimensions=c('year','race'),
+                                       verbose = VERBOSE)
+
+print("PULLING INCIDENCE BY SEX/RISK...")
+incidence.by.sex.risk = sim.collection$get(outcomes = 'incidence',
+                                           output = 'numerator',
+                                           dimension.values=list(year=2020:2035),
+                                           keep.dimensions=c('year','sex','risk'),
+                                           verbose = VERBOSE)
+
+# total.new = apply(full.results[,,,,,,'new',,], c('year','sim','location','intervention'), sum)
+# total.pop = apply(full.results[,,,,,,'population',,], c('year','sim','location','intervention'), sum)
+
 total.incidence = array.access(total.results, outcome='incidence', drop = T)
 total.new = array.access(total.results, outcome='new', drop = T)
 total.pop = array.access(total.results, outcome='population', drop = T)
@@ -86,10 +86,16 @@ if (!RW.IS.STATE.LEVEL)
 save(total.results,
      
      total.incidence,
+     incidence.by.race,
+     incidence.by.age,
+     incidence.by.sex.risk,
      
      total.new,
      total.pop,
      total.sexual.transmission,
+
+     all.parameters,
+     
      
      file=filename
 )

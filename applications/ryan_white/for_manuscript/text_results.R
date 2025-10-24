@@ -1,8 +1,8 @@
 
 #total.dx = apply(full.results[,,,,,,'new',,], c('year','sim','location','intervention'), sum, na.rm=T)
 
-#YEARS.TO.CONSIDER = as.character(2026:2031)
-YEARS.TO.CONSIDER = as.character(2025:2030) # OLD VERSION - FOR AJPH (text labels will be wrong)
+YEARS.TO.CONSIDER = as.character(2026:2031)
+#YEARS.TO.CONSIDER = as.character(2025:2030) # OLD VERSION - FOR AJPH (text labels will be wrong)
 YEARS.TO.CONSIDER2 = as.character(2025:2035)
 
 END.NAME = 'rw.end' # rw.end.26
