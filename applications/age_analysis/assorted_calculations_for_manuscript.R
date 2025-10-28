@@ -46,3 +46,7 @@ region_total_prevalence = sum(SURVEILLANCE.MANAGER$data$diagnosed.prevalence$est
 national_prevalence = sum(SURVEILLANCE.MANAGER$data$diagnosed.prevalence$estimate$cdc.hiv$cdc.national$year__location__age__race__sex__risk["2021",,,,,],na.rm = T)
 
 region_total_prevalence / national_prevalence # 86%
+
+# Median age by sex (meaning heterosexual vs. MSM)?
+
+# Median age by race?

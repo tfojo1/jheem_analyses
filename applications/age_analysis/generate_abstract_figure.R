@@ -22,15 +22,16 @@ med_age_delta_data <- reshape2::melt(get_stats(med_age_timeline_arr["2040",,,dro
                                                include.quartiles = T)) %>%
     pivot_wider(names_from = metric, values_from = value) %>%
     mutate(year = factor(year)) %>%
-    select(-year)
+    select(-year) %>%
+    mutate(isTotal = location=="total")
 
-# Order by delta median age
-location_ordering <- (med_age_delta_data %>%
+# # Order by delta median age
+# location_ordering <- (med_age_delta_data %>%
+#                           arrange(mean))$location
+# Order by median age in 2025
+location_ordering <- (med_age_data %>%
+                          filter(year=="2025") %>%
                           arrange(mean))$location
-# # Order by median age in 2040
-# location_ordering <- (med_age_data %>%
-#                           filter(year=="2040") %>%
-#                           arrange(`50%`))$location
 # location_ordering <- (med_age_data %>%
 #                           select(year, location, mean) %>%
 #                           pivot_wider(names_from = year, values_from = mean) %>%
@@ -53,7 +54,8 @@ formatted_labels <- med_age_data %>%
     mutate(formatted = paste0(fullname, " (", mean, ")"))
 formatted_labels <- setNames(formatted_labels$formatted,
                              formatted_labels$location)
-formatted_labels["total"] <- "Total (Median Age in 2025: 51)"
+# formatted_labels["total"] <- "Total (Median Age, 2025: 51)"
+formatted_labels["total"] <- "Total (51)"
 
 # Plot 
 plot <- ggplot(med_age_delta_data, mapping=aes(y = location)) +
@@ -61,17 +63,23 @@ plot <- ggplot(med_age_delta_data, mapping=aes(y = location)) +
                      xlower = lowermid,
                      xmiddle = median, # actually got some deltaMedAge means outside the box!
                      xupper = uppermid,
-                     xmax = upper),
+                     xmax = upper,
+                     fill = isTotal),
+                 width = 0.5,
+                 linewidth = 0.2,
                  stat="identity",
-                 position="dodge",
-                 fill = "#2171b5") +
+                 position="dodge") +
+                 # fill = "#2171b5") +
     # geom_point(aes(x = mean),
     #            color = "#fd8d3c",
     #            size = 2) +
+    scale_fill_manual(values=c("#2171b5","#DF8F44FF"), guide="none") +
     scale_y_discrete(labels = formatted_labels) +
     labs(x = "Change in Median Age Between 2025 and 2040 (years)", y  = element_blank()) +
     theme_bw() + 
-    theme(legend.position = "bottom") +
+    theme(legend.position = "bottom",
+          axis.text=element_text(size=7),
+          axis.title.x = element_text(size=7, hjust = - 0.1)) +
     geom_vline(xintercept = 0, linetype="dashed")
 
 # Plot 
@@ -93,6 +101,6 @@ plot <- ggplot(med_age_delta_data, mapping=aes(y = location)) +
 #     theme(legend.position = "bottom") +
 #     geom_vline(xintercept = 0, linetype="dashed")
 
-ggsave(paste0("../jheem_analyses/applications/age_analysis/abstract_figure_option1.png"),
-       plot = plot, width = 10, height = 7, dpi=300)
+ggsave(paste0("../jheem_analyses/applications/age_analysis/abstract_figure.png"),
+       plot = plot, width = 4, height = 3, dpi=600)
 

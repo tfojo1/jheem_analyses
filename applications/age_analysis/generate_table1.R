@@ -24,23 +24,26 @@ sixty_five_plus_estimates <- sixty_five_plus_estimates[,c("2025", "2040"),,
                                                        setdiff(dimnames(sixty_five_plus_estimates)$location,
                                                                "total")]
 
-# # For HIV & Aging Conference, which uses only 11
-# original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
-# 
-# total_results_og <- total_results
-# total_results <- total_results[,,,original_eleven,,drop=F]
-# age_results_og <- age_results
-# age_results <- age_results[,,,,original_eleven,,drop=F]
-# 
-# state_order_og <- state_order
-# state_order <- c(intersect(state_order_og, original_eleven), "total")
-# state_order_names_og <- state_order_names
-# state_order_names <- state_order_names_og[state_order]
-# 
-# # Do NOT use the total from this set, because it's made with 24!
-# sixty_five_plus_estimates_og <- sixty_five_plus_estimates
-# sixty_five_plus_estimates <- sixty_five_plus_estimates_og[,,,c(original_eleven)]
+# For HIV & Aging Conference, which uses only 11
+original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
+# ONLY_ELEVEN <- F
+ONLY_ELEVEN <- T
 
+if (ONLY_ELEVEN) {
+    total_results_og <- total_results
+    total_results <- total_results[,,,original_eleven,,drop=F]
+    age_results_og <- age_results
+    age_results <- age_results[,,,,original_eleven,,drop=F]
+
+    state_order_og <- state_order
+    state_order <- c(intersect(state_order_og, original_eleven), "total")
+    state_order_names_og <- state_order_names
+    state_order_names <- state_order_names_og[state_order]
+
+    # Do NOT use the total from this set, because it's made with 24!
+    sixty_five_plus_estimates_og <- sixty_five_plus_estimates
+    sixty_five_plus_estimates <- sixty_five_plus_estimates_og[,,,c(original_eleven)]
+}
 
 do_conversion_operations <- function(df, is.percentage=F) {
     rv <-  df %>%
@@ -151,13 +154,17 @@ table_med_age <- cbind(do_conversion_operations(filter(med_age_timeline_data, ye
                        do_delta_conversion_operations(med_age_delta_replaced))
 
 # Combine to make full table ----
-csv_double_rows <- convert_to_double_rows(as.matrix(cbind(total_prev_column, table_prop_over_55, table_prop_over_65, table_med_age)))
+if (ONLY_ELEVEN) {
+    csv_double_rows <- convert_to_double_rows(as.matrix(cbind(table_prop_over_65, table_med_age)))
+} else {
+    csv_double_rows <- convert_to_double_rows(as.matrix(cbind(total_prev_column, table_prop_over_55, table_prop_over_65, table_med_age)))
+}
 
 # write.table(csv_double_rows, file="../jheem_analyses/applications/age_analysis/table1.csv", sep=",", row.names=F, col.names=F)
 # save(csv_double_rows, file="../jheem_analyses/applications/age_analysis/table1.Rdata")
 
-do_create_table_colors <- function(df, num.groups=3, groups.with.percent=1:2, groups.with.comma=numeric(0)) {
-    my_cols <- df[2 * seq_along(state_order) - 1 , c(1 + 3 * (1:num.groups))]
+do_create_table_colors <- function(df, num.groups=3, groups.with.percent=1:2, groups.with.comma=numeric(0), with.total.prev=T) {
+    my_cols <- df[2 * seq_along(state_order) - 1 , c(with.total.prev + 3 * (1:num.groups))]
     my_cols[,groups.with.comma] <- gsub(",", "", my_cols[,groups.with.comma])
     my_cols[,groups.with.percent] <- gsub("%", "", my_cols[,groups.with.percent])
     my_cols <- matrix(as.numeric(my_cols), ncol=ncol(my_cols))
@@ -173,15 +180,22 @@ do_create_table_colors <- function(df, num.groups=3, groups.with.percent=1:2, gr
     })
     normalized <- t(apply(apply(normalized, 2, function(col) {rep(col, each=2)}),
                           1, function(row) {rep(row, each=3)}))
-    cbind(rep(0, nrow(df)), normalized)
+    if (with.total.prev)
+        cbind(rep(0, nrow(df)), normalized)
+    else
+        normalized
 }
 
-table_colors <- do_create_table_colors(csv_double_rows)
+if (ONLY_ELEVEN) {
+    table_colors <- do_create_table_colors(csv_double_rows, num.groups=2, groups.with.percent = 1, with.total.prev = F)
+} else {
+    table_colors <- do_create_table_colors(csv_double_rows)
+}
 # write.table(table_colors, file="../jheem_analyses/applications/age_analysis/table1_colors.csv", sep=",", row.names=F, col.names=F)
 # save(table_colors, file="../jheem_analyses/applications/age_analysis/table1_colors.Rdata")
 write.shaded.table(csv_double_rows,
-                   file = "../jheem_analyses/applications/age_analysis/shaded_table.xlsx",
-                   # file = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/shaded_table.xlsx",
+                   # file = "../jheem_analyses/applications/age_analysis/shaded_table.xlsx",
+                   file = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/shaded_table.xlsx",
                    color.by = table_colors,
                    thresholds = c(-1, 0, 1),
                    colors = c("#2171b5", "white", "#fd8d3c"),
