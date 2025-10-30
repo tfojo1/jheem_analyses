@@ -43,10 +43,49 @@ data.manager$register.outcome(
         units = '%',
         description = "Proportion of ADAP Ryan White Clients on Medicaid"), denominator.outcome = 'adap.clients') 
 
+data.manager$register.outcome(
+    'medicaid.total',
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Medicaid Total',
+        axis.name = 'Medicaid Total',
+        units = 'population',
+        description = "Total Count of Individuals with Medicaid"))
+
+data.manager$register.outcome(
+    'uninsured.total',
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Uninsured Total',
+        axis.name = 'Uninsured Total',
+        units = 'population',
+        description = "Total Count of Individuals who are Uninsured"))
+
+data.manager$register.outcome(
+    'proportion.tested.for.hiv.past.year.medicaid',
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion on Medicaid Tested for HIV Past Year',
+        axis.name = 'Proportion on Medicaid Tested for HIV Past Year',
+        units = '%',
+        description = "Proportion of Individuals on Medicaid who were Tested for HIV in the Past Year"), denominator.outcome = 'medicaid.total') 
+
+data.manager$register.outcome(
+    'proportion.tested.for.hiv.past.year.uninsured',
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'Proportion Uninsured Tested for HIV Past Year',
+        axis.name = 'Proportion Uninsured Tested for HIV Past Year',
+        units = '%',
+        description = "Proportion of Uninsured Individuals who were Tested for HIV in the Past Year"), denominator.outcome = 'uninsured.total')
+
+
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
+data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") 
 
 data.manager$register.source('ryan.white.program', parent.source= "HRSA", full.name = "Ryan White HIV/AIDS Program Annual Data Report", short.name='ryan.white.program') #child
+data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss') 
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -60,6 +99,17 @@ data.manager$register.ontology(
         risk = c('msm', "msm_idu", 'heterosexual', 'other', 'idu'),
         fpl = c('0-100', '101-138', '139-250', '251-400', '>400'),
         service.received = c('full pay medication support', 'insurance premium assistance', 'medication co pay/deductible', 'multiple services')
+    ))
+
+data.manager$register.ontology(
+    'brfss',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('18-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-49 years', '50-54 years', '55-59 years', '60-64 years', '65-69 years', '70-74 years', '75-79 years', '80+ years'),
+        race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'hispanic', 'other race'),
+        sex=c('male','female'),
+        risk=c('msm', 'not_msm')
     ))
 
 #Register locations (because these reports use Regions [groups of states])
@@ -76,7 +126,7 @@ data.manager$register.ontology(
 # Source ------------------------------------------------------------------
 source('data_processing/medicaid.data.manager/adap.and.non.adap.totals.by.region.R') #outcome = adap.clients; non.adap.clients
 source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
-source('data_processing/medicaid.data.manager/brfss.proportion.tested.medicaid.R')
+source('data_processing/medicaid.data.manager/brfss.proportion.tested.medicaid.R') #outcomes = medicaid.total; uninsured.total; proportion.tested.for.hiv.past.year.medicaid; proportion.tested.for.hiv.past.year.uninsured
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/medicaid.data.manager.rdata")
