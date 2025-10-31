@@ -23,17 +23,17 @@ medicaid.total.clean = lapply(medicaid.total, function(file){
 })
 
 # Put ---------------------------------------------------------------------
-
-medicaid.total.put = lapply(medicaid.total.clean, `[[`, 2)
-
-for (data in medicaid.total.put) {
-    data.manager$put.long.form(
-        data = data,
-        ontology.name = 'ryan.white.pdfs',
-        source = 'ryan.white.program',
-        url = 'https://ryanwhite.hrsa.gov/data/reports',
-        details = 'Ryan White Downloaded PDF Reports')
-}
+# 
+# medicaid.total.put = lapply(medicaid.total.clean, `[[`, 2)
+# 
+# for (data in medicaid.total.put) {
+#     data.manager$put.long.form(
+#         data = data,
+#         ontology.name = 'ryan.white.pdfs',
+#         source = 'ryan.white.program',
+#         url = 'https://ryanwhite.hrsa.gov/data/reports',
+#         details = 'Ryan White Downloaded PDF Reports')
+# }
 
 
 

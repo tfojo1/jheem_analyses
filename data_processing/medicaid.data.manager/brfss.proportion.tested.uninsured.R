@@ -100,12 +100,16 @@ brfss.age.mappings= c('1'= '18-24 years',
 
 ################################################################################
 ##Creating clean template of BRFSS state data##
-##Outcome = proportion.tested.for.hiv.past.year.medicaid
+##Outcome = proportion.tested.for.hiv.past.year.uninsured
 ################################################################################
 data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
     
     data=file[["data"]] 
     filename = file[["filename"]] 
+    
+    #Select uninsured only:
+    data$uninsured = data$HLTHPLN1
+    data = subset(data, data$uninsured == "2")
     
     #Change _state to character#
     data$state_fips = as.character(data$`_STATE`)
@@ -120,8 +124,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
         data$age = data$`_AGEG5YR`  
         data$risk = NA #No sexual orientation data for 2013#
         data$ever.tested = data$HIVTST6
-        data$medicaid = "0"
-
     }
     if(grepl("2014", filename)) {
         data$year = as.numeric("2014")
@@ -133,7 +135,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
                                     SEX== "1" & SXORIENT == "3" ~ "msm",
                                     TRUE ~ NA ))
         data$ever.tested = data$HIVTST6
-        data$medicaid = data$HLTHCVR1
     }
     if(grepl("2015", filename)) {
         data$year = as.numeric("2015")
@@ -145,7 +146,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
                                     SEX== "1" & SXORIENT == "3" ~ "msm",
                                     TRUE ~ NA ))
         data$ever.tested = data$HIVTST6
-        data$medicaid = "0"
     }
     if(grepl("2016", filename)) {
         data$year = as.numeric("2016")
@@ -158,7 +158,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
                                     TRUE ~ NA )) %>%
             mutate(at_risk = if_else(HIVRISK4 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
         data$ever.tested = data$HIVTST6
-        data$medicaid = ifelse(data$HLTHCVR1=="4", "1", "0")
     }
     if(grepl("2017", filename)) {
         data$year = as.numeric("2017")
@@ -171,7 +170,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
                                     TRUE ~ NA )) %>%
             mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
         data$ever.tested = data$HIVTST6
-        data$medicaid = ifelse(data$HLTHCVR1=="4", "1", "0")
     }
     if(grepl("2018", filename)) {
         data$year = as.numeric("2018")
@@ -182,7 +180,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
         data <- data %>%
             mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
         data$ever.tested = data$HIVTST6
-        data$medicaid = ifelse(data$HLTHCVR1=="4", "1", "0")
     }
     if(grepl("2019", filename)) {
         data$year = as.numeric("2019")
@@ -193,7 +190,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
         data <- data %>%
             mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
         data$ever.tested = data$HIVTST7
-        data$medicaid = ifelse(data$HLTHCVR1=="4", "1", "0")
     }
     if(grepl("2020", filename)) {
         data$year = as.numeric("2020")
@@ -204,7 +200,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
         data <- data %>%
             mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
         data$ever.tested = data$HIVTST7
-        data$medicaid = ifelse(data$HLTHCVR1=="4", "1", "0")
     }
     if(grepl("2021", filename)) {
         data$year = as.numeric("2021")
@@ -213,7 +208,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
         data$age = data$`_AGEG5YR`
         data$risk = if_else(data$SOMALE == "1" | data$SOMALE == "3", "msm", NA)
         data$ever.tested = data$HIVTST7
-        data$medicaid = ifelse(data$PRIMINSR=="5", "1", "0")
     }
     if(grepl("2022", filename)) {
         data$year = as.numeric("2022")
@@ -224,15 +218,10 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
         data <- data %>%
             mutate(at_risk = if_else(HIVRISK5 =="1", '1', '0'))  #A value of 1 means individual is at risk; else 0; for denominator#
         data$ever.tested = data$HIVTST7
-        data$medicaid = ifelse(data$PRIMINSR=="5", "1", "0")
-        
     }
     
-    ##Select ONLY medicaid:
-    data = subset(data, data$medicaid == "1")
-    
     data$location = state.to.fips.mappings[data$state_fips]
-    data$outcome = "proportion.tested.for.hiv.past.year.medicaid" 
+    data$outcome = "proportion.tested.for.hiv.past.year.uninsured" 
     
     data$sex = brfss.sex.mappings[data$sex]
     data$age = brfss.age.mappings[data$age]
@@ -278,14 +267,6 @@ data.list.brfss.state.clean = lapply(brfss_file_state_list, function(file){
         filter(tested != "drop")
     
     data$tested = as.numeric(data$tested)
-    
-    
-    #\\\\\\To show only individuals at risk of HIV in the denominator///////#
-    #Un-comment line 259-262
-    # brfss_risk_var = c(HIVRISK5= "HIVRISK4")
-    # data <- data %>%
-    #    rename(any_of(brfss_risk_var))
-    # data = subset(data, HIVRISK5 == "1" ) #select only those at risk#
     
     list(filename, data) 
 })
@@ -475,12 +456,12 @@ data.list.brfss.state.risk.put = lapply(data.list.brfss.state.risk, function(fil
 ################################################################################
 ################################################################################
 
-##Create outcome for the denominator value -> medicaid.total##
+##Create outcome for the denominator value -> uninsured.total##
 #WEIGHTED
 
 
 ################################################################################
-##Outcome = medicaid.total
+##Outcome = uninsured.total
 #WEIGHTED
 ################################################################################
 data.list.brfss.state.n = lapply(data.list.brfss.state.totals, function(file){
@@ -488,7 +469,7 @@ data.list.brfss.state.n = lapply(data.list.brfss.state.totals, function(file){
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "medicaid.total"
+    data$outcome = "uninsured.total"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -499,7 +480,7 @@ data.list.brfss.state.n = lapply(data.list.brfss.state.totals, function(file){
 })
 ################################################################################
 ##Sex
-##Outcome = medicaid.total
+##Outcome = uninsured.total
 #WEIGHTED
 ################################################################################
 data.list.brfss.state.sex.n = lapply(data.list.brfss.state.sex, function(file){
@@ -507,7 +488,7 @@ data.list.brfss.state.sex.n = lapply(data.list.brfss.state.sex, function(file){
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "medicaid.total"
+    data$outcome = "uninsured.total"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -518,7 +499,7 @@ data.list.brfss.state.sex.n = lapply(data.list.brfss.state.sex, function(file){
 })
 ################################################################################
 ##age
-##Outcome = medicaid.total
+##Outcome = uninsured.total
 #WEIGHTED
 ################################################################################
 data.list.brfss.state.age.n = lapply(data.list.brfss.state.age, function(file){
@@ -526,7 +507,7 @@ data.list.brfss.state.age.n = lapply(data.list.brfss.state.age, function(file){
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "medicaid.total"
+    data$outcome = "uninsured.total"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -537,7 +518,7 @@ data.list.brfss.state.age.n = lapply(data.list.brfss.state.age, function(file){
 })
 ################################################################################
 ##race
-##Outcome = medicaid.total
+##Outcome = uninsured.total
 #WEIGHTED
 ################################################################################
 data.list.brfss.state.race.n = lapply(data.list.brfss.state.race, function(file){
@@ -545,7 +526,7 @@ data.list.brfss.state.race.n = lapply(data.list.brfss.state.race, function(file)
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "medicaid.total"
+    data$outcome = "uninsured.total"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -557,7 +538,7 @@ data.list.brfss.state.race.n = lapply(data.list.brfss.state.race, function(file)
 
 ################################################################################
 ##risk
-##Outcome = medicaid.total
+##Outcome = uninsured.total
 #WEIGHTED
 ################################################################################
 data.list.brfss.state.risk.n = lapply(data.list.brfss.state.risk, function(file){
@@ -565,7 +546,7 @@ data.list.brfss.state.risk.n = lapply(data.list.brfss.state.risk, function(file)
     data=file[[2]] 
     filename = file[[1]] 
     
-    data$outcome = "medicaid.total"
+    data$outcome = "uninsured.total"
     data$value = data$n_weighted #replace the "population" calculated above as the outcome value
     
     data <- data %>%
@@ -579,7 +560,7 @@ data.list.brfss.state.risk.n = lapply(data.list.brfss.state.risk, function(file)
 ##PUT INTO THE DATA MANAGER###
 #10 statements#
 ################################################################################
-##State-TOTAL-proportion.tested.for.hiv.past.year.medicaid
+##State-TOTAL-proportion.tested
 state.total.num = lapply(data.list.brfss.state.totals, `[[`, 2)  
 
 for (data in state.total.num) {
@@ -593,7 +574,7 @@ for (data in state.total.num) {
         details = 'Behavioral Risk Factor Surveillance System')
 }
 
-##State-SEX-proportion.tested.for.hiv.past.year.medicaid
+##State-SEX-proportion.tested
 state.sex.num = lapply(data.list.brfss.state.sex, `[[`, 2)  
 
 for (data in state.sex.num) {
@@ -606,7 +587,7 @@ for (data in state.sex.num) {
         url = 'https://www.cdc.gov/brfss/index.html',
         details = 'Behavioral Risk Factor Surveillance System')
 }
-##State-AGE-proportion.tested.for.hiv.past.year.medicaid
+##State-AGE-proportion.tested
 state.age.num = lapply(data.list.brfss.state.age, `[[`, 2)  
 
 for (data in state.age.num) {
@@ -619,7 +600,7 @@ for (data in state.age.num) {
         url = 'https://www.cdc.gov/brfss/index.html',
         details = 'Behavioral Risk Factor Surveillance System')
 }
-##State-RACE-proportion.tested.for.hiv.past.year.medicaid
+##State-RACE-proportion.tested
 state.race.num = lapply(data.list.brfss.state.race, `[[`, 2)  
 
 for (data in state.race.num) {
@@ -632,7 +613,7 @@ for (data in state.race.num) {
         url = 'https://www.cdc.gov/brfss/index.html',
         details = 'Behavioral Risk Factor Surveillance System')
 }
-##State-RISK-proportion.tested.for.hiv.past.year.medicaid
+##State-RISK-proportion.tested
 state.risk.num = lapply(data.list.brfss.state.risk.put, `[[`, 2)  
 
 for (data in state.risk.num) {
@@ -646,7 +627,7 @@ for (data in state.risk.num) {
         details = 'Behavioral Risk Factor Surveillance System')
 }
 
-#####State-TOTAL-medicaid.total
+#####State-TOTAL-proportion.tested.N
 state.total.denom = lapply(data.list.brfss.state.n, `[[`, 2)  
 
 for (data in state.total.denom) {
@@ -659,7 +640,7 @@ for (data in state.total.denom) {
         url = 'https://www.cdc.gov/brfss/index.html',
         details = 'Behavioral Risk Factor Surveillance System')
 }
-######State-SEX-medicaid.total
+######State-SEX-proportion.tested.N
 state.sex.denom = lapply(data.list.brfss.state.sex.n, `[[`, 2)  
 
 for (data in state.sex.denom) {
@@ -672,7 +653,7 @@ for (data in state.sex.denom) {
         url = 'https://www.cdc.gov/brfss/index.html',
         details = 'Behavioral Risk Factor Surveillance System')
 }
-######State-AGE-medicaid.total
+######State-AGE-proportion.tested.n
 state.age.denom = lapply(data.list.brfss.state.age.n, `[[`, 2)  
 
 for (data in state.age.denom) {
@@ -685,7 +666,7 @@ for (data in state.age.denom) {
         url = 'https://www.cdc.gov/brfss/index.html',
         details = 'Behavioral Risk Factor Surveillance System')
 }
-######State-RACE-medicaid.total
+######State-RACE-proportion.tested.n
 state.race.denom = lapply(data.list.brfss.state.race.n, `[[`, 2)  
 
 for (data in state.race.denom) {
@@ -698,7 +679,7 @@ for (data in state.race.denom) {
         url = 'https://www.cdc.gov/brfss/index.html',
         details = 'Behavioral Risk Factor Surveillance System')
 }
-######State-RISK-medicaid.total
+######State-RISK-proportion.tested.n
 state.risk.denom = lapply(data.list.brfss.state.risk.n, `[[`, 2)  
 
 for (data in state.risk.denom) {

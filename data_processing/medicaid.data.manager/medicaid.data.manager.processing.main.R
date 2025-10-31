@@ -112,6 +112,7 @@ data.manager$register.ontology(
         risk=c('msm', 'not_msm')
     ))
 
+#Waiting for update on Locations package to fix error in registering new locations#
 #Register locations (because these reports use Regions [groups of states])
 # locations::register.locations(type='region', 
 #                               locations = c("01", "02", "03", "04", "05",
@@ -126,7 +127,9 @@ data.manager$register.ontology(
 # Source ------------------------------------------------------------------
 source('data_processing/medicaid.data.manager/adap.and.non.adap.totals.by.region.R') #outcome = adap.clients; non.adap.clients
 source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
-source('data_processing/medicaid.data.manager/brfss.proportion.tested.medicaid.R') #outcomes = medicaid.total; uninsured.total; proportion.tested.for.hiv.past.year.medicaid; proportion.tested.for.hiv.past.year.uninsured
+source('data_processing/medicaid.data.manager/brfss.proportion.tested.medicaid.R') #outcomes = medicaid.total;proportion.tested.for.hiv.past.year.medicaid; 
+source('data_processing/medicaid.data.manager/brfss.proportion.tested.uninsured.R') #outcomes = uninsured.total;  proportion.tested.for.hiv.past.year.uninsured
+
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/medicaid.data.manager.rdata")

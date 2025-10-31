@@ -9,6 +9,7 @@ medicaid.non.adap <- lapply(medicaid.non.adap.tables, function(x){
     list(filename=x, data=read.csv(x, check.names = FALSE, colClasses = "character"))
 })
 
+
 ###
 medicaid.non.adap.proportion = lapply(medicaid.non.adap, function(file){
     
@@ -22,7 +23,9 @@ medicaid.non.adap.proportion = lapply(medicaid.non.adap, function(file){
                      values_to = "value")%>%
         filter(`health care coverage` == "Medicaid")
     
-    data$location = gsub("\\D", "", data$location) ###FIX LOCATION###
+    data$location = gsub("\\D", "", data$location) 
+    data$location = paste("rw.region.", data$location)
+    data$location = gsub(" ", "", data$location)
 
     data$outcome = 'proportion.nonadap.rw.clients.on.medicaid'
     data$value = as.numeric(data$value)
@@ -70,7 +73,9 @@ medicaid.adap.proportion = lapply(medicaid.adap, function(file){
                      values_to = "value")%>%
         filter(`health care coverage` == "Medicaid")
     
-    data$location = gsub("\\D", "", data$location) ###FIX LOCATION###
+    data$location = gsub("\\D", "", data$location) 
+    data$location = paste("rw.region.", data$location)
+    data$location = gsub(" ", "", data$location)
     
     data$outcome = 'proportion.adap.rw.clients.on.medicaid'
     data$value = as.numeric(data$value)
