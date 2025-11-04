@@ -96,13 +96,13 @@ brfss.age.mappings= c('1'= '18-24 years',
 
 # Create Template of BRFSS Uninsured Data ---------------------------------
 
-inconsistently_named_brfss_variables <- c('_HLTHPLN', 'HLTHPLN1', 
+inconsistently_named_brfss_variables <- c('_HLTHPLN', 'HLTHPLN1', '_HLTHPL1', '_HLTHPL2',
                                           'HIVTST7', 'HIVTST6', 
                                           '_SEX', 'SEX1', 'SEX',
                                           '_RACE', '_RACE1',
                                           '_AGEG5YR',
                                           'SXORIENT', 'SOMALE',
-                                          'PRIMINSR', 'HLTHCVR1',
+                                          'PRIMINSR', 'HLTHCVR1', 'PRIMINS2', 'PRIMINS1',
                                           'HIVTSTD3')
 
 
@@ -154,17 +154,29 @@ brfss.uninsured.template = lapply(brfss_file_state_list, function(file){
     if("HLTHPLN1" %in% names(data)){
         data$uninsured = data$HLTHPLN1
     }
-    if("PRIMINSR" %in% names(data)){
-        data$medicaid = data$PRIMINSR
+    if("_HLTHPLN1" %in% names(data)){
+        data$uninsured = data$`_HLTHPLN1`
     }
+    if("_HLTHPLN2" %in% names(data)){
+        data$uninsured = data$`_HLTHPLN2`
+    }
+    if("PRIMINSR" %in% names(data)){
+        data$medicaid = ifelse(data$PRIMINSR=="5", "1", "0") #5 is medicaid for PRIMINSR; for this var 1=medicaid
+    }
+    if("PRIMINSR1" %in% names(data)){
+        data$medicaid = ifelse(data$PRIMINSR1=="5", "1", "0") #5 is medicaid for PRIMINSR1; for this var 1=medicaid
+    }   
+    if("PRIMINSR2" %in% names(data)){
+        data$medicaid = ifelse(data$PRIMINSR2=="5", "1", "0") #5 is medicaid for PRIMINSR2; for this var 1=medicaid
+    }       
     if("HLTHCVR1" %in% names(data)){
-        data$medicaid = data$HLTHCVR1
+        data$medicaid = ifelse(data$HLTHCVR1=="4", "1", "0") #4 is medicaid for HLTHCVR1; for this var 1=medicaid
     }
     
     #Create a risk variable (different for different survey years depending on available variables):
     survey_years_no_risk <- c("2013")
     survey_years_with_sxorient<- c("2014", "2015", "2016", "2017")
-    survey_years_with_somale<- c("2018", "2019", "2020", "2021", "2022")
+    survey_years_with_somale<- c("2018", "2019", "2020", "2021", "2022", "2023", "2024")
     
     if(survey_years_no_risk %in% data$year){
         data$risk = NA #No sexual orientation data for 2013#
