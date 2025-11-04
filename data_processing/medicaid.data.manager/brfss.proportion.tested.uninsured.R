@@ -196,7 +196,7 @@ brfss.uninsured.template = lapply(brfss_file_state_list, function(file){
     data = subset(data, data$uninsured == 2)
     
     #Create outcome:
-    data$outcome = "total.uninsured" 
+    data$outcome = "uninsured.total" 
     
     #Map stratifications:
     data$location = state.to.fips.mappings[data$state_fips]
@@ -277,6 +277,8 @@ uninsured.proportion.tested.template = lapply(brfss.uninsured.template, function
         filter(tested != "drop")
     
     data$tested = as.numeric(data$tested)
+    
+    data$outcome = "proportion.tested.for.hiv.past.year.uninsured"
     
     data= as.data.frame(data)
     
@@ -452,7 +454,8 @@ sex.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, f
         mutate(unweighted.denominator.check = n())%>%
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
-        filter(suppression.indicator != "suppress")
+        filter(suppression.indicator != "suppress")%>%
+        select(outcome, year, location, value, sex)
     
     data= as.data.frame(data)
     
@@ -490,7 +493,8 @@ age.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, f
         mutate(unweighted.denominator.check = n())%>%
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
-        filter(suppression.indicator != "suppress")
+        filter(suppression.indicator != "suppress")%>%
+        select(outcome, year, location, value, age)
     
     data= as.data.frame(data)
     
@@ -528,7 +532,8 @@ race.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, 
         mutate(unweighted.denominator.check = n())%>%
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
-        filter(suppression.indicator != "suppress")
+        filter(suppression.indicator != "suppress")%>%
+        select(outcome, year, location, value, race)
     
     data= as.data.frame(data)
     
@@ -568,10 +573,141 @@ risk.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, 
         mutate(unweighted.denominator.check = n())%>%
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
-        filter(suppression.indicator != "suppress")
+        filter(suppression.indicator != "suppress")%>%
+        select(outcome, year, location, value, risk)
     
     data= as.data.frame(data)
     
     list(filename, data) 
 })
 
+# Put statements: ---------------------------------------------------------
+
+total.uninsured.put = lapply(total.uninsured, `[[`, 2)  
+
+for (data in total.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+total.proportion.tested.uninsured.put = lapply(total.proportion.tested.uninsured, `[[`, 2)  
+
+for (data in total.proportion.tested.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+sex.uninsured.put = lapply(sex.uninsured, `[[`, 2)  
+
+for (data in sex.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+sex.proportion.tested.uninsured.put = lapply(sex.proportion.tested.uninsured, `[[`, 2)  
+
+for (data in sex.proportion.tested.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+age.uninsured.put = lapply(age.uninsured, `[[`, 2)  
+
+for (data in age.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+age.proportion.tested.uninsured.put = lapply(age.proportion.tested.uninsured, `[[`, 2)  
+
+for (data in age.proportion.tested.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+race.uninsured.put = lapply(race.uninsured, `[[`, 2)  
+
+for (data in race.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+race.proportion.tested.uninsured.put = lapply(race.proportion.tested.uninsured, `[[`, 2)  
+
+for (data in race.proportion.tested.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+risk.uninsured.put = lapply(risk.uninsured, `[[`, 2)  
+
+for (data in risk.uninsured.put) {
+
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+risk.proportion.tested.uninsured.put = lapply(risk.proportion.tested.uninsured, `[[`, 2)  
+
+for (data in risk.proportion.tested.uninsured.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')}

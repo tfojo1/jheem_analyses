@@ -163,11 +163,11 @@ brfss.medicaid.template = lapply(brfss_file_state_list, function(file){
     if("PRIMINSR" %in% names(data)){
         data$medicaid = ifelse(data$PRIMINSR=="5", "1", "0") #5 is medicaid for PRIMINSR; for this var 1=medicaid
     }
-    if("PRIMINSR1" %in% names(data)){
-        data$medicaid = ifelse(data$PRIMINSR1=="5", "1", "0") #5 is medicaid for PRIMINSR1; for this var 1=medicaid
+    if("PRIMINS1" %in% names(data)){
+        data$medicaid = ifelse(data$PRIMINS1=="5", "1", "0") #5 is medicaid for PRIMINSR1; for this var 1=medicaid
     }   
-    if("PRIMINSR2" %in% names(data)){
-        data$medicaid = ifelse(data$PRIMINSR2=="5", "1", "0") #5 is medicaid for PRIMINSR2; for this var 1=medicaid
+    if("PRIMINS2" %in% names(data)){
+        data$medicaid = ifelse(data$PRIMINS2=="5", "1", "0") #5 is medicaid for PRIMINSR2; for this var 1=medicaid
     }       
     if("HLTHCVR1" %in% names(data)){
         data$medicaid = ifelse(data$HLTHCVR1=="4", "1", "0") #4 is medicaid for HLTHCVR1; for this var 1=medicaid
@@ -194,12 +194,12 @@ brfss.medicaid.template = lapply(brfss_file_state_list, function(file){
     
     ###SELECT ONLY THOSE ON MEDICAID ###
     #Note: there is no medicaid variable in BRFSS for 2013 or 2015
-    data = subset(data, data$year != "2013")
-    data = subset(data, data$year != "2015")
-    data = subset(data, data$medicaid == "1")
+    data<-data%>%
+        mutate(medicaid = ifelse(year == "2013" | year == "2015", NA, medicaid))%>%
+        filter(medicaid == "1")
     
     #Create outcome:
-    data$outcome = "total.medicaid" 
+    data$outcome = "medicaid.total" 
     
     #Map stratifications:
     data$location = state.to.fips.mappings[data$state_fips]
@@ -280,6 +280,8 @@ medicaid.proportion.tested.template = lapply(brfss.medicaid.template, function(f
     
     data$tested = as.numeric(data$tested)
     
+    data$outcome = "proportion.tested.for.hiv.past.year.medicaid"
+    
     data= as.data.frame(data)
     
     list(filename, data) 
@@ -316,4 +318,399 @@ total.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, f
     list(filename, data) 
 })
 
+###########################
+#STRATIFIED DATA: Total medicaid
+##########################
 
+# Stratified: Total medicaid by Sex --------------------------------------
+sex.medicaid = lapply(brfss.medicaid.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$sex)) #Remove sex is NA
+    
+    data<- data %>%
+        group_by(location, sex) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data$value = data$n_weighted
+    
+    data <- data %>%
+        select(outcome, year, location, value, sex)
+    
+    data<- data[!duplicated(data), ]
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Stratified: Total medicaid by age --------------------------------------
+age.medicaid = lapply(brfss.medicaid.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$age)) #Remove missing age
+    data= subset(data, data$age != 'Unknown')
+    
+    data<- data %>%
+        group_by(location, age) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data$value = data$n_weighted
+    
+    data <- data %>%
+        select(outcome, year, location, value, age)
+    
+    data<- data[!duplicated(data), ]
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Stratified: Total medicaid by race --------------------------------------
+race.medicaid = lapply(brfss.medicaid.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$race)) #Remove unknown race
+    data= subset(data, data$race != 'unknown')
+    
+    data<- data %>%
+        group_by(location, race) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data$value = data$n_weighted
+    
+    data <- data %>%
+        select(outcome, year, location, value, race)
+    
+    data<- data[!duplicated(data), ]
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Stratified: Total medicaid by risk --------------------------------------
+risk.medicaid = lapply(brfss.medicaid.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data<- data %>%
+        group_by(location, risk) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data$value = data$n_weighted
+    
+    data <- data %>%
+        select(outcome, year, location, value, risk)
+    
+    data<- data[!duplicated(data), ]
+    
+    data <- data %>%
+        filter(risk == "msm")
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+##########################
+#STRATIFIED DATA: Proportion.Tested
+########################
+
+# Calculate Sex Proportion Tested medicaid -----------------------------
+sex.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$sex)) #Remove sex is NA
+    
+    data<- data %>%
+        group_by(location, sex) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data<- data %>%
+        group_by(location, sex) %>%
+        mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+        ungroup()%>%
+        mutate(proportion_tested = (sum_tested/n_weighted))
+    
+    data$proportion_tested = round(data$proportion_tested, digits=4)
+    
+    data$year = as.character(data$year)
+    data$value = data$proportion_tested
+    
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, sex)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")%>%
+        select(outcome, year, location, value, sex)
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Calculate age Proportion Tested medicaid -----------------------------
+age.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$age)) #Remove missing age
+    data= subset(data, data$age != 'Unknown')
+    
+    data<- data %>%
+        group_by(location, age) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data<- data %>%
+        group_by(location, age) %>%
+        mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+        ungroup()%>%
+        mutate(proportion_tested = (sum_tested/n_weighted))
+    
+    data$proportion_tested = round(data$proportion_tested, digits=4)
+    
+    data$year = as.character(data$year)
+    data$value = data$proportion_tested
+    
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, age)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")%>%
+        select(outcome, year, location, value, age)
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Calculate race Proportion Tested medicaid -----------------------------
+race.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$race)) #Remove unknown race
+    data= subset(data, data$race != 'unknown')
+    
+    data<- data %>%
+        group_by(location, race) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data<- data %>%
+        group_by(location, race) %>%
+        mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+        ungroup()%>%
+        mutate(proportion_tested = (sum_tested/n_weighted))
+    
+    data$proportion_tested = round(data$proportion_tested, digits=4)
+    
+    data$year = as.character(data$year)
+    data$value = data$proportion_tested
+    
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, race)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")%>%
+        select(outcome, year, location, value, race)
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+
+# Calculate risk Proportion Tested medicaid -----------------------------
+risk.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data<- data %>%
+        group_by(location, risk) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data<- data %>%
+        group_by(location, risk) %>%
+        mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+        ungroup()%>%
+        mutate(proportion_tested = (sum_tested/n_weighted))
+    
+    data$proportion_tested = round(data$proportion_tested, digits=4)
+    
+    data$year = as.character(data$year)
+    data$value = data$proportion_tested
+    
+    #Select only risk = MSM
+    data<-data%>%
+        filter(risk == "msm")
+    
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, risk)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")%>%
+        select(outcome, year, location, value, risk)
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+
+# Put statements: ---------------------------------------------------------
+
+total.medicaid.put = lapply(total.medicaid, `[[`, 2)  
+
+for (data in total.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+total.proportion.tested.medicaid.put = lapply(total.proportion.tested.medicaid, `[[`, 2)  
+
+for (data in total.proportion.tested.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+sex.medicaid.put = lapply(sex.medicaid, `[[`, 2)  
+
+for (data in sex.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+sex.proportion.tested.medicaid.put = lapply(sex.proportion.tested.medicaid, `[[`, 2)  
+
+for (data in sex.proportion.tested.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+age.medicaid.put = lapply(age.medicaid, `[[`, 2)  
+
+for (data in age.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+age.proportion.tested.medicaid.put = lapply(age.proportion.tested.medicaid, `[[`, 2)  
+
+for (data in age.proportion.tested.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+race.medicaid.put = lapply(race.medicaid, `[[`, 2)  
+
+for (data in race.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+race.proportion.tested.medicaid.put = lapply(race.proportion.tested.medicaid, `[[`, 2)  
+
+for (data in race.proportion.tested.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+risk.medicaid.put = lapply(risk.medicaid, `[[`, 2)  
+
+for (data in risk.medicaid.put) {
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
+
+risk.proportion.tested.medicaid.put = lapply(risk.proportion.tested.medicaid, `[[`, 2)  
+
+for (data in risk.proportion.tested.medicaid.put) {
+    
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'brfss',
+        source = 'brfss',
+        dimension.values = list(),
+        url = 'https://www.cdc.gov/brfss/index.html',
+        details = 'Behavioral Risk Factor Surveillance System')
+}
