@@ -154,11 +154,11 @@ brfss.uninsured.template = lapply(brfss_file_state_list, function(file){
     if("HLTHPLN1" %in% names(data)){
         data$uninsured = data$HLTHPLN1
     }
-    if("_HLTHPLN1" %in% names(data)){
-        data$uninsured = data$`_HLTHPLN1`
+    if("_HLTHPL1" %in% names(data)){
+        data$uninsured = data$`_HLTHPL1`
     }
-    if("_HLTHPLN2" %in% names(data)){
-        data$uninsured = data$`_HLTHPLN2`
+    if("_HLTHPL2" %in% names(data)){
+        data$uninsured = data$`_HLTHPL2`
     }
     if("PRIMINSR" %in% names(data)){
         data$medicaid = ifelse(data$PRIMINSR=="5", "1", "0") #5 is medicaid for PRIMINSR; for this var 1=medicaid
@@ -268,9 +268,10 @@ uninsured.proportion.tested.template = lapply(brfss.uninsured.template, function
     data$HIVTSTD3 = as.character(data$HIVTSTD3)
     data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '1', "0", data$tested) #If date of last test is missing and ever.tested is 'yes'
     data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '2', "0", data$tested) #test date is missing and ever.tested is 'no'
-    data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '7', "0", data$tested) #test date is missing and ever.tested is 'dont know'  ***CHECK THIS ONE***
+    data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '7', "0", data$tested) #test date is missing and ever.tested is 'dont know' 
     data$tested = ifelse(is.na(data$HIVTSTD3) & data$ever.tested == '9', "drop", data$tested) #test date is missing and ever.tested is 'refused'
     data$tested = ifelse(is.na(data$HIVTSTD3) & is.na(data$ever.tested), "drop", data$tested) #test date is missing and ever.tested is missing
+    
     #Remove test date missing ever.tested refused or missing:
     data <- data %>%
         filter(tested != "drop")
@@ -313,4 +314,264 @@ total.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template,
     list(filename, data) 
 })
 
+###########################
+#STRATIFIED DATA: Total Uninsured
+##########################
+
+# Stratified: Total Uninsured by Sex --------------------------------------
+sex.uninsured = lapply(brfss.uninsured.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$sex)) #Remove sex is NA
+    
+    data<- data %>%
+        group_by(location, sex) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data$value = data$n_weighted
+    
+    data <- data %>%
+        select(outcome, year, location, value, sex)
+    
+    data<- data[!duplicated(data), ]
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Stratified: Total Uninsured by age --------------------------------------
+age.uninsured = lapply(brfss.uninsured.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$age)) #Remove missing age
+    data= subset(data, data$age != 'Unknown')
+    
+    data<- data %>%
+        group_by(location, age) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data$value = data$n_weighted
+    
+    data <- data %>%
+        select(outcome, year, location, value, age)
+
+    data<- data[!duplicated(data), ]
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Stratified: Total Uninsured by race --------------------------------------
+race.uninsured = lapply(brfss.uninsured.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$race)) #Remove unknown race
+    data= subset(data, data$race != 'unknown')
+    
+    data<- data %>%
+        group_by(location, race) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data$value = data$n_weighted
+    
+    data <- data %>%
+        select(outcome, year, location, value, race)
+    
+    data<- data[!duplicated(data), ]
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Stratified: Total Uninsured by risk --------------------------------------
+risk.uninsured = lapply(brfss.uninsured.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data<- data %>%
+        group_by(location, risk) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data$value = data$n_weighted
+    
+    data <- data %>%
+        select(outcome, year, location, value, risk)
+    
+    data<- data[!duplicated(data), ]
+    
+    data <- data %>%
+        filter(risk == "msm")
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+##########################
+#STRATIFIED DATA: Proportion.Tested
+########################
+
+# Calculate Sex Proportion Tested Uninsured -----------------------------
+sex.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$sex)) #Remove sex is NA
+    
+    data<- data %>%
+        group_by(location, sex) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data<- data %>%
+        group_by(location, sex) %>%
+        mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+        ungroup()%>%
+        mutate(proportion_tested = (sum_tested/n_weighted))
+    
+    data$proportion_tested = round(data$proportion_tested, digits=4)
+    
+    data$year = as.character(data$year)
+    data$value = data$proportion_tested
+    
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, sex)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Calculate age Proportion Tested Uninsured -----------------------------
+age.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$age)) #Remove missing age
+    data= subset(data, data$age != 'Unknown')
+    
+    data<- data %>%
+        group_by(location, age) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data<- data %>%
+        group_by(location, age) %>%
+        mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+        ungroup()%>%
+        mutate(proportion_tested = (sum_tested/n_weighted))
+    
+    data$proportion_tested = round(data$proportion_tested, digits=4)
+    
+    data$year = as.character(data$year)
+    data$value = data$proportion_tested
+    
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, age)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+# Calculate race Proportion Tested Uninsured -----------------------------
+race.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data= subset(data, !is.na(data$race)) #Remove unknown race
+    data= subset(data, data$race != 'unknown')
+    
+    data<- data %>%
+        group_by(location, race) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data<- data %>%
+        group_by(location, race) %>%
+        mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+        ungroup()%>%
+        mutate(proportion_tested = (sum_tested/n_weighted))
+    
+    data$proportion_tested = round(data$proportion_tested, digits=4)
+    
+    data$year = as.character(data$year)
+    data$value = data$proportion_tested
+    
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, race)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
+
+
+# Calculate risk Proportion Tested Uninsured -----------------------------
+risk.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, function(file){
+    
+    data=file[[2]] 
+    filename = file[[1]] 
+    
+    data<- data %>%
+        group_by(location, risk) %>%
+        mutate(n_weighted = sum(`_LLCPWT`)) %>% #denominator should be the sum of weights#
+        ungroup()
+    
+    data<- data %>%
+        group_by(location, risk) %>%
+        mutate(sum_tested = sum(tested*`_LLCPWT`)) %>% #multiply numerator value by the weight value#
+        ungroup()%>%
+        mutate(proportion_tested = (sum_tested/n_weighted))
+    
+    data$proportion_tested = round(data$proportion_tested, digits=4)
+    
+    data$year = as.character(data$year)
+    data$value = data$proportion_tested
+    
+    #Select only risk = MSM
+    data<-data%>%
+        filter(risk == "msm")
+    
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, risk)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")
+    
+    data= as.data.frame(data)
+    
+    list(filename, data) 
+})
 

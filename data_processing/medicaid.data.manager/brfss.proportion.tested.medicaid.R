@@ -154,11 +154,11 @@ brfss.medicaid.template = lapply(brfss_file_state_list, function(file){
     if("HLTHPLN1" %in% names(data)){
         data$uninsured = data$HLTHPLN1
     }
-    if("_HLTHPLN1" %in% names(data)){
-        data$uninsured = data$`_HLTHPLN1`
+    if("_HLTHPL1" %in% names(data)){
+        data$uninsured = data$`_HLTHPL1`
     }
-    if("_HLTHPLN2" %in% names(data)){
-        data$uninsured = data$`_HLTHPLN2`
+    if("_HLTHPL2" %in% names(data)){
+        data$uninsured = data$`_HLTHPL2`
     }
     if("PRIMINSR" %in% names(data)){
         data$medicaid = ifelse(data$PRIMINSR=="5", "1", "0") #5 is medicaid for PRIMINSR; for this var 1=medicaid
@@ -167,7 +167,7 @@ brfss.medicaid.template = lapply(brfss_file_state_list, function(file){
         data$medicaid = ifelse(data$PRIMINSR1=="5", "1", "0") #5 is medicaid for PRIMINSR1; for this var 1=medicaid
     }   
     if("PRIMINSR2" %in% names(data)){
-            data$medicaid = ifelse(data$PRIMINSR2=="5", "1", "0") #5 is medicaid for PRIMINSR2; for this var 1=medicaid
+        data$medicaid = ifelse(data$PRIMINSR2=="5", "1", "0") #5 is medicaid for PRIMINSR2; for this var 1=medicaid
     }       
     if("HLTHCVR1" %in% names(data)){
         data$medicaid = ifelse(data$HLTHCVR1=="4", "1", "0") #4 is medicaid for HLTHCVR1; for this var 1=medicaid
