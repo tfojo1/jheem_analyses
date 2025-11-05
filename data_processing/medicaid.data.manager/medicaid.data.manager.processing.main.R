@@ -125,8 +125,8 @@ data.manager$register.ontology(
 
 
 # Source ------------------------------------------------------------------
-source('data_processing/medicaid.data.manager/adap.and.non.adap.totals.by.region.R') #outcome = adap.clients; non.adap.clients
-source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
+#source('data_processing/medicaid.data.manager/adap.and.non.adap.totals.by.region.R') #outcome = adap.clients; non.adap.clients
+#source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
 source('data_processing/medicaid.data.manager/brfss.proportion.tested.medicaid.R') #outcomes = medicaid.total;proportion.tested.for.hiv.past.year.medicaid; 
 source('data_processing/medicaid.data.manager/brfss.proportion.tested.uninsured.R') #outcomes = uninsured.total;  proportion.tested.for.hiv.past.year.uninsured
 
