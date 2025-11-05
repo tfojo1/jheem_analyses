@@ -337,7 +337,13 @@ sex.medicaid = lapply(brfss.medicaid.template, function(file){
     
     data$value = data$n_weighted
     
-    data <- data %>%
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, sex)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")%>%
         select(outcome, year, location, value, sex)
     
     data<- data[!duplicated(data), ]
@@ -362,8 +368,14 @@ age.medicaid = lapply(brfss.medicaid.template, function(file){
     
     data$value = data$n_weighted
     
-    data <- data %>%
-        select(outcome, year, location, value, age)
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, age)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")%>%
+      select(outcome, year, location, value, age)
     
     data<- data[!duplicated(data), ]
     data= as.data.frame(data)
@@ -387,8 +399,15 @@ race.medicaid = lapply(brfss.medicaid.template, function(file){
     
     data$value = data$n_weighted
     
-    data <- data %>%
-        select(outcome, year, location, value, race)
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, race)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        filter(suppression.indicator != "suppress")%>%
+       select(outcome, year, location, value, race)
+    
     
     data<- data[!duplicated(data), ]
     data= as.data.frame(data)
@@ -409,8 +428,14 @@ risk.medicaid = lapply(brfss.medicaid.template, function(file){
     
     data$value = data$n_weighted
     
-    data <- data %>%
-        select(outcome, year, location, value, risk)
+    #Check the unweighted denominator value - if less than 50, suppress:
+    data<-data%>%
+        group_by(location, risk)%>%
+        mutate(unweighted.denominator.check = n())%>%
+        ungroup()%>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep"))%>%
+       filter(suppression.indicator != "suppress")%>%
+       select(outcome, year, location, value, risk)
     
     data<- data[!duplicated(data), ]
     
