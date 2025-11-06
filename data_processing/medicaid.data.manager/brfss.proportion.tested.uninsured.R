@@ -448,12 +448,12 @@ sex.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, f
     data$year = as.character(data$year)
     data$value = data$proportion_tested
     
-    #Check the unweighted denominator value - if less than 50, suppress:
+    #Check the unweighted denominator value - if less than 20, suppress:
     data<-data%>%
         group_by(location, sex)%>%
         mutate(unweighted.denominator.check = n())%>%
         ungroup()%>%
-        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
         select(outcome, year, location, value, sex)
     
@@ -487,12 +487,12 @@ age.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, f
     data$year = as.character(data$year)
     data$value = data$proportion_tested
     
-    #Check the unweighted denominator value - if less than 50, suppress:
+    #Check the unweighted denominator value - if less than 20, suppress:
     data<-data%>%
         group_by(location, age)%>%
         mutate(unweighted.denominator.check = n())%>%
         ungroup()%>%
-        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
         select(outcome, year, location, value, age)
     
@@ -526,12 +526,12 @@ race.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, 
     data$year = as.character(data$year)
     data$value = data$proportion_tested
     
-    #Check the unweighted denominator value - if less than 50, suppress:
+    #Check the unweighted denominator value - if less than 20, suppress:
     data<-data%>%
         group_by(location, race)%>%
         mutate(unweighted.denominator.check = n())%>%
         ungroup()%>%
-        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
         select(outcome, year, location, value, race)
     
@@ -567,12 +567,12 @@ risk.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, 
     data<-data%>%
         filter(risk == "msm")
     
-    #Check the unweighted denominator value - if less than 50, suppress:
+    #Check the unweighted denominator value - if less than 20, suppress:
     data<-data%>%
         group_by(location, risk)%>%
         mutate(unweighted.denominator.check = n())%>%
         ungroup()%>%
-        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 50, "suppress", "keep")) %>%
+        mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
         select(outcome, year, location, value, risk)
     
