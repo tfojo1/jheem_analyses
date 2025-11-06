@@ -2,6 +2,7 @@
 library(jheem2)
 library(tidyverse)
 library(locations)
+library(haven)
 
 data.manager = create.data.manager('medicaid.data.manager', description='medicaid.data.manager')
 
@@ -129,7 +130,10 @@ data.manager$register.ontology(
 #source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
 source('data_processing/medicaid.data.manager/brfss.proportion.tested.medicaid.R') #outcomes = medicaid.total;proportion.tested.for.hiv.past.year.medicaid; 
 source('data_processing/medicaid.data.manager/brfss.proportion.tested.uninsured.R') #outcomes = uninsured.total;  proportion.tested.for.hiv.past.year.uninsured
+source('data_processing/medicaid.data.manager/brfss.data.variance.values.R') #Adds variance values to uninsured.total and medicaid.total
 
+source('data_processing/medicaid.data.manager/acs.total.medicaid.and.uninsured.R') #outcomes = medicaid.total;uninsured.total
+source('data_processing/medicaid.data.manager/cms.total.medicaid.R') #outcomes = medicaid.total;uninsured.total
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/medicaid.data.manager.rdata")

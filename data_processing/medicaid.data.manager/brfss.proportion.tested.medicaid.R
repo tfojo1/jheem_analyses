@@ -482,7 +482,7 @@ sex.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, fun
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
-        select(outcome, year, location, value, sex)
+        select(outcome, year, location, value, sex, `_LLCPWT`, n_weighted)
     
     data= as.data.frame(data)
     
@@ -521,7 +521,7 @@ age.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, fun
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
-        select(outcome, year, location, value, age)
+        select(outcome, year, location, value, age, `_LLCPWT`, n_weighted)
     
     data= as.data.frame(data)
     
@@ -560,7 +560,7 @@ race.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, fu
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
-        select(outcome, year, location, value, race)
+        select(outcome, year, location, value, race, `_LLCPWT`, n_weighted)
     
     data= as.data.frame(data)
     
@@ -601,7 +601,7 @@ risk.proportion.tested.medicaid = lapply(medicaid.proportion.tested.template, fu
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
-        select(outcome, year, location, value, risk)
+        select(outcome, year, location, value, risk, `_LLCPWT`, n_weighted)
     
     data= as.data.frame(data)
     

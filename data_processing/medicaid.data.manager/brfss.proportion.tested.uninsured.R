@@ -1,97 +1,96 @@
-library(haven)
+#library(haven)
 
-DATA.DIR.BRFSS.STATE="Q:/data_raw/brfss/brfss_state"
-
-brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.names = "TRUE")
-
-brfss_file_state_list <- lapply(brfss_file_state, function(x) {
-    list(filename=x, data=read_xpt(x))
-})
+# DATA.DIR.BRFSS.STATE="Q:/data_raw/brfss/brfss_state"
+# 
+# brfss_file_state <- list.files(DATA.DIR.BRFSS.STATE, pattern = ".XPT", full.names = "TRUE")
+# 
+# brfss_file_state_list <- lapply(brfss_file_state, function(x) {
+#     list(filename=x, data=read_xpt(x))
+# })
 
 # Create BRFSS Mappings ---------------------------------------------------
-
-state.to.fips.mappings = c('1' = 'AL',
-                           '2'='AK',
-                           '4'='AZ',
-                           '5'='AR',
-                           '6'='CA',
-                           '8'='CO',
-                           '9'='CT',
-                           '10'='DE',
-                           '11'='DC',
-                           '12'='FL',
-                           '13'='GA',
-                           '15'='HI',
-                           '16'='ID',
-                           '17'='IL',
-                           '18'='IN',
-                           '19'='IA',
-                           '20'='KS',
-                           '21'='KY',
-                           '22'='LA',
-                           '23'='ME',
-                           '24'='MD',
-                           '25'='MA',
-                           '26'='MI',
-                           '27'='MN',
-                           '28'='MS',
-                           '29'='MO',
-                           '30'='MT',
-                           '31'='NE',
-                           '32'='NV',
-                           '33'='NH',
-                           '34'='NJ',
-                           '35'='NM',
-                           '36'='NY',
-                           '37'='NC',
-                           '38'='ND',
-                           '39'='OH',
-                           '40'='OK',
-                           '41'='OR',
-                           '42'='PA',
-                           '44'='RI',
-                           '45'='SC',
-                           '46'='SD',
-                           '47'='TN',
-                           '48'='TX',
-                           '49'='UT',
-                           '50'='VT',
-                           '51'='VA',
-                           '53'='WA',
-                           '54'='WV',
-                           '55'='WI',
-                           '56'='WY',
-                           '72'= 'PR')
-
-brfss.sex.mappings = c('1' = 'male',
-                       '2' = 'female',
-                       '7' = NA,
-                       '9' = NA)
-
-brfss.race.mappings= c('1'= "white",
-                       '2'= "black",
-                       '3'= 'american indian/alaska native',
-                       '4'= 'asian',
-                       '5'= 'native hawaiian/other pacific islander',
-                       '6'= 'other race',
-                       '7'= 'multiracial', 
-                       '8'= 'hispanic',
-                       '9'= 'unknown')
-brfss.age.mappings= c('1'= '18-24 years',
-                      '2'= '25-29 years',
-                      '3'='30-34 years',
-                      '4'='35-39 years',
-                      '5'='40-44 years',
-                      '6'= '45-49 years',
-                      '7'='50-54 years',
-                      '8'='55-59 years',
-                      '9'='60-64 years',
-                      '10'='65-69 years',
-                      '11'='70-74 years',
-                      '12'= '75-79 years',
-                      '13'= '80+ years',
-                      '14'= 'Unknown')
-
+# 
+# state.to.fips.mappings = c('1' = 'AL',
+#                            '2'='AK',
+#                            '4'='AZ',
+#                            '5'='AR',
+#                            '6'='CA',
+#                            '8'='CO',
+#                            '9'='CT',
+#                            '10'='DE',
+#                            '11'='DC',
+#                            '12'='FL',
+#                            '13'='GA',
+#                            '15'='HI',
+#                            '16'='ID',
+#                            '17'='IL',
+#                            '18'='IN',
+#                            '19'='IA',
+#                            '20'='KS',
+#                            '21'='KY',
+#                            '22'='LA',
+#                            '23'='ME',
+#                            '24'='MD',
+#                            '25'='MA',
+#                            '26'='MI',
+#                            '27'='MN',
+#                            '28'='MS',
+#                            '29'='MO',
+#                            '30'='MT',
+#                            '31'='NE',
+#                            '32'='NV',
+#                            '33'='NH',
+#                            '34'='NJ',
+#                            '35'='NM',
+#                            '36'='NY',
+#                            '37'='NC',
+#                            '38'='ND',
+#                            '39'='OH',
+#                            '40'='OK',
+#                            '41'='OR',
+#                            '42'='PA',
+#                            '44'='RI',
+#                            '45'='SC',
+#                            '46'='SD',
+#                            '47'='TN',
+#                            '48'='TX',
+#                            '49'='UT',
+#                            '50'='VT',
+#                            '51'='VA',
+#                            '53'='WA',
+#                            '54'='WV',
+#                            '55'='WI',
+#                            '56'='WY',
+#                            '72'= 'PR')
+# 
+# brfss.sex.mappings = c('1' = 'male',
+#                        '2' = 'female',
+#                        '7' = NA,
+#                        '9' = NA)
+# 
+# brfss.race.mappings= c('1'= "white",
+#                        '2'= "black",
+#                        '3'= 'american indian/alaska native',
+#                        '4'= 'asian',
+#                        '5'= 'native hawaiian/other pacific islander',
+#                        '6'= 'other race',
+#                        '7'= 'multiracial', 
+#                        '8'= 'hispanic',
+#                        '9'= 'unknown')
+# brfss.age.mappings= c('1'= '18-24 years',
+#                       '2'= '25-29 years',
+#                       '3'='30-34 years',
+#                       '4'='35-39 years',
+#                       '5'='40-44 years',
+#                       '6'= '45-49 years',
+#                       '7'='50-54 years',
+#                       '8'='55-59 years',
+#                       '9'='60-64 years',
+#                       '10'='65-69 years',
+#                       '11'='70-74 years',
+#                       '12'= '75-79 years',
+#                       '13'= '80+ years',
+#                       '14'= 'Unknown')
 
 
 # Create Template of BRFSS Uninsured Data ---------------------------------
@@ -455,7 +454,7 @@ sex.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, f
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
-        select(outcome, year, location, value, sex)
+        select(outcome, year, location, value, sex, `_LLCPWT`, n_weighted)
     
     data= as.data.frame(data)
     
@@ -494,7 +493,7 @@ age.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, f
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
-        select(outcome, year, location, value, age)
+        select(outcome, year, location, value, age, `_LLCPWT`, n_weighted)
     
     data= as.data.frame(data)
     
@@ -533,7 +532,7 @@ race.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, 
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
-        select(outcome, year, location, value, race)
+        select(outcome, year, location, value, race, `_LLCPWT`, n_weighted)
     
     data= as.data.frame(data)
     
@@ -574,7 +573,7 @@ risk.proportion.tested.uninsured = lapply(uninsured.proportion.tested.template, 
         ungroup()%>%
         mutate(suppression.indicator = ifelse(unweighted.denominator.check < 20, "suppress", "keep")) %>%
         filter(suppression.indicator != "suppress")%>%
-        select(outcome, year, location, value, risk)
+        select(outcome, year, location, value, risk, `_LLCPWT`, n_weighted)
     
     data= as.data.frame(data)
     
