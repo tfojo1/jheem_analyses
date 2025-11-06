@@ -64,7 +64,6 @@ medicaid.acs.data.stratified = lapply(medicaid.acs.data, function(file){
                          values_to = "value")%>%
             mutate(age = str_sub(age, start=-5, end=-1))
         
-        data$age = str_sub(data$age, -5, -1)
         data$age = gsub(" ", "", data$age)
         
     }
@@ -185,8 +184,6 @@ uninsured.acs.data.stratified = lapply(uninsured.acs.data, function(file){
                          names_to = "age",
                          values_to = "value")%>%
             mutate(age = str_sub(age, start=-5, end=-1))
-        
-        data$age = str_sub(data$age, -5, -1)
         data$age = gsub(" ", "", data$age)
         
     }
