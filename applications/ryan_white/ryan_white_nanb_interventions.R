@@ -80,6 +80,19 @@ nanb.rw.cessation = create.intervention(nanb.cessation.adap.expansion.effect,
                                         WHOLE.POPULATION, 
                                         code = paste0("nanb.rw.end",rw.intervention.suffix))
 
+nanb.rw.cessation.conservative = create.intervention(nanb.cessation.adap.expansion.effect,
+                                                     nanb.cessation.adap.nonexpansion.effect,
+                                                     nanb.cessation.oahs.expansion.effect,
+                                                     nanb.cessation.oahs.nonexpansion.effect,
+                                                     nanb.cessation.rw.support.expansion.effect, 
+                                                     nanb.cessation.rw.support.nonexpansion.effect, 
+                                                     parameters = adjusted.RW.effect.values[c(2,3,5,6),],
+                                                     generate.parameters.function = function(n, parameters, sim){
+                                                         rbind(fraction.nanb = state.rw.fraction.c.d.ehe.minority.of.non.adap[sim$location] * FRACTION.NANB.VARIATION[1:n])
+                                                     },
+                                                     WHOLE.POPULATION, 
+                                                     code = paste0("nanb.rw.end.cons",rw.intervention.suffix))
+
 
 ##-- INTERRUPTION --##
 
@@ -165,3 +178,16 @@ nanb.rw.interruption = create.intervention(nanb.interruption.adap.expansion.effe
                                            },
                                            WHOLE.POPULATION, 
                                            code = paste0("nanb.rw.intr",rw.intervention.suffix))
+
+nanb.rw.interruption.conservative = create.intervention(nanb.interruption.adap.expansion.effect,
+                                                        nanb.interruption.adap.nonexpansion.effect,
+                                                        nanb.interruption.oahs.expansion.effect,
+                                                        nanb.interruption.oahs.nonexpansion.effect,
+                                                        nanb.interruption.rw.support.expansion.effect, 
+                                                        nanb.interruption.rw.support.nonexpansion.effect, 
+                                                        parameters = adjusted.RW.effect.values[c(2,3,5,6),],
+                                                        generate.parameters.function = function(n, parameters, sim){
+                                                            rbind(fraction.nanb = state.rw.fraction.c.d.ehe.minority.of.non.adap[sim$location] * FRACTION.NANB.VARIATION[1:n])
+                                                        },
+                                                        WHOLE.POPULATION, 
+                                                        code = paste0("nanb.rw.intr.cons",rw.intervention.suffix))

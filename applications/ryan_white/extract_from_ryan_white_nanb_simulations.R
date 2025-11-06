@@ -3,12 +3,18 @@ print("Sourcing code prior to extracting from interventions")
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
+# print("Going to sleep for 1 hour")
+# Sys.sleep(15 * 60)
+# print("Waking up")
+
 LOCATIONS = RW.LOCATIONS
 FORCE.OVERWRITE = FORCE.REDO
 
 
 sim.collection=create.simset.collection(version="rw", calibration.code = CALIBRATION.CODE,
-                                        locations = LOCATIONS, interventions = RW.INTERVENTION.CODES, n.sim=N.SIM)
+                                        locations = LOCATIONS, interventions = c('noint','nanb.rw.end.26','nanb.rw.intr.26',
+                                                                                 'nanb.rw.end.cons.26','nanb.rw.intr.cons.26'),
+                                        n.sim=N.SIM)
 
 # full.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalence', 'new',
 #                                                'rw.clients', 'non.adap.clients','oahs.clients','adap.clients',
@@ -23,8 +29,8 @@ print("PULLING TOTALS...")
 total.results = sim.collection$get(outcomes = c('incidence', 'diagnosed.prevalence', 'new',
                                                 'rw.clients', 'non.adap.clients','oahs.clients','adap.clients',
                                                 'oahs.suppression', 'adap.suppression',
-                                                'suppression', 'population',
-                                                'hiv.mortality', 'awareness',
+                                                'awareness','suppression', 'population',
+                                                'hiv.mortality',
                                                 'sexual.transmission.rates','prep.uptake','testing'),
                                    output = 'numerator',
                                    dimension.values=list(year=2010:2035),
@@ -77,13 +83,13 @@ total.incidence = array.access(total.results, outcome='incidence', drop = T)
 total.new = array.access(total.results, outcome='new', drop = T)
 total.pop = array.access(total.results, outcome='population', drop = T)
 total.sexual.transmission = array.access(total.results, outcome='sexual.transmission.rates', drop = T)
-total.suppression = array.access(total.results, outcome='suppression', drop = T)
-total.awareness = array.access(total.results, outcome='awareness', drop = T)
+# 
+# if (RW.IS.STATE.LEVEL)
+#     filename = paste0('Q:results/ryan_white/ryan_white_results_state_', RW.ANCHOR.YEAR, "_", Sys.Date(), ".Rdata")
+# if (!RW.IS.STATE.LEVEL)
+#     filename = paste0('Q:results/ryan_white/ryan_white_results_city_', RW.ANCHOR.YEAR, "_", Sys.Date(), ".Rdata")
 
-if (RW.IS.STATE.LEVEL)
-    filename = paste0('Q:results/ryan_white/ryan_white_results_state_', RW.ANCHOR.YEAR, "_", Sys.Date(), ".Rdata")
-if (!RW.IS.STATE.LEVEL)
-    filename = paste0('Q:results/ryan_white/ryan_white_results_city_', RW.ANCHOR.YEAR, "_", Sys.Date(), ".Rdata")
+filename = paste0('Q:results/ryan_white/ryan_white_results_state_nanb_', RW.ANCHOR.YEAR, "_", Sys.Date(), ".Rdata")
 
 save(total.results,
      

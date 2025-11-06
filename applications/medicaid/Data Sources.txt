@@ -1,0 +1,8 @@
+In general
+https://www.kff.org/state-category/health-coverage-uninsured/
+
+Total Number of Adult Enrollees by State
+https://www.kff.org/medicaid/state-indicator/medicaid-distribution-people-0-64-by-age/?dataView=1&currentTimeframe=0&sortModel=%7B%22colId%22:%22Location%22,%22sort%22:%22asc%22%7D
+
+Proportion by Race of Medicaid Enrollees 0-64 by State
+https://www.kff.org/medicaid/state-indicator/medicaid-distribution-people-0-64-by-raceethnicity/?currentTimeframe=0&sortModel=%7B%22colId%22:%22Location%22,%22sort%22:%22asc%22%7D

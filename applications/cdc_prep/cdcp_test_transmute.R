@@ -1,9 +1,11 @@
 
-SURVEILLANCE
 
-load("/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_prep/test.AL.sim.Rdata")
+#load("/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_prep/test.AL.sim.Rdata")
+load('test.AL.sim.Rdata')
+
 
 source('applications/cdc_prep/cdc_prep_specification.R')
+source('applications/cdc_prep/Surveillance_Manager_Updates.R')
 
 transmuter = create.jheem.transmuter(sim, to.version = 'cdcp', from.year = 2025, to.year = 2035)
 
@@ -11,8 +13,8 @@ params = get.medians(CDC.PREP.PARAMETERS.PRIOR)
 
 sim.cdcp = transmuter$transmute(1, parameters = params)
 
-
-lik = test.cdc.test.positivity.likelihood.instr$instantiate.likelihood('ehe', sim$location)
+source('applications/cdc_prep/likelihood.R')
+lik = cdc.prep.joint.likelihood.instructions$instantiate.likelihood('cdcp', sim$location)
 lik$compute(sim.cdcp)
 
 print("Sourcing initial code")

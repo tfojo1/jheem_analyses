@@ -63,23 +63,25 @@ df.city.summ$name = get.location.name(rownames(df.city.summ))
 df.city.summ$new.per.pop = df.city.summ$new / df.city.summ$population
 df.city.summ$new.per.prev = df.city.summ$new / df.city.summ$diagnosed.prevalence
 
-
+if (1==2)
+    df.city.summ$awareness = apply(total.awareness['2025',,,'rw.end'], 'location', mean)
 
 pcc.df = df.city.summ[,c('rw.clients',
-                   #      'adap.clients',
+                 #        'adap.clients',
                 #         'oahs.clients',
                          'suppression',
-                 #        'oahs.suppression',
-                  #       'adap.suppression',
-                         'new.per.pop',
-                        # 'new.per.prev',
-                         'sexual.transmission',
+                  #       'oahs.suppression',
+                         'adap.suppression',
+                    #     'new.per.pop',
+                         'new.per.prev',
+                       #  'sexual.transmission',
                          'medicaid',
+                         'awareness',
                          'excess')]
 #pcc.df = df.city.summ[,c('rw.clients','suppression','oahs.suppression','adap.suppression','new','sexual.transmission','medicaid','excess')]
 prccs = epiR::epi.prcc(pcc.df); prccs[order(abs(prccs$est), decreasing = T),]
 prccs.est = prccs$est
-names(prccs.est) = prccs$var
+names(prccs.est) = prccs$var; prccs.est[order(abs(prccs.est), decreasing = T)]
 
 prccs.est = prccs.est[order(abs(prccs.est), decreasing = T)]
 
@@ -525,3 +527,133 @@ plot = ggplot() +
 
 
 
+
+if (1==2)
+{
+    values = lapply(1:ncol(df.city.summ), function(i){
+        vals = df.city.summ[,i]
+        names(vals)=dimnames(df.city.summ)[[1]]
+        vals
+    })
+    names(values) = dimnames(df.city.summ)[[2]]
+    
+    print("RW Clients")
+    sum(values$rw.clients[RW.MEDICAID.EXPANSION.LOCATIONS] * values$diagnosed.prevalence[RW.MEDICAID.EXPANSION.LOCATIONS]) / sum(values$diagnosed.prevalence[RW.MEDICAID.EXPANSION.LOCATIONS])
+    sum(values$rw.clients[RW.MEDICAID.NONEXPANSION.LOCATIONS] * values$diagnosed.prevalence[RW.MEDICAID.NONEXPANSION.LOCATIONS]) / sum(values$diagnosed.prevalence[RW.MEDICAID.NONEXPANSION.LOCATIONS])
+    
+    print("ADAP Clients")
+    sum(values$adap.clients[RW.MEDICAID.EXPANSION.LOCATIONS] * values$diagnosed.prevalence[RW.MEDICAID.EXPANSION.LOCATIONS]) / sum(values$diagnosed.prevalence[RW.MEDICAID.EXPANSION.LOCATIONS])
+    sum(values$adap.clients[RW.MEDICAID.NONEXPANSION.LOCATIONS] * values$diagnosed.prevalence[RW.MEDICAID.NONEXPANSION.LOCATIONS]) / sum(values$diagnosed.prevalence[RW.MEDICAID.NONEXPANSION.LOCATIONS])
+    
+    
+    print("ADAP Suppression")
+    sum(values$adap.suppression[RW.MEDICAID.EXPANSION.LOCATIONS] * values$adap.clients[RW.MEDICAID.EXPANSION.LOCATIONS]) / sum(values$adap.clients[RW.MEDICAID.EXPANSION.LOCATIONS])
+    sum(values$adap.suppression[RW.MEDICAID.NONEXPANSION.LOCATIONS] * values$adap.clients[RW.MEDICAID.NONEXPANSION.LOCATIONS]) / sum(values$adap.clients[RW.MEDICAID.NONEXPANSION.LOCATIONS])
+    
+    
+    print("New per prev")
+    sum(values$new.per.prev[RW.MEDICAID.EXPANSION.LOCATIONS] * values$diagnosed.prevalence[RW.MEDICAID.EXPANSION.LOCATIONS]) / sum(values$diagnosed.prevalence[RW.MEDICAID.EXPANSION.LOCATIONS])
+    sum(values$new.per.prev[RW.MEDICAID.NONEXPANSION.LOCATIONS] * values$diagnosed.prevalence[RW.MEDICAID.NONEXPANSION.LOCATIONS]) / sum(values$diagnosed.prevalence[RW.MEDICAID.NONEXPANSION.LOCATIONS])
+    
+    print("Awareness")
+    sum(values$diagnosed.prevalence[RW.MEDICAID.EXPANSION.LOCATIONS]) / sum(values$diagnosed.prevalence[RW.MEDICAID.EXPANSION.LOCATIONS] / values$awareness[RW.MEDICAID.EXPANSION.LOCATIONS])
+    sum(values$diagnosed.prevalence[RW.MEDICAID.NONEXPANSION.LOCATIONS]) / sum(values$diagnosed.prevalence[RW.MEDICAID.NONEXPANSION.LOCATIONS] / values$awareness[RW.MEDICAID.NONEXPANSION.LOCATIONS])
+}
+
+
+
+# FOR EXPLORATION
+if (1==2)
+{
+ggplot() + 
+    geom_point(data=df.city.summ, 
+               aes(adap.suppression, excess, size=new, fill=medicaid),
+               shape=21, show.legend = F) + 
+    ylab("Relative Excess HIV Infections") +
+    xlab("Proportion of AIDS Drug Assistance\nClients Virally Suppressed in 2025") + 
+    THEME + CITY.SIZE.SCALE + CITY.COLOR +
+    geom_segment(data = df.label, aes(x, y, xend=adap.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.5)) +
+    scale_x_continuous(labels = scales::percent)
+
+
+ggplot() + 
+    geom_point(data=df.city.summ, 
+               aes(oahs.suppression, excess, size=new, fill=medicaid),
+               shape=21, show.legend = F) + 
+    ylab("Relative Excess HIV Infections") +
+    xlab("Proportion of OAHS\nClients Virally Suppressed in 2025") + 
+    THEME + CITY.SIZE.SCALE + CITY.COLOR +
+    geom_segment(data = df.label, aes(x, y, xend=adap.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.5)) +
+    scale_x_continuous(labels = scales::percent)
+
+ggplot() + 
+    geom_point(data=df.city.summ, 
+               aes(adap.clients, excess, size=new, fill=medicaid),
+               shape=21, show.legend = F) + 
+    ylab("Relative Excess HIV Infections") +
+    xlab("Proportion of PWH\nWho Are ADAP Clients in 2025") + 
+    THEME + CITY.SIZE.SCALE + CITY.COLOR +
+    geom_segment(data = df.label, aes(x, y, xend=adap.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.5)) +
+    scale_x_continuous(labels = scales::percent)
+
+ggplot() + 
+    geom_point(data=df.city.summ, 
+               aes(oahs.clients, excess, size=new, fill=medicaid),
+               shape=21, show.legend = F) + 
+    ylab("Relative Excess HIV Infections") +
+    xlab("Proportion of PWH\nWho Are OAHS Clients in 2025") + 
+    THEME + CITY.SIZE.SCALE + CITY.COLOR +
+    geom_segment(data = df.label, aes(x, y, xend=adap.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.5)) +
+    scale_x_continuous(labels = scales::percent)
+
+ggplot() + 
+    geom_point(data=df.city.summ, 
+               aes(awareness, excess, size=new, fill=medicaid),
+               shape=21, show.legend = F) + 
+    ylab("Relative Excess HIV Infections") +
+    xlab("Awareness 2025") + 
+    THEME + CITY.SIZE.SCALE + CITY.COLOR +
+    geom_segment(data = df.label, aes(x, y, xend=adap.suppression, yend=excess), size=SEGMENT.SIZE, show.legend = F) + 
+    scale_y_continuous(labels = scales::percent, limits = c(0,1.5)) +
+    scale_x_continuous(labels = scales::percent)
+}
+
+# total change in adap suppression
+if (1==2)
+{
+    exp.locations = dimnames(df.city.summ)[[1]][df.city.summ$medicaid=='Expansion State']
+    nonexp.locations = dimnames(df.city.summ)[[1]][df.city.summ$medicaid!='Expansion State']
+    lose.adap.n.exp = total.results['2025',,'adap.suppression',exp.locations,'rw.end'] * all.parameters['lose.adap.expansion.effect',,exp.locations,'rw.end']
+    lose.adap.n.nonexp = total.results['2025',,'adap.suppression',nonexp.locations,'rw.end'] * all.parameters['lose.adap.nonexpansion.effect',,nonexp.locations,'rw.end']
+    
+    adap.n.exp = total.results['2025',,'adap.clients',exp.locations,'rw.end']
+    adap.n.nonexp = total.results['2025',,'adap.clients',nonexp.locations,'rw.end']
+    
+    supp.n.exp = total.results['2025',,'suppression',exp.locations,'rw.end']
+    supp.n.nonexp = total.results['2025',,'suppression',nonexp.locations,'rw.end']
+    
+    adap.suppression.loss.exp = rowSums(lose.adap.n.exp) / rowSums(supp.n.exp)
+    adap.suppression.loss.nonexp = rowSums(lose.adap.n.nonexp) / rowSums(supp.n.nonexp)
+    
+    mean(adap.suppression.loss.exp)
+    mean(adap.suppression.loss.nonexp)
+    
+    
+    prev.2025 = total.results['2025',,'diagnosed.prevalence',,'rw.end']
+    prev.2026 = total.results['2026',,'diagnosed.prevalence',,'rw.end']
+    unsuppressed.2025 = prev.2025 - total.results['2025',,'suppression',,'rw.end']
+    unsuppressed.2026 = prev.2026 - total.results['2026',,'suppression',,'rw.end']
+    
+    delta.suppression = rowSums(unsuppressed.2025)/rowSums(prev.2025) - rowSums(unsuppressed.2026)/rowSums(prev.2026)
+    delta.suppression.exp = rowSums(unsuppressed.2026[,exp.locations])/rowSums(prev.2026[,exp.locations]) / ( rowSums(unsuppressed.2025[,exp.locations])/rowSums(prev.2025[,exp.locations]) )
+    delta.suppression.nonexp = rowSums(unsuppressed.2026[,nonexp.locations])/rowSums(prev.2026[,nonexp.locations]) / ( rowSums(unsuppressed.2025[,nonexp.locations])/rowSums(prev.2025[,nonexp.locations]) )
+    
+    mean(delta.suppression)
+    mean(delta.suppression.exp)
+    mean(delta.suppression.nonexp)
+    
+}
