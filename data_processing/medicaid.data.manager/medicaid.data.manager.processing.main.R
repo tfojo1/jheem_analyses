@@ -84,9 +84,11 @@ data.manager$register.outcome(
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") 
+data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
 
 data.manager$register.source('ryan.white.program', parent.source= "HRSA", full.name = "Ryan White HIV/AIDS Program Annual Data Report", short.name='ryan.white.program') #child
-data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss') 
+data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
+data.manager$register.source('acs', parent.source= "census", full.name = 'American Community Survey', short.name= "acs") 
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -111,6 +113,16 @@ data.manager$register.ontology(
         race=c('white', 'black', 'american indian/alaska native', 'asian', 'native hawaiian/other pacific islander', 'hispanic', 'other race'),
         sex=c('male','female'),
         risk=c('msm', 'not_msm')
+    ))
+
+data.manager$register.ontology(
+    'acs',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('0-18', '19-64'),
+        race=c("white", "black", "hispanic", "asian/native hawaiian or pacific islander", "american indian or alaska native", "multiple races"),
+        sex=c('male','female')
     ))
 
 #Waiting for update on Locations package to fix error in registering new locations#
