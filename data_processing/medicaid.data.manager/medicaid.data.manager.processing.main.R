@@ -85,10 +85,13 @@ data.manager$register.outcome(
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") 
 data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
+data.manager$register.parent.source('cms', full.name = 'The Centers for Medicare & Medicaid Services', short.name= "cms")
+
 
 data.manager$register.source('ryan.white.program', parent.source= "HRSA", full.name = "Ryan White HIV/AIDS Program Annual Data Report", short.name='ryan.white.program') #child
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 data.manager$register.source('acs', parent.source= "census", full.name = 'American Community Survey', short.name= "acs") 
+data.manager$register.source('cms', parent.source= "cms", full.name = 'The Centers for Medicare & Medicaid Services', short.name= "cms") 
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -123,6 +126,14 @@ data.manager$register.ontology(
         age=c('0-18', '19-64'),
         race=c("white", "black", "hispanic", "asian/native hawaiian or pacific islander", "american indian or alaska native", "multiple races"),
         sex=c('male','female')
+    ))
+
+data.manager$register.ontology(
+    'cms',
+    ont = ontology(
+        year= NULL,
+        location= NULL,
+        age=c('0-18', '19-26', '27-44', '45-64', '65+')
     ))
 
 #Waiting for update on Locations package to fix error in registering new locations#

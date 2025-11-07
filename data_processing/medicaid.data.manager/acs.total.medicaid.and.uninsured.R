@@ -105,7 +105,7 @@ for (data in medicaid.acs.total.put) {
         ontology.name = 'acs',
         source = 'acs',
         url = 'https://www.kff.org/state-category/health-coverage-uninsured/',
-        details = 'ACS Data from Census access through KFF')
+        details = 'ACS Data from Census accessed through KFF')
 }
 
 medicaid.acs.data.stratified.put = lapply(medicaid.acs.data.stratified, `[[`, 2)
@@ -116,8 +116,8 @@ for (data in medicaid.acs.data.stratified.put) {
         ontology.name = 'acs',
         source = 'acs',
         dimension.values.to.distribute = list(race=c('multiple races')), 
-                                              url = 'https://www.kff.org/state-category/health-coverage-uninsured/',
-                                              details = 'ACS Data from Census access through KFF') }
+        url = 'https://www.kff.org/state-category/health-coverage-uninsured/',
+        details = 'ACS Data from Census accessed through KFF') }
 
 
 #UNINSURED
@@ -225,7 +225,7 @@ for (data in uninsured.acs.total.put) {
         ontology.name = 'acs',
         source = 'acs',
         url = 'https://www.kff.org/state-category/health-coverage-uninsured/',
-        details = 'ACS Data from Census access through KFF')
+        details = 'ACS Data from Census accessed through KFF')
 }
 
 uninsured.acs.data.stratified.put = lapply(uninsured.acs.data.stratified, `[[`, 2)
@@ -236,5 +236,5 @@ for (data in uninsured.acs.data.stratified.put) {
         ontology.name = 'acs',
         source = 'acs',
         dimension.values.to.distribute = list(race=c('multiple races')), 
-                                              url = 'https://www.kff.org/state-category/health-coverage-uninsured/',
-                                              details = 'ACS Data from Census access through KFF') }
+        url = 'https://www.kff.org/state-category/health-coverage-uninsured/',
+        details = 'ACS Data from Census accessed through KFF') }

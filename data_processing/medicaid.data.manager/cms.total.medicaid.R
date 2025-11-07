@@ -41,6 +41,9 @@ medicaid.cms.stratified = lapply(medicaid.cms.data, function(file){
     data$formatted.location = ifelse(data$location == "United States", "US", data$formatted.location)
     data$location = data$formatted.location
     
+    #Reformat age:
+    data$age = ifelse(data$age == "65 plus", "65+", data$age)
+    
     data= as.data.frame(data)
     
     list(filename, data)
@@ -80,18 +83,29 @@ medicaid.cms.total = lapply(medicaid.cms.data, function(file){
     list(filename, data)
 })
 
-#The Centers for Medicare & Medicaid Services (CMS) 
 
-#PUT:
-###REDISTRIBUTE AGE = UNK
-# uninsured.acs.data.stratified.put = lapply(uninsured.acs.data.stratified, `[[`, 2)
-# 
-# for (data in uninsured.acs.data.stratified.put) {
-#     data.manager$put.long.form(
-#         data = data,
-#         ontology.name = 'acs',
-#         source = 'acs',
-#         dimension.values.to.distribute = list(race=c('multiple races')), 
-#                                               url = 'https://www.kff.org/state-category/health-coverage-uninsured/',
-#                                               details = 'ACS Data from Census access through KFF')
-#         }
+# PUT: --------------------------------------------------------------------
+
+medicaid.cms.stratified.put = lapply(medicaid.cms.stratified, `[[`, 2)
+
+for (data in medicaid.cms.stratified.put) {
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'cms',
+        source = 'cms',
+        dimension.values.to.distribute = list(age=c('unknown')), 
+        url = 'https://www.kff.org/state-category/medicaid-chip/',
+        details = 'CMS Data accessed through KFF')
+        }
+
+
+medicaid.cms.total.put = lapply(medicaid.cms.total, `[[`, 2)
+
+for (data in medicaid.cms.total.put) {
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'cms',
+        source = 'cms',
+        url = 'https://www.kff.org/state-category/medicaid-chip/',
+        details = 'CMS Data accessed through KFF')
+        }
