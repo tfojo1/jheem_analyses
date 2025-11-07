@@ -8,36 +8,6 @@ logit = function(p){
 
 # helper function to build multivariate normal distribution
 
-# make.mv.spline.prior = function(parameter, logmean00, logsd00, 
-#                                 logsd.delta95, logsd.delta90, logsd.delta70,
-#                                 logsd.delta10, logsd.delta20, logsd.delta30){
-#     
-#     M = rbind(
-#         c(1,1,1,1,0,0,0),
-#         c(1,1,1,0,0,0,0),
-#         c(1,1,0,0,0,0,0),
-#         c(1,0,0,0,0,0,0),
-#         c(1,0,0,0,1,0,0),
-#         c(1,0,0,0,1,1,0),
-#         c(1,0,0,0,1,1,1)
-#     )
-#     untransformed.mu = c(logmean00,0,0,0,0,0,0)
-#     untransformed.sigma = diag(c(logsd00,
-#                                  logsd.delta95, 
-#                                  logsd.delta90, 
-#                                  logsd.delta70, 
-#                                  logsd.delta10, 
-#                                  logsd.delta20,
-#                                  logsd.delta30))
-#     
-#     mu = M %*% untransformed.mu
-#     sigma = M  %*% untransformed.sigma %*% t(M)
-#     
-#     
-#     dist = Multivariate.Lognormal.Distribution(mu = mu, sigma = sigma, var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2020,2030)))
-#     return(dist)
-# }
-
 
 make.mv.spline.prior = function(parameter, logmean00, logsd00, 
                                 logsd.delta95, logsd.delta90, logsd.delta70,
@@ -66,6 +36,16 @@ make.mv.spline.prior = function(parameter, logmean00, logsd00,
     dist = Multivariate.Lognormal.Distribution(mu = mu, sigma = sigma, var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2020)))
     return(dist)
 }
+
+
+create.auto.regressive.covariance.matrix = function(correlation.coefficient,
+                                                    n,sd){
+    delta = matrix(rep(1:n,n)-rep(1:n,each=n),nrow=n)
+    corr.matrix = correlation.coefficient^abs(delta)
+    corr.matrix*(sd^2)
+    
+}
+
 
 
 #my best guess for this parameter is different in different locations, so we formulate prior as a multiply of the best guess
@@ -106,6 +86,8 @@ POPULATION.PARAMETERS.PRIOR=join.distributions(
     black.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     hispanic.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     other.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
+    
+    
 )
 ## AGING.PARAMETERS.PRIOR ----
 AGING.PARAMETERS.PRIOR=join.distributions( 
@@ -205,42 +187,26 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     #lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
     
     ## Transmission
-    #global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 100), #directly used in specification (will need sth uch larger) 
-    #global.transmission.rate = Uniform.Distribution(min = 0, max = Inf),
-    global.transmission.rate = Lognormal.Distribution(meanlog = log(1.5), sdlog = log(10)/2),
+    global.transmission.rate = Lognormal.Distribution(meanlog = log(1.8), sdlog = log(10)/2),
+    #global.transmission.rate = Lognormal.Distribution(meanlog = log(6.8), sdlog = log(10)/2),
     
     #12 independant params
     # msm multipliers by time
-    # transmission.rate.multiplier.msm1970 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-    # transmission.rate.multiplier.msm1990 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-    # transmission.rate.multiplier.msm1995 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),#1995 #increasing the peak value
-    # transmission.rate.multiplier.msm2000 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)), 
-    # transmission.rate.multiplier.msm2010 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)), 
-    # transmission.rate.multiplier.msm2020 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-    # transmission.rate.multiplier.msm2030 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-    # 
+    
     make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", logmean00 = log(3),logsd00 = log(2), 
                          logsd.delta95 = log(sqrt(1.5))/2, 
                          logsd.delta90 = log(sqrt(1.5))/2, 
                          logsd.delta70 = log(1.5^2)/2,
                          logsd.delta10 = log(1.5)/2, 
-                         logsd.delta20 = log(1.5)/2#, 
-                         #logsd.delta30 = log(1.5)/2
+                         logsd.delta20 = log(1.5)/2
     ),
     
     
     
     # heterosexual multipliers by time
-    # transmission.rate.multiplier.heterosexual1970 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # transmission.rate.multiplier.heterosexual1990 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # transmission.rate.multiplier.heterosexual1995 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),#1995 #increasing the peak value
-    # transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    # transmission.rate.multiplier.heterosexual2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    # transmission.rate.multiplier.heterosexual2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    # transmission.rate.multiplier.heterosexual2030 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    # 
     
-    make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", logmean00 = 0,logsd00 = log(2), 
+    
+    make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", logmean00 = 0,logsd00 = log(2)/2, 
                          logsd.delta95 = log(sqrt(1.5))/2, 
                          logsd.delta90 = log(sqrt(1.5))/2, 
                          logsd.delta70 = log(1.5^2)/2,
@@ -279,6 +245,11 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
     fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
     
+    # Proportion MSM ----
+    black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0,sdlog = log(2)),
+    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    other.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+    
     # relapse & infectiousness for EL
     prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
     el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
@@ -286,33 +257,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 ## TESTING.PARAMETERS.PRIOR ----
 TESTING.PARAMETERS.PRIOR=join.distributions( 
-    # Odd-Ratio of symptomatic testing (stage X sex and time) 
     
-    # or.symptomatic.primary.black.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.black.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.black.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # or.symptomatic.primary.hispanic.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.hispanic.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.hispanic.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # or.symptomatic.primary.other.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.other.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.other.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # or.symptomatic.secondary.black.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.black.msm               = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.black.female            = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # 
-    # or.symptomatic.secondary.hispanic.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.hispanic.msm               = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.hispanic.female            = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # 
-    # or.symptomatic.secondary.other.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.other.msm               = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.other.female            = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # 
-    # 
     
     or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
     or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
@@ -336,20 +281,12 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-    #or.symptomatic.2030 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     
     # for HIV screening
     hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
     # STI screening knots multiplier (relative to HIV screening)
-    # sti.screening.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.1995 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.2030 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
     make.mv.spline.prior(parameter = "sti.screening.multiplier." ,logmean00 = 0,logsd00 = log(2), 
                          logsd.delta95 = log(sqrt(1.5))/2, 
@@ -386,35 +323,144 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     sti.screening.multiplier.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
     
-    # sti.screening.multiplier.black.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.black.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.black.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # sti.screening.multiplier.hispanic.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.hispanic.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.hispanic.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # sti.screening.multiplier.other.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.other.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.other.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
     
     # Contact tracing
     # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
     prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing)
     #prop.index.cases.reached.for.contact.tracing = Logitnormal.Distribution(meanlogit = 0, sdlogit = log(3))
     
-    
-    # Time varying treatment rate
-    
-    # treatment.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # treatment.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # treatment.multiplier.1995 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # treatment.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # treatment.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # treatment.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    # treatment.multiplier.2030 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
 )
+
+
+
+###--------------------------------------------------------------------------###
+#Data for sexual activity by age and risk
+age_labels <- c("19","24","29","34","39","44","49","54","64","65")
+n_ages <- length(age_labels)
+
+# msm_means <- c(
+#     0.78225996, 1.0, 0.95998551, 0.85426289,
+#     0.80110115, 0.74182871, 0.66807753, 0.59361831, 0.52443517, 0.24827982
+# )
+
+msm_means <- c(
+    1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1
+)
+msm_meanlog <- log(msm_means)
+
+# Heterosexual
+# het_means <- c(
+#      0.67344578, 1.0, 0.93856869, 0.89449681,
+#     0.82901671, 0.78709287, 0.69855360, 0.56671692, 0.35979200, 0.09428752
+# )
+het_means <- c(
+    1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1
+)
+het_meanlog <- log(het_means)
+
+#testing params
+testing_meanlog <- c(
+    0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0
+)
+
+# ---- AR parameters ----
+rho_age <- 0.0          # correlation between adjacent ages
+sdlog_msm <- 0.5 * log(2)     
+sdlog_het <- 0.5 * log(2)     
+sdlog_testing <- 0.5 * log(2)
+
+# Covariance matrices
+Sigma_msm <- create.auto.regressive.covariance.matrix(
+    correlation.coefficient = rho_age,
+    n = n_ages,
+    sd = sdlog_msm
+)
+
+Sigma_het <- create.auto.regressive.covariance.matrix(
+    correlation.coefficient = rho_age,
+    n = n_ages,
+    sd = sdlog_het
+)
+
+Sigma_testing <- create.auto.regressive.covariance.matrix(
+    correlation.coefficient = rho_age,
+    n = n_ages,
+    sd = sdlog_testing
+)
+
+# Variable names 
+msm_varnames <- paste0("transmission.rate.multiplier.age", age_labels, ".msm")
+het_varnames <- paste0("transmission.rate.multiplier.age", age_labels, ".heterosexual")
+screening_varnames <- paste0("sti.screening.multiplier.age", age_labels)
+symptomatic_varnames <- paste0("or.symptomatic.age", age_labels)
+###--------------------------------------------------------------------------###
+
+AGE.PARAMETERS.PRIOR=join.distributions(
+    
+    # --- New: age 0–14 time-varying splines, sex-specific ---
+    # make.mv.spline.prior(
+    #     parameter     = "transmission.rate.multiplier.age14.msm",
+    #     logmean00     = log(1e-2),
+    #     logsd00       = 0.5 * log(2),
+    #     logsd.delta95 = log(sqrt(1.5))/2,
+    #     logsd.delta90 = log(sqrt(1.5))/2,
+    #     logsd.delta70 = log(1.5^2)/2,
+    #     logsd.delta10 = log(1.5)/2,
+    #     logsd.delta20 = log(1.5)/2
+    # ),
+    # 
+    # make.mv.spline.prior(
+    #     parameter     = "transmission.rate.multiplier.age14.heterosexual",
+    #     logmean00     = log(1e-2),
+    #     logsd00       = 0.5 * log(2),
+    #     logsd.delta95 = log(sqrt(1.5))/2,
+    #     logsd.delta90 = log(sqrt(1.5))/2,
+    #     logsd.delta70 = log(1.5^2)/2,
+    #     logsd.delta10 = log(1.5)/2,
+    #     logsd.delta20 = log(1.5)/2
+    # ),
+    
+    
+    transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(1), sdlog = 0.5 * log(2)),
+    
+    TRANSMISSION.AGE.MSM.PRIOR <- Multivariate.Lognormal.Distribution(
+        mu = msm_meanlog,
+        sigma = Sigma_msm,
+        var.names = msm_varnames
+    ),
+    
+    transmission.rate.multiplier.age14.heterosexual = Lognormal.Distribution(meanlog = log(1), sdlog = 0.5 * log(2)),
+    
+    
+    TRANSMISSION.AGE.HET.PRIOR <- Multivariate.Lognormal.Distribution(
+        mu = het_meanlog,
+        sigma = Sigma_het,
+        var.names = het_varnames
+    ), 
+    
+    sti.screening.multiplier.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    
+    
+    SCREENING.AGE.PRIOR <- Multivariate.Lognormal.Distribution(
+        mu = testing_meanlog,
+        sigma = Sigma_testing,
+        var.names = screening_varnames
+    ),
+    
+    or.symptomatic.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+    
+    
+    SYMPTOMATIC.PRIOR <- Multivariate.Lognormal.Distribution(
+        mu = testing_meanlog,
+        sigma = Sigma_testing,
+        var.names = symptomatic_varnames
+    )
+    
+)
+
 
 
 ## PRENATAL.PARAMETER.PRIOR ----
@@ -610,6 +656,15 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                    dimension = "sex",
                                                    applies.to.dimension.values = c('female'))
     
+    ## Proportion MSM by race ----
+    set.element.functional.form.main.effect.alphas(model.settings,
+                                                   element.name = 'prp.msm.of.male',
+                                                   alpha.name = 'value',
+                                                   values = parameters[paste0(races, '.proportion.msm.of.male.mult')],
+                                                   applies.to.dimension.values = races,
+                                                   dimension = 'race')
+    
+    
     ## Transmission ----
     #multipliers for msm rates in each knot:
     for(time in c("1970","1990","1995","2000","2010","2020")){    
@@ -628,7 +683,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        applies.to.dimension.values = 'all')
         
         
-        #race multipliers, shared for msm and heterosexuals: 
+        #race multipliers: 
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "transmission.rate.msm",
                                                        alpha.name = time,
@@ -645,6 +700,54 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                                              "transmission.rate.multiplier.other.heterosexual")],
                                                        dimension = "race.to", #recipient
                                                        applies.to.dimension.values = c("black","hispanic", "other"))
+        
+        #age multipliers:
+        agegroups = c("14", "19","24", "29", "34", "39", "44", "49", "54", "64", "65")
+        for(age.index in 1:11) {
+            agegroup=agegroups[age.index]
+            paramName.msm =paste0("transmission.rate.multiplier.age",agegroups[age.index], ".msm")
+            paramName.heterosexual =paste0("transmission.rate.multiplier.age",agegroups[age.index], ".heterosexual")
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                           element.name = "transmission.rate.msm",
+                                                           alpha.name = time,
+                                                           values = parameters[paramName.msm],
+                                                           dimension = "age.to", #recipient
+                                                           applies.to.dimension.values = c(ages))
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                           element.name = "transmission.rate.heterosexual",
+                                                           alpha.name = time,
+                                                           values = parameters[paramName.heterosexual],
+                                                           dimension = "age.to", #recipient
+                                                           applies.to.dimension.values = c(ages)) }
+        # agegroups <- c("14","19","24","29","34","39","44","49","54","64","65")
+        # age_map   <- setNames(ages, agegroups)
+        # age14_lab <- unname(age_map[["14"]])
+        # 
+        # # age 14: time-varying, sex-specific
+        # set.element.functional.form.main.effect.alphas(
+        #     model.settings, element.name="transmission.rate.msm", alpha.name=time,
+        #     values=parameters[paste0("transmission.rate.multiplier.age14.msm", time)],
+        #     dimension="age.to", applies.to.dimension.values=age14_lab
+        # )
+        # set.element.functional.form.main.effect.alphas(
+        #     model.settings, element.name="transmission.rate.heterosexual", alpha.name=time,
+        #     values=parameters[paste0("transmission.rate.multiplier.age14.heterosexual", time)],
+        #     dimension="age.to", applies.to.dimension.values=age14_lab
+        # )
+        # # other ages keep time-invariant per-age, per-sex effects
+        # for (age_key in setdiff(agegroups, "14")) {
+        #     par_msm <- parameters[paste0("transmission.rate.multiplier.age", age_key, ".msm")]
+        #     par_het <- parameters[paste0("transmission.rate.multiplier.age", age_key, ".heterosexual")]
+        #     age_lab <- unname(age_map[[age_key]])
+        # 
+        #     set.element.functional.form.main.effect.alphas(
+        #         model.settings, element.name="transmission.rate.msm", alpha.name=time,
+        #         values=par_msm, dimension="age.to", applies.to.dimension.values=age_lab
+        #     )
+        #     set.element.functional.form.main.effect.alphas(
+        #          model.settings, element.name="transmission.rate.heterosexual", alpha.name=time,
+        #         values=par_het, dimension="age.to", applies.to.dimension.values=age_lab
+        #     ) }
     }
     
     set.element.functional.form.main.effect.alphas(model.settings,
@@ -709,6 +812,17 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        values = parameters[paste0("sti.screening.multiplier.", sexes)],
                                                        dimension = "sex", #recipient
                                                        applies.to.dimension.values = sexes)
+        
+        for(age.index in 1:11) {
+            agegroup=agegroups[age.index]
+            paramName =paste0("sti.screening.multiplier.age",agegroups[age.index])
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                           element.name = "multiplier.syphilis.screening.to.hiv.tests",
+                                                           alpha.name = time,
+                                                           values = parameters[paramName],
+                                                           dimension = "age", 
+                                                           applies.to.dimension.values = c(ages))}
+        
     }
     #Note: sti.screening.multiplier.*by stage are directly linked in the specification
     set.element.functional.form.main.effect.alphas(model.settings,
@@ -768,6 +882,25 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        values = parameters[paste0("or.symptomatic.secondary.", races)],
                                                        dimension = "race", #recipient
                                                        applies.to.dimension.values = races)
+        
+        
+        for(age.index in 1:11) {
+            agegroup=agegroups[age.index]
+            paramName =paste0("or.symptomatic.age",agegroups[age.index])
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                           element.name = "prp.symptomatic.primary",
+                                                           alpha.name = time,
+                                                           values = parameters[paramName],
+                                                           dimension = "age", 
+                                                           applies.to.dimension.values = c(ages))
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                           element.name = "prp.symptomatic.secondary",
+                                                           alpha.name = time,
+                                                           values = parameters[paramName],
+                                                           dimension = "age", 
+                                                           applies.to.dimension.values = c(ages))}
+        
+        
         # 
         # # Secondary symptomatic
         # for (r in races) for (s in sexes) {
@@ -1027,26 +1160,6 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
         'el.diagnoses.heterosexual_male.multiplier.1970',
         'lu.diagnoses.heterosexual_male.multiplier.1970'
     ),
-    #' initial.infections.Females=c(
-    #'     'ps.diagnoses.female.multiplier.1970',
-    #'     'el.diagnoses.female.multiplier.1970'#,
-    #'     'lu.diagnoses.female.multiplier.1970'
-    #' ),
-    # initial.infections.black=c(
-    #     'ps.diagnoses.black.multiplier.1970',
-    #     'el.diagnoses.black.multiplier.1970',
-    #     'lu.diagnoses.black.multiplier.1970'
-    # ),
-    # initial.infections.hispanic=c(
-    #     'ps.diagnoses.hispanic.multiplier.1970',
-    #     'el.diagnoses.hispanic.multiplier.1970',
-    #     'lu.diagnoses.hispanic.multiplier.1970'
-    # ),
-    # initial.infections.other=c(
-    #     'ps.diagnoses.other.multiplier.1970',
-    #     'el.diagnoses.other.multiplier.1970',
-    #     'lu.diagnoses.other.multiplier.1970'
-    # ),
     global.transmission.rate=c("global.transmission.rate"),
     #
     msm.transmission.block1 = c(
@@ -1080,6 +1193,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
         "transmission.rate.multiplier.hispanic.heterosexual",
         "transmission.rate.multiplier.other.heterosexual"
     ),
+    
     future.change.trate=c("transmission.rate.future.change.mult"),
     age.mixing.transmission=(
         "age.mixing.sd.mult"
@@ -1091,6 +1205,11 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     risk.mixing.transmission= c("oe.female.pairings.with.msm",
                                 "fraction.heterosexual_male.pairings.with.male",
                                 "fraction.msm.pairings.with.female"),
+    
+    proportion.msm.of.male = c(
+        'black.proportion.msm.of.male.mult',
+        'hispanic.proportion.msm.of.male.mult',
+        'other.proportion.msm.of.male.mult'),
     relapse=c(
         "prop.early.latent.to.secondary"
     ),
@@ -1162,6 +1281,7 @@ TESTING.SAMPLING.BLOCKS = list(
         "or.symptomatic.2020"#,
         #"or.symptomatic.2030"
     ),
+    
     hiv.testing = c(
         "hiv.testing.or",
         "hiv.testing.slope.or"
@@ -1197,24 +1317,111 @@ TESTING.SAMPLING.BLOCKS = list(
         "sti.screening.multiplier.msm",
         "sti.screening.multiplier.female"
     ),
-    # screening.by.sex.race1 = c(
-    #     "sti.screening.multiplier.black.heterosexual_male",
-    #     "sti.screening.multiplier.black.msm",
-    #     "sti.screening.multiplier.black.female"
-    # ),
-    # screening.by.sex.race2 = c(
-    #     "sti.screening.multiplier.hispanic.heterosexual_male",
-    #     "sti.screening.multiplier.hispanic.msm",
-    #     "sti.screening.multiplier.hispanic.female"
-    # ),
-    # screening.by.sex.race3 = c(
-    #     "sti.screening.multiplier.other.heterosexual_male",
-    #     "sti.screening.multiplier.other.msm",
-    #     "sti.screening.multiplier.other.female"
-    # ),
     future.change.screen=c("sti.screening.future.change.mult"),
     contact.tracing=c(
         "prop.index.cases.reached.for.contact.tracing"   
+    )
+)
+
+AGE.SAMPLING.BLOCKS = list(
+    # age14.transmission.msm.block1 = c(
+    #     "transmission.rate.multiplier.age14.msm1970",
+    #     "transmission.rate.multiplier.age14.msm1990",
+    #     "transmission.rate.multiplier.age14.msm1995"
+    # ),
+    # age14.transmission.msm.block2 = c(
+    #     "transmission.rate.multiplier.age14.msm2000",
+    #     "transmission.rate.multiplier.age14.msm2010",
+    #     "transmission.rate.multiplier.age14.msm2020"
+    # ),
+    # 
+    # age14.transmission.het.block1 = c(
+    #     "transmission.rate.multiplier.age14.heterosexual1970",
+    #     "transmission.rate.multiplier.age14.heterosexual1990",
+    #     "transmission.rate.multiplier.age14.heterosexual1995"
+    # ),
+    # age14.transmission.het.block2 = c(
+    #     "transmission.rate.multiplier.age14.heterosexual2000",
+    #     "transmission.rate.multiplier.age14.heterosexual2010",
+    #     "transmission.rate.multiplier.age14.heterosexual2020"
+    # ),
+    age.transmission.msm.1 = c(
+        "transmission.rate.multiplier.age14.msm",
+        "transmission.rate.multiplier.age19.msm",
+        "transmission.rate.multiplier.age24.msm",
+        "transmission.rate.multiplier.age29.msm",
+        "transmission.rate.multiplier.age34.msm"
+    ),
+    
+    age.transmission.msm.2 = c(
+        "transmission.rate.multiplier.age39.msm",
+        "transmission.rate.multiplier.age44.msm",
+        "transmission.rate.multiplier.age49.msm"
+    ),
+    
+    age.transmission.msm.3 = c(
+        "transmission.rate.multiplier.age54.msm",
+        "transmission.rate.multiplier.age64.msm",
+        "transmission.rate.multiplier.age65.msm"
+    ),
+    
+    age.transmission.heterosexual.1 = c(
+        "transmission.rate.multiplier.age14.heterosexual",
+        "transmission.rate.multiplier.age19.heterosexual",
+        "transmission.rate.multiplier.age24.heterosexual",
+        "transmission.rate.multiplier.age29.heterosexual",
+        "transmission.rate.multiplier.age34.heterosexual"
+    ),
+    
+    age.transmission.heterosexual.2 = c(
+        "transmission.rate.multiplier.age39.heterosexual",
+        "transmission.rate.multiplier.age44.heterosexual",
+        "transmission.rate.multiplier.age49.heterosexual"
+    ),
+    
+    age.transmission.heterosexual.3 = c(
+        "transmission.rate.multiplier.age54.heterosexual",
+        "transmission.rate.multiplier.age64.heterosexual",
+        "transmission.rate.multiplier.age65.heterosexual"
+    ),
+    
+    age.symptomatic.testing.1 = c(
+        "or.symptomatic.age14",
+        "or.symptomatic.age19",
+        "or.symptomatic.age24",
+        "or.symptomatic.age29",
+        "or.symptomatic.age34"
+    ),
+    
+    age.symptomatic.testing.2 = c(
+        "or.symptomatic.age39",
+        "or.symptomatic.age44",
+        "or.symptomatic.age49"
+    ),
+    
+    age.symptomatic.testing.3 = c(
+        "or.symptomatic.age54",
+        "or.symptomatic.age64",
+        "or.symptomatic.age65"
+    ),
+    screening.by.age.1 = c(
+        "sti.screening.multiplier.age14",
+        "sti.screening.multiplier.age19",
+        "sti.screening.multiplier.age24",
+        "sti.screening.multiplier.age29",
+        "sti.screening.multiplier.age34"
+    ),
+    
+    screening.by.age.2 = c(
+        "sti.screening.multiplier.age39",
+        "sti.screening.multiplier.age44",
+        "sti.screening.multiplier.age49"
+    ),
+    
+    screening.by.age.3 = c(
+        "sti.screening.multiplier.age54",
+        "sti.screening.multiplier.age64",
+        "sti.screening.multiplier.age65"
     )
 )
 
@@ -1295,6 +1502,7 @@ SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
     AGING.PARAMETERS.PRIOR,
     TRANSMISSION.PARAMETERS.PRIOR,
     TESTING.PARAMETERS.PRIOR,
+    AGE.PARAMETERS.PRIOR,
     PRENATAL.PARAMETERS.PRIOR
 )
 
@@ -1303,6 +1511,7 @@ SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
     AGING.SAMPLING.BLOCKS ,
     TRANSMISSION.SAMPLING.BLOCKS,
     TESTING.SAMPLING.BLOCKS,
+    AGE.SAMPLING.BLOCKS,
     PRENATAL.SAMPLING.BLOCKS
     
 )
