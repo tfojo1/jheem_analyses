@@ -63,7 +63,8 @@ make.mv.spline.prior = function(parameter, logmean00, logsd00,
     sigma = M  %*% untransformed.sigma %*% t(M)
     
     
-    dist = Multivariate.Lognormal.Distribution(mu = mu, sigma = sigma, var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2020)))
+    dist = Multivariate.Lognormal.Distribution(mu = mu, sigma = sigma, 
+                                               var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2020)))
     return(dist)
 }
 
@@ -184,44 +185,23 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     ## Initial diagnosis multipliers in 1970 by sex/risk group
     ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
     ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    # ps.diagnoses.black.multiplier.1970 = Lognormal.Distribution(meanlog = log(5), sdlog = 0.5*log(2)),
-    # ps.diagnoses.hispanic.multiplier.1970 = Lognormal.Distribution(meanlog = log(2), sdlog = 0.5*log(2)),
-    # ps.diagnoses.other.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    # 
-    #ps.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    
+  
     el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
     el.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-    # el.diagnoses.black.multiplier.1970 = Lognormal.Distribution(meanlog = log(5), sdlog = 0.5*log(2)),
-    # el.diagnoses.hispanic.multiplier.1970 = Lognormal.Distribution(meanlog = log(2), sdlog = 0.5*log(2)),
-    # el.diagnoses.other.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    # 
-    #el.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
     
     lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
     lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-    # lu.diagnoses.black.multiplier.1970 = Lognormal.Distribution(meanlog = log(5), sdlog = 0.5*log(2)),
-    # lu.diagnoses.hispanic.multiplier.1970 = Lognormal.Distribution(meanlog = log(2), sdlog = 0.5*log(2)),
-    # lu.diagnoses.other.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
-    # 
-    #lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-    
-    ## Transmission
+  
+     ## Transmission
     #global.transmission.rate = Lognormal.Distribution(meanlog = 0, sdlog = 100), #directly used in specification (will need sth uch larger) 
     #global.transmission.rate = Uniform.Distribution(min = 0, max = Inf),
     global.transmission.rate = Lognormal.Distribution(meanlog = log(1.5), sdlog = log(10)/2),
     
     #12 independant params
     # msm multipliers by time
-    # transmission.rate.multiplier.msm1970 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-    # transmission.rate.multiplier.msm1990 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-    # transmission.rate.multiplier.msm1995 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),#1995 #increasing the peak value
-    # transmission.rate.multiplier.msm2000 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)), 
-    # transmission.rate.multiplier.msm2010 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)), 
-    # transmission.rate.multiplier.msm2020 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-    # transmission.rate.multiplier.msm2030 = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-    # 
-    make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", logmean00 = log(3),logsd00 = log(2), 
+    make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to hetrosexuals
+                         logmean00 = log(3),logsd00 = log(2), #reference year 2000 #'@ryan: can you include the study ref?
+                         #
                          logsd.delta95 = log(sqrt(1.5))/2, 
                          logsd.delta90 = log(sqrt(1.5))/2, 
                          logsd.delta70 = log(1.5^2)/2,
@@ -233,16 +213,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     
     # heterosexual multipliers by time
-    # transmission.rate.multiplier.heterosexual1970 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # transmission.rate.multiplier.heterosexual1990 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # transmission.rate.multiplier.heterosexual1995 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),#1995 #increasing the peak value
-    # transmission.rate.multiplier.heterosexual2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    # transmission.rate.multiplier.heterosexual2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    # transmission.rate.multiplier.heterosexual2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    # transmission.rate.multiplier.heterosexual2030 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)), 
-    # 
-    
-    make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", logmean00 = 0,logsd00 = log(2)/2, 
+     make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", 
+                         logmean00 = 0,logsd00 = log(2), #we use het as the refrerence 
                          logsd.delta95 = log(sqrt(1.5))/2, 
                          logsd.delta90 = log(sqrt(1.5))/2, 
                          logsd.delta70 = log(1.5^2)/2,
@@ -271,12 +243,12 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)), #directly used in specification helper function
     #to control the standard deviation of the contact matrix by age
     
-    ## Sexual Mixing by Race
-    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(4)/2),
-    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(4)/2),
+    ## Sexual Mixing by Race #this is multiplied in the race mixing matrix
+    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(4)/2), #emperical 
+    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(4)/2),  #'@PK: to review
     other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(4)/2),
     
-    ## Sexual Mixing by Risk
+    ## Sexual Mixing by Risk #'@PK: to review
     oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(4)/2),
     fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
     fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
@@ -294,33 +266,6 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 ## TESTING.PARAMETERS.PRIOR ----
 TESTING.PARAMETERS.PRIOR=join.distributions( 
     # Odd-Ratio of symptomatic testing (stage X sex and time) 
-    
-    # or.symptomatic.primary.black.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.black.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.black.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # or.symptomatic.primary.hispanic.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.hispanic.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.hispanic.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # or.symptomatic.primary.other.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.other.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # or.symptomatic.primary.other.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # or.symptomatic.secondary.black.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.black.msm               = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.black.female            = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # 
-    # or.symptomatic.secondary.hispanic.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.hispanic.msm               = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.hispanic.female            = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # 
-    # or.symptomatic.secondary.other.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.other.msm               = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # or.symptomatic.secondary.other.female            = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)),
-    # 
-    # 
-    
     or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
     or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
     or.symptomatic.primary.female = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
@@ -343,21 +288,13 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-    #or.symptomatic.2030 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
+    #'@ryan: let's put into a spline format
     
     # for HIV screening
     hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
     hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
     
     # STI screening knots multiplier (relative to HIV screening)
-    # sti.screening.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.1990 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.1995 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.2000 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.2010 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.2020 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.2030 = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    
     make.mv.spline.prior(parameter = "sti.screening.multiplier." ,logmean00 = 0,logsd00 = log(2), 
                          logsd.delta95 = log(sqrt(1.5))/2, 
                          logsd.delta90 = log(sqrt(1.5))/2, 
@@ -366,7 +303,6 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
                          logsd.delta20 = log(1.5)/2#, 
                          #logsd.delta30 = log(1.5)/2
     ),
-    
     
     
     sti.screening.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
@@ -380,37 +316,17 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     
     
     # STI screening multiplier by race
-    
     sti.screening.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     sti.screening.multiplier.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     sti.screening.multiplier.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
-    
     # STI screening multiplier by sex
-    
     sti.screening.multiplier.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     sti.screening.multiplier.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     sti.screening.multiplier.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
     
-    # sti.screening.multiplier.black.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.black.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.black.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # sti.screening.multiplier.hispanic.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.hispanic.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.hispanic.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    # sti.screening.multiplier.other.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.other.msm               = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # sti.screening.multiplier.other.female            = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    # 
-    
-    # Contact tracing
-    # prop.index.cases.reached.for.contact.tracing = 0.8 [0.3, 0.98] #I chose the sdlogit to roughly create this range
-    prop.index.cases.reached.for.contact.tracing=Logitnormal.Distribution(meanlogit = logit(.8), sdlogit = log(2)*1.7 )# get.intervals(prop.index.cases.reached.for.contact.tracing)
-    #prop.index.cases.reached.for.contact.tracing = Logitnormal.Distribution(meanlogit = 0, sdlogit = log(3))
-    
+   
     
     # Time varying treatment rate
     
@@ -1233,10 +1149,7 @@ TESTING.SAMPLING.BLOCKS = list(
     #     "sti.screening.multiplier.other.msm",
     #     "sti.screening.multiplier.other.female"
     # ),
-    future.change.screen=c("sti.screening.future.change.mult"),
-    contact.tracing=c(
-        "prop.index.cases.reached.for.contact.tracing"   
-    )
+    future.change.screen=c("sti.screening.future.change.mult")
 )
 
 ## PRENATAL.SAMPLING.BLOCKS ----

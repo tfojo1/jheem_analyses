@@ -6,11 +6,13 @@
 # we should bound agegroups at 85+
 source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 
-
+# STAGE.0: Demographic calibration
+# STAGE.1: Diagnosis (race, sex stratified) - demog
+# STAGE.2: Diagnosis (race, sex, age stratified) - demog
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
 TOTAL.WEIGHT=1/16
-STAGE.0.POP.WEIGHT= 1/32
-STAGE.0.TD.WEIGHT= 1/4
+STAGE.0.POP.WEIGHT= 1/32 #'@ryan: to add
+STAGE.0.TD.WEIGHT= 1/4 #total diagnosis  #'@ryan: to add
 EL.DIAGNOSIS.WEIGHT = TOTAL.WEIGHT 
 POPULATION.WEIGHT = TOTAL.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
@@ -266,12 +268,8 @@ total.diagnosis.by.strata.stage1.likelihood.instructions =
                                          error.variance.type = c('cv', 'sd'),
                                          weights = DIAGNOSIS.WEIGHT ,
                                          equalize.weight.by.year = T,
-                                         minimum.error.sd = 1 #
+                                         minimum.error.sd = 1 
     )
-
-
-
-
 
 total.diagnosis.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
@@ -288,22 +286,6 @@ total.diagnosis.by.strata.stage2.likelihood.instructions =
                                          minimum.error.sd = 1 #
     )
 
-total.diagnosis.by.strata.EoV.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
-                                         outcome.for.data = "total.syphilis.diagnoses",  
-                                         levels.of.stratification = c(0,1,2),
-                                         dimensions = c("sex","race"),
-                                         from.year = 1993,
-                                         to.year = 2022,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.62617012189868,
-                                         error.variance.type = 'exp.of.variance',
-                                         weights = DIAGNOSIS.WEIGHT ,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1 #
-    )
-
-
 total.diagnosis.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
                                          outcome.for.data = "total.syphilis.diagnoses",  
@@ -318,22 +300,6 @@ total.diagnosis.likelihood.instructions =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1 #
     )
-
-total.diagnosis.stage0.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
-                                         outcome.for.data = "total.syphilis.diagnoses",  
-                                         levels.of.stratification = c(0),
-                                         #dimensions = c("sex","race"),
-                                         from.year = 1993,
-                                         to.year = 2022,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,  
-                                         error.variance.type = 'cv',
-                                         weights = STAGE.0.TD.WEIGHT ,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1 #
-    )
-
 
 ##---- PS ----
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
@@ -355,20 +321,6 @@ ps.diagnosis.total.likelihood.instructions =
                                          error.variance.term = list(0.0764791209420945, 10),  
                                          error.variance.type = c('cv', 'sd'),
                                          weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1  
-    )
-
-ps.diagnosis.total.stage0.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         levels.of.stratification = c(0), 
-                                         from.year = 1993,
-                                         to.year = 2022,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.0764791209420945,  
-                                         error.variance.type = 'cv',
-                                         weights = STAGE.0.TD.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
@@ -403,25 +355,7 @@ ps.diagnosis.by.strata.stage2.likelihood.instructions =
                                          minimum.error.sd = 1  
     )
 
-ps.diagnosis.by.strata.EoV.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         dimensions = c("age","race","sex"),
-                                         levels.of.stratification = c(0,1,2),
-                                         from.year = 1993,
-                                         to.year = 2022,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.62617012189868,
-                                         error.variance.type = 'exp.of.variance',
-                                         weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1  
-    )
-
-
-
-
-
+##---- FUTURE PENALTY FOR PS ----
 future.change.likelihood.instructions =
     create.custom.likelihood.instructions(
         name = "future.change.likelihood",
@@ -480,7 +414,7 @@ future.change.likelihood.instructions =
         get.data.function = function(version, location) {
             sim.meta <- get.simulation.metadata(version = version, location = location)
             
-            start_year  <- 2020L
+            start_year  <- 2020L #'@ryan: we should revise to 2018 so the penalty starts in 2023
             end_year    <- 2030L
             window_len  <- 5L
             # need years 2020..2030 so t=2025..2030 ratios are computable
@@ -587,7 +521,7 @@ future.change.strata.likelihood.instructions =
         get.data.function = function(version, location) {
             sim.meta   <- get.simulation.metadata(version = version, location = location)
             
-            start_year <- 2020L     # pick your window; must allow t-1 within range
+            start_year <- 2020L     # pick your window; must allow t-1 within range #'@ryan: we should revise to 2018 so the penalty starts in 2023
             end_year   <- 2030L
             window_len <- 5L
             years      <- seq(start_year, end_year)
@@ -680,7 +614,7 @@ U.turn.likelihood.instructions =
         get.data.function = function(version, location) {
             sim.meta <- get.simulation.metadata(version = version, location = location)
             
-            start_year <- 2010L
+            start_year <- 2010L #'@ryan: we should revise to 2013 so the penalty starts in 2023
             end_year   <- 2030L
             window_len <- 5L
             years <- seq(start_year, end_year)
@@ -793,7 +727,7 @@ U.turn.strata.likelihood.instructions = create.custom.likelihood.instructions(
     get.data.function = function(version, location) {
         sim.meta <- get.simulation.metadata(version = version, location = location)
         
-        start_year <- 2010L    
+        start_year <- 2010L    #'@ryan: we should revise to 2013 so the penalty starts in 2023
         end_year   <- 2030L
         window_len <- 5L        
         years <- seq(start_year, end_year)
@@ -846,7 +780,6 @@ early.diagnosis.total.likelihood.instructions =
                                          minimum.error.sd = 1
     )
 
-
 early.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
@@ -876,25 +809,6 @@ early.diagnosis.by.strata.stage2.likelihood.instructions =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
-
-
-early.diagnosis.by.strata.EoV.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
-                                         outcome.for.data = "early.syphilis.diagnoses", 
-                                         #dimensions = c("age","race","sex"),
-                                         dimensions = c("sex","race"),
-                                         levels.of.stratification = c(0,1,2),
-                                         from.year = 1993,
-                                         to.year = 2022,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.62617012189868,
-                                         error.variance.type = 'exp.of.variance',
-                                         weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-
 
 
 ##---- Late/Unknown ---- 
@@ -947,26 +861,6 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
-
-
-late.diagnosis.by.strata.EoV.likelihood.instructions =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
-                                         outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         #dimensions = c("age","race","sex"),
-                                         dimensions = c("sex","race"),
-                                         levels.of.stratification = c(0,1,2),
-                                         from.year = 1993,
-                                         to.year = 2022,
-                                         observation.correlation.form = 'autoregressive.1',
-                                         error.variance.term = 0.62617012189868,
-                                         error.variance.type = 'exp.of.variance',
-                                         weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
-    )
-
-
-
 
 ##** HIV TESTS ** ----
 ### MSA-level ----
@@ -1312,27 +1206,27 @@ no.prenatal.care.likelihood.instructions =
 
 
 #-- LIKELIHOODS --# ----
+
 ## Demographics only ----
+# lik.inst.demog=join.likelihood.instructions(
+#     population.likelihood.instructions,
+#     deaths.likelihood.instructions,
+#     fertility.likelihood.instructions,
+#     immigration.likelihood.instructions,
+#     emigration.likelihood.instructions
+# )
 
-lik.inst.demog=join.likelihood.instructions(
-    population.likelihood.instructions,
-    deaths.likelihood.instructions,
-    fertility.likelihood.instructions,
-    immigration.likelihood.instructions,
-    emigration.likelihood.instructions
-)
-
-lik.inst.demog.TD=join.likelihood.instructions(
-    population.likelihood.instructions,
-    deaths.likelihood.instructions,
-    fertility.likelihood.instructions,
-    immigration.likelihood.instructions,
-    emigration.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions,
-    total.diagnosis.likelihood.instructions,
-    historical.diagnosis.likelihood.instructions
-    
-)
+# STAGE0
+# lik.inst.demog.TD=join.likelihood.instructions(
+#     population.likelihood.instructions,
+#     deaths.likelihood.instructions,
+#     fertility.likelihood.instructions,
+#     immigration.likelihood.instructions,
+#     emigration.likelihood.instructions,
+#     ps.diagnosis.total.likelihood.instructions,
+#     total.diagnosis.likelihood.instructions,
+#     historical.diagnosis.likelihood.instructions
+# )
 
 lik.inst.demog.TD.2=join.likelihood.instructions(
     population.likelihood.instructions,
@@ -1344,7 +1238,6 @@ lik.inst.demog.TD.2=join.likelihood.instructions(
 )
 
 ## Adult syphilis diagnosis only / HIV tests ----- 
-
 lik.inst.diag.strata.stage1.no.demog.w.future.totals=join.likelihood.instructions(
     total.diagnosis.by.strata.stage1.likelihood.instructions,
     total.diagnosis.likelihood.instructions,
@@ -1364,9 +1257,6 @@ lik.inst.diag.strata.stage1.no.demog.w.future.totals=join.likelihood.instruction
     U.turn.likelihood.instructions,
     U.turn.strata.likelihood.instructions
 )
-
-
-
 
 lik.inst.diag.strata.stage2.no.demog.w.future.totals=join.likelihood.instructions(
     total.diagnosis.by.strata.stage2.likelihood.instructions,
