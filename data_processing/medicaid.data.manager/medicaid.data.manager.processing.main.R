@@ -124,7 +124,7 @@ data.manager$register.ontology(
         year= NULL,
         location= NULL,
         age=c('0-18', '19-64'),
-        race=c("white", "black", "hispanic", "asian/native hawaiian or pacific islander", "american indian or alaska native", "multiple races"),
+        race=c("white", "black", "hispanic", "asian/native hawaiian or pacific islander", "american indian or alaska native"),
         sex=c('male','female')
     ))
 

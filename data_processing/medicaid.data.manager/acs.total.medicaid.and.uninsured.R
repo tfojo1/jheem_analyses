@@ -141,7 +141,7 @@ uninsured.acs.total = lapply(uninsured.acs.data, function(file){
     data<-data %>% select(location, total)
     
     #Create year:
-    data$year = str_sub(filename, 37, 40) 
+    data$year = str_sub(filename, 38, 41) 
     
     #Create outcome:
     data$outcome = 'uninsured.total'
@@ -195,7 +195,7 @@ uninsured.acs.data.stratified = lapply(uninsured.acs.data, function(file){
     }
     
     #Create year:
-    data$year = str_sub(filename, 37, 40) 
+    data$year = str_sub(filename, 38, 41) 
     
     #Create outcome:
     data$outcome = 'uninsured.total'
