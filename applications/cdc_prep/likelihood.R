@@ -65,6 +65,36 @@ cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions
                                                                                    error.variance.type = c('sd')
 )
 
+nonfunded.rate.likelihood <- create.custom.likelihood.instructions(name = "cdc.nonfunded.rate",
+    
+    get.data.function = function(version, location){
+        
+        start.years = '2025'
+        end.years = '2035'
+        keep_dims <- c("year")
+        
+        sim.metadata = get.simulation.metadata(version=version, location=location)
+        
+        optimized.get.instr.sim <- sim.metadata$prepare.optimized.get.instructions(
+            outcomes         = "cdc.nonfunded.general.population.testing",        
+            dimension.values = list(year = sort(unique(c(as.integer(start.years), as.integer(end.years))))),
+            keep.dimensions  = keep_dims          
+        )
+        
+       
+
+        
+    }, compute.function = function(sim,data,log = TRUE){
+    
+    x =sim$optimized.get(data$optimized.get.instructions)
+    if(any(x < 0)){
+        return(-Inf)
+    }
+    else{
+        return(0)
+    }
+}
+)
 
 future.test.likelihood.instructions <- create.custom.likelihood.instructions(name = "cdc.funded.test.ratio",
     get.data.function = function(version, location){
@@ -97,7 +127,7 @@ future.test.likelihood.instructions <- create.custom.likelihood.instructions(nam
         
         data = list(log.mean = unname(logR5[location]), 
                     log.sd = sd_logR5,
-                    optimized.get.instr = optimized.get.instr) 
+                    optimized.get.instructions = optimized.get.instr.sim) 
         
         
     },
@@ -108,8 +138,8 @@ future.test.likelihood.instructions <- create.custom.likelihood.instructions(nam
         
         #Calculate ratio 
         
-        x =sim$get("cdc.funded.tests")
-        sim.ratio = x["2028",,]/x["2023",,]
+        x =sim$optimized.get(data$optimized.get.instructions)
+        sim.ratio = x["2028",]/x["2023",]
         
         if ((sim.ratio <= upper) && (sim.ratio >= lower)){
             return(dnorm(log(lower),data$log.mean,data$log.sd)*1/sim.ratio)
@@ -122,7 +152,7 @@ future.test.likelihood.instructions <- create.custom.likelihood.instructions(nam
 )
 
 
-cdc.prep.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcare.tests.likelihood.instructions,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions,future.test.likelihood.instructions)
+cdc.prep.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcare.tests.likelihood.instructions,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,future.test.likelihood.instructions,nonfunded.rate.likelihood)
 
 
 

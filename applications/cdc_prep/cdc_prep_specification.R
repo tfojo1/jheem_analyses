@@ -201,6 +201,21 @@ register.model.quantity(CDCP.SPECIFICATION,
 ##--------------##
 
 
+track.point.outcome(CDCP.SPECIFICATION,
+                         name = 'cdc.nonfunded.general.population.testing',
+                         outcome.metadata = create.outcome.metadata(display.name = 'CDC Nonfunded General Testing Rate',
+                                                               description = "CDC Nonfunded General Testing Rate",
+                                                               scale = 'rate',
+                                                               axis.name = 'tests/person-year',
+                                                               units = 'tests/person-year',
+                                                               singular.unit = 'test/person-year'),
+                         denominator.outcome = 'point.population',
+                         scale = 'rate',
+                         value = 'cdc.nonfunded.general.population.testing',
+                         keep.dimensions = c('age','race','sex','risk','location'),
+                         save = T)
+
+
 track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cdc.funded.tests.in.uninfected',
                          outcome.metadata = NULL,
