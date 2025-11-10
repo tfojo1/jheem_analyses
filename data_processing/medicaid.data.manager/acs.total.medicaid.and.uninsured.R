@@ -23,7 +23,7 @@ medicaid.acs.total = lapply(medicaid.acs.data, function(file){
     data$year = str_sub(filename, 37, 40) 
     
     #Create outcome:
-    data$outcome = 'uninsured.total'
+    data$outcome = 'medicaid.total'
     
     #Clean value:
     #data$value = ifelse(data$value == "N/A", NA, data$value)
@@ -78,7 +78,7 @@ medicaid.acs.data.stratified = lapply(medicaid.acs.data, function(file){
     data$year = str_sub(filename, 37, 40) 
     
     #Create outcome:
-    data$outcome = 'uninsured.total'
+    data$outcome = 'medicaid.total'
     
     #Clean value:
     data$value = ifelse(data$value == "N/A", NA, data$value)
