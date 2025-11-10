@@ -1234,7 +1234,7 @@ lik.inst.demog.TD.2=join.likelihood.instructions(
     fertility.likelihood.instructions,
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
-    ps.diagnosis.total.stage0.likelihood.instructions
+    ps.diagnosis.total.likelihood.instructions
 )
 
 ## Adult syphilis diagnosis only / HIV tests ----- 
