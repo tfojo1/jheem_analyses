@@ -69,3 +69,12 @@ sync.cached.data.manager("ryan.white.web.data.manager.rdata",
                          allow.flag = T)
 
 get.data.manager.cache.metadata()
+
+#medicaid data manager -----------------------------------------
+
+
+sync.cached.data.manager("medicaid.data.manager.rdata",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/EV5Cu3Imh1tGhswKWLwlvQEBQMYolFTH9IjAtxdrdwOfPg?e=TvYvHj",
+                         allow.flag = T)
+
+get.data.manager.cache.metadata()
