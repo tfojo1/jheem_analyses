@@ -414,7 +414,7 @@ future.change.likelihood.instructions =
         get.data.function = function(version, location) {
             sim.meta <- get.simulation.metadata(version = version, location = location)
             
-            start_year  <- 2020L #'@ryan: we should revise to 2018 so the penalty starts in 2023
+            start_year  <- 2018L #'@ryan: we should revise to 2018 so the penalty starts in 2023
             end_year    <- 2030L
             window_len  <- 5L
             # need years 2020..2030 so t=2025..2030 ratios are computable
@@ -433,7 +433,7 @@ future.change.likelihood.instructions =
                 start_year  = start_year,
                 end_year    = end_year,
                 window_len  = window_len,
-                meanlog     = 0.522, # hard coded for years 2010 - 2022
+                meanlog     = 0.522, # hard coded for years 2012 - 2022
                 sdlog       = 0.357,
                 sd.width   = 2,
                 weight = PENALTY.WEIGHT  
@@ -614,7 +614,7 @@ U.turn.likelihood.instructions =
         get.data.function = function(version, location) {
             sim.meta <- get.simulation.metadata(version = version, location = location)
             
-            start_year <- 2010L #'@ryan: we should revise to 2013 so the penalty starts in 2023
+            start_year <- 2013L #'@ryan: we should revise to 2013 so the penalty starts in 2023
             end_year   <- 2030L
             window_len <- 5L
             years <- seq(start_year, end_year)
@@ -727,7 +727,7 @@ U.turn.strata.likelihood.instructions = create.custom.likelihood.instructions(
     get.data.function = function(version, location) {
         sim.meta <- get.simulation.metadata(version = version, location = location)
         
-        start_year <- 2010L    #'@ryan: we should revise to 2013 so the penalty starts in 2023
+        start_year <- 2013L    #'@ryan: we should revise to 2013 so the penalty starts in 2023
         end_year   <- 2030L
         window_len <- 5L        
         years <- seq(start_year, end_year)

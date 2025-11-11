@@ -174,7 +174,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     #12 independant params
     # msm multipliers by time
-    make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to hetrosexuals
+    make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to heterosexuals
                          logmean00 = log(3),logsd00 = log(2), #reference year 2000 #'@ryan: can you include the study ref?
                          #
                          logsd.delta95 = log(sqrt(1.5))/2, 
