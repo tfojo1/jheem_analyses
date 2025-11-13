@@ -14,3 +14,6 @@ simplot(simset,
         split.by='risk',
         data.manager = RW.DATA.MANAGER,
         'non.adap.clients', dimension.values = list(year=2015:2025)) 
+
+simplot(simset, 'new', 
+        summary.type = 'mean.and.interval')
