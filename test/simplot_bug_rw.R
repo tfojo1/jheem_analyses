@@ -1,4 +1,5 @@
 
+source('applications/ryan_white/ryan_white_main.R')
 
 simset = retrieve.simulation.set('rw', 'C.12580', 'final.ehe', n.sim=80, intervention.code = 'noint', sub.version='w')
 
