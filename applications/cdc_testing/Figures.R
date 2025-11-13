@@ -15,7 +15,7 @@ library(forcats)
 
 #load simulation set
 
-load('/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/cdc_testing_results_2025-09-16.Rdata')
+load('/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cdc_testing/cdc_testing_results_2025-08-05.Rdata')
 
 #stratified
 dimnames(full.incidence)
@@ -304,14 +304,16 @@ ggplot(plot_data, aes(x = relative_incidence_capped, y = state, fill = intervent
 
 #Texas Plots, LA Plots, IL Plots
 # Subset and label TX
-tx_end <- subset(all.summary.data.cdct.end, state == "TX")
-tx_end$intervention <- "CDC Testing Cessation"
 
-tx_pintr <- subset(all.summary.data.cdct.pintr, state == "TX")
-tx_pintr$intervention <- "Prolonged Interruption"
 
-tx_bintr <- subset(all.summary.data.cdct.bintr, state == "TX")
-tx_bintr$intervention <- "Brief Interruption"
+total_pintr <- subset(all.summary.data.cdct.pintr, state == "Total")
+total_pintr$intervention <- "Prolonged Interruption"
+
+total_bintr <- subset(all.summary.data.cdct.bintr, state == "Total")
+total_bintr$intervention <- "Brief Interruption"
+
+total_end <- subset(all.summary.data.cdct.end, state == "Total")
+total_end$intervention <- "CDC Testing Cessation"
 
 # Subset and label LA
 la_end <- subset(all.summary.data.cdct.end, state == "LA")
@@ -334,7 +336,7 @@ il_bintr <- subset(all.summary.data.cdct.bintr, state == "IL")
 il_bintr$intervention <- "Brief Interruption"
 
 # Combine all
-combined <- rbind(tx_end, tx_pintr, tx_bintr,
+combined <- rbind(total_end, total_pintr, total_bintr,
                   la_end, la_pintr, la_bintr,
                   il_end, il_pintr, il_bintr)
 # Factor levels
@@ -342,7 +344,7 @@ combined$intervention <- factor(combined$intervention,
                                 levels = c("Brief Interruption", "Prolonged Interruption", "CDC Testing Cessation"))
 combined$scenario <- factor(combined$scenario,
                             levels = c("noint", "cdct.bintr", "cdct.pintr", "cdct.end"))
-combined$state <- factor(combined$state, levels = c("IL", "TX", "LA"))
+combined$state <- factor(combined$state, levels = c("IL", "Total", "LA"))
 
 # Colors
 jama_colors <- c(
@@ -361,19 +363,19 @@ vline_data <- data.frame(
 # Y-axis limits by state
 y_max_by_state <- list(
     IL = 1500,
-    TX = 6000,
+    Total = 30000,
     LA = 2200
 )
 
 # Annotation text
 annotations <- data.frame(
-    state = rep(c("IL", "TX", "LA"), each = 3),
+    state = rep(c("IL", "Total", "LA"), each = 3),
     intervention = rep(c("CDC Testing Cessation", "Prolonged Interruption", "Brief Interruption"), 3),
     year = c(2032, 2031, 2030, 2032, 2031, 2030, 2032, 2031, 2030),
     value = c(900, 800, 700, 3000, 2500, 2000, 1800, 1500, 1200),
     label = c(
         "174 (62–320)", "150 (53–274)", "77 (28–138)",             # IL
-        "2303 (835–4120)", "1867 (693–3305)", "837 (328–1424)",    # TX
+        "12,719", "10,601", "5,012",    # Total
         "1387 (429–2823)", "1081 (349–2138)", "432 (155–780)"      # LA
     )
 )
@@ -925,11 +927,49 @@ for (state in states) {
     #simset$location
     #simset$save()
 
+    # Define larger, clearer theme
+    my_theme <- theme_bw(base_size = 16) +
+        theme(
+            axis.text = element_text(size = 28),        # twice as large
+            axis.title = element_text(size = 32),       # larger axis labels
+            plot.title = element_text(size = 36, face = "bold") # larger plot title
+        )
     
+    # A: New Diagnoses (n)
+    simplot(simset, "new", dimension.values = list(year = 2010:2030),
+            summary.type = "mean.and.interval") +
+        my_theme +
+        labs(x = "Year", y = "New Diagnoses (n)")
     
-    simplot(simset,"total.cdc.hiv.test.positivity",dimension.values = list(year = 2010:2030),summary.type = "mean.and.interval")
-    simplot(simset,"cdc.funded.tests",dimension.values = list(year = 2010:2030),summary.type = "mean.and.interval")
+    # B: Proportion Aware (%)
+    simplot(simset, "awareness", dimension.values = list(year = 2010:2030),
+            summary.type = "mean.and.interval") +
+        my_theme +
+        labs(x = "Year", y = "Proportion Aware (%)")
     
+    # C: Tests (n)
+    simplot(simset, "cdc.funded.tests", dimension.values = list(year = 2010:2030),
+            summary.type = "mean.and.interval") +
+        my_theme +
+        labs(x = "Year", y = "Tests (n)")
+    
+    # D: Positivity (%)
+    simplot(simset, "total.cdc.hiv.test.positivity", dimension.values = list(year = 2010:2030),
+            summary.type = "mean.and.interval") +
+        my_theme +
+        labs(x = "Year", y = "Positivity (%)")
+    
+    # E: People with HIV (n)
+    simplot(simset, "diagnosed.prevalence", dimension.values = list(year = 2010:2030),
+            summary.type = "mean.and.interval") +
+        my_theme +
+        labs(x = "Year", y = "People with HIV (n)")
+    
+    # F: Proportion Tested (%)
+    simplot(simset, "testing", dimension.values = list(year = 2010:2030),
+            summary.type = "mean.and.interval") +
+        my_theme +
+        labs(x = "Year", y = "Proportion Tested (%)")
     
     
     # Run setup calibration
@@ -1316,4 +1356,9 @@ ggplot(plot_data, aes(x = relative_incidence_capped, y = state, fill = intervent
         legend.text = element_text(size = 18),
         axis.text = element_text(size = 18)
     )
+
+
+#Supplementary Table EHE/Medicaid Expansion
+
+
 
