@@ -157,7 +157,7 @@ data.manager$register.ontology(
     ))
 
 #Register Locations:
-locations::register.types(type = c("rw.region"), prefix = c("region"), prefix.longform = c("ryan.white.region"))
+locations::register.types(type = c("rw.region"), prefix = c("rw"), prefix.longform = c("ryan.white.region"))
 
 locations::register.locations(type='rw.region',
                               locations = c('rw.region.1', 'rw.region.2', 'rw.region.3',
@@ -172,8 +172,8 @@ locations::register.locations(type='rw.region',
 
 
 # Source ------------------------------------------------------------------
-#source('data_processing/medicaid.data.manager/adap.and.non.adap.totals.by.region.R') #outcome = adap.clients; non.adap.clients (by region)
-#source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
+source('data_processing/medicaid.data.manager/adap.and.non.adap.totals.by.region.R') #outcome = adap.clients; non.adap.clients (by region)
+source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
 source('data_processing/medicaid.data.manager/brfss.proportion.tested.medicaid.R') #outcomes = medicaid.total;proportion.tested.for.hiv.past.year.medicaid; 
 source('data_processing/medicaid.data.manager/brfss.proportion.tested.uninsured.R') #outcomes = uninsured.total;  proportion.tested.for.hiv.past.year.uninsured
 source('data_processing/medicaid.data.manager/brfss.data.variance.values.R') #Adds variance values to uninsured.total and medicaid.total
