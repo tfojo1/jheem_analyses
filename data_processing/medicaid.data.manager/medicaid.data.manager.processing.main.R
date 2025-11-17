@@ -156,15 +156,18 @@ data.manager$register.ontology(
         age=c('0-18', '19-26', '27-44', '45-64', '65+')
     ))
 
-#Waiting for update on Locations package to fix error in registering new locations#
-#Register locations (because these reports use Regions [groups of states])
-# locations::register.locations(type='region', 
-#                               locations = c("01", "02", "03", "04", "05",
-#                                             "06", "07", "08", "09", "10"),
-#                               location.names =c('rw.region.1', 'rw.region.2', 'rw.region.3', 
-#                                                 'rw.region.4', 'rw.region.5', 'rw.region.6',
-#                                                 'rw.region.7', 'rw.region.8', 'rw.region.9',
-#                                                  'rw.region.10'))
+#Register Locations:
+locations::register.types(type = c("rw.region"), prefix = c("region"), prefix.longform = c("ryan.white.region"))
+
+locations::register.locations(type='rw.region',
+                              locations = c('rw.region.1', 'rw.region.2', 'rw.region.3',
+                                            'rw.region.4', 'rw.region.5', 'rw.region.6',
+                                            'rw.region.7', 'rw.region.8', 'rw.region.9',
+                                            'rw.region.10'),
+                              location.names =c('rw.region.1', 'rw.region.2', 'rw.region.3',
+                                                'rw.region.4', 'rw.region.5', 'rw.region.6',
+                                                'rw.region.7', 'rw.region.8', 'rw.region.9',
+                                                'rw.region.10'))
 
 
 
