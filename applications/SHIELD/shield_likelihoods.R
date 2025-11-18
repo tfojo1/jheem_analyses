@@ -43,16 +43,6 @@ w.population <- lapply(c(w1,w2), function(wi) {
     )
 })
 
-# adding more weight to diagnosis data before 2000 and those after 2010
-# w.diagnosis=lapply(c(1993:2023),function(year){
-#   if(year<2000){w=1
-#   }else{ if(year<2010){w=.5
-#   }else{ w=1}
-#   }
-#   total.weight = DIAGNOSIS.WEIGHT * w
-#   create.likelihood.weights(total.weight,dimension.values = list(year=year))
-#   
-# })
 
 #** POPULATION SIZES ** ---- 
 #'@PK: what is the logic, where are the assumptions from?
@@ -267,7 +257,7 @@ total.diagnosis.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.term = list(0.0764791209420945, 10),  #@Ryan: can you please cite the reference code here and clean up that coe and include dcumentation 
                                          #
                                          observation.correlation.form = 'autoregressive.1', #long timeframe
                                          #
@@ -844,7 +834,7 @@ early.diagnosis.by.strata.stage2.likelihood.instructions =
     )
 
 
-##---- Late/Unknown Diagnosis---- 
+## Late/Unknown Diagnosis---- 
 # data from 1941-2022 (cdc.pdf.report) for national model Only (total)
 # data from 2000-2023 (cdc.sti) for county; state; national level (total; sex; race; age group; age group+sex; age group + race; race+sex)
 # data from 2000-2023 (cdc.sti) for state & national (by race, agegroup, sex)
@@ -908,22 +898,6 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
     )
 
 ##** HIV TESTS ** ----
-##---- Overall 2014-2019 ----
-hiv.testing.total.likelihood.instructions = #@Ryan: is this redundant? 
-    create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
-                                         outcome.for.data = "proportion.tested.for.hiv", 
-                                         levels.of.stratification = c(0),
-                                         from.year = 2014,
-                                         to.year = 2019,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = 0.05,
-                                         #
-                                         observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
-                                         #
-                                         weights = TESTING.WEIGHT
-    )
-#
 ##---- Strata Stage1 2014-2019 ----
 hiv.testing.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
@@ -1023,7 +997,7 @@ SHIELD.PARTITIONING.FUNCTION <- function(arr, version, location)
     # we return 'arr' unchanged (again, matching EHE behavior).
     arr
 }
-##---- Overall 2010-2019 ----
+##---- Overall 2010-2019 ---- #@Ryan: please document and explain what's what 
 proportion.tested.nested.likelihood.instructions =
     create.nested.proportion.likelihood.instructions(outcome.for.data = "proportion.tested.for.hiv",
                                                      outcome.for.sim = "hiv.testing",
@@ -1132,28 +1106,7 @@ state.HIV.tested.by.strata.stage2.likelihood.instructions =
 
 
 #-- LIKELIHOODS --# ----
-
-## Demographics only ----
-# lik.inst.demog=join.likelihood.instructions(
-#     population.likelihood.instructions,
-#     deaths.likelihood.instructions,
-#     fertility.likelihood.instructions,
-#     immigration.likelihood.instructions,
-#     emigration.likelihood.instructions
-# )
-
-# STAGE0
-# lik.inst.demog.TD=join.likelihood.instructions(
-#     population.likelihood.instructions,
-#     deaths.likelihood.instructions,
-#     fertility.likelihood.instructions,
-#     immigration.likelihood.instructions,
-#     emigration.likelihood.instructions,
-#     ps.diagnosis.total.likelihood.instructions,
-#     total.diagnosis.likelihood.instructions,
-#     historical.diagnosis.likelihood.instructions
-# )
-
+## STAGE0 ----
 lik.inst.demog.TD.2=join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,

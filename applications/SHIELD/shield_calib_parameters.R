@@ -1,27 +1,22 @@
 source("applications/SHIELD/shield_base_parameters.R")
 
 # Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
+# HELPER FUNCTIONS ----
 
 logit = function(p){
     log(p) - log(1-p)
 }
 
 # helper function to build multivariate normal distribution
-
-
-make.mv.spline.prior = function(parameter, logmean00, logsd00, 
-                                logsd.delta95, logsd.delta90, logsd.delta70,
-                                logsd.delta10, logsd.delta20){
-    
-    M = rbind(
-        c(1,1,1,1,0,0),
-        c(1,1,1,0,0,0),
-        c(1,1,0,0,0,0),
-        c(1,0,0,0,0,0),
-        c(1,0,0,0,1,0),
-        c(1,0,0,0,1,1)
-    )
-    untransformed.mu = c(logmean00,0,0,0,0,0)
+make.mv.spline.prior = function(parameter, 
+                                logmean00, logsd00, #mean and standard deviation for the parameter corresponding to the year 2000
+                                logsd.delta95, logsd.delta90, logsd.delta70, #SD for past changes (delta) in the param values between knots to 2000
+                                logsd.delta10, logsd.delta20 #SD for future changes (delta) in the param values between knots to 2000
+                                ){
+   
+    untransformed.mu = c(logmean00,0,0,0,0,0) #the initial expectation is that the change between years is zero
+    #diagonal covariance matrix for the initial parameters. Initial parameters are assumed to be independent.
+    #The variances for the changes (logsd.delta...) determine the expected magnitude of the annual changes.
     untransformed.sigma = diag(c(logsd00,
                                  logsd.delta95, 
                                  logsd.delta90, 
@@ -29,21 +24,33 @@ make.mv.spline.prior = function(parameter, logmean00, logsd00,
                                  logsd.delta10, 
                                  logsd.delta20))
     
+    #trasformation matrix: transforming the initial, independent parameters (baseline value + deltas) to the 
+    # final, correlated parameters (the value of the parameter at each of the six years)
+    # This structure allows to model knot values by accumulating changes (deltas) from baseline year
+    # P2000=baseline
+    # P1995=P2000+deltas???  #'@Ryan: can you review notes to see how the knots depend on each other. 
+    
+    M = rbind(
+      c(1,1,1,1,0,0),
+      c(1,1,1,0,0,0),
+      c(1,1,0,0,0,0),
+      c(1,0,0,0,0,0),
+      c(1,0,0,0,1,0),
+      c(1,0,0,0,1,1)
+    ) 
+    
     mu = M %*% untransformed.mu
     sigma = M  %*% untransformed.sigma %*% t(M)
-    
-    
+    #
     dist = Multivariate.Lognormal.Distribution(mu = mu, sigma = sigma, 
                                                var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2020)))
     return(dist)
 }
 
-create.auto.regressive.covariance.matrix = function(correlation.coefficient,
-                                                    n,sd){
+create.auto.regressive.covariance.matrix = function(correlation.coefficient,n,sd){
     delta = matrix(rep(1:n,n)-rep(1:n,each=n),nrow=n)
     corr.matrix = correlation.coefficient^abs(delta)
     corr.matrix*(sd^2)
-    
 }
 
 #my best guess for this parameter is different in different locations, so we formulate prior as a multiply of the best guess

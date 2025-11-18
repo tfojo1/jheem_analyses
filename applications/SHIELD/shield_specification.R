@@ -990,65 +990,6 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 )
 
 # Susceptibility of uninfected persons
-
-
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'doxy.rr',
-                       scale = 'proportion',
-                       value = 1
-)
-
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'doxy.coverage',
-                       scale = 'proportion',
-                       value = 0
-)
-
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'sexual.susceptibility',
-                        value = expression((1 - doxy.coverage) + doxy.coverage*(doxy.rr))
-)
-
-
-# Infectiousness ----
-# Secondary stage has max infection, the primary and EL infectiousness is set as a ratio relative to secondary
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'sexual.transmissibility',
-                        value = 0)
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'secondary.transmissibility',
-                       scale = 'non.negative.number',
-                       value = SHIELD_BASE_PARAMETER_VALUES['secondary.transmissibility'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'primary.rel.secondary.transmissibility',
-                       scale = 'ratio',
-                       value = SHIELD_BASE_PARAMETER_VALUES['primary.rel.secondary.transmissibility'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'el.rel.secondary.transmissibility',
-                       scale = 'ratio',
-                       value = SHIELD_BASE_PARAMETER_VALUES['el.rel.secondary.transmissibility'])
-##apply:
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'sexual.transmissibility',
-                               applies.to=list(stage='secondary'),
-                               value = 'secondary.transmissibility')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'sexual.transmissibility',
-                               applies.to=list(stage='primary'),
-                               value = expression(primary.rel.secondary.transmissibility*secondary.transmissibility))
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'sexual.transmissibility',
-                               applies.to=list(stage='early.latent'),
-                               value = expression(el.rel.secondary.transmissibility * secondary.transmissibility))
-
-# where do new infections go to? ----
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'new.infection.proportions',
-                        value = 1)
-
-
-##--------------------------------------------------------------------------------------------------------------#
-
 ##---- Sexual Contact: By RACE ----
 # oes for racial mixing with the same sex are estiamted from 4 studies. we assume equally likely mixing with other groups
 baseline.sexual.oes = array(c(SHIELD_BASE_PARAMETER_VALUES['oe.sexual.byrace.bb'],1,1,
@@ -1120,6 +1061,65 @@ register.model.element(SHIELD.SPECIFICATION,
                        get.value.function = get.race.population.counts)
 
 
+
+##---- DOXY PEP ----
+# relative risk: default=1 no protection
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'doxy.rr',
+                       scale = 'proportion',
+                       value = 1
+)
+#
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'doxy.coverage',
+                       scale = 'proportion',
+                       value = 0
+)
+#
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'sexual.susceptibility',
+                        value = expression((1 - doxy.coverage) + doxy.coverage*(doxy.rr))
+)
+
+
+## Infectiousness ----
+# Secondary stage has max infection, the primary and EL infectiousness is set as a ratio relative to secondary
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'sexual.transmissibility',
+                        value = 0)
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'secondary.transmissibility',
+                       scale = 'non.negative.number',
+                       value = SHIELD_BASE_PARAMETER_VALUES['secondary.transmissibility'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'primary.rel.secondary.transmissibility',
+                       scale = 'ratio',
+                       value = SHIELD_BASE_PARAMETER_VALUES['primary.rel.secondary.transmissibility'])
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'el.rel.secondary.transmissibility',
+                       scale = 'ratio',
+                       value = SHIELD_BASE_PARAMETER_VALUES['el.rel.secondary.transmissibility'])
+##apply:
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.transmissibility',
+                               applies.to=list(stage='secondary'),
+                               value = 'secondary.transmissibility')
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.transmissibility',
+                               applies.to=list(stage='primary'),
+                               value = expression(primary.rel.secondary.transmissibility*secondary.transmissibility))
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'sexual.transmissibility',
+                               applies.to=list(stage='early.latent'),
+                               value = expression(el.rel.secondary.transmissibility * secondary.transmissibility))
+
+## where do new infections go to? ----
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'new.infection.proportions',
+                        value = 1)
+
+
+##--------------------------------------------------------------------------------------------------------------#
 
 
 #*** SYPHILIS NATURAL HISTORY *** ----
