@@ -87,9 +87,10 @@ CDC.PREP.PARAMETERS.PRIOR = join.distributions(
 )
 
 
-
 cdc.prep.apply.set.parameters <- function(model.settings, parameters)
 {
+    
+    print("apply function")
     specification.metadata = model.settings$specification.metadata
 
     non.idu.states = specification.metadata$compartment.aliases$never.idu.states
@@ -213,6 +214,9 @@ cdc.prep.apply.set.parameters <- function(model.settings, parameters)
                                                        value = parameters[paste0(parameter.prefix, 'or')],
                                                        dimension = 'all',
                                                        applies.to.dimension.values='all')
+        
+        print(element.name)
+        print(parameters[paste0(parameter.prefix, 'or')])
         
         # Sex/Risk Terms
         set.element.functional.form.interaction.alphas(model.settings,
