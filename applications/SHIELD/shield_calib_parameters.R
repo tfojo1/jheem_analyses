@@ -56,7 +56,7 @@ create.auto.regressive.covariance.matrix = function(correlation.coefficient,n,sd
 #my best guess for this parameter is different in different locations, so we formulate prior as a multiply of the best guess
 # Defining the calibration parameters and prior distributions
 
-#1- PARAMETER PRIORS:----
+#***** PARAMETER PRIORS *****----
 
 ## POPULATION.PARAMETERS.PRIOR ----
 POPULATION.PARAMETERS.PRIOR=join.distributions( 
@@ -91,9 +91,7 @@ POPULATION.PARAMETERS.PRIOR=join.distributions(
     black.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     hispanic.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
     other.immigration.rate.multiplier.2= Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2))
-    
-    
-)
+    )
 ## AGING.PARAMETERS.PRIOR ----
 AGING.PARAMETERS.PRIOR=join.distributions( 
     # By age, race, sex for 2 knots:
@@ -166,36 +164,34 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 
 ## TRANSMISSION.PARAMETERS.PRIOR ----
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
-    ## Initial diagnosis multipliers in 1970 by sex/risk group
-    ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
+    ## Initial diagnosis 1970 by sex/risk group ----
+    ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu?
     ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
-    el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
+    el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
     el.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
     
-    lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),
+    lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
     lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
   
-     ## Transmission
-    global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2),
+    ## Global transmission ----
+    global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
     
     #12 independant params
-    # msm multipliers by time
+    ## msm multipliers by time ----
     make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to heterosexuals
-                         logmean00 = log(3),logsd00 = log(2), #reference year 2000 #'@ryan: can you include the study ref?
+                         logmean00 = log(3),logsd00 = log(2), #reference year 2000 #'@Ryan: why are we using these mu/sd?Ref?
                          #
-                         logsd.delta95 = log(sqrt(1.5))/2, 
+                         logsd.delta95 = log(sqrt(1.5))/2, #'@Ryan: why are we using these values?
                          logsd.delta90 = log(sqrt(1.5))/2, 
                          logsd.delta70 = log(1.5^2)/2,
                          logsd.delta10 = log(1.5)/2, 
                          logsd.delta20 = log(1.5)/2
     ),
     
-    
-    
-    # heterosexual multipliers by time
+    ## heterosexual multipliers by time ----
      make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", 
-                         logmean00 = 0,logsd00 = log(2), #we use het as the refrerence 
+                         logmean00 = 0,logsd00 = log(2), ##'@Ryan: why are we using this SD?
                          logsd.delta95 = log(sqrt(1.5))/2, 
                          logsd.delta90 = log(sqrt(1.5))/2, 
                          logsd.delta70 = log(1.5^2)/2,
@@ -203,10 +199,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
                          logsd.delta20 = log(1.5)/2
     ),
     
-    
-    
-    
-    ### race multipliers (msm and het seperate):
+    ## race multipliers (msm and het seperatly) ----
+    #'@Ryan: we have used sdlog= log(2)/2 everywhere else.why increasing here?
     transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
@@ -216,36 +210,40 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     
-    ### future change
-    transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
+    ## future change ----
+    transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #@Ryan: please cite these numbers 
     
-    ## Sexual Mixing by Age
-    age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)), #directly used in specification helper function
+    ## Sexual Mixing by Age ----
+    age.mixing.sd.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)), #the model is sensitive to this parameter-we reduce the sdlog=1/4*log(2)
+    #directly used in specification helper function
     #to control the standard deviation of the contact matrix by age
     
-    ## Sexual Mixing by Race #this is multiplied in the race mixing matrix
-    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(4)/2), #emperical 
-    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(4)/2),  #'@PK: to review
+    ## Sexual Mixing by Race ----
+    #this is multiplied in the race mixing matrix
+    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(4)/2), #'@:Ryan: where are these mu/sd coming from? 
+    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(4)/2),  
     other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(4)/2),
     
-    ## Sexual Mixing by Risk #'@PK: to review
+    ## Sexual Mixing by Risk ----
+    #'@:Ryan: where are these mu/sd coming from? 
     oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(4)/2),
     fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
     fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
     
-    # Proportion MSM ----
-    black.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
-    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
-    other.proportion.msm.of.male.mult = Lognormal.Distribution(0, 0.125*log(2)),
+    # Proportion MSM ----#'@:Ryan: where are these mu/sd coming from? 
+    black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
+    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =sdlog = 0, 0.125*log(2)),
+    other.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
     
-    # relapse & infectiousness for EL
+    # relapse & infectiousness for EL ---- '@:Ryan: where are these mu/sd coming from? 
     prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
     el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
 ) 
 
 ## TESTING.PARAMETERS.PRIOR ----
 TESTING.PARAMETERS.PRIOR=join.distributions( 
-    # Odd-Ratio of symptomatic testing (stage X sex and time) 
+ #'@Ryan: why sd=log(2) for ORs? 
+    # Odd-Ratio of symptomatic testing (by stage & sex ) ----
     or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
     or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
     or.symptomatic.primary.female = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
@@ -261,21 +259,24 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     or.symptomatic.secondary.black = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)) ,
     or.symptomatic.secondary.hispanic = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)) ,
     or.symptomatic.secondary.other= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-    #
+    
+    # Odd-Ratio of symptomatic testing (by time) ----
+    #'@Ryan: let's put into a spline format
     or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-    #'@ryan: let's put into a spline format
     
-    # for HIV screening
+    # HIV screening ----
     hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-    hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5),
+    hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5), #'@Ryan: why smaller sdlog?
     
-    # STI screening knots multiplier (relative to HIV screening)
-    make.mv.spline.prior(parameter = "sti.screening.multiplier." ,logmean00 = 0,logsd00 = log(2), 
+    # STI screening knots multiplier ----
+    # (relative to HIV screening)
+    make.mv.spline.prior(parameter = "sti.screening.multiplier." , #'@Ryan: how are parameters set?
+                         logmean00 = 0,logsd00 = log(2), 
                          logsd.delta95 = log(sqrt(1.5))/2, 
                          logsd.delta90 = log(sqrt(1.5))/2, 
                          logsd.delta70 = log(1.5^2)/2,
@@ -284,16 +285,19 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
                          #logsd.delta30 = log(1.5)/2
     ),
     
+    # STI screening future multiplier ----
+    sti.screening.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #'Ryan: where are values coming from?
     
-    sti.screening.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
-    
-    # STI screening multiplier by stage (defined in specification-no linking needed here)
-    sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)), #get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
-    sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)), #changing the prior to reflect higher freq of screening among syphilis-infected subgroups (highrisk)
+    # STI screening multiplier by stage ----
+    #(defined in specification-no linking needed here)
+    # get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
+    sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)), 
+    sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)), 
     sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
     sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
     sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    
+    #@Ryan: my note says that "#we set the priors to reflect higher freq of screening among syphilis-infected subgroups (highrisk)" 
+    #but this is by stage. should we set the meanlog=0 and test?
     
     # STI screening multiplier by race
     sti.screening.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
@@ -307,61 +311,49 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
 )
 
 ###--------------------------------------------------------------------------###
+## AGE.TRANS.TEST.PARAMETERS.PRIOR ----
+# defining age coefficients for transmission, testing and screening
+# we assume an auto regressive (AR) structure between agegroups 
+
+#'@ryan: where are the numbers coming from?
 #Helpers for sexual activity by age and risk
 age_labels <- c("19","24","29","34","39","44","49","54","64","65")
-n_ages <- length(age_labels)
+n_ages <- length(age_labels) 
 
-msm_means <- c(
-    0.78225996, 1.0, 0.95998551, 0.85426289,
-    0.80110115, 0.74182871, 0.66807753, 0.59361831, 0.52443517, 0.24827982
-)
+# MSM_sexualActivity
+msm_sexualActivity_means <- c(0.78225996, 1.0, 0.95998551, 0.85426289,0.80110115, 0.74182871, 0.66807753, 0.59361831, 0.52443517, 0.24827982)
+msm_sexualActivity_meanlog <- log(msm_sexualActivity_means)
+msm_sexualActivity_sdlog <- 0.5 * log(2)     
 
-# msm_means <- c(
-#     1, 1, 1, 1,
-#     1, 1, 1, 1, 1, 1
-# )
-msm_meanlog <- log(msm_means)
+# Heterosexual_sexualActivity
+het_sexualActivity_means <- c(0.67344578, 1.0, 0.93856869, 0.89449681, 0.82901671, 0.78709287, 0.69855360, 0.56671692, 0.35979200, 0.09428752)
+het_sexualActivity_meanlog <- log(het_sexualActivity_means)
+het_sexualActivity_sdlog <- 0.5 * log(2)     
 
-# Heterosexual
-het_means <- c(
-    0.67344578, 1.0, 0.93856869, 0.89449681,
-    0.82901671, 0.78709287, 0.69855360, 0.56671692, 0.35979200, 0.09428752
-)
-# het_means <- c(
-#     1, 1, 1, 1,
-#    1, 1, 1, 1, 1, 1
-# )
-het_meanlog <- log(het_means)
+# Testing params
+testing_meanlog <- c(0, 0, 0, 0,0, 0, 0, 0, 0, 0)
+testing_sdlog <- 0.5 * log(2)
 
-#testing params
-testing_meanlog <- c(
-    0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0
-)
-
-# ---- AR parameters ----
-rho_age <- 0.7          # correlation between adjacent ages
-sdlog_msm <- 0.5 * log(2)     
-sdlog_het <- 0.5 * log(2)     
-sdlog_testing <- 0.5 * log(2)
+# AR parameters 
+rho_age <- 0.7  # p: correlation between adjacent ages
 
 # Covariance matrices
-Sigma_msm <- create.auto.regressive.covariance.matrix(
+msm_sexualActivity_sigma <- create.auto.regressive.covariance.matrix(
     correlation.coefficient = rho_age,
     n = n_ages,
-    sd = sdlog_msm
+    sd = msm_sexualActivity_sdlog
 )
 
-Sigma_het <- create.auto.regressive.covariance.matrix(
+het_sexualActivity_sigma <- create.auto.regressive.covariance.matrix(
     correlation.coefficient = rho_age,
     n = n_ages,
-    sd = sdlog_het
+    sd = het_sexualActivity_sdlog
 )
 
-Sigma_testing <- create.auto.regressive.covariance.matrix(
+testing_sigma <- create.auto.regressive.covariance.matrix(
     correlation.coefficient = rho_age,
     n = n_ages,
-    sd = sdlog_testing
+    sd = testing_sdlog
 )
 
 # Variable names 
@@ -369,39 +361,42 @@ msm_varnames <- paste0("transmission.rate.multiplier.age", age_labels, ".msm")
 het_varnames <- paste0("transmission.rate.multiplier.age", age_labels, ".heterosexual")
 screening_varnames <- paste0("sti.screening.multiplier.age", age_labels)
 symptomatic_varnames <- paste0("or.symptomatic.age", age_labels)
-###--------------------------------------------------------------------------###
 
-AGE.PARAMETERS.PRIOR=join.distributions(
+## -------------------- ##
+
+AGE.TRANS.TEST.PARAMETERS.PRIOR=join.distributions(
+    ## MSM Sexual activity ----
+    #Transmission multiplier for age 0-14: we have a seperate parameter for this agegroup 
+    transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(0.01), 
+                                                                    sdlog = 0.5 * log(2)), #'@Ryan: havent we updated this? 
+    #'@Ryan: please double check the values and cire references or explain the rationale for assuming specific values
     
-    transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(1e-2), sdlog = 0.5 * log(2)),
-    
+    # The other agegroups are tied together through a MVN distribution
     TRANSMISSION.AGE.MSM.PRIOR <- Multivariate.Lognormal.Distribution(
-        mu = msm_meanlog,
-        sigma = Sigma_msm,
+        mu = msm_sexualActivity_meanlog,
+        sigma = msm_sexualActivity_sigma,
         var.names = msm_varnames
     ),
     
+    ## HET Sexual activity ----
+    ##'@ryan: update:
     transmission.rate.multiplier.age14.heterosexual = Lognormal.Distribution(meanlog = log(1e-2), sdlog = 0.5 * log(2)),
-    
-    
     TRANSMISSION.AGE.HET.PRIOR <- Multivariate.Lognormal.Distribution(
-        mu = het_meanlog,
-        sigma = Sigma_het,
+        mu = het_sexualActivity_meanlog,
+        sigma = het_sexualActivity_sigma,
         var.names = het_varnames
     ), 
     
+    ## STI.Screening ----
     sti.screening.multiplier.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    
-    
     SCREENING.AGE.PRIOR <- Multivariate.Lognormal.Distribution(
         mu = testing_meanlog,
-        sigma = Sigma_testing,
+        sigma = testing_sigma,
         var.names = screening_varnames
     ),
     
+    ## Symptomatic Testing ----
     or.symptomatic.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-    
-    
     SYMPTOMATIC.PRIOR <- Multivariate.Lognormal.Distribution(
         mu = testing_meanlog,
         sigma = Sigma_testing,
@@ -482,23 +477,9 @@ PRENATAL.PARAMETERS.PRIOR=join.distributions(
     
 )
 
-# Notes: 
-# x=Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2))
-# get.intervals(x)
-# calculate.density(x,10)/calculate.density(x,1) #penalty for drawing a point at 10 instead of 1
-# 
-# x=Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2))
-# get.intervals(x)
-# calculate.density(x,10)/calculate.density(x,3)
-# 
-# x=Lognormal.Distribution(meanlog = log(3), sdlog = log(2))
-# get.intervals(x)
-# calculate.density(x,10)/calculate.density(x,3)
-
-
 
 #### ----
-#2- LINKING PARAMETERS TO FUNCTIONAL FORMS....  -----
+#***** LINKING PARAMETERS TO FUNCTIONAL FORMS *****  -----
 SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){ 
     ages=model.settings$specification.metadata$dim.names$age
     sexes=model.settings$specification.metadata$dim.names$sex
@@ -839,7 +820,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
 
 
 #### ----
-#3- SAMPLING BLOCKS: ----
+#***** SAMPLING BLOCKS ***** ----
 # classic mcmc samples one param at a time, adaptive mcms samples multiple params (1-5 per block)
 
 ## POPULATION.SAMPLING.BLOCKS ----
@@ -1080,7 +1061,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     )
 )
 
-# TESTING.SAMPLING.BLOCKS ----
+## TESTING.SAMPLING.BLOCKS ----
 TESTING.SAMPLING.BLOCKS = list(
     symptomatic.testing.primary.sex = c(
         "or.symptomatic.primary.msm",
@@ -1150,8 +1131,9 @@ TESTING.SAMPLING.BLOCKS = list(
     future.change.screen=c("sti.screening.future.change.mult")
 )
 
-
-AGE.SAMPLING.BLOCKS = list(
+## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
+AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
+    #'@Ryan: please take out 0-14 into a seperate block
     
     age.transmission.msm.1 = c(
         "transmission.rate.multiplier.age14.msm",
@@ -1310,7 +1292,7 @@ SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
     AGING.PARAMETERS.PRIOR,
     TRANSMISSION.PARAMETERS.PRIOR,
     TESTING.PARAMETERS.PRIOR,
-    AGE.PARAMETERS.PRIOR,
+    AGE.TRANS.TEST.PARAMETERS.PRIOR,
     PRENATAL.PARAMETERS.PRIOR
 )
 
@@ -1319,7 +1301,23 @@ SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
     AGING.SAMPLING.BLOCKS ,
     TRANSMISSION.SAMPLING.BLOCKS,
     TESTING.SAMPLING.BLOCKS,
-    AGE.SAMPLING.BLOCKS,
+    AGE.TRANS.TEST.SAMPLING.BLOCKS,
     PRENATAL.SAMPLING.BLOCKS
     
 )
+
+
+
+# Notes: 
+# x=Lognormal.Distribution(meanlog = log(1), sdlog = 0.5*log(2))
+# get.intervals(x)
+# calculate.density(x,10)/calculate.density(x,1) #penalty for drawing a point at 10 instead of 1
+# 
+# x=Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2))
+# get.intervals(x)
+# calculate.density(x,10)/calculate.density(x,3)
+# 
+# x=Lognormal.Distribution(meanlog = log(3), sdlog = log(2))
+# get.intervals(x)
+# calculate.density(x,10)/calculate.density(x,3)
+
