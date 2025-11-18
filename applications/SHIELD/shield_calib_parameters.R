@@ -368,7 +368,7 @@ AGE.TRANS.TEST.PARAMETERS.PRIOR=join.distributions(
     ## MSM Sexual activity ----
     #Transmission multiplier for age 0-14: we have a seperate parameter for this agegroup 
     transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(0.01), 
-                                                                    sdlog = 0.5 * log(2)), #'@Ryan: havent we updated this? 
+                                                                    sdlog = 0.5 * log(8)), #'@Ryan: havent we updated this? 
     #'@Ryan: please double check the values and cire references or explain the rationale for assuming specific values
     
     # The other agegroups are tied together through a MVN distribution
@@ -380,7 +380,7 @@ AGE.TRANS.TEST.PARAMETERS.PRIOR=join.distributions(
     
     ## HET Sexual activity ----
     ##'@ryan: update:
-    transmission.rate.multiplier.age14.heterosexual = Lognormal.Distribution(meanlog = log(1e-2), sdlog = 0.5 * log(2)),
+    transmission.rate.multiplier.age14.heterosexual = Lognormal.Distribution(meanlog = log(1e-2), sdlog = 0.5 * log(8)),
     TRANSMISSION.AGE.HET.PRIOR <- Multivariate.Lognormal.Distribution(
         mu = het_sexualActivity_meanlog,
         sigma = het_sexualActivity_sigma,
