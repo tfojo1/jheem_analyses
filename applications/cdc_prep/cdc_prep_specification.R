@@ -185,7 +185,7 @@ register.model.quantity(CDCP.SPECIFICATION,
 
 register.model.quantity(CDCP.SPECIFICATION,
                         name = 'cdc.nonfunded.general.population.testing',
-                        scale = 'rate',
+                        #scale = 'rate',
                         value = expression(super.general.population.testing - cdc.funded.testing.rate +
                                                cdc.funded.testing.rate * (1-cdc.testing.effect) * proportion.tested.regardless)
 )
@@ -422,3 +422,5 @@ register.set.parameters.for.version('cdcp',
                                     parameter.names = CDC.PREP.PARAMETERS.PRIOR@var.names,
                                     apply.function = cdc.prep.apply.set.parameters,
                                     join.with.previous.version = T)
+
+

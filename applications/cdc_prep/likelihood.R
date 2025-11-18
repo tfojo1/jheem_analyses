@@ -68,25 +68,13 @@ cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions
 nonfunded.rate.likelihood <- create.custom.likelihood.instructions(name = "cdc.nonfunded.rate",
     
     get.data.function = function(version, location){
-        
-        start.years = '2025'
-        end.years = '2035'
-        keep_dims <- c("year")
-        
-        sim.metadata = get.simulation.metadata(version=version, location=location)
-        
-        optimized.get.instr.sim <- sim.metadata$prepare.optimized.get.instructions(
-            outcomes         = "cdc.nonfunded.general.population.testing",        
-            dimension.values = list(year = sort(unique(c(as.integer(start.years), as.integer(end.years))))),
-            keep.dimensions  = keep_dims          
-        )
-        
-       
-
+        NULL
         
     }, compute.function = function(sim,data,log = TRUE){
     
-    x =sim$optimized.get(data$optimized.get.instructions)
+    
+    x = sim$cdc.nonfunded.general.population.testing
+
     if(any(x < 0)){
         return(-Inf)
     }

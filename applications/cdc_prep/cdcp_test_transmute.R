@@ -7,14 +7,18 @@ load("/Users/ruchita/Documents/Harvard/JHEEM/code/jheem_analyses/applications/cd
 
 source('applications/cdc_prep/cdc_prep_specification.R')
 source('applications/cdc_prep/Surveillance_Manager_Updates.R')
-
+source('applications/cdc_prep/likelihood.R')
 
 
 transmuter = create.jheem.transmuter(sim, to.version = 'cdcp', from.year = 2010, to.year = 2035)
 
 params = get.medians(CDC.PREP.PARAMETERS.PRIOR)
-
+#params["fraction.cdc.tests.unique"] = 1.0 
+params["prep.eligible.slope.or"] <- 10.0
+params["prep.referred.slope.or"] <- 10.0
+library(dplyr)
 sim.cdcp = transmuter$transmute(1, parameters = params)
+range(sim.cdcp$cdc.nonfunded.general.population.testing)
 
 
 lik = cdc.prep.joint.likelihood.instructions$instantiate.likelihood('cdcp', sim$location)
