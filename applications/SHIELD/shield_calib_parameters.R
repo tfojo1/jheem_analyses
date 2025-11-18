@@ -170,7 +170,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
   
      ## Transmission
-    global.transmission.rate = Lognormal.Distribution(meanlog = log(6.8), sdlog = log(10)/2),
+    global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2),
     
     #12 independant params
     # msm multipliers by time

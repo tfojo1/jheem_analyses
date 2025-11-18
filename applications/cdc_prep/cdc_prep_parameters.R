@@ -88,8 +88,6 @@ CDC.PREP.PARAMETERS.PRIOR = join.distributions(
 
 
 
-
-
 cdc.prep.apply.set.parameters <- function(model.settings, parameters)
 {
     specification.metadata = model.settings$specification.metadata

@@ -80,18 +80,38 @@ data.manager$register.outcome(
         units = '%',
         description = "Proportion of Uninsured Individuals who were Tested for HIV in the Past Year"), denominator.outcome = 'uninsured.total')
 
+data.manager$register.outcome(
+    'oahs.clients', #was previously ambulatory.care.past.year
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Received Ambulatory Care in Past Year',
+        axis.name = 'Received Ambulatory Care in Past Year',
+        units = 'population',
+        description = "Received Ambulatory Care in Past Year"))
+
+data.manager$register.outcome(
+    'adap.suppression', 
+    metadata = create.outcome.metadata(
+        scale = 'proportion',
+        display.name = 'ADAP Viral Suppression',
+        axis.name = 'ADAP Viral Suppression',
+        units = '%',
+        description = "ADAP Viral Suppression"), denominator.outcome = 'adap.clients')
+
 
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") 
 data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
 data.manager$register.parent.source('cms', full.name = 'The Centers for Medicare & Medicaid Services', short.name= "cms")
-
+data.manager$register.parent.source('NASTAD', full.name = 'National Alliance of State and Territorial AIDS Directors', short.name= "NASTAD") #parent
 
 data.manager$register.source('ryan.white.program', parent.source= "HRSA", full.name = "Ryan White HIV/AIDS Program Annual Data Report", short.name='ryan.white.program') #child
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 data.manager$register.source('acs', parent.source= "census", full.name = 'American Community Survey', short.name= "acs") 
 data.manager$register.source('cms', parent.source= "cms", full.name = 'The Centers for Medicare & Medicaid Services', short.name= "cms") 
+data.manager$register.source('nastad.adap', parent.source= "NASTAD", full.name = "ADAP Monitoring Project Annual Report", short.name='nastad.adap') #child
+
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -136,27 +156,32 @@ data.manager$register.ontology(
         age=c('0-18', '19-26', '27-44', '45-64', '65+')
     ))
 
-#Waiting for update on Locations package to fix error in registering new locations#
-#Register locations (because these reports use Regions [groups of states])
-# locations::register.locations(type='region', 
-#                               locations = c("01", "02", "03", "04", "05",
-#                                             "06", "07", "08", "09", "10"),
-#                               location.names =c('rw.region.1', 'rw.region.2', 'rw.region.3', 
-#                                                 'rw.region.4', 'rw.region.5', 'rw.region.6',
-#                                                 'rw.region.7', 'rw.region.8', 'rw.region.9',
-#                                                  'rw.region.10'))
+#Register Locations:
+locations::register.types(type = c("rw.region"), prefix = c("rw"), prefix.longform = c("ryan.white.region"))
+
+locations::register.locations(type='rw.region',
+                              locations = c('rw.region.1', 'rw.region.2', 'rw.region.3',
+                                            'rw.region.4', 'rw.region.5', 'rw.region.6',
+                                            'rw.region.7', 'rw.region.8', 'rw.region.9',
+                                            'rw.region.10'),
+                              location.names =c('rw.region.1', 'rw.region.2', 'rw.region.3',
+                                                'rw.region.4', 'rw.region.5', 'rw.region.6',
+                                                'rw.region.7', 'rw.region.8', 'rw.region.9',
+                                                'rw.region.10'))
 
 
 
 # Source ------------------------------------------------------------------
-#source('data_processing/medicaid.data.manager/adap.and.non.adap.totals.by.region.R') #outcome = adap.clients; non.adap.clients
-#source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
+source('data_processing/medicaid.data.manager/adap.and.non.adap.totals.by.region.R') #outcome = adap.clients; non.adap.clients (by region)
+source('data_processing/medicaid.data.manager/adap.and.non.adap.medicaid.proportions.R') #outcome = proportion.nonadap.rw.clients.on.medicaid; proportion.adap.rw.clients.on.medicaid
 source('data_processing/medicaid.data.manager/brfss.proportion.tested.medicaid.R') #outcomes = medicaid.total;proportion.tested.for.hiv.past.year.medicaid; 
 source('data_processing/medicaid.data.manager/brfss.proportion.tested.uninsured.R') #outcomes = uninsured.total;  proportion.tested.for.hiv.past.year.uninsured
 source('data_processing/medicaid.data.manager/brfss.data.variance.values.R') #Adds variance values to uninsured.total and medicaid.total
 
 source('data_processing/medicaid.data.manager/acs.total.medicaid.and.uninsured.R') #outcomes = medicaid.total;uninsured.total
 source('data_processing/medicaid.data.manager/cms.total.medicaid.R') #outcomes = medicaid.total;uninsured.total
+source('data_processing/medicaid.data.manager/ryan.white.total.and.stratified.state.only.R') #outcomes = adap.clients; non.adap.clients (by state)
+source('data_processing/medicaid.data.manager/ryan.white.adap.suppression.copy.R') #outcomes = adap.suppression
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/medicaid.data.manager.rdata")

@@ -37,17 +37,17 @@ medicaid.non.adap.proportion = lapply(medicaid.non.adap, function(file){
     list(filename, data)
 })
 
-# ###
-# medicaid.non.adap.proportion.put = lapply(medicaid.non.adap.proportion, `[[`, 2)
-# 
-# for (data in medicaid.non.adap.proportion.put) {
-#     data.manager$put.long.form(
-#         data = data,
-#         ontology.name = 'ryan.white.pdfs',
-#         source = 'ryan.white.program',
-#         url = 'https://ryanwhite.hrsa.gov/data/reports',
-#         details = 'Ryan White Downloaded PDF Reports')
-# }
+###Put:
+medicaid.non.adap.proportion.put = lapply(medicaid.non.adap.proportion, `[[`, 2)
+
+for (data in medicaid.non.adap.proportion.put) {
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'ryan.white.pdfs',
+        source = 'ryan.white.program',
+        url = 'https://ryanwhite.hrsa.gov/data/reports',
+        details = 'Ryan White Downloaded PDF Reports')
+}
 
 
 # Outcome = proportion.adap.rw.clients.on.medicaid ---------------------
@@ -87,14 +87,14 @@ medicaid.adap.proportion = lapply(medicaid.adap, function(file){
     list(filename, data)
 })
 
-# ###
-# medicaid.adap.proportion.put = lapply(medicaid.adap.proportion, `[[`, 2)
-# 
-# for (data in medicaid.adap.proportion.put) {
-#     data.manager$put.long.form(
-#         data = data,
-#         ontology.name = 'ryan.white.pdfs',
-#         source = 'ryan.white.program',
-#         url = 'https://ryanwhite.hrsa.gov/data/reports',
-#         details = 'Ryan White Downloaded PDF Reports')
-# }
+###Put:
+medicaid.adap.proportion.put = lapply(medicaid.adap.proportion, `[[`, 2)
+
+for (data in medicaid.adap.proportion.put) {
+    data.manager$put.long.form(
+        data = data,
+        ontology.name = 'ryan.white.pdfs',
+        source = 'ryan.white.program',
+        url = 'https://ryanwhite.hrsa.gov/data/reports',
+        details = 'Ryan White Downloaded PDF Reports')
+}
