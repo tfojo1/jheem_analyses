@@ -10,11 +10,11 @@ source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 # STAGE.1: Diagnosis (race, sex stratified) - demog
 # STAGE.2: Diagnosis (race, sex, age stratified) - demog
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
-TOTAL.WEIGHT=1/16
+TOTAL.WEIGHT=1/2
 STAGE.0.POP.WEIGHT= 1/32 #'@ryan: to add
 STAGE.0.TD.WEIGHT= 1/4 #total diagnosis  #'@ryan: to add
 EL.DIAGNOSIS.WEIGHT = TOTAL.WEIGHT 
-POPULATION.WEIGHT = TOTAL.WEIGHT
+POPULATION.WEIGHT = STAGE.0.POP.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
@@ -274,8 +274,8 @@ total.diagnosis.by.strata.stage1.likelihood.instructions =
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.type = 'cv',
+                                         error.variance.term = 0.0764791209420945,  
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short timeframe
                                          #
@@ -292,8 +292,8 @@ total.diagnosis.by.strata.stage2.likelihood.instructions =
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.type = 'cv',
+                                         error.variance.term = 0.0764791209420945,   
                                          #
                                          observation.correlation.form = 'compound.symmetry',  #short timeframe
                                          #
@@ -341,8 +341,8 @@ ps.diagnosis.by.strata.stage1.likelihood.instructions =
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.type = 'cv',
+                                         error.variance.term = 0.0764791209420945,  
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short timeframe
                                          #
@@ -805,8 +805,8 @@ early.diagnosis.by.strata.stage1.likelihood.instructions =
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.type = 'cv',
+                                         error.variance.term = 0.0764791209420945,   
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -823,8 +823,8 @@ early.diagnosis.by.strata.stage2.likelihood.instructions =
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.type = 'cv',
+                                         error.variance.term = 0.0764791209420945, 
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -869,8 +869,8 @@ late.diagnosis.by.strata.stage1.likelihood.instructions =
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.type = 'cv',
+                                         error.variance.term = 0.0764791209420945,  
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -887,8 +887,8 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.type = 'cv',
+                                         error.variance.term = 0.0764791209420945,  
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -1107,6 +1107,18 @@ state.HIV.tested.by.strata.stage2.likelihood.instructions =
 
 #-- LIKELIHOODS --# ----
 ## STAGE0 ----
+lik.inst.demog.TD=join.likelihood.instructions(
+    population.likelihood.instructions,
+    deaths.likelihood.instructions,
+    fertility.likelihood.instructions,
+    immigration.likelihood.instructions,
+    emigration.likelihood.instructions,
+    ps.diagnosis.total.likelihood.instructions,
+    total.diagnosis.likelihood.instructions,
+    historical.diagnosis.likelihood.instructions
+    
+)
+
 lik.inst.demog.TD.2=join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,

@@ -9,7 +9,7 @@ library(tidyverse)
 # 2. Load GSS data
 ##############################
 
-## Load data from GSS survey
+## Load data from GSS survey (https://gss.norc.org/)
 #for % of population sexually active
 GSS_bysex_sexfreq <- read_csv("../jheem_analyses/applications/SHIELD/data_files/sexual_activity_by_age/GSS_bysex_sexfreq.csv")
 View(GSS_bysex_sexfreq)

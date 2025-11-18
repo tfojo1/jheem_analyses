@@ -220,13 +220,12 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     ## Sexual Mixing by Race ----
     #this is multiplied in the race mixing matrix
-    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(4)/2), #'@:Ryan: where are these mu/sd coming from? 
-    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(4)/2),  
-    other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(4)/2),
+    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(2)), #Mu and SD are chosen empirically 
+    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2),  
+    other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2),
     
     ## Sexual Mixing by Risk ----
-    #'@:Ryan: where are these mu/sd coming from? 
-    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(4)/2),
+    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2), #SD and Mu are chosen empirically 
     fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
     fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
     
@@ -315,7 +314,7 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
 # defining age coefficients for transmission, testing and screening
 # we assume an auto regressive (AR) structure between agegroups 
 
-#'@ryan: where are the numbers coming from?
+#See estimate_sexual_activity_by_age for calculation of sexualActivity mean priors: 
 #Helpers for sexual activity by age and risk
 age_labels <- c("19","24","29","34","39","44","49","54","64","65")
 n_ages <- length(age_labels) 
