@@ -12,11 +12,11 @@ library(tidyverse)
 ## Load data from GSS survey (https://gss.norc.org/)
 #for % of population sexually active
 GSS_bysex_sexfreq <- read_csv("../jheem_analyses/applications/SHIELD/data_files/sexual_activity_by_age/GSS_bysex_sexfreq.csv")
-View(GSS_bysex_sexfreq)
+# View(GSS_bysex_sexfreq)
 
 #for average number of sexual partners by age
 GSS_n_sexpartners <- read_csv("../jheem_analyses/applications/SHIELD/data_files/sexual_activity_by_age/GSS_n_sexpartners.csv")
-View(GSS_n_sexpartners)
+# View(GSS_n_sexpartners)
 
 ##############################
 # 3. Define age brackets
@@ -41,9 +41,11 @@ GSS_anysex_by_age_sex <- GSS_bysex_sexfreq %>%
                         breaks = age_breaks,
                         labels = age_labels,
                         right = TRUE)
-    ) 
-    # add_row(age_group = "0–14", `Percent Any Sex` = 6.2) # value is yearly average since 1991
-View(GSS_anysex_by_age_sex)
+    )    
+# the proportion of 0-14 year old who have any sex is very small and we remove them from this analysis 
+# %>% add_row(age_group = "0–14", `Percent Any Sex` = 6.2) # value is yearly average since 1991
+
+# View(GSS_anysex_by_age_sex)
 
 GSS_n_sex_part_by_age_sex <- GSS_n_sexpartners %>%
     mutate(
@@ -179,14 +181,14 @@ ggplot(GSS_n_sex_part_by_age_sex, aes(x = age_group, y = `Percent Any Partner`, 
         legend.position = "top"
     )
 
-##############################
-# 9. Clean up / standardize any-sex probability
-##############################
-
-GSS_anysex_summary <- GSS_anysex_summary %>%
-    mutate(
-        p_any = ifelse(weighted_mean_anysex > 1, weighted_mean_anysex/100, weighted_mean_anysex)
-    )
+# ##############################
+# # 9. Clean up / standardize any-sex probability
+# ##############################
+# 
+# GSS_anysex_summary <- GSS_anysex_summary %>%
+#     mutate(
+#         p_any = ifelse(weighted_mean_anysex > 1, weighted_mean_anysex/100, weighted_mean_anysex)
+#     )
 
 ##############################
 # 10. Compute average number of partners by age and sex
@@ -265,3 +267,9 @@ ggplot(GSS_activity, aes(x = age_group, y = sexual_activity, color = Sex, group 
         axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "top"
     )
+
+# We will use the Male values from this survey to represent MSM and use the Female values to represent HET 
+
+#'@Ryan: return the final mean sexual activity values for male and female here that you 
+#'het_sexualActivity_means
+#'msm_sexualActivity_means

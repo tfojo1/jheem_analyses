@@ -11,10 +11,12 @@ source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 # STAGE.2: Diagnosis (race, sex, age stratified) - demog
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
 TOTAL.WEIGHT=1/2
+#
 STAGE.0.POP.WEIGHT= 1/32 
 STAGE.0.TD.WEIGHT= 1/4 
-EL.DIAGNOSIS.WEIGHT = TOTAL.WEIGHT 
 POPULATION.WEIGHT = STAGE.0.POP.WEIGHT
+#
+EL.DIAGNOSIS.WEIGHT = TOTAL.WEIGHT 
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
 TESTING.WEIGHT = TOTAL.WEIGHT
 PRENATAL.WEIGHT = TOTAL.WEIGHT
@@ -258,12 +260,14 @@ total.diagnosis.likelihood.instructions =
                                          #
                                          error.variance.type = c('cv', 'sd'),
                                          error.variance.term = list(0.0764791209420945, 10),  #see inputs folder file input_diag_cv_estimates
+                                         # total variance = (cv.m)^2 + sd^2 : this ensures when mu is super small, our variance stays up (at least to sd^2)
+                                         #keep us from over penalizing years with small mu (early years)
                                          #
                                          observation.correlation.form = 'autoregressive.1', #long timeframe
                                          #
                                          weights = DIAGNOSIS.WEIGHT ,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1 #
+                                         equalize.weight.by.year = T
+                                         # minimum.error.sd = 1 #redundant because we have sd in variance structure 
     )
 ##---- Strata Stage1 2019-2022----
 total.diagnosis.by.strata.stage1.likelihood.instructions =
@@ -316,7 +320,7 @@ total.diagnosis.by.strata.stage2.likelihood.instructions =
 # data from 2000-2023 for MSA level (cdc.sti) for MSA (age group+sex; age group + race; race+sex)
 
 ##---- Overall 1993-2022 ----
-
+# this is only used in stage 0 calibration (unique weight for stage 0)
 ps.diagnosis.stage0.total.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
@@ -335,7 +339,7 @@ ps.diagnosis.stage0.total.likelihood.instructions =
     )
 
 
-
+# this is used in stage 1 and stage 2 (different weight than above)
 ps.diagnosis.total.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
