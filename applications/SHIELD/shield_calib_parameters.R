@@ -187,8 +187,9 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     #lu.diagnoses.female.multiplier.1970          = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
     
     ## Transmission
-    global.transmission.rate = Lognormal.Distribution(meanlog = log(1.8), sdlog = log(10)/2),
+    #global.transmission.rate = Lognormal.Distribution(meanlog = log(1.8), sdlog = log(10)/2),
     #global.transmission.rate = Lognormal.Distribution(meanlog = log(6.8), sdlog = log(10)/2),
+    global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2),
     
     #12 independant params
     # msm multipliers by time
@@ -232,7 +233,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0),
     
     ## Sexual Mixing by Age
-    age.mixing.sd.mult = Lognormal.Distribution(0, 0.25*log(2)), #directly used in specification helper function
+    age.mixing.sd.mult = Lognormal.Distribution(0, 0.5*log(2)), #directly used in specification helper function
     #to control the standard deviation of the contact matrix by age
     
     ## Sexual Mixing by Race
@@ -334,30 +335,30 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
 
 
 ###--------------------------------------------------------------------------###
-#Data for sexual activity by age and risk
+#Helpers for sexual activity by age and risk
 age_labels <- c("19","24","29","34","39","44","49","54","64","65")
 n_ages <- length(age_labels)
 
-# msm_means <- c(
-#     0.78225996, 1.0, 0.95998551, 0.85426289,
-#     0.80110115, 0.74182871, 0.66807753, 0.59361831, 0.52443517, 0.24827982
-# )
-
 msm_means <- c(
-    1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1
+    0.78225996, 1.0, 0.95998551, 0.85426289,
+    0.80110115, 0.74182871, 0.66807753, 0.59361831, 0.52443517, 0.24827982
 )
+
+# msm_means <- c(
+#     1, 1, 1, 1,
+#     1, 1, 1, 1, 1, 1
+# )
 msm_meanlog <- log(msm_means)
 
 # Heterosexual
-# het_means <- c(
-#      0.67344578, 1.0, 0.93856869, 0.89449681,
-#     0.82901671, 0.78709287, 0.69855360, 0.56671692, 0.35979200, 0.09428752
-# )
 het_means <- c(
-    1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1
+    0.67344578, 1.0, 0.93856869, 0.89449681,
+    0.82901671, 0.78709287, 0.69855360, 0.56671692, 0.35979200, 0.09428752
 )
+# het_means <- c(
+#     1, 1, 1, 1,
+#    1, 1, 1, 1, 1, 1
+# )
 het_meanlog <- log(het_means)
 
 #testing params
@@ -367,7 +368,7 @@ testing_meanlog <- c(
 )
 
 # ---- AR parameters ----
-rho_age <- 0.0          # correlation between adjacent ages
+rho_age <- 0.7          # correlation between adjacent ages
 sdlog_msm <- 0.5 * log(2)     
 sdlog_het <- 0.5 * log(2)     
 sdlog_testing <- 0.5 * log(2)
@@ -424,7 +425,7 @@ AGE.PARAMETERS.PRIOR=join.distributions(
     # ),
     
     
-    transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(1), sdlog = 0.5 * log(2)),
+    transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(1e-2), sdlog = 0.5 * log(8)),
     
     TRANSMISSION.AGE.MSM.PRIOR <- Multivariate.Lognormal.Distribution(
         mu = msm_meanlog,
@@ -432,7 +433,7 @@ AGE.PARAMETERS.PRIOR=join.distributions(
         var.names = msm_varnames
     ),
     
-    transmission.rate.multiplier.age14.heterosexual = Lognormal.Distribution(meanlog = log(1), sdlog = 0.5 * log(2)),
+    transmission.rate.multiplier.age14.heterosexual = Lognormal.Distribution(meanlog = log(1e-2), sdlog = 0.5 * log(8)),
     
     
     TRANSMISSION.AGE.HET.PRIOR <- Multivariate.Lognormal.Distribution(
@@ -703,22 +704,20 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
         
         #age multipliers:
         agegroups = c("14", "19","24", "29", "34", "39", "44", "49", "54", "64", "65")
-        for(age.index in 1:11) {
-            agegroup=agegroups[age.index]
-            paramName.msm =paste0("transmission.rate.multiplier.age",agegroups[age.index], ".msm")
-            paramName.heterosexual =paste0("transmission.rate.multiplier.age",agegroups[age.index], ".heterosexual")
-            set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "transmission.rate.msm",
-                                                           alpha.name = time,
-                                                           values = parameters[paramName.msm],
-                                                           dimension = "age.to", #recipient
-                                                           applies.to.dimension.values = c(ages))
-            set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "transmission.rate.heterosexual",
-                                                           alpha.name = time,
-                                                           values = parameters[paramName.heterosexual],
-                                                           dimension = "age.to", #recipient
-                                                           applies.to.dimension.values = c(ages)) }
+        paramName.msm =paste0("transmission.rate.multiplier.age",agegroups, ".msm")
+        paramName.heterosexual =paste0("transmission.rate.multiplier.age",agegroups, ".heterosexual")
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "transmission.rate.msm",
+                                                       alpha.name = time,
+                                                       values = parameters[paramName.msm],
+                                                       dimension = "age.to", #recipient
+                                                       applies.to.dimension.values = ages)
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "transmission.rate.heterosexual",
+                                                       alpha.name = time,
+                                                       values = parameters[paramName.heterosexual],
+                                                       dimension = "age.to", #recipient
+                                                       applies.to.dimension.values = ages) 
         # agegroups <- c("14","19","24","29","34","39","44","49","54","64","65")
         # age_map   <- setNames(ages, agegroups)
         # age14_lab <- unname(age_map[["14"]])
@@ -790,15 +789,6 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        values = parameters[paste0("sti.screening.multiplier.",time)],
                                                        dimension = "all", #recipient
                                                        applies.to.dimension.values = "all")
-        # for (r in races) for (s in sexes) {
-        #     set.element.functional.form.interaction.alphas(
-        #         model.settings,
-        #         element.name = "multiplier.syphilis.screening.to.hiv.tests",
-        #         alpha.name   = time,
-        #         value        = parameters[paste0("sti.screening.multiplier.", r, ".", s)],
-        #         applies.to.dimension.values = list(race = r, sex = s)
-        #     )
-        # }
         
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "multiplier.syphilis.screening.to.hiv.tests",
@@ -813,15 +803,13 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        dimension = "sex", #recipient
                                                        applies.to.dimension.values = sexes)
         
-        for(age.index in 1:11) {
-            agegroup=agegroups[age.index]
-            paramName =paste0("sti.screening.multiplier.age",agegroups[age.index])
-            set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                           alpha.name = time,
-                                                           values = parameters[paramName],
-                                                           dimension = "age", 
-                                                           applies.to.dimension.values = c(ages))}
+        paramName = paste0("sti.screening.multiplier.age",agegroups)
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "multiplier.syphilis.screening.to.hiv.tests",
+                                                       alpha.name = time,
+                                                       values = parameters[paramName],
+                                                       dimension = "age", 
+                                                       applies.to.dimension.values = ages)
         
     }
     #Note: sti.screening.multiplier.*by stage are directly linked in the specification
@@ -853,16 +841,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        values = parameters[paste0("or.symptomatic.primary.", races)],
                                                        dimension = "race", #recipient
                                                        applies.to.dimension.values = races)
-        # # Primary symptomatic
-        # for (r in races) for (s in sexes) {
-        #     set.element.functional.form.interaction.alphas(
-        #         model.settings,
-        #         element.name = "prp.symptomatic.primary",
-        #         alpha.name   = time,
-        #         value        = parameters[paste0("or.symptomatic.primary.", r, ".", s)],
-        #         applies.to.dimension.values = list(race = r, sex = s)
-        #     )
-        # }
+        
         
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = "prp.symptomatic.secondary",
@@ -883,35 +862,20 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                        dimension = "race", #recipient
                                                        applies.to.dimension.values = races)
         
+        paramName =paste0("or.symptomatic.age",agegroups)
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "prp.symptomatic.primary",
+                                                       alpha.name = time,
+                                                       values = parameters[paramName],
+                                                       dimension = "age", 
+                                                       applies.to.dimension.values = ages)
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = "prp.symptomatic.secondary",
+                                                       alpha.name = time,
+                                                       values = parameters[paramName],
+                                                       dimension = "age", 
+                                                       applies.to.dimension.values = ages)
         
-        for(age.index in 1:11) {
-            agegroup=agegroups[age.index]
-            paramName =paste0("or.symptomatic.age",agegroups[age.index])
-            set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "prp.symptomatic.primary",
-                                                           alpha.name = time,
-                                                           values = parameters[paramName],
-                                                           dimension = "age", 
-                                                           applies.to.dimension.values = c(ages))
-            set.element.functional.form.main.effect.alphas(model.settings,
-                                                           element.name = "prp.symptomatic.secondary",
-                                                           alpha.name = time,
-                                                           values = parameters[paramName],
-                                                           dimension = "age", 
-                                                           applies.to.dimension.values = c(ages))}
-        
-        
-        # 
-        # # Secondary symptomatic
-        # for (r in races) for (s in sexes) {
-        #     set.element.functional.form.interaction.alphas(
-        #         model.settings,
-        #         element.name = "prp.symptomatic.secondary",
-        #         alpha.name   = time,
-        #         value        = parameters[paste0("or.symptomatic.secondary.", r, ".", s)],
-        #         applies.to.dimension.values = list(race = r, sex = s)
-        #     )
-        # }
     }
     
     
@@ -1345,8 +1309,13 @@ AGE.SAMPLING.BLOCKS = list(
     #     "transmission.rate.multiplier.age14.heterosexual2010",
     #     "transmission.rate.multiplier.age14.heterosexual2020"
     # ),
-    age.transmission.msm.1 = c(
+    
+    age14.transmission = c(
         "transmission.rate.multiplier.age14.msm",
+        "transmission.rate.multiplier.age14.heterosexual"
+    ),
+    
+    age.transmission.msm.1 = c(
         "transmission.rate.multiplier.age19.msm",
         "transmission.rate.multiplier.age24.msm",
         "transmission.rate.multiplier.age29.msm",
@@ -1365,8 +1334,8 @@ AGE.SAMPLING.BLOCKS = list(
         "transmission.rate.multiplier.age65.msm"
     ),
     
+    
     age.transmission.heterosexual.1 = c(
-        "transmission.rate.multiplier.age14.heterosexual",
         "transmission.rate.multiplier.age19.heterosexual",
         "transmission.rate.multiplier.age24.heterosexual",
         "transmission.rate.multiplier.age29.heterosexual",
@@ -1385,8 +1354,12 @@ AGE.SAMPLING.BLOCKS = list(
         "transmission.rate.multiplier.age65.heterosexual"
     ),
     
-    age.symptomatic.testing.1 = c(
+    age14.testing = c(
         "or.symptomatic.age14",
+        "sti.screening.multiplier.age14"
+    ),
+    
+    age.symptomatic.testing.1 = c(
         "or.symptomatic.age19",
         "or.symptomatic.age24",
         "or.symptomatic.age29",
@@ -1405,7 +1378,6 @@ AGE.SAMPLING.BLOCKS = list(
         "or.symptomatic.age65"
     ),
     screening.by.age.1 = c(
-        "sti.screening.multiplier.age14",
         "sti.screening.multiplier.age19",
         "sti.screening.multiplier.age24",
         "sti.screening.multiplier.age29",

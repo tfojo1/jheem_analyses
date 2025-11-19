@@ -1713,7 +1713,7 @@ register.remission(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name='prob.vertical.transmission.mothers.early.syphilis',
                        scale='proportion',
-                       value=SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.early.syphilis']) 
+                       value= SHIELD_BASE_PARAMETER_VALUES['prob.vertical.transmission.mothers.early.syphilis']) 
 register.model.element(SHIELD.SPECIFICATION,
                        name='prob.vertical.transmission.mothers.late.syphilis',
                        scale='proportion',
