@@ -11,8 +11,8 @@ WHOLE.POPULATION = create.target.population(name = 'Whole Population')
 
 # Timing
 DOXY.START <- 2022 + 9/12       # Oct 1, 2022
-DOXY.END   <- 2025 + 9/12      #  Oct 1, 2025
-DOXY.END.2   <- 2027 + 9/12      #  Oct 1, 2027
+DOXY.END   <- 2025 + 9/12      #  Oct 1, 2025 #3 year
+DOXY.END.2   <- 2027 + 9/12      #  Oct 1, 2027 # 5 year
 
 
 
@@ -176,7 +176,9 @@ rownames(DOXY.PARAMS) <- "doxy.rr"
 `10% Doxy-PEP Coverage` = sim_doxy10.MIA.slow
 `25% Doxy-PEP Coverage`= sim_doxy25.MIA
 intervention.style.manager = create.style.manager(color.sim.by = "simset")
+
 library(ggplot2)
+
 simplot(
     `No Doxy-PEP Intervention`,
     `10% Doxy-PEP Coverage`,

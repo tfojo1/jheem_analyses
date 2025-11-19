@@ -11,8 +11,8 @@ source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 # STAGE.2: Diagnosis (race, sex, age stratified) - demog
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
 TOTAL.WEIGHT=1/2
-STAGE.0.POP.WEIGHT= 1/32 #'@ryan: to add
-STAGE.0.TD.WEIGHT= 1/4 #total diagnosis  #'@ryan: to add
+STAGE.0.POP.WEIGHT= 1/32 
+STAGE.0.TD.WEIGHT= 1/4 
 EL.DIAGNOSIS.WEIGHT = TOTAL.WEIGHT 
 POPULATION.WEIGHT = STAGE.0.POP.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
@@ -156,7 +156,7 @@ immigration.likelihood.instructions =
                                          observation.correlation.form = 'compound.symmetry',
                                          #
                                          weights = POPULATION.WEIGHT ,
-                                         equalize.weight.by.year = T,  #'@Ryan: do we need this? 
+                                         equalize.weight.by.year = T,  #To apply weight evenly over time
                                          na.rm =T
     )
 
@@ -174,7 +174,7 @@ emigration.likelihood.instructions =
                                           observation.correlation.form = 'compound.symmetry',
                                           #
                                           weights = POPULATION.WEIGHT ,
-                                          equalize.weight.by.year = T,  #'@Ryan: do we need this? 
+                                          equalize.weight.by.year = T,  #To apply weight evenly over time 
                                           na.rm =T
     )
 
@@ -257,7 +257,7 @@ total.diagnosis.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  #@Ryan: can you please cite the reference code here and clean up that coe and include dcumentation 
+                                         error.variance.term = list(0.0764791209420945, 10),  #see inputs folder file input_diag_cv_estimates
                                          #
                                          observation.correlation.form = 'autoregressive.1', #long timeframe
                                          #
@@ -316,6 +316,26 @@ total.diagnosis.by.strata.stage2.likelihood.instructions =
 # data from 2000-2023 for MSA level (cdc.sti) for MSA (age group+sex; age group + race; race+sex)
 
 ##---- Overall 1993-2022 ----
+
+ps.diagnosis.stage0.total.likelihood.instructions =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                         outcome.for.data = "ps.syphilis.diagnoses",  
+                                         levels.of.stratification = c(0), 
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         #
+                                         error.variance.type = c('cv', 'sd'),
+                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         #
+                                         observation.correlation.form = 'autoregressive.1',
+                                         #
+                                         weights = STAGE.0.TD.WEIGHT,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1  
+    )
+
+
+
 ps.diagnosis.total.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
@@ -332,6 +352,7 @@ ps.diagnosis.total.likelihood.instructions =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
+
 ##---- Strata Stage1 2019-2022 ----
 ps.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
@@ -535,7 +556,7 @@ future.change.strata.likelihood.instructions =
         get.data.function = function(version, location) {
             sim.meta   <- get.simulation.metadata(version = version, location = location)
             
-            start_year <- 2020L     # pick your window; must allow t-1 within range #'@ryan: we should revise to 2018 so the penalty starts in 2023
+            start_year <- 2018L     
             end_year   <- 2030L
             window_len <- 5L
             years      <- seq(start_year, end_year)
@@ -628,7 +649,7 @@ U.turn.likelihood.instructions =
         get.data.function = function(version, location) {
             sim.meta <- get.simulation.metadata(version = version, location = location)
             
-            start_year <- 2013L #'@ryan: we should revise to 2013 so the penalty starts in 2023
+            start_year <- 2013L 
             end_year   <- 2030L
             window_len <- 5L
             years <- seq(start_year, end_year)
@@ -741,7 +762,7 @@ U.turn.strata.likelihood.instructions = create.custom.likelihood.instructions(
     get.data.function = function(version, location) {
         sim.meta <- get.simulation.metadata(version = version, location = location)
         
-        start_year <- 2013L    #'@ryan: we should revise to 2013 so the penalty starts in 2023
+        start_year <- 2013L    
         end_year   <- 2030L
         window_len <- 5L        
         years <- seq(start_year, end_year)
@@ -1107,25 +1128,14 @@ state.HIV.tested.by.strata.stage2.likelihood.instructions =
 
 #-- LIKELIHOODS --# ----
 ## STAGE0 ----
-lik.inst.demog.TD=join.likelihood.instructions(
-    population.likelihood.instructions,
-    deaths.likelihood.instructions,
-    fertility.likelihood.instructions,
-    immigration.likelihood.instructions,
-    emigration.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions,
-    total.diagnosis.likelihood.instructions,
-    historical.diagnosis.likelihood.instructions
-    
-)
 
-lik.inst.demog.TD.2=join.likelihood.instructions(
+lik.inst.demog.TD.2 =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,
     fertility.likelihood.instructions,
     immigration.likelihood.instructions,
     emigration.likelihood.instructions,
-    ps.diagnosis.total.likelihood.instructions
+    ps.diagnosis.stage0.total.likelihood.instructions
 )
 
 ## STAGE1 ----- 

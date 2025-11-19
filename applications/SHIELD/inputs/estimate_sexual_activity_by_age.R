@@ -32,13 +32,18 @@ age_labels <- c("0-14", "15-19", "20-24", "25-29", "30-34",
 ##############################
 
 # Summarize total 'Any Sex' and total respondents by sex and age group
+# Note GSS runs 18 and older have to approximate youngest age group
+# manually add CDC YRBS result for % having sex before 13
+
 GSS_anysex_by_age_sex <- GSS_bysex_sexfreq %>%
     mutate(
         age_group = cut(`AGE (age of respondent)`,
                         breaks = age_breaks,
                         labels = age_labels,
                         right = TRUE)
-    )
+    ) %>%
+    add_row(age_group = "0–14", `Percent Any Sex` = 6.2) # value is yearly average since 1991
+View(GSS_anysex_by_age_sex)
 
 GSS_n_sex_part_by_age_sex <- GSS_n_sexpartners %>%
     mutate(

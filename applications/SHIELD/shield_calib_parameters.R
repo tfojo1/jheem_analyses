@@ -29,18 +29,32 @@ make.mv.spline.prior = function(parameter,
     # This structure allows to model knot values by accumulating changes (deltas) from baseline year
     # P2000=baseline
     # P1995=P2000+deltas???  #'@Ryan: can you review notes to see how the knots depend on each other. 
-    
+    # Each delta is a log-change between successive knots.
+    # We use an accumulation matrix M as a shortcut to find covariances
     M = rbind(
-      c(1,1,1,1,0,0),
-      c(1,1,1,0,0,0),
-      c(1,1,0,0,0,0),
-      c(1,0,0,0,0,0),
-      c(1,0,0,0,1,0),
-      c(1,0,0,0,1,1)
-    ) 
+      c(1,1,1,1,0,0), # 1970 # log P_1970 = logsd00 + logsd.delta95 + logsd.delta90 + logsd.delta70
+      c(1,1,1,0,0,0), # 1990 # log P_1970 = logsd00 + logsd.delta95 + logsd.delta90 
+      c(1,1,0,0,0,0), # 1995 # log P_1970 = logsd00 + logsd.delta95 
+      c(1,0,0,0,0,0), # 2000 # log P_1970 = logsd00 
+      c(1,0,0,0,1,0), # 2010 # log P_1970 = logsd00 + logsd.delta10 
+      c(1,0,0,0,1,1) # 2020 # log P_1970 = logsd00 + logsd.delta10 + logsd.delta20 
+    ) # 2000, 1995, 1990, 2010, 2020
     
-    mu = M %*% untransformed.mu
-    sigma = M  %*% untransformed.sigma %*% t(M)
+    mu = M %*% untransformed.mu # E[y] = M E[x]
+    sigma = M  %*% untransformed.sigma %*% t(M) # Σ_y = M Σ_x Mᵀ 
+    
+    # Let:
+    #   y_i = sum_k M[i,k] * x_k
+    #   y_j = sum_l M[j,l] * x_l
+    #
+    # Then the covariance between y_i and y_j is:
+    #   Cov(y_i, y_j) = sum_{k,l} M[i,k] * M[j,l] * Cov(x_k, x_l)
+    #
+    # Since Σ_x is diagonal (the x_k are independent),
+    # all Cov(x_k, x_l) = 0 unless k = l. Therefore:
+    #
+    #   Cov(y_i, y_j) = sum_{k shared by i and j} M[i,k] * M[j,k] * σ_k^2
+
     #
     dist = Multivariate.Lognormal.Distribution(mu = mu, sigma = sigma, 
                                                var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2020)))
