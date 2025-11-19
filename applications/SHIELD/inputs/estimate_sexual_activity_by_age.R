@@ -41,8 +41,8 @@ GSS_anysex_by_age_sex <- GSS_bysex_sexfreq %>%
                         breaks = age_breaks,
                         labels = age_labels,
                         right = TRUE)
-    ) %>%
-    add_row(age_group = "0–14", `Percent Any Sex` = 6.2) # value is yearly average since 1991
+    ) 
+    # add_row(age_group = "0–14", `Percent Any Sex` = 6.2) # value is yearly average since 1991
 View(GSS_anysex_by_age_sex)
 
 GSS_n_sex_part_by_age_sex <- GSS_n_sexpartners %>%
@@ -56,7 +56,7 @@ GSS_n_sex_part_by_age_sex <- GSS_n_sexpartners %>%
 ##############################
 # 5. Boxplots of totals by age group
 ##############################
-
+#percentage of people who have any sex
 ggplot(GSS_anysex_by_age_sex, aes(x = age_group, y = Total, fill = SEX)) +
     geom_boxplot(outlier.shape = 16, outlier.size = 1.5, alpha = 0.7) +
     labs(
@@ -69,7 +69,7 @@ ggplot(GSS_anysex_by_age_sex, aes(x = age_group, y = Total, fill = SEX)) +
         axis.text.x = element_text(angle = 45, hjust = 1),
         legend.position = "top"
     )
-
+#percentage of people who have more than one partner 
 ggplot(GSS_n_sex_part_by_age_sex, aes(x = age_group, y = Total, fill = Sex)) +
     geom_boxplot(outlier.shape = 16, outlier.size = 1.5, alpha = 0.7) +
     labs(
@@ -134,7 +134,7 @@ GSS_anypartner_summary <- GSS_n_sex_part_by_age_sex %>%
 ##############################
 # 8. Boxplots with weighted means overlaid
 ##############################
-
+#dots are the weighted
 ggplot(GSS_anysex_by_age_sex, aes(x = age_group, y = `Percent Any Sex`, fill = SEX)) +
     geom_boxplot(outlier.shape = 16, outlier.size = 1.5, alpha = 0.7) +
     # Add weighted mean as a point
