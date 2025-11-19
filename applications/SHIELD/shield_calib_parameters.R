@@ -33,12 +33,12 @@ make.mv.spline.prior = function(parameter,
     # We use an accumulation matrix M as a shortcut to find covariances
     M = rbind(
       c(1,1,1,1,0,0), # 1970 # log P_1970 = logsd00 + logsd.delta95 + logsd.delta90 + logsd.delta70
-      c(1,1,1,0,0,0), # 1990 # log P_1970 = logsd00 + logsd.delta95 + logsd.delta90 
-      c(1,1,0,0,0,0), # 1995 # log P_1970 = logsd00 + logsd.delta95 
-      c(1,0,0,0,0,0), # 2000 # log P_1970 = logsd00 
-      c(1,0,0,0,1,0), # 2010 # log P_1970 = logsd00 + logsd.delta10 
-      c(1,0,0,0,1,1) # 2020 # log P_1970 = logsd00 + logsd.delta10 + logsd.delta20 
-    ) # 2000, 1995, 1990, 2010, 2020
+      c(1,1,1,0,0,0), # 1990 # log P_1990 = logsd00 + logsd.delta95 + logsd.delta90 
+      c(1,1,0,0,0,0), # 1995 # log P_1995 = logsd00 + logsd.delta95 
+      c(1,0,0,0,0,0), # 2000 # log P_2000 = logsd00 
+      c(1,0,0,0,1,0), # 2010 # log P_2010 = logsd00 + logsd.delta10 
+      c(1,0,0,0,1,1) # 2020 # log P_2020 = logsd00 + logsd.delta10 + logsd.delta20 
+    ) # 2000, 1970, 1995, 1990, 2010, 2020
     
     mu = M %*% untransformed.mu # E[y] = M E[x]
     sigma = M  %*% untransformed.sigma %*% t(M) # Σ_y = M Σ_x Mᵀ 
