@@ -245,7 +245,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     
     # Proportion MSM ----#'@:Ryan: where are these mu/sd coming from? 
     black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
-    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =sdlog = 0, 0.125*log(2)),
+    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)),
     other.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
     
     # relapse & infectiousness for EL ---- '@:Ryan: where are these mu/sd coming from? 
@@ -274,7 +274,7 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
     or.symptomatic.secondary.other= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     
     # Odd-Ratio of symptomatic testing (by time) ----
-    #'@Ryan: let's put into a spline format
+    #'@Ryan: let's put into a MVN format
     or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
     or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
@@ -490,6 +490,23 @@ PRENATAL.PARAMETERS.PRIOR=join.distributions(
     
 )
 
+## DOXY-PEP.PARAMETERS.PRIOR ----
+
+DOXYPEP.PARAMETERS.PRIOR = join.distributions(
+
+    # Logistic slope for doxy coverage after 2022
+    # logit(coverage(t)) = doxy.coverage.slope * (t - 2022), t >= 2022
+    # This prior is fairly diffuse
+    doxy.coverage.slope = Lognormal.Distribution(
+        meanlog = log(0),sdlog  = 0.5*log(2)),
+
+    # Luetkemeyer et al. 2025 https://pubmed.ncbi.nlm.nih.gov/40147465/
+    # Relative risk under doxy-PEP (multiplicative reduction in acquisition)
+    doxy.rr = Lognormal.Distribution(
+        meanlog = log(0.20),   # prior mean RR ~0.20 (80% reduction)
+        sdlog  = 0.4570899     # chosen to match 95% CI [0.08 - 0.48]
+    )
+)
 
 #### ----
 #***** LINKING PARAMETERS TO FUNCTIONAL FORMS *****  -----
@@ -1295,6 +1312,15 @@ PRENATAL.SAMPLING.BLOCKS=list(
     #                "age50.54.third.trimester.odds.mult",
     #                "age55.64.third.trimester.odds.mult",
     #                "age65.plus.third.trimester.odds.mult")
+)
+
+
+## DOXY-PEP.SAMPLING.BLOCKS ----
+DOXYPEP.SAMPLING.BLOCKS = list(
+    doxy.block = c(
+        "doxy.coverage.slope",
+        "doxy.rr"
+    )
 )
 
 #### ----
