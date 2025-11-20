@@ -1074,6 +1074,13 @@ register.model.element(SHIELD.SPECIFICATION,
 
 register.model.element(
     SHIELD.SPECIFICATION,
+    name  = 'doxy.coverage.slope',
+    scale = 'ratio',
+    value = 0     
+)
+
+register.model.element(
+    SHIELD.SPECIFICATION,
     name = 'doxy.coverage',
     scale = 'proportion',
     get.functional.form.function = get.doxy.coverage.functional.form,

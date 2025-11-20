@@ -1205,7 +1205,7 @@ get.doxy.coverage.functional.form <- function(location, specification.metadata )
 {
     create.logistic.linear.functional.form(
         intercept = 0,                      # fixed logit-scale intercept
-        slope = get.model.element("doxy.coverage.slope", NA, specification.metadata),
+        slope = "doxy.coverage.slope",
         anchor.year = 2021,                 # logistic curve “starts” here
         #max = ... ,
         parameters.are.on.logit.scale = TRUE

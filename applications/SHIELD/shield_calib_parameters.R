@@ -496,9 +496,8 @@ DOXYPEP.PARAMETERS.PRIOR = join.distributions(
 
     # Logistic slope for doxy coverage after 2022
     # logit(coverage(t)) = doxy.coverage.slope * (t - 2022), t >= 2022
-    # This prior is fairly diffuse
     doxy.coverage.slope = Lognormal.Distribution(
-        meanlog = log(0),sdlog  = 0.5*log(2)),
+        meanlog = log(0), sdlog  = 0.5*log(2)),
 
     # Luetkemeyer et al. 2025 https://pubmed.ncbi.nlm.nih.gov/40147465/
     # Relative risk under doxy-PEP (multiplicative reduction in acquisition)
