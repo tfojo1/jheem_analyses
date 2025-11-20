@@ -98,6 +98,14 @@ data.manager$register.outcome(
         units = '%',
         description = "ADAP Viral Suppression"), denominator.outcome = 'adap.clients')
 
+data.manager$register.outcome(
+    'medicaid.enrollees.with.hiv',
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Medicaid Enrollees with HIV',
+        axis.name = 'Medicaid Enrollees with HIV',
+        units = 'population',
+        description = "Medicaid Enrollees with HIV"))
 
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
@@ -105,13 +113,14 @@ data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor
 data.manager$register.parent.source('census', full.name = 'United States Census Bureau', short.name= "census")
 data.manager$register.parent.source('cms', full.name = 'The Centers for Medicare & Medicaid Services', short.name= "cms")
 data.manager$register.parent.source('NASTAD', full.name = 'National Alliance of State and Territorial AIDS Directors', short.name= "NASTAD") #parent
+data.manager$register.parent.source('tmsis', full.name = 'Transformed Medicaid Statistical Information System', short.name= "tmsis")
 
 data.manager$register.source('ryan.white.program', parent.source= "HRSA", full.name = "Ryan White HIV/AIDS Program Annual Data Report", short.name='ryan.white.program') #child
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
 data.manager$register.source('acs', parent.source= "census", full.name = 'American Community Survey', short.name= "acs") 
 data.manager$register.source('cms', parent.source= "cms", full.name = 'The Centers for Medicare & Medicaid Services', short.name= "cms") 
-data.manager$register.source('nastad.adap', parent.source= "NASTAD", full.name = "ADAP Monitoring Project Annual Report", short.name='nastad.adap') #child
-
+data.manager$register.source('nastad.adap', parent.source= "NASTAD", full.name = "ADAP Monitoring Project Annual Report", short.name='nastad.adap') 
+data.manager$register.source('dhhs', parent.source= "tmsis", full.name = "Department of Health and Human Services", short.name='dhhs') 
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -182,6 +191,7 @@ source('data_processing/medicaid.data.manager/acs.total.medicaid.and.uninsured.R
 source('data_processing/medicaid.data.manager/cms.total.medicaid.R') #outcomes = medicaid.total;uninsured.total
 source('data_processing/medicaid.data.manager/ryan.white.total.and.stratified.state.only.R') #outcomes = adap.clients; non.adap.clients (by state)
 source('data_processing/medicaid.data.manager/ryan.white.adap.suppression.copy.R') #outcomes = adap.suppression
+source('data_processing/medicaid.data.manager/medicaid.enrollees.with.hiv.R') #outcomes = medicaid.enrollees.with.hiv
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/medicaid.data.manager.rdata")
