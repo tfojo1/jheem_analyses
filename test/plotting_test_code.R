@@ -7,7 +7,7 @@ location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager = create.style.manager(color.data.by = "source") 
 stratum.style.manager = create.style.manager(color.data.by = "stratum") # this is the default right now 
 
-LOCATION = 'MI'
+LOCATION = 'MS'
 
 CALIBRATION.CODE.TO.PULL = 'final.ehe.state'
 

@@ -51,7 +51,7 @@ all.parameters = sim.collection$get.parameters(verbose = VERBOSE)
 print("PULLING INCIDENCE BY AGE...")
 incidence.by.age = sim.collection$get(outcomes = 'incidence',
                                       output = 'numerator',
-                                      dimension.values=list(year=2020:2035),
+                                      dimension.values=list(year=2010:2036),
                                       keep.dimensions=c('year','age'),
                                       verbose = VERBOSE)
 
@@ -59,14 +59,14 @@ incidence.by.age = sim.collection$get(outcomes = 'incidence',
 print("PULLING INCIDENCE BY RACE")
 incidence.by.race = sim.collection$get(outcomes = 'incidence',
                                        output = 'numerator',
-                                       dimension.values=list(year=2020:2035),
+                                       dimension.values=list(year=2010:2036),
                                        keep.dimensions=c('year','race'),
                                        verbose = VERBOSE)
 
 print("PULLING INCIDENCE BY SEX/RISK...")
 incidence.by.sex.risk = sim.collection$get(outcomes = 'incidence',
                                            output = 'numerator',
-                                           dimension.values=list(year=2020:2035),
+                                           dimension.values=list(year=2010:2036),
                                            keep.dimensions=c('year','sex','risk'),
                                            verbose = VERBOSE)
 
