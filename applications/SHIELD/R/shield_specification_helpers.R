@@ -1200,15 +1200,7 @@ get.fraction.over.age <- function(location,
 }
 
 
-#logistic form for doxy coverage, only slope can be calibrated
-get.doxy.coverage.functional.form <- function(location, specification.metadata )
-{
-    create.logistic.linear.functional.form(
-        intercept = 0,                      # fixed logit-scale intercept
-        slope = "doxy.coverage.slope",
-        anchor.year = 2021,                 # logistic curve “starts” here
-        #max = ... ,
-        parameters.are.on.logit.scale = TRUE
-    )
-}
+
+
+
 

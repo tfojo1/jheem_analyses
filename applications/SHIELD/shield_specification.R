@@ -1072,18 +1072,19 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = 1
 )
 
-register.model.element(
-    SHIELD.SPECIFICATION,
-    name  = 'doxy.coverage.slope',
-    scale = 'ratio',
-    value = 0     
-)
+
 
 register.model.element(
     SHIELD.SPECIFICATION,
     name = 'doxy.coverage',
     scale = 'proportion',
-    get.functional.form.function = get.doxy.coverage.functional.form,
+    functional.form = create.logistic.linear.functional.form(
+                                                    intercept = 0, # fixed logit-scale intercept
+                                                    slope = 0,
+                                                    anchor.year = 2021, # logistic curve “starts” here
+                                                    #max = ... ,
+                                                    parameters.are.on.logit.scale = TRUE
+    ),
     functional.form.from.time = 2021,  
     functional.form.to.time   = 2025
 )

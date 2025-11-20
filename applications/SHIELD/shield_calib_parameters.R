@@ -412,7 +412,7 @@ AGE.TRANS.TEST.PARAMETERS.PRIOR=join.distributions(
     or.symptomatic.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
     SYMPTOMATIC.PRIOR <- Multivariate.Lognormal.Distribution(
         mu = testing_meanlog,
-        sigma = Sigma_testing,
+        sigma = testing_sigma,
         var.names = symptomatic_varnames
     )
     
@@ -497,7 +497,7 @@ DOXYPEP.PARAMETERS.PRIOR = join.distributions(
     # Logistic slope for doxy coverage after 2022
     # logit(coverage(t)) = doxy.coverage.slope * (t - 2022), t >= 2022
     doxy.coverage.slope = Lognormal.Distribution(
-        meanlog = log(0), sdlog  = 0.5*log(2)),
+        meanlog = log(1), sdlog  = 0.5*log(2)),
 
     # Luetkemeyer et al. 2025 https://pubmed.ncbi.nlm.nih.gov/40147465/
     # Relative risk under doxy-PEP (multiplicative reduction in acquisition)
@@ -842,6 +842,16 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
             applies.to.dimension.values = "all")
         
     }
+    
+    ## Doxy-PEP Coverage
+    set.element.functional.form.main.effect.alphas(
+        model.settings,
+        element.name = "doxy.coverage",
+        alpha.name   = "slope",
+        values       = parameters["doxy.coverage.slope"],
+        dimension    = "all",
+        applies.to.dimension.values = "all"
+    )
     
     
 }
