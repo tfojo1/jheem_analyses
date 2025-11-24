@@ -107,6 +107,16 @@ data.manager$register.outcome(
         units = 'population',
         description = "Medicaid Enrollees with HIV"))
 
+data.manager$register.outcome(
+    'medicaid.enrollees.losing.coverage',
+    metadata = create.outcome.metadata(
+        scale = 'non.negative.number',
+        display.name = 'Medicaid Enrollees Losing Coverage',
+        axis.name = 'Medicaid Enrollees Losing Coverage',
+        units = 'population',
+        description = "Medicaid Enrollees Losing Coverage"))
+
+
 #Register Sources:
 data.manager$register.parent.source('HRSA', full.name = 'Health Resources and Services Administration', short.name= "HRSA") #parent
 data.manager$register.parent.source('BRFSS', full.name = 'Behavioral Risk Factor Surveillance System', short.name= "BRFSS") 
@@ -114,6 +124,7 @@ data.manager$register.parent.source('census', full.name = 'United States Census 
 data.manager$register.parent.source('cms', full.name = 'The Centers for Medicare & Medicaid Services', short.name= "cms")
 data.manager$register.parent.source('NASTAD', full.name = 'National Alliance of State and Territorial AIDS Directors', short.name= "NASTAD") #parent
 data.manager$register.parent.source('tmsis', full.name = 'Transformed Medicaid Statistical Information System', short.name= "tmsis")
+data.manager$register.parent.source('cbo', full.name = 'Congressional Budget Office', short.name= "cbo")
 
 data.manager$register.source('ryan.white.program', parent.source= "HRSA", full.name = "Ryan White HIV/AIDS Program Annual Data Report", short.name='ryan.white.program') #child
 data.manager$register.source('brfss', parent.source= "BRFSS", full.name = "Behavioral Risk Factor Surveillance System", short.name='brfss')
@@ -121,6 +132,9 @@ data.manager$register.source('acs', parent.source= "census", full.name = 'Americ
 data.manager$register.source('cms', parent.source= "cms", full.name = 'The Centers for Medicare & Medicaid Services', short.name= "cms") 
 data.manager$register.source('nastad.adap', parent.source= "NASTAD", full.name = "ADAP Monitoring Project Annual Report", short.name='nastad.adap') 
 data.manager$register.source('dhhs', parent.source= "tmsis", full.name = "Department of Health and Human Services", short.name='dhhs') 
+data.manager$register.source('jec', parent.source= "cbo", full.name = "U.S. Congress Joint Economic Committee – Minority", short.name='jec') 
+
+
 
 #Register Ontologies:
 data.manager$register.ontology(
@@ -192,16 +206,12 @@ source('data_processing/medicaid.data.manager/cms.total.medicaid.R') #outcomes =
 source('data_processing/medicaid.data.manager/ryan.white.total.and.stratified.state.only.R') #outcomes = adap.clients; non.adap.clients (by state)
 source('data_processing/medicaid.data.manager/ryan.white.adap.suppression.copy.R') #outcomes = adap.suppression
 source('data_processing/medicaid.data.manager/medicaid.enrollees.with.hiv.R') #outcomes = medicaid.enrollees.with.hiv
+source('data_processing/medicaid.data.manager/medicaid.enrollees.losing.coverage.R') #outcomes = medicaid.enrollees.losing.coverage
+
+# Adding in Todd's cleaning file ------------------------------------------
+source('applications/ryan_white/ryan_white_data_cleanup.R')
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/medicaid.data.manager.rdata")
 save(data.manager, file = '../../cached/medicaid.data.manager.rdata')
 
-################################################################################################
-################################################################################################
-
-# Zoe Question: Check what this is and verify if you need if for this data manager --------
-# # Source Todd's Additional Cleaning Code ----------------------------------
-# source('applications/EHE/ehe_ontology_mappings.R')
-# source('applications/ryan_white/ryan_white_data_ontology_mappings.R')
-# source('applications/ryan_white/ryan_white_data_cleanup.R')
