@@ -209,7 +209,9 @@ source('data_processing/medicaid.data.manager/medicaid.enrollees.with.hiv.R') #o
 source('data_processing/medicaid.data.manager/medicaid.enrollees.losing.coverage.R') #outcomes = medicaid.enrollees.losing.coverage
 
 # Adding in Todd's cleaning file ------------------------------------------
-source('applications/ryan_white/ryan_white_data_cleanup.R')
+# source('applications/EHE/ehe_ontology_mappings.R')
+# source('applications/ryan_white/ryan_white_data_ontology_mappings.R')
+# source('applications/ryan_white/ryan_white_data_cleanup.R')
 
 # Save --------------------------------------------------------------------
 save(data.manager, file="Q:/data_managers/medicaid.data.manager.rdata")
