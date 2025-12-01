@@ -1,8 +1,3 @@
-#put national
-#year?
-
-
-
 
 DATA.DIR.MEDICAID.LOSS="Q:/data_raw/medicaid/medicaid.enrollees.losing.coverage"
 
