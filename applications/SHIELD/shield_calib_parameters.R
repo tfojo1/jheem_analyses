@@ -1383,3 +1383,4 @@ SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
 # get.intervals(x)
 # calculate.density(x,10)/calculate.density(x,3)
 
+cat('*** shield_calib_parameters.R completed! ***\n')

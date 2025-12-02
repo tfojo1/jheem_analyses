@@ -154,7 +154,7 @@ calculate.lhd.error.terms = function(data.type,
     do.calculate.variance.parameters(e=e, x=x, output=output, fixed.exp.of.var=fixed.exp.of.var, verbose=verbose)
 }
 
-do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, verbose=T)
+do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, verbose=F)
 {
     mask = !is.na(e) & !is.na(x)
     e = e[mask]
@@ -186,7 +186,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
         cv = sqrt(sum(e^2/x^2)/n) 
         log.l = sum(dnorm(e, mean=0, sd=cv*x, log=T))
         
-        print(paste0("With CV = ", cv, ", log L = ", log.l))
+        if(verbose) print(paste0("With CV = ", cv, ", log L = ", log.l))
         
         cv
     }
@@ -195,7 +195,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
         cv.sqrt = sqrt(sum(e^2/x)/n)
         log.l = sum(dnorm(e, mean=0, sd=cv.sqrt*sqrt(x), log=T))
         
-        print(paste0("With CV.sqrt = ", cv.sqrt, ", log L = ", log.l))
+        if(verbose) print(paste0("With CV.sqrt = ", cv.sqrt, ", log L = ", log.l))
         
         cv.sqrt
     }
@@ -204,7 +204,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
         c.of.v.and.sqrt = sqrt(sum(e^2/(x+x^2))/n)
         log.l = sum(dnorm(e, mean=0, sd=c.of.v.and.sqrt*sqrt(x+x^2), log=T))
         
-        print(paste0("With c.of.v.and.sqrt = ", c.of.v.and.sqrt, ", log L = ", log.l))
+        if(verbose) print(paste0("With c.of.v.and.sqrt = ", c.of.v.and.sqrt, ", log L = ", log.l))
         
         c.of.v.and.sqrt
     }
@@ -221,7 +221,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
         
         exponent.of.variance = as.numeric(optimize.result$maximum)
         log.l = sum(dnorm(e, mean=0, sd=x^exponent.of.variance, log=T))
-        print(paste0("With exponent.of.variance = ", exponent.of.variance, ", log L = ", log.l))
+        if(verbose) print(paste0("With exponent.of.variance = ", exponent.of.variance, ", log L = ", log.l))
         
         exponent.of.variance
     }
@@ -236,7 +236,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
         
         cv = as.numeric(optimize.result$maximum)
         log.l = sum(dnorm(e, mean=0, sd=sqrt(x^(2*fixed.exp.of.var) + (cv*x)^2), log=T))
-        print(paste0("With exponent.of.variance fixed to = ", fixed.exp.of.var, "and cv = ", cv, ", log L = ", log.l))
+        if(verbose) print(paste0("With exponent.of.variance fixed to = ", fixed.exp.of.var, "and cv = ", cv, ", log L = ", log.l))
         
         cv
     }
@@ -251,7 +251,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
         
         cv = as.numeric(optimize.result$maximum)
         log.l = sum(dnorm(e, mean=0, sd=sqrt(x + (cv*x)^2), log=T))
-        print(paste0("With exponent.of.variance fixed to = 0.5 and cv = ", cv, ", log L = ", log.l))
+        if(verbose) print(paste0("With exponent.of.variance fixed to = 0.5 and cv = ", cv, ", log L = ", log.l))
         
         cv
     }
@@ -274,7 +274,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
         
         log.l = sum(dnorm(e, mean=0, sd=sqrt(x*rv$cv.sqrt + (x*rv$cv)^2), log=T))
         
-        print(paste0("With CV = ", rv$cv, " and CV.sqrt = ", rv$cv.sqrt, ", log L = ", log.l))
+        if(verbose)  print(paste0("With CV = ", rv$cv, " and CV.sqrt = ", rv$cv.sqrt, ", log L = ", log.l))
         
         rv
     }
@@ -297,7 +297,7 @@ do.calculate.variance.parameters <- function(e, x, output, fixed.exp.of.var=NA, 
         
         log.l = sum(dnorm(e, mean=0, sd=sqrt(x^(2*rv$exponent.of.variance) + (x*rv$cv)^2), log=T))
         
-        print(paste0("With CV = ", rv$cv, " and exponent.of.variance = ", rv$exponent.of.variance, ", log L = ", log.l))
+        if(verbose) print(paste0("With CV = ", rv$cv, " and exponent.of.variance = ", rv$exponent.of.variance, ", log L = ", log.l))
         
         rv
     }
@@ -316,7 +316,8 @@ calculate.error.terms = function(data.type,
                                  use.sex = T,
                                  use.race = F,
                                  output='cv',
-                                 fixed.exp.of.var=NA){
+                                 fixed.exp.of.var=NA,
+                                 verbose=F){
     
     all.values1 = numeric()
     all.values2 = numeric()
@@ -432,7 +433,7 @@ calculate.error.terms = function(data.type,
     cvs = cvs[!outliers.mask]
     x = x[!outliers.mask]
     errors = errors[!outliers.mask]
-    print(qplot(all.values1,all.values2)+geom_abline(intercept = 0,slope = 1))
+    if (verbose) print(qplot(all.values1,all.values2)+geom_abline(intercept = 0,slope = 1))
     do.calculate.variance.parameters(e = errors, x = x, fixed.exp.of.var=fixed.exp.of.var, output=output)
 }
 

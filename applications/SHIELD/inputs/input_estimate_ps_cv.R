@@ -5,7 +5,8 @@ PS_CV <- calculate.error.terms(
     data.type    = "ps.syphilis.diagnoses",
     data.source.1 = "cdc.aggregated.county",
     data.source.2 = "lhd",
-    output       = "cv"
+    output       = "cv",
+    verbose = F
 ) # gives 0.0764791209420945, log L = -2005.39939971725
 
 

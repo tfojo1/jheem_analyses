@@ -53,7 +53,7 @@ mcmc = run.calibration(version = VERSION,
                        location = LOCATION,
                        calibration.code = CALIBRATION.NAME,
                        chains = 1,
-                       update.frequency = UPDATE.FREQ,#50,
+                       update.frequency = UPDATE.FREQ,
                        update.detail = 'med')
 end.time = Sys.time()
 run.time = as.numeric(end.time) - as.numeric(start.time)
