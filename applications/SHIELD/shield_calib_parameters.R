@@ -185,74 +185,11 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
   el.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
   
-<<<<<<< HEAD
+#'@PKASAIE
   lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
   lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-  
-  ## Global transmission ----
-  global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
-  
-  #12 independant params
-  ## msm multipliers by time ----
-  make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to heterosexuals
-                       logmean00 = log(3),logsd00 = log(2), #reference year 2000 #'@Ryan: why are we using these mu/sd?Ref?
-                       #
-                       logsd.delta95 = log(sqrt(1.5))/2, #'@Ryan: why are we using these values?
-                       logsd.delta90 = log(sqrt(1.5))/2, 
-                       logsd.delta70 = log(1.5^2)/2,
-                       logsd.delta10 = log(1.5)/2, 
-                       logsd.delta20 = log(1.5)/2
-  ),
-  
-  ## heterosexual multipliers by time ----
-  make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", 
-                       logmean00 = 0,logsd00 = log(2), ##'@Ryan: why are we using this SD?
-                       logsd.delta95 = log(sqrt(1.5))/2, 
-                       logsd.delta90 = log(sqrt(1.5))/2, 
-                       logsd.delta70 = log(1.5^2)/2,
-                       logsd.delta10 = log(1.5)/2, 
-                       logsd.delta20 = log(1.5)/2
-  ),
-  
-  ## race multipliers (msm and het seperatly) ----
-  #'@Ryan: we have used sdlog= log(2)/2 everywhere else.why increasing here?
-  transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  
-  transmission.rate.multiplier.hispanic.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  transmission.rate.multiplier.hispanic.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  
-  transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  
-  ## future change ----
-  transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #@Ryan: please cite these numbers 
-  
-  ## Sexual Mixing by Age ----
-  age.mixing.sd.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)), #the model is sensitive to this parameter-we reduce the sdlog=1/4*log(2)
-  #directly used in specification helper function
-  #to control the standard deviation of the contact matrix by age
-  
-  ## Sexual Mixing by Race ----
-  #this is multiplied in the race mixing matrix
-  black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(2)), #Mu and SD are chosen empirically 
-  hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),  
-  other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),
-  
-  ## Sexual Mixing by Risk ----
-  oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), #SD are chosen empirically '@Ryan: Mu?
-  fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
-  fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
-  
-  # Proportion MSM ----#'@:Ryan: where are these mu/sd coming from? 
-  black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
-  hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)),
-  other.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
-  
-  # relapse & infectiousness for EL ---- '@:Ryan: where are these mu/sd coming from? 
-  prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
-  el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
-=======
+
+
     ## Global transmission ----
     global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
     
@@ -316,8 +253,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     # relapse & infectiousness for EL ---- '@:Ryan: where are these mu/sd coming from? 
     prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
     el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
->>>>>>> 584e781efcce66aa21302f3d0790b9d589819a44
-) 
+ ) 
 
 ## TESTING.PARAMETERS.PRIOR ----
 TESTING.PARAMETERS.PRIOR=join.distributions( 
@@ -1099,7 +1035,6 @@ AGING.SAMPLING.BLOCKS = list(
 
 ## TRANSMISSION.SAMPLING.BLOCKS ----
 TRANSMISSION.SAMPLING.BLOCKS = list(
-<<<<<<< HEAD
   global.transmission.rate=c("global.transmission.rate"),
   #
   relapse=c("prop.early.latent.to.secondary"),
@@ -1164,70 +1099,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     'black.proportion.msm.of.male.mult',
     'hispanic.proportion.msm.of.male.mult',
     'other.proportion.msm.of.male.mult')
-=======
-    initial.infections.msm=c(
-        'ps.diagnoses.msm.multiplier.1970',
-        'el.diagnoses.msm.multiplier.1970',
-        'lu.diagnoses.msm.multiplier.1970'
-    ),
-    initial.infections.Heterosexual=c(
-        'ps.diagnoses.heterosexual_male.multiplier.1970',
-        'el.diagnoses.heterosexual_male.multiplier.1970',
-        'lu.diagnoses.heterosexual_male.multiplier.1970'
-    ),
-    global.transmission.rate=c("global.transmission.rate"),
-    
-    msm.transmission.block1 = c(
-        "transmission.rate.multiplier.msm1970",
-        "transmission.rate.multiplier.msm1990",
-        "transmission.rate.multiplier.msm1995"),
-    msm.transmission.block2=c(
-        "transmission.rate.multiplier.msm2000",
-        "transmission.rate.multiplier.msm2010",
-        "transmission.rate.multiplier.msm2020"#,
-        #"transmission.rate.multiplier.msm2030"
-    ),
-    #
-    het.transmission.block1 =c(
-        "transmission.rate.multiplier.heterosexual1970",
-        "transmission.rate.multiplier.heterosexual1990",
-        "transmission.rate.multiplier.heterosexual1995"),
-    het.transmission.block2=c(
-        "transmission.rate.multiplier.heterosexual2000",
-        "transmission.rate.multiplier.heterosexual2010",
-        "transmission.rate.multiplier.heterosexual2020"#,
-        #"transmission.rate.multiplier.heterosexual2030"
-    ),
-    race.transmission.msm = c(
-        "transmission.rate.multiplier.black.msm",
-        "transmission.rate.multiplier.hispanic.msm",
-        "transmission.rate.multiplier.other.msm"
-    ),
-    race.transmission.heterosexual = c(
-        "transmission.rate.multiplier.black.heterosexual",
-        "transmission.rate.multiplier.hispanic.heterosexual",
-        "transmission.rate.multiplier.other.heterosexual"
-    ),
-    future.change.trate=c("transmission.rate.future.change.mult"),
-    race.mixing.transmission= c("black.black.sexual.multi",
-                                "hispanic.hispanic.sexual.multi", 
-                                "other.other.sexual.multi"
-    ),
-    risk.mixing.transmission= c("oe.female.pairings.with.msm",
-                                "fraction.heterosexual_male.pairings.with.male",
-                                "fraction.msm.pairings.with.female"),
-    
-    proportion.msm.of.male = c(
-        'black.proportion.msm.of.male.mult',
-        'hispanic.proportion.msm.of.male.mult',
-        'other.proportion.msm.of.male.mult'),
-    relapse=c(
-        "prop.early.latent.to.secondary"
-    ),
-    infectiousness=c(
-        "el.rel.secondary.transmissibility"
-    )
->>>>>>> 584e781efcce66aa21302f3d0790b9d589819a44
+
 )
 
 ## TESTING.SAMPLING.BLOCKS ----
@@ -1304,7 +1176,7 @@ TESTING.SAMPLING.BLOCKS = list(
 
 ## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
 AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
-<<<<<<< HEAD
+ 
   
   # age.mixing.transmission=(
   #   "age.mixing.sd.mult"
@@ -1386,105 +1258,7 @@ AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
     "sti.screening.multiplier.age54",
     "sti.screening.multiplier.age64",
     "sti.screening.multiplier.age65"
-  )
-=======
-    
-    age.mixing.transmission=(
-        "age.mixing.sd.mult"
-    ),
-    
-    age14.transmission = c(
-        "transmission.rate.multiplier.age14.msm",
-        "transmission.rate.multiplier.age14.heterosexual"
-    ),
-    
-    age19.transmission = c(
-        "transmission.rate.multiplier.age19.msm",
-        "transmission.rate.multiplier.age19.heterosexual"
-    ),
-    
-    age.transmission.msm.1 = c(
-        "transmission.rate.multiplier.age24.msm",
-        "transmission.rate.multiplier.age29.msm",
-        "transmission.rate.multiplier.age34.msm"
-    ),
-    
-    age.transmission.msm.2 = c(
-        "transmission.rate.multiplier.age39.msm",
-        "transmission.rate.multiplier.age44.msm",
-        "transmission.rate.multiplier.age49.msm"
-    ),
-    
-    age.transmission.msm.3 = c(
-        "transmission.rate.multiplier.age54.msm",
-        "transmission.rate.multiplier.age64.msm",
-        "transmission.rate.multiplier.age65.msm"
-    ),
-    
-    
-    age.transmission.heterosexual.1 = c(
-        "transmission.rate.multiplier.age24.heterosexual",
-        "transmission.rate.multiplier.age29.heterosexual",
-        "transmission.rate.multiplier.age34.heterosexual"
-    ),
-    
-    age.transmission.heterosexual.2 = c(
-        "transmission.rate.multiplier.age39.heterosexual",
-        "transmission.rate.multiplier.age44.heterosexual",
-        "transmission.rate.multiplier.age49.heterosexual"
-    ),
-    
-    age.transmission.heterosexual.3 = c(
-        "transmission.rate.multiplier.age54.heterosexual",
-        "transmission.rate.multiplier.age64.heterosexual",
-        "transmission.rate.multiplier.age65.heterosexual"
-    ),
-    
-    age14.testing = c(
-        "or.symptomatic.age14",
-        "sti.screening.multiplier.age14"
-    ),
-    
-    age19.testing = c(
-        "or.symptomatic.age19",
-        "sti.screening.multiplier.age19"
-    ),
-    
-    age.symptomatic.testing.1 = c(
-        "or.symptomatic.age24",
-        "or.symptomatic.age29",
-        "or.symptomatic.age34"
-    ),
-    
-    age.symptomatic.testing.2 = c(
-        "or.symptomatic.age39",
-        "or.symptomatic.age44",
-        "or.symptomatic.age49"
-    ),
-    
-    age.symptomatic.testing.3 = c(
-        "or.symptomatic.age54",
-        "or.symptomatic.age64",
-        "or.symptomatic.age65"
-    ),
-    screening.by.age.1 = c(
-        "sti.screening.multiplier.age24",
-        "sti.screening.multiplier.age29",
-        "sti.screening.multiplier.age34"
-    ),
-    
-    screening.by.age.2 = c(
-        "sti.screening.multiplier.age39",
-        "sti.screening.multiplier.age44",
-        "sti.screening.multiplier.age49"
-    ),
-    
-    screening.by.age.3 = c(
-        "sti.screening.multiplier.age54",
-        "sti.screening.multiplier.age64",
-        "sti.screening.multiplier.age65"
-    )
->>>>>>> 584e781efcce66aa21302f3d0790b9d589819a44
+  ) 
 )
 # SD.MULT.SAMPLING.BLOCKS ----
 SD.MULT.SAMPLING.BLOCKS = list(
