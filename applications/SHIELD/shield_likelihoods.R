@@ -1132,8 +1132,8 @@ state.HIV.tested.by.strata.stage2.likelihood.instructions =
 
 #-- LIKELIHOODS --# ----
 ## STAGE0 ----
-
-lik.inst.demog.TD.2 =join.likelihood.instructions(
+# popualtion targets+total ps
+lik.inst.stage0 =join.likelihood.instructions(
     population.likelihood.instructions,
     deaths.likelihood.instructions,
     fertility.likelihood.instructions,
@@ -1143,7 +1143,8 @@ lik.inst.demog.TD.2 =join.likelihood.instructions(
 )
 
 ## STAGE1 ----- 
-lik.inst.diag.strata.stage1.no.demog.w.future.totals=join.likelihood.instructions(
+# total syphilis+stage1 stratas (by race, sex)
+lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage1.likelihood.instructions,
     #
@@ -1169,8 +1170,9 @@ lik.inst.diag.strata.stage1.no.demog.w.future.totals=join.likelihood.instruction
     U.turn.likelihood.instructions,
     U.turn.strata.likelihood.instructions
 )
-## STAGE2 ----- 
-lik.inst.diag.strata.stage2.no.demog.w.future.totals=join.likelihood.instructions(
+## STAGE2 -----
+#total syphilis +stage 2 stratas (by age, sex, race)
+lik.inst.stage2=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
     #

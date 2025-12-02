@@ -5,189 +5,45 @@ N.ITER=15000
 # shield.solver = create.solver.metadata(rtol = 0.001, atol=0.03) #rtol,atol
 # default.solver= create.solver.metadata()
 
-#parameter set for demographic & diagnosis calibration
-param.names.all<-c(
-    POPULATION.PARAMETERS.PRIOR@var.names,
-    AGING.PARAMETERS.PRIOR@var.names,
-    TRANSMISSION.PARAMETERS.PRIOR@var.names,
-    TESTING.PARAMETERS.PRIOR@var.names)
-
-# Usedbelow: 06.09.pk*:Calibrating to demographic targets only
-register.calibration.info('calib.demog.06.09.pk', 
-                          likelihood.instructions = likelihood.instructions.demographics,
+#STAGE0: The demographic stage
+register.calibration.info('calib.12.02.stage0', 
+                          likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
                           parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
-                                              AGING.PARAMETERS.PRIOR@var.names), 
+                                              AGING.PARAMETERS.PRIOR@var.names,
+                                              "global.transmission.rate"),
+                          parameter.aliases = par.aliases.transmission,
                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-# Usedbelow: 07.06.pk*: Adding extra knots to testing and screening to align with transmission knots 
-register.calibration.info(code = ("calib.diagnosis.07.06.pk4"),
-                          preceding.calibration.codes = "calib.demog.06.09.pk", #calibrated demographic model
-                          likelihood.instructions = likelihood.instructions.syphilis.diag.total.no.demog, #PS total, EL total, Late total, HIV tests statified
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = 
-                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-
-#Usedbelow: 07.07.pk* #likelihoods Totals, all with w=1/8 weight
-register.calibration.info(code = paste0("calib.diagnosis.07.07.pk1"),
-                          preceding.calibration.codes = "calib.diagnosis.07.06.pk4", #calibrated diagnosis model
-                          likelihood.instructions = lik.inst.diag.total.no.demog,  
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = 
-                              c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-
-# Usedbelow: 07.09 running with different weights
-for (i in c(0:3)){
-    register.calibration.info(code = paste0("calib.07.09.pk",i),
-                              preceding.calibration.codes = "calib.diagnosis.07.07.pk1",  #calibrated demographic model using total likelihoods
-                              likelihood.instructions = lik.inst.diag.total.no.demog,  
+#STAGE1: 
+register.calibration.info('calib.12.02.stage1',
+                              preceding.calibration.codes = 'calib.12.02.stage0',
+                              likelihood.instructions = lik.inst.stage1,
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
-                              parameter.names = 
-                                  c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                    TESTING.PARAMETERS.PRIOR@var.names),
+                              parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                                  TESTING.PARAMETERS.PRIOR@var.names),
                               n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
     )
-}
 
-# Usedbelow: 07.10 adding EL specific knots in 1990,95,2000,2010,2020 for screening to see if it works
-for (i in c(0:3)){
-    register.calibration.info(code = paste0("calib.07.10.pk",i),
-                              preceding.calibration.codes = "calib.07.09.pk3",  #calibrated demographic model using total likelihoods with w=1 for EL
-                              likelihood.instructions = lik.inst.diag.total.no.demog,  
+#STAGE2
+register.calibration.info('calib.12.02.stage2',
+                              preceding.calibration.codes = 'calib.12.02.stage1',
+                              likelihood.instructions = lik.inst.stage2,
                               data.manager = SURVEILLANCE.MANAGER,
                               end.year = 2030,
-                              parameter.names = 
-                                  c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                    TESTING.PARAMETERS.PRIOR@var.names),
+                              parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                                  TESTING.PARAMETERS.PRIOR@var.names,
+                                                  AGE.TRANS.TEST.PARAMETERS.PRIOR@var.names,
+                                                  "age.mixing.sd.mult"
+                                                  ),
                               n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-    )
-}
-
-########################################################################################################
-# 07.16 removing additional knots for EL screening and additional weights.
-# starting from demog.calibration again
-# this run doesnt have the 2023 data points for diagnosis
-for (i in c(0)){
-    register.calibration.info(code = paste0("calib.07.16.pk",i),
-                              preceding.calibration.codes = "calib.demog.06.09.pk",  #calibrated demographic model using total likelihoods with w=1 for EL
-                              likelihood.instructions = lik.inst.diag.total.no.demog,  
-                              data.manager = SURVEILLANCE.MANAGER,
-                              end.year = 2030,
-                              parameter.names = 
-                                  c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                    TESTING.PARAMETERS.PRIOR@var.names),
-                              n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-    )
-}
+    ) 
 
 
-# LOG SUMMARY -----
-# <calib.07.10.pk*> adding EL specific knots in 1990,95,2000,2010,2020 for screening to see if it works
-#0-likelihoods Totals, all with w=1/8 weight
-#1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
-#2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
-#3-likelihoods Totals, all with w=1/8 weight except for EL (w=1)
-
-# <calib.07.09.pk*> running with different weights for EL
-#0-likelihoods Totals, all with w=1/8 weight
-#1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
-#2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
-#3-likelihoods Totals, all with w=1/8 weight except for EL (w=1) >>> Best fit
-
-# <calib.diagnosis.07.08.pk>
-# increasing the weight of EL diagnosis to see if it works
-# <calib.diagnosis.07.08.pk1> using total likelihoods, all with w=1/8 except for EL
-#1-likelihoods Totals, all with w=1/8 weight except for EL (w=1/4)
-#2-likelihoods Totals, all with w=1/8 weight except for EL (w=1/2)
-#3-likelihoods Totals, all with w=1/8 weight except for EL (w=1)
-
-
-# <calib.diagnosis.07.07.pk1>
-# rerunning *4 from yesterday after revising the HIV likelihood to use the "TOTALS" only.
-# <<calib.diagnosis.07.07.pk1>> total likelihoods, using the previous calibration as starting point
-# <<calib.diagnosis.07.07.pk2>> stratified likelihoods, using the previous calibration as starting point
-# <<calib.diagnosis.07.07.pk11>> total likelihoods, using the demog calibration as starting point
-# <<calib.diagnosis.07.07.pk22>> stratified likelihoods, using the demog calibration as starting point
-# The starting point from demographic wasnt good, dismissing *11, *22
-# stratified diagnosis data are problematic (dismissing *2)
-# <calib.diagnosis.07.06.pk1>
-#adding additional knots to symptomatic testing to align with transmission: 1970,90,95,2000,2010,2020
-# >>> this is a good fit, and it captures the tails of late diagnosis well
-# <calib.diagnosis.07.06.pk2>
-#revising knots in sti.screening function to be the same : 1970,90,95,2000,2010,2020
-# <calib.diagnosis.07.06.pk3> #revising the sym.testing spline function to use a knot.link=logit, and use link=identity. 
-# >>> using identity link for probabilities doesnt make sense. Ignore this run
-# <calib.diagnosis.07.06.pk4> #revising the sym.testing spline function to use a knot.link=logit, and use link=logit 
-# >>> this is exactly the same as *2. why? #'@Todd? 
-
-
-# <calib.07.03.pk1> ----
-# repeating Ryan's run with the last sim as starting point
-# EL infectiousness = ON; Relapse=ON, PS screening=ON ; contact tracing=ON
-
-
-# <calib.diagnosis.07.02.pk1> ----
-# repeating calibration from yesterday with weight 1/8, running another one with proceeding=calib.diagnosis.07.01.pk1 
-
-# <calib.diag.07.02.pk[2...*] > using the demographic calibration as the starting point (calib.diagnosis.06.30.pk1)
-# <calib.diag.07.02.pk2> # EL transmissibility = ON
-# <calib.diag.07.02.pk3> # EL transmissibility = ON; Relapse=ON
-# <calib.diag.07.02.pk4> # EL transmissibility = ON; Relapse=ON, PS screening=ON [Range of 0.13-1.9]
-# <calib.diag.07.02.pk5> # EL transmissibility = ON; Relapse=ON, PS screening=ON ; contact tracing=ON
-# <calib.diag.07.02.pk6> same as before, adding a contact.tracing parameter to calibration
-
-
-# <calib.diagnosis.07.01.pk1> ----
-# w=1/8
-# revised the prior for EL and LL sti screening multipliers
-# change the diagnosis likelihood to use "autoregressive.1" correlation instead of compound symmetry
-# >>> this one works great
-
-# <calib.diagnosis.07.01.pk2> # downweighting likelihoods to w=1/32 to make sure it mixes well
-# >>> this one didnt work as well
-
-# <calib.diagnosis.06.30.pk1> ----
-# changing the initial number infected in 1970
-# adding new transmission multiplier in 1990
-# calibrating to PS total, EL total, Late total, HIV tests
-# only changing Transmission and Testing Parameters
-# excluding sti.screening.multiplier.ps from calibration
-# >>> The initial peak pre-1990 is gone. Simulations have a hard time catching up with EL diagnoses.
-# >>> Manual try suggested high levels of screening for EL and LL is needed
-
-# <calib.diagnosis.06.30.pk1> 
-#  
-
-# ## TEST for Nick:
-# register.calibration.info('pop.demog.test', 
-#                           likelihood.instructions = likelihood.instructions.demographics,
-#                           data.manager = SURVEILLANCE.MANAGER,
-#                           end.year = 2030,  
-#                           parameter.names = c(
-#                               POPULATION.PARAMETERS.PRIOR@var.names,
-#                               AGING.PARAMETERS.PRIOR@var.names 
-#                           ), 
-#                           n.iter = 10,
-#                           thin = 1, 
-#                           is.preliminary = T, 
-#                           max.run.time.seconds = 30, 
-#                           description = "A quick run to get population parameters in the general vicinity",
-#                           solver.metadata = solver
-# )
-cat("*** Shiled_register_calibration.R completed!***\n")
-
-
+     
 # fixed.initial.parameter.values = c(global.transmission.rate=3), #change the initial value for a parameter
 # is.preliminary = T, # it's set to optimization mode with a smaller acceptance rate of 10% to move more quickly 
 # max.run.time.seconds = 30,  # If solving the differential equations takes longer than this, it returns a ‘degenerate’ sim where all outcomes are NA and the likelihood evaluates to -Inf.
