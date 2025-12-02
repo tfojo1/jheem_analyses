@@ -1,7 +1,7 @@
 source("applications/SHIELD/R/shield_calculating_error_terms_for_likelihoods.R")
 
 #Estimate used for all syphilis stages (too few data points in other stages)
-cv_PS <- calculate.error.terms(
+PS_CV <- calculate.error.terms(
     data.type    = "ps.syphilis.diagnoses",
     data.source.1 = "cdc.aggregated.county",
     data.source.2 = "lhd",

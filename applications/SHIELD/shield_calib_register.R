@@ -16,7 +16,7 @@ par.aliases.transmission = list(
 )
 
 #STAGE0: The demographic stage
-register.calibration.info('calib.12.02.stage0', 
+register.calibration.info('calib.12.02.stage0.pk', 
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
@@ -27,30 +27,30 @@ register.calibration.info('calib.12.02.stage0',
                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-#STAGE1: 
-register.calibration.info('calib.12.02.stage1',
-                              preceding.calibration.codes = 'calib.12.02.stage0',
-                              likelihood.instructions = lik.inst.stage1,
-                              data.manager = SURVEILLANCE.MANAGER,
-                              end.year = 2030,
-                              parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                                  TESTING.PARAMETERS.PRIOR@var.names),
-                              n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-    )
-
-#STAGE2
-register.calibration.info('calib.12.02.stage2',
-                              preceding.calibration.codes = 'calib.12.02.stage1',
-                              likelihood.instructions = lik.inst.stage2,
-                              data.manager = SURVEILLANCE.MANAGER,
-                              end.year = 2030,
-                              parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                                  TESTING.PARAMETERS.PRIOR@var.names,
-                                                  AGE.TRANS.TEST.PARAMETERS.PRIOR@var.names,
-                                                  "age.mixing.sd.mult"
-                                                  ),
-                              n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-    ) 
+# #STAGE1: 
+# register.calibration.info('calib.12.02.stage1',
+#                               preceding.calibration.codes = 'calib.12.02.stage0',
+#                               likelihood.instructions = lik.inst.stage1,
+#                               data.manager = SURVEILLANCE.MANAGER,
+#                               end.year = 2030,
+#                               parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                                   TESTING.PARAMETERS.PRIOR@var.names),
+#                               n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+#     )
+# 
+# #STAGE2
+# register.calibration.info('calib.12.02.stage2',
+#                               preceding.calibration.codes = 'calib.12.02.stage1',
+#                               likelihood.instructions = lik.inst.stage2,
+#                               data.manager = SURVEILLANCE.MANAGER,
+#                               end.year = 2030,
+#                               parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                                   TESTING.PARAMETERS.PRIOR@var.names,
+#                                                   AGE.TRANS.TEST.PARAMETERS.PRIOR@var.names,
+#                                                   "age.mixing.sd.mult"
+#                                                   ),
+#                               n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+#     ) 
 
 
      

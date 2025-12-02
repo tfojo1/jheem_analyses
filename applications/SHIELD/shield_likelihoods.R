@@ -6,6 +6,10 @@
 # we should bound agegroups at 85+
 source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 
+#estiamting cv for ps diagnosis from 2 available sources:
+source("applications/SHIELD/inputs/input_estimate_ps_cv.R") #calculates PS_CV
+diag_cv=PS_CV #we will use this error variance for all diagnosis categories
+
 # STAGE.0: Demographic calibration + total SD
 # STAGE.1: Diagnosis (race, sex stratified) 
 # STAGE.2: Diagnosis (race, sex, age stratified)
@@ -251,7 +255,7 @@ total.diagnosis.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  #see inputs folder file input_diag_cv_estimates
+                                         error.variance.term = list(diag_cv, 10),  #see inputs folder file input_diag_cv_estimates
                                          # total variance = (cv.m)^2 + sd^2 : this ensures when mu is super small, our variance stays up (at least to sd^2)
                                          #keep us from over penalizing years with small mu (early years)
                                          #
@@ -271,7 +275,7 @@ total.diagnosis.by.strata.stage1.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = 0.0764791209420945,  
+                                         error.variance.term = diag_cv,  
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short time frame
                                          #
@@ -289,7 +293,7 @@ total.diagnosis.by.strata.stage2.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = 0.0764791209420945,   
+                                         error.variance.term = diag_cv,   
                                          #
                                          observation.correlation.form = 'compound.symmetry',  #short time frame
                                          #
@@ -321,7 +325,7 @@ ps.diagnosis.stage0.total.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.term = list(diag_cv, 10),  
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
@@ -340,7 +344,7 @@ ps.diagnosis.total.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.term = list(diag_cv, 10),  
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
@@ -359,7 +363,7 @@ ps.diagnosis.by.strata.stage1.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = 0.0764791209420945,  
+                                         error.variance.term = diag_cv,  
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short timeframe
                                          #
@@ -377,7 +381,7 @@ ps.diagnosis.by.strata.stage2.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv'),
-                                         error.variance.term = list(0.0764791209420945),  
+                                         error.variance.term = list(diag_cv),  
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short timeframe
                                          #
@@ -805,7 +809,7 @@ early.diagnosis.total.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.term = list(diag_cv, 10),  
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
@@ -823,7 +827,7 @@ early.diagnosis.by.strata.stage1.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = 0.0764791209420945,   
+                                         error.variance.term = diag_cv,   
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -841,7 +845,7 @@ early.diagnosis.by.strata.stage2.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = 0.0764791209420945, 
+                                         error.variance.term = diag_cv, 
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -868,7 +872,7 @@ late.diagnosis.total.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.term = list(diag_cv, 10),  
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
@@ -887,7 +891,7 @@ late.diagnosis.by.strata.stage1.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = 0.0764791209420945,  
+                                         error.variance.term = diag_cv,  
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
@@ -905,7 +909,7 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = 0.0764791209420945,  
+                                         error.variance.term = diag_cv,  
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #

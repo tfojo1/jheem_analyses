@@ -27,7 +27,7 @@ set.seed(00000)
 CACHE.FREQ= 10#100 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 5#50 # how often to print messages (Default: 50)
 
-CALIBRATION.NAME = 'calib.12.02.stage0' 
+CALIBRATION.NAME = 'calib.12.02.stage0.pk' 
 
 
 #################
@@ -66,15 +66,15 @@ print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
 
 
-# Save simset
+# # Save simset
 simset = assemble.simulations.from.calibration(version = VERSION,
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
 # filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
 # save(simset,file=filename)
-
-filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
-save(simset,file =filename )
-
-print(paste0("Simet was saved on disk as:   ", filename))
+# 
+# filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+# save(simset,file =filename )
+# 
+# print(paste0("Simet was saved on disk as:   ", filename))
