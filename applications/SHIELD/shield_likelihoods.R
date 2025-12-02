@@ -12,8 +12,8 @@ source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
  #
 STAGE.0.WEIGHT= 1/16 
-STAGE.1.WEIGHT= 1/16 
-STAGE.2.WEIGHT= 1/16 
+STAGE.1.WEIGHT= 1/8
+STAGE.2.WEIGHT= 1/8 
 
 # Population weights: 
 # the census runs population count every 10 years (Decennial Census), including 2010 and 2020.
