@@ -228,7 +228,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
     transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #@Ryan: please cite these numbers 
     
     ## Sexual Mixing by Age ----
-    age.mixing.sd.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.25*log(2)), #the model is sensitive to this parameter-we reduce the sdlog=1/4*log(2)
+    age.mixing.sd.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #the model is sensitive to this parameter-we reduce the sdlog=1/4*log(2)
     #directly used in specification helper function
     #to control the standard deviation of the contact matrix by age
     
@@ -1077,9 +1077,6 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
         "transmission.rate.multiplier.other.heterosexual"
     ),
     future.change.trate=c("transmission.rate.future.change.mult"),
-    age.mixing.transmission=(
-        "age.mixing.sd.mult"
-    ),
     race.mixing.transmission= c("black.black.sexual.multi",
                                 "hispanic.hispanic.sexual.multi", 
                                 "other.other.sexual.multi"
@@ -1172,11 +1169,22 @@ TESTING.SAMPLING.BLOCKS = list(
 
 ## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
 AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
-    #'@Ryan: please take out 0-14 into a seperate block
+    
+    age.mixing.transmission=(
+        "age.mixing.sd.mult"
+    ),
+    
+    age14.transmission = c(
+        "transmission.rate.multiplier.age14.msm",
+        "transmission.rate.multiplier.age14.heterosexual"
+    ),
+    
+    age19.transmission = c(
+        "transmission.rate.multiplier.age19.msm",
+        "transmission.rate.multiplier.age19.heterosexual"
+    ),
     
     age.transmission.msm.1 = c(
-        "transmission.rate.multiplier.age14.msm",
-        "transmission.rate.multiplier.age19.msm",
         "transmission.rate.multiplier.age24.msm",
         "transmission.rate.multiplier.age29.msm",
         "transmission.rate.multiplier.age34.msm"
@@ -1194,9 +1202,8 @@ AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
         "transmission.rate.multiplier.age65.msm"
     ),
     
+    
     age.transmission.heterosexual.1 = c(
-        "transmission.rate.multiplier.age14.heterosexual",
-        "transmission.rate.multiplier.age19.heterosexual",
         "transmission.rate.multiplier.age24.heterosexual",
         "transmission.rate.multiplier.age29.heterosexual",
         "transmission.rate.multiplier.age34.heterosexual"
@@ -1214,9 +1221,17 @@ AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
         "transmission.rate.multiplier.age65.heterosexual"
     ),
     
-    age.symptomatic.testing.1 = c(
+    age14.testing = c(
         "or.symptomatic.age14",
+        "sti.screening.multiplier.age14"
+    ),
+    
+    age19.testing = c(
         "or.symptomatic.age19",
+        "sti.screening.multiplier.age19"
+    ),
+    
+    age.symptomatic.testing.1 = c(
         "or.symptomatic.age24",
         "or.symptomatic.age29",
         "or.symptomatic.age34"
@@ -1234,8 +1249,6 @@ AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
         "or.symptomatic.age65"
     ),
     screening.by.age.1 = c(
-        "sti.screening.multiplier.age14",
-        "sti.screening.multiplier.age19",
         "sti.screening.multiplier.age24",
         "sti.screening.multiplier.age29",
         "sti.screening.multiplier.age34"
