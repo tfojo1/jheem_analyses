@@ -210,7 +210,7 @@ historical.diagnosis.likelihood.instructions <-
                 # if fall over max threshold:  penalize with a lognormal centered at max_r
                 if (r > max_r) {
                     μ_high <- log(max_r)
-                    logp_annual   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high/sqrt(PENALTY.WEIGHT), log = TRUE)
+                    logp_annual   <- dlnorm(r, meanlog = μ_high, sdlog = σ_high/sqrt(STAGE.1.WEIGHT), log = TRUE)
                 }
                 #
                 logp_annual
@@ -467,7 +467,7 @@ future.change.likelihood.instructions =
                 meanlog     = 0.522, # hard coded for years 2012 - 2022
                 sdlog       = 0.357,
                 sd.width   = 2,
-                weight = PENALTY.WEIGHT  
+                weight = STAGE.1.WEIGHT  
             )
         }
     )
@@ -573,7 +573,7 @@ future.change.strata.likelihood.instructions =
                 meanlog     =  0.522,   
                 sdlog       =  0.357,   
                 sd.width    =  2,
-                weight      = PENALTY.WEIGHT,
+                weight      = STAGE.1.WEIGHT,
                 min_count   = 30L
             )
         }
@@ -667,7 +667,7 @@ U.turn.likelihood.instructions =
                 sdlog       = 0.630,   # 2*SD [0.3753111-4.66459]
                 Q25         = 0.6590209,
                 Q75         = 1.879489,
-                weight      = PENALTY.WEIGHT
+                weight      = STAGE.1.WEIGHT
             )
         }
     )
@@ -780,7 +780,7 @@ U.turn.strata.likelihood.instructions = create.custom.likelihood.instructions(
             sdlog       = 0.630,  
             Q25         = 0.6590209,
             Q75         = 1.879489,               
-            weight      = PENALTY.WEIGHT,       
+            weight      = STAGE.1.WEIGHT,       
             min_count   = 30L                   
         )
     }
