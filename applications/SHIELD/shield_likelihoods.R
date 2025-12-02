@@ -6,21 +6,14 @@
 # we should bound agegroups at 85+
 source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 
-# STAGE.0: Demographic calibration
-# STAGE.1: Diagnosis (race, sex stratified) - demog
-# STAGE.2: Diagnosis (race, sex, age stratified) - demog
+# STAGE.0: Demographic calibration + total SD
+# STAGE.1: Diagnosis (race, sex stratified) 
+# STAGE.2: Diagnosis (race, sex, age stratified)
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
-TOTAL.WEIGHT=1/8
-#
-STAGE.0.POP.WEIGHT= 1/16 
-STAGE.0.TD.WEIGHT= 1/16 
-POPULATION.WEIGHT = STAGE.0.POP.WEIGHT
-#
-EL.DIAGNOSIS.WEIGHT = TOTAL.WEIGHT 
-DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
-TESTING.WEIGHT = TOTAL.WEIGHT
-PRENATAL.WEIGHT = TOTAL.WEIGHT
-PENALTY.WEIGHT = TOTAL.WEIGHT
+ #
+STAGE.0.WEIGHT= 1/16 
+STAGE.1.WEIGHT= 1/16 
+STAGE.2.WEIGHT= 1/16 
 
 # Population weights: 
 # the census runs population count every 10 years (Decennial Census), including 2010 and 2020.
@@ -39,12 +32,11 @@ w2=lapply(2020:2023, function(year){
 })
 w.population <- lapply(c(w1,w2), function(wi) {
     create.likelihood.weights(
-        total.weight = POPULATION.WEIGHT * wi$total.weight,
+        total.weight = STAGE.0.WEIGHT * wi$total.weight,
         dimension.values = wi$dimension.values,
         is.recursive = wi$is.recursive
     )
 })
-
 
 #** POPULATION SIZES ** ---- 
 #'@PK: what is the logic, where are the assumptions from?
@@ -119,7 +111,7 @@ deaths.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry', 
                                          #
-                                         weights = POPULATION.WEIGHT ,
+                                         weights = STAGE.0.WEIGHT ,
                                          na.rm =T
     )
 
@@ -137,7 +129,7 @@ fertility.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
-                                         weights = POPULATION.WEIGHT ,
+                                         weights = STAGE.0.WEIGHT ,
                                          na.rm =T
     )
 
@@ -157,7 +149,7 @@ immigration.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
-                                         weights = POPULATION.WEIGHT ,
+                                         weights = STAGE.0.WEIGHT ,
                                          equalize.weight.by.year = T,  #To apply weight evenly over time
                                          na.rm =T
     )
@@ -175,7 +167,7 @@ emigration.likelihood.instructions =
                                           #
                                           observation.correlation.form = 'compound.symmetry',
                                           #
-                                          weights = POPULATION.WEIGHT ,
+                                          weights = STAGE.0.WEIGHT ,
                                           equalize.weight.by.year = T,  #To apply weight evenly over time 
                                           na.rm =T
     )
@@ -265,7 +257,7 @@ total.diagnosis.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1', #long timeframe
                                          #
-                                         weights = DIAGNOSIS.WEIGHT ,
+                                         weights = STAGE.1.WEIGHT ,
                                          equalize.weight.by.year = T
                                          # minimum.error.sd = 1 #redundant because we have sd in variance structure 
     )
@@ -281,9 +273,9 @@ total.diagnosis.by.strata.stage1.likelihood.instructions =
                                          error.variance.type = 'cv',
                                          error.variance.term = 0.0764791209420945,  
                                          #
-                                         observation.correlation.form = 'compound.symmetry', #short timeframe
+                                         observation.correlation.form = 'compound.symmetry', #short time frame
                                          #
-                                         weights = DIAGNOSIS.WEIGHT ,
+                                         weights = STAGE.1.WEIGHT ,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1 
     )
@@ -299,9 +291,9 @@ total.diagnosis.by.strata.stage2.likelihood.instructions =
                                          error.variance.type = 'cv',
                                          error.variance.term = 0.0764791209420945,   
                                          #
-                                         observation.correlation.form = 'compound.symmetry',  #short timeframe
+                                         observation.correlation.form = 'compound.symmetry',  #short time frame
                                          #
-                                         weights = DIAGNOSIS.WEIGHT ,
+                                         weights = STAGE.2.WEIGHT ,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1 
     )
@@ -333,9 +325,9 @@ ps.diagnosis.stage0.total.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = STAGE.0.TD.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1  
+                                         weights = STAGE.0.WEIGHT,
+                                         equalize.weight.by.year = T
+                                         # minimum.error.sd = 1  
     )
 
 
@@ -352,9 +344,9 @@ ps.diagnosis.total.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1  
+                                         weights = STAGE.1.WEIGHT,
+                                         equalize.weight.by.year = T
+                                         # minimum.error.sd = 1  
     )
 
 ##---- Strata Stage1 2019-2022 ----
@@ -371,7 +363,7 @@ ps.diagnosis.by.strata.stage1.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short timeframe
                                          #
-                                         weights = DIAGNOSIS.WEIGHT ,
+                                         weights = STAGE.1.WEIGHT ,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
@@ -384,14 +376,14 @@ ps.diagnosis.by.strata.stage2.likelihood.instructions =
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
-                                         error.variance.type = c('cv', 'sd'),
-                                         error.variance.term = list(0.0764791209420945, 10),  
+                                         error.variance.type = c('cv'),
+                                         error.variance.term = list(0.0764791209420945),  
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short timeframe
                                          #
-                                         weights = DIAGNOSIS.WEIGHT ,
+                                         weights = STAGE.2.WEIGHT ,
                                          equalize.weight.by.year = T,
-                                         minimum.error.sd = 1   
+                                         minimum.error.sd = 1
     )
 
 ##---- Future Penalty ----
@@ -817,9 +809,9 @@ early.diagnosis.total.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = EL.DIAGNOSIS.WEIGHT,  
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
+                                         weights = STAGE.1.WEIGHT,  
+                                         equalize.weight.by.year = T
+                                         # minimum.error.sd = 1
     )
 ##---- Strata Stage1 2019-2022 ----
 early.diagnosis.by.strata.stage1.likelihood.instructions =
@@ -835,7 +827,7 @@ early.diagnosis.by.strata.stage1.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
-                                         weights = DIAGNOSIS.WEIGHT,
+                                         weights = STAGE.1.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
@@ -853,7 +845,7 @@ early.diagnosis.by.strata.stage2.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
-                                         weights = DIAGNOSIS.WEIGHT,
+                                         weights = STAGE.2.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
@@ -880,9 +872,9 @@ late.diagnosis.total.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = DIAGNOSIS.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
+                                         weights = STAGE.1.WEIGHT,
+                                         equalize.weight.by.year = T 
+                                         # minimum.error.sd = 1
                                          
     )
 ##---- Strata Stage1 2019-2022 ----
@@ -899,7 +891,7 @@ late.diagnosis.by.strata.stage1.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
-                                         weights = DIAGNOSIS.WEIGHT,
+                                         weights = STAGE.1.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
@@ -917,7 +909,7 @@ late.diagnosis.by.strata.stage2.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry',
                                          #
-                                         weights = DIAGNOSIS.WEIGHT,
+                                         weights = STAGE.2.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
@@ -937,7 +929,7 @@ hiv.testing.by.strata.stage1.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
                                          #
-                                         weights = TESTING.WEIGHT,
+                                         weights = STAGE.1.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
@@ -956,7 +948,7 @@ hiv.testing.by.strata.stage2.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
                                          #
-                                         weights = TESTING.WEIGHT,
+                                         weights = STAGE.2.WEIGHT,
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
@@ -1049,7 +1041,7 @@ proportion.tested.nested.likelihood.instructions =
                                                      #
                                                      partitioning.function = SHIELD.DUMMY.PARTITIONING.FUNCTION,
                                                      #
-                                                     weights = TESTING.WEIGHT,
+                                                     weights = STAGE.1.WEIGHT,
                                                      equalize.weight.by.year = T
     )
 
@@ -1082,7 +1074,7 @@ proportion.tested.by.strata.stage1.nested.likelihood.instructions =
                                                      #
                                                      partitioning.function = SHIELD.PARTITIONING.FUNCTION,
                                                      #
-                                                     weights = (TESTING.WEIGHT),
+                                                     weights = STAGE.1.WEIGHT,
                                                      equalize.weight.by.year = T
     )
 ##---- Strata Stage2 2010-2019 ----
@@ -1113,7 +1105,7 @@ proportion.tested.by.strata.stage2.nested.likelihood.instructions =
                                                      #
                                                      partitioning.function = SHIELD.PARTITIONING.FUNCTION,
                                                      #
-                                                     weights = (TESTING.WEIGHT),
+                                                     weights = STAGE.2.WEIGHT,
                                                      equalize.weight.by.year = T
     )
 ##---- State Strata Stage1 ----

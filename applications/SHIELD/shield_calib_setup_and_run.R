@@ -22,12 +22,12 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 
 #
 VERSION='shield'
-LOCATION='C.12580' #Baltimore MSA 
+LOCATION='C.35620' #NYC
 set.seed(00000)
-CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
-UPDATE.FREQ= 50 # how often to print messages (Default: 50)
+CACHE.FREQ= 10#100 # how often should write the results to disk (Default: 100)
+UPDATE.FREQ= 5#50 # how often to print messages (Default: 50)
 
-CALIBRATION.NAME = 'calib.07.16.pk0' 
+CALIBRATION.NAME = 'calib.12.02.stage0' 
 
 
 #################
