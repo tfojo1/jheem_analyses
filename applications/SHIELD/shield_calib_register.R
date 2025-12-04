@@ -15,17 +15,17 @@ par.aliases.transmission = list(
     trate.5 = c("transmission.rate.multiplier.msm2020", "transmission.rate.multiplier.heterosexual2020")
 )
 
-#STAGE0: The demographic stage
-register.calibration.info('calib.12.02.stage0.pk', 
-                          likelihood.instructions = lik.inst.stage0,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,  
-                          parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
-                                              AGING.PARAMETERS.PRIOR@var.names,
-                                              "global.transmission.rate"),
-                          parameter.aliases = par.aliases.transmission,
-                          n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
+# #STAGE0: The demographic stage
+# register.calibration.info('calib.12.02.stage0.pk', 
+#                           likelihood.instructions = lik.inst.stage0,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,  
+#                           parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
+#                                               AGING.PARAMETERS.PRIOR@var.names,
+#                                               "global.transmission.rate"),
+#                           parameter.aliases = par.aliases.transmission,
+#                           n.iter = N.ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+# )
 
 # #STAGE1: 
 # register.calibration.info('calib.12.02.stage1',
@@ -54,7 +54,7 @@ register.calibration.info('calib.12.02.stage0.pk',
 
 ###########Stage 0 
 register.calibration.info('calib.11.25.demog.1', 
-                          likelihood.instructions = lik.inst.stage0,
+                          likelihood.instructions = lik.inst.demog.TD.2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
                           parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
@@ -66,7 +66,7 @@ register.calibration.info('calib.11.25.demog.1',
 
 
 register.calibration.info('calib.11.25.demog.3', 
-                          likelihood.instructions = lik.inst.stage0,
+                          likelihood.instructions = lik.inst.demog.TD.2,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,  
                           parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
@@ -80,7 +80,7 @@ register.calibration.info('calib.11.25.demog.3',
 
 register.calibration.info('calib.11.27.stage1.1',
                           preceding.calibration.codes = 'calib.11.25.demog.1',
-                          likelihood.instructions = lik.inst.stage1,
+                          likelihood.instructions = lik.inst.diag.strata.stage1.no.demog.w.future.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
@@ -92,7 +92,7 @@ register.calibration.info('calib.11.27.stage1.1',
 
 register.calibration.info('calib.11.27.stage1.3',
                           preceding.calibration.codes = 'calib.11.25.demog.3',
-                          likelihood.instructions = lik.inst.stage1,
+                          likelihood.instructions = lik.inst.diag.strata.stage1.no.demog.w.future.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
@@ -105,7 +105,7 @@ register.calibration.info('calib.11.27.stage1.3',
 
 register.calibration.info('calib.12.03.stage2.1',
                           preceding.calibration.codes = 'calib.11.27.stage1.1',
-                          likelihood.instructions = lik.inst.stage2,
+                          likelihood.instructions = lik.inst.diag.strata.stage2.no.demog.w.future.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
@@ -117,7 +117,7 @@ register.calibration.info('calib.12.03.stage2.1',
 
 register.calibration.info('calib.12.03.stage2.3',
                           preceding.calibration.codes = 'calib.11.27.stage1.3',
-                          likelihood.instructions = lik.inst.stage2,
+                          likelihood.instructions = lik.inst.diag.strata.stage2.no.demog.w.future.totals,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,

@@ -10,9 +10,9 @@ source("applications/SHIELD/shield_historical_likelihood_penalty_helper.R")
 # STAGE.1: Diagnosis (race, sex stratified) - demog
 # STAGE.2: Diagnosis (race, sex, age stratified) - demog
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
-TOTAL.WEIGHT=1/2
-STAGE.0.POP.WEIGHT= 1/32 #'@ryan: to add
-STAGE.0.TD.WEIGHT= 1/4 #total diagnosis  #'@ryan: to add
+TOTAL.WEIGHT=1/8
+STAGE.0.POP.WEIGHT= 1/16 #'@ryan: to add
+STAGE.0.TD.WEIGHT= 1/16 #total diagnosis  #'@ryan: to add
 EL.DIAGNOSIS.WEIGHT = TOTAL.WEIGHT 
 POPULATION.WEIGHT = STAGE.0.POP.WEIGHT
 DIAGNOSIS.WEIGHT = TOTAL.WEIGHT
