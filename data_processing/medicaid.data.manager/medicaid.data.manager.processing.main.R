@@ -179,6 +179,13 @@ data.manager$register.ontology(
         age=c('0-18', '19-26', '27-44', '45-64', '65+')
     ))
 
+data.manager$register.ontology(
+    'jec',
+    ont = ontology(
+        year= c("2025-2034"),
+        location= NULL
+    ))
+
 #Register Locations:
 locations::register.types(type = c("rw.region"), prefix = c("rw"), prefix.longform = c("ryan.white.region"))
 

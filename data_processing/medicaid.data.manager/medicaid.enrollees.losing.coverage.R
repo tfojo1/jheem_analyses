@@ -36,7 +36,7 @@ medicaid.loss.data.clean.put = lapply(medicaid.loss.data.clean, `[[`, 2)
 for (data in medicaid.loss.data.clean.put) {
     data.manager$put.long.form(
         data = data,
-        ontology.name = 'cms', #This is just total level data so I did not create a specific ontology
+        ontology.name = 'jec',
         source = 'jec',
         url = 'https://www.jec.senate.gov/public/_cache/files/d5fb1359-92a6-47ac-8fae-aeffb1de2f6e/jec-fact-sheet-on-state-by-state-impacts-of-health-care-cuts.pdf',
         details = 'Report: State-by-State Data- 13.7 Million People Would Lose Health Insurance from Medicaid, ACA Cuts')
