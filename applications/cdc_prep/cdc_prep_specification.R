@@ -43,6 +43,12 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
                        scale = "proportion",
                        functional.form.from.time = 2010)
 
+register.model.element(CDCP.SPECIFICATION, name = "fraction.tests.from.cdc",
+                       functional.form = create.logistic.linear.functional.form(intercept = log(0.092800629)-log(0.9071994), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
+                       scale = "proportion",
+                       functional.form.from.time = 2010)
+
+
 
 #-- Relating Testing to PrEP --#
 
@@ -152,6 +158,30 @@ register.model.quantity(CDCP.SPECIFICATION, name = "testing.of.undiagnosed",
                         value = expression( (cdc.funded.testing.of.undiagnosed + cdc.nonfunded.testing.of.undiagnosed) *
                                                 (1-fraction.diagnoses.from.contact.tracing + fraction.diagnoses.from.contact.tracing * cdc.contact.tracing.effect)) )
 
+
+#-- The Testing Rate --#
+
+
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'cdc.funded.general.population.testing',
+                        scale = 'rate',
+                        value = expression(super.general.population.testing * fraction.tests.from.cdc * cdc.testing.effect)
+)
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'cdc.nonfunded.general.population.testing',
+                        scale = 'rate',
+                        value = expression(super.general.population.testing * 
+                                               ( (1-fraction.tests.from.cdc) +
+                                                     fraction.tests.from.cdc * (1-cdc.testing.effect) * proportion.tested.regardless ) )
+)
+
+register.model.quantity(CDCP.SPECIFICATION,
+                        name = 'general.population.testing',
+                        scale = 'rate',
+                        value = expression(cdc.funded.general.population.testing + cdc.nonfunded.general.population.testing))
+
 #-- Derive cdc-funded testing rate from PrEP --#
 
 register.model.quantity(CDCP.SPECIFICATION, name = 'cdc.prep.uptake.rate',
@@ -162,38 +192,24 @@ register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.referral.rate",
                         scale = 'rate', # per person per year
                         value = expression(cdc.prep.uptake.rate / p.prep.uptake.from.referral / fraction.cdc.tests.unique))
 
-register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.eligible.rate",
-                        scale = 'rate', # per person per year
-                        value = expression(cdc.prep.referral.rate / fraction.cdc.referred.to.prep))
 
 register.model.quantity(CDCP.SPECIFICATION, name = "cdc.funded.non.healthcare.testing.rate",
                         scale = 'rate', # per person per year
-                        value = expression(cdc.prep.eligible.rate / fraction.cdc.tested.prep.eligible))
+                        value = expression(cdc.funded.general.population.testing * fraction.cdc.funded.tests.in.non.healthcare.settings))
 
-register.model.quantity(CDCP.SPECIFICATION, name = 'cdc.funded.testing.rate',
-                        scale = 'rate', # per person per year,
-                        value = expression(cdc.funded.non.healthcare.testing.rate / fraction.cdc.funded.tests.in.non.healthcare.settings))
+register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.eligible.rate",
+                        scale = 'rate', # per person per year
+                        value = expression(cdc.funded.non.healthcare.testing.rate * fraction.cdc.tests.unique * fraction.cdc.tested.prep.eligible ))
 
 
-#-- The Testing Rate --#
 
-register.model.quantity(CDCP.SPECIFICATION,
-                        name = 'cdc.funded.general.population.testing',
-                        scale = 'rate',
-                        value = expression(cdc.funded.testing.rate * cdc.testing.effect)
-)
 
-register.model.quantity(CDCP.SPECIFICATION,
-                        name = 'cdc.nonfunded.general.population.testing',
-                        #scale = 'rate',
-                        value = expression(super.general.population.testing - cdc.funded.testing.rate +
-                                               cdc.funded.testing.rate * (1-cdc.testing.effect) * proportion.tested.regardless)
-)
 
-register.model.quantity(CDCP.SPECIFICATION,
-                        name = 'general.population.testing',
-                        scale = 'rate',
-                        value = expression(cdc.funded.general.population.testing + cdc.nonfunded.general.population.testing))
+
+
+
+
+
 
 
 ##--------------##

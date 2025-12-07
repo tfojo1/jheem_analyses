@@ -38,7 +38,6 @@ cdc.test.positivity.likelihood.instructions = create.basic.likelihood.instructio
 )
 
 
-
 cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "number.eligible", 
                                                                                    outcome.for.sim = "cumulative.cdc.prep.eligible",
                                                                                    dimensions = character(), #total
@@ -65,24 +64,6 @@ cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions
                                                                                    error.variance.type = c('sd')
 )
 
-nonfunded.rate.likelihood <- create.custom.likelihood.instructions(name = "cdc.nonfunded.rate",
-    
-    get.data.function = function(version, location){
-        NULL
-        
-    }, compute.function = function(sim,data,log = TRUE){
-    
-    
-    x = sim$cdc.nonfunded.general.population.testing
-
-    if(any(x < 0)){
-        return(-Inf)
-    }
-    else{
-        return(0)
-    }
-}
-)
 
 future.test.likelihood.instructions <- create.custom.likelihood.instructions(name = "cdc.funded.test.ratio",
     get.data.function = function(version, location){
