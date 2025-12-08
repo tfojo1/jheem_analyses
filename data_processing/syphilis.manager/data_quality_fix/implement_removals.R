@@ -9,8 +9,8 @@ cat(sprintf("Started: %s\n\n", Sys.time()))
 
 # Load data and analysis results
 cat("Loading data...\n")
-load("cached/syphilis.manager.rdata")
-load("cached/stratification_analysis_results_county_based.rdata")
+#load("cached/syphilis.manager.rdata")
+load("Q:/data_managers/stratification_analysis_results_county_based.rdata")
 
 cat(sprintf("Found %d problematic combinations to remove\n\n", length(problematic_combinations)))
 
@@ -128,23 +128,23 @@ if (successful_removals == length(problematic_combinations) &&
 }
 
 # === SAVE RESULTS ===
-cat("\n=== SAVING RESULTS ===\n")
-
-# Save clean manager
-cat("Saving clean manager...\n")
-syphilis.manager <- clean.syphilis.manager
-save(syphilis.manager, file = "cached/syphilis.manager.rdata")
-
-cat(sprintf("\n=== OPERATION COMPLETE ===\n"))
-cat(sprintf("Completed: %s\n", Sys.time()))
-cat("\nFiles created:\n")
-cat("  - cached/syphilis.manager.rdata (main deliverable)\n")
-cat(sprintf("  - %s (operation backup)\n", backup_file))
-
-cat("\nTo view operations: list_operations()\n")
-cat("To rollback: restore_operation(syphilis.manager, 'path/to/backup.rdata')\n")
-
-cat("\nNext steps:\n")
-cat("1. Add total syphilis diagnosis outcome\n")
-cat("2. Validate results\n")
-cat("3. Package for team\n")
+# cat("\n=== SAVING RESULTS ===\n")
+# 
+# # Save clean manager
+# cat("Saving clean manager...\n")
+# syphilis.manager <- clean.syphilis.manager
+# save(syphilis.manager, file = "cached/syphilis.manager.rdata")
+# 
+# cat(sprintf("\n=== OPERATION COMPLETE ===\n"))
+# cat(sprintf("Completed: %s\n", Sys.time()))
+# cat("\nFiles created:\n")
+# cat("  - cached/syphilis.manager.rdata (main deliverable)\n")
+# cat(sprintf("  - %s (operation backup)\n", backup_file))
+# 
+# cat("\nTo view operations: list_operations()\n")
+# cat("To rollback: restore_operation(syphilis.manager, 'path/to/backup.rdata')\n")
+# 
+# cat("\nNext steps:\n")
+# cat("1. Add total syphilis diagnosis outcome\n")
+# cat("2. Validate results\n")
+# cat("3. Package for team\n")

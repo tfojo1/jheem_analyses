@@ -23,6 +23,19 @@ syphilis.manager = section3
 
 #Source code to create proportion of congenital syphilis births:
 source('data_processing/syphilis.manager/proportion.of.congenital.syphilis.births.R')
+
+# Source Nick's Codes from Leave: -----------------------------------------
+
+#Add Adult population from HIV surveillance manager to syphilis manager:
+source('data_processing/transfer_adult_population_to_syphilis_manager.R')
+
+#Aggregate syphilis data into total.syphilis.diagnoses:
+source('data_processing/syphilis.manager/data_quality_fix/test_total_with_restratification.R')
+
+#Remove certain racial data that doesn't sum to proper totals:
+source('data_processing/syphilis.manager/data_quality_fix/implement_removals.R')
+
+# Save: -------------------------------------------------------------------
  
 #SAVE Final, Complete Syphilis Manager to Cached
 save(syphilis.manager, file="../../cached/syphilis.manager.rdata")

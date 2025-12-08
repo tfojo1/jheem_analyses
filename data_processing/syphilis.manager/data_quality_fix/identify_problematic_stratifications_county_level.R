@@ -6,7 +6,7 @@ library(locations)
 
 # Load data managers
 cat("Loading data managers...\n")
-load("cached/syphilis.manager.rdata")
+load("Q:/data_managers/syphilis.manager.rdata")
 
 # Configuration
 COUNTY_COVERAGE_THRESHOLD <- 0.9  # Base flagging decision on county-level coverage
@@ -274,7 +274,7 @@ if (nrow(analysis_summary) == 0) {
 # Save results for later use
 cat(sprintf("\nSaving analysis results...\n"))
 save(analysis_summary, problematic_combinations, 
-     file = "cached/stratification_analysis_results_county_based.rdata")
+     file = "Q:/data_managers/stratification_analysis_results_county_based.rdata")
 
 cat(sprintf("\nApproach: County-level data quality assessment with MSA comparison\n"))
 cat(sprintf("Flagging threshold: County race coverage must be ≥%.0f%%\n", COUNTY_COVERAGE_THRESHOLD * 100))

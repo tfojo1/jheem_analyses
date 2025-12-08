@@ -7,8 +7,8 @@ library(jheem2)
 cat("Loading data managers...\n")
 
 # Load both managers
-surveillance.manager <- load.data.manager("cached/surveillance.manager.rdata")
-syphilis.manager <- load.data.manager("cached/syphilis.manager.rdata")
+surveillance.manager <- load.data.manager("Q:/data_managers/surveillance.manager.rdata")
+#syphilis.manager <- load.data.manager("Q:/data_managers/syphilis.manager.rdata")
 
 cat("✅ Both managers loaded successfully\n")
 
@@ -124,8 +124,8 @@ print(names(syphilis.manager$data$adult.population$estimate$census.aggregated.ad
 
 cat("\n✅ Transfer completed successfully! All stratifications preserved.\n")
 
-cat("\nSaving updated manager...\n")
-new_filename <- paste0("cached/syphilis.manager_complete_", Sys.Date(), ".rdata")
-save(syphilis.manager, file = new_filename)
-cat("✅ Saved to:", new_filename, "\n")
+# cat("\nSaving updated manager...\n")
+# new_filename <- paste0("cached/syphilis.manager_complete_", Sys.Date(), ".rdata")
+# save(syphilis.manager, file = new_filename)
+# cat("✅ Saved to:", new_filename, "\n")
 

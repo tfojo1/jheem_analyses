@@ -4,8 +4,8 @@ library(jheem2)
 cat("=== TOTAL DIAGNOSIS WITH AGE RESTRATIFICATION ===\n")
 
 # Load existing syphilis manager
-cat("Loading existing syphilis manager...\n")
-load("cached/syphilis.manager.rdata")
+# cat("Loading existing syphilis manager...\n")
+# load("Q:/data_managers/syphilis.manager.rdata")
 
 # Target: cdc.aggregated.county source, cdc.sti ontology (10 age groups)
 source_name <- 'cdc.aggregated.county'
@@ -161,9 +161,9 @@ tryCatch({
   cat("Error in verification:", e$message, "\n")
 })
 
-# Save test result
-cat("\nSaving test result...\n")
-save(syphilis.manager, file="cached/syphilis.manager.rdata")
-cat("Saved to: cached/syphilis.manager.rdata\n")
-
-cat("\n=== TEST COMPLETED ===\n")
+# # Save test result
+# cat("\nSaving test result...\n")
+# save(syphilis.manager, file="cached/syphilis.manager.rdata")
+# cat("Saved to: cached/syphilis.manager.rdata\n")
+# 
+# cat("\n=== TEST COMPLETED ===\n")

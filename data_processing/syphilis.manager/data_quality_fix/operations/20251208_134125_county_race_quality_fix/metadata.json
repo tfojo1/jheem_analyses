@@ -1,0 +1,119 @@
+{
+  "metadata": {
+    "operation_id": "20251208_134125_county_race_quality_fix",
+    "operation_name": "county_race_quality_fix",
+    "script_name": "implement_removals.R",
+    "criteria_description": "County race coverage < 90% threshold",
+    "timestamp": "2025-12-08 13:41:26",
+    "user": "",
+    "r_version": "R version 4.4.1 (2024-06-14 ucrt)",
+    "git_commit": "1ba65839f4815b72eeece5cdcd0bb3231baa79b1",
+    "total_combinations": 16
+  },
+  "impact": {
+    "total_combinations": 16,
+    "total_data_points_removed": 54,
+    "total_cases_affected": 39405
+  },
+  "by_msa": {
+    "Baltimore": {
+      "combinations": 3,
+      "data_points": 12,
+      "cases": 1810
+    },
+    "NYC": {
+      "combinations": 5,
+      "data_points": 20,
+      "cases": 22732
+    },
+    "Atlanta": {
+      "combinations": 7,
+      "data_points": 18,
+      "cases": 11404
+    },
+    "Miami": {
+      "combinations": 1,
+      "data_points": 4,
+      "cases": 3459
+    }
+  },
+  "by_outcome": {
+    "ps.syphilis.diagnoses": {
+      "combinations": 5,
+      "data_points": 18,
+      "cases": 6728
+    },
+    "early.syphilis.diagnoses": {
+      "combinations": 4,
+      "data_points": 17,
+      "cases": 12548
+    },
+    "unknown.duration.or.late.syphilis.diagnoses": {
+      "combinations": 7,
+      "data_points": 19,
+      "cases": 20129
+    }
+  },
+  "sample_removals": {
+    "ps.syphilis.diagnoses_C.12580_2022_year__location__race": {
+      "combination": {
+        "outcome": "ps.syphilis.diagnoses",
+        "ontology": "cdc.sti",
+        "stratification": "year__location__race",
+        "msa": "C.12580",
+        "msa_name": "Baltimore",
+        "year": "2022",
+        "counties_analyzed": 7,
+        "county_total_cases": 525,
+        "county_race_cases": 266,
+        "county_coverage": 0.5067,
+        "msa_coverage": 0.5048,
+        "aggregation_loss": 1,
+        "aggregation_loss_pct": 0.3759
+      },
+      "race_data": ["NaN", 2, 117, 26, 0, 120],
+      "total_data": 525,
+      "backup_key": "ps.syphilis.diagnoses_C.12580_2022_year__location__race"
+    },
+    "ps.syphilis.diagnoses_C.12580_2023_year__location__race": {
+      "combination": {
+        "outcome": "ps.syphilis.diagnoses",
+        "ontology": "cdc.sti",
+        "stratification": "year__location__race",
+        "msa": "C.12580",
+        "msa_name": "Baltimore",
+        "year": "2023",
+        "counties_analyzed": 7,
+        "county_total_cases": 571,
+        "county_race_cases": 340,
+        "county_coverage": 0.5954,
+        "msa_coverage": 0.5954,
+        "aggregation_loss": 0,
+        "aggregation_loss_pct": 0
+      },
+      "race_data": [2, 7, 138, 42, "NaN", 151],
+      "total_data": 571,
+      "backup_key": "ps.syphilis.diagnoses_C.12580_2023_year__location__race"
+    },
+    "ps.syphilis.diagnoses_C.35620_2021_year__location__race": {
+      "combination": {
+        "outcome": "ps.syphilis.diagnoses",
+        "ontology": "cdc.sti",
+        "stratification": "year__location__race",
+        "msa": "C.35620",
+        "msa_name": "NYC",
+        "year": "2021",
+        "counties_analyzed": 23,
+        "county_total_cases": 3170,
+        "county_race_cases": 2694,
+        "county_coverage": 0.8498,
+        "msa_coverage": 0.8498,
+        "aggregation_loss": 0,
+        "aggregation_loss_pct": 0
+      },
+      "race_data": [1, 114, 998, 822, "NaN", 759],
+      "total_data": 3170,
+      "backup_key": "ps.syphilis.diagnoses_C.35620_2021_year__location__race"
+    }
+  }
+}
