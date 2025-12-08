@@ -24,11 +24,12 @@ syphilis.1941.2022 = lapply(table.2022.raw, function(file){
   data$year = as.character(data$Year)
   
 data <- data %>%
-  select(year, `Total Syphilis Cases`, `Primary and Secondary Cases`, `Early Non-Primary Non-Secondary Cases`, `Unknown Duration or Late Cases`, `Congenital Cases` )%>%
+    mutate(total.syphilis.cases.adjusted = (`Total Syphilis Cases` - `Congenital Cases`))%>%
+  select(year, total.syphilis.cases.adjusted, `Primary and Secondary Cases`, `Early Non-Primary Non-Secondary Cases`, `Unknown Duration or Late Cases`, `Congenital Cases` )%>%
   pivot_longer(cols = contains("cases"),
                names_to = "outcome",
                values_to = "value")%>%
-  mutate(outcome = case_when(outcome == "Total Syphilis Cases" ~ "total.syphilis.diagnoses",
+  mutate(outcome = case_when(outcome == "total.syphilis.cases.adjusted" ~ "total.syphilis.diagnoses",
                              outcome == "Primary and Secondary Cases" ~ "ps.syphilis.diagnoses",
                              outcome == "Early Non-Primary Non-Secondary Cases" ~ "early.syphilis.diagnoses",
                              outcome == "Unknown Duration or Late Cases" ~ "unknown.duration.or.late.syphilis.diagnoses",

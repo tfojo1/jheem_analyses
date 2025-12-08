@@ -2,98 +2,102 @@
 #Note: I am pulling the most recent report of each year of data- so data for 1993 comes
 #from the 1997 report.  
 
+
+#Note: these US totals are actually getting replaced with the 1941-2022 table so I'm commenting them out. 
+#If ever added back in, the count of congenital cases needs to be subtracted from the total
+
 # National- Total Level Data ----------------------------------------------
 
-DATA.DIR.PDF.REPORTS="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.totals"
-
-pdf.reports <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS, '/*.csv'))
-
-cdc.pdf.reports <- lapply(pdf.reports, function(x){
-  list(filename=x, data=read.csv(x, skip=1, colClasses = "character"))
-})
-
-# National- Total Level Data -clean -------------------------------------------------------------------
-
-national.totals = lapply(cdc.pdf.reports, function(file){
-  
-  data=file[["data"]]
-  filename = file[["filename"]]
-  
-  data= as.data.frame(data)
-  
-  data <- data %>%
-    pivot_longer(cols = contains("X"),
-                 names_to = "year",
-                 values_to = "value")
-  
-  data$value = gsub(",", '', data$value)
-  data$value = as.numeric(data$value)
-
-  data$year = gsub("X", "", data$year)
-
-  data <- data %>%
-     filter(State.Area == "U.S. TOTAL")%>%
-    mutate(location = "US")
-
-  if(grepl("early.latent", filename)) {
-    data$outcome = 'early.syphilis.diagnoses'
-  }
-  if(grepl("ps", filename)) {
-    data$outcome = 'ps.syphilis.diagnoses'
-  }
-  if(grepl("late.latent", filename)) {
-    data$outcome = 'unknown.duration.or.late.syphilis.diagnoses'
-  }
-  if(grepl("all.stages", filename)) {
-  data$outcome = 'total.syphilis.diagnoses'
-  }
-  
-  #Pull the most recent report of a particular year. Ex. 2003 Report has the most recent values for 1999:
-  
-  if(grepl("2003", filename)) {
-    data<-data%>%
-      filter(year == "1999")
-  }
-  if(grepl("2002", filename)) {
-    data<-data%>%
-      filter(year == "1998")
-  }
-  if(grepl("2001", filename)) {
-    data<-data%>%
-      filter(year == "1997")
-  }
-  if(grepl("2000", filename)) {
-    data<-data%>%
-      filter(year == "1996")
-  }
-  if(grepl("1999", filename)) {
-    data<-data%>%
-      filter(year == "1995")
-  }
-  if(grepl("1998", filename)) {
-    data<-data%>%
-      filter(year == "1994")
-  }
-  if(grepl("1997", filename)) {
-    data<-data%>%
-      filter(year == "1993")
-  }
-  
-  data= as.data.frame(data)
-  list(filename, data)
-})
-
-# National- Total Level Data- Put ---------------------------------------------------------------------
-national.totals.put = lapply(national.totals, `[[`, 2)
-
-for (data in national.totals.put) {
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'cdc.pdf.report',
-    source = 'cdc.sti.surveillance.reports',
-    url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
-    details = 'CDC STI Surveillance Reports')
-}
+# DATA.DIR.PDF.REPORTS="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/national.totals"
+# 
+# pdf.reports <- Sys.glob(paste0(DATA.DIR.PDF.REPORTS, '/*.csv'))
+# 
+# cdc.pdf.reports <- lapply(pdf.reports, function(x){
+#   list(filename=x, data=read.csv(x, skip=1, colClasses = "character"))
+# })
+# 
+# # National- Total Level Data -clean -------------------------------------------------------------------
+# 
+# national.totals = lapply(cdc.pdf.reports, function(file){
+#   
+#   data=file[["data"]]
+#   filename = file[["filename"]]
+#   
+#   data= as.data.frame(data)
+#   
+#   data <- data %>%
+#     pivot_longer(cols = contains("X"),
+#                  names_to = "year",
+#                  values_to = "value")
+#   
+#   data$value = gsub(",", '', data$value)
+#   data$value = as.numeric(data$value)
+# 
+#   data$year = gsub("X", "", data$year)
+# 
+#   data <- data %>%
+#      filter(State.Area == "U.S. TOTAL")%>%
+#     mutate(location = "US")
+# 
+#   if(grepl("early.latent", filename)) {
+#     data$outcome = 'early.syphilis.diagnoses'
+#   }
+#   if(grepl("ps", filename)) {
+#     data$outcome = 'ps.syphilis.diagnoses'
+#   }
+#   if(grepl("late.latent", filename)) {
+#     data$outcome = 'unknown.duration.or.late.syphilis.diagnoses'
+#   }
+#   if(grepl("all.stages", filename)) {
+#   data$outcome = 'total.syphilis.diagnoses'
+#   }
+#   
+#   #Pull the most recent report of a particular year. Ex. 2003 Report has the most recent values for 1999:
+#   
+#   if(grepl("2003", filename)) {
+#     data<-data%>%
+#       filter(year == "1999")
+#   }
+#   if(grepl("2002", filename)) {
+#     data<-data%>%
+#       filter(year == "1998")
+#   }
+#   if(grepl("2001", filename)) {
+#     data<-data%>%
+#       filter(year == "1997")
+#   }
+#   if(grepl("2000", filename)) {
+#     data<-data%>%
+#       filter(year == "1996")
+#   }
+#   if(grepl("1999", filename)) {
+#     data<-data%>%
+#       filter(year == "1995")
+#   }
+#   if(grepl("1998", filename)) {
+#     data<-data%>%
+#       filter(year == "1994")
+#   }
+#   if(grepl("1997", filename)) {
+#     data<-data%>%
+#       filter(year == "1993")
+#   }
+#   
+#   data= as.data.frame(data)
+#   list(filename, data)
+# })
+# 
+# # National- Total Level Data- Put ---------------------------------------------------------------------
+# national.totals.put = lapply(national.totals, `[[`, 2)
+# 
+# for (data in national.totals.put) {
+#   data.manager$put.long.form(
+#     data = data,
+#     ontology.name = 'cdc.pdf.report',
+#     source = 'cdc.sti.surveillance.reports',
+#     url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
+#     details = 'CDC STI Surveillance Reports')
+# }
 
 # MSA - Total Level Data --------------------------------------------------
 
@@ -135,6 +139,9 @@ msa.totals = lapply(cdc.pdf.reports.msa, function(file){
   }
   if(grepl("all.stages", filename)) {
     data$outcome = 'total.syphilis.diagnoses'
+  }
+  if(grepl("congenital", filename)) {
+      data$outcome = 'congenital.syphilis.diagnoses'
   }
 
   #Pull the most recent report of a particular year. Ex. 2003 Report has the most recent values for 1999:
@@ -191,7 +198,8 @@ msa.totals = lapply(cdc.pdf.reports.msa, function(file){
     mutate(location = ifelse(city.name == "New York City", "C.35620", location))%>%
     filter(City != "Yonkers, NY")%>%
     mutate(location = as.character(location))%>%
-    select(year, location, outcome, value)
+     select(year, location, outcome, value)
+
   
   data= as.data.frame(data)
   list(filename, data)
@@ -208,6 +216,31 @@ for (data in msa.totals.put) {
     url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
     details = 'CDC STI Surveillance Reports')
 }
+
+#Re-calculate the total diagnoses by removing congenital cases -------------------------------------------------------------------------
+#This will replace the total.diagnoses above:
+#Added this 12-8-25 to align the PDF report total diagnoses with Atlas Plus total diagnoses
+
+total.dx <- as.data.frame.table(data.manager$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(total.diagnoses = Freq)
+
+congenital.dx <- as.data.frame.table(data.manager$data$congenital.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location)%>%rename(congenital.diagnoses = Freq)
+
+corrected.total = merge(total.dx, congenital.dx, by = c("year", "location"))
+
+corrected.total <- corrected.total%>%
+    mutate(value = (total.diagnoses - congenital.diagnoses))%>%#this represents total syphilis cases with congenital removed
+    mutate(outcome = "total.syphilis.diagnoses")%>%
+    mutate(year = as.character(year))%>%
+    mutate(location = as.character(location))
+
+
+data.manager$put.long.form(
+    data = corrected.total,
+    ontology.name = 'cdc.pdf.report',
+    source = 'cdc.sti.surveillance.reports',
+    url = 'https://www.cdc.gov/sti-statistics/media/pdfs/2024/07/1997-Surveillance-Report.pdf',
+    details = 'CDC STI Surveillance Reports')
+
 
 # MSA - Stratified Data ---------------------------------------------------
 DATA.DIR.PDF.REPORTS.MSA.STRATIFIED="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/syphilis.tables.older/msa.stratified"
