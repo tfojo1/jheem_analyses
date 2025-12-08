@@ -30,8 +30,6 @@ Here are the scripts for changes I made to the syphilis and HIV surveillance man
 
 **What**: Identifies and removes race stratifications where county-level race coverage < 90%. Affects 16 combinations across Baltimore, NYC, Miami, Atlanta.
 
-**See also**: `data_processing/syphilis.manager/data_quality_fix/README.md` for full methodology.
-
 ---
 
 ## HIV Surveillance Manager (1 change)
@@ -45,6 +43,4 @@ Here are the scripts for changes I made to the syphilis and HIV surveillance man
 **Critical**: Uses `cdc` ontology (5 age groups), NOT `cdc.new` (6 age groups).
 
 **Data file**: `data_raw/hiv_surveillance/viral_suppression_comprehensive_Pennsylvania_20250727_120208.csv`
-
-**See also**: `data_processing/hiv.surveillance.manager/pa_viral_suppression/README.md` for full documentation.
 
