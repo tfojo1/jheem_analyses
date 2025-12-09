@@ -30,6 +30,9 @@ source('data_processing/hiv.surveillance.manager/tests.per.population.R') # Sour
 # Source code to aggregate proportion.msm  --------------------------------
 source('data_processing/hiv.surveillance.manager/aggregating.proportion.msm.R')
 
+#Add in Nick's code to add PA 2022-2023 suppression data --------------------------------
+source('data_processing/hiv.surveillance.manager/pa_viral_suppression/pa_viral_suppression_integration_5age.R')
+
 # Remove outliers ---------------------------------------------------------
 save(surveillance.manager, file="../../cached/surveillance.manager.before.outliers.rdata")
 

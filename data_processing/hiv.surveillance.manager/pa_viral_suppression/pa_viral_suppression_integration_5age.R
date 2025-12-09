@@ -3,15 +3,15 @@
 # Aligns with JHEEM standard processing pattern (cdc ontology)
 
 source("use_jheem2_package_setting.R")
-library(jheem2)
-library(tidyverse)
+# library(jheem2)
+# library(tidyverse)
 
 cat("=== PA VIRAL SUPPRESSION INTEGRATION - 5 AGE GROUP VERSION ===\n")
 cat("Started:", as.character(Sys.time()), "\n\n")
 
 CONFIG <- list(
-  INPUT_FILE = "data_raw/hiv_surveillance/viral_suppression_comprehensive_Pennsylvania_20250727_120208.csv",
-  ORIGINAL_MANAGER = "cached/surveillance.manager_backup_2025-08-14.rdata",  # Using clean backup from before PA integration
+  INPUT_FILE = "Q:/data_raw/temp/viral_suppression_comprehensive_Pennsylvania_20250727_120208.csv",
+  ORIGINAL_MANAGER = surveillance.manager,  
   OUTCOME = "suppression",
   SOURCE = "cdc.hiv",
   ONTOLOGY = "cdc",  # CHANGED: Using 'cdc' ontology for 5 age groups
@@ -60,7 +60,7 @@ RISK_MAPPINGS <- c(
 
 # Load and check manager
 cat("1. Loading surveillance manager...\n")
-manager <- load.data.manager(CONFIG$ORIGINAL_MANAGER)
+manager <- surveillance.manager
 
 # Check if outcome/source/ontology are registered
 if (!CONFIG$OUTCOME %in% manager$outcomes) {
@@ -257,18 +257,18 @@ tryCatch({
 })
 
 # Save the updated manager
-cat("\n8. Saving updated manager...\n")
-output_file <- "cached/surveillance.manager.pa_5age.rdata"
-save(manager, file = output_file)
-cat(sprintf("   Saved to: %s\n", output_file))
-
-cat("\n=== INTEGRATION COMPLETE ===\n")
-cat("Completed:", as.character(Sys.time()), "\n")
-
-# Final summary
-cat("\nSUMMARY:\n")
-cat("- Processed PA viral suppression data for 2022-2023\n")
-cat("- Used 'cdc' ontology with 5 age groups (55+ combined)\n")
-cat("- Age groups 55-64 and 65+ properly weighted by population\n")
-cat("- Data should now be compatible with likelihood system\n")
-cat("\nNext step: Test with EHE calibration setup\n")
+# cat("\n8. Saving updated manager...\n")
+# output_file <- "cached/surveillance.manager.pa_5age.rdata"
+# save(manager, file = output_file)
+# cat(sprintf("   Saved to: %s\n", output_file))
+# 
+# cat("\n=== INTEGRATION COMPLETE ===\n")
+# cat("Completed:", as.character(Sys.time()), "\n")
+# 
+# # Final summary
+# cat("\nSUMMARY:\n")
+# cat("- Processed PA viral suppression data for 2022-2023\n")
+# cat("- Used 'cdc' ontology with 5 age groups (55+ combined)\n")
+# cat("- Age groups 55-64 and 65+ properly weighted by population\n")
+# cat("- Data should now be compatible with likelihood system\n")
+# cat("\nNext step: Test with EHE calibration setup\n")
