@@ -42,6 +42,60 @@ cdc.testing.cessation = create.intervention(WHOLE.POPULATION,
                                             code = paste0("cdct.end", CDC.TESTING.INTERVENTION.SUFFIX),
                                             parameters = proportion.tested.regardless.values)
 
+
+#Testing effect reduced to 25%
+
+cdc.testing.cessation.effect.25 = create.intervention.effect(quantity.name = "cdc.effect",
+                                                          start.time = CDC.TESTING.START.YEAR,
+                                                          effect.values = 0.25,
+                                                          times = CDC.TESTING.START.YEAR + CDC.TESTING.LOSS.LAG,
+                                                          scale = "proportion",
+                                                          apply.effects.as = "value",
+                                                          allow.values.less.than.otherwise = T,
+                                                          allow.values.greater.than.otherwise = F)
+
+cdc.testing.cessation.25 = create.intervention(WHOLE.POPULATION,
+                                            cdc.testing.cessation.effect.25,
+                                            #                                         proportion.tested.regardless.effect,
+                                            code = paste0("cdct.end", CDC.TESTING.INTERVENTION.SUFFIX),
+                                            parameters = proportion.tested.regardless.values)
+
+
+#Testing effect reduced to 50%
+
+cdc.testing.cessation.effect.5 = create.intervention.effect(quantity.name = "cdc.effect",
+                                                             start.time = CDC.TESTING.START.YEAR,
+                                                             effect.values = 0.5,
+                                                             times = CDC.TESTING.START.YEAR + CDC.TESTING.LOSS.LAG,
+                                                             scale = "proportion",
+                                                             apply.effects.as = "value",
+                                                             allow.values.less.than.otherwise = T,
+                                                             allow.values.greater.than.otherwise = F)
+
+cdc.testing.cessation.5 = create.intervention(WHOLE.POPULATION,
+                                               cdc.testing.cessation.effect.5,
+                                               #                                         proportion.tested.regardless.effect,
+                                               code = paste0("cdct.end", CDC.TESTING.INTERVENTION.SUFFIX),
+                                               parameters = proportion.tested.regardless.values)
+
+#Testing effect reduced to 75%
+
+cdc.testing.cessation.effect.75 = create.intervention.effect(quantity.name = "cdc.effect",
+                                                            start.time = CDC.TESTING.START.YEAR,
+                                                            effect.values = 0.75,
+                                                            times = CDC.TESTING.START.YEAR + CDC.TESTING.LOSS.LAG,
+                                                            scale = "proportion",
+                                                            apply.effects.as = "value",
+                                                            allow.values.less.than.otherwise = T,
+                                                            allow.values.greater.than.otherwise = F)
+
+cdc.testing.cessation.75 = create.intervention(WHOLE.POPULATION,
+                                              cdc.testing.cessation.effect.75,
+                                              #                                         proportion.tested.regardless.effect,
+                                              code = paste0("cdct.end", CDC.TESTING.INTERVENTION.SUFFIX),
+                                              parameters = proportion.tested.regardless.values)
+
+
 #Return 2027
 
 cdc.testing.brief.interruption.effect = create.intervention.effect(quantity.name = "cdc.effect",
