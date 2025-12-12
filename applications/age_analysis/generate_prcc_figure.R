@@ -73,16 +73,16 @@ common_significant_params <- names(sort(table(unlist(all_most_significant_params
 #                       future.suppression.slope = "Future change in suppression rates")
 
 # Now write their full names.
-param_full_names <- c(age2.msm.hiv.aging.multiplier.2 = "Proportion of 25-34 year old MSM PWH\nwho are 34 years old in 2020",
-                      black.hiv.aging.multiplier.2 = "Proportion of black PWH who are in final year\nof their age bracket in 2020",
-                      black.hiv.aging.multiplier.1 = "Proportion of black PWH who are in final year\nof their age bracket in 2010",
-                      age4.heterosexual.hiv.aging.multiplier.2 = "Proportion of 45-54 year old MSM PWH\nwho are 54 years old in 2020",
-                      future.testing.slope = "Yearly rise in testing rates",
-                      age2.msm.hiv.aging.multiplier.1 = "Proportion of 25-34 year old MSM PWH\nwho are 34 years old in 2010",
-                      age3.msm.hiv.aging.multiplier.1 = "Proportion of 35-44 year old MSM PWH\nwho are 44 years old in 2010",
-                      age3.msm.hiv.aging.multiplier.2 = "Proportion of 35-44 year old MSM PWH\nwho are 44 years old in 2020",
-                      black.msm.ratio.trate.change.after.t2 = "Change in transmission rate among black PWH\nfrom 2020 to 2030",
-                      hispanic.hiv.aging.multiplier.2 = "Proportion of hispanic PWH who are in final year\nof their age bracket in 2020")
+param_full_names <- c(age2.msm.hiv.aging.multiplier.2 = "Percentage of 25-34 year old MSM PWDH\nwho are 34 years old in 2020",
+                      black.hiv.aging.multiplier.2 = "Percentage of Black PWDH who are in final\nyear of their age bracket in 2020",
+                      black.hiv.aging.multiplier.1 = "Percentage of Black PWDH who are in final\nyear of their age bracket in 2010",
+                      age4.heterosexual.hiv.aging.multiplier.2 = "Percentage of 45-54 year old MSM PWDH\nwho are 54 years old in 2020",
+                      future.testing.slope = "Annual increase in testing rates",
+                      age2.msm.hiv.aging.multiplier.1 = "Percentage of 25-34 year old MSM PWDH\nwho are 34 years old in 2010",
+                      age3.msm.hiv.aging.multiplier.1 = "Percentage of 35-44 year old MSM PWDH\nwho are 44 years old in 2010",
+                      age3.msm.hiv.aging.multiplier.2 = "Percentage of 35-44 year old MSM PWDH\nwho are 44 years old in 2020",
+                      black.msm.ratio.trate.change.after.t2 = "Change in transmission rate among\nBlack PWDH from 2020 to 2030",
+                      hispanic.hiv.aging.multiplier.2 = "Percentage of Hispanic PWDH who are in final\nyear of their age bracket in 2020")
 
 if (!setequal(common_significant_params, names(param_full_names)))
     stop("Oops! You might need to update the significant parameters if they've changed.")
@@ -147,17 +147,6 @@ all_bottom_sims_prev_values <- lapply(common_significant_params, function(param)
 })
 names(all_top_sims_prev_values) <- names(all_bottom_sims_prev_values) <- common_significant_params
 
-# # Now calculate the proportion.
-# regional_top_sims_values <- lapply(common_significant_params, function(param) {
-#     prop55 <- get_prop_over_55(all_top_sims_prev_values[[param]], digits=4)
-#     delta <- prop55["2040",] - prop55["2025",]
-# })
-# regional_bottom_sims_values <- lapply(common_significant_params, function(param) {
-#     prop55 <- get_prop_over_55(all_bottom_sims_prev_values[[param]], digits=4)
-#     delta <- prop55["2040",] - prop55["2025",]
-# })
-# names(regional_top_sims_values) <- names(regional_bottom_sims_values) <- common_significant_params
-
 # Now calculate the median age
 if (1==2) {
     regional_top_sims_values <- lapply(common_significant_params, function(param) {
@@ -173,9 +162,9 @@ if (1==2) {
     save(regional_bottom_sims_values, file = "../jheem_analyses/applications/age_analysis/Rdata Objects/reg_bottom_sims_values.Rdata")
 }
 
-if (!exists(regional_top_sims_values))
+if (!exists("regional_top_sims_values"))
     load(file = "../jheem_analyses/applications/age_analysis/Rdata Objects/reg_top_sims_values.Rdata")
-if (!exists(regional_bottom_sims_values))
+if (!exists("regional_bottom_sims_values"))
     load(file = "../jheem_analyses/applications/age_analysis/Rdata Objects/reg_bottom_sims_values.Rdata")
 
 
@@ -207,6 +196,18 @@ boxplot_df <- rbind(regional_top_sims_df, regional_bottom_sims_df) %>%
     mutate(param = factor(most_significant_params_formatted[as.character(param)],
                           levels = most_significant_params_formatted))
 
+# Now add fake entries for each param to make invisible gaps below.
+boxplot_df <- rbind(boxplot_df,
+                    data.frame(param = unique(boxplot_df$param),
+                               `Min.` = rep(NA, 10),
+                               `1st Qu.` = rep(NA, 10),
+                               Median = rep(NA, 10),
+                               Mean = rep(NA, 10),
+                               `3rd Qu.` = rep(NA, 10),
+                               `Max.` = rep(NA, 10),
+                               topOrBottom = "ZZZ",
+                               check.names = F))
+
 # For vertical dashed line of regional delta prop 55+.
 vline_value <- filter(med_age_delta_data, location=="total")[["mean"]] # 11
 
@@ -221,11 +222,14 @@ plot <- ggplot(boxplot_df) +
                  stat="identity",
                  position="dodge") +
     labs(x = "Change in Median Age (years)", y  = element_blank()) +
-    scale_fill_discrete(name = element_blank(),
+    scale_fill_manual(name = element_blank(),
                         labels = c(top = "Simulations with the highest 20% of parameter values",
-                                   bottom = "Simulations with the lowest 20% of parameter values")) +
+                                   bottom = "Simulations with the lowest 20% of parameter values"),
+                        values = c(top = "#00A1D5FF",
+                                   bottom = "#B24745FF")) +
     theme_bw() + 
-    theme(legend.position = "bottom") +
+    theme(legend.position = "bottom",
+          legend.text = element_text(size=10)) +
     geom_vline(xintercept = vline_value, linetype="dashed")
 ggsave(paste0("../jheem_analyses/applications/age_analysis/Figures/Manuscript/PRCC_figure.png"),
        plot = plot, width = 10, height = 7, dpi=300)

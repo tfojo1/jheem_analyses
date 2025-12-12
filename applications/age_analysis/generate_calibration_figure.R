@@ -95,7 +95,7 @@ for (outcome in outcomes) {
     plot <- make_calibration_plot(total_sim_df, total_data_df, outcome)
     ggsave(paste0("../jheem_analyses/applications/age_analysis/Calibration Plots/",
                   gsub("\\.", "_", outcome), "_total.png"),
-           plot = plot,width = 3, height = 2.5, dpi = 300)
+           plot = plot,width = 2, height = 1.2, dpi = 300)
 }
 
 # Age stratified ----
@@ -130,7 +130,7 @@ for (outcome in outcomes) {
         plot <- make_calibration_plot(sim_df, data_df, outcome, i)
         ggsave(paste0("../jheem_analyses/applications/age_analysis/Calibration Plots/",
                       gsub("\\.", "_", outcome), "_", i, ".png"),
-               plot = plot,width = 3, height = 2.5, dpi = 300)
+               plot = plot,width = 2, height = 1.2, dpi = 300)
         # Will I paste them into Word at 60%?
     }
 }

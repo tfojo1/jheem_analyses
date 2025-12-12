@@ -27,7 +27,7 @@ sixty_five_plus_estimates <- sixty_five_plus_estimates[,c("2025", "2040"),,
 # For HIV & Aging Conference, which uses only 11
 original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
 # ONLY_ELEVEN <- F
-ONLY_ELEVEN <- T
+ONLY_ELEVEN <- F
 
 if (ONLY_ELEVEN) {
     total_results_og <- total_results
@@ -60,8 +60,8 @@ do_conversion_operations <- function(df, is.percentage=F) {
             mutate(mean40 = paste0(mean40, "%"))
     }
     rv <- rv[match(state_order, rv$location),] %>%
-        mutate(int25 = paste0("[", lo25, " to ", up25, "]")) %>%
-        mutate(int40 = paste0("[", lo40, " to ", up40, "]")) %>%
+        mutate(int25 = paste0("[", lo25, "-", up25, "]")) %>%
+        mutate(int40 = paste0("[", lo40, "-", up40, "]")) %>%
         select(mean25, int25, mean40, int40) %>%
         mutate(across(everything(), ~prettyNum(., big.mark=",", preserve.width = "none")))
 }
@@ -77,7 +77,7 @@ do_delta_conversion_operations <- function(df, is.percentage=F) {
 do_total_conversion_operations <- function(df) {
     # Assume we're already in the correct order in this case
     rv <- df %>%
-        mutate(ci = paste0("[", lower, " to ", upper, "]")) %>%
+        mutate(ci = paste0("[", lower, "-", upper, "]")) %>%
         select(mean, ci) %>%
         mutate(across(everything(), ~prettyNum(., big.mark=",", preserve.width = "none")))
 }
@@ -194,8 +194,8 @@ if (ONLY_ELEVEN) {
 # write.table(table_colors, file="../jheem_analyses/applications/age_analysis/table1_colors.csv", sep=",", row.names=F, col.names=F)
 # save(table_colors, file="../jheem_analyses/applications/age_analysis/table1_colors.Rdata")
 write.shaded.table(csv_double_rows,
-                   # file = "../jheem_analyses/applications/age_analysis/shaded_table.xlsx",
-                   file = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/shaded_table.xlsx",
+                   file = "../jheem_analyses/applications/age_analysis/Figures/Manuscript/shaded_table.xlsx",
+                   # file = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/shaded_table.xlsx",
                    color.by = table_colors,
                    thresholds = c(-1, 0, 1),
                    colors = c("#2171b5", "white", "#fd8d3c"),

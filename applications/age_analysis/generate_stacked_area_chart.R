@@ -16,8 +16,8 @@ load(file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order
 load(file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order_names.Rdata")
 
 original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
-# ONLY_ELEVEN <- F
-ONLY_ELEVEN <- T
+ONLY_ELEVEN <- F
+# ONLY_ELEVEN <- T
 
 if (ONLY_ELEVEN) {
     state_order <- c(intersect(state_order, original_eleven), "total")
@@ -52,7 +52,7 @@ make_stacked_area_plots <- function(states, type=c("absolute", "percentage")[1])
         # ggtitle(paste0("Diagnosed Prevalence")) +
         scale_fill_manual(values=my_palette(length(unique(stacked_area_plot_data$age)))) +
         scale_y_continuous(labels=comma) +
-        guides(fill = guide_legend(reverse=T)) +
+        guides(fill = guide_legend(reverse=F)) +
         labs(y = "Cases", x = "Year", fill="Age") +
         theme_bw() +
         theme(legend.position="bottom")

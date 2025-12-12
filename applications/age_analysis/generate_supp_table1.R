@@ -22,22 +22,22 @@ sixty_five_plus_estimates <- sixty_five_plus_estimates[,c("2025", "2040"),,
                                                        setdiff(dimnames(sixty_five_plus_estimates)$location,
                                                                "total")]
 
-# # For HIV & Aging Conference, which uses only 11----
-original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
-
-total_results_og <- total_results
-total_results <- total_results[,,,original_eleven,,drop=F]
-age_results_og <- age_results
-age_results <- age_results[,,,,original_eleven,,drop=F]
-
-state_order_og <- state_order
-state_order <- c(intersect(state_order_og, original_eleven), "total")
-state_order_names_og <- state_order_names
-state_order_names <- state_order_names_og[state_order]
-
-# Do NOT use the total from this set, because it's made with 24!
-sixty_five_plus_estimates_og <- sixty_five_plus_estimates
-sixty_five_plus_estimates <- sixty_five_plus_estimates_og[,,,c(original_eleven)]
+# # # For HIV & Aging Conference, which uses only 11----
+# original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
+# 
+# total_results_og <- total_results
+# total_results <- total_results[,,,original_eleven,,drop=F]
+# age_results_og <- age_results
+# age_results <- age_results[,,,,original_eleven,,drop=F]
+# 
+# state_order_og <- state_order
+# state_order <- c(intersect(state_order_og, original_eleven), "total")
+# state_order_names_og <- state_order_names
+# state_order_names <- state_order_names_og[state_order]
+# 
+# # Do NOT use the total from this set, because it's made with 24!
+# sixty_five_plus_estimates_og <- sixty_five_plus_estimates
+# sixty_five_plus_estimates <- sixty_five_plus_estimates_og[,,,c(original_eleven)]
 
 # Code ----
 do_conversion_operations <- function(df, is.percentage=F) {
@@ -55,8 +55,8 @@ do_conversion_operations <- function(df, is.percentage=F) {
             mutate(mean40 = paste0(mean40, "%"))
     }
     rv <- rv[match(state_order, rv$location),] %>%
-        mutate(int25 = paste0("[", lo25, " to ", up25, "]")) %>%
-        mutate(int40 = paste0("[", lo40, " to ", up40, "]")) %>%
+        mutate(int25 = paste0("[", lo25, "-", up25, "]")) %>%
+        mutate(int40 = paste0("[", lo40, "-", up40, "]")) %>%
         select(mean25, int25, mean40, int40) %>%
         mutate(across(everything(), ~prettyNum(., big.mark=",", preserve.width = "none")))
 }
@@ -72,7 +72,7 @@ do_delta_conversion_operations <- function(df, is.percentage=F) {
 do_total_conversion_operations <- function(df) {
     # Assume we're already in the correct order in this case
     rv <- df %>%
-        mutate(ci = paste0("[", lower, " to ", upper, "]")) %>%
+        mutate(ci = paste0("[", lower, "-", upper, "]")) %>%
         select(mean, ci) %>%
         mutate(across(everything(), ~prettyNum(., big.mark=",", preserve.width = "none")))
 }
@@ -133,5 +133,5 @@ table_num_over_65 <- cbind(do_conversion_operations(reshape2::melt(get_stats(num
 # Combine to make full table ----
 csv_double_rows <- convert_to_double_rows(as.matrix(cbind(total_prev_column, table_num_over_55, table_num_over_65)))
 
-# write.table(csv_double_rows, file="../jheem_analyses/applications/age_analysis/supp_table1X.csv", sep=",", row.names=F, col.names=F)
-write.table(csv_double_rows, file = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/supp_table1X.xlsx", sep=",", row.names=F, col.names=F)
+write.table(csv_double_rows, file="../jheem_analyses/applications/age_analysis/supp_table1X.csv", sep=",", row.names=F, col.names=F)
+# write.table(csv_double_rows, file = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/supp_table1X.xlsx", sep=",", row.names=F, col.names=F)
