@@ -1,3 +1,7 @@
+#'@Ryan: Please add documentation
+### Estiamting XXX
+### Data
+### Returning 
 #Estimate meanlog and SDlog of doxypep effectiveness
 
 fit_rr_lognorm_from_ci <- function(rr_lo, rr_hi, p_lo = 0.025, p_hi = 0.975){

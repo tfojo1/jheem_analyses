@@ -1,3 +1,7 @@
+### Estiamting sexual activity levels by age
+### Data: GSS survey (https://gss.norc.org/)
+### Returning het_sexualActivity_means and msm_sexualActivity_means
+
 ##############################
 # 1. Setup
 ##############################
@@ -34,7 +38,6 @@ age_labels <- c("0-14", "15-19", "20-24", "25-29", "30-34",
 # Summarize total 'Any Sex' and total respondents by sex and age group
 # Note GSS runs 18 and older have to approximate youngest age group
 # manually add CDC YRBS result for % having sex before 13
-
 GSS_anysex_by_age_sex <- GSS_bysex_sexfreq %>%
     mutate(
         age_group = cut(`AGE (age of respondent)`,
@@ -271,5 +274,5 @@ ggplot(GSS_activity, aes(x = age_group, y = sexual_activity, color = Sex, group 
 # We will use the Male values from this survey to represent MSM and use the Female values to represent HET 
 
 #'@Ryan: return the final mean sexual activity values for male and female here that you 
-#'het_sexualActivity_means
-#'msm_sexualActivity_means
+het_sexualActivity_means=GSS_activity[GSS_activity$Sex=="Female",]$weighted_mean_anysex
+msm_sexualActivity_means=GSS_activity[GSS_activity$Sex=="Male",]$weighted_mean_anysex

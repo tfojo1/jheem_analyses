@@ -86,7 +86,7 @@ if (!exists('SURVEILLANCE.MANAGER') ){
 # SHIELD specific code ----
 source('applications/SHIELD/shield_calib_parameters.R') ; print("shield_calib_parameters.R sourced")
 source('applications/SHIELD/shield_base_parameters.R') ; print("shield_base_parameters.R sourced")
-source('applications/SHIELD/shield_ontology_mappings.R') ; print("shield_ontology_mappings.R sourced")
+source('applications/SHIELD/R/shield_ontology_mappings.R') ; print("shield_ontology_mappings.R sourced")
 source('applications/SHIELD/R/shield_specification_helpers.R'); print("shield_specification_helpers.R sourced")
 source('applications/SHIELD/R/shield_inputManager_pairing.R') ; print("shield_inputManager_pairing.R sourced")
 source('applications/SHIELD/R/shield_inputManager_helpers.R') ; print("shield_inputManager_helpers.R sourced")

@@ -1279,8 +1279,9 @@ register.transition(SHIELD.SPECIFICATION,
 #*** CONTINUUM TRANSISION *** ----
 ##---- 1-SYMPTHOMATIC TESTING ----
 # Register "Effective" symptomatic proportions for primary and secondary stages
-# We assume 100% care seeking and testing rate for ”symptomatic” cases in Primary&Secondary Stage (effective proportion) 
-# Those who don’t notice the symptoms or don’t seek care based on symptoms are treated as asymptomatic. 
+# We assume 100% care seeking and testing rate for "symptomatic" cases in Primary&Secondary Stage (effective proportion) 
+# Those who don’t notice the symptoms or don’t seek care based on symptoms are treated as asymptomatic.
+# We assume 100% care/seeking and testing rate for symptomatic individuals
 base.prp.symptomatic.primary = array(
     c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'],
       SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'],
@@ -1334,7 +1335,7 @@ register.model.element(SHIELD.SPECIFICATION,
                            min=0, #do we need these for the proportion? 
                            max=1
                        ))
-# We assume 100% care/seeking and testing rate for symptomatic individuals
+
 # For now, we assume 100% test.sensitivity as well. 
 # proportion of symp.testing that are successfully diagnosed: 
 register.model.quantity(SHIELD.SPECIFICATION,

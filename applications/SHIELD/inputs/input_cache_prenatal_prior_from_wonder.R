@@ -1,3 +1,11 @@
+### Estimating the proportion of women initiating prenatal care in each trimester
+### Data: CDC Wonder
+### Returing the final functions informing the 
+# prenatal.care.initiation.first.trimester.prior
+# prenatal.care.initiation.second.trimester.prior
+# prenatal.care.initiation.third.trimester.prior in the model ###
+
+
 # Data: Proportion of births receiving prenatal care ine ach trimester (p1,p2,p3) and those not receiving any prenatal care(p0)
 # Zoe has pulled this data from CDC Wonderby year, age and race of moms
 # (p0,p1,p2,p3) form a multinomial distribution in each year and category 
