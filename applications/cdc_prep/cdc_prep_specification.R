@@ -62,9 +62,9 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tested.prep.elig
                        functional.form.from.time = 2010) 
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.referred.to.prep",
-                       get.functional.form.function = get.fraction.prep.referred,
-                       scale = "proportion",
-                       functional.form.from.time = 2010)
+                      get.functional.form.function = get.fraction.prep.referred,
+                      scale = "proportion",
+                      functional.form.from.time = 2010)
 
 #-- Contact Tracing --#
 
@@ -184,24 +184,22 @@ register.model.quantity(CDCP.SPECIFICATION,
 
 #-- Derive cdc-funded testing rate from PrEP --#
 
-register.model.quantity(CDCP.SPECIFICATION, name = 'cdc.prep.uptake.rate',
-                        scale = 'rate', # per person per year
-                        value = expression(proportion.receiving.prep * fraction.prep.from.cdc))
-
-register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.referral.rate",
-                        scale = 'rate', # per person per year
-                        value = expression(cdc.prep.uptake.rate / p.prep.uptake.from.referral / fraction.cdc.tests.unique))
-
-
 register.model.quantity(CDCP.SPECIFICATION, name = "cdc.funded.non.healthcare.testing.rate",
-                        scale = 'rate', # per person per year
+                        scale = 'rate', # per person per year*
                         value = expression(cdc.funded.general.population.testing * fraction.cdc.funded.tests.in.non.healthcare.settings))
+
 
 register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.eligible.rate",
                         scale = 'rate', # per person per year
                         value = expression(cdc.funded.non.healthcare.testing.rate * fraction.cdc.tests.unique * fraction.cdc.tested.prep.eligible ))
 
+register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.referral.rate",
+                        scale = 'rate', # per person per year
+                        value = expression(cdc.prep.eligible.rate *fraction.cdc.referred.to.prep))
 
+register.model.quantity(CDCP.SPECIFICATION, name = 'cdc.prep.uptake.rate',
+                        scale = 'rate', # per person per year
+                        value = expression(cdc.prep.referral.rate * p.prep.uptake.from.referral))
 
 
 
@@ -312,12 +310,17 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
 
 track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cumulative.cdc.prep.referrals',
-                         outcome.metadata = NULL,
+                         outcome.metadata = create.outcome.metadata(display.name = 'Number of Referrals for PrEP',
+                                                                    description = "Number of Referrals for PrEP",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'People',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
                          scale = 'non.negative.number',
                          value.to.integrate = 'uninfected',
                          multiply.by = 'cdc.prep.referral.rate', 
                          keep.dimensions = c('location'),
-                         save = F)
+                         save = T)
 
 track.integrated.outcome(CDCP.SPECIFICATION,
                          name = 'cumulative.cdc.prep.eligible',
