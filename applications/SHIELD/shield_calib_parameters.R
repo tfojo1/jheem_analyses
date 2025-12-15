@@ -1,4 +1,5 @@
 source("applications/SHIELD/shield_base_parameters.R")
+source("applications/SHIELD/inputs/input_estimate_sexual_activity_by_age.R")
 
 # Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
 # HELPER FUNCTIONS ----
@@ -335,15 +336,14 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
 age_labels <- c("19","24","29","34","39","44","49","54","64","65")
 n_ages <- length(age_labels) 
 
-#'@ Ryan: let's return these vectors directly from the input script
 #see inputs/estiamte_sexual_activity_by_age.R
 # MSM_sexualActivity (male values in the survey)
-msm_sexualActivity_means <- c(0.78225996, 1.0, 0.95998551, 0.85426289,0.80110115, 0.74182871, 0.66807753, 0.59361831, 0.52443517, 0.24827982)
+# msm_sexualActivity_means <- ESTIAMTED IN input_estimate_sexual_activity_by_age.R 
 msm_sexualActivity_meanlog <- log(msm_sexualActivity_means)
 msm_sexualActivity_sdlog <- 0.5 * log(2)     
 
 # Heterosexual_sexualActivity (these are female values)
-het_sexualActivity_means <- c(0.67344578, 1.0, 0.93856869, 0.89449681, 0.82901671, 0.78709287, 0.69855360, 0.56671692, 0.35979200, 0.09428752)
+# het_sexualActivity_means <- ESTIAMTED IN input_estimate_sexual_activity_by_age.R 
 het_sexualActivity_meanlog <- log(het_sexualActivity_means)
 het_sexualActivity_sdlog <- 0.5 * log(2)     
 
