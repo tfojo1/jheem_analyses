@@ -1,3 +1,6 @@
+
+source("../jheem_analyses/applications/SHIELD/inputs/input_congenital_relative_risks.R")
+
 b.INTIAL=T
 b.INFECTIOUSNESS = T
 b.INFECTIOUSNESS.REL=T
@@ -153,16 +156,16 @@ if (b.CONGENITAL){
 
 ## ---- Risk Ratios Based on Prenatal Cares timing  ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.no.prenatal.care',
-                                      0.36,0.28,0.449, 
+                                      cs_relative_risks["none"],0.28,0.449, 
                                       citation = "syphilis_natural_history.docx") 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.first.trimester',
-                                      0.104, 0.077, 0.14,
+                                      cs_relative_risks["first"], 0.077, 0.14,
                                       citation = "syphilis_natural_history.docx") 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.second.trimester',
-                                      0.176, 0.118, 0.254,
+                                      cs_relative_risks["second"], 0.118, 0.254,
                                       citation = "syphilis_natural_history.docx") 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rr.congenital.syphilis.prenatal.care.third.trimester',
-                                      0.406, 0.313, 0.507,
+                                      cs_relative_risks["third"], 0.313, 0.507,
                                       citation = "syphilis_natural_history.docx") 
 
 # *** NEW BIRTHS ---- ##----

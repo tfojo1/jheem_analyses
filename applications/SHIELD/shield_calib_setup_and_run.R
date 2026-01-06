@@ -17,7 +17,8 @@
 ##----
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
+# source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
+source('../jheem_analyses/applications/SHIELD/shield_calib_register_new.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
 #
@@ -27,7 +28,8 @@ set.seed(00000)
 CACHE.FREQ= 10#100 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 5#50 # how often to print messages (Default: 50)
 
-CALIBRATION.NAME = 'calib.12.02.stage0.pk' 
+# CALIBRATION.NAME = 'calib.12.02.stage0.pk'
+CALIBRATION.NAME = 'calib.1.06.stage0.az'
 
 
 #################
