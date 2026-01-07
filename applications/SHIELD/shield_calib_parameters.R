@@ -1384,3 +1384,16 @@ SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
 # calculate.density(x,10)/calculate.density(x,3)
 
 cat('*** shield_calib_parameters.R completed! ***\n')
+
+
+#length(SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS) = 85
+#we roughly accept 1 in 4 parameter values
+#average number of samples needed: 85*4=340
+
+
+# if x is normally distributed with mu-0, and sd=1
+# the 95% confidence interval is mu+/- 1.96*sd
+# then log(x) has the confidence bound as +-log(1.96) = +-log(2)
+# which means that we can estimate the sdlog as ".5 * log(2)"
+# what does this mean for our paramter sampling in the log scale?
+# if we exponentiate those bounds, we can estimate the interval for sampling: exp(log(2))=2. exp(-log(2))=.5
