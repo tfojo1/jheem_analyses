@@ -200,20 +200,7 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'ps.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['ps.diagnoses.multiplier.1970'])
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'ps.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
-#                        value = SHIELD_BASE_PARAMETER_VALUES['ps.diagnoses.multiplier.1970'])
-
-# by race
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'ps.diagnoses.black.multiplier.1970', scale = 'non.negative.number',
-#                        value = 1)
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'ps.diagnoses.hispanic.multiplier.1970', scale = 'non.negative.number',
-#                        value = 1)
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'ps.diagnoses.other.multiplier.1970', scale = 'non.negative.number',
-#                        value = 1)
+                       
 
 # Early latent
 register.model.element(SHIELD.SPECIFICATION,
@@ -222,19 +209,7 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'el.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['el.diagnoses.multiplier.1970'])
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'el.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
-#                        value = SHIELD_BASE_PARAMETER_VALUES['el.diagnoses.multiplier.1970'])
 
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'el.diagnoses.black.multiplier.1970', scale = 'non.negative.number',
-#                        value = 1 )
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'el.diagnoses.hispanic.multiplier.1970', scale = 'non.negative.number',
-#                        value =  1)
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'el.diagnoses.other.multiplier.1970', scale = 'non.negative.number',
-#                        value = 1)
 
 # Late latent
 register.model.element(SHIELD.SPECIFICATION,
@@ -243,17 +218,6 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'lu.diagnoses.heterosexual_male.multiplier.1970', scale = 'non.negative.number',
                        value = SHIELD_BASE_PARAMETER_VALUES['lu.diagnoses.multiplier.1970'])
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'lu.diagnoses.female.multiplier.1970', scale = 'non.negative.number',
-#                        value = SHIELD_BASE_PARAMETER_VALUES['lu.diagnoses.multiplier.1970'])
-
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'lu.diagnoses.black.multiplier.1970', scale = 'non.negative.number', value = 1)
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'lu.diagnoses.hispanic.multiplier.1970', scale = 'non.negative.number', value = 1)
-# register.model.element(SHIELD.SPECIFICATION,
-#                        name = 'lu.diagnoses.other.multiplier.1970', scale = 'non.negative.number', value = 1)
-
 
 # Estimating size of infected population
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -266,59 +230,20 @@ register.model.quantity(SHIELD.SPECIFICATION,
 # MSM
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='primary', sex='msm', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='primary', sex='msm'),
                                value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * 0.25))
-
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='msm', race='black'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * ps.diagnoses.black.multiplier.1970 * 0.25))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='msm', race='hispanic'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * ps.diagnoses.hispanic.multiplier.1970 * 0.25))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='msm', race='other'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * ps.diagnoses.other.multiplier.1970 * 0.25))
 
 # Heterosexual male
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='primary', sex='heterosexual_male', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='primary', sex='heterosexual_male'),
                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970* 0.25))
-
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='heterosexual_male', race='black'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.black.multiplier.1970 * 0.25))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='heterosexual_male', race='hispanic'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.hispanic.multiplier.1970 * 0.25))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='heterosexual_male', race='other'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.other.multiplier.1970 * 0.25))
 
 # Female (currently uses heterosexual_male multiplier)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='primary', sex='female', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='primary', sex='female'),
                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * 0.25))
-
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='female', race='black'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.black.multiplier.1970 * 0.25))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='female', race='hispanic'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.hispanic.multiplier.1970 * 0.25))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='primary', sex='female', race='other'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.other.multiplier.1970 * 0.25))
 
 # -----------------------------
 # SECONDARY (75% of PS) — RACE-STRATIFIED
@@ -326,59 +251,21 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 # MSM
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='msm', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='msm'),
                                value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * 0.75))
-
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='msm', race='black'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * ps.diagnoses.black.multiplier.1970 * 0.75))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='msm', race='hispanic'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * ps.diagnoses.hispanic.multiplier.1970 * 0.75))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='msm', race='other'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.msm.multiplier.1970 * ps.diagnoses.other.multiplier.1970 * 0.75))
 
 # Heterosexual male
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='heterosexual_male', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='heterosexual_male'),
                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * 0.75))
-
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='heterosexual_male', race='black'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.black.multiplier.1970 * 0.75))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='heterosexual_male', race='hispanic'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.hispanic.multiplier.1970 * 0.75))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='heterosexual_male', race='other'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.other.multiplier.1970 * 0.75))
 
 # Female (same stand-in)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='female', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='secondary', sex='female'),
                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * 0.75))
 
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='female', race='black'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.black.multiplier.1970 * 0.75))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='female', race='hispanic'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.hispanic.multiplier.1970 * 0.75))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='secondary', sex='female', race='other'),
-#                                value=expression(prp.ps.diag.1997 * ps.diagnoses.heterosexual_male.multiplier.1970 * ps.diagnoses.other.multiplier.1970 * 0.75))
 
 # -----------------------------
 # EARLY LATENT — RACE-STRATIFIED
@@ -386,21 +273,8 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 # MSM
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='msm', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='msm'),
                                value=expression(prp.el.diag.1997 * el.diagnoses.msm.multiplier.1970))
-
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='msm', race='black'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.msm.multiplier.1970 * el.diagnoses.black.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='msm', race='hispanic'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.msm.multiplier.1970 * el.diagnoses.hispanic.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='msm', race='other'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.msm.multiplier.1970 * el.diagnoses.other.multiplier.1970))
 
 # Heterosexual male
 register.model.quantity.subset(SHIELD.SPECIFICATION,
@@ -408,37 +282,12 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='heterosexual_male', race='black'),
                                value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 ))
 
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='heterosexual_male', race='black'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 * el.diagnoses.black.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='heterosexual_male', race='hispanic'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 * el.diagnoses.hispanic.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='heterosexual_male', race='other'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 * el.diagnoses.other.multiplier.1970))
-
 # Female (stand-in)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='female', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='early.latent', sex='female'),
                                value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 ))
 
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='female', race='black'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 * el.diagnoses.black.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='female', race='hispanic'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 * el.diagnoses.hispanic.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='early.latent', sex='female', race='other'),
-#                                value=expression(prp.el.diag.1997 * el.diagnoses.heterosexual_male.multiplier.1970 * el.diagnoses.other.multiplier.1970))
 
 # -----------------------------
 # LATE LATENT — RACE-STRATIFIED
@@ -447,60 +296,22 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='msm', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='msm'),
                                value=expression(prp.lu.diag.1997 * lu.diagnoses.msm.multiplier.1970 ))
 
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='msm', race='black'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.msm.multiplier.1970 * lu.diagnoses.black.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='msm', race='hispanic'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.msm.multiplier.1970 * lu.diagnoses.hispanic.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='msm', race='other'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.msm.multiplier.1970 * lu.diagnoses.other.multiplier.1970))
 
 # Heterosexual male
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='heterosexual_male', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='heterosexual_male'),
                                value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970 ))
-
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='heterosexual_male', race='black'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970 * lu.diagnoses.black.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='heterosexual_male', race='hispanic'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970 * lu.diagnoses.hispanic.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='heterosexual_male', race='other'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970 * lu.diagnoses.other.multiplier.1970))
 
 # Female (stand-in)
 
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name='prop.initial.population.infected',
-                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='female', race='black'),
+                               applies.to=list(continuum='undiagnosed', stage='late.latent', sex='female'),
                                value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970))
-
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='female', race='black'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970 * lu.diagnoses.black.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='female', race='hispanic'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970 * lu.diagnoses.hispanic.multiplier.1970))
-# register.model.quantity.subset(SHIELD.SPECIFICATION,
-#                                name='prop.initial.population.infected',
-#                                applies.to=list(continuum='undiagnosed', stage='late.latent', sex='female', race='other'),
-#                                value=expression(prp.lu.diag.1997 * lu.diagnoses.heterosexual_male.multiplier.1970 * lu.diagnoses.other.multiplier.1970))
 
 
 register.model.quantity(SHIELD.SPECIFICATION,
