@@ -12,6 +12,7 @@ P.INTR.NAME = 'rw.p.intr.26'
 B.INTR.NAME = 'rw.b.intr'
 
 USE.B.INTR = F # to remove brief interruption
+USE.MEDICAID = F # to remove medicaid distinction on plot
 
 if (DO.FOR.CONSERVATIVE.ANALYSIS)
 {
@@ -477,70 +478,141 @@ if(USE.B.INTR){
     )
 }
 
-
-
-boxplot.df$location = factor(boxplot.df$location,
-                             levels = c(city.plus.total.names[c('total','nonexp','exp')],
-                                        rev(location.names)))
-
-boxplot.df$group = paste0(boxplot.df$Scenario, "_", boxplot.df$location)
-
-
-nonexp.mask = sapply(boxplot.df$loc.code, function(city){
-    any(city==RW.MEDICAID.NONEXPANSION.LOCATIONS)
-})
-nonexp.mask[boxplot.df$loc.code=='nonexp'] = T
-total.mask = boxplot.df$loc.code == 'total'
-total.and.subtotal.mask = total.mask | boxplot.df$loc.code == 'exp' | boxplot.df$loc.code == 'nonexp'
-
-location.colors = rep(RW.EXP.LABEL.COLOR, length(boxplot.df$location))
-location.colors[nonexp.mask] = RW.NONEXP.LABEL.COLOR
-location.face = rep('plain', length(boxplot.df$location))
-
-location.colors[total.mask] = RW.TOTAL.LABEL.COLOR
-location.face[total.and.subtotal.mask] = 'bold'
-
-MAX = 5
-boxplot.df$upper = pmin(boxplot.df$upper, MAX)
-
-asterisk.df = boxplot.df[!is.na(boxplot.df$upper) & boxplot.df$upper==MAX,]
-
-if(USE.B.INTR){
-    plot = ggplot() + 
-        geom_boxplot(data = boxplot.df,
-                     aes(y = location,
-                         xmiddle = mean,
-                         xlower = iqr.lower,
-                         xupper = iqr.upper,
-                         xmin = lower,
-                         xmax = upper,
-                         fill = Scenario,
-                         group = group),
-                     stat = 'identity',
-                     position = position_dodge2()) + 
-        geom_text(data = asterisk.df[asterisk.df$Scenario=='3.end',],
-                  aes(y=location, x=upper, label='*', group=group, vjust=0.5, hjust=0.5),
-                  nudge_y=.25, nudge_x = 0.006) +
-        geom_text(data = asterisk.df[asterisk.df$Scenario!='3.end',],
-                  aes(y=location, x=upper, label='*', group=group, vjust=0.5, hjust=0.5),
-                  nudge_y=0, nudge_x = 0.006) +
-        scale_fill_manual(values = c('3.end'=RW.END.COLOR,
-                                     '2.p.intr'=RW.P.INTR.COLOR,
-                                     '1.b.intr'=RW.B.INTR.COLOR),
-                          labels = c('3.end'='Cessation',
-                                     '2.p.intr'='Prolonged Interruption',
-                                     '1.b.intr'='Brief Interruption'),
-                          name=NULL) +
-        theme_bw() +
-        scale_x_continuous(labels = scales::percent, sec.axis = dup_axis(name=NULL)) +
-        ylab(NULL) +
-        xlab("Relative Increase in HIV Infections, 2025-2030") + 
-        theme(legend.position = 'bottom',
-              legend.direction = 'horizontal',
-              axis.text.y = element_text(color=rev(location.colors), face=rev(location.face))); print(plot)
+if(USE.MEDICAID){
     
+    boxplot.df$location = factor(boxplot.df$location,
+                                 levels = c(city.plus.total.names[c('total','nonexp','exp')],
+                                            rev(location.names)))
+    
+    boxplot.df$group = paste0(boxplot.df$Scenario, "_", boxplot.df$location)
+    
+    
+    nonexp.mask = sapply(boxplot.df$loc.code, function(city){
+        any(city==RW.MEDICAID.NONEXPANSION.LOCATIONS)
+    })
+    nonexp.mask[boxplot.df$loc.code=='nonexp'] = T
+    total.mask = boxplot.df$loc.code == 'total'
+    total.and.subtotal.mask = total.mask | boxplot.df$loc.code == 'exp' | boxplot.df$loc.code == 'nonexp'
+    
+    location.colors = rep(RW.EXP.LABEL.COLOR, length(boxplot.df$location))
+    location.colors[nonexp.mask] = RW.NONEXP.LABEL.COLOR
+    location.face = rep('plain', length(boxplot.df$location))
+    
+    location.colors[total.mask] = RW.TOTAL.LABEL.COLOR
+    location.face[total.and.subtotal.mask] = 'bold'
+    
+    MAX = 5
+    boxplot.df$upper = pmin(boxplot.df$upper, MAX)
+    
+    asterisk.df = boxplot.df[!is.na(boxplot.df$upper) & boxplot.df$upper==MAX,]
+    
+    if(USE.B.INTR){
+        plot = ggplot() + 
+            geom_boxplot(data = boxplot.df,
+                         aes(y = location,
+                             xmiddle = mean,
+                             xlower = iqr.lower,
+                             xupper = iqr.upper,
+                             xmin = lower,
+                             xmax = upper,
+                             fill = Scenario,
+                             group = group),
+                         stat = 'identity',
+                         position = position_dodge2()) + 
+            geom_text(data = asterisk.df[asterisk.df$Scenario=='3.end',],
+                      aes(y=location, x=upper, label='*', group=group, vjust=0.5, hjust=0.5),
+                      nudge_y=.25, nudge_x = 0.006) +
+            geom_text(data = asterisk.df[asterisk.df$Scenario!='3.end',],
+                      aes(y=location, x=upper, label='*', group=group, vjust=0.5, hjust=0.5),
+                      nudge_y=0, nudge_x = 0.006) +
+            scale_fill_manual(values = c('3.end'=RW.END.COLOR,
+                                         '2.p.intr'=RW.P.INTR.COLOR,
+                                         '1.b.intr'=RW.B.INTR.COLOR),
+                              labels = c('3.end'='Cessation',
+                                         '2.p.intr'='Prolonged Interruption',
+                                         '1.b.intr'='Brief Interruption'),
+                              name=NULL) +
+            theme_bw() +
+            scale_x_continuous(labels = scales::percent, sec.axis = dup_axis(name=NULL)) +
+            ylab(NULL) +
+            xlab("Relative Increase in HIV Infections, 2025-2030") + 
+            theme(legend.position = 'bottom',
+                  legend.direction = 'horizontal',
+                  axis.text.y = element_text(color=rev(location.colors), face=rev(location.face))); print(plot)
+        
+        
+    } else {
+        plot = ggplot() + 
+            geom_boxplot(data = boxplot.df,
+                         aes(y = location,
+                             xmiddle = mean,
+                             xlower = iqr.lower,
+                             xupper = iqr.upper,
+                             xmin = lower,
+                             xmax = upper,
+                             fill = Scenario,
+                             group = group),
+                         stat = 'identity',
+                         position = position_dodge2()) + 
+            geom_text(data = asterisk.df[asterisk.df$Scenario=='3.end',],
+                      aes(y=location, x=upper, label='*', group=group, vjust=0.5, hjust=0.5),
+                      nudge_y=.25, nudge_x = 0.006) +
+            geom_text(data = asterisk.df[asterisk.df$Scenario!='3.end',],
+                      aes(y=location, x=upper, label='*', group=group, vjust=0.5, hjust=0.5),
+                      nudge_y=0, nudge_x = 0.006) +
+            scale_fill_manual(values = c('3.end'=RW.END.COLOR,
+                                         '2.p.intr'=RW.P.INTR.COLOR,
+                                         '1.b.intr'=RW.B.INTR.COLOR),
+                              labels = c('3.end'='Cessation',
+                                         '2.p.intr'='2.5-year Interruption',
+                                         '1.b.intr'='Brief Interruption'),
+                              name=NULL) +
+            theme_bw() +
+            scale_x_continuous(labels = scales::percent, sec.axis = dup_axis(name=NULL)) +
+            ylab(NULL) +
+            xlab("Relative Increase in HIV Infections, 2026-2031") + 
+            theme(legend.position = 'bottom',
+                  legend.direction = 'horizontal',
+                  axis.text.y = element_text(color=rev(location.colors), face=rev(location.face))); print(plot)
+        
+        
+    }
+    
+    PLOT.HEIGHT = 7
+    PLOT.WIDTH = 6.5
+    PLOT.DPI = 600
+    PLOT.DEVICE = 'png'
     
 } else {
+    boxplot.df = boxplot.df[!(boxplot.df$location %in% city.plus.total.names[c('nonexp','exp')]),]
+    
+    boxplot.df$location = factor(boxplot.df$location,
+                                 levels = c(city.plus.total.names[c('total')],
+                                            rev(location.names)))
+    
+    boxplot.df$group = paste0(boxplot.df$Scenario, "_", boxplot.df$location)
+    
+    
+    # nonexp.mask = sapply(boxplot.df$loc.code, function(city){
+    #     any(city==RW.MEDICAID.NONEXPANSION.LOCATIONS)
+    # })
+    #nonexp.mask[boxplot.df$loc.code=='nonexp'] = T
+    total.mask = boxplot.df$loc.code == 'total'
+    total.and.subtotal.mask = total.mask
+    
+    location.colors = rep(RW.TOTAL.LABEL.COLOR, length(boxplot.df$location))
+    #location.colors[nonexp.mask] = RW.NONEXP.LABEL.COLOR
+    location.face = rep('plain', length(boxplot.df$location))
+    
+    location.colors[total.mask] = RW.TOTAL.LABEL.COLOR
+    location.face[total.and.subtotal.mask] = 'bold'
+    
+    MAX = 5
+    boxplot.df$upper = pmin(boxplot.df$upper, MAX)
+    
+    asterisk.df = boxplot.df[!is.na(boxplot.df$upper) & boxplot.df$upper==MAX,]
+    
+
     plot = ggplot() + 
         geom_boxplot(data = boxplot.df,
                      aes(y = location,
@@ -574,14 +646,20 @@ if(USE.B.INTR){
               legend.direction = 'horizontal',
               axis.text.y = element_text(color=rev(location.colors), face=rev(location.face))); print(plot)
     
+    PLOT.HEIGHT = 7
+    PLOT.WIDTH = 6.5
+    PLOT.DPI = 600
+    PLOT.DEVICE = 'png'
     
 }
 
-PLOT.HEIGHT = 7
-PLOT.WIDTH = 6.5
-PLOT.DPI = 600
-PLOT.DEVICE = 'png'
-
-ggsave(plot = plot, 
-       filename=file.path(PLOT.DIR, paste0(tolower(RW.LOCATION.DESCRIPTOR), '_boxplots.png')),
-       height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+if(USE.MEDICAID){
+    ggsave(plot = plot, 
+           filename=file.path(PLOT.DIR, paste0(tolower(RW.LOCATION.DESCRIPTOR), '_boxplots.png')),
+           height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+} else {
+    ggsave(plot = plot, 
+           filename=file.path(RW.PLOT.DIR, paste0(tolower(RW.LOCATION.DESCRIPTOR),'_nomedicaid_boxplots.png')),
+           height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+}

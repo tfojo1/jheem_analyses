@@ -10,7 +10,15 @@ CONS.END.NAME = 'rw.end.cons' # rw.end.cons.26
 P.INTR.NAME = 'rw.p.intr' # rw.p.intr.26
 P.INTR.CONS.NAME = 'rw.p.intr.cons' # rw.p.intr.cons.26
 
-USE.B.INTR = T # to remove brief interruption
+if(NEW.TIMELINE){
+    END.NAME = 'rw.end.26'
+    CONS.END.NAME = 'rw.end.cons.26' 
+    P.INTR.NAME = 'rw.p.intr.26' 
+    P.INTR.CONS.NAME = 'rw.p.intr.cons.26' 
+}
+
+
+USE.B.INTR = F # to remove brief interruption
 
 #-- Description if RW Continues --#
 

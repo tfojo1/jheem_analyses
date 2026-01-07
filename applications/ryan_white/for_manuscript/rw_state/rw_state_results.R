@@ -4,26 +4,36 @@ library(ggrepel)
 source("../jheem_analyses/applications/ryan_white/for_manuscript/load_survey_results.R")
 print(paste0("RW.IS.STATE.LEVEL is set to ",RW.IS.STATE.LEVEL))
 
-# check and load the right file 
-files
-file = files[4] # this was the last one before we revised the timeframe - I think (9/9 version)
+NEW.TIMELINE = T
+
+files # check and load the right file 
+
+# for manuscript, use old timeline and only 11 states
+if(!NEW.TIMELINE){ 
+    file = files[4] # 9/9 is the original timeframe - for manuscript  
+    RW.STATES = c("AL","CA","FL","GA","IL","LA","MS",
+                   "MO","NY","TX","WI")
+    
+    # select only the 11 states if those are the ones we're using
+    total.results = total.results[,,,RW.STATES,]
+    total.incidence = total.incidence[,,RW.STATES,]
+    incidence.by.sex.risk = incidence.by.sex.risk[,,,,RW.STATES,]
+    incidence.by.age = incidence.by.age[,,,RW.STATES,]
+    incidence.by.race = incidence.by.race[,,,RW.STATES,]
+    total.new = total.new[,,RW.STATES,]
+    #total.suppression = total.suppression[,,RW.STATES,]
+    total.sexual.transmission = total.sexual.transmission[,,RW.STATES,]
+    RW.MEDICAID.EXPANSION.LOCATIONS = RW.STATES[RW.STATES %in% RW.MEDICAID.EXPANSION.LOCATIONS]
+    RW.MEDICAID.NONEXPANSION.LOCATIONS = RW.STATES[!RW.STATES %in% RW.MEDICAID.EXPANSION.LOCATIONS]
+}
+
+if(NEW.TIMELINE){
+    file = files[6] # 9/11 is the revised timeframe - for CROI  
+}
+
 load(file)
 
-RW.STATES = c("AL","CA","FL","GA","IL","LA","MS",
-              "MO","NY","TX","WI")
-
-# select only the 11 states if those are the ones we're using
-total.results = total.results[,,,RW.STATES,]
-total.incidence = total.incidence[,,RW.STATES,]
-incidence.by.sex.risk = incidence.by.sex.risk[,,,,RW.STATES,]
-incidence.by.age = incidence.by.age[,,,RW.STATES,]
-incidence.by.race = incidence.by.race[,,,RW.STATES,]
-total.new = total.new[,,RW.STATES,]
-#total.suppression = total.suppression[,,RW.STATES,]
-total.sexual.transmission = total.sexual.transmission[,,RW.STATES,]
-RW.MEDICAID.EXPANSION.LOCATIONS = RW.STATES[RW.STATES %in% RW.MEDICAID.EXPANSION.LOCATIONS]
-RW.MEDICAID.NONEXPANSION.LOCATIONS = RW.STATES[!RW.STATES %in% RW.MEDICAID.EXPANSION.LOCATIONS]
-
+# for manuscript
 # text results 
 source("../jheem_analyses/applications/ryan_white/for_manuscript/text_results.R")
 

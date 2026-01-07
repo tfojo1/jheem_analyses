@@ -7,9 +7,9 @@ if (!dir.exists(RW.PLOT.DIR))
     dir.create(RW.PLOT.DIR)
 
 VERSION = 'rw'
-SUB.VERSION = 'w'
+SUB.VERSION = NULL
 LOCATION = 'NY'
-NSIM = 80
+NSIM = 1000
 
 if (locations::get.location.type(LOCATION)=='STATE')
     CALIBRATION.CODE = 'final.ehe.state'
@@ -32,21 +32,21 @@ if (!exists('simset.end'))
                                          CALIBRATION.CODE, 
                                          n.sim = NSIM, 
                                          sub.version = SUB.VERSION,
-                                         intervention.code = 'rw.end')
+                                         intervention.code = 'rw.end.26')
     
-    simset.bintr = retrieve.simulation.set(VERSION, 
-                                         LOCATION, 
-                                         CALIBRATION.CODE, 
-                                         n.sim = NSIM, 
-                                         sub.version = SUB.VERSION,
-                                         intervention.code = 'rw.b.intr')
+    # simset.bintr = retrieve.simulation.set(VERSION, 
+    #                                      LOCATION, 
+    #                                      CALIBRATION.CODE, 
+    #                                      n.sim = NSIM, 
+    #                                      sub.version = SUB.VERSION,
+    #                                      intervention.code = 'rw.b.intr')
     
     simset.pintr = retrieve.simulation.set(VERSION, 
                                          LOCATION, 
                                          CALIBRATION.CODE, 
                                          n.sim = NSIM, 
                                          sub.version = SUB.VERSION,
-                                         intervention.code = 'rw.p.intr')
+                                         intervention.code = 'rw.p.intr.26')
 }
 
 if (!exists("total.results"))
@@ -54,7 +54,8 @@ if (!exists("total.results"))
     load("Q:results/ryan_white/ryan_white_results_city_2025-07-01.Rdata")
     city.totals = total.results
     
-    load("Q:results/ryan_white/ryan_white_results_state_2025-09-09.Rdata")
+    #load("Q:results/ryan_white/ryan_white_results_state_2025-09-09.Rdata") # this is the old timeframe
+    load("Q:results/ryan_white/ryan_white_results_state_2026_2025-09-11.Rdata")
     state.totals = total.results
     
     load("Q:results/ryan_white/ryan_white_results_state_nanb_2026_2025-10-14.Rdata")
@@ -93,7 +94,7 @@ RW.STYLE.MANAGER.3 = create.style.manager(color.sim.by = 'simset',
 SIMSET.COLORS = c(
     simset.noint = RW.BASELINE.COLOR,
     simset.end = RW.END.COLOR,
-    simset.bintr = RW.B.INTR.COLOR,
+    #simset.bintr = RW.B.INTR.COLOR,
     simset.pintr = RW.P.INTR.COLOR,
     simset.end.cons =  rgb(59/256,77/256,84/256),
     simset.intr = RW.P.INTR.COLOR
@@ -102,8 +103,8 @@ SIMSET.COLORS = c(
 SIMSET.NAMES = c(
     simset.noint = 'Continuation',
     simset.end = "Cessation",
-    simset.bintr = "Brief Interruption",
-    simset.pintr = "Prolonged Interruption",
+    #simset.bintr = "Brief Interruption",
+    simset.pintr = "2.5-year Interruption",
     simset.end.cons = "Cessation (Conservative)",
     simset.intr = "Interruption"
 )
@@ -346,7 +347,7 @@ ggsave(plot = plot,
 
 #-- PROJECTIONS --#
 
-PROJ.YUPPER = 1000
+PROJ.YUPPER = 6000
 
 # Indiv sims
 plot = simplot(simset.noint,
@@ -371,25 +372,10 @@ plot = simplot(simset.noint,
     scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
     scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
     scale_y_continuous(labels=function(y){format(y, big.mark=',')}, limits=c(0, PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("42-Month Interruption"); plot
+    ylab("Infections (n)") + ggtitle("2.5-year Interruption"); plot
 
 ggsave(plot = plot, 
        filename = file.path(RW.PLOT.DIR, 'rw_total_inc_vs_pintr_individual_sims.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-plot = simplot(simset.noint,
-               simset.bintr,
-               'incidence', dimension.values = list(year=RW.YEARS),
-               style.manager = RW.STYLE.MANAGER.1) + theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_y_continuous(labels=function(y){format(y, big.mark=',')}, limits=c(0, PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("18-Month Interruption"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'rw_total_inc_vs_bintr_individual_sims.png'),
        height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
        dpi = PLOT.DPI, device = PLOT.DEVICE)
 
@@ -407,7 +393,7 @@ plot = simplot(simset.noint,
 
 ggsave(plot = plot, 
        filename = file.path(RW.PLOT.DIR, 'rw_total_inc_vs_end.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+       height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH,
        dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -419,161 +405,37 @@ plot = simplot(simset.noint,
     scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
     scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
     scale_y_continuous(labels=function(y){format(y, big.mark=',')}, limits=c(0, PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("42-Month Interruption"); plot
+    ylab("Infections (n)") + ggtitle("2.5-year Interruption"); plot
 
 ggsave(plot = plot, 
        filename = file.path(RW.PLOT.DIR, 'rw_total_inc_vs_pintr.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+       height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH,
        dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-plot = simplot(simset.noint,
-               simset.bintr,
-               'incidence', dimension.values = list(year=RW.YEARS),
-               summary.type = 'mean.and.interval',
-               style.manager = RW.STYLE.MANAGER.3) + theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_y_continuous(labels=function(y){format(y, big.mark=',')}, limits=c(0, PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("18-Month Interruption"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'rw_total_inc_vs_bintr.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
 
 
 #-- PROJECTION - TOTAL --#
 
-PROJ.YUPPER = 65000
+PROJ.YUPPER = 80000
 
-city.total.incidence = apply(city.totals[as.character(RW.YEARS),,'incidence',,],
-                             c('year','sim','intervention'), sum)
-
-city.totals.df = reshape2::melt(apply(city.total.incidence, c('year','intervention'), mean))
-city.totals.df$intervention = as.character(city.totals.df$intervention)
-city.totals.df$intervention = paste0("simset.",city.totals.df$intervention)
-city.totals.df$intervention = gsub("(rw.)","",city.totals.df$intervention)
-city.totals.df$intervention = gsub("b\\.intr","bintr",city.totals.df$intervention)
-city.totals.df$intervention = gsub("p\\.intr","pintr",city.totals.df$intervention)
-city.totals.df$lower = as.numeric(apply(city.total.incidence,c('year','intervention'), quantile, probs=.025, na.rm=T))
-city.totals.df$upper = as.numeric(apply(city.total.incidence,c('year','intervention'), quantile, probs=.975, na.rm=T))
-
-replace.into.mask = city.totals.df$intervention=='simset.end.cons' & city.totals.df$year=='2024'
-replace.from.mask = city.totals.df$intervention=='simset.end' & city.totals.df$year=='2024'
-city.totals.df$value[replace.into.mask] = city.totals.df$value[replace.from.mask]
-city.totals.df$lower[replace.into.mask] = city.totals.df$lower[replace.from.mask]
-city.totals.df$upper[replace.into.mask] = city.totals.df$upper[replace.from.mask]
-
-plot = ggplot(city.totals.df[city.totals.df$intervention=='simset.noint' | city.totals.df$intervention=='simset.end',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("Cessation"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'aggregated_rw_city_total_inc_vs_end.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-plot = ggplot(city.totals.df[city.totals.df$intervention=='simset.noint' | city.totals.df$intervention=='simset.bintr',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("18-Month Interruption"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'aggregated_rw_city_total_inc_vs_bintr.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-plot = ggplot(city.totals.df[city.totals.df$intervention=='simset.noint' | city.totals.df$intervention=='simset.pintr',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("42-Month Interruption"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'aggregated_rw_city_total_inc_vs_pintr.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-#-- For comparisons to conservative analysis --#
-
-
-plot = ggplot(city.totals.df[city.totals.df$intervention=='simset.noint' | city.totals.df$intervention=='simset.end',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("31 Cities - Survey-Based"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'orig_aggregated_rw_city_total_inc_vs_end.png'),
-       height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-
-plot = ggplot(city.totals.df[city.totals.df$intervention=='simset.noint' | city.totals.df$intervention=='simset.end.cons',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("31 Cities - Conservative"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'cons_aggregated_rw_city_total_inc_vs_end.png'),
-       height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-
-state.total.incidence = apply(state.totals[as.character(RW.YEARS),,'incidence',RW.11.STATES,],
+state.total.incidence = apply(state.totals[as.character(RW.YEARS),,'incidence',,],
                              c('year','sim','intervention'), sum)
 
 state.totals.df = reshape2::melt(apply(state.total.incidence, c('year','intervention'), mean))
 state.totals.df$intervention = as.character(state.totals.df$intervention)
 state.totals.df$intervention = paste0("simset.",state.totals.df$intervention)
 state.totals.df$intervention = gsub("(rw.)","",state.totals.df$intervention)
+state.totals.df$intervention = gsub("\\.26$","",state.totals.df$intervention) # MS added this to fix colors below 
 state.totals.df$intervention = gsub("b\\.intr","bintr",state.totals.df$intervention)
 state.totals.df$intervention = gsub("p\\.intr","pintr",state.totals.df$intervention)
-state.totals.df$intervention = gsub("\\.26$","",state.totals.df$intervention)
 state.totals.df$lower = as.numeric(apply(state.total.incidence,c('year','intervention'), quantile, probs=.025, na.rm=T))
 state.totals.df$upper = as.numeric(apply(state.total.incidence,c('year','intervention'), quantile, probs=.975, na.rm=T))
 
-
-PROJ.YUPPER = 45000
-
-# For stand-alone
-
+# not sure what this is doing
+replace.into.mask = state.totals.df$intervention=='simset.end.cons' & state.totals.df$year=='2024'
+replace.from.mask = state.totals.df$intervention=='simset.end' & state.totals.df$year=='2024'
+state.totals.df$value[replace.into.mask] = state.totals.df$value[replace.from.mask]
+state.totals.df$lower[replace.into.mask] = state.totals.df$lower[replace.from.mask]
+state.totals.df$upper[replace.into.mask] = state.totals.df$upper[replace.from.mask]
 
 plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.end',],
               aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
@@ -588,24 +450,7 @@ plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | sta
 
 ggsave(plot = plot, 
        filename = file.path(RW.PLOT.DIR, 'aggregated_rw_state_total_inc_vs_end.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.bintr',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("18-Month Interruption"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'aggregated_rw_state_total_inc_vs_bintr.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+       height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH, 
        dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
@@ -618,131 +463,251 @@ plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | sta
     scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
     guides(linetype='none') +
     scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("42-Month Interruption"); plot
+    ylab("Infections (n)") + ggtitle("2.5-year Interruption"); plot
 
 ggsave(plot = plot, 
        filename = file.path(RW.PLOT.DIR, 'aggregated_rw_state_total_inc_vs_pintr.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-# For comparison to conservative
-
-plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.end',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("11 States - Survey-Based"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'orig_aggregated_rw_state_total_inc_vs_end.png'),
-       height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
+       height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH, 
        dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
-
-plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.end.cons',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("11 States - Conservative"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'cons_aggregated_rw_state_total_inc_vs_end.png'),
-       height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-#-- State Fraction of Costs --#
-
-cost.locations = RW.STATES
-rw.total.budget = state.rw.costs[,'total']
-names(rw.total.buget) = rowNames(state.rw.costs)
-RW.COSTS.DF = data.frame(
-    state = get.location.name(cost.locations),
-    budget = rw.total.budget[cost.locations],
-    fraction.nanb = state.rw.fraction.c.d.ehe.minority.of.non.adap[cost.locations]
-)
-RW.COSTS.DF$ehe = "nonehe"
-RW.COSTS.DF$ehe[sapply(cost.locations, function(loc){any(loc==c('AL','SC','KY','MO','AR','OK','MS'))})] = "ehe"
-RW.COSTS.DF$state = factor(RW.COSTS.DF$state, levels = RW.COSTS.DF$state[order(RW.COSTS.DF$fraction.nanb)])
-
-#ggplot(RW.COSTS.DF, aes(x=budget, y=fraction.nanb)) + geom_point()
+## Boxplot ##
 
 
-plot = ggplot(RW.COSTS.DF, aes(fraction.nanb, state, size=budget, fill=ehe)) + geom_point(shape=22) + 
-    scale_x_continuous("Fraction of Non-ADAP Budget\nfrom Parts C/D, EHE, MAI", labels = scales::percent, limits=c(0,.6)) +
-    scale_size_continuous(labels = function(x){paste0("$", round(x/1000000), "M")}) +
-    scale_fill_manual(
-        values = c(ehe=RW.NONEXP.COLOR, nonehe=RW.EXP.COLOR),
-        labels = c(ehe='EHE Priority State', nonehe = 'Non-Priority State')
-    ) +
-    ylab(NULL) + 
-    theme_bw() + THEME.4; plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'rw_costs.png'),
-       height = SINGLE.PANEL.HEIGHT, width = SINGLE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
-#-- NANB --#
-nanb.total.incidence = apply(nanb.totals[as.character(RW.YEARS),,'incidence',,],
-                              c('year','sim','intervention'), sum)
 
-nanb.totals.df = reshape2::melt(apply(nanb.total.incidence, c('year','intervention'), mean))
-nanb.totals.df$intervention = as.character(nanb.totals.df$intervention)
-nanb.totals.df$intervention = paste0("simset.",nanb.totals.df$intervention)
-nanb.totals.df$intervention = gsub("(rw.)","",nanb.totals.df$intervention)
-nanb.totals.df$intervention = gsub("b\\.intr","bintr",nanb.totals.df$intervention)
-nanb.totals.df$intervention = gsub("p\\.intr","pintr",nanb.totals.df$intervention)
-nanb.totals.df$intervention = gsub("\\.26$","",nanb.totals.df$intervention)
-nanb.totals.df$lower = as.numeric(apply(nanb.total.incidence,c('year','intervention'), quantile, probs=.025, na.rm=T))
-nanb.totals.df$upper = as.numeric(apply(nanb.total.incidence,c('year','intervention'), quantile, probs=.975, na.rm=T))
-
-
-PROJ.YUPPER = 45000
-
-# For stand-alone
-
-
-plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.totals.df$intervention=='simset.end',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("Cessation"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'aggregated_rw_nanb_total_inc_vs_end.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
-
-
-plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.totals.df$intervention=='simset.bintr',],
-              aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
-    geom_ribbon(alpha=0.2, size=.2) +
-    geom_line(aes(color=intervention), size=1) +
-    theme_bw() + THEME.4 +
-    scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
-    guides(linetype='none') +
-    scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("18-Month Interruption"); plot
-
-ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'aggregated_rw_nanb_total_inc_vs_bintr.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
-       dpi = PLOT.DPI, device = PLOT.DEVICE)
+##### From below is Todd's old code - haven't reviewed and don't think I need #####
+if(1==2){
+    
+    #-- For comparisons to conservative analysis --#
+    
+    
+    plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.end',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("31 Cities - Survey-Based"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'orig_aggregated_rw_state_total_inc_vs_end.png'),
+           height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+    
+    plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.end.cons',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("31 Cities - Conservative"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'cons_aggregated_rw_state_total_inc_vs_end.png'),
+           height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+    
+    state.total.incidence = apply(state.totals[as.character(RW.YEARS),,'incidence',RW.11.STATES,],
+                                  c('year','sim','intervention'), sum)
+    
+    state.totals.df = reshape2::melt(apply(state.total.incidence, c('year','intervention'), mean))
+    state.totals.df$intervention = as.character(state.totals.df$intervention)
+    state.totals.df$intervention = paste0("simset.",state.totals.df$intervention)
+    state.totals.df$intervention = gsub("(rw.)","",state.totals.df$intervention)
+    state.totals.df$intervention = gsub("b\\.intr","bintr",state.totals.df$intervention)
+    state.totals.df$intervention = gsub("p\\.intr","pintr",state.totals.df$intervention)
+    state.totals.df$intervention = gsub("\\.26$","",state.totals.df$intervention)
+    state.totals.df$lower = as.numeric(apply(state.total.incidence,c('year','intervention'), quantile, probs=.025, na.rm=T))
+    state.totals.df$upper = as.numeric(apply(state.total.incidence,c('year','intervention'), quantile, probs=.975, na.rm=T))
+    
+    
+    PROJ.YUPPER = 45000
+    
+    # For stand-alone
+    
+    
+    plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.end',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("Cessation"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'aggregated_rw_state_total_inc_vs_end.png'),
+           height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+    plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.bintr',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("18-Month Interruption"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'aggregated_rw_state_total_inc_vs_bintr.png'),
+           height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+    plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.pintr',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("42-Month Interruption"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'aggregated_rw_state_total_inc_vs_pintr.png'),
+           height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    # For comparison to conservative
+    
+    plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.end',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("11 States - Survey-Based"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'orig_aggregated_rw_state_total_inc_vs_end.png'),
+           height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+    
+    plot = ggplot(state.totals.df[state.totals.df$intervention=='simset.noint' | state.totals.df$intervention=='simset.end.cons',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("11 States - Conservative"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'cons_aggregated_rw_state_total_inc_vs_end.png'),
+           height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    #-- State Fraction of Costs --#
+    
+    cost.locations = RW.STATES
+    rw.total.budget = state.rw.costs[,'total']
+    names(rw.total.buget) = rowNames(state.rw.costs)
+    RW.COSTS.DF = data.frame(
+        state = get.location.name(cost.locations),
+        budget = rw.total.budget[cost.locations],
+        fraction.nanb = state.rw.fraction.c.d.ehe.minority.of.non.adap[cost.locations]
+    )
+    RW.COSTS.DF$ehe = "nonehe"
+    RW.COSTS.DF$ehe[sapply(cost.locations, function(loc){any(loc==c('AL','SC','KY','MO','AR','OK','MS'))})] = "ehe"
+    RW.COSTS.DF$state = factor(RW.COSTS.DF$state, levels = RW.COSTS.DF$state[order(RW.COSTS.DF$fraction.nanb)])
+    
+    #ggplot(RW.COSTS.DF, aes(x=budget, y=fraction.nanb)) + geom_point()
+    
+    
+    plot = ggplot(RW.COSTS.DF, aes(fraction.nanb, state, size=budget, fill=ehe)) + geom_point(shape=22) + 
+        scale_x_continuous("Fraction of Non-ADAP Budget\nfrom Parts C/D, EHE, MAI", labels = scales::percent, limits=c(0,.6)) +
+        scale_size_continuous(labels = function(x){paste0("$", round(x/1000000), "M")}) +
+        scale_fill_manual(
+            values = c(ehe=RW.NONEXP.COLOR, nonehe=RW.EXP.COLOR),
+            labels = c(ehe='EHE Priority State', nonehe = 'Non-Priority State')
+        ) +
+        ylab(NULL) + 
+        theme_bw() + THEME.4; plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'rw_costs.png'),
+           height = SINGLE.PANEL.HEIGHT, width = SINGLE.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+    #-- NANB --#
+    nanb.total.incidence = apply(nanb.totals[as.character(RW.YEARS),,'incidence',,],
+                                 c('year','sim','intervention'), sum)
+    
+    nanb.totals.df = reshape2::melt(apply(nanb.total.incidence, c('year','intervention'), mean))
+    nanb.totals.df$intervention = as.character(nanb.totals.df$intervention)
+    nanb.totals.df$intervention = paste0("simset.",nanb.totals.df$intervention)
+    nanb.totals.df$intervention = gsub("(rw.)","",nanb.totals.df$intervention)
+    nanb.totals.df$intervention = gsub("b\\.intr","bintr",nanb.totals.df$intervention)
+    nanb.totals.df$intervention = gsub("p\\.intr","pintr",nanb.totals.df$intervention)
+    nanb.totals.df$intervention = gsub("\\.26$","",nanb.totals.df$intervention)
+    nanb.totals.df$lower = as.numeric(apply(nanb.total.incidence,c('year','intervention'), quantile, probs=.025, na.rm=T))
+    nanb.totals.df$upper = as.numeric(apply(nanb.total.incidence,c('year','intervention'), quantile, probs=.975, na.rm=T))
+    
+    
+    PROJ.YUPPER = 45000
+    
+    # For stand-alone
+    
+    
+    plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.totals.df$intervention=='simset.end',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("Cessation"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'aggregated_rw_nanb_total_inc_vs_end.png'),
+           height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+    plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.totals.df$intervention=='simset.bintr',],
+                  aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
+        geom_ribbon(alpha=0.2, size=.2) +
+        geom_line(aes(color=intervention), size=1) +
+        theme_bw() + THEME.4 +
+        scale_color_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
+        guides(linetype='none') +
+        scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
+        ylab("Infections (n)") + ggtitle("18-Month Interruption"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(RW.PLOT.DIR, 'aggregated_rw_nanb_total_inc_vs_bintr.png'),
+           height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+}
