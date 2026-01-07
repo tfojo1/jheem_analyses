@@ -8,6 +8,7 @@ source("applications/SHIELD/inputs/input_historical_likelihood_penalty_helper.R"
 
 #estiamting cv for ps diagnosis from 2 available sources:
 source("applications/SHIELD/inputs/input_estimate_error_variances.R") #calculates PS_CV
+
 diag_cv=PS_CV #we will use this error variance for all diagnosis categories
 
 # STAGE.0: Demographic calibration + total SD
@@ -269,20 +270,20 @@ total.diagnosis.likelihood.instructions =
 ##---- Strata Stage1 2019-2022----
 total.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.total",
-                                         outcome.for.data = "total.syphilis.diagnoses",  
+                                         outcome.for.data = "total.syphilis.diagnoses",
                                          levels.of.stratification = c(0,1,2),
                                          dimensions = c("sex","race"),
                                          from.year = 2019,
                                          to.year = 2022,
                                          #
                                          error.variance.type = 'cv',
-                                         error.variance.term = diag_cv,  
+                                         error.variance.term = diag_cv,
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short time frame
                                          #
                                          weights = STAGE.1.WEIGHT ,
                                          equalize.weight.by.year = T,
-                                         minimum.error.sd = 1 
+                                         minimum.error.sd = 1
     )
 ##---- Strata Stage2 2019-2022 ----
 total.diagnosis.by.strata.stage2.likelihood.instructions =

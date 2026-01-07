@@ -747,22 +747,26 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = 1
 )
 
-
-
-register.model.element(
-    SHIELD.SPECIFICATION,
-    name = 'doxy.coverage',
-    scale = 'proportion',
-    functional.form = create.logistic.linear.functional.form(
-                                                    intercept = 0, # fixed logit-scale intercept
-                                                    slope = 0,
-                                                    anchor.year = 2021, # logistic curve “starts” here
-                                                    #max = ... ,
-                                                    parameters.are.on.logit.scale = TRUE
-    ),
-    functional.form.from.time = 2021,  
-    functional.form.to.time   = 2025
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'doxy.coverage',
+                       scale = 'ratio',
+                       value = 1
 )
+
+# register.model.element(
+#     SHIELD.SPECIFICATION,
+#     name = 'doxy.coverage',
+#     scale = 'proportion',
+#     functional.form = create.logistic.linear.functional.form(
+#                                                     intercept = 0, # fixed logit-scale intercept
+#                                                     slope = 0,
+#                                                     anchor.year = 2021, # logistic curve “starts” here
+#                                                     #max = ... ,
+#                                                     parameters.are.on.logit.scale = TRUE
+#     ),
+#     functional.form.from.time = 2021,  
+#     functional.form.to.time   = 2025
+# )
 
 register.model.quantity(SHIELD.SPECIFICATION,
                                name = 'sexual.susceptibility',
