@@ -1,8 +1,6 @@
 
 source("../jheem_analyses/applications/SHIELD/inputs/input_congenital_relative_risks.R")
 
-# made from SHIELD_BASE_PARAMETERS.R
-
 # what are the citation numbers?
 add.parameter <- function(params, param.name,
                           value,
@@ -28,42 +26,40 @@ SHIELD_BASE_PARAMETER = list(values=numeric(),
 # citation numbers are pubmed ID, they're for our own records'
 
 # *** INITIAL POPULATION INFECTED in 1970 ---- ## ----
-# Due to unavailability of data, we estimate this based on rate of syphilis diagnosis in that year <input_syphilis_prev_1970.R>
-# (we further add two calibration parameters to tune the number pf people with early stage and late stage syphilis in 1970) 
+# Because the true size of infected compartments are unknown, we approximate them based on number of new diagnosis (and will add multipliers to tune the true compartment sizes in the model). 
+# First, we need to estimate the POPULATION PROPORTION (RATE) of diagnosis in year 1970 as = "n diag/population size" 
+# Since diagnoses data is unavailable in 1970, we need to use another (later year) to approximate 1970
+# We will use the first year that data is reported in each city 
+# Population Proportion (Rate)= #diagnosesin stage X / population size 
 
+# Finding the first year of reporting:
+#'@Andrew: this is based on C.12580 now. How can we generalize to other locations?
+x=SURVEILLANCE.MANAGER$data$total.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[,'C.12580']
+y0=names(x)[!is.na(x)][1] #1993 in baltimore
 
+# Estimating the population proportion of diagnoses in each stage in the max year (num: # of diag / denom: population)
+popProp.ps.diag.1970= SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
+popProp.el.diag.1970= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
+popProp.lu.diag.1970= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[y0,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[y0,'C.12580']
 
-#proportion of population diagnosed with syphilis (denom: total population) in 1997 - peak year
-max.ps.year="1997"
-prp.ps.diag.1997= SURVEILLANCE.MANAGER$data$ps.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[max.ps.year,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[max.ps.year,'C.12580']
-prp.el.diag.1997= SURVEILLANCE.MANAGER$data$early.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[max.ps.year,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[max.ps.year,'C.12580']
-prp.lu.diag.1997= SURVEILLANCE.MANAGER$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.sti.surveillance.reports$cdc.pdf.report$year__location[max.ps.year,'C.12580']/SURVEILLANCE.MANAGER$data$population$estimate$census.aggregated.population$census$year__location[max.ps.year,'C.12580']
+# save these to use in the model (populationProportion of diagnosis in each stage in 1970)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.ps.diag.1970',
+                                      popProp.ps.diag.1970,0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.el.diag.1970',
+                                      popProp.el.diag.1970,0,0)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'popProp.lu.diag.1970',
+                                      popProp.lu.diag.1970,0,0)
 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.ps.diag.1997',
-                                      prp.ps.diag.1997,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.el.diag.1997',
-                                      prp.el.diag.1997,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.lu.diag.1997',
-                                      prp.lu.diag.1997,0,0)
-
-
-# ratio of syphilis diagnoses rate in 1970 to diagnosis rate in 1990 (peak of national data)
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'ps.diagnoses.multiplier.1970',
-                                      0.5,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'el.diagnoses.multiplier.1970',
-                                      0.4,0,0)
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'lu.diagnoses.multiplier.1970',
-                                      2.2,0,0)
+# proportion of PS diagnoses that are in the primary stage in 1970
+# we estimate this as 25% based on duration of primary (4 weeks relative to PS duration of 12 months)
+SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.ps.in.primary.stage.1970',
+                                      0.25,0,0)
 
 # *** INFECTIOUSNESS ---- ## ----
-
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'secondary.transmissibility',  
-                                      1,1,1)  # Max value
+                                      1,0,0)  # Max value
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'primary.rel.secondary.transmissibility',  
-                                      1,1,1) 
-
-
+                                      1,0,0) 
 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER,'el.rel.secondary.transmissibility',  
                                       .25,0,0)
@@ -107,7 +103,7 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.msm.sex.with.f
 # *** CONGENITAL SYPHILIS ---- ##----
 # Boolean variable to control prenatal care as a switch
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'b.model.prenatal.care',
-                                      1,1,1)
+                                      1,0,0)
 
 
 ## ---- Prob of Vertical Transmission Based on Disease Stage -----
