@@ -1,5 +1,8 @@
+# https://www.cdc.gov/sti-statistics/media/pdfs/2025/09/2023_STI_Surveillance_Report_FINAL_508.pdf		
+# DATA TABLES FROM STI SURVEILLANCE, 2023 | PAGE 1 OF 37 | ALL PAGES 				
+# Table 1. Sexually Transmitted Infections — Reported Cases and Rates of Reported Cases*, United States				
 
-# reported syphilis diagnoses in 1970
+# reported syphilis diagnoses in 1970 (from the report)
 n.diag= c(
     total=91382 ,
     ps=21981,
@@ -10,7 +13,7 @@ n.diag= c(
 known.stages=sum(n.diag[c("ps","el","ll","congenital")])
 known.stages #this is short of the total diagnoses 91,382
 
-#rates per 100,000
+#rates per 100,000 (from the report)
 r.diag=c(
     total=44.8 ,
     ps=10.8,
