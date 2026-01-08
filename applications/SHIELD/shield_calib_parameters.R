@@ -181,14 +181,14 @@ AGING.PARAMETERS.PRIOR=join.distributions(
 TRANSMISSION.PARAMETERS.PRIOR=join.distributions( 
   ## Initial diagnosis 1970 by sex/risk group ----
   ps.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu?
-  ps.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
+  ps.diagnoses.heterosexual.multiplier.1970 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)),
   
   el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
-  el.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
+  el.diagnoses.heterosexual.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
   
 #'@PKASAIE
   lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
-  lu.diagnoses.heterosexual_male.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
+  lu.diagnoses.heterosexual.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
 
 
     ## Global transmission ----
@@ -1047,9 +1047,9 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     'lu.diagnoses.msm.multiplier.1970'
   ),
   initial.infections.Heterosexual=c(
-    'ps.diagnoses.heterosexual_male.multiplier.1970',
-    'el.diagnoses.heterosexual_male.multiplier.1970',
-    'lu.diagnoses.heterosexual_male.multiplier.1970'
+    'ps.diagnoses.heterosexual.multiplier.1970',
+    'el.diagnoses.heterosexual.multiplier.1970',
+    'lu.diagnoses.heterosexual.multiplier.1970'
   ),
   #
   msm.transmission.block1 = c(
