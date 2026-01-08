@@ -1,4 +1,8 @@
-    library(ggplot2)
+### Estimating XXX
+### Data XXX
+### Returning XXX
+
+library(ggplot2)
     
     # From
     # https://www.sciencedirect.com/science/article/pii/0021968155901399

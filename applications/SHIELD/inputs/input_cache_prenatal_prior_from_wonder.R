@@ -1,6 +1,6 @@
 ### Estimating the proportion of women initiating prenatal care in each trimester
 ### Data: CDC Wonder
-### Returing the final functions informing the 
+### Returning the final functions informing the 
 # prenatal.care.initiation.first.trimester.prior
 # prenatal.care.initiation.second.trimester.prior
 # prenatal.care.initiation.third.trimester.prior in the model ###

@@ -1,6 +1,6 @@
 ### Estimating the proportion of population who report receiving HIV testing in the past year 
 ### Data: BRFSS
-### Returing the final function informing the hiv.testing.prior in the model 
+### Returning the final function informing the hiv.testing.prior in the model 
 
 library(dplyr) 
 library(reshape2)

@@ -1,3 +1,6 @@
+### Estiamting xxx
+### Data: xxx
+ 
 source("/applications/SHIELD/R/shield_calculating_error_terms_for_likelihoods.R")
 cv_PS_1 <- calculate.error.terms(
     data.type    = "ps.syphilis.diagnoses",

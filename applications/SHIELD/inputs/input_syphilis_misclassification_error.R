@@ -1,8 +1,10 @@
+### Estimating the % of EL cases that are misclassified as LL/Unknown and LL/U cases misclassified as EL
+### Data from a manuscript (see below)
+
 # Misclassification of the Stages of Syphilis: Implications for Surveillance
 # https://journals.lww.com/stdjournal/fulltext/2005/03000/A_Randomized,_Comparative_Pilot_Study_of.2.aspx?casa_token=bsLapfDIFtsAAAAA:fqDn-YMkzY9qasYsfSke0N8QCVQlon6msOKbyv5N0-nbSQSJDVjXe4CjHUUDrjiTnHt9KVm6QiclzHarN0Dk2qI
 
 # TABLE 1: Stage of Syphilis as Classified by the Sites and Reclassified by the Authors Using the CDC Case Definition
-
 df<-as.data.frame(rbind(
   c(150, 94, 0, 3.3, 0, 0, 2.7),
   c(218, 0, 95.4, 2.8, 0.5, 0.5, 0.5),
@@ -47,3 +49,6 @@ percent.misclassified.llu.as.el<-misclassified.llu.as.el/true.llu*100;percent.mi
 
 print(paste("percent.misclassified.el.as.llu = ",percent.misclassified.el.as.llu))
 print(paste("percent.misclassified.llu.as.el = ", percent.misclassified.llu.as.el))
+
+# return(list("percent.misclassified.el.as.llu"=percent.misclassified.el.as.llu/100,
+# "percent.misclassified.llu.as.el"= percent.misclassified.llu.as.el/100))

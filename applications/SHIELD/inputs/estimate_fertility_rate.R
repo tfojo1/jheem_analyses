@@ -1,3 +1,7 @@
+### Estimating XXX
+### Data XXX
+### Returning XXX
+
 # MAPPING FERTILITY RATE DATA AS A FUNCTION OF TIME AND OTHER COVARIATES 
 library(reshape2)
 library(ggplot2)

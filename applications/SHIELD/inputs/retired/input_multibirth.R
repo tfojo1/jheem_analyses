@@ -1,3 +1,6 @@
+#
+library(ggplot2)
+# Data on Rate for multiple births in the United States from 1980 to 2023*
 # https://www.statista.com/statistics/276022/us-multiple-birth-rate/
   df <- as.data.frame(matrix(c(1980, 19.3,
                              1990, 23,
@@ -11,6 +14,7 @@ df$Period <- cut(df$Year,
                  breaks = c(1980, 1990, 2000, 2010, 2020, 2022),
                  labels = c("pre-1990", "1990-2000", "2000-2010", "2010-2020", "post-2020"),
                  include.lowest = TRUE, right = FALSE)
+df
 fit <- lm(Value ~ Year + Period, data = df)
 summary(fit)
 

@@ -1,3 +1,7 @@
+### Estimating XXX
+### Data XXX
+### Returning XXX
+
 library(locations)
 source("commoncode/locations_of_interest.R")
 len=MSAS.OF.INTEREST;print(len)
