@@ -703,17 +703,16 @@ nanb.totals.df = reshape2::melt(apply(nanb.total.incidence, c('year','interventi
 nanb.totals.df$intervention = as.character(nanb.totals.df$intervention)
 nanb.totals.df$intervention = paste0("simset.",nanb.totals.df$intervention)
 nanb.totals.df$intervention = gsub("(rw.)","",nanb.totals.df$intervention)
-nanb.totals.df$intervention = gsub("b\\.intr","bintr",nanb.totals.df$intervention)
-nanb.totals.df$intervention = gsub("p\\.intr","pintr",nanb.totals.df$intervention)
+nanb.totals.df$intervention = gsub("(nanb.)","",nanb.totals.df$intervention)
+nanb.totals.df$intervention = gsub("b\\.intr","intr",nanb.totals.df$intervention)
 nanb.totals.df$intervention = gsub("\\.26$","",nanb.totals.df$intervention)
 nanb.totals.df$lower = as.numeric(apply(nanb.total.incidence,c('year','intervention'), quantile, probs=.025, na.rm=T))
 nanb.totals.df$upper = as.numeric(apply(nanb.total.incidence,c('year','intervention'), quantile, probs=.975, na.rm=T))
 
+omit.mask = nanb.totals.df$intervention != 'simset.noint' & nanb.totals.df$year==2024
+nanb.totals.df$value[omit.mask] = nanb.totals.df$lower[omit.mask] = nanb.totals.df$upper[omit.mask] = NA
 
-PROJ.YUPPER = 45000
-
-# For stand-alone
-
+PROJ.YUPPER = 40000
 
 plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.totals.df$intervention=='simset.end',],
               aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
@@ -728,11 +727,11 @@ plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.
 
 ggsave(plot = plot, 
        filename = file.path(RW.PLOT.DIR, 'aggregated_rw_nanb_total_inc_vs_end.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+       height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH, 
        dpi = PLOT.DPI, device = PLOT.DEVICE)
 
 
-plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.totals.df$intervention=='simset.bintr',],
+plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.totals.df$intervention=='simset.intr',],
               aes(x=year, y=value, ymin=lower, ymax=upper, fill=intervention)) +
     geom_ribbon(alpha=0.2, size=.2) +
     geom_line(aes(color=intervention), size=1) +
@@ -741,9 +740,9 @@ plot = ggplot(nanb.totals.df[nanb.totals.df$intervention=='simset.noint' | nanb.
     scale_fill_manual(values = SIMSET.COLORS, labels=SIMSET.NAMES) + 
     guides(linetype='none') +
     scale_y_continuous(labels = function(y){format(y, big.mark=',')}, limits = c(0,PROJ.YUPPER)) +
-    ylab("Infections (n)") + ggtitle("18-Month Interruption"); plot
+    ylab("Infections (n)") + ggtitle("3-Year Interruption"); plot
 
 ggsave(plot = plot, 
-       filename = file.path(RW.PLOT.DIR, 'aggregated_rw_nanb_total_inc_vs_bintr.png'),
-       height = THREE.PANEL.HEIGHT, width = THREE.PANEL.WIDTH, 
+       filename = file.path(RW.PLOT.DIR, 'aggregated_rw_nanb_total_inc_vs_intr.png'),
+       height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH, 
        dpi = PLOT.DPI, device = PLOT.DEVICE)

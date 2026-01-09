@@ -56,8 +56,7 @@ cdc.testing.cessation.effect.25 = create.intervention.effect(quantity.name = "cd
 
 cdc.testing.cessation.25 = create.intervention(WHOLE.POPULATION,
                                             cdc.testing.cessation.effect.25,
-                                            #                                         proportion.tested.regardless.effect,
-                                            code = paste0("cdct.end", CDC.TESTING.INTERVENTION.SUFFIX),
+                                            code = paste0("cdct.end.25", CDC.TESTING.INTERVENTION.SUFFIX),
                                             parameters = proportion.tested.regardless.values)
 
 
@@ -72,10 +71,9 @@ cdc.testing.cessation.effect.5 = create.intervention.effect(quantity.name = "cdc
                                                              allow.values.less.than.otherwise = T,
                                                              allow.values.greater.than.otherwise = F)
 
-cdc.testing.cessation.5 = create.intervention(WHOLE.POPULATION,
+cdc.testing.cessation.50 = create.intervention(WHOLE.POPULATION,
                                                cdc.testing.cessation.effect.5,
-                                               #                                         proportion.tested.regardless.effect,
-                                               code = paste0("cdct.end", CDC.TESTING.INTERVENTION.SUFFIX),
+                                               code = paste0("cdct.end.50", CDC.TESTING.INTERVENTION.SUFFIX),
                                                parameters = proportion.tested.regardless.values)
 
 #Testing effect reduced to 75%
@@ -91,8 +89,7 @@ cdc.testing.cessation.effect.75 = create.intervention.effect(quantity.name = "cd
 
 cdc.testing.cessation.75 = create.intervention(WHOLE.POPULATION,
                                               cdc.testing.cessation.effect.75,
-                                              #                                         proportion.tested.regardless.effect,
-                                              code = paste0("cdct.end", CDC.TESTING.INTERVENTION.SUFFIX),
+                                              code = paste0("cdct.end.75", CDC.TESTING.INTERVENTION.SUFFIX),
                                               parameters = proportion.tested.regardless.values)
 
 

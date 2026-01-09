@@ -103,9 +103,6 @@ register.model.element(MEDICAID.SPECIFICATION,
                        scale = 'proportion',
                        value = 0.25) # @Melissa - need to set a functional form
 
-
-
-
 #-- Testing --#
 
 # Medicaid and uninured testing rates will be a multiplier of the previously calibrated overall testing rate
@@ -865,6 +862,178 @@ track.integrated.outcome(MEDICAID.SPECIFICATION,
                          multiply.by = 'p.uninsured.of.uninfected',
                          keep.dimensions = c('location','age','race','sex','risk'),
                          corresponding.data.outcome = 'n.uninsured')
+
+##-------------------------##
+##-- RYAN WHITE OUTCOMES --##
+##-------------------------##
+
+# We will need:
+# 1) Number of non-ADAP clients
+# 2) Number of ADAP clients
+# 3) Suppression among OAHS clients (we will treat this as the same as suppression among non-ADAP clients, which is an assumption)
+# 4) Suppression among ADAP clients
+# 5) Proportion of non-ADAP clients who are on Medicaid
+# 6) Proportion of ADAP clients who are on Medicaid
+# And while we don't strictly need these for calibration, we'll keep them for interest
+# 7) Number of non-ADAP clients with Medicaid
+# 8) Number of ADAP clients with Medicaid
+
+
+track.point.outcome(MEDICAID.SPECIFICATION,
+                    name = 'diagnosed.pwh.with.medicaid',
+                    outcome.metadata = NULL,
+                    value = expression(infected * p.diagnosed.pwh.on.medicaid),
+                    keep.dimensions = c('location','age','race','sex','risk'),
+                    subset.dimension.values = list(continuum='diagnosed.states'),
+                    scale = 'non.negative.number',
+                    save = F)
+
+track.point.outcome(MEDICAID.SPECIFICATION,
+                    name = 'diagnosed.pwh.without.medicaid',
+                    outcome.metadata = NULL,
+                    value = expression(infected * (1-p.diagnosed.pwh.on.medicaid)),
+                    keep.dimensions = c('location','age','race','sex','risk'),
+                    subset.dimension.values = list(continuum='diagnosed.states'),
+                    scale = 'non.negative.number',
+                    save = F)
+
+track.integrated.outcome(MEDICAID.SPECIFICATION,
+                         name = 'n.adap.with.medicaid',
+                         outcome.metadata = create.outcome.metadata(display.name = 'ADAP/Medicaid Clients',
+                                                                    description = "Number of Individuals Receiving AIDS Drug Assistance Program through Ryan White AND Medicaid",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value.to.integrate = 'diagnosed.pwh.with.medicaid',
+                         multiply.by = 'p.adap.of.pwh.with.medicaid',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = T)
+
+track.integrated.outcome(MEDICAID.SPECIFICATION,
+                         name = 'n.adap.without.medicaid',
+                         outcome.metadata = NULL,
+                         value.to.integrate = 'diagnosed.pwh.without.medicaid',
+                         multiply.by = 'p.adap.of.pwh.without.medicaid',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         scale = 'non.negative.number',
+                         save = F)
+
+register.model.quantity(MEDICAID.SPECIFICATION,
+                        name = 'p.adap.and.non.adap.of.pwh.with.medicaid',
+                        value = expression(p.adap.of.pwh.with.medicaid * p.non.adap.of.adap.with.medicaid))
+
+track.integrated.outcome(MEDICAID.SPECIFICATION,
+                         name = 'n.adap.and.non.adap.with.medicaid',
+                         outcome.metadata = NULL,
+                         value.to.integrate = 'diagnosed.pwh.with.medicaid',
+                         multiply.by = 'p.adap.and.non.adap.of.pwh.with.medicaid',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         scale = 'non.negative.number',
+                         save = F)
+
+register.model.quantity(MEDICAID.SPECIFICATION,
+                        name = 'p.adap.and.non.adap.of.pwh.without.medicaid',
+                        value = expression(p.adap.of.pwh.without.medicaid * p.non.adap.of.adap.without.medicaid))
+
+track.integrated.outcome(MEDICAID.SPECIFICATION,
+                         name = 'n.adap.and.non.adap.without.medicaid',
+                         outcome.metadata = NULL,
+                         value.to.integrate = 'diagnosed.pwh.without.medicaid',
+                         multiply.by = 'p.adap.and.non.adap.of.pwh.without.medicaid',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         scale = 'non.negative.number',
+                         save = F)
+
+
+track.integrated.outcome(MEDICAID.SPECIFICATION,
+                         name = 'n.non.adap.without.adap.with.medicaid',
+                         outcome.metadata = NULL,
+                         value.to.integrate = 'diagnosed.pwh.with.medicaid',
+                         multiply.by = 'p.rw.without.adap.of.pwh.with.medicaid',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         scale = 'non.negative.number',
+                         save = F)
+
+track.integrated.outcome(MEDICAID.SPECIFICATION,
+                         name = 'n.non.adap.without.adap.without.medicaid',
+                         outcome.metadata = NULL,
+                         value.to.integrate = 'diagnosed.pwh.without.medicaid',
+                         multiply.by = 'p.rw.without.adap.of.pwh.without.medicaid',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         scale = 'non.negative.number',
+                         save = F)
+
+track.cumulative.outcome(MEDICAID.SPECIFICATION,
+                         name = 'n.non.adap.with.medicaid',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Non-ADAP/Medicaid Clients',
+                                                                    description = "Number of Individuals Receiving Non-ADAP Services through Ryan White AND Medicaid",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value = expression(n.non.adap.without.adap.with.medicaid + n.adap.and.non.adap.with.medicaid),
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         save = T)
+
+
+track.cumulative.outcome(MEDICAID.SPECIFICATION,
+                         name = 'adap.clients',
+                         outcome.metadata = create.outcome.metadata(display.name = 'ADAP Clients',
+                                                                    description = "Number of Individuals Receiving AIDS Drug Assistance Program through Ryan White",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value = expression(n.adap.with.medicaid + n.adap.without.medicaid),
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'adap.clients',
+                         save = T)
+
+track.cumulative.outcome(MEDICAID.SPECIFICATION,
+                         name = 'non.adap.clients',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Non-ADAP Clients',
+                                                                    description = "Number of Individuals Receiving any non-ADAP Ryan White Services",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value = expression(n.non.adap.without.adap.with.medicaid + n.adap.and.non.adap.with.medicaid + n.non.adap.without.adap.without.medicaid + n.adap.and.non.adap.without.medicaid),
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'non.adap.clients',
+                         save = T)
+
+track.cumulative.outcome(MEDICAID.SPECIFICATION,
+                         name = 'p.adap.clients.with.medicaid',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion ADAP Clients with Medicaid',
+                                                                    description = "Proportion of Individuals Receiving AIDS Drug Assistance Program through Ryan White who also Receive Medicaid",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value = 'n.adap.with.medicaid',
+                         value.is.numerator = T,
+                         denominator.outcome = 'adap.clients',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'p.adap.clients.with.medicaid',
+                         save = T)
+
+
+
+track.cumulative.outcome(MEDICAID.SPECIFICATION,
+                         name = 'p.non.adap.clients.with.medicaid',
+                         outcome.metadata = create.outcome.metadata(display.name = 'Proportion Non-ADAP Clients with Medicaid',
+                                                                    description = "Proportion of Individuals Receiving Non-ADAP Services through Ryan White who also Receive Medicaid",
+                                                                    scale = 'non.negative.number',
+                                                                    axis.name = 'Clients',
+                                                                    units = 'people',
+                                                                    singular.unit = 'person'),
+                         value = 'n.non.adap.with.medicaid',
+                         value.is.numerator = T,
+                         denominator.outcome = 'non.adap.clients',
+                         keep.dimensions = c('location','age','race','sex','risk'),
+                         corresponding.data.outcome = 'p.non.adap.clients.with.medicaid',
+                         save = T)
 
 ##---------------------------------------##
 ##-- PROBABILITY of RECEIVING HIV TEST --##

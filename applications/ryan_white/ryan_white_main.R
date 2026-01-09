@@ -25,7 +25,7 @@ if (1==2)
     cat(paste0("'", list.files('Q:simulations/rw/final.ehe.state-1000'), "'", collapse=', '))
 }
 
-#RW.STATES = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
+RW.11.STATES = sort(c("CA", "NY", "FL", "GA", "TX", "AL", "MS", "LA", "IL", "MO", "WI"))
 RW.STATES = c('AL', 'AR', 'AZ', 'CA', 'CO', 
               'FL', 'GA', 'IL', 'IN', 'KY',
               'LA', 'MA', 'MD', 'MI', 'MN',

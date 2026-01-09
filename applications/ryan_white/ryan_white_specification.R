@@ -244,7 +244,7 @@ track.integrated.outcome(RW.SPECIFICATION,
                          multiply.by = 'proportion.pwh.with.adap',
                          subset.dimension.values = list(continuum='diagnosed.states'),
                          keep.dimensions = c('location','age','race','sex','risk'),
-                         corresponding.data.outcome = 'non.adap.clients',
+                         corresponding.data.outcome = 'adap.clients',
                          save = T)
 
 track.integrated.outcome(RW.SPECIFICATION,

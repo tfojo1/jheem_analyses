@@ -8,13 +8,13 @@ source("applications/cdc_testing/likelihood.R")
 N.SIMS = 1000
 N.CHUNKS = 1
 
-# CDC.TESTING.LOCATIONS = c('AL','CA','FL','GA','IL','LA','MO','MS','NY','TX','WI',
-#                           'AZ','KY','MD','OH','SC','TN','WA')
+CDC.TESTING.LOCATIONS = c('AL','CA','FL','GA','IL','LA','MO','MS','NY','TX','WI',
+                          'AZ','KY','MD','OH','SC','TN','WA')
 # CDC.TESTING.INTERVENTION.CODES = c('noint', 'cdct.end', 'cdct.pintr', 'cdct.bintr')#,'cdc.intr')
 
-CDC.TESTING.LOCATIONS = c('AL', 'AZ', 'CA', 'FL', 'GA', 'IL', 'IN', 'KY', 'LA', 'MA', 'MD', 'MI', 'MO', 'MS', 'NV', 'NY', 'OH', 'PA', 'SC', 'TN', 'TX', 'VA', 'WA', 'WI')
+#CDC.TESTING.LOCATIONS = c('AL', 'AZ', 'CA', 'FL', 'GA', 'IL', 'IN', 'KY', 'LA', 'MA', 'MD', 'MI', 'MO', 'MS', 'NV', 'NY', 'OH', 'PA', 'SC', 'TN', 'TX', 'VA', 'WA', 'WI')
 
-CDC.TESTING.ANCHOR.YEAR = 2026
+CDC.TESTING.ANCHOR.YEAR = 2025
 if (CDC.TESTING.ANCHOR.YEAR==2025)
 {
     CDC.TESTING.INTERVENTION.SUFFIX = ''
@@ -24,7 +24,11 @@ if (CDC.TESTING.ANCHOR.YEAR==2026)
     CDC.TESTING.INTERVENTION.SUFFIX = ".26"
 }
 
-CDC.TESTING.INTERVENTION.CODES = c('noint', paste0(c('cdct.end', 'cdct.pintr', 'cdct.bintr'), CDC.TESTING.INTERVENTION.SUFFIX))
+CDC.TESTING.INTERVENTION.CODES = c('noint', 
+                                   paste0(c('cdct.end', 
+                                            'cdct.end.25','cdct.end.50','cdct.end.75',
+                                            'cdct.pintr', 'cdct.bintr'), 
+                                          CDC.TESTING.INTERVENTION.SUFFIX))
 
 CALIBRATION.CODE = 'final.ehe.state'
 VERBOSE = T
