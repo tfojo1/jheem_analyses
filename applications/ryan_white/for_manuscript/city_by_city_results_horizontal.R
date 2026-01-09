@@ -582,3 +582,9 @@ print(plot)
 ggsave(plot = plot, 
        filename=file.path(PLOT.DIR, 'Figure_4.png'),
        height = PLOT.HEIGHT, width = PLOT.WIDTH, dpi = PLOT.DPI, device = PLOT.DEVICE)
+
+# for AJPH 
+# ggsave(plot = plot,
+#        filename=file.path(PLOT.DIR, 'Figure_AJPH.pdf'),
+#        height = 5, width = 6.5, dpi = PLOT.DPI, device = cairo_pdf)
+

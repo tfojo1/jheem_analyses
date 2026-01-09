@@ -11,6 +11,7 @@ files # check and load the right file
 # for manuscript, use old timeline and only 11 states
 if(!NEW.TIMELINE){ 
     file = files[4] # 9/9 is the original timeframe - for manuscript  
+    load(file)
     RW.STATES = c("AL","CA","FL","GA","IL","LA","MS",
                    "MO","NY","TX","WI")
     
@@ -28,10 +29,11 @@ if(!NEW.TIMELINE){
 }
 
 if(NEW.TIMELINE){
-    file = files[6] # 9/11 is the revised timeframe - for CROI  
+    file = files[6] # 9/11 is the revised timeframe - for CROI 
+    load(file)
 }
 
-load(file)
+
 
 # for manuscript
 # text results 

@@ -7,10 +7,10 @@ print("Sourcing code prior to running interventions")
 
 source('../jheem_analyses/applications/ryan_white/ryan_white_main.R')
 
-LOCATIONS = 'MS'
+LOCATIONS = 'MS' # add all locations
 #LOCATIONS = RW.LOCATIONS[LOCATION.INDICES[LOCATION.INDICES<length(RW.LOCATIONS)]]
 FORCE.OVERWRITE = T #FORCE.REDO
-INTERVENTION.CODES = c('part.b.rw.end.26') # nanb.rw.end.26
+INTERVENTION.CODES = c('rw.end.26','rw.p.intr.26') # nanb.rw.end.26
 
 print(paste0("Doing locations: ",
              paste0(LOCATIONS, collapse=', ')))
