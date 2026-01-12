@@ -23,13 +23,14 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 
 #
 VERSION='shield'
-LOCATION='C.35620' #NYC
+# LOCATION='C.35620' #NYC
+LOCATION="C.12580" #Baltimore
 set.seed(00000)
 CACHE.FREQ= 10#100 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 5#50 # how often to print messages (Default: 50)
 
 # CALIBRATION.NAME = 'calib.12.02.stage0.pk'
-CALIBRATION.NAME = 'calib.1.06.stage0.az'
+CALIBRATION.NAME = 'calib.1.09.stage0.az'
 
 
 #################
@@ -37,9 +38,9 @@ print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locati
 #
 clear.calibration.cache(version=VERSION,
                         location=LOCATION,
-                       calibration.code = CALIBRATION.NAME,
+                        calibration.code = CALIBRATION.NAME,
                         allow.remove.incomplete = T)
-print("Cashe is cleared")
+print("Cache is cleared")
 #
 set.up.calibration(version=VERSION,
                    location=LOCATION,
@@ -63,9 +64,9 @@ run.time = as.numeric(end.time) - as.numeric(start.time)
 # Print run time ----
 print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time/60, 0), " minutes to run ",
-             format(N.ITER, big.mark = ","),
+             format(N_ITER, big.mark = ","),
              " simulations (",
-             round(run.time / N.ITER, 1), " seconds per simulation on average)"))
+             round(run.time / N_ITER, 1), " seconds per simulation on average)"))
 
 
 # # Save simset
@@ -73,11 +74,11 @@ simset = assemble.simulations.from.calibration(version = VERSION,
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
-#save locally
 filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
 save(simset,file=filename)
 
-#save on Q drive
+# filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+# save(simset,file =filename )
 save.simulation.set(simset)
 
-print(paste0("Simet was saved locally in the prelim_results folder and on the Q-drive/simulations as well"))
+print(paste0("Simset was saved on disk as:   ", filename))

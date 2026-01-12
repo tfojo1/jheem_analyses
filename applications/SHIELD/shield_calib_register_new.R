@@ -2,7 +2,7 @@
 
 cat("*** Registering SHIELD calibration ***\n")
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-N_ITER=10000
+N_ITER=20000
 
 # this lets us tune the transmission multipliers for MSM and het in each timepoint together 
 par.aliases.transmission = list(
@@ -15,7 +15,7 @@ par.aliases.transmission = list(
 )
 
 # STAGE 0 Demographics thin 50
-register.calibration.info("calib.1.06.stage0.az",
+register.calibration.info("calib.1.09.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -23,5 +23,5 @@ register.calibration.info("calib.1.06.stage0.az",
                                               AGING.PARAMETERS.PRIOR@var.names,
                                               "global.transmission.rate"),
                           parameter.aliases = par.aliases.transmission,
-                          n.iter = N_ITER, thin = 1, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
