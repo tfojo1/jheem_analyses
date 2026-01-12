@@ -8,11 +8,12 @@
 #   JHEEM.DIR="/home/pkasaie1/scratch4-pkasaie1/jheem_analyses"
 # } else {
 #   # If no argument is provided, print a message and don't change the working directory
-JHEEM.DIR="/Users/ryanforster/code/jheem_analyses"
+#   JHEEM.DIR="~/OneDrive - Johns Hopkins/SHIELDR01/Simulation/code/jheem_analyses/"
 # }
-setwd(JHEEM.DIR)
+# setwd(JHEEM.DIR)
+# cat("Working directory set to:", getwd(), "\n")
+setwd("/home/rforste3/jheem/code/jheem_analyses")
 cat("Working directory set to:", getwd(), "\n")
-
 
 ##----
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
@@ -22,28 +23,29 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 
 #
 VERSION='shield'
-LOCATION='C.35620' #NYC
+LOCATION='C.35620' 
 set.seed(00000)
-CACHE.FREQ= 100#100 # how often should write the results to disk (Default: 100)
-UPDATE.FREQ= 50#50 # how often to print messages (Default: 50)
+CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
+UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-CALIBRATION.NAME = 'calib.12.03.stage2.3' 
+
+CALIBRATION.NAME = 'calib.NYC.10.02.2way.2'
 
 
 #################
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
-#
-clear.calibration.cache(version=VERSION,
-                        location=LOCATION,
-                        calibration.code = CALIBRATION.NAME,
-                        allow.remove.incomplete = T)
-print("Cashe is cleared")
-#
-set.up.calibration(version=VERSION,
-                   location=LOCATION,
-                   calibration.code = CALIBRATION.NAME,
-                   cache.frequency = CACHE.FREQ #100 #how often write the results to disk
-)
+# #
+# clear.calibration.cache(version=VERSION,
+#                         location=LOCATION,
+#                         calibration.code = CALIBRATION.NAME,
+#                         allow.remove.incomplete = T)
+# print("Cashe is cleared")
+# # #
+# set.up.calibration(version=VERSION,
+#                    location=LOCATION,
+#                    calibration.code = CALIBRATION.NAME,
+#                    cache.frequency = CACHE.FREQ #100 #how often write the results to disk
+# )
 print(paste0("Calibration is set up for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 
 # Run calibration ----
@@ -53,7 +55,7 @@ mcmc = run.calibration(version = VERSION,
                        location = LOCATION,
                        calibration.code = CALIBRATION.NAME,
                        chains = 1,
-                       update.frequency = UPDATE.FREQ,
+                       update.frequency = UPDATE.FREQ,#50,
                        update.detail = 'med')
 end.time = Sys.time()
 run.time = as.numeric(end.time) - as.numeric(start.time)
@@ -66,15 +68,15 @@ print(paste0("DONE RUNNING MCMC: Took ",
              round(run.time / N.ITER, 1), " seconds per simulation on average)"))
 
 
-# # Save simset
+# Save simset
 simset = assemble.simulations.from.calibration(version = VERSION,
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
 # filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
 # save(simset,file=filename)
-# 
-# filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
-# save(simset,file =filename )
-# 
-# print(paste0("Simet was saved on disk as:   ", filename))
+
+filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+save(simset,file =filename )
+
+print(paste0("Simet was saved on disk as:   ", filename))

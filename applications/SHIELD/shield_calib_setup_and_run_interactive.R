@@ -17,13 +17,6 @@ setwd("/home/rforste3/jheem/code/jheem_analyses")
 cat("Working directory set to:", getwd(), "\n")
 
 ##----
-source('../jheem_analyses/applications/SHIELD/shield_specification.R')
-source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
-source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
-source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
-
-#
-VERSION='shield'
 
 # >>> ONLY CHANGE: LOCATION and CALIBRATION.NAME via CLI or interactive <<<
 .args <- commandArgs(trailingOnly = TRUE)
@@ -35,9 +28,7 @@ if (length(.args) >= 1 && nzchar(.args[1])) {
     LOCATION <- if (nzchar(.inp)) .inp else 'C.12580'
 }
 
-set.seed(00000)
-CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
-UPDATE.FREQ= 50 # how often to print messages (Default: 50)
+
 
 if (length(.args) >= 2 && nzchar(.args[2])) {
     CALIBRATION.NAME <- .args[2]
@@ -45,8 +36,23 @@ if (length(.args) >= 2 && nzchar(.args[2])) {
     .inp2 <- readline("Enter CALIBRATION.NAME [default calib.demog.BLT.08.11.v2]: ")
     CALIBRATION.NAME <- if (nzchar(.inp2)) .inp2 else 'calib.demog.BLT.08.11.v2'
 }
-# <<< END CHANGE >>>
 
+assign("LOCATION", LOCATION, envir = .GlobalEnv)
+assign("CALIBRATION.NAME", CALIBRATION.NAME, envir = .GlobalEnv)
+
+options(JHEEM.LOCATION = LOCATION)
+options(JHEEM.CALIBRATION.NAME = CALIBRATION.NAME)
+
+# <<< END CHANGE >>>
+source('../jheem_analyses/applications/SHIELD/shield_specification.R')
+source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
+source('../jheem_analyses/applications/SHIELD/shield_calib_register.R')
+source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
+
+VERSION='shield'
+set.seed(00000)
+CACHE.FREQ= 100 # how often should write the results to disk (Default: 100)
+UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 #################
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
