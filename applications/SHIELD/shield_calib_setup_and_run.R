@@ -73,10 +73,11 @@ simset = assemble.simulations.from.calibration(version = VERSION,
                                                location = LOCATION,
                                                calibration.code = CALIBRATION.NAME,
                                                allow.incomplete = T)
-# filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
-# save(simset,file=filename)
-# 
-# filename=paste0(get.jheem.root.directory(),"/shield/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
-# save(simset,file =filename )
-# 
-# print(paste0("Simet was saved on disk as:   ", filename))
+#save locally
+filename=paste0("prelim_results/",CALIBRATION.NAME,"_simset_",Sys.Date(),"_",LOCATION,".Rdata")
+save(simset,file=filename)
+
+#save on Q drive
+save.simulation.set(simset)
+
+print(paste0("Simet was saved locally in the prelim_results folder and on the Q-drive/simulations as well"))
