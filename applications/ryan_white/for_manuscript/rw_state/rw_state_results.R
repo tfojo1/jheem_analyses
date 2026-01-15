@@ -39,6 +39,33 @@ if(NEW.TIMELINE){
 # text results 
 source("../jheem_analyses/applications/ryan_white/for_manuscript/text_results.R")
 
+mean.ci.abs.total.infections.averted.end.by.city = cbind(
+    mean = apply(abs.total.infections.averted.end.by.city, 'location', mean, na.rm=T),
+    lower = apply(abs.total.infections.averted.end.by.city, 'location', quantile, probs=0.025, na.rm=T),
+    upper = apply(abs.total.infections.averted.end.by.city, 'location', quantile, probs=0.975, na.rm=T)
+)
+
+abs.total.infections.averted.int.by.city = apply(total.incidence[YEARS.TO.CONSIDER,,,P.INTR.NAME,drop=F] - total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+mean.ci.abs.total.infections.averted.int.by.city = cbind(
+    mean = apply(abs.total.infections.averted.int.by.city, 'location', mean, na.rm=T),
+    lower = apply(abs.total.infections.averted.int.by.city, 'location', quantile, probs=0.025, na.rm=T),
+    upper = apply(abs.total.infections.averted.int.by.city, 'location', quantile, probs=0.975, na.rm=T)
+)
+
+rel.total.infections.averted.int.by.city = abs.total.infections.averted.int.by.city  / apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T)
+mean.ci.rel.total.infections.averted.int.by.city = cbind(
+    mean = apply(rel.total.infections.averted.int.by.city, 'location', mean, na.rm=T),
+    lower = apply(rel.total.infections.averted.int.by.city, 'location', quantile, probs=0.025, na.rm=T),
+    upper = apply(rel.total.infections.averted.int.by.city, 'location', quantile, probs=0.975, na.rm=T)
+)
+
+# Report out # and % infections averted for specific state
+mean.ci.abs.total.infections.averted.end.by.city["NY",]
+mean.ci.rel.total.infections.averted.end.by.city["NY",]
+
+mean.ci.abs.total.infections.averted.int.by.city["NY",]
+mean.ci.rel.total.infections.averted.int.by.city["NY",]
+
 View(table.city)
 # figures 
 {
