@@ -241,4 +241,32 @@ doxyPEP_25_slow <- create.intervention(
 no.intervention = get.null.intervention()
 
 
+{sim_doxy10.NYC  <- doxyPEP_10$run(simset.NYC.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy10.NYC.slow  <- doxyPEP_10_slow$run(simset.NYC.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy25.NYC <- doxyPEP_25$run(simset.NYC.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy25.NYC.slow <- doxyPEP_25_slow$run(simset.NYC.burned.updated, start.year = 2022, end.year = 2030)
+    no.intervention.NYC = no.intervention$run(simset.NYC.burned.updated, start.year=2022, end.year=2030)
+    
+    
+    sim_doxy10.MIA  <- doxyPEP_10$run(simset.MIA.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy10.MIA.slow  <- doxyPEP_10_slow$run(simset.MIA.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy25.MIA  <- doxyPEP_25$run(simset.MIA.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy25.MIA.slow <- doxyPEP_25_slow$run(simset.MIA.burned.updated, start.year = 2022, end.year = 2030)
+    no.intervention.MIA = no.intervention$run(simset.MIA.burned.updated, start.year=2022, end.year=2030)
+    
+    sim_doxy10.ATL  <- doxyPEP_10$run(simset.ATL.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy10.ATL.slow  <- doxyPEP_10_slow$run(simset.ATL.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy25.ATL  <- doxyPEP_25$run(simset.ATL.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy25.ATL.slow <- doxyPEP_25_slow$run(simset.ATL.burned.updated, start.year = 2022, end.year = 2030)
+    no.intervention.ATL = no.intervention$run(simset.ATL.burned.updated, start.year=2022, end.year=2030)
+    
+    
+    sim_doxy10.BLT  <- doxyPEP_10$run(simset.BLT.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy10.BLT.slow  <- doxyPEP_10_slow$run(simset.BLT.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy25.BLT  <- doxyPEP_25$run(simset.BLT.burned.updated,  start.year = 2022, end.year = 2030)
+    sim_doxy25.BLT.slow <- doxyPEP_25_slow$run(simset.BLT.burned.updated, start.year = 2022, end.year = 2030)
+    no.intervention.BLT = no.intervention$run(simset.BLT.burned.updated, start.year=2022, end.year=2030)
+    
+    
+}
 
