@@ -12,7 +12,6 @@ source('../jheem_analyses/commoncode/locations_of_interest.R')
 location.style.manager = create.style.manager(color.data.by = "location.type")
 source.style.manager   = create.style.manager( color.data.by = "source",shade.data.by =  "stratum")
 stratum.style.manager  = create.style.manager(color.data.by = "stratum")
-sim.style.manager  = create.style.manager(color.data.by = "simulation")
 
 # Configuration ----
 VERSION <- 'shield'
@@ -23,7 +22,6 @@ LOCATION <- 'C.12580'  # Baltimore MSA
 get.jheem.root.directory() #"/Volumes/jheem$"
 # ROOT.DIR="../../files/"
 # set.jheem.root.directory(ROOT.DIR)
-# set.jheem.root.directory("/Volumes/jheem$")
 
 # # CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
 # # Load or Assemble Simulation Set ----
@@ -45,86 +43,40 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 # }
 
 # Load simset from the Q drive
-#07.10: These models have 5 additional knots for EL screening in 1990-95-2000-2010-2020
-for (i in c(0)){
-    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.10.pk',i); DATE <- "2025-07-10" 
-    filename=  paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata");print(filename) 
-    load(filename)
-    assign(paste0("simset",i),simset) #dynamic assignment
-}
-for (i in c(1:3)){
-    CALIBRATION.CODE.TO.RUN <- paste0('calib.07.10.pk',i); DATE <- "2025-07-11" 
-    filename=  paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata");print(filename) 
-    load(filename)
-    assign(paste0("simset",i),simset) #dynamic assignment
-}
+set.jheem.root.directory("/Volumes/jheem$")
+n.sim=400
+calib.name="calib.1.09.stage0.az"
+simset.baltimore<-retrieve.simulation.set(version=VERSION,location = LOCATION,calibration.code = calib.name,n.sim = n.sim)
+simset.NYC<-retrieve.simulation.set(version=VERSION,location = 'C.35620',calibration.code = calib.name,n.sim = n.sim)
 
-# # Ryan's
-# {
-#     CALIBRATION.CODE.TO.RUN <- 'calib.07.03.rf'; DATE <- "2025-07-04"
-#     load(paste0(get.jheem.root.directory(),"/shield/", CALIBRATION.CODE.TO.RUN, "_simset_", DATE, "_", LOCATION, ".Rdata"))
-#     simset.rf=simset;
-#     simset$n.sim
-#     # Extract first and last simulations and their parameters
-#     sim.first.rf    <- simset$first.sim()
-#     sim.last.rf    <- simset$last.sim()
-#     params.first.rf <- simset$first.sim()$params
-#     params.last.rf  <- simset$last.sim()$params
-# }
-
-for (i in c(0:3)){
-    simset=get(paste0("simset",i))
-    print(simset$n.sim)
-    # Extract first and last simulations and their parameters
-    assign(paste0("sim.first",i)   ,simset$first.sim())
-    assign(paste0("sim.last",i)   ,simset$last.sim())
-    assign(paste0("params.first",i) ,simset$first.sim()$params)
-    assign(paste0("params.last",i) ,simset$last.sim()$params)
-}
-# 
-# engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-# params.manual <- simset1$last.sim()$params
-# # params.manual["or.symptomatic.1990"] <- params.manual["or.symptomatic.1990"]*1# 0.970793 
-# # params.manual["or.symptomatic.1995"] <- params.manual["or.symptomatic.2000"]*.85 #1.101602 
-# # params.manual["or.symptomatic.2010"] <- params.manual["or.symptomatic.2000"]*1.1
-# # params.manual["or.symptomatic.2020"] <- params.manual["or.symptomatic.2020"] #0.6944672 
-# sim.mac.engine <- engine$run(params.manual)
 
 # PLOT -----
 simplot(
-    # sim.first0,
-    # sim.first1,
-    sim.last0, #w=1/8
-    # sim.last1, #w=1/4
-    # sim.last2,#w=1/2
-    # sim.last3,#w=1
-
-    # sim.mac.engine,
-    # simset.mac.calib$first.sim(),
-    # split.by = "race", facet.by = "sex",
-    # split.by = "race", facet.by = "age",
-    # outcomes = c("population"),    split.by = "race", facet.by = "age",
+    # simset.baltimore$first.sim(),
+    # simset.baltimore$last.sim(),
     
-    # outcomes=c("diagnosis.total"),   facet.by = "race",
-    # outcomes=c("diagnosis.ps"),     facet.by = "race",
-    # outcomes=c("diagnosis.el.misclassified"),   facet.by = "race",
-    # outcomes=c("diagnosis.late.misclassified"),   facet.by = "race",
+    # simset.NYC$first.sim(),
+    simset.NYC$last.sim(),
+    # simset.NYC[300:400],
+    outcomes = c("population"),    split.by = "race", facet.by = "age"
+    # 
+    # # outcomes = c("fertility.rate"),    split.by = "race", facet.by = "age"
+    # # outcomes = c("deaths")
+    # # outcomes = c("immigration")    #split.by = "race"
+    # outcomes = c("emigration") #split.by = "race", facet.by = "age"
     
-    outcomes = c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified",
-                 "diagnosis.late.misclassified","hiv.testing"),
-    # # outcomes = c("prevalence"),
-    dimension.values = list(year = 1970:2030) 
-    # style.manager = source.style.manager
+    ,dimension.values = list(year = 2010:2030)
+    ,style.manager = source.style.manager
 )
 
-# x+geom_hline(yintercept = 613)+geom_vline(xintercept = 2022)
-# x+geom_hline(yintercept =  672) +geom_vline(xintercept = 2023)
 # MCMC Diagnostics ----
-simset=simset0
+simset=simset.baltimore
 cbind(simset$get.params())
 
 {
+    # RV is ratio of variance in the first half to the second half of chain (if search is stuck, RV goes up)
     head(simset$get.mcmc.mixing.statistic())
+    
     simset$traceplot("transmission")
     cbind(simset$get.params("transmission"))
     cbind(sim.last$get.params("trans"))
