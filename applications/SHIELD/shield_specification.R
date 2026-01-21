@@ -750,23 +750,12 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'doxy.coverage',
                        scale = 'ratio',
-                       value = 1
+                       value = 1,
+                       dimension.values = list(sex = 'msm')
 )
 
-# register.model.element(
-#     SHIELD.SPECIFICATION,
-#     name = 'doxy.coverage',
-#     scale = 'proportion',
-#     functional.form = create.logistic.linear.functional.form(
-#                                                     intercept = 0, # fixed logit-scale intercept
-#                                                     slope = 0,
-#                                                     anchor.year = 2021, # logistic curve “starts” here
-#                                                     #max = ... ,
-#                                                     parameters.are.on.logit.scale = TRUE
-#     ),
-#     functional.form.from.time = 2021,  
-#     functional.form.to.time   = 2025
-# )
+
+
 
 register.model.quantity(SHIELD.SPECIFICATION,
                                name = 'sexual.susceptibility',
@@ -774,13 +763,24 @@ register.model.quantity(SHIELD.SPECIFICATION,
 )
 
 
+register.model.quantity(SHIELD.SPECIFICATION,
+                       name = 'doxy.msm.guard',
+                       value = 0) 
+
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = 'doxy.msm.guard',
+                               applies.to = list(sex = 'msm'),
+                               value = 1)
+
+
 ## MSM: apply doxy coverage + RR
 ## this is the ONLY place doxy.coverage & doxy.rr are used
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                         name = 'sexual.susceptibility',
                         applies.to = list(sex = 'msm'),
-                        value = expression((1 - doxy.coverage) + doxy.coverage * doxy.rr)
+                        value = expression(((1 - doxy.coverage) + doxy.coverage * doxy.rr)*doxy.msm.guard)
 )
+
 
 
 ## Infectiousness ----
