@@ -751,8 +751,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'doxy.coverage',
                        scale = 'ratio',
                        value = 1,
-                       dimension.values = list(sex = 'msm')
-)
+             )
 
 
 
