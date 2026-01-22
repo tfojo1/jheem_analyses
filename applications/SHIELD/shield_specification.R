@@ -2154,6 +2154,30 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
                       keep.dimensions = c('location','age','race','sex','stage') #have to keep these dimensions because they're used for ps and other stages below
 )
 
+## Doxy-PEP treatment
+track.point.outcome(SHIELD.SPECIFICATION,
+                    name = "point.n.doxy.pep",
+                    outcome.metadata = NULL,
+                    scale = "non.negative.number",
+                    save = F,
+                    value = expression((infected + uninfected) * doxy.coverage),
+                    keep.dimensions = c("location", "age", "race", "sex")
+)
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name = "n.doxy.pep",
+                         outcome.metadata = create.outcome.metadata(
+                             display.name = "Number on Doxy-PEP",
+                             description = "Number of individuals on Doxy-PEP",
+                             scale = "non.negative.number",
+                             axis.name = "Persons",
+                             units = "persons",
+                             singular.unit = "person"
+                         ),
+                         value.to.integrate = "point.n.doxy.pep",
+                         corresponding.data.outcome = "n.doxy.pep",
+                         keep.dimensions = c("location", "age", "race", "sex")
+)
+
 
 ##** REGISTER THE SPECIFICATION ----
 register.model.specification(SHIELD.SPECIFICATION)
