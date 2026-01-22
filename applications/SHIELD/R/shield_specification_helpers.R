@@ -1055,16 +1055,16 @@ get.prp.prenatal.care.functional.form = function(specification.metadata,trimeste
                                                       version = specification.metadata$version)
   #' #'@Todd: this is fix for now but we should find the issue with these additional ages in the specifications
   # browser()
-  new_ages <- c('0-14 years',"45-49 years", "50-54 years", "55-64 years","65+ years")
-  new_data=matrix(rep(0,15),nrow=5, dimnames = list(age=new_ages, race=c('black','hispanic','other')))
-  dim(new_data)
-  
-  prenatal.care.prior$intercepts <- rbind(prenatal.care.prior$intercepts, new_data)
-  names( dimnames(prenatal.care.prior$intercepts ))=c('age','race')
-  
-  prenatal.care.prior$slopes <- rbind(prenatal.care.prior$slopes,new_data)
-  names( dimnames(prenatal.care.prior$slopes ))=c('age','race')
-  
+  # new_ages <- c('0-14 years',"45-49 years", "50-54 years", "55-64 years","65+ years")
+  # new_data=matrix(rep(0,15),nrow=5, dimnames = list(age=new_ages, race=c('black','hispanic','other')))
+  # dim(new_data)
+  # 
+  # prenatal.care.prior$intercepts <- rbind(prenatal.care.prior$intercepts, new_data)
+  # names( dimnames(prenatal.care.prior$intercepts ))=c('age','race')
+  # 
+  # prenatal.care.prior$slopes <- rbind(prenatal.care.prior$slopes,new_data)
+  # names( dimnames(prenatal.care.prior$slopes ))=c('age','race')
+  # 
   prenatal.care.functional.form = create.logistic.linear.functional.form(intercept = prenatal.care.prior$intercepts - log(0.9), #helps counteract max value below a bit
                                                                          slope = prenatal.care.prior$slopes,
                                                                          anchor.year = 2010,
