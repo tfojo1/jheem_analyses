@@ -762,22 +762,12 @@ register.model.quantity(SHIELD.SPECIFICATION,
 )
 
 
-register.model.quantity(SHIELD.SPECIFICATION,
-                       name = 'doxy.msm.guard',
-                       value = 0) 
-
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'doxy.msm.guard',
-                               applies.to = list(sex = 'msm'),
-                               value = 1)
-
-
 ## MSM: apply doxy coverage + RR
 ## this is the ONLY place doxy.coverage & doxy.rr are used
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                         name = 'sexual.susceptibility',
                         applies.to = list(sex = 'msm'),
-                        value = expression(((1 - doxy.coverage) + doxy.coverage * doxy.rr)*doxy.msm.guard)
+                        value = expression((1 - doxy.coverage) + doxy.coverage * doxy.rr)
 )
 
 
@@ -2154,29 +2144,20 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 )
 
 ## Doxy-PEP treatment
-track.point.outcome(SHIELD.SPECIFICATION,
-                    name = "point.n.doxy.pep",
-                    outcome.metadata = NULL,
-                    scale = "non.negative.number",
-                    save = F,
-                    value = expression((infected + uninfected) * doxy.coverage),
-                    keep.dimensions = c("location", "age", "race", "sex")
-)
-track.integrated.outcome(SHIELD.SPECIFICATION,
-                         name = "n.doxy.pep",
+track.cumulative.outcome(SHIELD.SPECIFICATION,
+                         name = 'prop.sexual.susceptibile',
+                         value = expression(sexual.susceptibility * population),
+                         denominator.outcome = 'population',
+                         keep.dimensions = c('location','sex'),
                          outcome.metadata = create.outcome.metadata(
-                             display.name = "Number on Doxy-PEP",
-                             description = "Number of individuals on Doxy-PEP",
-                             scale = "non.negative.number",
-                             axis.name = "Persons",
-                             units = "persons",
-                             singular.unit = "person"
-                         ),
-                         value.to.integrate = "point.n.doxy.pep",
-                         corresponding.data.outcome = "n.doxy.pep",
-                         keep.dimensions = c("location", "age", "race", "sex")
+                             display.name = 'Fraction Sexual Susceptibile',
+                             description = 'Should be <100% for MSM only when Doxy-PEP active',
+                             scale = 'proportion', 
+                             axis.name = 'Susceptibility',
+                             units = '%',
+                             singular.unit = '%'
+                         )
 )
-
 
 ##** REGISTER THE SPECIFICATION ----
 register.model.specification(SHIELD.SPECIFICATION)
