@@ -744,13 +744,13 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'doxy.rr',
                        scale = 'ratio',
-                       value = 1
+                       value = 0.2
 )
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'doxy.coverage',
-                       scale = 'ratio',
-                       value = 1,
+                       scale = 'proportion',
+                       value = 0,
              )
 
 
