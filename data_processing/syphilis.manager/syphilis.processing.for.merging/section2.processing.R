@@ -164,34 +164,37 @@ syphilis.manager = data.manager
 source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
 source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
 source('../jheem2/R/HELPERS_array_helpers.R') 
-source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
 
-put.msa.data.as.new.source(outcome = 'ps.syphilis.diagnoses',
-                           from.source.name = 'cdc.sti',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
+##//Commenting this out as we test Andrew's new aggregation code: 1-30-26//**
 
-put.msa.data.as.new.source(outcome = 'early.syphilis.diagnoses',
-                           from.source.name = 'cdc.sti',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
-
-put.msa.data.as.new.source(outcome = 'unknown.duration.or.late.syphilis.diagnoses',
-                           from.source.name = 'cdc.sti',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
+# source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
+# 
+# put.msa.data.as.new.source(outcome = 'ps.syphilis.diagnoses',
+#                            from.source.name = 'cdc.sti',
+#                            to.source.name = 'cdc.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = syphilis.manager)
+# 
+# put.msa.data.as.new.source(outcome = 'early.syphilis.diagnoses',
+#                            from.source.name = 'cdc.sti',
+#                            to.source.name = 'cdc.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = syphilis.manager)
+# 
+# put.msa.data.as.new.source(outcome = 'unknown.duration.or.late.syphilis.diagnoses',
+#                            from.source.name = 'cdc.sti',
+#                            to.source.name = 'cdc.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = syphilis.manager)
 
 #Save:
 save(syphilis.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section2.rdata")

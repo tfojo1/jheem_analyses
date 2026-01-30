@@ -35,6 +35,11 @@ source('data_processing/syphilis.manager/data_quality_fix/test_total_with_restra
 #Remove certain racial data that doesn't sum to proper totals:
 source('data_processing/syphilis.manager/data_quality_fix/implement_removals.R')
 
+
+# Test Andrew's new Aggregation Code on Diagnoses: 1-30-26 ----------------
+
+source('data_processing/syphilis.manager/syphilis.processing.for.merging/new.aggregation.method.R')
+
 # Save: -------------------------------------------------------------------
  
 #SAVE Final, Complete Syphilis Manager to Cached
