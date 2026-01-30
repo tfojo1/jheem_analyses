@@ -1034,18 +1034,51 @@ oes.to.proportions <- function(oes, population)
 
 
 #-- HIV TESTING FUNCTIONAL FORM --# -----
-get.hiv.testing.functional.form = function(specification.metadata){
-  # cashed object from input_hiv_testing_prior_brfss.R
-  testing.prior = get.cached.object.for.version(name = "hiv.testing.prior",
-                                                version = specification.metadata$version)
-  
-  hiv.testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9), #helps counteract max value below a bit
-                                                                       slope = testing.prior$slopes,
-                                                                       anchor.year = 2010,
-                                                                       max = 0.9,
-                                                                       #min??
-                                                                       parameters.are.on.logit.scale = T)
-  hiv.testing.functional.form
+# get.hiv.testing.functional.form = function(specification.metadata){
+#   # cashed object from input_hiv_testing_prior_brfss.R
+#   testing.prior = get.cached.object.for.version(name = "hiv.testing.prior",
+#                                                 version = specification.metadata$version)
+# 
+#   
+#   hiv.testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9) , #helps counteract max value below a bit
+#                                                                        slope = testing.prior$slopes,
+#                                                                        anchor.year = 2010,
+#                                                                        max = 0.9,
+#                                                                        #min??
+#                                                                        parameters.are.on.logit.scale = T)
+#   hiv.testing.functional.form
+# }
+
+#-- STI SCREENING FUNCTIONAL FORMS --# ----
+get_sti_screening_functional_form <- function(specification.metadata) {
+    # Get a cached object
+    # Actually, we read the HIV testing prior in, then shift it to serve as our STI screening functional form's priors
+    # We will add log(0.5) assuming half the odds of an syphilis screen compared to the odds of an HIV test in the last year.
+    hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
+                                                     version = specification.metadata$version)
+    
+    # Use HIV testing prior slope and intercept and shift to find STI screening functional form slope and intercept
+    # The 0.9 that was in here was to say we never think we screen more than 90% of people in a stratum, and must subtract log(0.9) to compensate mathematically.
+    sti_screening_functional_form <- create.logistic.linear.functional.form(intercept = hiv_testing_prior$intercepts + log(0.5),
+                                                                            slope = hiv_testing_prior$slopes,
+                                                                            anchor.year = 2010,
+                                                                            max = 1,
+                                                                            parameters.are.on.logit.scale = T)
+    
+    sti_screening_functional_form
+}
+
+# Not yet used
+get_syphilis_to_hiv_multiplier_functional_form <- function(specification.metadata) {
+    # Get a cached object
+    multiplier_prior <- get.cached.object.for.version(name = "sti.to.hiv.test.prior",
+                                                      version = specification.metadata$version)
+    
+    syphilis_to_hiv_multiplier_functional_form <- create.logistic.linear.functional.form(intercept = multiplier_prior$intercepts,
+                                                                                         slope = multiplier_prior$slopes,
+                                                                                         parameters.are.on.logit.scale = T)
+    
+    syphilis_to_hiv_multiplier_functional_form
 }
 
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
