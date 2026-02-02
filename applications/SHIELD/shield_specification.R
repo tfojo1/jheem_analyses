@@ -1057,104 +1057,43 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
 
 ##---- 2-SCREENING FOR ALL ----
-# We estimate this from HIV Testing rates in JHEEM : background testing rate has a functional form and parameters are tuned 
-# we will calibrate this to testing data, and assume that STI screening rate is a function of HIV rate
-register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'rate.testing.hiv.without.covid',
-                        scale = 'rate',
-                        value=0)
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'rate.testing.hiv.without.covid',
-                               applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years"  )),
-                               value='rate.testing.hiv.without.covid.over.14')
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'rate.testing.hiv.without.covid.over.14',
-                       scale = 'rate',
-                       get.functional.form.function = get.hiv.testing.functional.form,
-                       functional.form.scale = 'proportion', #the functional form takes a proportion and produces a rate (from BRFSS: have u had a hiv test in the last year?)
-                       functional.form.from.time = DEFAULT.HIV.TESTING.START.YEAR) #2010: the projections remain fix at this year's value for years before. 
-register.model.quantity(SHIELD.SPECIFICATION, 
-                        name = 'rate.testing.hiv',
-                        scale = 'rate',
-                        value = 'rate.testing.hiv.without.covid')
 
-# defining a STI multiplier over time:
-# function to map the ratio of STI tests relative to hiv.tests in the US (for STI screening)
+# NEW: Model STI screening rate as a smooth function
+# Because our HIV testing prior that was used to make this FF's prior doesn't cover youngest strata, we must call it the screening rate for over 14 only.
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'multiplier.syphilis.screening.to.hiv.tests',
-                       scale = 'ratio',
-                       functional.form.from.time = 1970,  #the projections remain fix at this year's value for years before.
-                       functional.form = create.natural.spline.functional.form(
-                           knot.times = c("1970"=1970, "1990"=1990,"1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
-                           knot.values=list("1970"=1, "1990"=1,"1995"=1, "2000"=1, "2010"=1,"2020"=1),  
-                           knots.are.on.transformed.scale = F,
-                           knot.link = "log",
-                           link = "identity", #linear projections between the knots (avoid exponential growth)
-                           #
-                           knot.min = 0, #knot values can not fall below 0
-                           min=0, #projected spline values can not fall below 0
-                           after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled change between 2010-2020
-                           after.modifier = 0.5,
-                           after.modifier.increasing.change.link = 'identity',
-                           after.modifier.decreasing.change.link = 'log',
-                           modifiers.apply.to.change = T
-                       ) 
-) 
+                       name = 'rate.sti.screening.over.14',
+                       scale = 'rate',
+                       get.functional.form.function = get_sti_screening_functional_form,
+                       functional.form.from.time = 2010,
+                       functional.form.scale = 'proportion')
+
+# Make quantities to cover all ages.
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sti.screening',
                         scale = 'rate',
-                        value = expression(rate.testing.hiv * 
-                                               multiplier.syphilis.screening.to.hiv.tests *
-                                               sti.screening.by.stage))
+                        value=0)
 
-# additional STI multiplier by stage 
+register.model.quantity.subset(SHIELD.SPECIFICATION,
+                               name = "rate.sti.screening",
+                               applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years")),
+                               value = "rate.sti.screening.over.14")
+
+# NEW: Model multipler from STI screeening to HIV tests as a smooth function
+# Does phrasing '...screening TO hiv test' imply you multiply this by screening to GET hiv tests?
+register.model.element(SHIELD.SPECIFICATION,
+                       name = 'multiplier.syphilis.screening.to.hiv.tests',
+                       scale = "ratio",
+                       # get.functional.form.function = get_syphilis_to_hiv_multiplier_functional_form,
+                       value = 2) # A simple stand in.
+                       # functional.form.from.time = 2014,
+                       # functional.form.scale = "ratio") #???
+
+# NEW
+# @Parastu, Todd insisted on dividing, not multiplying, in this expression, but if the multiplier is >1 (such as 2), then it should be multiplying, yes? HIV rate > STI screening rate.
 register.model.quantity(SHIELD.SPECIFICATION,
-                        name = 'sti.screening.by.stage',
-                        scale = 'ratio',
-                        value = 1)
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'sti.screening.multiplier.ps',
-                       scale = 'ratio',
-                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.ps'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'sti.screening.multiplier.el',
-                       scale = 'ratio',
-                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.el'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'sti.screening.multiplier.ll',
-                       scale = 'ratio',
-                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.ll'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'sti.screening.multiplier.tertiary',
-                       scale = 'ratio',
-                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.tertiary'])
-register.model.element(SHIELD.SPECIFICATION,
-                       name = 'sti.screening.multiplier.cns',
-                       scale = 'ratio',
-                       value = SHIELD_BASE_PARAMETER_VALUES['sti.screening.multiplier.cns'])
-
-
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'sti.screening.by.stage',
-                               applies.to = list(stage = c("primary", "secondary")),
-                               value = 'sti.screening.multiplier.ps')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'sti.screening.by.stage',
-                               applies.to = list(stage = c("early.latent")),
-                               value = 'sti.screening.multiplier.el')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'sti.screening.by.stage',
-                               applies.to = list(stage = c("late.latent")),
-                               value = 'sti.screening.multiplier.ll')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'sti.screening.by.stage',
-                               applies.to = list(stage = c("tertiary")),
-                               value = 'sti.screening.multiplier.tertiary')
-register.model.quantity.subset(SHIELD.SPECIFICATION,
-                               name = 'sti.screening.by.stage',
-                               applies.to = list(stage = c("cns")),
-                               value = 'sti.screening.multiplier.cns')
-
+                        name = 'rate.testing.hiv',
+                        scale = "rate",
+                        value = expression(rate.sti.screening * multiplier.syphilis.screening.to.hiv.tests))
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
 # prop of pregnant women receiving 'successful' prenatal screening 
@@ -1675,11 +1614,11 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                                                                  scale = 'proportion',
                                                                                  axis.name = 'Proportion Tested',
                                                                                  units = '%'),
-                                      rate.value = 'rate.sti.screening',
+                                      rate.value = 'rate.sti.screening', # Make sure this is the name of the quantity we made.
                                       denominator.outcome =  'prevalence',
-                                      keep.dimensions = c('location','age','race','sex','stage'),
+                                      keep.dimensions = c('location','age','race','sex'), # @Andrew removed stage
                                       # force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify
-                                      corresponding.data.outcome = 'proportion.tested.for.hiv'
+                                      # corresponding.data.outcome = 'proportion.tested.for.hiv'
 )
 
 ##---- HIV Testing -----
@@ -1690,7 +1629,7 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                                                                  scale = 'proportion',
                                                                                  axis.name = 'Proportion Tested',
                                                                                  units = '%'),
-                                      rate.value = 'rate.testing.hiv.over.18',
+                                      rate.value = 'rate.testing.hiv.over.18', # use what we found from above
                                       denominator.outcome =  'population.over.18',
                                       keep.dimensions = c('location','age','race','sex'), 
                                       force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify  

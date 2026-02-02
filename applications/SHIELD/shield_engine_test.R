@@ -19,7 +19,7 @@ params=get.medians(SHIELD.FULL.PARAMETERS.PRIOR)
 sim = engine$run(params)
 
 
-
+if (1==2) {
 
 # INSTANTIATE LIKELIHOODS
 source('applications/SHIELD/shield_likelihoods.R')
@@ -133,7 +133,7 @@ simplot(sim,"diagnosis.el")
 # apply(SURVEILLANCE.MANAGER$data$population$estimate$census.population$stratified.census$year__location__age__race__ethnicity__sex['2010','US',,,,],
 #       c('ethnicity'),sum)
 
-
+}
 
 if (1==2){
     get.ontology.error.debug.info()

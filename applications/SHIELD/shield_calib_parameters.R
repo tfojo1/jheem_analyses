@@ -285,45 +285,54 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
   or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
   
-  # HIV screening ----
-  hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5), #'@Ryan: why smaller sdlog?
+  # # HIV screening ----
+  # hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5), #'@Ryan: why smaller sdlog?
   
-  # STI screening knots multiplier ----
-  # (relative to HIV screening)
-  make.mv.spline.prior(parameter = "sti.screening.multiplier." , #'@Ryan: how are parameters set?
-                       logmean00 = 0,logsd00 = log(2), 
-                       logsd.delta95 = log(sqrt(1.5))/2, 
-                       logsd.delta90 = log(sqrt(1.5))/2, 
-                       logsd.delta70 = log(1.5^2)/2,
-                       logsd.delta10 = log(1.5)/2, 
-                       logsd.delta20 = log(1.5)/2#, 
-                       #logsd.delta30 = log(1.5)/2
-  ),
+  # NEW: STI screening
+  # This will be an odds ratio between the simulation odds and the fixed beta odds...? No...
+  sti.screening.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), # 95% prob of ranging between half and double
+  sti.screening.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2) # should it vary more?
   
-  # STI screening future multiplier ----
-  sti.screening.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #'Ryan: where are values coming from?
+  # # NEW: STI to HIV testing multiplier (not yet used)
+  # syphilis.to.hiv.testing.multiplier.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # syphilis.to.hiv.testing.multiplier.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
   
-  # STI screening multiplier by stage ----
-  #(defined in specification-no linking needed here)
-  # get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
-  sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)), 
-  sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)), 
-  sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-  sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  #@Ryan: my note says that "#we set the priors to reflect higher freq of screening among syphilis-infected subgroups (highrisk)" 
-  #but this is by stage. should we set the meanlog=0 and test?
-  
-  # STI screening multiplier by race
-  sti.screening.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  sti.screening.multiplier.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  sti.screening.multiplier.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  
-  # STI screening multiplier by sex
-  sti.screening.multiplier.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  sti.screening.multiplier.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  sti.screening.multiplier.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2))
+  # # STI screening knots multiplier ----
+  # # (relative to HIV screening)
+  # make.mv.spline.prior(parameter = "sti.screening.multiplier." , #'@Ryan: how are parameters set?
+  #                      logmean00 = 0,logsd00 = log(2),
+  #                      logsd.delta95 = log(sqrt(1.5))/2,
+  #                      logsd.delta90 = log(sqrt(1.5))/2,
+  #                      logsd.delta70 = log(1.5^2)/2,
+  #                      logsd.delta10 = log(1.5)/2,
+  #                      logsd.delta20 = log(1.5)/2#,
+  #                      #logsd.delta30 = log(1.5)/2
+  # ),
+  # 
+  # # STI screening future multiplier ----
+  # sti.screening.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #'Ryan: where are values coming from?
+  # 
+  # # STI screening multiplier by stage ----
+  # #(defined in specification-no linking needed here)
+  # # get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
+  # sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)),
+  # sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
+  # sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
+  # sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  # sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  # #@Ryan: my note says that "#we set the priors to reflect higher freq of screening among syphilis-infected subgroups (highrisk)"
+  # #but this is by stage. should we set the meanlog=0 and test?
+  # 
+  # # STI screening multiplier by race
+  # sti.screening.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  # sti.screening.multiplier.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  # sti.screening.multiplier.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  # 
+  # # STI screening multiplier by sex
+  # sti.screening.multiplier.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  # sti.screening.multiplier.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  # sti.screening.multiplier.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2))
 )
 
 ###--------------------------------------------------------------------------###
@@ -403,12 +412,12 @@ AGE.TRANS.TEST.PARAMETERS.PRIOR=join.distributions(
   ), 
   
   ## STI.Screening ----
-  sti.screening.multiplier.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  SCREENING.AGE.PRIOR <- Multivariate.Lognormal.Distribution(
-    mu = testing_meanlog,
-    sigma = testing_sigma,
-    var.names = screening_varnames
-  ),
+  # sti.screening.multiplier.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+  # SCREENING.AGE.PRIOR <- Multivariate.Lognormal.Distribution(
+  #   mu = testing_meanlog,
+  #   sigma = testing_sigma,
+  #   var.names = screening_varnames
+  # ),
   
   ## Symptomatic Testing ----
   or.symptomatic.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
@@ -697,61 +706,77 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   
   
   ## STI SCREENING  ----
-  # Changing the intercept and slope for HIV tests
+  # # Changing the intercept and slope for HIV tests
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "rate.testing.hiv.without.covid.over.14",
+  #                                                alpha.name = "intercept",
+  #                                                values = parameters["hiv.testing.or"],
+  #                                                dimension = "all", #recipient
+  #                                                applies.to.dimension.values = "all")
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "rate.testing.hiv.without.covid.over.14",
+  #                                                alpha.name = "slope",
+  #                                                values = parameters["hiv.testing.slope.or"],
+  #                                                dimension = "all", #recipient
+  #                                                applies.to.dimension.values = "all")
+  
+  # NEW: Change intercept and slope for STI screening
   set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.testing.hiv.without.covid.over.14",
+                                                 element.name = "rate.sti.screening.over.14",
                                                  alpha.name = "intercept",
-                                                 values = parameters["hiv.testing.or"],
+                                                 values = parameters["sti.screening.or"],
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
   set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "rate.testing.hiv.without.covid.over.14",
+                                                 element.name = "rate.sti.screening.over.14",
                                                  alpha.name = "slope",
-                                                 values = parameters["hiv.testing.slope.or"],
+                                                 values = parameters["sti.screening.slope.or"],
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
   
-  # Changing the knot values for ratio of STI screening to HIV tests
-  for(time in c("1970","1990","1995","2000","2010","2020")){
-    
-    
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("sti.screening.multiplier.",time)],
-                                                   dimension = "all", #recipient
-                                                   applies.to.dimension.values = "all")
-    
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("sti.screening.multiplier.",races)],
-                                                   dimension = "race", #recipient
-                                                   applies.to.dimension.values = races)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("sti.screening.multiplier.", sexes)],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = sexes)
-    paramName =paste0("sti.screening.multiplier.age",agegroups)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                   alpha.name = time,
-                                                   values = parameters[paramName],
-                                                   dimension = "age", 
-                                                   applies.to.dimension.values = ages)
-    
-    
-  }
-  #Note: sti.screening.multiplier.*by stage are directly linked in the specification
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "multiplier.syphilis.screening.to.hiv.tests",
-                                                 alpha.name = "after.modifier",
-                                                 values = parameters["sti.screening.future.change.mult"],
-                                                 applies.to.dimension.values = "all",
-                                                 dimension = "all"
-  )
+  # NEW: Do the same for the multiplier of syphilis to HIV tests
+  
+  # # Changing the knot values for ratio of STI screening to HIV tests
+  # for(time in c("1970","1990","1995","2000","2010","2020")){
+  #   
+  #   
+  #   set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
+  #                                                  alpha.name = time,
+  #                                                  values = parameters[paste0("sti.screening.multiplier.",time)],
+  #                                                  dimension = "all", #recipient
+  #                                                  applies.to.dimension.values = "all")
+  #   
+  #   set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
+  #                                                  alpha.name = time,
+  #                                                  values = parameters[paste0("sti.screening.multiplier.",races)],
+  #                                                  dimension = "race", #recipient
+  #                                                  applies.to.dimension.values = races)
+  #   set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
+  #                                                  alpha.name = time,
+  #                                                  values = parameters[paste0("sti.screening.multiplier.", sexes)],
+  #                                                  dimension = "sex", #recipient
+  #                                                  applies.to.dimension.values = sexes)
+  #   paramName =paste0("sti.screening.multiplier.age",agegroups)
+  #   set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
+  #                                                  alpha.name = time,
+  #                                                  values = parameters[paramName],
+  #                                                  dimension = "age", 
+  #                                                  applies.to.dimension.values = ages)
+  #   
+  #   
+  # }
+  # #Note: sti.screening.multiplier.*by stage are directly linked in the specification
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "multiplier.syphilis.screening.to.hiv.tests",
+  #                                                alpha.name = "after.modifier",
+  #                                                values = parameters["sti.screening.future.change.mult"],
+  #                                                applies.to.dimension.values = "all",
+  #                                                dimension = "all"
+  # )
   
   # Symptomatic Testing ----
   for(time in c("1970", "1990","1995","2000","2010","2020")){
@@ -1104,9 +1129,13 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 
 ## TESTING.SAMPLING.BLOCKS ----
 TESTING.SAMPLING.BLOCKS = list(
-  hiv.testing = c(
-    "hiv.testing.or",
-    "hiv.testing.slope.or"
+  # hiv.testing = c(
+  #   "hiv.testing.or",
+  #   "hiv.testing.slope.or"
+  # ),
+  sti.testing = c(
+      "sti.screening.or",
+      "sti.screening.slope.or"
   ),
   #
   symptomatic.testing.primary.sex = c(
@@ -1138,40 +1167,40 @@ TESTING.SAMPLING.BLOCKS = list(
     "or.symptomatic.2000",
     "or.symptomatic.2010",
     "or.symptomatic.2020"
-  ),
-  #
-  sti.screening.by.stage1=c(
-    "sti.screening.multiplier.ps",     
-    "sti.screening.multiplier.el",
-    "sti.screening.multiplier.ll"
-  ),
-  sti.screening.by.stage2=c(
-    "sti.screening.multiplier.tertiary",
-    "sti.screening.multiplier.cns"
-  ),    
-  sti.screening.by.time1 = c(
-    "sti.screening.multiplier.1970",
-    "sti.screening.multiplier.1990",
-    "sti.screening.multiplier.1995"
-  ),
-  sti.screening.by.time2 = c(
-    "sti.screening.multiplier.2000",
-    "sti.screening.multiplier.2010",
-    "sti.screening.multiplier.2020"
-  ),
-  
-  sti.screening.by.race = c(
-    "sti.screening.multiplier.black",
-    "sti.screening.multiplier.hispanic",
-    "sti.screening.multiplier.other"
-  ),
-  sti.screening.by.sex = c(
-    "sti.screening.multiplier.heterosexual_male",
-    "sti.screening.multiplier.msm",
-    "sti.screening.multiplier.female"
-  ),
-  #
-  future.change.sti.screening=c("sti.screening.future.change.mult")
+  )
+  # #
+  # sti.screening.by.stage1=c(
+  #   "sti.screening.multiplier.ps",     
+  #   "sti.screening.multiplier.el",
+  #   "sti.screening.multiplier.ll"
+  # ),
+  # sti.screening.by.stage2=c(
+  #   "sti.screening.multiplier.tertiary",
+  #   "sti.screening.multiplier.cns"
+  # ),    
+  # sti.screening.by.time1 = c(
+  #   "sti.screening.multiplier.1970",
+  #   "sti.screening.multiplier.1990",
+  #   "sti.screening.multiplier.1995"
+  # ),
+  # sti.screening.by.time2 = c(
+  #   "sti.screening.multiplier.2000",
+  #   "sti.screening.multiplier.2010",
+  #   "sti.screening.multiplier.2020"
+  # ),
+  # 
+  # sti.screening.by.race = c(
+  #   "sti.screening.multiplier.black",
+  #   "sti.screening.multiplier.hispanic",
+  #   "sti.screening.multiplier.other"
+  # ),
+  # sti.screening.by.sex = c(
+  #   "sti.screening.multiplier.heterosexual_male",
+  #   "sti.screening.multiplier.msm",
+  #   "sti.screening.multiplier.female"
+  # ),
+  # #
+  # future.change.sti.screening=c("sti.screening.future.change.mult")
 )
 
 ## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
@@ -1239,26 +1268,26 @@ AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
     "or.symptomatic.age54",
     "or.symptomatic.age64",
     "or.symptomatic.age65"
-  ),
-  screening.by.age.1 = c(
-    "sti.screening.multiplier.age14",
-    "sti.screening.multiplier.age19",
-    "sti.screening.multiplier.age24",
-    "sti.screening.multiplier.age29",
-    "sti.screening.multiplier.age34"
-  ),
-  
-  screening.by.age.2 = c(
-    "sti.screening.multiplier.age39",
-    "sti.screening.multiplier.age44",
-    "sti.screening.multiplier.age49"
-  ),
-  
-  screening.by.age.3 = c(
-    "sti.screening.multiplier.age54",
-    "sti.screening.multiplier.age64",
-    "sti.screening.multiplier.age65"
-  ) 
+  )
+  # screening.by.age.1 = c(
+  #   "sti.screening.multiplier.age14",
+  #   "sti.screening.multiplier.age19",
+  #   "sti.screening.multiplier.age24",
+  #   "sti.screening.multiplier.age29",
+  #   "sti.screening.multiplier.age34"
+  # ),
+  # 
+  # screening.by.age.2 = c(
+  #   "sti.screening.multiplier.age39",
+  #   "sti.screening.multiplier.age44",
+  #   "sti.screening.multiplier.age49"
+  # ),
+  # 
+  # screening.by.age.3 = c(
+  #   "sti.screening.multiplier.age54",
+  #   "sti.screening.multiplier.age64",
+  #   "sti.screening.multiplier.age65"
+  # ) 
 )
 ## SD.MULT.SAMPLING.BLOCKS ----
 SD.MULT.SAMPLING.BLOCKS = list(
