@@ -47,12 +47,15 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
         
         from_locations <- locations::get.contained.locations(to_location, geographic.type.from)
         
+        error_prefix <- paste0("Cannot aggregate ", geographic.type.from, " data for 'to.location' ", to_location, ": ")
+        
         # Contribution data - each location as a fraction of all in that year
         relative_contribution_data <- get_relative_contributions(data.manager,
                                                                  outcome.for.relative.contribution,
                                                                  source.for.relative.contribution,
                                                                  ontology.for.relative.contribution,
-                                                                 from_locations)
+                                                                 from_locations,
+                                                                 error.prefix = error_prefix)
         
         years_with_contribution_data <- dimnames(relative_contribution_data)$year
         
@@ -67,7 +70,7 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
             
             for (strat_name in names(outcome_data_all_ontologies[[ont_name]])) {
                 
-                if (strat_name == "year__location__race") browser()
+                # if (strat_name == "year__location__race") browser()
                 
                 if (scale == "proportion" && !(strat_name %in% names(denominator_data_for_ontology))) next
                 
@@ -180,15 +183,21 @@ get_relative_contributions <- function(data.manager,
                                        source.for.relative.contribution,
                                        ontology.for.relative.contribution,
                                        from.locations,
+                                       error.prefix,
                                        debug=F) {
     if (debug) browser()
     relative_contribution_data <- data.manager$data[[outcome.for.relative.contribution]][["estimate"]][[source.for.relative.contribution]][[ontology.for.relative.contribution]][["year__location"]][,from.locations,drop=F]
+    
+    if (is.null(relative_contribution_data))
+        stop(paste0(error.prefix, "No ", outcome.for.relative.contribution, " data found"))
+    
+    if (dim(relative_contribution_data)[["location"]] == 1)
+        return(relative_contribution_data[!is.na(relative_contribution_data),,drop=F])
 
     # check if we got data. If a county is missing... we have trouble!
-
     relative_contributions <- t(apply(relative_contribution_data, "year", function(x) {x / sum(x)}))
-    
     relative_contributions[apply(!is.na(relative_contributions), "year", all),,drop=F]
+    
 }
 
 #' @description
