@@ -1,4 +1,4 @@
-source('data_processing/aggregate_county_to_msa.new.R') #This aggregates county level data to other locations
+source('data_processing/aggregate_county_to_msa_new.R') #This aggregates county level data to other locations
 
 put.msa.data.as.new.source.NEW(outcome = 'ps.syphilis.diagnoses',
                                from.source.name = 'cdc.sti',
