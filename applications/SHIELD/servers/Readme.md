@@ -4,6 +4,10 @@ This guide provides instructions for accessing and using the JHEEM/SHIELD modeli
 
 **Note:** You must be connected to the JHU VPN to access any of these servers.
 
+> **Important: DNS Not Yet Updated (January 2026)**
+>
+> The `shield1` and `shield2` servers were recently moved and assigned new IP addresses. The DNS records have **not yet been updated**, so connecting via hostname (e.g., `shield1.jhsph.edu`) will fail. **Use the IP addresses directly** until DNS is updated.
+
 ## Getting Started & Account Management
 
 ### Initial Login and Password Change
@@ -23,23 +27,25 @@ Multiple users can be logged in and working on the servers simultaneously. Be mi
 
 ## Connecting to the Servers
 
-You can connect to the servers using their hostnames:
-- `pearl1.jhsph.edu`
-- `shield1.jhsph.edu`
-- `shield2.jhsph.edu`
+### Server Addresses
 
-Or their respective IP addresses if needed:
-- `pearl1`: `10.253.171.246`
-- `shield1`: `10.253.171.232`
-- `shield2`: `10.253.171.233`
+| Server | Hostname | IP Address |
+|--------|----------|------------|
+| pearl1 | `pearl1.jhsph.edu` | `10.253.171.246` |
+| shield1 | `shield1.jhsph.edu` | `10.253.170.91` |
+| shield2 | `shield2.jhsph.edu` | `10.253.170.89` |
+
+> **Reminder:** Until DNS is updated, use IP addresses for `shield1` and `shield2`.
 
 ### Method 1: Terminal (macOS/Linux) using SSH
 
-Use the following command, replacing `YOUR_USERNAME` with your assigned username and `SERVER_HOSTNAME` with the specific server you are connecting to (e.g., `pearl1.jhsph.edu`).
+Use the following command, replacing `YOUR_USERNAME` with your assigned username and `SERVER_ADDRESS` with the IP address (or hostname once DNS is fixed).
 
 Type this in your local terminal:
 ```bash
-ssh YOUR_USERNAME@SERVER_HOSTNAME
+ssh YOUR_USERNAME@10.253.170.91   # For shield1
+ssh YOUR_USERNAME@10.253.170.89   # For shield2
+ssh YOUR_USERNAME@pearl1.jhsph.edu   # For pearl1
 ```
 
 ### Method 2: VS Code with Remote - SSH Extension
@@ -54,24 +60,26 @@ This provides a rich editing environment directly on the server.
    chmod 700 ~/.ssh
    chmod 600 ~/.ssh/config
    ```
-   
+
    Then edit the `~/.ssh/config` file (you can open it in VS Code) and add these entries:
    ```
-   Host jhu-pearl1 # Alias for pearl1
+   Host jhu-pearl1
        HostName pearl1.jhsph.edu
        User YOUR_USERNAME
 
-   Host jhu-shield1 # Alias for shield1
-       HostName shield1.jhsph.edu
+   Host jhu-shield1
+       HostName 10.253.170.91
        User YOUR_USERNAME
 
-   Host jhu-shield2 # Alias for shield2
-       HostName shield2.jhsph.edu
+   Host jhu-shield2
+       HostName 10.253.170.89
        User YOUR_USERNAME
    ```
    Replace `YOUR_USERNAME` with your assigned username on the servers.
 
-3. In VS Code, open the Command Palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows/Linux), type "Remote-SSH: Connect to Host...", and select the alias you configured (e.g., `jhu-pearl1`).
+   > **Note:** Once DNS is updated, you can change the `HostName` for shield1/shield2 back to `shield1.jhsph.edu` and `shield2.jhsph.edu`.
+
+3. In VS Code, open the Command Palette (`Cmd+Shift+P` on macOS, `Ctrl+Shift+P` on Windows/Linux), type "Remote-SSH: Connect to Host...", and select the alias you configured (e.g., `jhu-shield1`).
 
 ### Method 3: RStudio Server (Web Browser)
 
@@ -79,9 +87,11 @@ RStudio Server provides a familiar R IDE accessible via your web browser.
 
 1. Open a web browser and go to the appropriate URL:
    - For `pearl1`: `http://pearl1.jhsph.edu:8787`
-   - For `shield1`: `http://shield1.jhsph.edu:8787`
-   - For `shield2`: `http://shield2.jhsph.edu:8787`
+   - For `shield1`: `http://10.253.170.91:8787`
+   - For `shield2`: `http://10.253.170.89:8787`
 2. Log in with your Linux username and password for that specific server.
+
+> **Note:** Once DNS is updated, you can use the hostnames (e.g., `http://shield1.jhsph.edu:8787`).
 
 ### Recommended: SSH Key-Based Authentication (Passwordless Login)
 
@@ -103,10 +113,17 @@ In a terminal on your *local* machine:
 
 #### B. Copy Your Public Key to EACH Server
 
-For *each server* (`pearl1`, `shield1`, `shield2`) you want passwordless access to, run this command from your *local* machine, replacing `SERVER_HOSTNAME` and `YOUR_USERNAME`:
+For *each server* (`pearl1`, `shield1`, `shield2`) you want passwordless access to, run this command from your *local* machine:
 
 ```bash
-ssh-copy-id -i ~/.ssh/id_ed25519.pub YOUR_USERNAME@SERVER_HOSTNAME
+# For pearl1:
+ssh-copy-id -i ~/.ssh/id_ed25519.pub YOUR_USERNAME@pearl1.jhsph.edu
+
+# For shield1 (use IP until DNS is fixed):
+ssh-copy-id -i ~/.ssh/id_ed25519.pub YOUR_USERNAME@10.253.170.91
+
+# For shield2 (use IP until DNS is fixed):
+ssh-copy-id -i ~/.ssh/id_ed25519.pub YOUR_USERNAME@10.253.170.89
 ```
 
 You will be prompted for your password for that server one last time to authorize the key.
@@ -124,7 +141,7 @@ Host jhu-pearl1
 
 If you used the default key (`id_ed25519` or `id_rsa`), SSH usually tries it automatically.
 
-Now, `ssh YOUR_USERNAME@SERVER_HOSTNAME` or connecting via VS Code should not ask for a password (it might ask for your SSH key's passphrase once per session, which your system's SSH agent can often remember).
+Now, `ssh YOUR_USERNAME@SERVER_ADDRESS` or connecting via VS Code should not ask for a password (it might ask for your SSH key's passphrase once per session, which your system's SSH agent can often remember).
 
 ## Setting Up Your JHEEM Workspace (First-Time Setup)
 
@@ -132,7 +149,7 @@ Organize your JHEEM-related files in your home directory on the server.
 
 ### Create Workspace Directories
 
-Open a terminal on the server (e.g., pearl1) and run:
+Open a terminal on the server (e.g., shield1) and run:
 
 ```bash
 cd ~  # Go to your home directory
@@ -178,7 +195,7 @@ Populate this `~/jheem/code/jheem_analyses/cached/` directory with the required 
 - If using VS Code, you can often drag and drop files/folders from your local machine directly into the cached directory visible in VS Code's file explorer connected to the server.
 - Alternatively, use `scp` or other file transfer methods. For example, to copy all files from a local cached folder to the server's cached directory:
   ```bash
-  scp -r /path/to/local/cached/* YOUR_USERNAME@pearl1.jhsph.edu:~/jheem/code/jheem_analyses/cached/
+  scp -r /path/to/local/cached/* YOUR_USERNAME@10.253.170.91:~/jheem/code/jheem_analyses/cached/
   ```
 
 ## Running R and Model Scripts
@@ -256,7 +273,7 @@ nohup Rscript applications/SHIELD/shield_calib_setup_and_run.R > shield_run_outp
 
 To see your R processes:
 ```bash
-ps -fu YOUR_USERNAME | grep '[R]script' 
+ps -fu YOUR_USERNAME | grep '[R]script'
 # Or more generally for any R process:
 # ps -fu YOUR_USERNAME | grep '[R]'
 ```
@@ -282,9 +299,9 @@ You would typically run this in a separate R session (e.g., in RStudio Server, o
 # Example:
 # source("path/to/your/main_jheem_setup.R") # If needed
 
-get.calibration.progress(version = "shield", 
+get.calibration.progress(version = "shield",
                          locations = "C.12580", # Or a vector of locations
-                         calibration.code = "name_of_your_calibration") 
+                         calibration.code = "name_of_your_calibration")
                          # root.dir might need to be specified if not default
 ```
 
@@ -320,7 +337,7 @@ If the job was started in `screen` or `tmux`, you would typically reattach to th
 
 ### Using RStudio Server
 
-1. Access RStudio Server for the specific server (e.g., `http://pearl1.jhsph.edu:8787`) and log in.
+1. Access RStudio Server for the specific server (e.g., `http://10.253.170.91:8787`) and log in.
 2. Your R session will start in your home directory (`/home/YOUR_USERNAME`).
 3. Use the Files pane in RStudio to navigate to your `jheem/code/jheem_analyses/` directory.
 4. Open R scripts (e.g., `applications/SHIELD/shield_calib_setup_and_run.R`).
