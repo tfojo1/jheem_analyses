@@ -1,0 +1,16 @@
+REMOVAL SUMMARY - 20260202_153253_county_race_quality_fix
+============================================================ 
+Script: implement_removals.R
+Criteria: County race coverage < 90% threshold
+Timestamp: 2026-02-02 15:32:53.964506
+User: 
+Git Commit: 96f500cd
+
+IMPACT:
+- 16 combinations affected across 0 MSAs
+- 0 individual race data points removed
+- 0 total cases affected (preserved in totals)
+
+BY MSA:
+
+BY OUTCOME:
