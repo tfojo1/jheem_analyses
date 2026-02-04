@@ -138,8 +138,17 @@ get_race_ids <- function(races, mappings = cdc_mappings) {
   ids <- mappings$race %>%
     filter(name %in% races) %>%
     pull(id)
-  
+
   if(length(ids) == 0) stop("Invalid races: ", paste(races, collapse=", "))
+  return(ids)
+}
+
+get_sex_ids <- function(sexes, mappings = cdc_mappings) {
+  ids <- mappings$sex %>%
+    filter(name %in% sexes) %>%
+    pull(id)
+
+  if(length(ids) == 0) stop("Invalid sexes: ", paste(sexes, collapse=", "))
   return(ids)
 }
 
@@ -165,6 +174,7 @@ get_cdc_data <- function(
   years <- if(length(years) == 1) c(years) else as.character(years)
   age_groups <- if(length(age_groups) == 1) c(age_groups) else age_groups
   races <- if(length(races) == 1) c(races) else races
+  sex <- if(length(sex) == 1) c(sex) else sex
 
   # Get all combinations of parameters to fetch
   param_grid <- expand.grid(
@@ -189,9 +199,8 @@ get_cdc_data <- function(
     year_id <- get_year_ids(year)
     age_ids <- get_age_ids(age_groups)
     race_ids <- get_race_ids(races)
+    sex_ids <- get_sex_ids(sex)
 
-    # Constants
-    sex_id <- 601  # "Both sexes" - could make this dynamic later
     unknown_id <- 801  # Required by API
 
     # Construct variable_ids string
@@ -202,7 +211,7 @@ get_cdc_data <- function(
         year_id,
         age_ids,
         race_ids,
-        sex_id,
+        sex_ids,
         unknown_id
       ),
       collapse = ","
@@ -274,7 +283,7 @@ get_cdc_data <- function(
             FIPS = mappings$geography$fips[match(sourcedata.3, mappings$geography$id)],
             `Age Group` = mappings$age$name[match(sourcedata.7, mappings$age$id)],
             `Race/Ethnicity` = mappings$race$name[match(sourcedata.5, mappings$race$id)],
-            Sex = sex,
+            Sex = mappings$sex$name[match(sourcedata.6, mappings$sex$id)],
             `Data Status` = case_when(
               sourcedata.4 == 404 ~ "Available",
               sourcedata.4 == 408 ~ "Not available",
@@ -332,7 +341,7 @@ get_cdc_data <- function(
             FIPS = mappings$geography$fips[match(sourcedata.3, mappings$geography$id)],
             `Age Group` = mappings$age$name[match(sourcedata.7, mappings$age$id)],
             `Race/Ethnicity` = mappings$race$name[match(sourcedata.5, mappings$race$id)],
-            Sex = sex,
+            Sex = mappings$sex$name[match(sourcedata.6, mappings$sex$id)],
             `Data Status` = case_when(
               sourcedata.4 == 400 ~ "Not suppressed",
               sourcedata.4 == 405 ~ "Data suppressed",

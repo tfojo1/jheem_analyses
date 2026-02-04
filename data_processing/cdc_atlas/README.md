@@ -13,7 +13,8 @@ data <- get_cdc_data(
   locations = "Arizona",
   years = "2023",
   age_groups = "Ages 13 years and older",
-  races = "All races/ethnicities"
+  races = "All races/ethnicities",
+  sex = "Both sexes"  # default
 )
 
 # Multiple indicators
@@ -43,6 +44,16 @@ data <- get_cdc_data(
   age_groups = "Ages 13 years and older",
   races = "All races/ethnicities"
 )
+
+# Filter by sex
+data <- get_cdc_data(
+  indicators = "Primary and Secondary Syphilis",
+  locations = "California",
+  years = "2023",
+  age_groups = "Ages 13 years and older",
+  races = "All races/ethnicities",
+  sex = c("Male", "Female")
+)
 ```
 
 ## Available Syphilis Indicators
@@ -52,11 +63,26 @@ data <- get_cdc_data(
 - "Congenital Syphilis"
 - "Unknown Duration or Late Syphilis"
 
-## List All Available Indicators
+## Available Sex/Gender Options
+
+- "Both sexes" (default)
+- "Male"
+- "Female"
+- "All gender identities"
+- "Man", "Woman"
+- "Transgender", "Transgender woman", "Transgender man"
+- "Additional gender identity (AGI)"
+
+Note: Not all sex/gender options have data for all indicators.
+
+## List All Available Options
 
 ```r
 source("data_processing/cdc_atlas/load_cdc.R")
-print(cdc_mappings$indicators$name)
+print(cdc_mappings$indicators$name)  # indicators
+print(cdc_mappings$sex$name)         # sex/gender options
+print(cdc_mappings$race$name)        # race/ethnicity options
+print(cdc_mappings$age$name)         # age groups
 ```
 
 ## Output Columns
