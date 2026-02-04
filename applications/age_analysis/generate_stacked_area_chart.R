@@ -18,11 +18,18 @@ load(file="../jheem_analyses/applications/age_analysis/Rdata Objects/state_order
 original_eleven <- c("AL", "CA", "FL", "GA", "IL", "LA", "MO", "MS", "NY", "TX", "WI")
 ONLY_ELEVEN <- F
 # ONLY_ELEVEN <- T
+CROI_states <- c("AL", "CA", "FL", "GA", "OK", "TX")
+CROI_2026 <- T
 
 if (ONLY_ELEVEN) {
     state_order <- c(intersect(state_order, original_eleven), "total")
     state_order_names <- state_order_names[state_order]
     age_results <- age_results[,,,,original_eleven,,drop=F]
+}
+if (CROI_2026) {
+    state_order <- c(intersect(state_order, CROI_states), "total")
+    state_order_names <- state_order_names[state_order]
+    age_results <- age_results[,,,,CROI_states,,drop=F]
 }
 my_states <- setdiff(sort(state_order), "total")
 
@@ -63,6 +70,9 @@ plot <- make_stacked_area_plots(c(my_states, "total"))
 if (ONLY_ELEVEN) {
     ggsave(filename = "../jheem_analyses/applications/age_analysis/Figures/HIV & Aging/stacked_area_chart.png",
            plot=plot,width = 7, height=6)
+} else if (CROI_2026) {
+    ggsave(filename = "../jheem_analyses/applications/age_analysis/Figures/CROI_2026/stacked_area_chart.png",
+           plot=plot,width = 6, height=8)
 } else {
     ggsave(filename = "../jheem_analyses/applications/age_analysis/Figures/Manuscript/stacked_area_chart.png",
            plot=plot,width = 10, height=10)
