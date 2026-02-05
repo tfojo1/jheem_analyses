@@ -272,17 +272,17 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   # Stratify intercept by race and sex 
   #'@Andrew: it doesnt make sense to me to seperate this by stage
   # 
-  or.symptomatic.ps.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  or.symptomatic.ps.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  or.symptomatic.ps.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  #
-  or.symptomatic.ps.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  or.symptomatic.ps.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  or.symptomatic.ps.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  
-  # Changing the slope for everyone (We avoid sampling slopes across many dimensions at once, because small changes in the slope
-  # can lead to very large increases in the odds ratio)
-  or.slope.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20), #'@Andrew: did we divide by 10 to control variations?
+  # or.symptomatic.ps.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  # or.symptomatic.ps.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  # or.symptomatic.ps.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  # #
+  # or.symptomatic.ps.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  # or.symptomatic.ps.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  # or.symptomatic.ps.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  # 
+  # # Changing the slope for everyone (We avoid sampling slopes across many dimensions at once, because small changes in the slope
+  # # can lead to very large increases in the odds ratio)
+  # or.slope.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20), #'@Andrew: did we divide by 10 to control variations?
   
   ## STI Screening ----
   # Stratify intercept by race and sex
@@ -294,20 +294,20 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   # Changing the slope for everyone
-  or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20),  #'@Andrew: did we divide by 10 to control variations?
+  or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20)   #'@Andrew: did we divide by 10 to control variations?
   
   
   ## Syphilis to HIV Testing Ratio ----
   # Stratify intercept by race and sex
-  or.syphilis.to.hiv.testing.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  or.syphilis.to.hiv.testing.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  or.syphilis.to.hiv.testing.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  #
-  or.syphilis.to.hiv.testing.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  #
-  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20) #'@Andrew: did we divide by 10 to control variations? 
+  # or.syphilis.to.hiv.testing.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # or.syphilis.to.hiv.testing.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # or.syphilis.to.hiv.testing.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # #
+  # or.syphilis.to.hiv.testing.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # #
+  # or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20) #'@Andrew: did we divide by 10 to control variations? 
 )
 
 ###--------------------------------------------------------------------------###
@@ -676,45 +676,45 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   
   ## Symptomatic Testing ----
   # changes in intercept by sex
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.primary",
-                                                 alpha.name = "intercept",
-                                                 values = parameters[paste0("or.symptomatic.ps.", sexes)],
-                                                 dimension = "sex", #recipient
-                                                 applies.to.dimension.values = sexes)
-  # changes in intercept by race
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.primary",
-                                                 alpha.name = "intercept",
-                                                 values = parameters[paste0("or.symptomatic.ps.msm", races)],
-                                                 dimension = "race", #recipient
-                                                 applies.to.dimension.values = races)
-  # same changes for secondary:
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.secondary",
-                                                 alpha.name = "intercept",
-                                                 values = parameters[paste0("or.symptomatic.ps.", sexes)],
-                                                 dimension = "sex", #recipient
-                                                 applies.to.dimension.values = sexes)
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.secondary",
-                                                 alpha.name = "intercept",
-                                                 values = parameters[paste0("or.symptomatic.ps.msm", races)],
-                                                 dimension = "race", #recipient
-                                                 applies.to.dimension.values = races)
-  # changing the slope
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.primary",
-                                                 alpha.name = "slope",
-                                                 values = parameters['or.slope.symptomatic.ps'],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "prp.symptomatic.secondary",
-                                                 alpha.name = "slope",
-                                                 values = parameters['or.slope.symptomatic.ps'],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "prp.symptomatic.primary",
+  #                                                alpha.name = "intercept",
+  #                                                values = parameters[paste0("or.symptomatic.ps.", sexes)],
+  #                                                dimension = "sex", #recipient
+  #                                                applies.to.dimension.values = sexes)
+  # # changes in intercept by race
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "prp.symptomatic.primary",
+  #                                                alpha.name = "intercept",
+  #                                                values = parameters[paste0("or.symptomatic.ps.msm", races)],
+  #                                                dimension = "race", #recipient
+  #                                                applies.to.dimension.values = races)
+  # # same changes for secondary:
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "prp.symptomatic.secondary",
+  #                                                alpha.name = "intercept",
+  #                                                values = parameters[paste0("or.symptomatic.ps.", sexes)],
+  #                                                dimension = "sex", #recipient
+  #                                                applies.to.dimension.values = sexes)
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "prp.symptomatic.secondary",
+  #                                                alpha.name = "intercept",
+  #                                                values = parameters[paste0("or.symptomatic.ps.msm", races)],
+  #                                                dimension = "race", #recipient
+  #                                                applies.to.dimension.values = races)
+  # # changing the slope
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "prp.symptomatic.primary",
+  #                                                alpha.name = "slope",
+  #                                                values = parameters["or.slope.symptomatic.ps"],
+  #                                                dimension = "all", #recipient
+  #                                                applies.to.dimension.values = "all")
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "prp.symptomatic.secondary",
+  #                                                alpha.name = "slope",
+  #                                                values = parameters["or.slope.symptomatic.ps"],
+  #                                                dimension = "all", #recipient
+  #                                                applies.to.dimension.values = "all")
   ## STI Screening  ----
   # Change intercept and slope 
   set.element.functional.form.main.effect.alphas(model.settings,
@@ -738,25 +738,25 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   
   ## Syphilis to HIV tests Ratio ----
   # Change intercept and slope
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "ratio.syphilis.screening.to.hiv.tests",
-                                                 alpha.name = "intercept",
-                                                 values = parameters[paste0("or.syphilis.to.hiv.testing.", sexes)],
-                                                 dimension = "sex", #recipient
-                                                 applies.to.dimension.values = sexes)
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "ratio.syphilis.screening.to.hiv.tests",
-                                                 alpha.name = "intercept",
-                                                 values = parameters[paste0("or.syphilis.to.hiv.testing.", races)],
-                                                 dimension = "race", #recipient
-                                                 applies.to.dimension.values = races)
-  
-  set.element.functional.form.main.effect.alphas(model.settings,
-                                                 element.name = "ratio.syphilis.screening.to.hiv.tests",
-                                                 alpha.name = "slope",
-                                                 values = parameters["or.slope.syphilis.to.hiv.testing."],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")  
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "ratio.syphilis.screening.to.hiv.tests",
+  #                                                alpha.name = "intercept",
+  #                                                values = parameters[paste0("or.syphilis.to.hiv.testing.", sexes)],
+  #                                                dimension = "sex", #recipient
+  #                                                applies.to.dimension.values = sexes)
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "ratio.syphilis.screening.to.hiv.tests",
+  #                                                alpha.name = "intercept",
+  #                                                values = parameters[paste0("or.syphilis.to.hiv.testing.", races)],
+  #                                                dimension = "race", #recipient
+  #                                                applies.to.dimension.values = races)
+  # 
+  # set.element.functional.form.main.effect.alphas(model.settings,
+  #                                                element.name = "ratio.syphilis.screening.to.hiv.tests",
+  #                                                alpha.name = "slope",
+  #                                                values = parameters["or.slope.syphilis.to.hiv.testing."],
+  #                                                dimension = "all", #recipient
+  #                                                applies.to.dimension.values = "all")  
   
   # Prenatal care ----
   trimesters <- list(
@@ -1058,38 +1058,38 @@ STI.TESTING.SAMPLING.BLOCKS = list(
     "or.sti.screening.other"),
   #
   sti.testing.slope=c(
-    "or.slope.sti.screening"), #'@Andrew: should we keep this as a single param or add to the other one?
+    "or.slope.sti.screening") #'@Andrew: should we keep this as a single param or add to the other one?
   #
-  prp.sympt.ps.sex = c(
-    "or.symptomatic.ps.msm",
-    "or.symptomatic.ps.heterosexual_male",
-    "or.symptomatic.ps.female"
-  ),
+  # prp.sympt.ps.sex = c(
+  #   "or.symptomatic.ps.msm",
+  #   "or.symptomatic.ps.heterosexual_male",
+  #   "or.symptomatic.ps.female"
+  # ),
+  # #
+  # prp.sympt.ps.race = c(
+  #   "or.symptomatic.ps.black",
+  #   "or.symptomatic.ps.hispanic",
+  #   "or.symptomatic.ps.other"
+  # ),
+  # prp.sympt.slope=c(
+  #   "or.slope.symptomatic.ps"  #'@Andrew: should we keep this as a single param or add to the other one?
+  # ),
   #
-  prp.sympt.ps.race = c(
-    "or.symptomatic.ps.black",
-    "or.symptomatic.ps.hispanic",
-    "or.symptomatic.ps.other"
-  ),
-  prp.sympt.slope=c(
-    "or.slope.symptomatic.ps"  #'@Andrew: should we keep this as a single param or add to the other one?
-  ),
-  #
-  syphilis.to.hiv.testing.ratio.sex<-c(
-    "or.syphilis.to.hiv.testing.msm",
-    "or.syphilis.to.hiv.testing.heterosexual_male",
-    "or.syphilis.to.hiv.testing.female"
-  ),
-  #
-  syphilis.to.hiv.testing.ratio.race<-c(
-    "or.syphilis.to.hiv.testing.black",
-    "or.syphilis.to.hiv.testing.hispanic",
-    "or.syphilis.to.hiv.testing.other"
-  ),
-  #
-  syphilis.to.hiv.testing.ratio.slope<-c(
-    "or.slope.syphilis.to.hiv.testing" #'@Andrew: should we keep this as a single param or add to the other one?
-  )
+  # syphilis.to.hiv.testing.ratio.sex<-c(
+  #   "or.syphilis.to.hiv.testing.msm",
+  #   "or.syphilis.to.hiv.testing.heterosexual_male",
+  #   "or.syphilis.to.hiv.testing.female"
+  # ),
+  # #
+  # syphilis.to.hiv.testing.ratio.race<-c(
+  #   "or.syphilis.to.hiv.testing.black",
+  #   "or.syphilis.to.hiv.testing.hispanic",
+  #   "or.syphilis.to.hiv.testing.other"
+  # ),
+  # #
+  # syphilis.to.hiv.testing.ratio.slope<-c(
+  #   "or.slope.syphilis.to.hiv.testing" #'@Andrew: should we keep this as a single param or add to the other one?
+  # )
   
 )
 ## SD.MULT.SAMPLING.BLOCKS ----

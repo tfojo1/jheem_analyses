@@ -1044,6 +1044,7 @@ get_prp_symptomatic_primary_functional_form <- function(specification.metadata) 
   prp_symptomatic_primary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.primary,
                                                                                     slope = 0,
                                                                                     max = 1,
+                                                                                    anchor.year = 1970,
                                                                                     parameters.are.on.logit.scale = F)
   
   prp_symptomatic_primary_functional_form
@@ -1057,6 +1058,7 @@ get_prp_symptomatic_secondary_functional_form <- function(specification.metadata
   prp_symptomatic_secondary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.secondary,
                                                                                       slope = 0,
                                                                                       max = 1,
+                                                                                      anchor.year = 1970,
                                                                                       parameters.are.on.logit.scale = F)
   
   prp_symptomatic_secondary_functional_form
@@ -1091,7 +1093,7 @@ get_sti_to_hiv_testing_ratio_functional_form <- function(specification.metadata)
                                                                                         slope = 0,
                                                                                         anchor.year = 2014,
                                                                                         max = 1,
-                                                                                        parameters.are.on.logit.scale = T)
+                                                                                        parameters.are.on.logit.scale = F)
   
   syphilis_to_hiv_testing_ratio_functional_form
 }

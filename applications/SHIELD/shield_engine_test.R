@@ -10,7 +10,7 @@ source('applications/SHIELD/shield_specification.R')
 VERSION='shield'
 LOCATION='C.12580' #Baltimore MSA
 # LOCATION='C.35620'#NYC 
-#'@MS:How to find the codes for each MSA?
+
 
 # make a run:
 engine = create.jheem.engine( VERSION,  LOCATION, end.year = 2030)
