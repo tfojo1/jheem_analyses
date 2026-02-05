@@ -1,6 +1,17 @@
 source("applications/SHIELD/shield_base_parameters.R")
 source("applications/SHIELD/inputs/input_estimate_sexual_activity_by_age.R")
 
+#Notes:
+# We use this distribution to model uncertainty in changes to event odds.
+# We assume the odds ratio is most likely between half and double the prior odds.
+# Lognormal.Distribution(meanlog = log(1), sdlog = log(2)/2), # 95% CI= (0.5, 1.9) 
+
+# When using a log-linear or logit-linear model, we can express changes in terms of odds ratios
+# for both the intercept and the slope.
+# In practice, it is generally recommended to apply this formulation to the intercept.
+# We avoid sampling slopes across many dimensions at once, because small changes in the slope
+# can lead to very large increases in the odds ratio.
+
 # Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
 # HELPER FUNCTIONS ----
 
@@ -186,101 +197,106 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   el.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
   el.diagnoses.heterosexual.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
   
-#'@PKASAIE
+  #'@PKASAIE
   lu.diagnoses.msm.multiplier.1970             = Lognormal.Distribution(meanlog = log(3), sdlog = 0.5*log(2)),#'@Ryan: why are we using these mu
   lu.diagnoses.heterosexual.multiplier.1970 = Lognormal.Distribution(meanlog = 0.0, sdlog = 0.5*log(2)),
-
-
-    ## Global transmission ----
-    global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
-    
-    #12 independant params
-    ## msm multipliers by time ----
-    make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to heterosexuals
-                         logmean00 = log(3),logsd00 = log(2), #reference year 2000 # 3X transmission assumption based on https://pmc.ncbi.nlm.nih.gov/articles/PMC11307151
-                         #
-                         logsd.delta95 = log(sqrt(1.5))/2, #'@Ryan: why are we using these values?
-                         logsd.delta90 = log(sqrt(1.5))/2, 
-                         logsd.delta70 = log(1.5^2)/2,
-                         logsd.delta10 = log(1.5)/2, 
-                         logsd.delta20 = log(1.5)/2
-    ),
-    
-    ## heterosexual multipliers by time ----
-     make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", 
-                         logmean00 = 0,logsd00 = log(2), ##'@Ryan: why are we using this SD?
-                         logsd.delta95 = log(sqrt(1.5))/2, 
-                         logsd.delta90 = log(sqrt(1.5))/2, 
-                         logsd.delta70 = log(1.5^2)/2,
-                         logsd.delta10 = log(1.5)/2, 
-                         logsd.delta20 = log(1.5)/2
-    ),
-    
-    ## race multipliers (msm and het seperatly) ----
-    #'@Ryan: we have used sdlog= log(2)/2 everywhere else.why increasing here?
-    transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    
-    transmission.rate.multiplier.hispanic.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.hispanic.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    
-    transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-    
-    ## future change ----
-    transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #@Ryan: please cite these numbers 
-    
-    ## Sexual Mixing by Age ----
-    age.mixing.sd.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #the model is sensitive to this parameter-we reduce the sdlog=1/4*log(2)
-    #directly used in specification helper function
-    #to control the standard deviation of the contact matrix by age
-    
-    ## Sexual Mixing by Race ----
-    #this is multiplied in the race mixing matrix
-    black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(2)), #Mu and SD are chosen empirically 
-    hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),  
-    other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),
-    
-    ## Sexual Mixing by Risk ----
-    oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), #SD are chosen empirically '@Ryan: Mu?
-    fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
-    fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
-    
-    # Proportion MSM ----#'@:Ryan: where are these mu/sd coming from? 
-    black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
-    hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)),
-    other.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
-    
-    # relapse & infectiousness for EL ---- '@:Ryan: where are these mu/sd coming from? 
-    prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
-    el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
- ) 
+  
+  
+  ## Global transmission ----
+  global.transmission.rate = Lognormal.Distribution(meanlog = log(2.2), sdlog = log(10)/2), #'@Ryan: why are we using these mu/sd?
+  
+  #12 independant params
+  ## msm multipliers by time ----
+  make.mv.spline.prior(parameter = "transmission.rate.multiplier.msm", #relative to heterosexuals
+                       logmean00 = log(3),logsd00 = log(2), #reference year 2000 # 3X transmission assumption based on https://pmc.ncbi.nlm.nih.gov/articles/PMC11307151
+                       #
+                       logsd.delta95 = log(sqrt(1.5))/2, #'@Ryan: why are we using these values?
+                       logsd.delta90 = log(sqrt(1.5))/2, 
+                       logsd.delta70 = log(1.5^2)/2,
+                       logsd.delta10 = log(1.5)/2, 
+                       logsd.delta20 = log(1.5)/2
+  ),
+  
+  ## heterosexual multipliers by time ----
+  make.mv.spline.prior(parameter = "transmission.rate.multiplier.heterosexual", 
+                       logmean00 = 0,logsd00 = log(2), ##'@Ryan: why are we using this SD?
+                       logsd.delta95 = log(sqrt(1.5))/2, 
+                       logsd.delta90 = log(sqrt(1.5))/2, 
+                       logsd.delta70 = log(1.5^2)/2,
+                       logsd.delta10 = log(1.5)/2, 
+                       logsd.delta20 = log(1.5)/2
+  ),
+  
+  ## race multipliers (msm and het seperatly) ----
+  #'@Ryan: we have used sdlog= log(2)/2 everywhere else.why increasing here?
+  transmission.rate.multiplier.black.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  transmission.rate.multiplier.black.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  
+  transmission.rate.multiplier.hispanic.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  transmission.rate.multiplier.hispanic.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  
+  transmission.rate.multiplier.other.msm= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  transmission.rate.multiplier.other.heterosexual= Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
+  
+  ## future change ----
+  transmission.rate.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #@Ryan: please cite these numbers 
+  
+  ## Sexual Mixing by Age ----
+  age.mixing.sd.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.5*log(2)), #the model is sensitive to this parameter-we reduce the sdlog=1/4*log(2)
+  #directly used in specification helper function
+  #to control the standard deviation of the contact matrix by age
+  
+  ## Sexual Mixing by Race ----
+  #this is multiplied in the race mixing matrix
+  black.black.sexual.multi = Lognormal.Distribution(meanlog = log(4), sdlog = log(2)), #Mu and SD are chosen empirically 
+  hispanic.hispanic.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),  
+  other.other.sexual.multi = Lognormal.Distribution(meanlog =  log(4), sdlog = log(2)),
+  
+  ## Sexual Mixing by Risk ----
+  oe.female.pairings.with.msm = Lognormal.Distribution(meanlog = log(0.0895), sdlog = log(2)), #SD are chosen empirically '@Ryan: Mu?
+  fraction.heterosexual_male.pairings.with.male = Logitnormal.Distribution(meanlogit = logit(0.004), sdlogit = log(2)),
+  fraction.msm.pairings.with.female = Logitnormal.Distribution(meanlogit = logit(0.1187612), sdlogit = log(2)),
+  
+  # Proportion MSM ----#'@:Ryan: where are these mu/sd coming from? 
+  black.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
+  hispanic.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog = 0, sdlog = 0.125*log(2)),
+  other.proportion.msm.of.male.mult = Lognormal.Distribution(meanlog =0, sdlog = 0.125*log(2)),
+  
+  # relapse & infectiousness for EL ---- '@:Ryan: where are these mu/sd coming from? 
+  prop.early.latent.to.secondary=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) ),# get.intervals(prop.early.latent.to.secondary)
+  el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
+) 
 
 ## TESTING.PARAMETERS.PRIOR ----
 TESTING.PARAMETERS.PRIOR=join.distributions( 
-  # Symptomatic testing ----
-  # Odd-Ratio of symptomatic testing (Changes in the intercept) #'@Andrew: it doesnt make sense to me to seperate this by stage
-  # by sex:
+  ## Proportion Symptomatic (Testing) ----
+  # Stratify intercept by race and sex 
+  #'@Andrew: it doesnt make sense to me to seperate this by stage
+  # 
   or.symptomatic.ps.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
   or.symptomatic.ps.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
   or.symptomatic.ps.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
-  # by race:
+  #
   or.symptomatic.ps.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
   or.symptomatic.ps.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
   or.symptomatic.ps.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
   
-  ## STI screening ----
-  # This will be an odds ratio between the simulation odds and the fixed beta odds...? No...
-  # sti.screening.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), # 95% prob of ranging between half and double
+  # Changing the slope for everyone (We avoid sampling slopes across many dimensions at once, because small changes in the slope
+  # can lead to very large increases in the odds ratio)
+  or.slope.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20), #'@Andrew: did we divide by 10 to control variations?
   
-  # We are careful not to sample the slope by many dimensions at once, because
-  # just do this by sex.
-  sti.screening.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2/10), # if divide by 
-  
+  ## STI Screening ----
   # Stratify intercept by race and sex
-  sti.screening.or.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  sti.screening.or.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  sti.screening.or.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.sti.screening.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.sti.screening.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.sti.screening.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  #
+  or.sti.screening.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  # Changing the slope for everyone
+  or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20),  #'@Andrew: did we divide by 10 to control variations?
+  
   
   # # NEW: STI to HIV testing multiplier (not yet used)
   # syphilis.to.hiv.testing.multiplier.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
@@ -721,32 +737,37 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  values = parameters[paste0("or.symptomatic.ps.msm", races)],
                                                  dimension = "race", #recipient
                                                  applies.to.dimension.values = races)
+  # changing the slope
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "prp.symptomatic.primary",
+                                                 alpha.name = "slope",
+                                                 values = parameters['or.slope.symptomatic.ps'],
+                                                 dimension = "all", #recipient
+                                                 applies.to.dimension.values = "all")
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "prp.symptomatic.secondary",
+                                                 alpha.name = "slope",
+                                                 values = parameters['or.slope.symptomatic.ps'],
+                                                 dimension = "all", #recipient
+                                                 applies.to.dimension.values = "all")
   ## Sti Screening  ----
-  # # Changing the intercept and slope for HIV tests
-  # set.element.functional.form.main.effect.alphas(model.settings,
-  #                                                element.name = "rate.testing.hiv.without.covid.over.14",
-  #                                                alpha.name = "intercept",
-  #                                                values = parameters["hiv.testing.or"],
-  #                                                dimension = "all", #recipient
-  #                                                applies.to.dimension.values = "all")
-  # set.element.functional.form.main.effect.alphas(model.settings,
-  #                                                element.name = "rate.testing.hiv.without.covid.over.14",
-  #                                                alpha.name = "slope",
-  #                                                values = parameters["hiv.testing.slope.or"],
-  #                                                dimension = "all", #recipient
-  #                                                applies.to.dimension.values = "all")
-  
-  # NEW: Change intercept and slope for STI screening
+  # Change intercept and slope for STI screening
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "rate.sti.screening.over.14",
                                                  alpha.name = "intercept",
-                                                 values = parameters[paste0("sti.screening.or.", races)],
+                                                 values = parameters[paste0("or.sti.screening.", races)],
                                                  dimension = "race", #recipient
-                                                 applies.to.dimension.values = races) # vectorized, defined line 527
+                                                 applies.to.dimension.values = races) 
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "rate.sti.screening.over.14",
+                                                 alpha.name = "intercept",
+                                                 values = parameters[paste0("or.sti.screening.", sexes)],
+                                                 dimension = "sex", #recipient
+                                                 applies.to.dimension.values = sexes)
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "rate.sti.screening.over.14",
                                                  alpha.name = "slope",
-                                                 values = parameters["sti.screening.slope.or"],
+                                                 values = parameters["or.slope.sti.screening"],
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
   
@@ -795,7 +816,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   # )
   
   
-
+  
   
   
   
@@ -1085,34 +1106,44 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
     'black.proportion.msm.of.male.mult',
     'hispanic.proportion.msm.of.male.mult',
     'other.proportion.msm.of.male.mult')
-
+  
 )
 
 ## TESTING.SAMPLING.BLOCKS ----
 TESTING.SAMPLING.BLOCKS = list(
-  sti.testing = c(
-      "sti.screening.or",
-      "sti.screening.slope.or"
-  ),
+  sti.testing.sex = c(
+    "or.sti.screening.msm",
+    "or.sti.screening.heterosexual_male",
+    "or.sti.screening.female"),
   #
-  symptomatic.testing.ps.sex = c(
+  sti.testing.race= c(
+    "or.sti.screening.black",
+    "or.sti.screening.hispanic",
+    "or.sti.screening.other"),
+  #
+  sti.testing.slope=c(
+    "or.slope.sti.screening"), #'@Andrew: should we keep this as a single param or add to the other one?
+  #
+  prp.sympt.ps.sex = c(
     "or.symptomatic.ps.msm",
     "or.symptomatic.ps.heterosexual_male",
     "or.symptomatic.ps.female"
   ),
   #
-  symptomatic.testing.ps.race = c(
+  prp.sympt.ps.race = c(
     "or.symptomatic.ps.black",
     "or.symptomatic.ps.hispanic",
     "or.symptomatic.ps.other"
   ),
-     
+  prp.sympt.slope=c(
+    "or.slope.symptomatic.ps"  #'@Andrew: should we keep this as a single param or add to the other one?
+  )
   # future.change.sti.screening=c("sti.screening.future.change.mult")
 )
 
 ## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
 AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
- 
+  
   
   # age.mixing.transmission=(
   #   "age.mixing.sd.mult"
@@ -1198,7 +1229,7 @@ AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
 )
 ## SD.MULT.SAMPLING.BLOCKS ----
 SD.MULT.SAMPLING.BLOCKS = list(
-
+  
   age.mixing.transmission=(
     "age.mixing.sd.mult"
   )
