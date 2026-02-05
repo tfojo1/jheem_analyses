@@ -1033,23 +1033,35 @@ oes.to.proportions <- function(oes, population)
 }
 
 
-#-- HIV TESTING FUNCTIONAL FORM --# -----
-# get.hiv.testing.functional.form = function(specification.metadata){
-#   # cashed object from input_hiv_testing_prior_brfss.R
-#   testing.prior = get.cached.object.for.version(name = "hiv.testing.prior",
-#                                                 version = specification.metadata$version)
-# 
-#   
-#   hiv.testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9) , #helps counteract max value below a bit
-#                                                                        slope = testing.prior$slopes,
-#                                                                        anchor.year = 2010,
-#                                                                        max = 0.9,
-#                                                                        #min??
-#                                                                        parameters.are.on.logit.scale = T)
-#   hiv.testing.functional.form
-# }
 
-#-- STI SCREENING FUNCTIONAL FORMS --# ----
+#-- PRP SYMPTOMATIC TESTING --# ----
+get_prp_symptomatic_testing_primary_functional_form <- function(specification.metadata) {
+  base.prp.symptomatic.primary = array(
+    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'],
+      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'],
+      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
+  #
+  prp_symptomatic_testing_primary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.primary,
+                                                                          slope = 0,
+                                                                          max = 1,
+                                                                          parameters.are.on.logit.scale = F)
+  
+  prp_symptomatic_testing_primary_functional_form
+}
+get_prp_symptomatic_testing_secondary_functional_form <- function(specification.metadata) {
+  base.prp.symptomatic.secondary = array(
+    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
+      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'],
+      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
+  #
+  prp_symptomatic_testing_secondary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.secondary,
+                                                                                            slope = 0,
+                                                                                            max = 1,
+                                                                                            parameters.are.on.logit.scale = F)
+  
+  prp_symptomatic_testing_secondary_functional_form
+}
+#-- STI SCREENING --# ----
 get_sti_screening_functional_form <- function(specification.metadata) {
     # Get a cached object
     # Actually, we read the HIV testing prior in, then shift it to serve as our STI screening functional form's priors
