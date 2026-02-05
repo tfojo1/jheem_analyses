@@ -950,59 +950,18 @@ register.transition(SHIELD.SPECIFICATION,
 # We assume 100% care seeking and testing rate for "symptomatic" cases in Primary&Secondary Stage (effective proportion) 
 # Those who don’t notice the symptoms or don’t seek care based on symptoms are treated as asymptomatic.
 # We assume 100% care/seeking and testing rate for symptomatic individuals
-base.prp.symptomatic.primary = array(
-    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']
-    ),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.primary",
-                       scale = 'proportion',
-                       functional.form.from.time = 1970, 
-                       functional.form = create.natural.spline.functional.form(
-                           knot.times = c("1970"=1970,  "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
-                           knot.values = list("1970" = base.prp.symptomatic.primary,
-                                              "1990" = base.prp.symptomatic.primary,
-                                              "1995" = base.prp.symptomatic.primary,
-                                              "2000" =  base.prp.symptomatic.primary,
-                                              "2010" =  base.prp.symptomatic.primary,
-                                              "2020" =  base.prp.symptomatic.primary),
-                           #
-                           knots.are.on.transformed.scale = F,
-                           knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
-                           link="logit",
-                           #
-                           min=0, #do we need these for the proportion? 
-                           max=1
-                           #
-                           
-                       ))
-base.prp.symptomatic.secondary = array(
-    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']
-    ),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
+                       scale = "proportion",
+                       functional.form.from.time = 1970,
+                       get.functional.form.function = get_prp_symptomatic_testing_primary_functional_form)
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.secondary",
-                       scale = 'proportion',
-                       functional.form.from.time = 1970, 
-                       functional.form = create.natural.spline.functional.form(
-                           knot.times = c("1970"=1970, "1990" = 1990, "1995" = 1995,"2000"=2000, "2010"=2010, "2020" = 2020),
-                           knot.values = list("1970" = base.prp.symptomatic.secondary,
-                                              "1990" = base.prp.symptomatic.secondary,
-                                              "1995" = base.prp.symptomatic.secondary,
-                                              "2000" =  base.prp.symptomatic.secondary,
-                                              "2010" =  base.prp.symptomatic.secondary,
-                                              "2020" =  base.prp.symptomatic.secondary),
-                           knots.are.on.transformed.scale = F,
-                           knot.link = "logit", #I think that the knots multipliers are in the logit scale, right? 
-                           link="logit",
-                           #
-                           min=0, #do we need these for the proportion? 
-                           max=1
-                       ))
+                       scale = "proportion",
+                       functional.form.from.time = 1970,
+                       get.functional.form.function = get_prp_symptomatic_testing_secondary_functional_form)
 
 # For now, we assume 100% test.sensitivity as well. 
 # proportion of symp.testing that are successfully diagnosed: 
@@ -1081,10 +1040,10 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 # NEW: Model multipler from STI screeening to HIV tests as a smooth function
 # Does phrasing '...screening TO hiv test' imply you multiply this by screening to GET hiv tests?
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'multiplier.syphilis.screening.to.hiv.tests',
+                       name = 'ratio.syphilis.screening.to.hiv.tests',
                        scale = "ratio",
                        # get.functional.form.function = get_syphilis_to_hiv_multiplier_functional_form,
-                       value = 2) # A simple stand in.
+                       value = 0.5) # A simple stand in.
                        # functional.form.from.time = 2014,
                        # functional.form.scale = "ratio") #???
 
@@ -1093,7 +1052,7 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.testing.hiv',
                         scale = "rate",
-                        value = expression(rate.sti.screening * multiplier.syphilis.screening.to.hiv.tests))
+                        value = expression(rate.sti.screening / ratio.syphilis.screening.to.hiv.tests))
 
 ##---- 3-PRENATAL SCREENING FOR PREGNANT WOMEN ----
 # prop of pregnant women receiving 'successful' prenatal screening 
@@ -1615,7 +1574,7 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                                                                  axis.name = 'Proportion Tested',
                                                                                  units = '%'),
                                       rate.value = 'rate.sti.screening', # Make sure this is the name of the quantity we made.
-                                      denominator.outcome =  'prevalence',
+                                      denominator.outcome =  'population',
                                       keep.dimensions = c('location','age','race','sex'), # @Andrew removed stage
                                       # force.dim.names.to.keep.dimensions = T, #forces to keep the dimensions that we specify
                                       # corresponding.data.outcome = 'proportion.tested.for.hiv'

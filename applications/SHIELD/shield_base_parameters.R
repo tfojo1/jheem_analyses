@@ -187,6 +187,9 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.t
 ## ---- SYMPTOMATIC INFECTIONS ----                        
 ## Proportion of incident cases presenting with symptomatic primary or secondary disease: 
 # FOR HET_MALE AND FEMALES, values set based on MSM data #LIMITATION
+
+# Look for more data for female
+
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm.est',
                                       0.25, 0.2, 0.29, #data from MSM 
                                       citation = "syphilis_natural_history.docx")
