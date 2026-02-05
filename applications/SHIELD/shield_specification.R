@@ -949,8 +949,6 @@ register.transition(SHIELD.SPECIFICATION,
 # Register "Effective" symptomatic proportions for primary and secondary stages
 # We assume 100% care seeking and testing rate for "symptomatic" cases in Primary&Secondary Stage (effective proportion) 
 # Those who don’t notice the symptoms or don’t seek care based on symptoms are treated as asymptomatic.
-# We assume 100% care/seeking and testing rate for symptomatic individuals
-
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.primary",
                        scale = "proportion",
@@ -968,7 +966,7 @@ register.model.element(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'prp.diagnosed.sym.testing.primary',
                         scale = 'proportion',
-                        value =0)
+                        value = 0 )
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'prp.diagnosed.sym.testing.primary',
                                applies.to = list(stage='primary'),
@@ -982,9 +980,10 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(stage='secondary'),
                                value = 'prp.symptomatic.secondary') # can also add: *sensitivity of test in primary * care seeking behavior
 
-#  Testing is modeled "during the stage", i.e. at the same time as the stage is active. 
-#  r= -log(1-p)/t
-# we only calculate the rate here, and model the transitions below 
+# Symp.Testing happens "during the PS stages", i.e. during the months of secondary disease. 
+# So we need to convert the proportion to a gradual rate of exit for this stage
+# p= 1-exp(-rt) -> r=-log(1-p)/t
+# we calculate the rate here, and model the transitions below 
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.testing.symptomatic',
                         scale = 'rate',
@@ -997,6 +996,8 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.testing.symptomatic',
                                applies.to = list(stage='secondary'),
                                value = expression(-log(1-prp.diagnosed.sym.testing.secondary)/duration.secondary))
+
+# Tertiary state is always symptomatic and care seeking happens after the first month (duration = 1month)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'duration.tertiary',
                        scale = 'non.negative.number',
@@ -1015,10 +1016,13 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value =expression(1/duration.cns))
 
 
-##---- 2-SCREENING FOR ALL ----
+##---- 2-STI SCREENING ----
+# In absence of direct data on STI screening rate, we estiamte the initial function using the HIV testing data from BRFSS.
+# We then implement multiple parameters to fine tune STI testing in our model (by sex, race, etc) to fit STI diagnosis
+# We also calculate the projected HIV testing pattern from simulated STI screening in the model, and fit that against observed data to make sure that we stay true to it
 
-# NEW: Model STI screening rate as a smooth function
-# Because our HIV testing prior that was used to make this FF's prior doesn't cover youngest strata, we must call it the screening rate for over 14 only.
+# HIV testing data (BRFFS) starts from age 18. We assume those age 15-17 have similar testing proportions as those in 18-19 agegroup
+# we assume 0 testing in the youngest age-group [0-14].
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'rate.sti.screening.over.14',
                        scale = 'rate',
@@ -1037,18 +1041,17 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                applies.to = list(age=c("15-19 years" ,"20-24 years" ,"25-29 years" ,"30-34 years", "35-39 years", "40-44 years", "45-49 years" ,"50-54 years", "55-64 years" ,"65+ years")),
                                value = "rate.sti.screening.over.14")
 
-# NEW: Model multipler from STI screeening to HIV tests as a smooth function
-# Does phrasing '...screening TO hiv test' imply you multiply this by screening to GET hiv tests?
+# Model the ratio of STI screening to HIV tests as a smooth function 
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'ratio.syphilis.screening.to.hiv.tests',
-                       scale = "ratio",
+                       scale = "ratio", #can go over 1 but we would expect it  not to
                        # get.functional.form.function = get_syphilis_to_hiv_multiplier_functional_form,
-                       value = 0.5) # A simple stand in.
                        # functional.form.from.time = 2014,
                        # functional.form.scale = "ratio") #???
-
-# NEW
+                       value = 0.5) # A simple stand in.
+                       
 # @Parastu, Todd insisted on dividing, not multiplying, in this expression, but if the multiplier is >1 (such as 2), then it should be multiplying, yes? HIV rate > STI screening rate.
+#' @Andrew: it's OK to divide. we can limit this to remain below 1 through the prior (logitnormal)  
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.testing.hiv',
                         scale = "rate",
