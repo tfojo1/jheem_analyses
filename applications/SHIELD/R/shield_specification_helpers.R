@@ -1034,33 +1034,34 @@ oes.to.proportions <- function(oes, population)
 
 
 
-#-- PRP SYMPTOMATIC TESTING --# ----
-get_prp_symptomatic_testing_primary_functional_form <- function(specification.metadata) {
+#-- PRP SYMPTOMATIC  --# ----
+get_prp_symptomatic_primary_functional_form <- function(specification.metadata) {
   base.prp.symptomatic.primary = array(
     c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'],
       SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'],
       SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
   #
-  prp_symptomatic_testing_primary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.primary,
+  prp_symptomatic_primary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.primary,
                                                                           slope = 0,
                                                                           max = 1,
                                                                           parameters.are.on.logit.scale = F)
   
-  prp_symptomatic_testing_primary_functional_form
+  prp_symptomatic_primary_functional_form
 }
-get_prp_symptomatic_testing_secondary_functional_form <- function(specification.metadata) {
+get_prp_symptomatic_secondary_functional_form <- function(specification.metadata) {
   base.prp.symptomatic.secondary = array(
     c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
       SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'],
       SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
   #
-  prp_symptomatic_testing_secondary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.secondary,
+  prp_symptomatic_secondary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.secondary,
                                                                                             slope = 0,
                                                                                             max = 1,
                                                                                             parameters.are.on.logit.scale = F)
   
-  prp_symptomatic_testing_secondary_functional_form
+  prp_symptomatic_secondary_functional_form
 }
+
 #-- STI SCREENING --# ----
 get_sti_screening_functional_form <- function(specification.metadata) {
     # Get a cached object

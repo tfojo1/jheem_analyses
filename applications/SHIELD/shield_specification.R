@@ -953,13 +953,13 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.primary",
                        scale = "proportion",
                        functional.form.from.time = 1970,
-                       get.functional.form.function = get_prp_symptomatic_testing_primary_functional_form)
+                       get.functional.form.function = get_prp_symptomatic_primary_functional_form)
 
 register.model.element(SHIELD.SPECIFICATION,
                        name = "prp.symptomatic.secondary",
                        scale = "proportion",
                        functional.form.from.time = 1970,
-                       get.functional.form.function = get_prp_symptomatic_testing_secondary_functional_form)
+                       get.functional.form.function = get_prp_symptomatic_secondary_functional_form)
 
 # For now, we assume 100% test.sensitivity as well. 
 # proportion of symp.testing that are successfully diagnosed: 

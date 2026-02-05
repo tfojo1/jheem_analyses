@@ -258,36 +258,18 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
 
 ## TESTING.PARAMETERS.PRIOR ----
 TESTING.PARAMETERS.PRIOR=join.distributions( 
-  #'@Ryan: why sd=log(2) for ORs? 
-  # Odd-Ratio of symptomatic testing (by stage & sex ) ----
-  or.symptomatic.primary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
-  or.symptomatic.primary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
-  or.symptomatic.primary.female = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
-  #
-  or.symptomatic.secondary.msm = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
-  or.symptomatic.secondary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
-  or.symptomatic.secondary.female= Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ),
-  #
+  # Symptomatic testing ----
+  # Odd-Ratio of symptomatic testing (Changes in the intercept) #'@Andrew: it doesnt make sense to me to seperate this by stage
+  # by sex:
+  or.symptomatic.ps.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  or.symptomatic.ps.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  or.symptomatic.ps.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  # by race:
+  or.symptomatic.ps.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  or.symptomatic.ps.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
+  or.symptomatic.ps.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2 ) ,
   
-  # NEW: no distinction by stage for race
-  or.symptomatic.primary.black = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
-  or.symptomatic.primary.hispanic = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
-  or.symptomatic.primary.other = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
-  #
-  or.symptomatic.secondary.black = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)) ,
-  or.symptomatic.secondary.hispanic = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)) ,
-  or.symptomatic.secondary.other= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  
-  # Odd-Ratio of symptomatic testing (by time) ----
-  #' #'@Ryan: let's put into a MVN format
-  #' or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  #' or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  #' or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  #' or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  #' or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  #' or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  
-  # NEW: STI screening ----
+  ## STI screening ----
   # This will be an odds ratio between the simulation odds and the fixed beta odds...? No...
   # sti.screening.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), # 95% prob of ranging between half and double
   
@@ -711,7 +693,35 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   )
   
   
-  ## STI SCREENING  ----
+  ## Symptomatic Testing ----
+  # changes in intercept by sex
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "prp.symptomatic.primary",
+                                                 alpha.name = "intercept",
+                                                 values = parameters[paste0("or.symptomatic.ps.", sexes)],
+                                                 dimension = "sex", #recipient
+                                                 applies.to.dimension.values = sexes)
+  # changes in intercept by race
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "prp.symptomatic.primary",
+                                                 alpha.name = "intercept",
+                                                 values = parameters[paste0("or.symptomatic.ps.msm", races)],
+                                                 dimension = "race", #recipient
+                                                 applies.to.dimension.values = races)
+  # same changes for secondary:
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "prp.symptomatic.secondary",
+                                                 alpha.name = "intercept",
+                                                 values = parameters[paste0("or.symptomatic.ps.", sexes)],
+                                                 dimension = "sex", #recipient
+                                                 applies.to.dimension.values = sexes)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "prp.symptomatic.secondary",
+                                                 alpha.name = "intercept",
+                                                 values = parameters[paste0("or.symptomatic.ps.msm", races)],
+                                                 dimension = "race", #recipient
+                                                 applies.to.dimension.values = races)
+  ## Sti Screening  ----
   # # Changing the intercept and slope for HIV tests
   # set.element.functional.form.main.effect.alphas(model.settings,
   #                                                element.name = "rate.testing.hiv.without.covid.over.14",
@@ -784,64 +794,8 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   #                                                dimension = "all"
   # )
   
-  # Symptomatic Testing ----
-  # NEW: Don't have knots.
-  for(time in c("1970", "1990","1995","2000","2010","2020")){
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.primary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.",time)],
-                                                   dimension = "all", #recipient
-                                                   applies.to.dimension.values = "all")
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.primary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.primary.", sexes)],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = sexes)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.primary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.primary.", races)],
-                                                   dimension = "race", #recipient
-                                                   applies.to.dimension.values = races)
-    
-    
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.secondary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.",time)],
-                                                   dimension = "all", #recipient
-                                                   applies.to.dimension.values = "all")
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.secondary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.secondary.", sexes)],
-                                                   dimension = "sex", #recipient
-                                                   applies.to.dimension.values = sexes)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.secondary",
-                                                   alpha.name = time,
-                                                   values = parameters[paste0("or.symptomatic.secondary.", races)],
-                                                   dimension = "race", #recipient
-                                                   applies.to.dimension.values = races)
-    paramName =paste0("or.symptomatic.age",agegroups)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.primary",
-                                                   alpha.name = time,
-                                                   values = parameters[paramName],
-                                                   dimension = "age", 
-                                                   applies.to.dimension.values = ages)
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = "prp.symptomatic.secondary",
-                                                   alpha.name = time,
-                                                   values = parameters[paramName],
-                                                   dimension = "age", 
-                                                   applies.to.dimension.values = ages)
-  }
   
-  
-  
+
   
   
   
@@ -1136,77 +1090,23 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 
 ## TESTING.SAMPLING.BLOCKS ----
 TESTING.SAMPLING.BLOCKS = list(
-  # hiv.testing = c(
-  #   "hiv.testing.or",
-  #   "hiv.testing.slope.or"
-  # ),
   sti.testing = c(
       "sti.screening.or",
       "sti.screening.slope.or"
   ),
   #
-  symptomatic.testing.primary.sex = c(
-    "or.symptomatic.primary.msm",
-    "or.symptomatic.primary.heterosexual_male",
-    "or.symptomatic.primary.female"
+  symptomatic.testing.ps.sex = c(
+    "or.symptomatic.ps.msm",
+    "or.symptomatic.ps.heterosexual_male",
+    "or.symptomatic.ps.female"
   ),
-  symptomatic.testing.secondary.sex = c(
-    "or.symptomatic.secondary.msm",
-    "or.symptomatic.secondary.heterosexual_male",
-    "or.symptomatic.secondary.female"
+  #
+  symptomatic.testing.ps.race = c(
+    "or.symptomatic.ps.black",
+    "or.symptomatic.ps.hispanic",
+    "or.symptomatic.ps.other"
   ),
-  symptomatic.testing.primary.race = c(
-    "or.symptomatic.primary.black",
-    "or.symptomatic.primary.hispanic",
-    "or.symptomatic.primary.other"
-  ),
-  symptomatic.testing.secondary.race = c(
-    "or.symptomatic.secondary.black",
-    "or.symptomatic.secondary.hispanic",
-    "or.symptomatic.secondary.other"
-  ),
-  symptomatic.testing.by.time1 = c(
-    "or.symptomatic.1970",
-    "or.symptomatic.1990",
-    "or.symptomatic.1995"
-  ),
-  symptomatic.testing.by.time2 = c(
-    "or.symptomatic.2000",
-    "or.symptomatic.2010",
-    "or.symptomatic.2020"
-  )
-  # #
-  # sti.screening.by.stage1=c(
-  #   "sti.screening.multiplier.ps",     
-  #   "sti.screening.multiplier.el",
-  #   "sti.screening.multiplier.ll"
-  # ),
-  # sti.screening.by.stage2=c(
-  #   "sti.screening.multiplier.tertiary",
-  #   "sti.screening.multiplier.cns"
-  # ),    
-  # sti.screening.by.time1 = c(
-  #   "sti.screening.multiplier.1970",
-  #   "sti.screening.multiplier.1990",
-  #   "sti.screening.multiplier.1995"
-  # ),
-  # sti.screening.by.time2 = c(
-  #   "sti.screening.multiplier.2000",
-  #   "sti.screening.multiplier.2010",
-  #   "sti.screening.multiplier.2020"
-  # ),
-  # 
-  # sti.screening.by.race = c(
-  #   "sti.screening.multiplier.black",
-  #   "sti.screening.multiplier.hispanic",
-  #   "sti.screening.multiplier.other"
-  # ),
-  # sti.screening.by.sex = c(
-  #   "sti.screening.multiplier.heterosexual_male",
-  #   "sti.screening.multiplier.msm",
-  #   "sti.screening.multiplier.female"
-  # ),
-  # #
+     
   # future.change.sti.screening=c("sti.screening.future.change.mult")
 )
 
