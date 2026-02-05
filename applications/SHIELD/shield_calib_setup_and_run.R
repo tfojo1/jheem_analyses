@@ -24,16 +24,19 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 #
 VERSION='shield'
 # LOCATION='C.35620' #NYC
-LOCATION="C.12580" #Baltimore
+# LOCATION="C.12580" #Baltimore
+# LOCATION="C.12060"
+LOCATION = "C.33100"
 set.seed(00000)
-CACHE.FREQ= 10#100 # how often should write the results to disk (Default: 100)
-UPDATE.FREQ= 5#50 # how often to print messages (Default: 50)
+CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
+UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
 # CALIBRATION.NAME = 'calib.12.02.stage0.pk'
-CALIBRATION.NAME = 'calib.1.09.stage0.az'
+# CALIBRATION.NAME = 'calib.1.19.stage0.az'
+# CALIBRATION.NAME = 'calib.1.20.stage1.az'
+CALIBRATION.NAME = 'calib.1.20.stage1B.az'
 
-
-#################
+################
 print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
 #
 clear.calibration.cache(version=VERSION,

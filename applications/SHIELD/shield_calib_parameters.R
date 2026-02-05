@@ -268,6 +268,8 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   or.symptomatic.secondary.heterosexual_male = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
   or.symptomatic.secondary.female= Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ),
   #
+  
+  # NEW: no distinction by stage for race
   or.symptomatic.primary.black = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
   or.symptomatic.primary.hispanic = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
   or.symptomatic.primary.other = Lognormal.Distribution(meanlog = log(1), sdlog = log(2) ) ,
@@ -277,22 +279,26 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   or.symptomatic.secondary.other= Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
   
   # Odd-Ratio of symptomatic testing (by time) ----
-  #'@Ryan: let's put into a MVN format
-  or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
-  or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
+  #' #'@Ryan: let's put into a MVN format
+  #' or.symptomatic.1970 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
+  #' or.symptomatic.1990 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
+  #' or.symptomatic.1995 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
+  #' or.symptomatic.2000 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
+  #' or.symptomatic.2010 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
+  #' or.symptomatic.2020 = Lognormal.Distribution(meanlog = log(1), sdlog = log(2)),
   
-  # # HIV screening ----
-  # hiv.testing.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  # hiv.testing.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/5), #'@Ryan: why smaller sdlog?
-  
-  # NEW: STI screening
+  # NEW: STI screening ----
   # This will be an odds ratio between the simulation odds and the fixed beta odds...? No...
-  sti.screening.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), # 95% prob of ranging between half and double
-  sti.screening.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2) # should it vary more?
+  # sti.screening.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2), # 95% prob of ranging between half and double
+  
+  # We are careful not to sample the slope by many dimensions at once, because
+  # just do this by sex.
+  sti.screening.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2/10), # if divide by 
+  
+  # Stratify intercept by race and sex
+  sti.screening.or.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  sti.screening.or.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  sti.screening.or.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   
   # # NEW: STI to HIV testing multiplier (not yet used)
   # syphilis.to.hiv.testing.multiplier.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
@@ -724,9 +730,9 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "rate.sti.screening.over.14",
                                                  alpha.name = "intercept",
-                                                 values = parameters["sti.screening.or"],
-                                                 dimension = "all", #recipient
-                                                 applies.to.dimension.values = "all")
+                                                 values = parameters[paste0("sti.screening.or.", races)],
+                                                 dimension = "race", #recipient
+                                                 applies.to.dimension.values = races) # vectorized, defined line 527
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "rate.sti.screening.over.14",
                                                  alpha.name = "slope",
@@ -779,6 +785,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   # )
   
   # Symptomatic Testing ----
+  # NEW: Don't have knots.
   for(time in c("1970", "1990","1995","2000","2010","2020")){
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "prp.symptomatic.primary",
