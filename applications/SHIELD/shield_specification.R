@@ -1571,7 +1571,7 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
 )
 ##---- STI screening -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
-                                      name = 'sti.testing',
+                                      name = 'sti.screening',
                                       outcome.metadata = create.outcome.metadata(display.name = 'Proportion with STI screening in the Past Year',
                                                                                  description = "The Proportion of General Population who Received STI screening in the Past Year",
                                                                                  scale = 'proportion',
@@ -1601,10 +1601,6 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       rename.dimension.values = list(age=c('15-19 years'='18-19 years')) #the code is smart to recognize that this agegroup falls within 18-24
 )
 
-
-
-
-
 ### RATE.VALUE:
 # SHILED agegroups are: ('0-14', '15-19','20-24','25-34','35-44','45-54','55-64','65+')
 # BRFSS data includes '18-24','25-29','30-34',....
@@ -1617,8 +1613,7 @@ track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
 #                     = fraction.hiv.tests.18.19.among.15.19 * RATE(15-19) * 1/fraction.18.19.among.15.19 
 # so we need to compute: fraction.18.19.among.15.19: which is the fraction of 15-19 year olds that are 18-19 years old
 # we can estimate fraction.hiv.tests.18.19.among.15.19 from CDC data
-
-
+#
 # what fraction of 15-19 year olds are 18-19 years?
 register.model.element(SHIELD.SPECIFICATION,
                        'fraction.population.18.19.among.15.19',  
@@ -1647,7 +1642,6 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 
 ### DENOMINATOR.OUTCOME: 
 # we need to track the population over age of 18
-
 register.model.element(SHIELD.SPECIFICATION,
                        'fraction.population.over.18',  
                        scale = 'proportion',
@@ -1655,7 +1649,6 @@ register.model.element(SHIELD.SPECIFICATION,
                        age = 18,
                        denom.age.bracket.index=""
 ) #since we didnt supply a denominator.age.index, it will loop over all ages and returns a vector of fractions
-
 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'population.over.18',
@@ -1666,7 +1659,6 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          subset.dimension.values = list(age=c('15-19 years','20-24 years','25-29 years', '30-34 years','35-39 years','40-44 years', '45-49 years','50-54 years','55-64 years','65+ years')), #we can drop the first agegroup because BRFSS data starts from 18-24
                          rename.dimension.values = list(age=c('15-19 years'='18-19 years')), #the code is smart to recognize that this agegroup falls within 18-24
                          outcome.metadata = NULL)
-
 
 track.point.outcome(
     SHIELD.SPECIFICATION,
@@ -1702,12 +1694,6 @@ track.integrated.outcome(
     ),
     save = T
 )
-
-
-
-
-
-
 
 ##---- Syphilis Incidence ---- 
 # (new infections + reinfections)
@@ -1793,7 +1779,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'ps.syphilis.diagnoses' ,
                          keep.dimensions = c('location','age','race','sex')
 )
-###  Early Latent Syphilis: True Estimate ----
+### Early Latent Syphilis: True Estimate ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.el.true',
                          value = expression(diagnosis.total),
@@ -1823,7 +1809,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',  #<just for comparison>
                          keep.dimensions = c('location','age','race','sex') 
 )
-###  Early Latent Syphilis: Misclassified Estimate reported <used in calibration> ----
+### Early Latent Syphilis: Misclassified Estimate reported <used in calibration> ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.el.misclassified',
                          value = expression(diagnosis.el.true *(1-fraction.el.misclassified.ll) + 
@@ -1839,7 +1825,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'early.syphilis.diagnoses',
                          keep.dimensions = c('location','age','race','sex') 
 )
-###  Late Latent Syphilis: Misclassified Estimate in the model ----
+### Late Latent Syphilis: Misclassified Estimate in the model ----
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.ll.misclassified',
                          value = expression( diagnosis.ll.true *(1- fraction.ll.misclassified.el) + 
@@ -1854,7 +1840,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses',#<just for comparison>
                          keep.dimensions = c('location','age','race','sex') 
 )
-###  Tertiary Diagnosis  ----
+### Tertiary Diagnosis  ----
 # (all cases are symptomatic: no misclassification)
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.tertiary',
@@ -1871,7 +1857,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex') 
 ) 
 
-###  CNS diagnosis  ----
+### CNS diagnosis  ----
 #(all cases are symptomatic: no misclassification)
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.cns',
@@ -1887,7 +1873,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          # corresponding.data.outcome = 'unknown.duration.or.late.syphilis.diagnoses', #<just for comparison>
                          keep.dimensions = c('location','age','race','sex') 
 ) 
-###  Late Syphilis True ----
+### Late Syphilis True ----
 # (including LL, Tertirary and CNS): True Estimate
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.late.true', 
@@ -1904,7 +1890,7 @@ track.cumulative.outcome(SHIELD.SPECIFICATION,
                          keep.dimensions = c('location','age','race','sex')
 )
 
-###  Late Syphilis Misclassified <used in calibration> ----
+### Late Syphilis Misclassified <used in calibration> ----
 # (including LL, Tertirary and CNS): Misclassified Estimate reported 
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'diagnosis.late.misclassified',

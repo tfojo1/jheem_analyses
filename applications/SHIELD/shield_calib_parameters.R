@@ -11,7 +11,7 @@ source("applications/SHIELD/inputs/input_estimate_sexual_activity_by_age.R")
 # In practice, it is generally recommended to apply this formulation to the intercept.
 # We avoid sampling slopes across many dimensions at once, because small changes in the slope
 # can lead to very large increases in the odds ratio.
-
+# ************************************************************************************************************************
 # Helpul command: #get.intervals(variable name): Get intervals (confidence/credible intervals) for the variables in a distribution
 # HELPER FUNCTIONS ----
 
@@ -83,7 +83,6 @@ create.auto.regressive.covariance.matrix = function(correlation.coefficient,n,sd
 # Defining the calibration parameters and prior distributions
 
 #***** PARAMETER PRIORS *****----
-
 ## POPULATION.PARAMETERS.PRIOR ----
 POPULATION.PARAMETERS.PRIOR=join.distributions( 
   # Fertility rates ----
@@ -267,8 +266,8 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
   el.rel.secondary.transmissibility=Logitnormal.Distribution(meanlogit = logit(.25), sdlogit = log(2) )
 ) 
 
-## TESTING.PARAMETERS.PRIOR ----
-TESTING.PARAMETERS.PRIOR=join.distributions( 
+## STI.TESTING.PARAMETERS.PRIOR ----
+STI.TESTING.PARAMETERS.PRIOR=join.distributions( 
   ## Proportion Symptomatic (Testing) ----
   # Stratify intercept by race and sex 
   #'@Andrew: it doesnt make sense to me to seperate this by stage
@@ -309,100 +308,44 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   #
   or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20), #'@Andrew: did we divide by 10 to control variations? 
-  
-  # # STI screening knots multiplier ----
-  # # (relative to HIV screening)
-  # make.mv.spline.prior(parameter = "sti.screening.multiplier." , #'@Ryan: how are parameters set?
-  #                      logmean00 = 0,logsd00 = log(2),
-  #                      logsd.delta95 = log(sqrt(1.5))/2,
-  #                      logsd.delta90 = log(sqrt(1.5))/2,
-  #                      logsd.delta70 = log(1.5^2)/2,
-  #                      logsd.delta10 = log(1.5)/2,
-  #                      logsd.delta20 = log(1.5)/2#,
-  #                      #logsd.delta30 = log(1.5)/2
-  # ),
-  # 
-  # # STI screening future multiplier ----
-  # sti.screening.future.change.mult = Normal.Distribution(mean = 0.75, sd=0.25, lower = 0), #'Ryan: where are values coming from?
-  # 
-  # # STI screening multiplier by stage ----
-  # #(defined in specification-no linking needed here)
-  # # get.intervals(sti.screening.multiplier.ps) #most values between 0.25-0.75
-  # sti.screening.multiplier.ps = Lognormal.Distribution(meanlog = log(.5), sdlog = log(2)),
-  # sti.screening.multiplier.el = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-  # sti.screening.multiplier.ll = Lognormal.Distribution(meanlog = log(3), sdlog = log(2)),
-  # sti.screening.multiplier.tertiary = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  # sti.screening.multiplier.cns = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  # #@Ryan: my note says that "#we set the priors to reflect higher freq of screening among syphilis-infected subgroups (highrisk)"
-  # #but this is by stage. should we set the meanlog=0 and test?
-  # 
-  # # STI screening multiplier by race
-  # sti.screening.multiplier.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  # sti.screening.multiplier.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  # sti.screening.multiplier.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  # 
-  # # STI screening multiplier by sex
-  # sti.screening.multiplier.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  # sti.screening.multiplier.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)),
-  # sti.screening.multiplier.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2))
 )
 
 ###--------------------------------------------------------------------------###
-## AGE.TRANS.TEST.PARAMETERS.PRIOR ----
-# defining age coefficients for transmission, testing and screening
+## TRANS.BY.AGE.PARAMETERS.PRIOR ----
+# changing transmission function by age
 # we assume an auto regressive (AR) structure between agegroups 
-
+# 1- Parameters:
 #See estimate_sexual_activity_by_age for calculation of sexualActivity mean priors: 
 #Helpers for sexual activity by age and risk
 age_labels <- c("19","24","29","34","39","44","49","54","64","65")
 n_ages <- length(age_labels) 
-
-#see inputs/estiamte_sexual_activity_by_age.R
+#see inputs/estimate_sexual_activity_by_age.R
 # MSM_sexualActivity (male values in the survey)
 # msm_sexualActivity_means <- ESTIAMTED IN input_estimate_sexual_activity_by_age.R 
 msm_sexualActivity_meanlog <- log(msm_sexualActivity_means)
 msm_sexualActivity_sdlog <- 0.5 * log(2)     
-
 # Heterosexual_sexualActivity (these are female values)
 # het_sexualActivity_means <- ESTIAMTED IN input_estimate_sexual_activity_by_age.R 
 het_sexualActivity_meanlog <- log(het_sexualActivity_means)
 het_sexualActivity_sdlog <- 0.5 * log(2)     
-
-# Testing params
-testing_meanlog <- c(0, 0, 0, 0,0, 0, 0, 0, 0, 0)
-testing_sdlog <- 0.5 * log(2)
-
 # AR parameters 
 rho_age <- 0.7  # p: correlation between adjacent ages
-
 # Covariance matrices
 msm_sexualActivity_sigma <- create.auto.regressive.covariance.matrix(
   correlation.coefficient = rho_age,
   n = n_ages,
   sd = msm_sexualActivity_sdlog
 )
-
 het_sexualActivity_sigma <- create.auto.regressive.covariance.matrix(
   correlation.coefficient = rho_age,
   n = n_ages,
   sd = het_sexualActivity_sdlog
 )
-
-testing_sigma <- create.auto.regressive.covariance.matrix(
-  correlation.coefficient = rho_age,
-  n = n_ages,
-  sd = testing_sdlog
-)
-
-# Variable names 
+# 2- Define variable names 
 msm_varnames <- paste0("transmission.rate.multiplier.age", age_labels, ".msm")
 het_varnames <- paste0("transmission.rate.multiplier.age", age_labels, ".heterosexual")
-screening_varnames <- paste0("sti.screening.multiplier.age", age_labels)
-symptomatic_varnames <- paste0("or.symptomatic.age", age_labels)
-
-## -------------------- ##
-
-AGE.TRANS.TEST.PARAMETERS.PRIOR=join.distributions(
+# 3-Build the prior
+TRANS.BY.AGE.PARAMETERS.PRIOR=join.distributions(
   ## MSM Sexual activity ----
   #Transmission multiplier for age 0-14: we have a seperate parameter for this agegroup 
   transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(0.01), #pure assumption: sexual activity relative to 20-24 (peak)
@@ -421,26 +364,40 @@ AGE.TRANS.TEST.PARAMETERS.PRIOR=join.distributions(
     mu = het_sexualActivity_meanlog,
     sigma = het_sexualActivity_sigma,
     var.names = het_varnames
-  ), 
-  
-  ## STI.Screening ----
-  # sti.screening.multiplier.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  # SCREENING.AGE.PRIOR <- Multivariate.Lognormal.Distribution(
-  #   mu = testing_meanlog,
-  #   sigma = testing_sigma,
-  #   var.names = screening_varnames
-  # ),
-  
-  ## Symptomatic Testing ----
-  or.symptomatic.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
-  SYMPTOMATIC.PRIOR <- Multivariate.Lognormal.Distribution(
-    mu = testing_meanlog,
-    sigma = testing_sigma,
-    var.names = symptomatic_varnames
   )
-  
 )
+###--------------------------------------------------------------------------###
+## //TESTING.BY.AGE.PARAMETERS.PRIOR ----
+# A similar framework to model changes in STI screening by age #'Andrew: should we model this for sympomatic testing too?
 
+# 1- Define the params
+# testing_meanlog <- c(0, 0, 0, 0,0, 0, 0, 0, 0, 0)
+# testing_sdlog <- 0.5 * log(2)
+# testing_sigma <- create.auto.regressive.covariance.matrix(
+#   correlation.coefficient = rho_age,
+#   n = n_ages,
+#   sd = testing_sdlog
+# )
+# 2-variable names
+# screening_varnames <- paste0("sti.screening.multiplier.age", age_labels)
+# symptomatic_varnames <- paste0("or.symptomatic.age", age_labels)
+# 3-make the prior
+# TESTING.BY.AGE.PARAMETERS.PRIOR=join.distributions( 
+## STI.Screening 
+# sti.screening.multiplier.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+# SCREENING.AGE.PRIOR <- Multivariate.Lognormal.Distribution(
+#   mu = testing_meanlog,
+#   sigma = testing_sigma,
+#   var.names = screening_varnames
+# ),
+
+## Symptomatic Testing 
+# or.symptomatic.age14 = Lognormal.Distribution(meanlog = 0, sdlog = 0.5 * log(2)),
+# SYMPTOMATIC.PRIOR <- Multivariate.Lognormal.Distribution(
+#   mu = testing_meanlog,
+#   sigma = testing_sigma,
+#   var.names = symptomatic_varnames
+# )
 
 ## PRENATAL.PARAMETER.PRIOR ----
 PRENATAL.PARAMETERS.PRIOR=join.distributions(
@@ -758,7 +715,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  values = parameters['or.slope.symptomatic.ps'],
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
-  ## Sti Screening  ----
+  ## STI Screening  ----
   # Change intercept and slope 
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "rate.sti.screening.over.14",
@@ -1088,8 +1045,8 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
   
 )
 
-## TESTING.SAMPLING.BLOCKS ----
-TESTING.SAMPLING.BLOCKS = list(
+## STI.TESTING.SAMPLING.BLOCKS ----
+STI.TESTING.SAMPLING.BLOCKS = list(
   sti.testing.sex = c(
     "or.sti.screening.msm",
     "or.sti.screening.heterosexual_male",
@@ -1134,102 +1091,53 @@ TESTING.SAMPLING.BLOCKS = list(
     "or.slope.syphilis.to.hiv.testing.other"#'@Andrew: should we keep this as a single param or add to the other one?
   )
   
-  # future.change.sti.screening=c("sti.screening.future.change.mult")
 )
-
+## SD.MULT.SAMPLING.BLOCKS ----
+SD.MULT.SAMPLING.BLOCKS = list(
+  age.mixing.transmission=(
+    "age.mixing.sd.mult"
+  )
+)
 ## AGE.TRANS.TEST.SAMPLING.BLOCKS ----
-AGE.TRANS.TEST.SAMPLING.BLOCKS = list(
-  
-  
-  # age.mixing.transmission=(
-  #   "age.mixing.sd.mult"
-  # ),
+TRANS.BY.AGE.SAMPLING.BLOCKS = list(
+  age.transmission.young<-c(
+    "transmission.rate.multiplier.age14.msm",
+    "transmission.rate.multiplier.age14.heterosexual"),
+  #
   age.transmission.msm.1 = c(
-    "transmission.rate.multiplier.age14.msm",#'@Ryan: please take out 0-14 into a seperate block
     "transmission.rate.multiplier.age19.msm",
     "transmission.rate.multiplier.age24.msm",
     "transmission.rate.multiplier.age29.msm",
     "transmission.rate.multiplier.age34.msm"
   ),
-  
   age.transmission.msm.2 = c(
     "transmission.rate.multiplier.age39.msm",
     "transmission.rate.multiplier.age44.msm",
     "transmission.rate.multiplier.age49.msm"
   ),
-  
   age.transmission.msm.3 = c(
     "transmission.rate.multiplier.age54.msm",
     "transmission.rate.multiplier.age64.msm",
     "transmission.rate.multiplier.age65.msm"
   ),
-  
   age.transmission.heterosexual.1 = c(
-    "transmission.rate.multiplier.age14.heterosexual",
     "transmission.rate.multiplier.age19.heterosexual",
     "transmission.rate.multiplier.age24.heterosexual",
     "transmission.rate.multiplier.age29.heterosexual",
     "transmission.rate.multiplier.age34.heterosexual"
   ),
-  
   age.transmission.heterosexual.2 = c(
     "transmission.rate.multiplier.age39.heterosexual",
     "transmission.rate.multiplier.age44.heterosexual",
     "transmission.rate.multiplier.age49.heterosexual"
   ),
-  
   age.transmission.heterosexual.3 = c(
     "transmission.rate.multiplier.age54.heterosexual",
     "transmission.rate.multiplier.age64.heterosexual",
     "transmission.rate.multiplier.age65.heterosexual"
-  ),
-  
-  age.symptomatic.testing.1 = c(
-    "or.symptomatic.age14",
-    "or.symptomatic.age19",
-    "or.symptomatic.age24",
-    "or.symptomatic.age29",
-    "or.symptomatic.age34"
-  ),
-  
-  age.symptomatic.testing.2 = c(
-    "or.symptomatic.age39",
-    "or.symptomatic.age44",
-    "or.symptomatic.age49"
-  ),
-  
-  age.symptomatic.testing.3 = c(
-    "or.symptomatic.age54",
-    "or.symptomatic.age64",
-    "or.symptomatic.age65"
-  )
-  # screening.by.age.1 = c(
-  #   "sti.screening.multiplier.age14",
-  #   "sti.screening.multiplier.age19",
-  #   "sti.screening.multiplier.age24",
-  #   "sti.screening.multiplier.age29",
-  #   "sti.screening.multiplier.age34"
-  # ),
-  # 
-  # screening.by.age.2 = c(
-  #   "sti.screening.multiplier.age39",
-  #   "sti.screening.multiplier.age44",
-  #   "sti.screening.multiplier.age49"
-  # ),
-  # 
-  # screening.by.age.3 = c(
-  #   "sti.screening.multiplier.age54",
-  #   "sti.screening.multiplier.age64",
-  #   "sti.screening.multiplier.age65"
-  # ) 
-)
-## SD.MULT.SAMPLING.BLOCKS ----
-SD.MULT.SAMPLING.BLOCKS = list(
-  
-  age.mixing.transmission=(
-    "age.mixing.sd.mult"
   )
 )
+
 ## PRENATAL.SAMPLING.BLOCKS ----
 PRENATAL.SAMPLING.BLOCKS=list(
   # First trimester
@@ -1315,7 +1223,7 @@ SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
   POPULATION.PARAMETERS.PRIOR,
   AGING.PARAMETERS.PRIOR,
   TRANSMISSION.PARAMETERS.PRIOR,
-  TESTING.PARAMETERS.PRIOR,
+  STI.TESTING.PARAMETERS.PRIOR,
   AGE.TRANS.TEST.PARAMETERS.PRIOR,
   PRENATAL.PARAMETERS.PRIOR
 )
@@ -1324,8 +1232,8 @@ SHIELD.FULL.PARAMETERS.SAMPLING.BLOCKS=c(
   POPULATION.SAMPLING.BLOCKS,
   AGING.SAMPLING.BLOCKS ,
   TRANSMISSION.SAMPLING.BLOCKS,
-  TESTING.SAMPLING.BLOCKS,
-  AGE.TRANS.TEST.SAMPLING.BLOCKS,
+  STI.TESTING.SAMPLING.BLOCKS,
+  TRANS.BY.AGE.SAMPLING.BLOCKS,
   PRENATAL.SAMPLING.BLOCKS,
   SD.MULT.SAMPLING.BLOCKS #we have seperated this for now.
   
