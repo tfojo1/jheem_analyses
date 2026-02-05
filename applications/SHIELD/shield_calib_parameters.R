@@ -298,9 +298,17 @@ TESTING.PARAMETERS.PRIOR=join.distributions(
   or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20),  #'@Andrew: did we divide by 10 to control variations?
   
   
-  # # NEW: STI to HIV testing multiplier (not yet used)
-  # syphilis.to.hiv.testing.multiplier.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
-  # syphilis.to.hiv.testing.multiplier.slope.or = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2)
+  ## Syphilis to HIV Testing Ratio ----
+  # Stratify intercept by race and sex
+  or.syphilis.to.hiv.testing.msm = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.syphilis.to.hiv.testing.heterosexual_male = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.syphilis.to.hiv.testing.female = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  #
+  or.syphilis.to.hiv.testing.black = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
+  #
+  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20), #'@Andrew: did we divide by 10 to control variations? 
   
   # # STI screening knots multiplier ----
   # # (relative to HIV screening)
@@ -751,7 +759,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
   ## Sti Screening  ----
-  # Change intercept and slope for STI screening
+  # Change intercept and slope 
   set.element.functional.form.main.effect.alphas(model.settings,
                                                  element.name = "rate.sti.screening.over.14",
                                                  alpha.name = "intercept",
@@ -771,56 +779,27 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
                                                  dimension = "all", #recipient
                                                  applies.to.dimension.values = "all")
   
-  # NEW: Do the same for the multiplier of syphilis to HIV tests
+  ## Syphilis to HIV tests Ratio ----
+  # Change intercept and slope
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "ratio.syphilis.screening.to.hiv.tests",
+                                                 alpha.name = "intercept",
+                                                 values = parameters[paste0("or.syphilis.to.hiv.testing.", sexes)],
+                                                 dimension = "sex", #recipient
+                                                 applies.to.dimension.values = sexes)
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "ratio.syphilis.screening.to.hiv.tests",
+                                                 alpha.name = "intercept",
+                                                 values = parameters[paste0("or.syphilis.to.hiv.testing.", races)],
+                                                 dimension = "race", #recipient
+                                                 applies.to.dimension.values = races)
   
-  # # Changing the knot values for ratio of STI screening to HIV tests
-  # for(time in c("1970","1990","1995","2000","2010","2020")){
-  #   
-  #   
-  #   set.element.functional.form.main.effect.alphas(model.settings,
-  #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
-  #                                                  alpha.name = time,
-  #                                                  values = parameters[paste0("sti.screening.multiplier.",time)],
-  #                                                  dimension = "all", #recipient
-  #                                                  applies.to.dimension.values = "all")
-  #   
-  #   set.element.functional.form.main.effect.alphas(model.settings,
-  #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
-  #                                                  alpha.name = time,
-  #                                                  values = parameters[paste0("sti.screening.multiplier.",races)],
-  #                                                  dimension = "race", #recipient
-  #                                                  applies.to.dimension.values = races)
-  #   set.element.functional.form.main.effect.alphas(model.settings,
-  #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
-  #                                                  alpha.name = time,
-  #                                                  values = parameters[paste0("sti.screening.multiplier.", sexes)],
-  #                                                  dimension = "sex", #recipient
-  #                                                  applies.to.dimension.values = sexes)
-  #   paramName =paste0("sti.screening.multiplier.age",agegroups)
-  #   set.element.functional.form.main.effect.alphas(model.settings,
-  #                                                  element.name = "multiplier.syphilis.screening.to.hiv.tests",
-  #                                                  alpha.name = time,
-  #                                                  values = parameters[paramName],
-  #                                                  dimension = "age", 
-  #                                                  applies.to.dimension.values = ages)
-  #   
-  #   
-  # }
-  # #Note: sti.screening.multiplier.*by stage are directly linked in the specification
-  # set.element.functional.form.main.effect.alphas(model.settings,
-  #                                                element.name = "multiplier.syphilis.screening.to.hiv.tests",
-  #                                                alpha.name = "after.modifier",
-  #                                                values = parameters["sti.screening.future.change.mult"],
-  #                                                applies.to.dimension.values = "all",
-  #                                                dimension = "all"
-  # )
-  
-  
-  
-  
-  
-  
-  
+  set.element.functional.form.main.effect.alphas(model.settings,
+                                                 element.name = "ratio.syphilis.screening.to.hiv.tests",
+                                                 alpha.name = "slope",
+                                                 values = parameters["or.slope.syphilis.to.hiv.testing."],
+                                                 dimension = "all", #recipient
+                                                 applies.to.dimension.values = "all")  
   
   # Prenatal care ----
   trimesters <- list(
@@ -1137,7 +1116,24 @@ TESTING.SAMPLING.BLOCKS = list(
   ),
   prp.sympt.slope=c(
     "or.slope.symptomatic.ps"  #'@Andrew: should we keep this as a single param or add to the other one?
+  ),
+  #
+  syphilis.to.hiv.testing.ratio.sex<-c(
+    "or.syphilis.to.hiv.testing.msm",
+    "or.syphilis.to.hiv.testing.heterosexual_male",
+    "or.syphilis.to.hiv.testing.female"
+  ),
+  #
+  syphilis.to.hiv.testing.ratio.race<-c(
+    "or.syphilis.to.hiv.testing.black",
+    "or.syphilis.to.hiv.testing.hispanic",
+    "or.syphilis.to.hiv.testing.other"
+  ),
+  #
+  syphilis.to.hiv.testing.ratio.slope<-c(
+    "or.slope.syphilis.to.hiv.testing.other"#'@Andrew: should we keep this as a single param or add to the other one?
   )
+  
   # future.change.sti.screening=c("sti.screening.future.change.mult")
 )
 

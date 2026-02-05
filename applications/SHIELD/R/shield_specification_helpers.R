@@ -1082,18 +1082,18 @@ get_sti_screening_functional_form <- function(specification.metadata) {
   
   sti_screening_functional_form
 }
-
-# Not yet used
-get_syphilis_to_hiv_multiplier_functional_form <- function(specification.metadata) {
-  # Get a cached object
-  multiplier_prior <- get.cached.object.for.version(name = "sti.to.hiv.test.prior",
-                                                    version = specification.metadata$version)
+#-- STI TO HIV TESTS RATIO --# ----
+get_sti_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
+  # we use this to calculate hiv tests and fit them against BRFSS data
+  # since BRFSS is available seince 2014, we can anchor at that year 
+  #'@Andrew: to review with todd (should we keep logistic or use log.linear (allow values>1))
+  syphilis_to_hiv_testing_ratio_functional_form <-  create.logistic.linear.functional.form(intercept = 0.5,
+                                                                                        slope = 0,
+                                                                                        anchor.year = 2014,
+                                                                                        max = 1,
+                                                                                        parameters.are.on.logit.scale = T)
   
-  syphilis_to_hiv_multiplier_functional_form <- create.logistic.linear.functional.form(intercept = multiplier_prior$intercepts,
-                                                                                       slope = multiplier_prior$slopes,
-                                                                                       parameters.are.on.logit.scale = T)
-  
-  syphilis_to_hiv_multiplier_functional_form
+  syphilis_to_hiv_testing_ratio_functional_form
 }
 
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----

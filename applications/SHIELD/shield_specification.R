@@ -1042,13 +1042,14 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
                                value = "rate.sti.screening.over.14")
 
 # Model the ratio of STI screening to HIV tests as a smooth function 
+#'@Andrew: to review with Todd: I think that we should define this as a proportion (wont expect to go over 1?)
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'ratio.syphilis.screening.to.hiv.tests',
                        scale = "ratio", #can go over 1 but we would expect it  not to
-                       # get.functional.form.function = get_syphilis_to_hiv_multiplier_functional_form,
-                       # functional.form.from.time = 2014,
-                       # functional.form.scale = "ratio") #???
-                       value = 0.5) # A simple stand in.
+                       get.functional.form.function = get_sti_to_hiv_testing_ratio_functional_form,
+                       functional.form.from.time = 2014,
+                       functional.form.scale = "ratio") 
+                       
                        
 # @Parastu, Todd insisted on dividing, not multiplying, in this expression, but if the multiplier is >1 (such as 2), then it should be multiplying, yes? HIV rate > STI screening rate.
 #' @Andrew: it's OK to divide. we can limit this to remain below 1 through the prior (logitnormal)  
