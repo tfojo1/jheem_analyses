@@ -182,10 +182,7 @@ emigration.likelihood.instructions =
 #** SYPHILIS DIAGNOSIS ** ----
 ## Total Diagnosis----
 ##---- Historical Penalty ----
-# the model starts in 170 but we dont have any local data from 1970 to 1990
-# to inform the general range of diagnosis data in this period, we approxiate the general trend in diagnosis at the national level and apply it to locall projections
-# this helps us avoid models that project very large or very small number of new diagnosis between 1970-1990 before calibration begins
-# >> using national level data on total diagnosis, we estimated the min and max value of the ratio between annual diagnosis relative to the peak in 1990
+#using national level data on total diagnosis, we estimated the min and max value of the ratio between annual diagnosis relative to the peak in 1990
 # for each year between 1970-1990 in the model, we calculate a similar ratio and bound the values to fall within this min/max threshold (to align with national trend)
 # if the values fall below min, we penalize the likelihood by dlnorm. 
 # if they fall between min and max, they likelihood is 1

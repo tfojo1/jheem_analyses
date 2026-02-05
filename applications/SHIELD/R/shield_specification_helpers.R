@@ -286,7 +286,7 @@ get.best.guess.msm.proportions <- function(location,
 #' @return a spline functional form for fertility rates by age, race, year 
 get.fertility.rate.functional.form<-function(location, specification.metadata, population.years=DEFAULT.FERTILITY.RATE.YEARS){ 
   # pull fertility rates for location
-  mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years) 
+   mapped.fertility.rates=get.fertility.rates.from.census(location, specification.metadata,population.years) 
   #
   if (length(mapped.fertility.rates)==0)
     stop(paste0("Cannot get.fertility.rates.from.census() - no 'fertility' data are available in the CENSUS.MANAGER for the counties in location '", location, "' (",
@@ -1033,69 +1033,52 @@ oes.to.proportions <- function(oes, population)
 }
 
 
+#-- HIV TESTING FUNCTIONAL FORM --# -----
+# get.hiv.testing.functional.form = function(specification.metadata){
+#   # cashed object from input_hiv_testing_prior_brfss.R
+#   testing.prior = get.cached.object.for.version(name = "hiv.testing.prior",
+#                                                 version = specification.metadata$version)
+# 
+#   
+#   hiv.testing.functional.form = create.logistic.linear.functional.form(intercept = testing.prior$intercepts - log(0.9) , #helps counteract max value below a bit
+#                                                                        slope = testing.prior$slopes,
+#                                                                        anchor.year = 2010,
+#                                                                        max = 0.9,
+#                                                                        #min??
+#                                                                        parameters.are.on.logit.scale = T)
+#   hiv.testing.functional.form
+# }
 
-#-- PRP SYMPTOMATIC P&S --# ----
-get_prp_symptomatic_primary_functional_form <- function(specification.metadata) {
-  base.prp.symptomatic.primary = array(
-    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.heterosexual_male.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.female.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
-  #
-  prp_symptomatic_primary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.primary,
-                                                                                    slope = 0,
-                                                                                    max = 1,
-                                                                                    anchor.year = 1970,
-                                                                                    parameters.are.on.logit.scale = F)
-  
-  prp_symptomatic_primary_functional_form
-}
-get_prp_symptomatic_secondary_functional_form <- function(specification.metadata) {
-  base.prp.symptomatic.secondary = array(
-    c(SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.heterosexual_male.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.female.est'],
-      SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
-  #
-  prp_symptomatic_secondary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.secondary,
-                                                                                      slope = 0,
-                                                                                      max = 1,
-                                                                                      anchor.year = 1970,
-                                                                                      parameters.are.on.logit.scale = F)
-  
-  prp_symptomatic_secondary_functional_form
-}
-
-#-- STI SCREENING --# ----
+#-- STI SCREENING FUNCTIONAL FORMS --# ----
 get_sti_screening_functional_form <- function(specification.metadata) {
-  # Get a cached object
-  # We read the HIV testing prior from BRFSS in, then shift it to serve as our STI screening functional form's priors
-  # (After implementation in the model, we will calculate HIV tests based on simulated sti screenings again and fit it against BRFSS)
-  #
-  hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
+    # Get a cached object
+    # Actually, we read the HIV testing prior in, then shift it to serve as our STI screening functional form's priors
+    # We will add log(0.5) assuming half the odds of an syphilis screen compared to the odds of an HIV test in the last year.
+    hiv_testing_prior <- get.cached.object.for.version(name = "hiv.testing.prior",
                                                      version = specification.metadata$version)
-  
-  # Use HIV testing prior slope and intercept and shift to find STI screening functional form slope and intercept
-  # We will add log(0.5) assuming half the odds of an syphilis screen compared to the odds of an HIV test in the last year.
-  # The 0.9 that was in here was to say we never think we screen more than 90% of people in a stratum, and must subtract log(0.9) to compensate mathematically.
-  sti_screening_functional_form <- create.logistic.linear.functional.form(intercept = hiv_testing_prior$intercepts + log(0.5),
-                                                                          slope = hiv_testing_prior$slopes,
-                                                                          anchor.year = 2010,
-                                                                          max = 1,
-                                                                          parameters.are.on.logit.scale = T)
-  
-  sti_screening_functional_form
+    
+    # Use HIV testing prior slope and intercept and shift to find STI screening functional form slope and intercept
+    # The 0.9 that was in here was to say we never think we screen more than 90% of people in a stratum, and must subtract log(0.9) to compensate mathematically.
+    sti_screening_functional_form <- create.logistic.linear.functional.form(intercept = hiv_testing_prior$intercepts + log(0.5),
+                                                                            slope = hiv_testing_prior$slopes,
+                                                                            anchor.year = 2010,
+                                                                            max = 1,
+                                                                            parameters.are.on.logit.scale = T)
+    
+    sti_screening_functional_form
 }
-#-- STI TO HIV TESTS RATIO --# ----
-get_sti_to_hiv_testing_ratio_functional_form <- function(specification.metadata) {
-  # we use this to calculate hiv tests and fit them against BRFSS data
-  # since BRFSS is available seince 2014, we can anchor at that year 
-  #'@Andrew: to review with todd (should we keep logistic or use log.linear (allow values>1))
-  syphilis_to_hiv_testing_ratio_functional_form <-  create.logistic.linear.functional.form(intercept = 0.5,
-                                                                                        slope = 0,
-                                                                                        anchor.year = 2014,
-                                                                                        max = 1,
-                                                                                        parameters.are.on.logit.scale = F)
-  
-  syphilis_to_hiv_testing_ratio_functional_form
+
+# Not yet used
+get_syphilis_to_hiv_multiplier_functional_form <- function(specification.metadata) {
+    # Get a cached object
+    multiplier_prior <- get.cached.object.for.version(name = "sti.to.hiv.test.prior",
+                                                      version = specification.metadata$version)
+    
+    syphilis_to_hiv_multiplier_functional_form <- create.logistic.linear.functional.form(intercept = multiplier_prior$intercepts,
+                                                                                         slope = multiplier_prior$slopes,
+                                                                                         parameters.are.on.logit.scale = T)
+    
+    syphilis_to_hiv_multiplier_functional_form
 }
 
 #-- PRENTAL CARE BY TRIMESTER FUNCTIONAL FORM --# -----
