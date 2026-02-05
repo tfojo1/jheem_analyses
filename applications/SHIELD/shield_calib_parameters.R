@@ -307,11 +307,11 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   #
-  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20), #'@Andrew: did we divide by 10 to control variations? 
+  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20) #'@Andrew: did we divide by 10 to control variations? 
 )
 
 ###--------------------------------------------------------------------------###
-## TRANS.BY.AGE.PARAMETERS.PRIOR ----
+## TRANS.BY.AGE.SAMPLING.PRIOR ----
 # changing transmission function by age
 # we assume an auto regressive (AR) structure between agegroups 
 # 1- Parameters:
@@ -345,7 +345,7 @@ het_sexualActivity_sigma <- create.auto.regressive.covariance.matrix(
 msm_varnames <- paste0("transmission.rate.multiplier.age", age_labels, ".msm")
 het_varnames <- paste0("transmission.rate.multiplier.age", age_labels, ".heterosexual")
 # 3-Build the prior
-TRANS.BY.AGE.PARAMETERS.PRIOR=join.distributions(
+TRANS.BY.AGE.SAMPLING.PRIOR=join.distributions(
   ## MSM Sexual activity ----
   #Transmission multiplier for age 0-14: we have a seperate parameter for this agegroup 
   transmission.rate.multiplier.age14.msm = Lognormal.Distribution(meanlog = log(0.01), #pure assumption: sexual activity relative to 20-24 (peak)
@@ -1088,7 +1088,7 @@ STI.TESTING.SAMPLING.BLOCKS = list(
   ),
   #
   syphilis.to.hiv.testing.ratio.slope<-c(
-    "or.slope.syphilis.to.hiv.testing.other"#'@Andrew: should we keep this as a single param or add to the other one?
+    "or.slope.syphilis.to.hiv.testing" #'@Andrew: should we keep this as a single param or add to the other one?
   )
   
 )
@@ -1224,7 +1224,7 @@ SHIELD.FULL.PARAMETERS.PRIOR = distributions::join.distributions(
   AGING.PARAMETERS.PRIOR,
   TRANSMISSION.PARAMETERS.PRIOR,
   STI.TESTING.PARAMETERS.PRIOR,
-  AGE.TRANS.TEST.PARAMETERS.PRIOR,
+  TRANS.BY.AGE.SAMPLING.PRIOR,
   PRENATAL.PARAMETERS.PRIOR
 )
 
