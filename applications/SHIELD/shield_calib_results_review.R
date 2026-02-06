@@ -15,12 +15,13 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 
 # Configuration ----
 VERSION <- 'shield'
-LOCATION <- 'C.12580'  # Baltimore MSA
+LOCATION <- 'C.12060'  # Baltimore MSA
 # MSAS.OF.INTEREST #list of MSAs
 
 
 get.jheem.root.directory() #"/Volumes/jheem$"
 # ROOT.DIR="../../files/"
+# ROOT.DIR="/Volumes/jheem$"
 # set.jheem.root.directory(ROOT.DIR)
 
 # # CALIBRATION.CODE.TO.RUN <- 'calib.demog.06.09.pk'; DATE <- "2025-06-09"
@@ -45,9 +46,11 @@ get.jheem.root.directory() #"/Volumes/jheem$"
 # Load simset from the Q drive
 set.jheem.root.directory("/Volumes/jheem$")
 n.sim=400
-calib.name="calib.1.09.stage0.az"
-simset.baltimore<-retrieve.simulation.set(version=VERSION,location = LOCATION,calibration.code = calib.name,n.sim = n.sim)
-simset.NYC<-retrieve.simulation.set(version=VERSION,location = 'C.35620',calibration.code = calib.name,n.sim = n.sim)
+calib.name="calib.1.12.stage0.az"
+simset.atlanta<-retrieve.simulation.set(version=VERSION,location = 'C.12060',calibration.code = calib.name,n.sim = n.sim)
+simset.nyc<-retrieve.simulation.set(version=VERSION,location = 'C.35620',calibration.code = calib.name,n.sim = n.sim)
+simset.baltimore<-retrieve.simulation.set(version=VERSION,location = 'C.12580',calibration.code = calib.name,n.sim = n.sim)
+simset.miami<-retrieve.simulation.set(version=VERSION,location = 'C.33100',calibration.code = calib.name,n.sim = n.sim)
 
 
 # PLOT -----
@@ -97,32 +100,32 @@ cbind(simset$get.params())
 
 #Run Manual Simulation ----
 # engine <- create.jheem.engine(VERSION, LOCATION, end.year = 2030)
-# {
-#     params.manual <- params.last
-#     # params.manual["hiv.testing.or"] <- 1.004 
-#     # params.manual["hiv.testing.slope.or"] <- 0.9995
-#     # params.manual["rate.screening.ps.multiplier"] <- 0.5
-#     # params.manual["rate.screening.el.multiplier"] <- 1.
-#     # 
-#     sim.manual <- engine$run(params.manual)
-#     #
-#     simplot(
-#         # sim.first,
-#         sim.last,
-#         # sim.last2,
-#         sim.manual,
-#         # split.by = "sex",
-#         # split.by = "age",
-#         # split.by = "race",
-#         # split.by = "race", facet.by = "sex", #we are matching the totals only for now
-#         # split.by = "race", facet.by = "age",
-#         # outcomes = c("population"),
-#         # outcomes = c("diagnosis.total"),
-#         outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
-#         # dimension.values = list(year = 1970:2030),
-#         style.manager = source.style.manager
-#     )
-# }
+{
+    params.manual <- params.last
+    # params.manual["hiv.testing.or"] <- 1.004
+    # params.manual["hiv.testing.slope.or"] <- 0.9995
+    # params.manual["rate.screening.ps.multiplier"] <- 0.5
+    # params.manual["rate.screening.el.multiplier"] <- 1.
+    #
+    sim.manual <- engine$run(params.manual)
+    #
+    simplot(
+        # sim.first,
+        sim.last,
+        # sim.last2,
+        sim.manual,
+        # split.by = "sex",
+        # split.by = "age",
+        # split.by = "race",
+        # split.by = "race", facet.by = "sex", #we are matching the totals only for now
+        # split.by = "race", facet.by = "age",
+        # outcomes = c("population"),
+        # outcomes = c("diagnosis.total"),
+        outcomes = c("diagnosis.ps","diagnosis.el.misclassified","hiv.testing"),
+        # dimension.values = list(year = 1970:2030),
+        style.manager = source.style.manager
+    )
+}
 # Likelihood Review ----
 {
     lik=lik.inst.diag.total.no.demog$instantiate.likelihood(VERSION,LOCATION)

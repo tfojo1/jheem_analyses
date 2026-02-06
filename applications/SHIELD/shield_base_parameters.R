@@ -186,16 +186,13 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'rate.late.latent.t
 
 ## ---- SYMPTOMATIC INFECTIONS ----                        
 ## Proportion of incident cases presenting with symptomatic primary or secondary disease: 
-# FOR HET_MALE AND FEMALES, values set based on MSM data #LIMITATION
-
-# Look for more data for female
-
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.msm.est',
                                       0.25, 0.2, 0.29, #data from MSM 
                                       citation = "syphilis_natural_history.docx")
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.secondary.msm.est',
                                       0.16, 0.15, 0.17, #data from MSM
                                       citation = "syphilis_natural_history.docx")
+#'@Andrew: the rest of parameters are copies of MSM. we need better estimates 
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prp.symptomatic.primary.heterosexual_male.est',
                                       0.25, 0,0,# 0.2, 0.29, 
                                       citation = "syphilis_natural_history.docx")
@@ -216,25 +213,10 @@ SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'fraction.hiv.tests
                                       0.62, 0,0,
                                       citation = "input_fraction_hiv_test_by_age.R")
 
-# *** STI SCREENING ---- ##-----
-# these are all changed in calibration 
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ps',
-                                      1,1,1)
-
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.el',
-                                      1,1,1  )
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.ll',
-                                      1,1,1  )
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.tertiary',
-                                      1,1,1  )
-SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'sti.screening.multiplier.cns',
-                                      1,1,1  )
-
 
 # *** CONTACT TRACING ---- ## ----
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'prop.index.cases.reached.for.contact.tracing',
                                       0.8,0,0)   #0.3, 0.98
-
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.diagnosed.treated.per.index.case',
                                       0.1, 0,0) #.05, 0.2,
 SHIELD_BASE_PARAMETER = add.parameter(SHIELD_BASE_PARAMETER, 'contacts.empirically.treated.infected.per.index.case',
