@@ -1042,9 +1042,9 @@ get_prp_symptomatic_primary_functional_form <- function(specification.metadata) 
       SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.primary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
   #
   prp_symptomatic_primary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.primary,
-                                                                                    slope = 0,
+                                                                                    slope = 1,
                                                                                     max = 1,
-                                                                                    anchor.year = 1970,
+                                                                                    anchor.year = 2010,
                                                                                     parameters.are.on.logit.scale = F)
   
   prp_symptomatic_primary_functional_form
@@ -1056,10 +1056,11 @@ get_prp_symptomatic_secondary_functional_form <- function(specification.metadata
       SHIELD_BASE_PARAMETER_VALUES['prp.symptomatic.secondary.msm.est']),dim = c(sex = 3),dimnames = list(sex = c("heterosexual_male","female","msm")))
   #
   prp_symptomatic_secondary_functional_form <- create.logistic.linear.functional.form(intercept = base.prp.symptomatic.secondary,
-                                                                                      slope = 0,
+                                                                                      slope = 1, #odd ratio
                                                                                       max = 1,
-                                                                                      anchor.year = 1970,
-                                                                                      parameters.are.on.logit.scale = F)
+                                                                                      anchor.year = 2010, #
+                                                                                      parameters.are.on.logit.scale = F
+                                                                                      )
   
   prp_symptomatic_secondary_functional_form
 }
@@ -1090,7 +1091,7 @@ get_sti_to_hiv_testing_ratio_functional_form <- function(specification.metadata)
   # since BRFSS is available seince 2014, we can anchor at that year 
   #'@Andrew: to review with todd (should we keep logistic or use log.linear (allow values>1))
   syphilis_to_hiv_testing_ratio_functional_form <-  create.logistic.linear.functional.form(intercept = 0.5,
-                                                                                        slope = 0,
+                                                                                        slope = 1,
                                                                                         anchor.year = 2014,
                                                                                         max = 1,
                                                                                         parameters.are.on.logit.scale = F)

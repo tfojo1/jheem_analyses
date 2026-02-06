@@ -1044,7 +1044,7 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 # Model the ratio of STI screening to HIV tests as a smooth function 
 #'@Andrew: to review with Todd: I think that we should define this as a proportion (wont expect to go over 1?)
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'ratio.syphilis.screening.to.hiv.tests',
+                       name = 'ratio.syphilis.screening.to.hiv.tests', #'@Andrew: we should call this a proportion
                        scale = "ratio", #can go over 1 but we would expect it  not to
                        get.functional.form.function = get_sti_to_hiv_testing_ratio_functional_form,
                        functional.form.from.time = 2014,

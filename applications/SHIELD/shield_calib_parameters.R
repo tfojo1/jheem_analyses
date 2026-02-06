@@ -282,7 +282,7 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
 
   # Changing the slope for everyone (We avoid sampling slopes across many dimensions at once, because small changes in the slope
   # can lead to very large increases in the odds ratio)
-  or.slope.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20), #'@Andrew: did we divide by 10 to control variations?
+  or.slope.symptomatic.ps = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/10), 
   
   ## STI Screening ----
   # Stratify intercept by race and sex
@@ -294,7 +294,7 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   or.sti.screening.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   or.sti.screening.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   # Changing the slope for everyone
-  or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20),   #'@Andrew: did we divide by 10 to control variations?
+  or.slope.sti.screening = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/10),
   
   
   ## Syphilis to HIV Testing Ratio ----
@@ -307,7 +307,7 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   #
-  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/20) #'@Andrew: did we divide by 10 to control variations?
+  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/10)
 )
 
 ###--------------------------------------------------------------------------###
@@ -1047,10 +1047,11 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
 
 ## STI.TESTING.SAMPLING.BLOCKS ----
 STI.TESTING.SAMPLING.BLOCKS = list(
-  prp.sympt.ps.sex = c(
+  prp.sympt.ps.sex.slope = c(
     "or.symptomatic.ps.msm",
     "or.symptomatic.ps.heterosexual_male",
-    "or.symptomatic.ps.female"
+    "or.symptomatic.ps.female",
+    "or.slope.symptomatic.ps"
   ),
   #
   prp.sympt.ps.race = c(
@@ -1058,39 +1059,31 @@ STI.TESTING.SAMPLING.BLOCKS = list(
     "or.symptomatic.ps.hispanic",
     "or.symptomatic.ps.other"
   ),
-  prp.sympt.slope=c(
-    "or.slope.symptomatic.ps"  #'@Andrew: should we keep this as a single param or add to the other one?
-  ),
   #
-  sti.testing.sex = c(
+  sti.testing.sex.slope = c(
     "or.sti.screening.msm",
     "or.sti.screening.heterosexual_male",
-    "or.sti.screening.female"),
+    "or.sti.screening.female",
+    "or.slope.sti.screening"),
   #
   sti.testing.race= c(
     "or.sti.screening.black",
     "or.sti.screening.hispanic",
     "or.sti.screening.other"),
   #
-  sti.testing.slope=c(
-    "or.slope.sti.screening"
-    ), #'@Andrew: should we keep this as a single param or add to the other one?
-  #
   
-  syphilis.to.hiv.testing.ratio.sex<-c(
+  
+  syphilis.to.hiv.testing.ratio.sex.slope<-c(
     "or.syphilis.to.hiv.testing.msm",
     "or.syphilis.to.hiv.testing.heterosexual_male",
-    "or.syphilis.to.hiv.testing.female"
+    "or.syphilis.to.hiv.testing.female",
+    "or.slope.syphilis.to.hiv.testing"
   ),
   #
   syphilis.to.hiv.testing.ratio.race<-c(
     "or.syphilis.to.hiv.testing.black",
     "or.syphilis.to.hiv.testing.hispanic",
     "or.syphilis.to.hiv.testing.other"
-  ),
-  # #
-  syphilis.to.hiv.testing.ratio.slope<-c(
-    "or.slope.syphilis.to.hiv.testing" #'@Andrew: should we keep this as a single param or add to the other one?
   )
   
 )
