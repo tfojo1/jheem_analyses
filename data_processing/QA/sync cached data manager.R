@@ -28,7 +28,7 @@ get.data.manager.cache.metadata()
 
 # CENSUS MANAGER ----------------------------------------------------------
 
-census.manager = load.data.manager(name="census.manager", file="../../cached/census.manager.rdata")
+census.manager = load.data.manager(name="census.manager", file="Q:/data_managers/census.manager.rdata")
 
 #You have to change the link everytime
 sync.cached.data.manager("census.manager.rdata",
@@ -40,11 +40,11 @@ get.data.manager.cache.metadata()
 
 # SYPHILIS MANAGER --------------------------------------------------------
 
-syphilis.manager = load.data.manager(name="syphilis.manager", file="../../cached/syphilis.manager.rdata")
+syphilis.manager = load.data.manager(name="syphilis.manager", file="Q:/data_managers/syphilis.manager.rdata")
 
 #UPDATE LINK EACH TIME
 sync.cached.data.manager("syphilis.manager.rdata",
-                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/IQCuvqU41PVWTqoeARZBGY3BAa9PdhohYlNipgZOQ92-gLw?e=bH4Nea",
+                         "https://livejohnshopkins-my.sharepoint.com/:u:/g/personal/tfojo1_jh_edu/IQCuvqU41PVWTqoeARZBGY3BAa9PdhohYlNipgZOQ92-gLw?e=rMybjs",
                          allow.flag = T)
 
 get.data.manager.cache.metadata()
