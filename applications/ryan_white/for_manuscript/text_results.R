@@ -89,10 +89,10 @@ print("")
 print("CESSATION (Conservative): ")
 
 
-print(paste0("Total Suppression post-drop in 2026 (CONSERVATIVE ESTIMATES): ",
-             round(100*mean(total.suppression['2026',,CONS.END.NAME])), '%',
-             " [", round(100*quantile(total.suppression['2026',,CONS.END.NAME], probs=.025)),
-             " - ", round(100*quantile(total.suppression['2026',,CONS.END.NAME], probs=.975)),
+print(paste0("Total Suppression post-drop in 2027 (CONSERVATIVE ESTIMATES): ",
+             round(100*mean(total.suppression['2027',,CONS.END.NAME])), '%',
+             " [", round(100*quantile(total.suppression['2027',,CONS.END.NAME], probs=.025)),
+             " - ", round(100*quantile(total.suppression['2027',,CONS.END.NAME], probs=.975)),
              "%]"))
 
 abs.delta.cessation.tot.inf.noint1.cons = apply(total.incidence[YEARS.TO.CONSIDER,,,CONS.END.NAME,drop=F], c('sim'), sum, na.rm=T) - tot.inf.noint1
