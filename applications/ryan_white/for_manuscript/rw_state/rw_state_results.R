@@ -29,7 +29,8 @@ if(!NEW.TIMELINE){
 }
 
 if(NEW.TIMELINE){
-    file = files[6] # 9/11 is the revised timeframe - for CROI 
+    #file = files[6] # 9/11 is the revised timeframe - for CROI 
+    file = files[7] # reran 1/15/26 to keep years prior to 2026 (results should match 9/11)
     load(file)
 }
 
@@ -65,6 +66,25 @@ mean.ci.rel.total.infections.averted.end.by.city["NY",]
 
 mean.ci.abs.total.infections.averted.int.by.city["NY",]
 mean.ci.rel.total.infections.averted.int.by.city["NY",]
+
+# check cumulative infections for website
+apply(apply(total.incidence[YEARS.TO.CONSIDER,,,END.NAME,drop=F], c('sim','location'), sum, na.rm=T), 'location', mean, na.rm=T)
+apply(apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], c('sim','location'), sum, na.rm=T), 'location', mean, na.rm=T)
+
+# individual years, NY
+cessation.annual.infections = apply(apply(total.incidence[YEARS.TO.CONSIDER,,,END.NAME,drop=F], 
+            c('sim','location','year'), sum, na.rm=T), c('location','year'), mean, na.rm=T)["NY",]
+baseline.annual.infections = apply(apply(total.incidence[YEARS.TO.CONSIDER,,,'noint',drop=F], 
+            c('sim','location','year'), sum, na.rm=T), c('location','year'), mean, na.rm=T)["NY",]
+
+cbind(cessation.annual.infections,baseline.annual.infections)
+
+# load correct simset for NY to compare
+simplot( simset,
+         outcomes = c("incidence"), summary.type = "mean.and.interval",
+         style.manager = source.style.manager, # use when looking at totals 
+         dimension.values = list(year = 1980:2030)) +geom_hline(yintercept = 2121  ) # check 2025 and 2030 values
+
 
 View(table.city)
 # figures 

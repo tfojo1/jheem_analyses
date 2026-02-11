@@ -48,7 +48,8 @@ if (!exists("total.results"))
     city.totals = total.results
     
     #load("Q:results/ryan_white/ryan_white_results_state_2025-09-09.Rdata") # this is the old timeframe
-    load("Q:results/ryan_white/ryan_white_results_state_2026_2025-09-11.Rdata")
+    #load("Q:results/ryan_white/ryan_white_results_state_2026_2025-09-11.Rdata")
+    load("Q:results/ryan_white/ryan_white_results_state_2026_2026-01-15.Rdata") # reran 1/15/26 to keep years prior to 2026 (results should match 9/11)
     state.totals = total.results
     
     load("Q:results/ryan_white/ryan_white_results_state_nanb_2026_2025-10-14.Rdata")

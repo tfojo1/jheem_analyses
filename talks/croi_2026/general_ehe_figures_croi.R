@@ -20,16 +20,16 @@ if (!exists('simset'))
 }
 
 
-#-- Total x 2 outcomes --#
+
+#-- Total x 2 outcomes (NEW using 4-panel dimensions) --#
 plot = simplot(simset, 'new', dimension.values = list(year=YEARS),
                style.manager = STYLE.MANAGER.2a) + theme_bw() + THEME.2a +
     ylab("New Diagnoses (n)") + ggtitle("New Diagnoses"); plot
 
 ggsave(plot = plot, 
        filename = file.path(PLOT.DIR, 'total_new.png'),
-       height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH, 
+       height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
        dpi = PLOT.DPI, device = PLOT.DEVICE)
-
 
 plot = simplot(simset, 'diagnosed.prevalence', dimension.values = list(year=YEARS),
                style.manager = STYLE.MANAGER.2a) + theme_bw() + THEME.2a +
@@ -37,9 +37,8 @@ plot = simplot(simset, 'diagnosed.prevalence', dimension.values = list(year=YEAR
 
 ggsave(plot = plot, 
        filename = file.path(PLOT.DIR, 'total_prevalence.png'),
-       height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH, 
+       height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
        dpi = PLOT.DPI, device = PLOT.DEVICE)
-
 
 
 #-- New one-way strat --#
@@ -138,3 +137,29 @@ ggsave(plot = plot,
        height = FOUR.PANEL.HEIGHT, width = FOUR.PANEL.WIDTH, 
        dpi = PLOT.DPI, device = PLOT.DEVICE)
 
+
+# Old dimensions
+if(1==2){
+    
+    #-- Total x 2 outcomes --#
+    plot = simplot(simset, 'new', dimension.values = list(year=YEARS),
+                   style.manager = STYLE.MANAGER.2a) + theme_bw() + THEME.2a +
+        ylab("New Diagnoses (n)") + ggtitle("New Diagnoses"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(PLOT.DIR, 'total_new_old.png'),
+           height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+    plot = simplot(simset, 'diagnosed.prevalence', dimension.values = list(year=YEARS),
+                   style.manager = STYLE.MANAGER.2a) + theme_bw() + THEME.2a +
+        ylab("Prevalent Cases (n)") + ggtitle("Estimated Prevalence"); plot
+    
+    ggsave(plot = plot, 
+           filename = file.path(PLOT.DIR, 'total_prevalence_old.png'),
+           height = TWO.PANEL.HEIGHT, width = TWO.PANEL.WIDTH, 
+           dpi = PLOT.DPI, device = PLOT.DEVICE)
+    
+    
+}
