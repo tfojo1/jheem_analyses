@@ -1,0 +1,20 @@
+REMOVAL SUMMARY - 20260211_102400_county_race_quality_fix
+============================================================ 
+Script: implement_removals.R
+Criteria: County race coverage < 90% threshold
+Timestamp: 2026-02-11 10:24:00.411899
+User: 
+Git Commit: 2b0fabea
+
+IMPACT:
+- 16 combinations affected across 3 MSAs
+- 18 individual race data points removed
+- 6728 total cases affected (preserved in totals)
+
+BY MSA:
+- Baltimore: 2 combinations, 8 data points, 1096 cases
+- NYC: 1 combinations, 6 data points, 3170 cases
+- Atlanta: 2 combinations, 4 data points, 2462 cases
+
+BY OUTCOME:
+- syphilis diagnoses: 5 combinations, 18 data points, 6728 cases
