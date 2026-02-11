@@ -735,6 +735,47 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale = 'non.negative.number',
                        get.value.function = get.race.population.counts)
 
+##---- HIV PrEP: Anchor for Uptake of Doxy-PEP ----
+
+# # PrEP uptake
+# register.model.element(EHE.SPECIFICATION,
+#                        name = 'oral.prep.uptake.without.covid',
+#                        scale = 'proportion',
+#                        get.functional.form.function = get.prep.use.functional.form,
+#                        functional.form.from.time = 2014,
+#                        ramp.times = 2011,
+#                        ramp.values = 0)
+# 
+# register.model.quantity(EHE.SPECIFICATION,
+#                         name = 'oral.prep.uptake.covid.multiplier',
+#                         value = expression((1-(1-max.covid.effect.prep.uptake.reduction) * covid.on *
+#                                                 (1-prep.uptake.transmission.mobility.correlation+
+#                                                      (prep.uptake.transmission.mobility.correlation*covid.mobility.change))))
+# )
+# 
+# register.model.element(EHE.SPECIFICATION,
+#                        name = 'max.covid.effect.prep.uptake.reduction',
+#                        scale = 'ratio',
+#                        value=1)
+# 
+# register.model.quantity(EHE.SPECIFICATION,
+#                         name = 'oral.prep.uptake',
+#                         scale = 'proportion',
+#                         value = expression(oral.prep.uptake.without.covid*oral.prep.uptake.covid.multiplier))
+# 
+# 
+# # PrEP indication
+# register.model.element(EHE.SPECIFICATION,
+#                        name='prep.indication.without.covid',
+#                        scale='proportion',
+#                        get.functional.form.function = get.prep.indication.functional.form,
+#                        functional.form.from.time = 2011)
+# 
+# register.model.quantity(EHE.SPECIFICATION,
+#                         name='prep.indication',
+#                         scale='proportion',
+#                         value = expression(prep.indication.without.covid * sexual.susceptibility.covid.multiplier))
+# 
 
 
 ##---- DOXY PEP ----
@@ -747,13 +788,35 @@ register.model.element(SHIELD.SPECIFICATION,
                        value = 0.2
 )
 
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'doxy.persistence',
+#                        scale = 'proportion',
+#                        value = 0
+# )
+# 
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'doxy.prop.prep',
+#                        scale = 'proportion',
+#                        value = 0
+# )
+# 
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'doxy.uptake',
+#                        scale = 'proportion',
+#                        value = expression(oral.prep.uptake*prep.indication*doxy.prop.prep)
+# )
+# 
+# register.model.element(SHIELD.SPECIFICATION,
+#                        name = 'doxy.coverage',
+#                        scale = 'proportion',
+#                        value = expression(doxy.uptake*(1 / (1-log(doxy.persistence))))
+#              )
+
+
 register.model.element(SHIELD.SPECIFICATION,
-                       name = 'doxy.coverage',
-                       scale = 'proportion',
-                       value = 0,
-             )
-
-
+                     name = 'doxy.coverage',
+                     scale = 'ratio',
+                     value = 0)
 
 
 register.model.quantity(SHIELD.SPECIFICATION,
@@ -771,6 +834,10 @@ register.model.quantity.subset(SHIELD.SPECIFICATION,
 )
 
 
+register.model.quantity(SHIELD.SPECIFICATION,
+                        name = 'cumulative.sexual.susceptibility',
+                        value = 'sexual.susceptibility'
+)
 
 ## Infectiousness ----
 # Secondary stage has max infection, the primary and EL infectiousness is set as a ratio relative to secondary
@@ -2144,15 +2211,36 @@ track.dynamic.outcome(SHIELD.SPECIFICATION,
 )
 
 ## Doxy-PEP treatment
+
+# Step 1: Track point outcome for the effective susceptible population
+track.point.outcome(SHIELD.SPECIFICATION,
+                    name = 'point.effective.susceptible.population',
+                    value = expression((infected + uninfected) * cumulative.sexual.susceptibility),
+                    keep.dimensions = c('location', 'sex'),
+                    save = FALSE,
+                    scale = 'non.negative.number',
+                    outcome.metadata = NULL)
+
+# Step 2: Integrate the point outcome
+track.integrated.outcome(SHIELD.SPECIFICATION,
+                         name = 'effective.susceptible.population',
+                         value.to.integrate = 'point.effective.susceptible.population',
+                         keep.dimensions = c('location', 'sex'),
+                         save = FALSE,
+                         scale = 'non.negative.number',
+                         outcome.metadata = NULL)
+
+# Step 3: Track the final proportion
 track.cumulative.outcome(SHIELD.SPECIFICATION,
                          name = 'prop.sexual.susceptibile',
-                         value = expression(sexual.susceptibility * population),
+                         value = 'effective.susceptible.population',
+                         value.is.numerator = TRUE,
                          denominator.outcome = 'population',
-                         keep.dimensions = c('location','sex'),
+                         keep.dimensions = c('location', 'sex'),
                          outcome.metadata = create.outcome.metadata(
                              display.name = 'Fraction Sexual Susceptibile',
                              description = 'Should be <100% for MSM only when Doxy-PEP active',
-                             scale = 'proportion', 
+                             scale = 'proportion',
                              axis.name = 'Susceptibility',
                              units = '%',
                              singular.unit = '%'
