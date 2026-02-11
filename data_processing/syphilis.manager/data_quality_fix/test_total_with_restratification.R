@@ -39,9 +39,9 @@ for (stratification in available_stratifications) {
   # Get PS data (already in target ontology)
   ps_data <- syphilis.manager$data$ps.syphilis.diagnoses$estimate[[source_name]][[target_ontology]][[stratification]]
   
-  # Get Early and Unknown data (from cdc.sti.two ontology)
-  early_data_original <- syphilis.manager$data$early.syphilis.diagnoses$estimate[[source_name]][['cdc.sti.two']][[stratification]]
-  unknown_data_original <- syphilis.manager$data$unknown.duration.or.late.syphilis.diagnoses$estimate[[source_name]][['cdc.sti.two']][[stratification]]
+  # Get Early and Unknown data (from cdc.sti ontology)
+  early_data_original <- syphilis.manager$data$early.syphilis.diagnoses$estimate[[source_name]][['cdc.sti']][[stratification]]
+  unknown_data_original <- syphilis.manager$data$unknown.duration.or.late.syphilis.diagnoses$estimate[[source_name]][['cdc.sti']][[stratification]]
   
   if (is.null(early_data_original) || is.null(unknown_data_original)) {
     cat(sprintf("  Skipping - missing Early/Unknown data for this stratification\n"))
@@ -136,16 +136,16 @@ cat("\n=== VERIFICATION ===\n")
 tryCatch({
   # Get component data for Baltimore 2022
   ps_balt_2022 <- syphilis.manager$data$ps.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location['2022', 'C.12580']
-  early_orig_2022 <- syphilis.manager$data$early.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti.two$year__location['2022', 'C.12580']
-  unknown_orig_2022 <- syphilis.manager$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti.two$year__location['2022', 'C.12580']
+  early_orig_2022 <- syphilis.manager$data$early.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location['2022', 'C.12580']
+  unknown_orig_2022 <- syphilis.manager$data$unknown.duration.or.late.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location['2022', 'C.12580']
   
   # Get our calculated total
   total_balt_2022 <- syphilis.manager$data$total.syphilis.diagnoses$estimate$cdc.aggregated.county$cdc.sti$year__location['2022', 'C.12580']
   
   cat(sprintf("Baltimore 2022 verification:\n"))
   cat(sprintf("PS (cdc.sti): %s\n", ps_balt_2022))
-  cat(sprintf("Early (cdc.sti.two): %s\n", early_orig_2022))
-  cat(sprintf("Unknown (cdc.sti.two): %s\n", unknown_orig_2022))
+  cat(sprintf("Early (cdc.sti): %s\n", early_orig_2022))
+  cat(sprintf("Unknown (cdc.sti): %s\n", unknown_orig_2022))
   cat(sprintf("Our calculated total: %s\n", total_balt_2022))
   
   # Note: Can't directly sum early_orig + unknown_orig since they use different age groups
