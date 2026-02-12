@@ -14,6 +14,9 @@
 #' @param outcome.for.relative.contribution,source.for.relative.contribution,ontology.for.relative.contribution
 #' For use with "required.coverage" to determine when there is enough data to
 #' permit aggregation.
+#' @param skip.coverage.condition Should a proportion be aggregated with
+#' available data even if the available counties aren't sufficient according to 
+#' coverage? Can also be used on counts, though caution is advised.
 #' 
 put.msa.data.as.new.source.NEW <- function(data.manager,
                                            outcome,
@@ -27,9 +30,11 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                                            source.for.relative.contribution,
                                            ontology.for.relative.contribution,
                                            required.coverage=0.9,
+                                           skip.coverage.condition=F,
                                            metric = 'estimate',
                                            source.for.denominator=NULL,
-                                           ontology.for.denominator=NULL) {
+                                           ontology.for.denominator=NULL,
+                                           debug=F) {
     
     error_prefix <- paste0("Cannot estimate ", geographic.type.to, " ", outcome, " data from ", geographic.type.from, " data: ")
     
@@ -38,6 +43,7 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
     outcome_data_all_ontologies <- data.manager$data[[outcome]][[metric]][[from.source.name]]
     outcome_url_all_ontologies <- data.manager$url[[outcome]][[metric]][[from.source.name]]
     
+    if (debug) browser()
     if (scale == "proportion") {
         denominator_outcome <- data.manager$outcome.info[[outcome]]$denominator.outcome
         denominator_data_for_ontology <- data.manager$data[[denominator_outcome]][["estimate"]][[source.for.denominator]][[ontology.for.denominator]]
@@ -49,19 +55,26 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
         
         error_prefix <- paste0("Cannot aggregate ", geographic.type.from, " data for 'to.location' ", to_location, ": ")
         
-        # Contribution data - each location as a fraction of all in that year
-        relative_contribution_data <- get_relative_contributions(data.manager,
-                                                                 outcome.for.relative.contribution,
-                                                                 source.for.relative.contribution,
-                                                                 ontology.for.relative.contribution,
-                                                                 from_locations,
-                                                                 error.prefix = error_prefix)
+        if (length(from_locations)==0)
+            stop(paste0(error_prefix, "No locations of type '", geographic.type.from, "' found for location '", to_location, "'"))
         
-        years_with_contribution_data <- dimnames(relative_contribution_data)$year
+        if (!skip.coverage.condition) {
         
-        if (length(years_with_contribution_data)==0) {
-            print(paste0("Skipping '", to_location, "' because no relative contribution data was found"))
-            next
+            # Contribution data - each location as a fraction of all in that year
+            relative_contribution_data <- get_relative_contributions(data.manager,
+                                                                     outcome.for.relative.contribution,
+                                                                     source.for.relative.contribution,
+                                                                     ontology.for.relative.contribution,
+                                                                     from_locations,
+                                                                     error.prefix = error_prefix)
+            
+            years_with_contribution_data <- dimnames(relative_contribution_data)$year
+            
+            # Proportions COULD get a temporary pass since they could possibly have complete denominator data...
+            if (length(years_with_contribution_data)==0) {
+                print(paste0("Skipping '", to_location, "' because no relative contribution data was found"))
+                next
+            }
         }
         
         for (ont_name in names(outcome_data_all_ontologies)) {
@@ -79,32 +92,48 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                 
                 from_locations_present <- intersect(from_locations, dimnames(strat_data)$location)
                 
-                years_in_this_strat_and_contr_data <- intersect(dimnames(strat_data)$year, years_with_contribution_data)
-                if (length(years_in_this_strat_and_contr_data)==0) next
-                
-                strat_data_from_locs_only <- subset_by_year_location(strat_data,
-                                                                     years_in_this_strat_and_contr_data,
-                                                                     from_locations_present)
-                strat_url_from_locs_only <- subset_by_year_location(strat_url,
-                                                                    years_in_this_strat_and_contr_data,
-                                                                    from_locations_present)
+                if (!skip.coverage.condition) {
+                    # For proportions, we don't need contr data necessarily, but will simplify code by assuming we DO have it, since we normally do.
+                    years_in_this_strat_and_contr_data <- intersect(dimnames(strat_data)$year, years_with_contribution_data)
+                    if (length(years_in_this_strat_and_contr_data)==0) next
+                    
+                    strat_data_from_locs_only <- subset_by_year_location(strat_data,
+                                                                         years_in_this_strat_and_contr_data,
+                                                                         from_locations_present)
+                    strat_url_from_locs_only <- subset_by_year_location(strat_url,
+                                                                        years_in_this_strat_and_contr_data,
+                                                                        from_locations_present)
+                } else {
+                    strat_data_from_locs_only <- subset_by_year_location(strat_data,
+                                                                         dimnames(strat_data)$year,
+                                                                         from_locations_present)
+                    strat_url_from_locs_only <- subset_by_year_location(strat_url,
+                                                                         dimnames(strat_url)$year,
+                                                                         from_locations_present)
+                }
                 if (is.null(strat_data_from_locs_only) || is.null(strat_url_from_locs_only)) next
                 
                 # Will be aggregating across location
                 non_location_margin = setdiff(names(dim(strat_data_from_locs_only)), 'location')
                 
                 if (scale == "non.negative.number") {
-                    strata_with_enough_data <- get_strata_with_enough_county_contribution(strat_data_from_locs_only,
-                                                                                          relative_contribution_data,
-                                                                                          required.coverage,
-                                                                                          from_locations_present,
-                                                                                          years_in_this_strat_and_contr_data,
-                                                                                          non_location_margin)
-                    aggregated_data <- aggregate_counts(strat_data_from_locs_only,
-                                                        strata_with_enough_data,
-                                                        non_location_margin)
+                    if (!skip.coverage.condition) {
+                        strata_with_enough_data <- get_strata_with_enough_county_contribution(strat_data_from_locs_only,
+                                                                                              relative_contribution_data,
+                                                                                              required.coverage,
+                                                                                              from_locations_present,
+                                                                                              years_in_this_strat_and_contr_data,
+                                                                                              non_location_margin)
+                        aggregated_data <- aggregate_counts(strat_data_from_locs_only,
+                                                            strata_with_enough_data,
+                                                            non_location_margin)
+                    } else {
+                        aggregated_data <- aggregate_counts(strat_data_from_locs_only,
+                                                            strata.with.enough.data = NULL,
+                                                            non_location_margin,
+                                                            skip.contr.condition = T)
+                    }
                     
-                    if (all(is.na(aggregated_data))) next
                 }
                 
                 if (scale == "proportion") {
@@ -118,15 +147,18 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                     from_locations_in_both <- intersect(from_locations_present, denominator_from_locations_present)
                     if (length(from_locations_in_both)==0) next
                     
-                    # Must have denominator data for all the counties (LATER: alternatively, use the contribution data for counties where both are missing)
-                    if (!setequal(from_locations, denominator_from_locations_present)) next
+                    # We need from_locations_in_both to be sufficient in terms of total denominator in the to_location,
+                    # but since there's a high likelihood of the denominator data being missing in enough places that it count
+                    # suffice to determine coverage, we'll just skip to using the relative_contribution_data to decide if our
+                    # from_locations_in_both are sufficient.
                     
-                    # Need data for all locations we have proportion data for (LATER: alternatively use contribution data for these too)
-                    if (length(setdiff(from_locations_present, denominator_from_locations_present)) > 0) next
-                    
-                    years_in_this_denominator_and_contr_data <- intersect(dimnames(strat_denominator_data)$year,
-                                                                          years_with_contribution_data)
-                    years_in_both <- intersect(years_in_this_strat_and_contr_data, years_in_this_denominator_and_contr_data)
+                    if (!skip.coverage.condition) {
+                        years_in_this_denominator_and_contr_data <- intersect(dimnames(strat_denominator_data)$year,
+                                                                              years_with_contribution_data)
+                        years_in_both <- intersect(years_in_this_strat_and_contr_data, years_in_this_denominator_and_contr_data)
+                    } else {
+                        years_in_both <- intersect(dimnames(strat_data)$year, dimnames(strat_denominator_data)$year)
+                    }
                     if (length(years_in_both)==0) next
                     
                     strat_data_from_locs_only <- subset_by_year_location(strat_data_from_locs_only,
@@ -137,20 +169,29 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                                                                                      years_in_both,
                                                                                      from_locations_in_both)
                     
-                    # See if the counties we have prop data for have enough denominator. Just use relative contribution data?
-                    strata_with_enough_prop_data <- get_strata_with_enough_county_contribution(strat_data_from_locs_only,
-                                                                                               relative_contribution_data,
-                                                                                               required.coverage,
-                                                                                               from_locations_in_both,
-                                                                                               years_in_both,
-                                                                                               non_location_margin)
-                    
-                    aggregated_data <- aggregate_proportions(proportion.data = strat_data_from_locs_only,
-                                                             denominator.data = strat_denominator_data_from_locs_only,
-                                                             strata.with.enough.data = strata_with_enough_prop_data,
-                                                             non.location.margin = non_location_margin)
-                    
+                    if (!skip.coverage.condition) {
+                        # See if the counties we have prop data for have enough denominator. Just use relative contribution data?
+                        strata_with_enough_prop_data <- get_strata_with_enough_county_contribution(strat_data_from_locs_only,
+                                                                                                   relative_contribution_data,
+                                                                                                   required.coverage,
+                                                                                                   from_locations_in_both,
+                                                                                                   years_in_both,
+                                                                                                   non_location_margin)
+                        
+                        aggregated_data <- aggregate_proportions(proportion.data = strat_data_from_locs_only,
+                                                                 denominator.data = strat_denominator_data_from_locs_only,
+                                                                 strata.with.enough.data = strata_with_enough_prop_data,
+                                                                 non.location.margin = non_location_margin)
+                    } else {
+                        aggregated_data <- aggregate_proportions(proportion.data = strat_data_from_locs_only,
+                                                                 denominator.data = strat_denominator_data_from_locs_only,
+                                                                 strata.with.enough.data = NULL,
+                                                                 non.location.margin = non_location_margin,
+                                                                 skip.contr.condition = T)
+                    }
                 }
+                
+                if (all(is.na(aggregated_data))) next
                 
                 post_aggregation_dimnames <- dimnames(aggregated_data)
                 
@@ -158,6 +199,7 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                 strat_url_from_locs_only <- data.manager$unhash.url(strat_url_from_locs_only)
 
                 # Put the data
+                # Doesn't work for American Somoa
                 data.manager$put(data = aggregated_data,
                                  outcome = outcome,
                                  source = to.source.name,
@@ -186,10 +228,12 @@ get_relative_contributions <- function(data.manager,
                                        error.prefix,
                                        debug=F) {
     if (debug) browser()
-    relative_contribution_data <- data.manager$data[[outcome.for.relative.contribution]][["estimate"]][[source.for.relative.contribution]][[ontology.for.relative.contribution]][["year__location"]][,from.locations,drop=F]
+    tryCatch(
+        {relative_contribution_data <- data.manager$data[[outcome.for.relative.contribution]][["estimate"]][[source.for.relative.contribution]][[ontology.for.relative.contribution]][["year__location"]][,from.locations,drop=F]},
+        error=function(e){stop(paste0(error.prefix, "Incomplete ", outcome.for.relative.contribution, " data found"))})
     
     if (is.null(relative_contribution_data))
-        stop(paste0(error.prefix, "No ", outcome.for.relative.contribution, " data found"))
+        stop(paste0(error.prefix, "Incomplete ", outcome.for.relative.contribution, " data found"))
     
     if (dim(relative_contribution_data)[["location"]] == 1)
         return(relative_contribution_data[!is.na(relative_contribution_data),,drop=F])
@@ -239,16 +283,20 @@ get_strata_with_enough_county_contribution <- function(count.data,
 #' 
 aggregate_counts <- function(count.data,
                              strata.with.enough.data,
-                             non.location.margin) {
+                             non.location.margin,
+                             skip.contr.condition=F) {
     all_aggregated_counts <- apply.robust(count.data, non.location.margin, sum, na.rm=T)
-    all_aggregated_counts[!strata.with.enough.data] <- NA
+    if (!skip.contr.condition)
+        all_aggregated_counts[!strata.with.enough.data] <- NA
     all_aggregated_counts
 }
 
 aggregate_proportions <- function(proportion.data,
                                   denominator.data,
                                   strata.with.enough.data,
-                                  non.location.margin) {
+                                  non.location.margin,
+                                  skip.contr.condition=F) {
+    
     # Wherever proportion.data is NA, make denominator.data NA as well or it will be too large
     denominator.data[is.na(proportion.data)] <- NA
     
@@ -257,7 +305,9 @@ aggregate_proportions <- function(proportion.data,
     aggregated_numerator <- apply.robust(numerator, non.location.margin, sum, na.rm=T)
     aggregated_denominator <- apply.robust(denominator.data, non.location.margin, sum, na.rm=T)
     all_aggregated_proportions <- aggregated_numerator / aggregated_denominator
-    all_aggregated_proportions[!strata.with.enough.data] <- NA
+    
+    if (!skip.contr.condition)
+        all_aggregated_proportions[!strata.with.enough.data] <- NA
     all_aggregated_proportions
 }
 
