@@ -1,7 +1,6 @@
 #EHE Intervention Effects on Racial Disparities in HIV Incidence
 #Code to specify interventions of interest.
 
-#source('../jheem2/R/tests/ENGINE_test.R')
 source("../jheem_analyses/applications/EHE/ehe_specification.R")
 
 #Interventions are scaled up linearly from January 1st of START.YEAR to January 1st of IMPLEMENTED.BY.YEAR

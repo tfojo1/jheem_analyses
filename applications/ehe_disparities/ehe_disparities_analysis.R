@@ -1,9 +1,9 @@
 #EHE Intervention Effects on Racial Disparities in HIV Incidence
 #Code to run interventions and output results.
 
-#devtools::install_github("tfojo1/jheem2")
 #devtools::install_github("tfojo1/locations")
 #devtools::install_github("tfojo1/distributions")
+#devtools::install_github("tfojo1/jheem2")
 
 library(dplyr)
 library(tidyverse)
@@ -12,25 +12,12 @@ library(jheem2)
 
 source("../jheem_analyses/applications/ehe_disparities/ehe_disparities_interventions.R")
 
-### Load simsets and plot baseline incidence through 2025
-#load_simset <- function(date, msa){
-#  load(paste("../jheem_analyses/applications/ehe_disparities/simset_",date,"_C.",msa,".Rdata",sep=""))
-#  simset$save()
-#  apply(simset$get(outcomes='incidence',keep.dimensions='year')/simset$get(outcomes='population',keep.dimensions='year'),1,median)*100000
-#  simplot(simset,'incidence', split.by='race')
-#}
-
-#load_simset(date="2025_01-31", msa="12060") #Atlanta
-#load_simset(date="2025_01-31", msa="12580") #Baltimore
-#load_simset(date="2025_01-31", msa="16980") #Chicago
-#load_simset(date="2025_01-31", msa="26420") #Houston
-#load_simset(date="2025_01-31", msa="35620") #NYC
-
+#Get list of MSAs
 source("../jheem_analyses/commoncode/locations_of_interest.R")
-#MSAS.OF.INTEREST
+MSAS.OF.INTEREST
 
 CALIBRATION.CODE="final.ehe"
-LOCATIONS=MSAS.OF.INTEREST[c(1:27,29:32)] #skip Cincinnati and St Louis
+LOCATIONS=MSAS.OF.INTEREST #[c(1:27,29:32)] #skip Cincinnati and St Louis
 INTERVENTIONS=c("noint", "fullint")
 NSIM=1000
 
