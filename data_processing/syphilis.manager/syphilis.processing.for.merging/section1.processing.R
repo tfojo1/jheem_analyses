@@ -243,14 +243,17 @@ source('commoncode/additional_locations_of_interest.R') #Additional locations of
 source('../jheem2/R/HELPERS_array_helpers.R') 
 source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
 
-put.msa.data.as.new.source(outcome = 'hiv.diagnosed.prevalence',
-                           from.source.name = 'cdc.hiv',
-                           to.source.name = 'cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager )
+# put.msa.data.as.new.source.NEW(outcome = 'hiv.diagnosed.prevalence',
+#                            from.source.name = 'cdc.hiv',
+#                            to.source.name = 'cdc.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,  #Think of this as containing location 
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = syphilis.manager,
+#                            outcome.for.relative.contribution = 'population',
+#                            source.for.relative.contribution = 'census.population',
+#                            ontology.for.relative.contribution = 'census')
 
 put.msa.data.as.new.source(outcome = 'hiv.diagnoses',
                            from.source.name = 'cdc.hiv',
@@ -261,32 +264,41 @@ put.msa.data.as.new.source(outcome = 'hiv.diagnoses',
                            details.for.new.data = 'estimated from county data',
                            data.manager = syphilis.manager)
 
-put.msa.data.as.new.source(outcome = 'prep',
-                           from.source.name = 'cdc.prep',
-                           to.source.name = 'prep.cdc.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
-
-put.msa.data.as.new.source(outcome = 'prep',
-                           from.source.name = 'aidsvu',
-                           to.source.name = 'prep.aidsvu.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
-
-put.msa.data.as.new.source(outcome = 'prep.indications',
-                           from.source.name = 'cdc.prep.indications',
-                           to.source.name = 'prep.indications.aggregated.county',
-                           to.locations =  MSAS.OF.INTEREST,
-                           geographic.type.from = 'COUNTY',
-                           geographic.type.to = 'CBSA',
-                           details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
+# put.msa.data.as.new.source.NEW(outcome = 'prep',
+#                            from.source.name = 'cdc.prep',
+#                            to.source.name = 'prep.cdc.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = syphilis.manager,
+#                            outcome.for.relative.contribution = 'population',
+#                            source.for.relative.contribution = 'census.population',
+#                            ontology.for.relative.contribution = 'census')
+# 
+# put.msa.data.as.new.source.NEW(outcome = 'prep',
+#                            from.source.name = 'aidsvu',
+#                            to.source.name = 'prep.aidsvu.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = syphilis.manager,
+#                            outcome.for.relative.contribution = 'population',
+#                            source.for.relative.contribution = 'census.population',
+#                            ontology.for.relative.contribution = 'census')
+# 
+# put.msa.data.as.new.source.NEW(outcome = 'prep.indications',
+#                            from.source.name = 'cdc.prep.indications',
+#                            to.source.name = 'prep.indications.aggregated.county',
+#                            to.locations =  MSAS.OF.INTEREST,
+#                            geographic.type.from = 'COUNTY',
+#                            geographic.type.to = 'CBSA',
+#                            details.for.new.data = 'estimated from county data',
+#                            data.manager = syphilis.manager,
+#                            outcome.for.relative.contribution = 'population',
+#                            source.for.relative.contribution = 'census.population',
+#                            ontology.for.relative.contribution = 'census')
 
 put.msa.data.as.new.source(outcome = 'hiv.suppression',
                            from.source.name= 'cdc.hiv',

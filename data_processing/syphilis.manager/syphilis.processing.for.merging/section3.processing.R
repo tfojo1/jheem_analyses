@@ -248,34 +248,46 @@ source('commoncode/additional_locations_of_interest.R') #Additional locations of
 source('../jheem2/R/HELPERS_array_helpers.R') 
 source('data_processing/put_msa_data_as_new_source_script.R') #This aggregates county level data to other locations
 
-put.msa.data.as.new.source(outcome = 'deaths',
+source('data_processing/aggregate_county_to_msa_new.R') #Applying new aggregation method to population and deaths
+
+put.msa.data.as.new.source.NEW(outcome = 'deaths',
                            from.source.name= 'census.deaths',
                            to.source.name = 'census.aggregated.population', 
                            to.locations = MSAS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager= syphilis.manager) 
+                           data.manager= syphilis.manager,
+                           outcome.for.relative.contribution = 'population',
+                           source.for.relative.contribution = 'census.population',
+                           ontology.for.relative.contribution = 'census') 
 
-all.states = locations::get.all.for.type('state')
+fifty.states <- state.abb
 
-put.msa.data.as.new.source(outcome = 'population',
+put.msa.data.as.new.source.NEW(outcome = 'population',
                            from.source.name = 'census.population',
                            to.source.name = 'census.aggregated.population',
-                           to.locations =  all.states,
+                           to.locations =  fifty.states,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'STATE',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
+                           data.manager = syphilis.manager,
+                           outcome.for.relative.contribution = 'population',
+                           source.for.relative.contribution = 'census.population',
+                           ontology.for.relative.contribution = 'census',
+                           skip.coverage.condition=T)
 
-put.msa.data.as.new.source(outcome = 'population',
+put.msa.data.as.new.source.NEW(outcome = 'population',
                            from.source.name = 'census.population',
                            to.source.name = 'census.aggregated.population',
                            to.locations =  MSAS.OF.INTEREST,
                            geographic.type.from = 'COUNTY',
                            geographic.type.to = 'CBSA',
                            details.for.new.data = 'estimated from county data',
-                           data.manager = syphilis.manager)
+                           data.manager = syphilis.manager,
+                           outcome.for.relative.contribution = 'population',
+                           source.for.relative.contribution = 'census.population',
+                           ontology.for.relative.contribution = 'census')
 
 # Source Code to Calculate Fertility Rate by MSA 
 source('data_processing/syphilis.manager/fertility.rate.msa.R')
