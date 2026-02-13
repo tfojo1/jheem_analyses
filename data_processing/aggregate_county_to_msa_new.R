@@ -91,6 +91,10 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                 strat_url <- outcome_url_all_ontologies[[ont_name]][[strat_name]]
                 
                 from_locations_present <- intersect(from_locations, dimnames(strat_data)$location)
+                if (length(from_locations_present)==0) {
+                    print(paste0("Skipping stratification '", strat_name,"' of '", to_location, "' because no data was found at the ", geographic.type.from, " level"))
+                    next
+                }
                 
                 if (!skip.coverage.condition) {
                     # For proportions, we don't need contr data necessarily, but will simplify code by assuming we DO have it, since we normally do.
@@ -200,6 +204,14 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
 
                 # Put the data
                 # Doesn't work for American Somoa
+                # tryCatch({data.manager$put(data = aggregated_data,
+                #                            outcome = outcome,
+                #                            source = to.source.name,
+                #                            ontology.name = ont_name,
+                #                            dimension.values = c(list(location=to_location), post_aggregation_dimnames),
+                #                            url = get_url_for_put(strat_url_from_locs_only, post_aggregation_dimnames),
+                #                            details = details.for.new.data,
+                #                            allow.na.to.overwrite = F)}, error=function(e){browser()})
                 data.manager$put(data = aggregated_data,
                                  outcome = outcome,
                                  source = to.source.name,
@@ -208,7 +220,8 @@ put.msa.data.as.new.source.NEW <- function(data.manager,
                                  url = get_url_for_put(strat_url_from_locs_only, post_aggregation_dimnames),
                                  details = details.for.new.data,
                                  allow.na.to.overwrite = F)
-                cat(paste0("put data for ", to_location, "\n"))
+                
+                cat(paste0("put data for ", to_location, " at stratification '", strat_name,"'\n"))
                 
             }
         }
