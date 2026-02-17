@@ -938,7 +938,7 @@ hiv.testing.by.strata.stage1.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
                                          #
-                                         weights = STAGE.1.WEIGHT,
+                                         weights = STAGE.1.WEIGHT*2, ###increasing the weight to twice larger than other stage1
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )
@@ -1187,9 +1187,9 @@ lik.inst.stage1=join.likelihood.instructions(
     create.ifelse.likelihood.instructions(
         hiv.testing.by.strata.stage1.likelihood.instructions,
         proportion.tested.by.strata.stage1.nested.likelihood.instructions
-    ),
+    )
     #
-    historical.diagnosis.likelihood.instructions
+    # historical.diagnosis.likelihood.instructions
 )
 lik.inst.stage1X=join.likelihood.instructions(
     # total.diagnosis.likelihood.instructions,

@@ -466,7 +466,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        scale='rate',
                        functional.form.from.time = 1970, 
                        functional.form = create.natural.spline.functional.form(
-                           knot.times =c("1970"=1970, "1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                           knot.times =c("1970"=1970, "1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2017), ### Changing the value to 2017 but keeping the names intact
                            knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
                            knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                            knot.link = 'log',
@@ -489,7 +489,7 @@ register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.heterosexual',
                        functional.form.from.time = 1970, 
                        scale='rate',
-                       functional.form = create.natural.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                       functional.form = create.natural.spline.functional.form(knot.times =c("1970"=1970,"1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2017),### Changing the value to 2017 but keeping the names intact
                                                                                knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
                                                                                knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                                                                                min=0,
