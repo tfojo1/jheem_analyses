@@ -938,7 +938,7 @@ hiv.testing.by.strata.stage1.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
                                          #
-                                         weights = STAGE.1.WEIGHT,
+                                         weights = STAGE.1.WEIGHT * 2, # start by increasing the weight to double what it is now
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1
     )

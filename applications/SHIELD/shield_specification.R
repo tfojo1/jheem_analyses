@@ -442,6 +442,7 @@ register.model.quantity(SHIELD.SPECIFICATION,
 register.model.quantity(SHIELD.SPECIFICATION,
                         name = 'rate.sexual.transmission',
                         value = 0)
+# "rate.sexual.transmission" has 4 dimensions: sex.from, sex.to, age.to, race.to (last two are built into "transmission.rate.msm" etc. through multiplication steps)
 register.model.quantity.subset(SHIELD.SPECIFICATION,
                                name = 'rate.sexual.transmission',
                                applies.to = list(sex.from=c('heterosexual_male','msm'),
@@ -457,26 +458,46 @@ register.model.quantity.subset(SHIELD.SPECIFICATION, #right now it's assuming th
                                applies.to = list(sex.from=c('female'),
                                                  sex.to=c('heterosexual_male','msm')),
                                value = 'transmission.rate.heterosexual')
+
+# # To track transmission rates as outcome, we need to flatten (such as, to the "sex.to" dimension)
+# register.model.quantity(SHIELD.SPECIFICATION,
+#                         name = "rate.sexual.transmission.flattened",
+#                         value = 0,
+#                         ) # one dimension "sex", plug in values for the 3 sexes
+# # Okay, but how does it do the flattening?
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = "rate.sexual.transmission.flattened",
+#                                value = "rate.sexual.transmission",
+#                                applies.to = list(sex.to = "msm"))
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = "rate.sexual.transmission.flattened",
+#                                value = "rate.sexual.transmission",
+#                                applies.to = list(sex.to = "heterosexual_male"))
+# register.model.quantity.subset(SHIELD.SPECIFICATION,
+#                                name = "rate.sexual.transmission.flattened",
+#                                value = "rate.sexual.transmission",
+#                                applies.to = list(sex.to = "female"))
+
 #spline models can project negative values - we should truncate to 0
 # use the log scale: exponentiate the values # log scale for the knots,
-# we define this as a spline with 2 knots, but we have no rpior about their values. they will change in calibration
-# Future Expnasions: msm.trate.by.race #add more alphas #if we assume the multiplier by black vs other remain the sma over time we only ned 2
+# we define this as a spline with 2 knots, but we have no prior about their values. they will change in calibration
+# Future Expnasions: msm.trate.by.race #add more alphas #if we assume the multiplier by black vs other remain the same over time we only need 2
 register.model.element(SHIELD.SPECIFICATION,
                        name = 'transmission.rate.msm',
                        scale='rate',
                        functional.form.from.time = 1970, 
                        functional.form = create.natural.spline.functional.form(
-                           knot.times =c("1970"=1970, "1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020),
+                           knot.times =c("1970"=1970, "1990"=1990, "1995"=1995, "2000"=2000, "2010"=2010,"2020"=2020), # Try 2018 instead to give future change mult more data?
                            knot.values =list("1970"=0, "1990"=0, "1995"=0, "2000"=0, "2010"=0,"2020"=0),
                            knots.are.on.transformed.scale = T, #knots on the log scale (value is exp(0))
                            knot.link = 'log',
                            link='identity', #linear projections between the knots     
                            #
-                           after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled channge between 2010-2020
-                           after.modifier = 0.5,
+                           after.time = 2030, #values between 2020-2030 are scaled down to change up to 50% of modeled change between 2010-2020
+                           after.modifier = 0.5, # 2030 = 2020 + delta(2020 vs 2010) * after.modifier IF delta is positive. This gets overwritten by the ~N(0.75, 0.25) fut change multiplier
                            after.modifier.increasing.change.link = 'identity',
-                           after.modifier.decreasing.change.link = 'log',
-                           modifiers.apply.to.change = T,
+                           after.modifier.decreasing.change.link = 'log', # log(2030) = log(2020) + log(delta(2020 vs 2010)) * after.modifier IF delta is negative
+                           modifiers.apply.to.change = T, # means it multiplies the delta
                            min=0 #even after using log for knots, value can be negative so we need to truncate
                        )
 ) 
@@ -1569,6 +1590,18 @@ track.integrated.outcome(SHIELD.SPECIFICATION,
                          # corresponding.data.outcome = 'population' ,
                          keep.dimensions = c('location','age','race','sex','stage','continuum')
 )
+##---- Sexual Transmission Rates ----
+# track.integrated.outcome(SHIELD.SPECIFICATION,
+#                          name = "transmission.rates",
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Transmission Rates',
+#                                                                     description = 'Transmission rates with respect to recipient',
+#                                                                     scale = 'non.negative.number',
+#                                                                     axis.name = 'Persons Infected per Encounter?',
+#                                                                     units = 'persons',
+#                                                                     singular.unit = 'person'),
+#                          value.to.integrate = "rate.sexual.transmission.flattened",
+#                          denominator.outcome = "population",
+#                          keep.dimensions = c('location','age','race','sex'))
 ##---- STI screening -----
 track.cumulative.proportion.from.rate(SHIELD.SPECIFICATION,
                                       name = 'sti.screening',
