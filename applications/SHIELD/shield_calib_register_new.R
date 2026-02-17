@@ -15,11 +15,11 @@ par.aliases.transmission = list(
 )
 
 # STAGE 0 Demographics thin 50
-register.calibration.info("calib.1.19.stage0.az",
+register.calibration.info("calib.2.13.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
-                          fixed.initial.parameter.values = c("global.transmission.rate"=2.3),
+                          fixed.initial.parameter.values = c("global.transmission.rate"=2.05), # median is 2.2
                           parameter.names = c(POPULATION.PARAMETERS.PRIOR@var.names,
                                               AGING.PARAMETERS.PRIOR@var.names,
                                               "global.transmission.rate"),
@@ -27,24 +27,13 @@ register.calibration.info("calib.1.19.stage0.az",
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-#STAGE1:
-register.calibration.info('calib.1.20.stage1.az',
-                          preceding.calibration.codes = 'calib.1.19.stage0.az',
+#STAGE1 (without future or u-turn likelihoods)
+register.calibration.info('calib.2.13.stage1.az',
+                          preceding.calibration.codes = 'calib.2.13.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              TESTING.PARAMETERS.PRIOR@var.names),
-                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
-)
-
-#STAGE1B (without future or u-turn likelihoods)
-register.calibration.info('calib.1.20.stage1B.az',
-                          preceding.calibration.codes = 'calib.1.19.stage0.az',
-                          likelihood.instructions = lik.inst.stage1B,
-                          data.manager = SURVEILLANCE.MANAGER,
-                          end.year = 2030,
-                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
-                                              TESTING.PARAMETERS.PRIOR@var.names),
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
