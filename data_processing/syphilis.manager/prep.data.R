@@ -98,6 +98,10 @@ data.list.clean.indications = lapply(data.list.atlas.prep, function(file){
   
   data$Population[data$Population %in% c("Data suppressed")] = NA    
   data$Population[data$Population %in% c("Data not available")] = NA  
+  
+  data <- data%>%
+      mutate(Population = ifelse(Population == 0, NA, Population)) #This change iowa data where population is zero to NA so it's not flagged by inspect marginals later
+  
   data$value = as.numeric(gsub(",", '', data$Population))   
   
   if(grepl("state", filename)) {
