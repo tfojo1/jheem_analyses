@@ -97,8 +97,15 @@ jobs:
           STRAT_RESULTS_PATH: _ci_inputs/stratification_analysis_results_county_based.rdata
         run: |
           mkdir -p _ci_outputs
-          Rscript data_processing/syphilis.manager/syphilis.processing.for.merging/syphilis.manager.merge.R \
-            2>&1 | tee _ci_outputs/build_log.txt
+          Rscript -e "
+            library(jheem2)
+            library(locations)
+            library(dplyr)
+            library(readxl)
+            library(stringr)
+            library(tidyr)
+            source('data_processing/syphilis.manager/syphilis.processing.for.merging/syphilis.manager.merge.R')
+          " 2>&1 | tee _ci_outputs/build_log.txt
 
       - name: Run validation
         run: |
