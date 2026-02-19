@@ -45,7 +45,8 @@ source('data_processing/syphilis.manager/data_quality_fix/implement_removals.R')
 # Save: -------------------------------------------------------------------
  
 #SAVE Final, Complete Syphilis Manager to Cached
-save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
+cached_dir <- Sys.getenv("CACHED_DIR", "../../cached")
+save(syphilis.manager, file=file.path(cached_dir, "syphilis.manager.rdata"))
 
 #SAVE Final, Complete Syphilis Manager to Q Drive
 output_dir <- Sys.getenv("OUTPUT_DIR", "Q:/data_managers")

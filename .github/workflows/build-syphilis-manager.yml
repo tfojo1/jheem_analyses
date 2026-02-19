@@ -1,0 +1,132 @@
+name: Build Syphilis Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      inputs_release_tag:
+        description: 'Release tag for build inputs (e.g. syphilis-manager-inputs-v1.0.0)'
+        required: true
+        type: string
+      surveillance_release_tag:
+        description: 'Release tag for surveillance manager (e.g. surveillance-manager-v1.0.0-alpha)'
+        required: true
+        type: string
+      jheem2_ref:
+        description: 'jheem2 branch or tag to use'
+        required: false
+        default: 'dev'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout jheem_analyses
+        uses: actions/checkout@v4
+
+      - name: Checkout jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/jheem2
+          ref: ${{ inputs.jheem2_ref }}
+          path: ../jheem2
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: 'release'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: r-packages-${{ hashFiles('**/DESCRIPTION') }}
+          restore-keys: r-packages-
+
+      - name: Install R dependencies
+        run: |
+          install.packages(c("remotes", "jsonlite", "readxl", "dplyr", "stringr",
+                             "tidyr", "tidyverse", "tools"))
+          remotes::install_github("tfojo1/locations")
+          remotes::install_local("../jheem2", upgrade = "never")
+        shell: Rscript {0}
+
+      - name: Download build inputs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p _ci_inputs/sections _ci_inputs/birth_data
+          # Download section files and other inputs from the inputs release
+          gh release download "${{ inputs.inputs_release_tag }}" \
+            --dir _ci_inputs/sections \
+            --pattern "syphilis.manager_section*.rdata"
+          gh release download "${{ inputs.inputs_release_tag }}" \
+            --dir _ci_inputs/birth_data \
+            --pattern "*.xlsx"
+          gh release download "${{ inputs.inputs_release_tag }}" \
+            --dir _ci_inputs \
+            --pattern "stratification_analysis_results_county_based.rdata"
+
+      - name: Download surveillance manager
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download "${{ inputs.surveillance_release_tag }}" \
+            --dir _ci_inputs \
+            --pattern "surveillance.manager.rdata"
+
+      - name: Run merge pipeline
+        env:
+          SECTION_DIR: _ci_inputs/sections
+          OUTPUT_DIR: _ci_outputs
+          ARCHIVE_DIR: _ci_outputs
+          CACHED_DIR: _ci_outputs
+          BIRTH_DATA_DIR: _ci_inputs/birth_data
+          SURVEILLANCE_MANAGER_PATH: _ci_inputs/surveillance.manager.rdata
+          STRAT_RESULTS_PATH: _ci_inputs/stratification_analysis_results_county_based.rdata
+        run: |
+          mkdir -p _ci_outputs
+          Rscript data_processing/syphilis.manager/syphilis.processing.for.merging/syphilis.manager.merge.R \
+            2>&1 | tee _ci_outputs/build_log.txt
+
+      - name: Run validation
+        run: |
+          Rscript data_processing/syphilis.manager/validation/run_validation.R \
+            _ci_outputs/syphilis.manager.rdata \
+            2>&1 | tee _ci_outputs/validation_report.txt
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: syphilis-manager-build
+          path: |
+            _ci_outputs/build_log.txt
+            _ci_outputs/validation_report.txt
+
+      - name: Create release
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION_TAG="syphilis-manager-v$(date +%Y%m%d)-$(echo $GITHUB_SHA | cut -c1-7)"
+          NOTES="Built from inputs: \`${{ inputs.inputs_release_tag }}\`
+          Surveillance manager: \`${{ inputs.surveillance_release_tag }}\`
+          jheem2 ref: \`${{ inputs.jheem2_ref }}\`
+          Commit: \`$GITHUB_SHA\`
+
+          Validation: PASSED"
+          gh release create "$VERSION_TAG" \
+            --title "Syphilis Manager $VERSION_TAG" \
+            --notes "$NOTES" \
+            _ci_outputs/syphilis.manager.rdata \
+            _ci_outputs/validation_report.txt
+          echo "Published release: $VERSION_TAG"
