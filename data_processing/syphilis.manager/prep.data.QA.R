@@ -16,31 +16,28 @@ syphilis.manager$register.outcome(
 
 # Pull Total Prep: --------------------------------------------------------
 
-prep = as.data.frame.table(syphilis.manager$data$prep$estimate$aidsvu$aidsvu$year__location)
-
-states.without.race <- c("CA", "HI", "IL", "NY", "TX", "VA")
-
-prep.problem.states <- prep%>%
-    filter(location %in% states.without.race)%>%
-    rename(total = Freq)
+# prep = as.data.frame.table(syphilis.manager$data$prep$estimate$aidsvu$aidsvu$year__location)
+# 
+ states.without.race <- c("CA", "HI", "IL", "NY", "TX", "VA")
+# 
+# prep.problem.states <- prep%>%
+#     filter(location %in% states.without.race)%>%
+#     rename(total = Freq)
 
 
 # Pull Prep by Race: ------------------------------------------------------
 
 prep.race = as.data.frame.table(syphilis.manager$data$prep$estimate$aidsvu$aidsvu$year__location__race)
+
 prep.problem.states.race <- prep.race%>%
     filter(location %in% states.without.race)%>%
-    rename(race.count = Freq)
-
-
-# Combine and Calculate Proportion: ---------------------------------------
-
-prep.proportion.df = left_join(prep.problem.states.race, prep.problem.states, by = c("year", "location"))
-
-
-prep.proportion.df <- prep.proportion.df %>%
-    mutate(prep.proportion = (round(race.count / total, digits = 2)))%>%
-    mutate(Keep.indicator = case_when(
+    rename(race.count = Freq)%>% #Create denominator value from the sum of the incomplete data rather than using the actual total
+    group_by(year, location)%>%
+    mutate(incomplete.total = sum(race.count, na.rm=T))%>%
+    ungroup()%>%
+    mutate(value = (round(race.count/incomplete.total, digits = 2)))%>% #calculate prep proportion
+    
+    mutate(Keep.indicator = case_when( #only keep years/locations that had limited data
         year == "2012" & location == "CA" ~ "keep",
         year == "2013" & location == "CA" ~ "keep",
         year == "2016" & location == "HI" ~ "keep",
@@ -65,10 +62,10 @@ prep.proportion.df <- prep.proportion.df %>%
     ))%>%
     filter(Keep.indicator == "keep")%>%
     mutate(outcome = "prep.proportion")%>%
-    rename(value = prep.proportion)%>%
     mutate(across(c(year, location, outcome, race), as.character))%>%
     select(year, location, outcome, race, value)
 
+prep.proportion.df = as.data.frame(prep.problem.states.race)
 
 # Put: --------------------------------------------------------------------
 
