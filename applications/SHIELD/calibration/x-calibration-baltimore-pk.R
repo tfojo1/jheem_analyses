@@ -19,25 +19,28 @@ VERSION='shield'
 LOCATION="C.12580"
 # MSAS.OF.INTEREST
 
-simsetBaltimore0 <- retrieve.simulation.set("shield",
-                                            location = LOCATION,calibration.code = "calib.2.7.stage0.az",n.sim = 400)
-simsetBaltimore1 <- retrieve.simulation.set("shield",
-                                            location = LOCATION,calibration.code = "calib.2.13.stage1.az", n.sim = 400)
+simsetBaltimore13 <- retrieve.simulation.set("shield",
+                                            location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
+simsetBaltimore17 <- retrieve.simulation.set("shield",
+                                            location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
+simsetBaltimore17k <- retrieve.simulation.set("shield",
+                                            location = LOCATION,calibration.code = "calib.2.17.stage1k.az", n.sim = 400)
 
 #ISSUES:# Hook shape!
 
 # PLOT -----
 simplot(
-    # simsetBaltimore0$last.sim(),
-    
-    simsetBaltimore1$last.sim(),
-    
+    simsetBaltimore13$last.sim(),
+    simsetBaltimore17$last.sim(),
+    simsetBaltimore17k$last.sim(),
     # outcomes = c("population"),    split.by = "race", facet.by = "age"
     # outcomes = c("fertility.rate"),    split.by = "race", facet.by = "age"
     # outcomes = c("deaths")
     # outcomes = c("immigration")    #split.by = "race"
     # outcomes = c("emigration") #split.by = "race", facet.by = "age"
-    outcomes=c("diagnosis.ps")
+    outcomes=c("diagnosis.total","diagnosis.ps",
+               "diagnosis.el.misclassified","diagnosis.ll.misclassified",
+               "hiv.testing","sti.screening")
     # outcomes=c("diagnosis.total")
     # , split.by = "race"
     # ,facet.by = "sex"

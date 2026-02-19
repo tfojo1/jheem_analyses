@@ -17,30 +17,36 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 MSAS.OF.INTEREST
 VERSION='shield'; LOCATION="C.33100"
-simsetMiami0 <- retrieve.simulation.set("shield",
-                                            location = LOCATION,calibration.code = "calib.2.13.stage0.az",n.sim = 400)
-simsetMiami1 <- retrieve.simulation.set("shield",
-                                            location = LOCATION,calibration.code = "calib.2.13.stage1.az", n.sim = 400)
+
+simsetMiami13 <- retrieve.simulation.set("shield",
+                                           location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
+simsetMiami17 <- retrieve.simulation.set("shield",
+                                           location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
+simsetMiami17k <- retrieve.simulation.set("shield",
+                                            location = LOCATION,calibration.code = "calib.2.17.stage1k.az", n.sim = 400)
+
 
 #ISSUES:#Not a good poulation fit
 # PLOT -----
 simplot(
-    simsetMiami0$last.sim(),
-    # simsetMiami1$last.sim(),
+    simsetMiami13$last.sim(),
+    simsetMiami17$last.sim(),
+    simsetMiami17k$last.sim(),
     # 
     # outcomes = c("population"),    split.by = "race", facet.by = "age"
     # outcomes = c("fertility.rate"),    split.by = "race", facet.by = "age"
     # outcomes = c("deaths")
-    outcomes = c("immigration","emigration")    #split.by = "race"
+    # outcomes = c("immigration","emigration")    #split.by = "race"
     # outcomes = c("emigration") #split.by = "race", facet.by = "age"
     # outcomes=c("diagnosis.ps")
     # outcomes=c("diagnosis.total")
-    # outcomes=c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified")
-    # ,split.by = "race"
+    outcomes=c("diagnosis.total","diagnosis.ps",
+               "diagnosis.el.misclassified","diagnosis.ll.misclassified",
+               "hiv.testing","sti.screening")    # ,split.by = "race"
     # ,facet.by = "sex"
     
     # outcomes=c("hiv.testing")
-    # ,dimension.values = list(year = 2010:2030)
+    ,dimension.values = list(year = 2000:2030)
     ,style.manager = source.style.manager
 )
 

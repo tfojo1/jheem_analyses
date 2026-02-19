@@ -17,16 +17,21 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 # Configuration ----
 VERSION='shield'
 LOCATION="C.35620"
-MSAS.OF.INTEREST
-simsetNyc0 <- retrieve.simulation.set("shield",
-                                            location = LOCATION,calibration.code = "calib.2.13.stage0.az",n.sim = 400)
-simsetNyc1 <- retrieve.simulation.set("shield",
-                                            location = LOCATION,calibration.code = "calib.2.13.stage1.az", n.sim = 400)
+
+simsetNyc13 <- retrieve.simulation.set("shield",
+                                         location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
+simsetNyc17 <- retrieve.simulation.set("shield",
+                                         location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
+simsetNyc17k <- retrieve.simulation.set("shield",
+                                          location = LOCATION,calibration.code = "calib.2.17.stage1k.az", n.sim = 400)
+
+
 
 # PLOT -----
 simplot(
-    simsetNyc0$last.sim(),
-    
+    simsetNyc13$last.sim(),
+    simsetNyc17$last.sim(),
+    simsetNyc17k$last.sim(),
     # simsetNyc1$last.sim(),
     # 
     # outcomes = c("population"),    split.by = "race", facet.by = "age"
@@ -36,7 +41,9 @@ simplot(
     # outcomes = c("emigration") #split.by = "race", facet.by = "age"
     # outcomes=c("diagnosis.ps")
     # outcomes=c("diagnosis.total")
-    outcomes=c("diagnosis.total","diagnosis.ps","diagnosis.el.misclassified","diagnosis.ll.misclassified")
+    outcomes=c("diagnosis.total","diagnosis.ps",
+               "diagnosis.el.misclassified","diagnosis.ll.misclassified",
+               "hiv.testing","sti.screening")
     # ,split.by = "race"
     # ,facet.by = "sex"
     
