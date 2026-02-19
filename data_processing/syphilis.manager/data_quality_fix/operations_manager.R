@@ -189,9 +189,10 @@ generate_impact_summary <- function(combinations, backup_data, metadata) {
 
 #' Write human-readable summary file (fixed newlines)
 write_summary_file <- function(summary, file_path) {
-  
+
   sink(file_path)
-  
+  on.exit(sink(), add = TRUE)
+
   cat(sprintf("REMOVAL SUMMARY - %s\n", summary$metadata$operation_id))
   cat(paste(rep("=", 60), collapse=""), "\n")
   cat(sprintf("Script: %s\n", summary$metadata$script_name))
@@ -202,32 +203,30 @@ write_summary_file <- function(summary, file_path) {
     cat(sprintf("Git Commit: %s\n", substr(summary$metadata$git_commit, 1, 8)))
   }
   cat("\n")
-  
+
   cat("IMPACT:\n")
-  cat(sprintf("- %d combinations affected across %d MSAs\n", 
-              summary$impact$total_combinations, 
+  cat(sprintf("- %d combinations affected across %d MSAs\n",
+              summary$impact$total_combinations,
               length(summary$by_msa)))
   cat(sprintf("- %d individual race data points removed\n", summary$impact$total_data_points_removed))
   cat(sprintf("- %d total cases affected (preserved in totals)\n", summary$impact$total_cases_affected))
   cat("\n")
-  
+
   cat("BY MSA:\n")
   for (msa_name in names(summary$by_msa)) {
     msa_info <- summary$by_msa[[msa_name]]
-    cat(sprintf("- %s: %d combinations, %d data points, %d cases\n", 
+    cat(sprintf("- %s: %d combinations, %d data points, %d cases\n",
                 msa_name, msa_info$combinations, msa_info$data_points, msa_info$cases))
   }
   cat("\n")
-  
+
   cat("BY OUTCOME:\n")
   for (outcome in names(summary$by_outcome)) {
     outcome_info <- summary$by_outcome[[outcome]]
     outcome_display <- gsub("\\.", " ", gsub("^([a-z]+)\\.", "", outcome))
-    cat(sprintf("- %s: %d combinations, %d data points, %d cases\n", 
+    cat(sprintf("- %s: %d combinations, %d data points, %d cases\n",
                 outcome_display, outcome_info$combinations, outcome_info$data_points, outcome_info$cases))
   }
-  
-  sink()
 }
 
 #' Print summary to console (fixed newlines)

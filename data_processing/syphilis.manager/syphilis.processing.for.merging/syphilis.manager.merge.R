@@ -9,10 +9,11 @@
 # MERGE -------------------------------------------------------------------
 
 #LOAD the saved sections of the syphilis manager (after you've made the changes to a particular section)
-section1 = load.data.manager(name="syphilis.manager_section1", file="Q:/data_managers/data.manager.merge/syphilis.manager_section1.rdata")
-section2 = load.data.manager(name="syphilis.manager_section2", file="Q:/data_managers/data.manager.merge/syphilis.manager_section2.rdata")
-section3 = load.data.manager(name="syphilis.manager_section3", file="Q:/data_managers/data.manager.merge/syphilis.manager_section3.rdata")
-section4 = load.data.manager(name="syphilis.manager_section1", file="Q:/data_managers/data.manager.merge/syphilis.manager_section4.rdata")
+section_dir <- Sys.getenv("SECTION_DIR", "Q:/data_managers/data.manager.merge")
+section1 = load.data.manager(name="syphilis.manager_section1", file=file.path(section_dir, "syphilis.manager_section1.rdata"))
+section2 = load.data.manager(name="syphilis.manager_section2", file=file.path(section_dir, "syphilis.manager_section2.rdata"))
+section3 = load.data.manager(name="syphilis.manager_section3", file=file.path(section_dir, "syphilis.manager_section3.rdata"))
+section4 = load.data.manager(name="syphilis.manager_section1", file=file.path(section_dir, "syphilis.manager_section4.rdata"))
 
 #MERGE the Sections
 section3$import.data(section1) #This order doesn't matter, do it this way: big.one$importdata(smaller.one)
@@ -47,9 +48,11 @@ source('data_processing/syphilis.manager/data_quality_fix/implement_removals.R')
 save(syphilis.manager, file="../../cached/syphilis.manager.rdata")
 
 #SAVE Final, Complete Syphilis Manager to Q Drive
-save(syphilis.manager, file="Q:/data_managers/syphilis.manager.rdata")
+output_dir <- Sys.getenv("OUTPUT_DIR", "Q:/data_managers")
+save(syphilis.manager, file=file.path(output_dir, "syphilis.manager.rdata"))
 
 #SAVE Final, Complete Syphilis Manager, Archive a dated version to the Q Drive#
 timestamp <- Sys.Date()
-filename <- paste0("Q:/data_managers/Archive/syphilis.manager_", timestamp, ".rdata")
+archive_dir <- Sys.getenv("ARCHIVE_DIR", file.path(output_dir, "Archive"))
+filename <- file.path(archive_dir, paste0("syphilis.manager_", timestamp, ".rdata"))
 save(syphilis.manager, file=filename)

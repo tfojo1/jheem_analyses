@@ -29,7 +29,7 @@ syphilis.manager$register.outcome(
 
 # First add birth data (this is from CDC Wonder, by county, state, this is the Denominator) --------
 
-DATA.DIR.BIRTHS="Q:/data_raw/syphilis.manager/births.for.congenital.syphilis.proportion"
+DATA.DIR.BIRTHS=Sys.getenv("BIRTH_DATA_DIR", "Q:/data_raw/syphilis.manager/births.for.congenital.syphilis.proportion")
 
 births.files <- Sys.glob(paste0(DATA.DIR.BIRTHS, '/*.xlsx'))
 
