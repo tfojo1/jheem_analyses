@@ -42,6 +42,43 @@ source('data_processing/syphilis.manager/data_quality_fix/test_total_with_restra
 #Remove certain racial data that doesn't sum to proper totals:
 source('data_processing/syphilis.manager/data_quality_fix/implement_removals.R')
 
+# Inspect Marginals QA Check ----------------------------------------------
+syphilis.manager$inspect_marginals()
+
+#Resolving 1 data issue from lack of age data:
+remove.data(
+    data.manager=syphilis.manager,
+    outcome = "ps.syphilis.diagnoses",
+    source= "cdc.sti",
+    ontology.name = "cdc.sti",
+    dimension.values = list(age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'), location="32031", year="2021"),
+    metric = "estimate",
+    details.for.removal = "removed",
+    url.for.removal = "url"
+)
+
+remove.data(
+    data.manager=syphilis.manager,
+    outcome = "early.syphilis.diagnoses",
+    source= "cdc.sti",
+    ontology.name = "cdc.sti",
+    dimension.values = list(age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'), location="32031", year="2021"),
+    metric = "estimate",
+    details.for.removal = "removed",
+    url.for.removal = "url"
+)
+
+remove.data(
+    data.manager=syphilis.manager,
+    outcome = "unknown.duration.or.late.syphilis.diagnoses",
+    source= "cdc.sti",
+    ontology.name = "cdc.sti",
+    dimension.values = list(age=c('0-14 years', '15-19 years', '20-24 years', '25-29 years', '30-34 years', '35-39 years', '40-44 years', '45-54 years', '55-64 years', '65+ years'), location="32031", year="2021"),
+    metric = "estimate",
+    details.for.removal = "removed",
+    url.for.removal = "url"
+)
+
 # Save: -------------------------------------------------------------------
  
 #SAVE Final, Complete Syphilis Manager to Cached

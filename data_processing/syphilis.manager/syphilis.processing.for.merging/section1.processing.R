@@ -237,6 +237,10 @@ source('data_processing/syphilis.manager/prep.data.R')
 
 syphilis.manager = data.manager
 
+#Clean up prep data from AIDS Vu due to missing racial groups for some states:
+#This also creates the 'prep.proportion' outcome
+source('data_processing/syphilis.manager/prep.data.QA.R')
+
 #Aggregate Outcomes to MSA:
 source('commoncode/locations_of_interest.R') #Source locations of interest to create MSA vectors
 source('commoncode/additional_locations_of_interest.R') #Additional locations of interest
