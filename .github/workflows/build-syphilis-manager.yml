@@ -54,9 +54,10 @@ jobs:
           restore-keys: r-packages-
 
       - name: Install R dependencies
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          install.packages(c("remotes", "jsonlite", "readxl", "dplyr", "stringr",
-                             "tidyr", "tidyverse", "tools"))
+          install.packages(c("remotes", "jsonlite", "readxl", "dplyr", "stringr", "tidyr"))
           remotes::install_github("tfojo1/locations")
           remotes::install_local("_jheem2", upgrade = "never")
         shell: Rscript {0}
