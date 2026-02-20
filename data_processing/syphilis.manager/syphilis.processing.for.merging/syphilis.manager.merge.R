@@ -22,30 +22,26 @@ section3$import.data(section4)
 
 syphilis.manager = section3
 
-#Source code to create proportion of congenital syphilis births:
+#Source code to create proportion of congenital syphilis births (Zoe):
 source('data_processing/syphilis.manager/proportion.of.congenital.syphilis.births.R')
 
-# Source Nick's Codes to transfer adult population: -----------------------------------------
-
-#Add Adult population from HIV surveillance manager to syphilis manager:
+# Source code to transfer Adult population from HIV surveillance manager to syphilis manager (Nick):
 source('data_processing/transfer_adult_population_to_syphilis_manager.R')
 
-# Test Andrew's new Aggregation Code on Diagnoses: 1-30-26 ----------------
-
+# Aggregate Outcomes from County to MSA using a New Method-2026 (Andrew) 
 source('data_processing/syphilis.manager/syphilis.processing.for.merging/new.aggregation.method.R')
 
-# Source Nick's QA Codes: -----------------------------------------
-
-#Aggregate syphilis data into total.syphilis.diagnoses:
+#Aggregate syphilis data into total.syphilis.diagnoses (Nick):
 source('data_processing/syphilis.manager/data_quality_fix/test_total_with_restratification.R')
 
-#Remove certain racial data that doesn't sum to proper totals:
+#Remove certain racial data that doesn't sum to proper totals (Nick):
 source('data_processing/syphilis.manager/data_quality_fix/implement_removals.R')
+
 
 # Inspect Marginals QA Check ----------------------------------------------
 syphilis.manager$inspect_marginals()
 
-#Resolving 1 data issue from lack of age data:
+#Resolving 1 data issue identified from inspect_maginals from lack of age data:
 remove.data(
     data.manager=syphilis.manager,
     outcome = "ps.syphilis.diagnoses",
