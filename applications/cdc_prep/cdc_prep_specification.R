@@ -20,7 +20,7 @@ CDCP.SPECIFICATION = create.jheem.specification(version='cdcp',
 #-- PrEP --#
 register.model.element(CDCP.SPECIFICATION,
                        name = "fraction.prep.from.cdc",
-                       functional.form = create.logistic.linear.functional.form(intercept = log(0.2)-log(0.2), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
+                       functional.form = create.logistic.linear.functional.form(intercept = log(0.02)-log(1-0.02), slope = 0, anchor.year = 2020, parameters.are.on.logit.scale = TRUE),
                        scale = "proportion", # per person
                        functional.form.from.time = 2010)
 
@@ -34,9 +34,9 @@ register.model.element(CDCP.SPECIFICATION, name = "proportion.tested.regardless"
                        value = 0.5,
                        scale = "proportion")
 
-register.model.element(CDCP.SPECIFICATION, name = 'fraction.cdc.funded.tests.in.non.healthcare.settings',
-                       value = 0.5,
-                       scale = "proportion")
+# register.model.element(CDCP.SPECIFICATION, name = 'fraction.cdc.funded.tests.in.non.healthcare.settings',
+#                        value = 0.5,
+#                        scale = "proportion")
 
 register.model.element(CDCP.SPECIFICATION, name = "fraction.diagnoses.from.cdc",
                        get.functional.form.function = get.fraction.diagnoses.from.cdc.model.spline,
@@ -61,10 +61,10 @@ register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.tested.prep.elig
                        scale = "proportion",
                        functional.form.from.time = 2010) 
 
-register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.referred.to.prep",
-                      get.functional.form.function = get.fraction.prep.referred,
-                      scale = "proportion",
-                      functional.form.from.time = 2010)
+# register.model.element(CDCP.SPECIFICATION, name = "fraction.cdc.referred.to.prep",
+#                       get.functional.form.function = get.fraction.prep.referred,
+#                       scale = "proportion",
+#                       functional.form.from.time = 2010)
 
 #-- Contact Tracing --#
 
@@ -184,22 +184,23 @@ register.model.quantity(CDCP.SPECIFICATION,
 
 #-- Derive cdc-funded testing rate from PrEP --#
 
-register.model.quantity(CDCP.SPECIFICATION, name = "cdc.funded.non.healthcare.testing.rate",
-                        scale = 'rate', # per person per year*
-                        value = expression(cdc.funded.general.population.testing * fraction.cdc.funded.tests.in.non.healthcare.settings))
-
-
-register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.eligible.rate",
+register.model.quantity(CDCP.SPECIFICATION, name = 'cdc.prep.uptake.rate',
                         scale = 'rate', # per person per year
-                        value = expression(cdc.funded.non.healthcare.testing.rate * fraction.cdc.tests.unique * fraction.cdc.tested.prep.eligible ))
+                        value = expression(proportion.receiving.prep * fraction.prep.from.cdc))
 
 register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.referral.rate",
                         scale = 'rate', # per person per year
-                        value = expression(cdc.prep.eligible.rate *fraction.cdc.referred.to.prep))
+                        value = expression(cdc.prep.uptake.rate / p.prep.uptake.from.referral))
+# 
+# register.model.quantity(CDCP.SPECIFICATION, name = "cdc.funded.non.healthcare.testing.rate",
+#                         scale = 'rate', # per person per year*
+#                         value = expression(cdc.funded.general.population.testing * fraction.cdc.funded.tests.in.non.healthcare.settings))
 
-register.model.quantity(CDCP.SPECIFICATION, name = 'cdc.prep.uptake.rate',
+register.model.quantity(CDCP.SPECIFICATION, name = "cdc.prep.eligible.rate",
                         scale = 'rate', # per person per year
-                        value = expression(cdc.prep.referral.rate * p.prep.uptake.from.referral))
+                        value = expression(cdc.funded.general.population.testing * fraction.cdc.tests.unique * fraction.cdc.tested.prep.eligible ))
+
+
 
 
 
@@ -271,28 +272,28 @@ track.cumulative.outcome(CDCP.SPECIFICATION,
                          keep.dimensions = c('location'),
                          corresponding.data.outcome = "hiv.tests")
 
-track.integrated.outcome(CDCP.SPECIFICATION,
-                         name = 'cumulative.fraction.cdc.funded.tests.in.non.healthcare.settings',
-                         outcome.metadata = NULL,
-                         value.to.integrate = 'fraction.cdc.funded.tests.in.non.healthcare.settings',
-                         scale = 'proportion',
-                         keep.dimensions = c('location'),
-                         denominator.outcome = 'cdc.funded.tests',
-                         save = F)
+# track.integrated.outcome(CDCP.SPECIFICATION,
+#                          name = 'cumulative.fraction.cdc.funded.tests.in.non.healthcare.settings',
+#                          outcome.metadata = NULL,
+#                          value.to.integrate = 'fraction.cdc.funded.tests.in.non.healthcare.settings',
+#                          scale = 'proportion',
+#                          keep.dimensions = c('location'),
+#                          denominator.outcome = 'cdc.funded.tests',
+#                          save = F)
 
 
-track.cumulative.outcome(CDCP.SPECIFICATION,
-                         name = 'cdc.funded.tests.nonhealthcare',
-                         outcome.metadata = create.outcome.metadata(display.name = 'Number of CDC-Funded HIV Tests in Non Health Care Settings',
-                                                                    description = "Number of CDC-Funded cleaHIV Tests Done in the past year in non health care settings",
-                                                                    scale = 'non.negative.number',
-                                                                    axis.name = 'Tests',
-                                                                    units = 'tests',
-                                                                    singular.unit = 'test'),
-                         scale = 'non.negative.number',
-                         value = expression(cdc.funded.tests * cumulative.fraction.cdc.funded.tests.in.non.healthcare.settings),
-                         keep.dimensions = c('location'),
-                         corresponding.data.outcome = "non.healthcare.hiv.tests")
+# track.cumulative.outcome(CDCP.SPECIFICATION,
+#                          name = 'cdc.funded.tests.nonhealthcare',
+#                          outcome.metadata = create.outcome.metadata(display.name = 'Number of CDC-Funded HIV Tests in Non Health Care Settings',
+#                                                                     description = "Number of CDC-Funded cleaHIV Tests Done in the past year in non health care settings",
+#                                                                     scale = 'non.negative.number',
+#                                                                     axis.name = 'Tests',
+#                                                                     units = 'tests',
+#                                                                     singular.unit = 'test'),
+#                          scale = 'non.negative.number',
+#                          value = expression(cdc.funded.tests * cumulative.fraction.cdc.funded.tests.in.non.healthcare.settings),
+#                          keep.dimensions = c('location'),
+#                          corresponding.data.outcome = "non.healthcare.hiv.tests")
 
 track.cumulative.outcome(CDCP.SPECIFICATION,
                          name = 'total.cdc.hiv.test.positivity',

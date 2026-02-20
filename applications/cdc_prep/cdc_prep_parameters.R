@@ -54,6 +54,8 @@ CDC.TESTING.PARAMETERS.PRIOR = join.distributions(
 
 PREP.ELIGIBLE.SD = log(1.5)/2
 PREP.ELIGIBLE.TOTAL.SD = log(10)/2
+PREP.CDC.SD = log(1.5)/2
+PREP.CDC.TOTAL.SD = log(10)/2
 #PREP.REFERRED.TOTAL.SD = log(10)/2
 #PREP.REFERRED.SD = log(1.5)/2
 
@@ -62,7 +64,7 @@ CDC.PREP.PARAMETERS.PRIOR = join.distributions(
     CDC.TESTING.PARAMETERS.PRIOR,
     
     prep.eligible.or = Lognormal.Distribution(0, PREP.ELIGIBLE.TOTAL.SD),
-    prep.eligible.slope.or = Lognormal.Distribution(0, PREP.ELIGIBLE.TOTAL.SD),
+    #prep.eligible.slope.or = Lognormal.Distribution(0, PREP.ELIGIBLE.TOTAL.SD),
     
     prep.eligible.msm.or = Lognormal.Distribution(0, PREP.ELIGIBLE.SD),
     prep.eligible.msm.idu.or = Lognormal.Distribution(0, PREP.ELIGIBLE.SD),
@@ -81,29 +83,52 @@ CDC.PREP.PARAMETERS.PRIOR = join.distributions(
     prep.eligible.age4.or = Lognormal.Distribution(0, PREP.ELIGIBLE.SD),
     prep.eligible.age5.or = Lognormal.Distribution(0, PREP.ELIGIBLE.SD),
     
-    prep.referred.or = Lognormal.Distribution(0, PREP.REFERRED.TOTAL.SD),
-    prep.referred.slope.or = Lognormal.Distribution(0, PREP.REFERRED.TOTAL.SD),
-
-    prep.referred.msm.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.msm.idu.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.idu.male.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.idu.female.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.heterosexual.male.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.heterosexual.female.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-
-    prep.referred.black.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.hispanic.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.other.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-
-    prep.referred.age1.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.age2.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.age3.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.age4.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
-    prep.referred.age5.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    prep.cdc.or = Lognormal.Distribution(0, PREP.CDC.TOTAL.SD),
+    #prep.eligible.slope.or = Lognormal.Distribution(0, PREP.ELIGIBLE.TOTAL.SD),
+    
+    prep.cdc.msm.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.msm.idu.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.idu.male.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.idu.female.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.heterosexual.male.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.heterosexual.female.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    
+    prep.cdc.black.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.hispanic.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.other.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    
+    prep.cdc.age1.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.age2.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.age3.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.age4.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    prep.cdc.age5.or = Lognormal.Distribution(0, PREP.CDC.SD),
+    
+    
+    # prep.referred.or = Lognormal.Distribution(0, PREP.REFERRED.TOTAL.SD),
+    # prep.referred.slope.or = Lognormal.Distribution(0, PREP.REFERRED.TOTAL.SD),
+    # 
+    # prep.referred.msm.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.msm.idu.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.idu.male.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.idu.female.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.heterosexual.male.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.heterosexual.female.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # 
+    # prep.referred.black.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.hispanic.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.other.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # 
+    # prep.referred.age1.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.age2.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.age3.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.age4.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
+    # prep.referred.age5.or = Lognormal.Distribution(0, PREP.REFERRED.SD),
 
     fraction.cdc.tests.unique = Beta.Distribution(7.2,7.2),
     
     rr.fraction.index.diagnoses.that.yield.a.positive.contact = Lognormal.Distribution(0, log(2)/2)
+    
+    #fraction.cdc.funded.tests.in.non.healthcare.settings = Beta.Distribution(1,1)
         
 )
 
@@ -122,99 +147,194 @@ cdc.prep.apply.set.parameters <- function(model.settings, parameters)
     n.ages = length(ages)
 
 
-parameter.prefixes = c(
-    #   fraction.diagnoses.from.cdc = 'cdc.funded.diagnoses.',
-    fraction.cdc.referred.to.prep = 'prep.referred.'
-
-)
-element.names = names(parameter.prefixes)
-
-for (i in 1:length(element.names))
-{
-    element.name = element.names[i]
-    parameter.prefix = parameter.prefixes[i]
-
-    # All
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   value = parameters[paste0(parameter.prefix, 'or')],
-                                                   dimension = 'all',
-                                                   applies.to.dimension.values='all')
-
-    # Sex/Risk Terms
-    set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   value = parameters[paste0(parameter.prefix, 'msm.or')],
-                                                   applies.to.dimension.values = list(sex='msm', risk=non.idu.states))
-
-    set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   value = parameters[paste0(parameter.prefix, 'msm.idu.or')],
-                                                   applies.to.dimension.values = list(sex='msm', risk=idu.states))
-
-    set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   value = parameters[paste0(parameter.prefix, 'heterosexual.male.or')],
-                                                   applies.to.dimension.values = list(sex='heterosexual_male', risk=non.idu.states))
-
-    set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   value = parameters[paste0(parameter.prefix, 'idu.male.or')],
-                                                   applies.to.dimension.values = list(sex='heterosexual_male', risk=idu.states))
-
-    set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   value = parameters[paste0(parameter.prefix, 'heterosexual.female.or')],
-                                                   applies.to.dimension.values = list(sex='female', risk=non.idu.states))
-
-    set.element.functional.form.interaction.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   value = parameters[paste0(parameter.prefix, 'idu.female.or')],
-                                                   applies.to.dimension.values = list(sex='female', risk=idu.states))
-
-    # Race Terms
-
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   values = parameters[paste0(parameter.prefix, races,'.or')],
-                                                   dimension = 'race',
-                                                   applies.to.dimension.values=races)
-
-    if (!is.na(parameters[paste0(parameter.prefix,'slope.or')]))
+# parameter.prefixes = c(
+#     #   fraction.diagnoses.from.cdc = 'cdc.funded.diagnoses.',
+#     fraction.cdc.referred.to.prep = 'prep.referred.'
+# 
+# )
+# element.names = names(parameter.prefixes)
+# 
+# for (i in 1:length(element.names))
+# {
+#     element.name = element.names[i]
+#     parameter.prefix = parameter.prefixes[i]
+# 
+#     # All
+#     set.element.functional.form.main.effect.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    value = parameters[paste0(parameter.prefix, 'or')],
+#                                                    dimension = 'all',
+#                                                    applies.to.dimension.values='all')
+# 
+#     # Sex/Risk Terms
+#     set.element.functional.form.interaction.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    value = parameters[paste0(parameter.prefix, 'msm.or')],
+#                                                    applies.to.dimension.values = list(sex='msm', risk=non.idu.states))
+# 
+#     set.element.functional.form.interaction.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    value = parameters[paste0(parameter.prefix, 'msm.idu.or')],
+#                                                    applies.to.dimension.values = list(sex='msm', risk=idu.states))
+# 
+#     set.element.functional.form.interaction.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    value = parameters[paste0(parameter.prefix, 'heterosexual.male.or')],
+#                                                    applies.to.dimension.values = list(sex='heterosexual_male', risk=non.idu.states))
+# 
+#     set.element.functional.form.interaction.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    value = parameters[paste0(parameter.prefix, 'idu.male.or')],
+#                                                    applies.to.dimension.values = list(sex='heterosexual_male', risk=idu.states))
+# 
+#     set.element.functional.form.interaction.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    value = parameters[paste0(parameter.prefix, 'heterosexual.female.or')],
+#                                                    applies.to.dimension.values = list(sex='female', risk=non.idu.states))
+# 
+#     set.element.functional.form.interaction.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    value = parameters[paste0(parameter.prefix, 'idu.female.or')],
+#                                                    applies.to.dimension.values = list(sex='female', risk=idu.states))
+# 
+#     # Race Terms
+# 
+#     set.element.functional.form.main.effect.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    values = parameters[paste0(parameter.prefix, races,'.or')],
+#                                                    dimension = 'race',
+#                                                    applies.to.dimension.values=races)
+# 
+#     if (!is.na(parameters[paste0(parameter.prefix,'slope.or')]))
+#     {
+#         set.element.functional.form.main.effect.alphas(model.settings,
+#                                                        element.name = element.name,
+#                                                        alpha.name = 'slope',
+#                                                        values = parameters[paste0(parameter.prefix,'slope.or')],
+#                                                        dimension = 'all',
+#                                                        applies.to.dimension.values='all')
+# 
+#         #set.element.functional.form.main.effect.alphas(model.settings,
+#         # element.name = element.name,
+#         # alpha.name = 'slope',
+#         # values = parameters[paste0(parameter.prefix, races,'.slope.or')],
+#         # dimension = 'race',
+#         # applies.to.dimension.values=races)
+#     }
+# 
+#     # Age Terms
+# 
+#     set.element.functional.form.main.effect.alphas(model.settings,
+#                                                    element.name = element.name,
+#                                                    alpha.name = 'intercept',
+#                                                    values = parameters[paste0(parameter.prefix, 'age', age.indices,'.or')],
+#                                                    dimension = 'age',
+#                                                    applies.to.dimension.values=ages)
+# 
+# }
+    
+    parameter.prefixes = c(
+        fraction.prep.from.cdc = 'prep.cdc.'
+        
+    )
+    element.names = names(parameter.prefixes)
+    for (i in 1:length(element.names))
     {
+        element.name = element.names[i]
+        parameter.prefix = parameter.prefixes[i]
+        
+        # All
         set.element.functional.form.main.effect.alphas(model.settings,
                                                        element.name = element.name,
-                                                       alpha.name = 'slope',
-                                                       values = parameters[paste0(parameter.prefix,'slope.or')],
+                                                       alpha.name = 'intercept',
+                                                       value = parameters[paste0(parameter.prefix, 'or')],
                                                        dimension = 'all',
                                                        applies.to.dimension.values='all')
-
-        #set.element.functional.form.main.effect.alphas(model.settings,
-        # element.name = element.name,
-        # alpha.name = 'slope',
-        # values = parameters[paste0(parameter.prefix, races,'.slope.or')],
-        # dimension = 'race',
-        # applies.to.dimension.values=races)
+        
+        
+        
+        # Sex/Risk Terms
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       value = parameters[paste0(parameter.prefix, 'msm.or')],
+                                                       applies.to.dimension.values = list(sex='msm', risk=non.idu.states))
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       value = parameters[paste0(parameter.prefix, 'msm.idu.or')],
+                                                       applies.to.dimension.values = list(sex='msm', risk=idu.states))
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       value = parameters[paste0(parameter.prefix, 'heterosexual.male.or')],
+                                                       applies.to.dimension.values = list(sex='heterosexual_male', risk=non.idu.states))
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       value = parameters[paste0(parameter.prefix, 'idu.male.or')],
+                                                       applies.to.dimension.values = list(sex='heterosexual_male', risk=idu.states))
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       value = parameters[paste0(parameter.prefix, 'heterosexual.female.or')],
+                                                       applies.to.dimension.values = list(sex='female', risk=non.idu.states))
+        
+        set.element.functional.form.interaction.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       value = parameters[paste0(parameter.prefix, 'idu.female.or')],
+                                                       applies.to.dimension.values = list(sex='female', risk=idu.states))
+        
+        # Race Terms
+        
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       values = parameters[paste0(parameter.prefix, races,'.or')],
+                                                       dimension = 'race',
+                                                       applies.to.dimension.values=races)
+        
+        if (!is.na(parameters[paste0(parameter.prefix,'slope.or')]))
+        {
+            set.element.functional.form.main.effect.alphas(model.settings,
+                                                           element.name = element.name,
+                                                           alpha.name = 'slope',
+                                                           values = parameters[paste0(parameter.prefix,'slope.or')],
+                                                           dimension = 'all',
+                                                           applies.to.dimension.values='all')
+            
+            #set.element.functional.form.main.effect.alphas(model.settings,
+            # element.name = element.name,
+            # alpha.name = 'slope',
+            # values = parameters[paste0(parameter.prefix, races,'.slope.or')],
+            # dimension = 'race',
+            # applies.to.dimension.values=races)
+        }
+        
+        # Age Terms
+        
+        set.element.functional.form.main.effect.alphas(model.settings,
+                                                       element.name = element.name,
+                                                       alpha.name = 'intercept',
+                                                       values = parameters[paste0(parameter.prefix, 'age', age.indices,'.or')],
+                                                       dimension = 'age',
+                                                       applies.to.dimension.values=ages)
+        
     }
-
-    # Age Terms
-
-    set.element.functional.form.main.effect.alphas(model.settings,
-                                                   element.name = element.name,
-                                                   alpha.name = 'intercept',
-                                                   values = parameters[paste0(parameter.prefix, 'age', age.indices,'.or')],
-                                                   dimension = 'age',
-                                                   applies.to.dimension.values=ages)
-
-}
+    
 
     parameter.prefixes = c(
         fraction.cdc.tested.prep.eligible = 'prep.eligible.'
@@ -528,12 +648,13 @@ CDC.PREP.PARAMETER.SAMPLING.BLOCKS = c(
         prep.eligible.by.risk = c("prep.eligible.msm.or","prep.eligible.msm.idu.or","prep.eligible.idu.male.or","prep.eligible.idu.female.or","prep.eligible.heterosexual.male.or","prep.eligible.heterosexual.female.or"),
         prep.eligible.by.age = c("prep.eligible.age1.or","prep.eligible.age2.or","prep.eligible.age3.or","prep.eligible.age4.or","prep.eligible.age5.or"),
         prep.eligible.by.race =  c("prep.eligible.black.or","prep.eligible.hispanic.or","prep.eligible.other.or"),
-        prep.eligible = c("prep.eligible.or","prep.eligible.slope.or"),
-        prep.referred.by.race = c("prep.referred.black.or","prep.referred.hispanic.or","prep.referred.other.or"),
-        prep.referred.by.risk = c("prep.referred.msm.or","prep.referred.msm.idu.or","prep.referred.idu.male.or","prep.referred.idu.female.or","prep.referred.heterosexual.male.or","prep.referred.heterosexual.female.or"),
-        prep.referred.by.rage = c("prep.referred.age1.or","prep.referred.age2.or","prep.referred.age3.or","prep.referred.age4.or","prep.referred.age5.or"),
-        prep.referred = c("prep.referred.or","prep.referred.slope.or"),
+        prep.eligible = c("prep.eligible.or"),
+        prep.cdc.by.race = c("prep.cdc.black.or","prep.cdc.hispanic.or","prep.cdc.other.or"),
+        prep.cdc.by.risk = c("prep.cdc.msm.or","prep.cdc.msm.idu.or","prep.cdc.idu.male.or","prep.cdc.idu.female.or","prep.cdc.heterosexual.male.or","prep.cdc.heterosexual.female.or"),
+        prep.cdc.by.rage = c("prep.cdc.age1.or","prep.cdc.age2.or","prep.cdc.age3.or","prep.cdc.age4.or","prep.cdc.age5.or"),
+        prep.cdc = c("prep.cdc.or"),
         prep.unique.total = 'fraction.cdc.tests.unique',
         rr.positive.contact = 'rr.fraction.index.diagnoses.that.yield.a.positive.contact'
+        #cdc.tests.non.healthcare ='fraction.cdc.funded.tests.in.non.healthcare.settings'
 ))
 

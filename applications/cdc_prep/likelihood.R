@@ -6,26 +6,54 @@ cdc.tests.likelihood.instructions = create.basic.likelihood.instructions(outcome
                                                                          dimensions = character(), #total
                                                                          levels.of.stratification = 0,
                                                                          from.year = 2010,
-                                                                         to.year = 2019,
+                                                                         omit.years = c(2020,2021),
+                                                                         #to.year = 2019,
                                                                          observation.correlation.form = 'compound.symmetry',
                                                                          correlation.different.years = 0,
-                                                                         error.variance.term = .005,
+                                                                         error.variance.term = .0005,
                                                                          error.variance.type = c('cv')
 )
 
-cdc.nonhealthcare.tests.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "non.healthcare.hiv.tests", 
-                                                                         outcome.for.sim = "cdc.funded.tests.nonhealthcare", 
-                                                                         dimensions = character(), #total
-                                                                         levels.of.stratification = 0,
-                                                                         from.year = 2018,
-                                                                         to.year = 2021,
-                                                                         observation.correlation.form = 'compound.symmetry',
-                                                                         correlation.different.years = 0,
-                                                                         error.variance.term = .015,
-                                                                         error.variance.type = c('sd')
-)
+# 
+# cdc.nonhealthcare.tests.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "non.healthcare.hiv.tests",
+#                                                                                           outcome.for.sim = "cdc.funded.tests.nonhealthcare",
+#                                                                                           dimensions = character(), #total
+#                                                                                           levels.of.stratification = 0,
+#                                                                                           from.year = 2011,
+#                                                                                           to.year = 2021,
+#                                                                                           observation.correlation.form = 'compound.symmetry',
+#                                                                                           correlation.different.years = 0,
+#                                                                                           error.variance.term = .000015,
+#                                                                                           error.variance.type = c('sd')
+# )
+# 
+# cdc.nonhealthcare.tests.likelihood.instructions.AL = create.basic.likelihood.instructions(outcome.for.data = "non.healthcare.hiv.tests",
+#                                                                          outcome.for.sim = "cdc.funded.tests.nonhealthcare",
+#                                                                          dimensions = "AL", #total
+#                                                                          levels.of.stratification = 0,
+#                                                                          from.year = 2018,
+#                                                                          to.year = 2021,
+#                                                                          observation.correlation.form = 'compound.symmetry',
+#                                                                          correlation.different.years = 0,
+#                                                                          error.variance.term = .00015,
+#                                                                          error.variance.type = c('sd')
+# )
+# 
+# 
+# cdc.nonhealthcare.tests.likelihood.instructions.LA = create.basic.likelihood.instructions(outcome.for.data = "non.healthcare.hiv.tests",
+#                                                                                        outcome.for.sim = "cdc.funded.tests.nonhealthcare",
+#                                                                                        dimensions = "LA", #total
+#                                                                                        levels.of.stratification = 0,
+#                                                                                        from.year = 2018,
+#                                                                                        to.year = 2021,
+#                                                                                        observation.correlation.form = 'compound.symmetry',
+#                                                                                        correlation.different.years = 0,
+#                                                                                        error.variance.term = .00015,
+#                                                                                        error.variance.type = c('sd')
+# )
+# 
 
-cdc.test.positivity.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "cdc.hiv.test.positivity", 
+cdc.test.positivity.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "cdc.hiv.test.positivity",
                                                                                    outcome.for.sim = "total.cdc.hiv.test.positivity",
                                                                                    dimensions = character(), #total
                                                                                    levels.of.stratification = 0,
@@ -38,7 +66,7 @@ cdc.test.positivity.likelihood.instructions = create.basic.likelihood.instructio
 )
 
 
-cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "number.eligible", 
+cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "number.eligible", 
                                                                                    outcome.for.sim = "cumulative.cdc.prep.eligible",
                                                                                    dimensions = character(), #total
                                                                                    levels.of.stratification = 0,
@@ -46,13 +74,13 @@ cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions
                                                                                    to.year = 2025,
                                                                                    observation.correlation.form = 'compound.symmetry',
                                                                                    correlation.different.years = 0.5,
-                                                                                   error.variance.term = .0009, 
+                                                                                   error.variance.term = .009, #off by 5% 
                                                                                    error.variance.type = c('cv')
 ) 
 
 
 
-cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "proportion.referred", 
+cdc.prep.referred.likelihood.instructions = create.basic.likelihood.instructions(outcome.for.data = "proportion.referred", 
                                                                                    outcome.for.sim = "cdc.fraction.prep.referred.of.eligible",
                                                                                    dimensions = character(), #total
                                                                                    levels.of.stratification = 0,
@@ -60,8 +88,9 @@ cdc.prep.eligible.likelihood.instructions = create.basic.likelihood.instructions
                                                                                    to.year = 2022,
                                                                                    observation.correlation.form = 'compound.symmetry',
                                                                                    correlation.different.years = 0.5,
-                                                                                   error.variance.term = 0.0845,
-                                                                                   error.variance.type = c('sd')
+                                                                                   error.variance.term = 0.104382, #half of inter-region variance + additional varaition between healthcare/non health care settings
+                                                                                   error.variance.type = c('sd'),
+                                                                                   weights = 4
 )
 
 
@@ -121,7 +150,8 @@ future.test.likelihood.instructions <- create.custom.likelihood.instructions(nam
 )
 
 
-cdc.prep.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcare.tests.likelihood.instructions,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,future.test.likelihood.instructions,nonfunded.rate.likelihood)
+cdc.prep.joint.likelihood.instructions = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions,future.test.likelihood.instructions)
 
-
+# cdc.prep.joint.likelihood.instructions.AL = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcare.tests.likelihood.instructions.AL,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions,future.test.likelihood.instructions)
+# cdc.prep.joint.likelihood.instructions.LA = join.likelihood.instructions(cdc.test.positivity.likelihood.instructions,cdc.nonhealthcare.tests.likelihood.instructions.LA,cdc.tests.likelihood.instructions,cdc.prep.referred.likelihood.instructions,cdc.prep.eligible.likelihood.instructions,future.test.likelihood.instructions)
 
