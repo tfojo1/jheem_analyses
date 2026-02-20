@@ -357,12 +357,46 @@ ps.diagnosis.total.likelihood.instructions =
                                          equalize.weight.by.year = T
                                          # minimum.error.sd = 1  
     )
-
+ps.diagnosis.total.likelihood.instructions.filtered.dataset =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                         outcome.for.data = "ps.syphilis.diagnoses",  
+                                         sources.to.use = c("cdc.aggregated.county","cdc.sti.surveillance.reports"),
+                                         levels.of.stratification = c(0), 
+                                         from.year = 1993,
+                                         to.year = 2022,
+                                         #
+                                         error.variance.type = c('cv', 'sd'),
+                                         error.variance.term = list(diag_cv, 10),  
+                                         #
+                                         observation.correlation.form = 'autoregressive.1',
+                                         #
+                                         weights = STAGE.1.WEIGHT,
+                                         equalize.weight.by.year = T
+                                         # minimum.error.sd = 1  
+    )
 ##---- Strata Stage1 2019-2022 ----
 ps.diagnosis.by.strata.stage1.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
+                                         dimensions = c("sex","race"), 
+                                         levels.of.stratification = c(0,1,2),
+                                         from.year = 2019,
+                                         to.year = 2022,
+                                         #
+                                         error.variance.type = 'cv',
+                                         error.variance.term = diag_cv,  
+                                         #
+                                         observation.correlation.form = 'compound.symmetry', #short timeframe
+                                         #
+                                         weights = STAGE.1.WEIGHT ,
+                                         equalize.weight.by.year = T,
+                                         minimum.error.sd = 1  
+    )
+ps.diagnosis.by.strata.stage1.likelihood.instructions.filtered.dataset =
+    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
+                                         outcome.for.data = "ps.syphilis.diagnoses",  
                                          dimensions = c("sex","race"),
+                                         sources.to.use = c("cdc.aggregated.county","cdc.sti.surveillance.reports"),
                                          levels.of.stratification = c(0,1,2),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -1145,32 +1179,32 @@ lik.inst.stage0 =join.likelihood.instructions(
 
 ## STAGE1 ----- 
 # total syphilis+stage1 stratas (by race, sex)
-lik.inst.stage1U=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    total.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    ps.diagnosis.total.likelihood.instructions,
-    ps.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    early.diagnosis.total.likelihood.instructions,
-    early.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    late.diagnosis.total.likelihood.instructions,
-    late.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    create.ifelse.likelihood.instructions(
-        hiv.testing.by.strata.stage1.likelihood.instructions,
-        proportion.tested.by.strata.stage1.nested.likelihood.instructions
-    ),
-    #
-    historical.diagnosis.likelihood.instructions,
-    #
-    future.change.likelihood.instructions,
-    future.change.strata.likelihood.instructions,
-    #
-    U.turn.likelihood.instructions,
-    U.turn.strata.likelihood.instructions
-)
+# lik.inst.stage1U=join.likelihood.instructions(
+#     total.diagnosis.likelihood.instructions,
+#     total.diagnosis.by.strata.stage1.likelihood.instructions,
+#     #
+#     ps.diagnosis.total.likelihood.instructions,
+#     ps.diagnosis.by.strata.stage1.likelihood.instructions,
+#     #
+#     early.diagnosis.total.likelihood.instructions,
+#     early.diagnosis.by.strata.stage1.likelihood.instructions,
+#     #
+#     late.diagnosis.total.likelihood.instructions,
+#     late.diagnosis.by.strata.stage1.likelihood.instructions,
+#     #
+#     create.ifelse.likelihood.instructions(
+#         hiv.testing.by.strata.stage1.likelihood.instructions,
+#         proportion.tested.by.strata.stage1.nested.likelihood.instructions
+#     ),
+#     #
+#     historical.diagnosis.likelihood.instructions,
+#     #
+#     future.change.likelihood.instructions,
+#     future.change.strata.likelihood.instructions,
+#     #
+#     U.turn.likelihood.instructions,
+#     U.turn.strata.likelihood.instructions
+# )
 lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage1.likelihood.instructions,
@@ -1191,12 +1225,12 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions
 )
-lik.inst.stage1X=join.likelihood.instructions(
-    # total.diagnosis.likelihood.instructions,
-    # total.diagnosis.by.strata.stage1.likelihood.instructions,
+lik.inst.stage1.filtered.dataset=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage1.likelihood.instructions,
     #
-    ps.diagnosis.total.likelihood.instructions,
-    ps.diagnosis.by.strata.stage1.likelihood.instructions,
+    ps.diagnosis.total.likelihood.instructions.filtered.dataset,
+    ps.diagnosis.by.strata.stage1.likelihood.instructions.filtered.dataset,
     #
     early.diagnosis.total.likelihood.instructions,
     early.diagnosis.by.strata.stage1.likelihood.instructions,

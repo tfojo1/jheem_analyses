@@ -41,7 +41,7 @@ simplot(
     outcomes=c("diagnosis.total","diagnosis.ps",
                "diagnosis.el.misclassified","diagnosis.ll.misclassified",
                "hiv.testing","sti.screening")
-    # outcomes=c("diagnosis.total")
+    # outcomes=c("diagnosis.ps")
     # , split.by = "race"
     # ,facet.by = "sex"
     
