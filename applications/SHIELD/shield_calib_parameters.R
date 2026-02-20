@@ -23,7 +23,7 @@ logit = function(p){
 make.mv.spline.prior = function(parameter, 
                                 logmean00, logsd00, #mean and standard deviation for the parameter corresponding to the year 2000
                                 logsd.delta95, logsd.delta90, logsd.delta70, #SD for past changes (delta) in the param values between knots to 2000
-                                logsd.delta10, logsd.delta20 #SD for future changes (delta) in the param values between knots to 2000
+                                logsd.delta10, logsd.delta17 #SD for future changes (delta) in the param values between knots to 2000
 ){
   
   untransformed.mu = c(logmean00,0,0,0,0,0) #the initial expectation is that the change between years is zero
@@ -34,7 +34,7 @@ make.mv.spline.prior = function(parameter,
                                logsd.delta90, 
                                logsd.delta70, 
                                logsd.delta10, 
-                               logsd.delta20))
+                               logsd.delta17))
   
   #trasformation matrix: transforming the initial, independent parameters (baseline value + deltas) to the 
   # final, correlated parameters (the value of the parameter at each of the six years)
@@ -49,7 +49,7 @@ make.mv.spline.prior = function(parameter,
     c(1,1,0,0,0,0), # 1995 # log P_1995 = logsd00 + logsd.delta95 
     c(1,0,0,0,0,0), # 2000 # log P_2000 = logsd00 
     c(1,0,0,0,1,0), # 2010 # log P_2010 = logsd00 + logsd.delta10 
-    c(1,0,0,0,1,1) # 2020 # log P_2020 = logsd00 + logsd.delta10 + logsd.delta20 
+    c(1,0,0,0,1,1) # 2017 # log P_2020 = logsd00 + logsd.delta10 + logsd.delta20 
   ) # 2000, 1970, 1995, 1990, 2010, 2020
   
   mu = M %*% untransformed.mu # E[y] = M E[x]
@@ -69,7 +69,7 @@ make.mv.spline.prior = function(parameter,
   
   #
   dist = Multivariate.Lognormal.Distribution(mu = mu, sigma = sigma, 
-                                             var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2020)))
+                                             var.names = paste0(parameter,c(1970,1990,1995,2000,2010,2017)))
   return(dist)
 }
 
@@ -213,7 +213,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
                        logsd.delta90 = log(sqrt(1.5))/2, 
                        logsd.delta70 = log(1.5^2)/2,
                        logsd.delta10 = log(1.5)/2, 
-                       logsd.delta20 = log(1.5)/2
+                       logsd.delta17 = log(1.5)/2 # change this to 2017
   ),
   
   ## heterosexual multipliers by time ----
@@ -223,7 +223,7 @@ TRANSMISSION.PARAMETERS.PRIOR=join.distributions(
                        logsd.delta90 = log(sqrt(1.5))/2, 
                        logsd.delta70 = log(1.5^2)/2,
                        logsd.delta10 = log(1.5)/2, 
-                       logsd.delta20 = log(1.5)/2
+                       logsd.delta17 = log(1.5)/2 # change this to 2017
   ),
   
   ## race multipliers (msm and het seperatly) ----
@@ -307,7 +307,7 @@ STI.TESTING.PARAMETERS.PRIOR=join.distributions(
   or.syphilis.to.hiv.testing.hispanic = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   or.syphilis.to.hiv.testing.other = Lognormal.Distribution(meanlog = 0, sdlog = log(2)/2),
   #
-  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (log(2)/2)/10)
+  or.slope.syphilis.to.hiv.testing = Lognormal.Distribution(meanlog = 0, sdlog = (log(1.25)/2)/10) # changed from 2 to make change slower
 )
 
 ###--------------------------------------------------------------------------###
@@ -605,7 +605,7 @@ SHIELD.APPLY.PARAMETERS.FN = function(model.settings, parameters ){
   
   ## Transmission ----
   #multipliers for msm rates in each knot:
-  for(time in c("1970","1990","1995","2000","2010","2020")){    
+  for(time in c("1970","1990","1995","2000","2010","2017")){   # change this to 2017 
     set.element.functional.form.main.effect.alphas(model.settings,
                                                    element.name = "transmission.rate.msm",
                                                    alpha.name = time,
@@ -1002,7 +1002,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
   msm.transmission.block2=c(
     "transmission.rate.multiplier.msm2000",
     "transmission.rate.multiplier.msm2010",
-    "transmission.rate.multiplier.msm2020"#,
+    "transmission.rate.multiplier.msm2017"#, # rename this and others to 2017
     #"transmission.rate.multiplier.msm2030"
   ),
   #
@@ -1013,7 +1013,7 @@ TRANSMISSION.SAMPLING.BLOCKS = list(
   het.transmission.block2=c(
     "transmission.rate.multiplier.heterosexual2000",
     "transmission.rate.multiplier.heterosexual2010",
-    "transmission.rate.multiplier.heterosexual2020"#,
+    "transmission.rate.multiplier.heterosexual2017"#,
     #"transmission.rate.multiplier.heterosexual2030"
   ),
   #

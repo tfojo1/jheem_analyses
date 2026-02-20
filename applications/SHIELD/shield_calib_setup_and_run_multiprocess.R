@@ -1,50 +1,30 @@
+#!/usr/bin/env Rscript
+args <- commandArgs(trailingOnly = TRUE)
+LOCATION <- as.character(args[1])
 
-# # Get the command-line arguments passed to the script
-# args <- commandArgs(trailingOnly = TRUE)
-# 
-# # Check if an argument was provided (in this case, checking if it's not empty)
-# if (length(args) > 0 && args[1] != "rockfish") {
-#   # If the first argument is not empty, use it as the working directory
-#   JHEEM.DIR="/home/pkasaie1/scratch4-pkasaie1/jheem_analyses"
-# } else {
-#   # If no argument is provided, print a message and don't change the working directory
-#   JHEEM.DIR="~/OneDrive - Johns Hopkins/SHIELDR01/Simulation/code/jheem_analyses/"
-# }
-# setwd(JHEEM.DIR)
-# cat("Working directory set to:", getwd(), "\n")
+# Multi-location calibration
 
+print(paste0("Starting ", LOCATION, " at ", Sys.time()))
 
-##----
+setwd("C:/Users/azalesa1/Documents/JHEEM/code/jheem_analyses")
+
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
 source('../jheem_analyses/applications/SHIELD/shield_calib_register_new.R')
 source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases for locations C.12580=Blatimore MSA
 
-#
 VERSION='shield'
-# LOCATION='C.35620' #NYC
-# LOCATION="C.12580" #Baltimore
-# LOCATION="C.12060"
-LOCATION = "C.33100"
 set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-# CALIBRATION.NAME = 'calib.12.02.stage0.pk'
-# CALIBRATION.NAME = 'calib.1.19.stage0.az'
-# CALIBRATION.NAME = 'calib.1.20.stage1.az'
-# CALIBRATION.NAME = 'calib.2.7.stage0.az'
-# CALIBRATION.NAME = 'calib.2.7.stage1X.az'
-
-# CALIBRATIONS.TO.RUN = c("calib.2.13.stage0.az", "calib.2.13.stage1.az")
-CALIBRATIONS.TO.RUN = "calib.2.17.stage1K.az"
-# CALIBRATIONS.TO.RUN = "calib.2.17.stage1.az"
-START_FROM_SCRATCH = F
+CALIBRATIONS.TO.RUN = c("calib.2.19.stage0.az", "calib.2.19.stage1.az")
+START_FROM_SCRATCH = T
 
 for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
     ################
     if (START_FROM_SCRATCH) {
-        print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ")"))
+        print(paste0("Setting up ",CALIBRATION.NAME," code for ", LOCATION, " (", locations::get.location.name(LOCATION), ") at ", Sys.time()))
         #
         clear.calibration.cache(version=VERSION,
                                 location=LOCATION,
@@ -92,7 +72,8 @@ for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
     # save(simset,file =filename )
     save.simulation.set(simset)
     
-    print(paste0("Simset was saved on disk as:   ", filename))
+    print(paste0("Simset was saved on disk at ", Sys.time(), " as:   ", filename))
     
 }
 
+print(paste0("Done with thread ", THREAD_NUMBER, " at ", Sys.time()))

@@ -11,11 +11,11 @@ par.aliases.transmission = list(
     trate.2 = c("transmission.rate.multiplier.msm1995","transmission.rate.multiplier.heterosexual1995"),
     trate.3 = c("transmission.rate.multiplier.msm2000", "transmission.rate.multiplier.heterosexual2000"),
     trate.4 = c("transmission.rate.multiplier.msm2010", "transmission.rate.multiplier.heterosexual2010"),
-    trate.5 = c("transmission.rate.multiplier.msm2020", "transmission.rate.multiplier.heterosexual2020")
+    trate.5 = c("transmission.rate.multiplier.msm2017", "transmission.rate.multiplier.heterosexual2017")
 )
 
 # STAGE 0 Demographics thin 50
-register.calibration.info("calib.2.13.stage0.az",
+register.calibration.info("calib.2.19.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -27,9 +27,9 @@ register.calibration.info("calib.2.13.stage0.az",
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
 
-#STAGE1 (without future or u-turn likelihoods)
-register.calibration.info('calib.2.13.stage1.az',
-                          preceding.calibration.codes = 'calib.2.13.stage0.az',
+#STAGE1
+register.calibration.info('calib.2.19.stage1.az',
+                          preceding.calibration.codes = 'calib.2.19.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
