@@ -30,13 +30,16 @@ report_data_quality <- function(manager,
   # Section 1: NA analysis
   report$sections$na_analysis <- analyze_na_patterns(manager)
 
-  # Section 2: Component consistency
+  # Section 2: Dimension value sanity
+  report$sections$dimension_sanity <- check_dimension_sanity(manager)
+
+  # Section 3: Component consistency
   if (!is.null(component.checks)) {
     report$sections$component_consistency <- check_component_consistency(
       manager, component.checks)
   }
 
-  # Section 3: Marginal consistency
+  # Section 4: Marginal consistency
   report$sections$marginal_consistency <- check_marginal_consistency(
     manager, marginals.outcomes)
 
@@ -83,6 +86,74 @@ analyze_na_patterns <- function(manager) {
   if (length(results) > 0) {
     na_pcts <- sapply(results, function(x) x$na_pct)
     results <- results[order(na_pcts, decreasing = TRUE)]
+  }
+
+  results
+}
+
+
+# -- Dimension Value Sanity ---------------------------------------------------
+
+#' Check that dimension values look reasonable
+#'
+#' Flags cases where dimension values don't match expected patterns — e.g.,
+#' year dimensions containing non-year values, which indicates dimension
+#' labels may have been swapped during data processing.
+#' @keywords internal
+check_dimension_sanity <- function(manager) {
+
+  results <- list()
+  year_pattern <- "^\\d{4}$"
+
+  for (outcome in names(manager$data)) {
+    estimate_data <- manager$data[[outcome]][["estimate"]]
+    if (is.null(estimate_data)) next
+
+    for (source in names(estimate_data)) {
+      for (ontology in names(estimate_data[[source]])) {
+        for (strat in names(estimate_data[[source]][[ontology]])) {
+          arr <- estimate_data[[source]][[ontology]][[strat]]
+          dims <- dimnames(arr)
+
+          # Check year dimension: all values should be 4-digit years
+          if ("year" %in% names(dims)) {
+            year_vals <- dims[["year"]]
+            bad_years <- year_vals[!grepl(year_pattern, year_vals)]
+            if (length(bad_years) > 0) {
+              results[[length(results) + 1]] <- list(
+                path = paste(outcome, source, ontology, strat, sep = " > "),
+                dimension = "year",
+                issue = "non_year_values",
+                bad_values = bad_years,
+                message = sprintf(
+                  "Year dimension contains %d non-year value(s): %s",
+                  length(bad_years),
+                  paste(head(bad_years, 5), collapse = ", "))
+              )
+            }
+          }
+
+          # Check location dimension: values should be state codes, FIPS, or CBSA codes
+          if ("location" %in% names(dims)) {
+            loc_vals <- dims[["location"]]
+            loc_pattern <- "^([A-Z]{2}|\\d{5}|C\\.\\d{5}|US)$"
+            bad_locs <- loc_vals[!grepl(loc_pattern, loc_vals)]
+            if (length(bad_locs) > 0) {
+              results[[length(results) + 1]] <- list(
+                path = paste(outcome, source, ontology, strat, sep = " > "),
+                dimension = "location",
+                issue = "unrecognized_location_codes",
+                bad_values = bad_locs,
+                message = sprintf(
+                  "Location dimension contains %d unrecognized code(s): %s",
+                  length(bad_locs),
+                  paste(head(bad_locs, 5), collapse = ", "))
+              )
+            }
+          }
+        }
+      }
+    }
   }
 
   results
@@ -344,6 +415,20 @@ print_quality_report <- function(report) {
     cat("\n")
   } else {
     cat("--- NA Analysis ---\n  No NAs found\n\n")
+  }
+
+  # -- Dimension Value Sanity --
+  dim_results <- report$sections$dimension_sanity
+  if (length(dim_results) > 0) {
+    cat("--- Dimension Value Sanity ---\n")
+    cat(sprintf("  %d issue(s) found:\n", length(dim_results)))
+    for (item in dim_results) {
+      cat(sprintf("  WARNING: %s\n", item$message))
+      cat(sprintf("    at: %s\n", item$path))
+    }
+    cat("\n")
+  } else {
+    cat("--- Dimension Value Sanity ---\n  All dimension values look reasonable\n\n")
   }
 
   # -- Component Consistency --
