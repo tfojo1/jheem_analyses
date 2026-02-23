@@ -16,6 +16,11 @@ on:
         required: false
         default: 'dev'
         type: string
+      update_spec:
+        description: 'Regenerate the structural spec from this build (use when structure changes intentionally)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   build:
@@ -25,6 +30,8 @@ jobs:
     steps:
       - name: Checkout jheem_analyses
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout jheem2
         uses: actions/checkout@v4
@@ -67,7 +74,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p _ci_inputs/sections _ci_inputs/birth_data
-          # Download section files and other inputs from the inputs release
           gh release download "${{ inputs.inputs_release_tag }}" \
             --dir _ci_inputs/sections \
             --pattern "syphilis.manager_section*.rdata"
@@ -107,11 +113,33 @@ jobs:
             source('data_processing/syphilis.manager/syphilis.processing.for.merging/syphilis.manager.merge.R')
           " 2>&1 | tee _ci_outputs/build_log.txt
 
-      - name: Run validation
+      - name: Update spec from build
+        if: inputs.update_spec
         run: |
+          Rscript data_processing/syphilis.manager/validation/generate_spec.R \
+            _ci_outputs/syphilis.manager.rdata
+
+      - name: Run validation
+        if: ${{ !inputs.update_spec }}
+        run: |
+          set -o pipefail
           Rscript data_processing/syphilis.manager/validation/run_validation.R \
             _ci_outputs/syphilis.manager.rdata \
             2>&1 | tee _ci_outputs/validation_report.txt
+
+      - name: Commit updated spec
+        if: inputs.update_spec
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data_processing/syphilis.manager/validation/syphilis_manager_spec.json
+          git diff --cached --quiet && echo "No spec changes" || \
+            git commit -m "Update syphilis manager spec from CI build
+
+          Inputs: ${{ inputs.inputs_release_tag }}
+          Surveillance: ${{ inputs.surveillance_release_tag }}
+          jheem2: ${{ inputs.jheem2_ref }}"
+          git push
 
       - name: Upload build artifacts
         if: always()
@@ -128,15 +156,24 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION_TAG="syphilis-manager-v$(date +%Y%m%d)-$(echo $GITHUB_SHA | cut -c1-7)"
+          SPEC_NOTE=""
+          if [ "${{ inputs.update_spec }}" = "true" ]; then
+            SPEC_NOTE="Spec: UPDATED (review commit)"
+          else
+            SPEC_NOTE="Validation: PASSED"
+          fi
           NOTES="Built from inputs: \`${{ inputs.inputs_release_tag }}\`
           Surveillance manager: \`${{ inputs.surveillance_release_tag }}\`
           jheem2 ref: \`${{ inputs.jheem2_ref }}\`
           Commit: \`$GITHUB_SHA\`
 
-          Validation: PASSED"
+          $SPEC_NOTE"
+          ASSETS="_ci_outputs/syphilis.manager.rdata"
+          if [ -f _ci_outputs/validation_report.txt ]; then
+            ASSETS="$ASSETS _ci_outputs/validation_report.txt"
+          fi
           gh release create "$VERSION_TAG" \
             --title "Syphilis Manager $VERSION_TAG" \
             --notes "$NOTES" \
-            _ci_outputs/syphilis.manager.rdata \
-            _ci_outputs/validation_report.txt
+            $ASSETS
           echo "Published release: $VERSION_TAG"
