@@ -6,10 +6,12 @@ on:
       inputs_release_tag:
         description: 'Release tag for build inputs (e.g. syphilis-manager-inputs-v1.0.0)'
         required: true
+        default: 'syphilis-manager-inputs-v1.0.0'
         type: string
       surveillance_release_tag:
         description: 'Release tag for surveillance manager (e.g. surveillance-manager-v1.0.0-alpha)'
         required: true
+        default: 'surveillance-manager-v1.0.0-alpha'
         type: string
       jheem2_ref:
         description: 'jheem2 branch or tag to use'
