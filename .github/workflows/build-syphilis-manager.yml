@@ -152,12 +152,20 @@ jobs:
             _ci_outputs/build_log.txt
             _ci_outputs/validation_report.txt
 
-      - name: Create release
+      - name: Create versioned release
         if: success()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          VERSION_TAG="syphilis-manager-v$(date +%Y%m%d)-$(echo $GITHUB_SHA | cut -c1-7)"
+          VERSION_TAG="syphilis-manager-v$(date +%Y.%m.%d)"
+          # Append sequence number if tag already exists (multiple builds in a day)
+          if gh release view "$VERSION_TAG" &>/dev/null; then
+            SEQ=2
+            while gh release view "${VERSION_TAG}.${SEQ}" &>/dev/null; do
+              SEQ=$((SEQ + 1))
+            done
+            VERSION_TAG="${VERSION_TAG}.${SEQ}"
+          fi
           SPEC_NOTE=""
           if [ "${{ inputs.update_spec }}" = "true" ]; then
             SPEC_NOTE="Spec: UPDATED (review commit)"
@@ -179,3 +187,24 @@ jobs:
             --notes "$NOTES" \
             $ASSETS
           echo "Published release: $VERSION_TAG"
+
+      - name: Update latest release
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_TAG="syphilis-manager-latest"
+          # Delete existing latest release if it exists
+          gh release delete "$LATEST_TAG" --cleanup-tag --yes 2>/dev/null || true
+          ASSETS="_ci_outputs/syphilis.manager.rdata"
+          if [ -f _ci_outputs/validation_report.txt ]; then
+            ASSETS="$ASSETS _ci_outputs/validation_report.txt"
+          fi
+          gh release create "$LATEST_TAG" \
+            --title "Syphilis Manager (Latest)" \
+            --notes "Always points to the most recent passing build.
+
+          Download: \`gh release download syphilis-manager-latest\`
+          Or: https://github.com/tfojo1/jheem_analyses/releases/download/syphilis-manager-latest/syphilis.manager.rdata" \
+            $ASSETS
+          echo "Updated latest release"
