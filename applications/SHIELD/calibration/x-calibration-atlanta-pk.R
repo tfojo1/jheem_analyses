@@ -18,20 +18,32 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 MSAS.OF.INTEREST
 VERSION='shield'; LOCATION="C.12060"
 
-simsetAtlanta13 <- retrieve.simulation.set("shield",
-                                             location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
-simsetAtlanta17 <- retrieve.simulation.set("shield",
-                                             location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
+#original model 
+# simsetAtlanta13 <- retrieve.simulation.set("shield",
+                                             # location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
+# increasing hiv testing weight
+# simsetAtlanta17 <- retrieve.simulation.set("shield",
+                                             # location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
+#increasing hiv testing weight & changing 2020 knot to 2017
 simsetAtlanta17k <- retrieve.simulation.set("shield",
                                               location = LOCATION,calibration.code = "calib.2.17.stage1k.az", n.sim = 400)
+
+simsetAtlanta19 <- retrieve.simulation.set("shield",
+                                            location = LOCATION,calibration.code = "calib.2.19.stage1.az", n.sim = 400)
+#increasing hiv testing weight & changing 2020 knot to 2017 & removing LHD data
+simsetAtlanta20f <- retrieve.simulation.set("shield",
+                                            location = LOCATION,calibration.code = "calib.2.20.stage1f.az", n.sim = 400)
 
 #ISSUES:#Not a good poulation fit
 # PLOT -----
 simplot(
     # simsetAtlanta13$last.sim(),
     # simsetAtlanta17$last.sim(),
-    # simsetAtlanta17k$last.sim(),
-    simsetAtlanta17k[391:400],
+    simsetAtlanta17k$last.sim(),
+    simsetAtlanta19$last.sim(),
+    # simsetAtlanta20f$last.sim(),
+    # simsetAtlanta17k[391:400],
+    # simsetAtlanta20f[390:400],
     # 
     # outcomes = c("population"),    split.by = "race", facet.by = "age"
     # outcomes = c("fertility.rate"),    split.by = "race", facet.by = "age"

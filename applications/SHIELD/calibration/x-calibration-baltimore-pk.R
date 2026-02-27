@@ -19,20 +19,24 @@ VERSION='shield'
 LOCATION="C.12580"
 # MSAS.OF.INTEREST
 
-simsetBaltimore13 <- retrieve.simulation.set("shield",
-                                            location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
-simsetBaltimore17 <- retrieve.simulation.set("shield",
-                                            location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
+# simsetBaltimore13 <- retrieve.simulation.set("shield",
+#                                             location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
+# simsetBaltimore17 <- retrieve.simulation.set("shield",
+#                                             location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
 simsetBaltimore17k <- retrieve.simulation.set("shield",
                                             location = LOCATION,calibration.code = "calib.2.17.stage1k.az", n.sim = 400)
+#repeating stage0 & 1 with the new model using the 2X larger weight for HIV testing and transmission knot in 2017
+simsetBaltimore19 <- retrieve.simulation.set("shield",
+                                              location = LOCATION,calibration.code = "calib.2.19.stage1.az", n.sim = 400)
 
 #ISSUES:# Hook shape!
 
 # PLOT -----
 simplot(
-    simsetBaltimore13$last.sim(),
-    simsetBaltimore17$last.sim(),
+    # simsetBaltimore13$last.sim(),
+    # simsetBaltimore17$last.sim(),
     simsetBaltimore17k$last.sim(),
+    simsetBaltimore19$last.sim(),
     # outcomes = c("population"),    split.by = "race", facet.by = "age"
     # outcomes = c("fertility.rate"),    split.by = "race", facet.by = "age"
     # outcomes = c("deaths")

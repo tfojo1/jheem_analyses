@@ -18,32 +18,42 @@ stratum.style.manager  = create.style.manager(color.data.by = "stratum")
 VERSION='shield'
 LOCATION="C.35620"
 
-simsetNyc13 <- retrieve.simulation.set("shield",
-                                         location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
-simsetNyc17 <- retrieve.simulation.set("shield",
-                                         location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
+# simsetNyc13 <- retrieve.simulation.set("shield",
+#                                          location = LOCATION,calibration.code = "calib.2.13.stage1.az",n.sim = 400)
+# simsetNyc17 <- retrieve.simulation.set("shield",
+#                                          location = LOCATION,calibration.code = "calib.2.17.stage1.az", n.sim = 400)
 simsetNyc17k <- retrieve.simulation.set("shield",
                                           location = LOCATION,calibration.code = "calib.2.17.stage1k.az", n.sim = 400)
+#repeating stage0 & 1 with the new model using the 2X larger weight for HIV testing and transmission knot in 2017
+simsetNyc19s0 <- retrieve.simulation.set("shield",
+                                         location = LOCATION,calibration.code = "calib.2.19.stage0.az", n.sim = 400)
 
+# get.calibration.progress('shield', LOCATION, "calib.2.19.stage0.az")
+#     simset <- assemble.simulations.from.calibration(
+#         version = VERSION,
+#         location = LOCATION,
+#         calibration.code = CALIBRATION.CODE.TO.RUN,
+#         allow.incomplete = TRUE
+#     )
 
 
 # PLOT -----
 simplot(
-    simsetNyc13$last.sim(),
-    simsetNyc17$last.sim(),
-    simsetNyc17k$last.sim(),
+    # simsetNyc13$last.sim(),
+    # simsetNyc17$last.sim(),
+    # simsetNyc17k$last.sim(),
     # simsetNyc1$last.sim(),
-    # 
+    simsetNyc19s0$last.sim(),
     # outcomes = c("population"),    split.by = "race", facet.by = "age"
     # outcomes = c("fertility.rate"),    split.by = "race", facet.by = "age"
     # outcomes = c("deaths")
     # outcomes = c("immigration","emigration")    #split.by = "race"
     # outcomes = c("emigration") #split.by = "race", facet.by = "age"
-    # outcomes=c("diagnosis.ps")
+    outcomes=c("diagnosis.ps")
     # outcomes=c("diagnosis.total")
-    outcomes=c("diagnosis.total","diagnosis.ps",
-               "diagnosis.el.misclassified","diagnosis.ll.misclassified",
-               "hiv.testing","sti.screening")
+    # outcomes=c("diagnosis.total","diagnosis.ps",
+    #            "diagnosis.el.misclassified","diagnosis.ll.misclassified",
+    #            "hiv.testing","sti.screening")
     # ,split.by = "race"
     # ,facet.by = "sex"
     
