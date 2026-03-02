@@ -6,7 +6,9 @@ LOCATION <- as.character(args[1])
 
 print(paste0("Starting ", LOCATION, " at ", Sys.time()))
 
-setwd("C:/Users/azalesa1/Documents/JHEEM/code/jheem_analyses")
+# setwd("C:/Users/azalesa1/Documents/JHEEM/code/jheem_analyses")
+
+setwd("../../../jheem_analyses")
 
 source('../jheem_analyses/applications/SHIELD/shield_specification.R')
 source('../jheem_analyses/applications/SHIELD/shield_likelihoods.R')
@@ -18,7 +20,7 @@ set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 
-CALIBRATIONS.TO.RUN = c("calib.3.2.stage1.az")
+CALIBRATIONS.TO.RUN = c("calib.3.2.stage1.pk")
 START_FROM_SCRATCH = T
 
 for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {

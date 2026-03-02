@@ -1176,33 +1176,7 @@ lik.inst.stage0 =join.likelihood.instructions(
 )
 
 ## STAGE1 ----- 
-# total syphilis+stage1 stratas (by race, sex)
-# lik.inst.stage1U=join.likelihood.instructions(
-#     total.diagnosis.likelihood.instructions,
-#     total.diagnosis.by.strata.stage1.likelihood.instructions,
-#     #
-#     ps.diagnosis.total.likelihood.instructions,
-#     ps.diagnosis.by.strata.stage1.likelihood.instructions,
-#     #
-#     early.diagnosis.total.likelihood.instructions,
-#     early.diagnosis.by.strata.stage1.likelihood.instructions,
-#     #
-#     late.diagnosis.total.likelihood.instructions,
-#     late.diagnosis.by.strata.stage1.likelihood.instructions,
-#     #
-#     create.ifelse.likelihood.instructions(
-#         hiv.testing.by.strata.stage1.likelihood.instructions,
-#         proportion.tested.by.strata.stage1.nested.likelihood.instructions
-#     ),
-#     #
-#     historical.diagnosis.likelihood.instructions,
-#     #
-#     future.change.likelihood.instructions,
-#     future.change.strata.likelihood.instructions,
-#     #
-#     U.turn.likelihood.instructions,
-#     U.turn.strata.likelihood.instructions
-# )
+# stage1 likelihoods without future trends
 lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage1.likelihood.instructions,
@@ -1222,6 +1196,33 @@ lik.inst.stage1=join.likelihood.instructions(
     ),
     #
     historical.diagnosis.likelihood.instructions
+)
+# stage1 likelihoods with future trends (penalty and U-trun)
+lik.inst.stage1.futureTrend=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage1.likelihood.instructions,
+    #
+    create.ifelse.likelihood.instructions(
+        hiv.testing.by.strata.stage1.likelihood.instructions,
+        proportion.tested.by.strata.stage1.nested.likelihood.instructions
+    ),
+    #
+    historical.diagnosis.likelihood.instructions,
+    #
+    future.change.likelihood.instructions,
+    future.change.strata.likelihood.instructions,
+    #
+    U.turn.likelihood.instructions,
+    U.turn.strata.likelihood.instructions
 )
 ## STAGE2 -----
 #total syphilis +stage 2 stratas (by age, sex, race)
