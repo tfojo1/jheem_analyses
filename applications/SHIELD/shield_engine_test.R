@@ -8,8 +8,8 @@
 source('applications/SHIELD/shield_specification.R')
 
 VERSION='shield'
-LOCATION='C.12580' #Baltimore MSA
-# LOCATION='C.35620'#NYC 
+# LOCATION='C.31080'
+LOCATION='C.35620'#NYC
 
 
 # make a run:
@@ -30,7 +30,13 @@ likelihood.all<- likelihood.instructions.syphilis.diagnoses$instantiate.likeliho
 likelihood.all$compute.piecewise(sim)
 # simplot(sim, 'diagnosis.total')
 
-
+sim0 <- engine$run(lastB$get.params())
+params2 <- lastB$get.params()
+params2["transmission.rate.future.change.mult"] <- 1.2
+sim2 <- engine$run(params2)
+simplot(sim2, lastB, "diagnosis.ps")
+simplot(sim2, lastB, "sti.screening")
+simplot(sim2, lastB, "hiv.testing")
 
 #POPUATION ----
 #fitting to age-race-sex-specific estimates starting in 2010, and assuming fix strata before then 

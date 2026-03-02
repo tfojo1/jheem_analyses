@@ -1066,6 +1066,10 @@ get_prp_symptomatic_secondary_functional_form <- function(specification.metadata
 }
 
 #-- STI SCREENING --# ----
+
+# Make linear spline functional form with logistic link, knots at 1990, 2010, 2020
+# 2010 knot prior is at hiv_testing_prior intercept. 2020 is intercept + 10*slope
+
 get_sti_screening_functional_form <- function(specification.metadata) {
   # Get a cached object
   # We read the HIV testing prior from BRFSS in, then shift it to serve as our STI screening functional form's priors
@@ -1077,11 +1081,18 @@ get_sti_screening_functional_form <- function(specification.metadata) {
   # Use HIV testing prior slope and intercept and shift to find STI screening functional form slope and intercept
   # We will add log(0.5) assuming half the odds of an syphilis screen compared to the odds of an HIV test in the last year.
   # The 0.9 that was in here was to say we never think we screen more than 90% of people in a stratum, and must subtract log(0.9) to compensate mathematically.
-  sti_screening_functional_form <- create.logistic.linear.functional.form(intercept = hiv_testing_prior$intercepts + log(0.5),
-                                                                          slope = hiv_testing_prior$slopes,
-                                                                          anchor.year = 2010,
-                                                                          max = 1,
-                                                                          parameters.are.on.logit.scale = T)
+  # sti_screening_functional_form <- create.logistic.linear.functional.form(intercept = hiv_testing_prior$intercepts + log(0.5),
+  #                                                                         slope = hiv_testing_prior$slopes,
+  #                                                                         anchor.year = 2010,
+  #                                                                         max = 1,
+  #                                                                         parameters.are.on.logit.scale = T)
+  sti_screening_functional_form <- create.linear.spline.functional.form(knot.times = c("1990"=1990, "2010"=2010, "2020"=2020),
+                                                                        knot.values = list("2010" = hiv_testing_prior$intercepts + log(0.5),
+                                                                                           "1990" = hiv_testing_prior$intercepts + log(0.5) - 20 * hiv_testing_prior$slopes,
+                                                                                           "2020" = hiv_testing_prior$intercepts + log(0.5) + 10 * hiv_testing_prior$slopes),
+                                                                        link = "logit",
+                                                                        knots.are.on.transformed.scale = T)
+  
   
   sti_screening_functional_form
 }

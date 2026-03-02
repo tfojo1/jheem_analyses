@@ -15,7 +15,7 @@ par.aliases.transmission = list(
 )
 
 # STAGE 0 Demographics thin 50
-register.calibration.info("calib.2.19.stage0.az",
+register.calibration.info("calib.2.27.stage0.az",
                           likelihood.instructions = lik.inst.stage0,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -28,8 +28,8 @@ register.calibration.info("calib.2.19.stage0.az",
 )
 
 #STAGE1
-register.calibration.info('calib.2.19.stage1.az',
-                          preceding.calibration.codes = 'calib.2.19.stage0.az',
+register.calibration.info('calib.2.27.stage1.az',
+                          preceding.calibration.codes = 'calib.2.27.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
@@ -37,3 +37,25 @@ register.calibration.info('calib.2.19.stage1.az',
                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
+
+# #STAGE1
+# register.calibration.info('calib.2.19.stage1.az',
+#                           preceding.calibration.codes = 'calib.2.19.stage0.az',
+#                           likelihood.instructions = lik.inst.stage1,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
+#                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+# )
+# 
+# #STAGE1 for Atlanta special. "f" for "filtered data set" (no LHD data in one of the likelihoods)
+# register.calibration.info('calib.2.20.stage1f.az',
+#                           preceding.calibration.codes = 'calib.2.19.stage0.az',
+#                           likelihood.instructions = lik.inst.stage1.filtered.dataset,
+#                           data.manager = SURVEILLANCE.MANAGER,
+#                           end.year = 2030,
+#                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+#                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
+#                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+# )

@@ -12,7 +12,7 @@ par.aliases.transmission = list(
     trate.2 = c("transmission.rate.multiplier.msm1995","transmission.rate.multiplier.heterosexual1995"),
     trate.3 = c("transmission.rate.multiplier.msm2000", "transmission.rate.multiplier.heterosexual2000"),
     trate.4 = c("transmission.rate.multiplier.msm2010", "transmission.rate.multiplier.heterosexual2010"),
-    trate.5 = c("transmission.rate.multiplier.msm2020", "transmission.rate.multiplier.heterosexual2020")
+    trate.5 = c("transmission.rate.multiplier.msm2017", "transmission.rate.multiplier.heterosexual2017")
 )
 
 #STAGE0: The demographic stage

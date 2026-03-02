@@ -24,8 +24,8 @@ source('../jheem_analyses/commoncode/locations_of_interest.R') #provides aliases
 VERSION='shield'
 # LOCATION='C.35620' #NYC
 # LOCATION="C.12580" #Baltimore
-# LOCATION="C.12060"
-LOCATION = "C.33100"
+LOCATION="C.12060"
+# LOCATION = "C.33100"
 set.seed(00000)
 CACHE.FREQ= 500 # how often should write the results to disk (Default: 100)
 UPDATE.FREQ= 50 # how often to print messages (Default: 50)
@@ -37,9 +37,9 @@ UPDATE.FREQ= 50 # how often to print messages (Default: 50)
 # CALIBRATION.NAME = 'calib.2.7.stage1X.az'
 
 # CALIBRATIONS.TO.RUN = c("calib.2.13.stage0.az", "calib.2.13.stage1.az")
-CALIBRATIONS.TO.RUN = "calib.2.17.stage1K.az"
+CALIBRATIONS.TO.RUN = "calib.2.20.stage1f.az"
 # CALIBRATIONS.TO.RUN = "calib.2.17.stage1.az"
-START_FROM_SCRATCH = F
+START_FROM_SCRATCH = T
 
 for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
     ################

@@ -334,7 +334,7 @@ ps.diagnosis.stage0.total.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'autoregressive.1',
                                          #
-                                         weights = STAGE.0.WEIGHT,
+                                         weights = STAGE.0.WEIGHT, # double the weight or even quadruple
                                          equalize.weight.by.year = T
                                          # minimum.error.sd = 1  
     )
@@ -973,8 +973,7 @@ hiv.testing.by.strata.stage1.likelihood.instructions =
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
                                          #
                                          weights = STAGE.1.WEIGHT * 2, # start by increasing the weight to double what it is now
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
+                                         equalize.weight.by.year = T
     )
 
 ##---- Strata Stage2 2014-2019 ----
@@ -992,8 +991,7 @@ hiv.testing.by.strata.stage2.likelihood.instructions =
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
                                          #
                                          weights = STAGE.2.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
+                                         equalize.weight.by.year = T
     )
 
 ##** PROPORTION TESTED ** ----
