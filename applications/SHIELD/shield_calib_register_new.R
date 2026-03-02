@@ -28,7 +28,7 @@ register.calibration.info("calib.2.19.stage0.az",
 )
 
 #STAGE1
-register.calibration.info('calib.2.19.stage1.az',
+register.calibration.info('calib.3.2.stage1.az',
                           preceding.calibration.codes = 'calib.2.19.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
                           data.manager = SURVEILLANCE.MANAGER,
