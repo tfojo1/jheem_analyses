@@ -972,9 +972,8 @@ hiv.testing.by.strata.stage1.likelihood.instructions =
                                          #
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
                                          #
-                                         weights = STAGE.1.WEIGHT * 2, # start by increasing the weight to double what it is now
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
+                                         weights = STAGE.1.WEIGHT, # start by increasing the weight to double what it is now
+                                         equalize.weight.by.year = T
     )
 
 ##---- Strata Stage2 2014-2019 ----
@@ -992,8 +991,7 @@ hiv.testing.by.strata.stage2.likelihood.instructions =
                                          observation.correlation.form = 'compound.symmetry', #short duration of data warrants using the CS
                                          #
                                          weights = STAGE.2.WEIGHT,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1
+                                         equalize.weight.by.year = T
     )
 
 ##** PROPORTION TESTED ** ----
@@ -1211,26 +1209,6 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     ps.diagnosis.total.likelihood.instructions,
     ps.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    early.diagnosis.total.likelihood.instructions,
-    early.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    late.diagnosis.total.likelihood.instructions,
-    late.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    create.ifelse.likelihood.instructions(
-        hiv.testing.by.strata.stage1.likelihood.instructions,
-        proportion.tested.by.strata.stage1.nested.likelihood.instructions
-    ),
-    #
-    historical.diagnosis.likelihood.instructions
-)
-lik.inst.stage1.filtered.dataset=join.likelihood.instructions(
-    total.diagnosis.likelihood.instructions,
-    total.diagnosis.by.strata.stage1.likelihood.instructions,
-    #
-    ps.diagnosis.total.likelihood.instructions.filtered.dataset,
-    ps.diagnosis.by.strata.stage1.likelihood.instructions.filtered.dataset,
     #
     early.diagnosis.total.likelihood.instructions,
     early.diagnosis.by.strata.stage1.likelihood.instructions,
