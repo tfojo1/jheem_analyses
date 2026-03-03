@@ -15,7 +15,7 @@ diag_cv=PS_CV #we will use this error variance for all diagnosis categories
 # STAGE.1: Diagnosis (race, sex stratified) 
 # STAGE.2: Diagnosis (race, sex, age stratified)
 # WEIGHTS: The weights are used to weaken the likelihoods for better mixing 
- #
+#
 STAGE.0.WEIGHT= 1/16 
 STAGE.1.WEIGHT= 1/8
 STAGE.2.WEIGHT= 1/8 
@@ -392,29 +392,12 @@ ps.diagnosis.by.strata.stage1.likelihood.instructions =
                                          equalize.weight.by.year = T,
                                          minimum.error.sd = 1  
     )
-ps.diagnosis.by.strata.stage1.likelihood.instructions.filtered.dataset =
-    create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
-                                         outcome.for.data = "ps.syphilis.diagnoses",  
-                                         dimensions = c("sex","race"),
-                                         sources.to.use = c("cdc.aggregated.county","cdc.sti.surveillance.reports"),
-                                         levels.of.stratification = c(0,1,2),
-                                         from.year = 2019,
-                                         to.year = 2022,
-                                         #
-                                         error.variance.type = 'cv',
-                                         error.variance.term = diag_cv,  
-                                         #
-                                         observation.correlation.form = 'compound.symmetry', #short timeframe
-                                         #
-                                         weights = STAGE.1.WEIGHT ,
-                                         equalize.weight.by.year = T,
-                                         minimum.error.sd = 1  
-    )
+
 ##---- Strata Stage2 2019-2022 ----
 ps.diagnosis.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.ps", 
                                          outcome.for.data = "ps.syphilis.diagnoses",  
-                                         dimensions = c("age","race","sex"),
+                                         dimensions = c("sex","race","age"),
                                          levels.of.stratification = c(0,1,2),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -878,7 +861,7 @@ early.diagnosis.by.strata.stage1.likelihood.instructions =
 early.diagnosis.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.el.misclassified",
                                          outcome.for.data = "early.syphilis.diagnoses", 
-                                         dimensions = c("age","race","sex"),
+                                         dimensions = c("race","sex","age"),
                                          levels.of.stratification = c(0,1,2),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -942,7 +925,7 @@ late.diagnosis.by.strata.stage1.likelihood.instructions =
 late.diagnosis.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "diagnosis.late.misclassified", #late latent misclassified + tertiary+cns
                                          outcome.for.data = "unknown.duration.or.late.syphilis.diagnoses", 
-                                         dimensions = c("age","race","sex"),
+                                         dimensions = c("race","sex","age"),
                                          levels.of.stratification = c(0,1,2),
                                          from.year = 2019,
                                          to.year = 2022,
@@ -980,7 +963,7 @@ hiv.testing.by.strata.stage1.likelihood.instructions =
 hiv.testing.by.strata.stage2.likelihood.instructions =
     create.basic.likelihood.instructions(outcome.for.sim = "hiv.testing",
                                          outcome.for.data = "proportion.tested.for.hiv", 
-                                         dimensions = c("age","race","sex"),
+                                         dimensions = c("race","sex","age"),
                                          levels.of.stratification = c(0,1),
                                          from.year = 2014,
                                          to.year = 2019,
@@ -1176,6 +1159,7 @@ lik.inst.stage0 =join.likelihood.instructions(
 )
 
 ## STAGE1 ----- 
+### without future trend -----
 # stage1 likelihoods without future trends
 lik.inst.stage1=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
@@ -1197,6 +1181,7 @@ lik.inst.stage1=join.likelihood.instructions(
     #
     historical.diagnosis.likelihood.instructions
 )
+### with future trend -----
 # stage1 likelihoods with future trends (penalty and U-trun)
 lik.inst.stage1.futureTrend=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
@@ -1225,8 +1210,30 @@ lik.inst.stage1.futureTrend=join.likelihood.instructions(
     U.turn.strata.likelihood.instructions
 )
 ## STAGE2 -----
+### without future trend -----
 #total syphilis +stage 2 stratas (by age, sex, race)
 lik.inst.stage2=join.likelihood.instructions(
+    total.diagnosis.likelihood.instructions,
+    total.diagnosis.by.strata.stage2.likelihood.instructions,
+    #
+    ps.diagnosis.total.likelihood.instructions,
+    ps.diagnosis.by.strata.stage2.likelihood.instructions,
+    # 
+    early.diagnosis.total.likelihood.instructions,
+    early.diagnosis.by.strata.stage2.likelihood.instructions,
+    # 
+    late.diagnosis.total.likelihood.instructions,
+    late.diagnosis.by.strata.stage2.likelihood.instructions,
+    # 
+    create.ifelse.likelihood.instructions(
+        hiv.testing.by.strata.stage2.likelihood.instructions,
+        proportion.tested.by.strata.stage2.nested.likelihood.instructions
+    ),
+    #
+    historical.diagnosis.likelihood.instructions
+)
+### with future trend -----
+lik.inst.stage2.futureTrend=join.likelihood.instructions(
     total.diagnosis.likelihood.instructions,
     total.diagnosis.by.strata.stage2.likelihood.instructions,
     #
@@ -1252,6 +1259,4 @@ lik.inst.stage2=join.likelihood.instructions(
     U.turn.likelihood.instructions,
     U.turn.strata.likelihood.instructions
 )
-
 cat('*** shield_likelihoods.R completed! ***\n')
- 

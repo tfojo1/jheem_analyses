@@ -26,8 +26,8 @@ register.calibration.info("calib.2.19.stage0.az",
                           parameter.aliases = par.aliases.transmission,
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-
-#STAGE1 without future trend
+# without future trend ----
+#STAGE1  
 register.calibration.info('calib.3.2.stage1.az',
                           preceding.calibration.codes = 'calib.2.19.stage0.az',
                           likelihood.instructions = lik.inst.stage1,
@@ -37,10 +37,31 @@ register.calibration.info('calib.3.2.stage1.az',
                                               STI.TESTING.PARAMETERS.PRIOR@var.names),
                           n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
 )
-#STAGE1 with future trend
+#STAGE2  
+register.calibration.info('calib.3.3.stage2.woFT',
+                          preceding.calibration.codes = 'calib.3.2.stage1.az',
+                          likelihood.instructions = lik.inst.stage2,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+# with future trend ----
+#STAGE1  
 register.calibration.info('calib.3.2.stage1.pk',
                           preceding.calibration.codes = 'calib.2.19.stage0.az',
                           likelihood.instructions = lik.inst.stage1.futureTrend,
+                          data.manager = SURVEILLANCE.MANAGER,
+                          end.year = 2030,
+                          parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
+                                              STI.TESTING.PARAMETERS.PRIOR@var.names),
+                          n.iter = N_ITER, thin = 50, is.preliminary = T, max.run.time.seconds = 30, description = "NA"
+)
+#STAGE2 
+register.calibration.info('calib.3.3.stage2.wFT',
+                          preceding.calibration.codes = 'calib.3.2.stage1.pk',
+                          likelihood.instructions = lik.inst.stage2.futureTrend,
                           data.manager = SURVEILLANCE.MANAGER,
                           end.year = 2030,
                           parameter.names = c(TRANSMISSION.PARAMETERS.PRIOR@var.names,
