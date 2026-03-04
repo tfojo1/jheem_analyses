@@ -78,4 +78,4 @@ for (CALIBRATION.NAME in CALIBRATIONS.TO.RUN) {
     
 }
 
-print(paste0("Done with thread ", THREAD_NUMBER, " at ", Sys.time()))
+print(paste0("Done with ", LOCATION, " at ", Sys.time()))
