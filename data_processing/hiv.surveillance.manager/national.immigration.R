@@ -58,7 +58,7 @@ national.immigration.sex.clean = lapply(national.immigration.sex, function(file)
     data$value = as.numeric(gsub(",", '', data$value))
     data$sex = tolower(data$sex)
     data$year = filename
-    data$year = substring(data$year,58, 61)
+    data$year = substring(data$year,55, 58)
     
     data = as.data.frame(data)
     list(filename, data) 
@@ -106,7 +106,7 @@ national.immigration.age.clean = lapply(national.immigration.age, function(file)
     data$age = gsub(' and ', '-', data$age)
     
     data$year = filename
-    data$year = substring(data$year,58, 61)
+    data$year = substring(data$year,55, 58)
     
     data = as.data.frame(data)
     list(filename, data) 
