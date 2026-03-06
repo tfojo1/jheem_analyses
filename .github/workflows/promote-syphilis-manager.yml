@@ -1,0 +1,66 @@
+name: Promote Syphilis Manager
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to promote to latest (e.g. syphilis-manager-v2026.02.24)'
+        required: true
+        type: string
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate release exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if ! gh release view "${{ inputs.release_tag }}" --repo "$GITHUB_REPOSITORY" &>/dev/null; then
+            echo "ERROR: Release '${{ inputs.release_tag }}' not found"
+            exit 1
+          fi
+          echo "Found release: ${{ inputs.release_tag }}"
+
+      - name: Download release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p _assets
+          gh release download "${{ inputs.release_tag }}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --dir _assets
+          echo "Downloaded assets:"
+          ls -lh _assets/
+
+      - name: Update latest release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          LATEST_TAG="syphilis-manager-latest"
+          # Delete existing latest release if it exists
+          gh release delete "$LATEST_TAG" --repo "$GITHUB_REPOSITORY" --cleanup-tag --yes 2>/dev/null || true
+
+          # Get the source release notes to extract build info
+          SOURCE_NOTES=$(gh release view "${{ inputs.release_tag }}" --repo "$GITHUB_REPOSITORY" --json body -q .body)
+
+          NOTES="## Latest Syphilis Manager
+
+          **Promoted from:** \`${{ inputs.release_tag }}\`
+          **Promoted at:** $(date -u +%Y-%m-%d\ %H:%M\ UTC)
+
+          **Stable download URL:**
+          \`\`\`
+          https://github.com/${GITHUB_REPOSITORY}/releases/download/syphilis-manager-latest/syphilis.manager.rdata
+          \`\`\`
+
+          ---
+
+          $SOURCE_NOTES"
+
+          gh release create "$LATEST_TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Syphilis Manager (Latest)" \
+            --notes "$NOTES" \
+            _assets/*
+          echo "Promoted ${{ inputs.release_tag }} to latest"

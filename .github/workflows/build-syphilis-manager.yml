@@ -166,18 +166,39 @@ jobs:
             done
             VERSION_TAG="${VERSION_TAG}.${SEQ}"
           fi
+
+          # Build release notes with embedded validation report
           SPEC_NOTE=""
           if [ "${{ inputs.update_spec }}" = "true" ]; then
             SPEC_NOTE="Spec: UPDATED (review commit)"
           else
             SPEC_NOTE="Validation: PASSED"
           fi
-          NOTES="Built from inputs: \`${{ inputs.inputs_release_tag }}\`
-          Surveillance manager: \`${{ inputs.surveillance_release_tag }}\`
-          jheem2 ref: \`${{ inputs.jheem2_ref }}\`
-          Commit: \`$GITHUB_SHA\`
+          NOTES="## Build Info
+          | | |
+          |---|---|
+          | **Inputs** | \`${{ inputs.inputs_release_tag }}\` |
+          | **Surveillance** | \`${{ inputs.surveillance_release_tag }}\` |
+          | **jheem2** | \`${{ inputs.jheem2_ref }}\` |
+          | **Commit** | \`${GITHUB_SHA:0:7}\` |
+          | **Status** | $SPEC_NOTE |
 
-          $SPEC_NOTE"
+          > To promote this build to \`latest\`, run the **Promote Syphilis Manager** workflow with tag \`$VERSION_TAG\`."
+
+          if [ -f _ci_outputs/validation_report.txt ]; then
+            REPORT=$(cat _ci_outputs/validation_report.txt)
+            NOTES="$NOTES
+
+          <details>
+          <summary>Validation Report (click to expand)</summary>
+
+          \`\`\`
+          $REPORT
+          \`\`\`
+
+          </details>"
+          fi
+
           ASSETS="_ci_outputs/syphilis.manager.rdata"
           if [ -f _ci_outputs/validation_report.txt ]; then
             ASSETS="$ASSETS _ci_outputs/validation_report.txt"
@@ -187,24 +208,3 @@ jobs:
             --notes "$NOTES" \
             $ASSETS
           echo "Published release: $VERSION_TAG"
-
-      - name: Update latest release
-        if: success()
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          LATEST_TAG="syphilis-manager-latest"
-          # Delete existing latest release if it exists
-          gh release delete "$LATEST_TAG" --cleanup-tag --yes 2>/dev/null || true
-          ASSETS="_ci_outputs/syphilis.manager.rdata"
-          if [ -f _ci_outputs/validation_report.txt ]; then
-            ASSETS="$ASSETS _ci_outputs/validation_report.txt"
-          fi
-          gh release create "$LATEST_TAG" \
-            --title "Syphilis Manager (Latest)" \
-            --notes "Always points to the most recent passing build.
-
-          Download: \`gh release download syphilis-manager-latest\`
-          Or: https://github.com/tfojo1/jheem_analyses/releases/download/syphilis-manager-latest/syphilis.manager.rdata" \
-            $ASSETS
-          echo "Updated latest release"
