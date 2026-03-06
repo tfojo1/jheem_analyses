@@ -22,6 +22,7 @@ on:
 env:
   Q_ROOT: /mnt/jheem_nas_share
   NAS_MERGE_DIR: /mnt/jheem_nas_share/data_managers/data.manager.merge
+  CI_SECTION_DIR: /mnt/jheem_nas_share/data_managers/ci_builds/sections
 
 jobs:
   build-section:
@@ -70,10 +71,13 @@ jobs:
             remotes::install_local('_jheem2', upgrade = 'never', force = FALSE)
           "
 
+      - name: Create CI output directory
+        run: mkdir -p "$CI_SECTION_DIR"
+
       - name: Build section ${{ matrix.section }}
         env:
           Q_ROOT: /mnt/jheem_nas_share
-          SECTION_OUTPUT: /mnt/jheem_nas_share/data_managers/data.manager.merge/syphilis.manager_section${{ matrix.section }}.rdata
+          SECTION_OUTPUT: /mnt/jheem_nas_share/data_managers/ci_builds/sections/syphilis.manager_section${{ matrix.section }}.rdata
         run: |
           echo "Building section ${{ matrix.section }}..."
           Rscript -e "
@@ -88,7 +92,7 @@ jobs:
 
       - name: Verify output
         run: |
-          OUTPUT="$NAS_MERGE_DIR/syphilis.manager_section${{ matrix.section }}.rdata"
+          OUTPUT="$CI_SECTION_DIR/syphilis.manager_section${{ matrix.section }}.rdata"
           if [ ! -f "$OUTPUT" ]; then
             echo "ERROR: Expected output not found: $OUTPUT"
             exit 1
@@ -116,5 +120,6 @@ jobs:
           gh workflow run build-syphilis-manager-self-hosted.yml \
             --repo "$GITHUB_REPOSITORY" \
             -f jheem2_ref="${{ inputs.jheem2_ref }}" \
-            -f update_spec=false
+            -f update_spec=false \
+            -f section_dir="/mnt/jheem_nas_share/data_managers/ci_builds/sections"
           echo "Merge workflow triggered"

@@ -13,6 +13,11 @@ on:
         required: false
         default: false
         type: boolean
+      section_dir:
+        description: 'Directory containing section .rdata files (default: NAS production merge dir)'
+        required: false
+        default: ''
+        type: string
 
 env:
   NAS_ROOT: /mnt/jheem_nas_share
@@ -31,8 +36,9 @@ jobs:
             echo "ERROR: NAS not mounted at $NAS_ROOT"
             exit 1
           fi
-          echo "NAS accessible. Section files:"
-          ls -lh $NAS_DATA_MANAGERS/data.manager.merge/syphilis.manager_section*.rdata
+          SDIR="${{ inputs.section_dir != '' && inputs.section_dir || '/mnt/jheem_nas_share/data_managers/data.manager.merge' }}"
+          echo "NAS accessible. Section files (from $SDIR):"
+          ls -lh "$SDIR"/syphilis.manager_section*.rdata
 
       - name: Checkout jheem_analyses
         uses: actions/checkout@v4
@@ -67,7 +73,7 @@ jobs:
 
       - name: Run merge pipeline
         env:
-          SECTION_DIR: /mnt/jheem_nas_share/data_managers/data.manager.merge
+          SECTION_DIR: ${{ inputs.section_dir != '' && inputs.section_dir || '/mnt/jheem_nas_share/data_managers/data.manager.merge' }}
           OUTPUT_DIR: _ci_outputs
           ARCHIVE_DIR: _ci_outputs
           CACHED_DIR: _ci_outputs
