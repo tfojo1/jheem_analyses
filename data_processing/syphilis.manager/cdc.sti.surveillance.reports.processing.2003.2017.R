@@ -3,7 +3,7 @@
 
 # Read in excel files -----------------------------------------------------
 
-DATA.DIR.CDC.REPORTS="Q:/data_raw/syphilis.manager/cdc.syphilis.reports/table.a2.2003.2017"
+DATA.DIR.CDC.REPORTS=file.path(Q_ROOT, "data_raw/syphilis.manager/cdc.syphilis.reports/table.a2.2003.2017")
 
 cdc.reports.files <- Sys.glob(paste0(DATA.DIR.CDC.REPORTS, '/*.xlsx'))
 

@@ -4,6 +4,8 @@ library(tidyverse)
 library(readxl)
 library(haven)
 
+Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
+
 ###############################################################################
 
 #####SECTION 2#####
@@ -197,4 +199,4 @@ source('../jheem2/R/HELPERS_array_helpers.R')
 #                            data.manager = syphilis.manager)
 
 #Save:
-save(syphilis.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section2.rdata")
+save(syphilis.manager, file=Sys.getenv("SECTION_OUTPUT", file.path(Q_ROOT, "data_managers/data.manager.merge/syphilis.manager_section2.rdata")))

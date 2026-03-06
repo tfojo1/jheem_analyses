@@ -3,7 +3,7 @@
 
 options(error=NULL)
 
-DATA.DIR.FERTILITY="Q:/data_raw/syphilis.manager/fertility"
+DATA.DIR.FERTILITY=file.path(Q_ROOT, "data_raw/syphilis.manager/fertility")
 
 fertility.files <- list.files(DATA.DIR.FERTILITY, pattern = ".txt", full.names = "TRUE")
 

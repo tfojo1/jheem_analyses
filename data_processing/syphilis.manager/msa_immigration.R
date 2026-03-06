@@ -3,7 +3,7 @@
 ##read in immigration/emigration##
 ################################################################################
 
-DATA.DIR.MOVEMENT="Q:/data_raw/movement"
+DATA.DIR.MOVEMENT=file.path(Q_ROOT, "data_raw/movement")
 
 movement_files <- Sys.glob(paste0(DATA.DIR.MOVEMENT, '/*.xlsx'))
 

@@ -4,6 +4,8 @@ library(readxl)
 library(tools)
 library(locations)
 
+Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
+
 ###############################################################################
 
 #####SECTION 3#####
@@ -388,4 +390,4 @@ put.msa.data.as.new.source(outcome = 'births.numerator.for.fertility.rate',
                            data.manager = syphilis.manager)
 
 #Save:
-save(syphilis.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section3.rdata")
+save(syphilis.manager, file=Sys.getenv("SECTION_OUTPUT", file.path(Q_ROOT, "data_managers/data.manager.merge/syphilis.manager_section3.rdata")))

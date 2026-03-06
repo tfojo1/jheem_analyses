@@ -4,6 +4,8 @@ library(tidyverse)
 library(readxl)
 library(haven)
 
+Q_ROOT <- Sys.getenv("Q_ROOT", "Q:")
+
 ###############################################################################
 
 #####SECTION 4#####
@@ -105,4 +107,4 @@ source('data_processing/syphilis.manager/proportion.tested.for.hiv_msa_weighted.
 source('data_processing/syphilis.manager/brfss_national_weighted_msm.R') #This is used for national level proportion.msm
 
 #Save:
-save(data.manager, file="Q:/data_managers/data.manager.merge/syphilis.manager_section4.rdata")
+save(data.manager, file=Sys.getenv("SECTION_OUTPUT", file.path(Q_ROOT, "data_managers/data.manager.merge/syphilis.manager_section4.rdata")))
