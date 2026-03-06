@@ -1,0 +1,178 @@
+name: Build Syphilis Manager (Self-Hosted)
+
+on:
+  workflow_dispatch:
+    inputs:
+      jheem2_ref:
+        description: 'jheem2 branch or tag to use'
+        required: false
+        default: 'dev'
+        type: string
+      update_spec:
+        description: 'Regenerate the structural spec from this build (use when structure changes intentionally)'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  NAS_ROOT: /mnt/jheem_nas_share
+  NAS_DATA_MANAGERS: /mnt/jheem_nas_share/data_managers
+  NAS_RAW_DATA: /mnt/jheem_nas_share/data_raw/syphilis.manager
+
+jobs:
+  build:
+    runs-on: [self-hosted, shield1]
+    timeout-minutes: 60
+
+    steps:
+      - name: Verify NAS access
+        run: |
+          if [ ! -d "$NAS_ROOT" ]; then
+            echo "ERROR: NAS not mounted at $NAS_ROOT"
+            exit 1
+          fi
+          echo "NAS accessible. Section files:"
+          ls -lh $NAS_DATA_MANAGERS/data.manager.merge/syphilis.manager_section*.rdata
+
+      - name: Checkout jheem_analyses
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/jheem2
+          ref: ${{ inputs.jheem2_ref }}
+          path: _jheem2
+
+      - name: Symlink jheem2 as sibling directory
+        run: |
+          # Remove stale symlink from previous run if present
+          rm -f "$GITHUB_WORKSPACE/../jheem2"
+          ln -s "$GITHUB_WORKSPACE/_jheem2" "$GITHUB_WORKSPACE/../jheem2"
+
+      - name: Install R dependencies
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Rscript -e "
+            needed <- c('remotes', 'jsonlite', 'readxl', 'dplyr', 'stringr', 'tidyr')
+            missing <- needed[!sapply(needed, requireNamespace, quietly = TRUE)]
+            if (length(missing) > 0) install.packages(missing)
+            if (!requireNamespace('locations', quietly = TRUE))
+              remotes::install_github('tfojo1/locations')
+            remotes::install_local('_jheem2', upgrade = 'never', force = FALSE)
+          "
+
+      - name: Run merge pipeline
+        env:
+          SECTION_DIR: /mnt/jheem_nas_share/data_managers/data.manager.merge
+          OUTPUT_DIR: _ci_outputs
+          ARCHIVE_DIR: _ci_outputs
+          CACHED_DIR: _ci_outputs
+          BIRTH_DATA_DIR: /mnt/jheem_nas_share/data_raw/syphilis.manager/births.for.congenital.syphilis.proportion
+          SURVEILLANCE_MANAGER_PATH: /mnt/jheem_nas_share/data_managers/surveillance.manager.rdata
+          STRAT_RESULTS_PATH: /mnt/jheem_nas_share/data_managers/stratification_analysis_results_county_based.rdata
+        run: |
+          mkdir -p _ci_outputs
+          Rscript -e "
+            library(jheem2)
+            library(locations)
+            library(dplyr)
+            library(readxl)
+            library(stringr)
+            library(tidyr)
+            source('data_processing/syphilis.manager/syphilis.processing.for.merging/syphilis.manager.merge.R')
+          " 2>&1 | tee _ci_outputs/build_log.txt
+
+      - name: Update spec from build
+        if: inputs.update_spec
+        run: |
+          Rscript data_processing/syphilis.manager/validation/generate_spec.R \
+            _ci_outputs/syphilis.manager.rdata
+
+      - name: Run validation
+        if: ${{ !inputs.update_spec }}
+        run: |
+          set -o pipefail
+          Rscript data_processing/syphilis.manager/validation/run_validation.R \
+            _ci_outputs/syphilis.manager.rdata \
+            2>&1 | tee _ci_outputs/validation_report.txt
+
+      - name: Commit updated spec
+        if: inputs.update_spec
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data_processing/syphilis.manager/validation/syphilis_manager_spec.json
+          git diff --cached --quiet && echo "No spec changes" || \
+            git commit -m "Update syphilis manager spec from CI build
+
+          jheem2: ${{ inputs.jheem2_ref }}"
+          git push
+
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: syphilis-manager-build
+          path: |
+            _ci_outputs/build_log.txt
+            _ci_outputs/validation_report.txt
+
+      - name: Create versioned release
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION_TAG="syphilis-manager-v$(date +%Y.%m.%d)"
+          # Append sequence number if tag already exists (multiple builds in a day)
+          if gh release view "$VERSION_TAG" &>/dev/null; then
+            SEQ=2
+            while gh release view "${VERSION_TAG}.${SEQ}" &>/dev/null; do
+              SEQ=$((SEQ + 1))
+            done
+            VERSION_TAG="${VERSION_TAG}.${SEQ}"
+          fi
+
+          # Build release notes with embedded validation report
+          SPEC_NOTE=""
+          if [ "${{ inputs.update_spec }}" = "true" ]; then
+            SPEC_NOTE="Spec: UPDATED (review commit)"
+          else
+            SPEC_NOTE="Validation: PASSED"
+          fi
+          NOTES="## Build Info
+          | | |
+          |---|---|
+          | **Runner** | shield1 (self-hosted) |
+          | **jheem2** | \`${{ inputs.jheem2_ref }}\` |
+          | **Commit** | \`${GITHUB_SHA:0:7}\` |
+          | **Status** | $SPEC_NOTE |
+
+          > To promote this build to \`latest\`, run the **Promote Syphilis Manager** workflow with tag \`$VERSION_TAG\`."
+
+          if [ -f _ci_outputs/validation_report.txt ]; then
+            REPORT=$(cat _ci_outputs/validation_report.txt)
+            NOTES="$NOTES
+
+          <details>
+          <summary>Validation Report (click to expand)</summary>
+
+          \`\`\`
+          $REPORT
+          \`\`\`
+
+          </details>"
+          fi
+
+          ASSETS="_ci_outputs/syphilis.manager.rdata"
+          if [ -f _ci_outputs/validation_report.txt ]; then
+            ASSETS="$ASSETS _ci_outputs/validation_report.txt"
+          fi
+          gh release create "$VERSION_TAG" \
+            --title "Syphilis Manager $VERSION_TAG" \
+            --notes "$NOTES" \
+            $ASSETS
+          echo "Published release: $VERSION_TAG"
