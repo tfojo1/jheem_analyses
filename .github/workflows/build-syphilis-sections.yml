@@ -1,0 +1,120 @@
+name: Build Syphilis Manager Sections
+
+on:
+  workflow_dispatch:
+    inputs:
+      sections:
+        description: 'Sections to build (comma-separated, e.g. "1,2,3,4" or "2")'
+        required: true
+        default: '1,2,3,4'
+        type: string
+      jheem2_ref:
+        description: 'jheem2 branch or tag to use'
+        required: false
+        default: 'dev'
+        type: string
+      trigger_merge:
+        description: 'Trigger merge build after sections complete'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  Q_ROOT: /mnt/jheem_nas_share
+  NAS_MERGE_DIR: /mnt/jheem_nas_share/data_managers/data.manager.merge
+
+jobs:
+  build-section:
+    runs-on: [self-hosted, shield1]
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        section: ${{ fromJSON(format('[{0}]', inputs.sections)) }}
+
+    steps:
+      - name: Verify NAS access
+        run: |
+          if [ ! -d "$Q_ROOT" ]; then
+            echo "ERROR: NAS not mounted at $Q_ROOT"
+            exit 1
+          fi
+          echo "NAS accessible"
+
+      - name: Checkout jheem_analyses
+        uses: actions/checkout@v4
+
+      - name: Checkout jheem2
+        uses: actions/checkout@v4
+        with:
+          repository: tfojo1/jheem2
+          ref: ${{ inputs.jheem2_ref }}
+          path: _jheem2
+
+      - name: Symlink jheem2 as sibling directory
+        run: |
+          rm -f "$GITHUB_WORKSPACE/../jheem2"
+          ln -s "$GITHUB_WORKSPACE/_jheem2" "$GITHUB_WORKSPACE/../jheem2"
+
+      - name: Install R dependencies
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Rscript -e "
+            needed <- c('remotes', 'jsonlite', 'readxl', 'dplyr', 'stringr',
+                        'tidyr', 'haven', 'tools', 'tidyverse')
+            missing <- needed[!sapply(needed, requireNamespace, quietly = TRUE)]
+            if (length(missing) > 0) install.packages(missing)
+            if (!requireNamespace('locations', quietly = TRUE))
+              remotes::install_github('tfojo1/locations')
+            remotes::install_local('_jheem2', upgrade = 'never', force = FALSE)
+          "
+
+      - name: Build section ${{ matrix.section }}
+        env:
+          Q_ROOT: /mnt/jheem_nas_share
+          SECTION_OUTPUT: /mnt/jheem_nas_share/data_managers/data.manager.merge/syphilis.manager_section${{ matrix.section }}.rdata
+        run: |
+          echo "Building section ${{ matrix.section }}..."
+          Rscript -e "
+            library(jheem2)
+            library(locations)
+            library(tidyverse)
+            library(readxl)
+            library(haven)
+            source('data_processing/syphilis.manager/syphilis.processing.for.merging/section${{ matrix.section }}.processing.R')
+          " 2>&1 | tee _section${{ matrix.section }}_build.log
+          echo "Section ${{ matrix.section }} complete"
+
+      - name: Verify output
+        run: |
+          OUTPUT="$NAS_MERGE_DIR/syphilis.manager_section${{ matrix.section }}.rdata"
+          if [ ! -f "$OUTPUT" ]; then
+            echo "ERROR: Expected output not found: $OUTPUT"
+            exit 1
+          fi
+          SIZE=$(du -h "$OUTPUT" | cut -f1)
+          echo "Section ${{ matrix.section }} output: $OUTPUT ($SIZE)"
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: section-${{ matrix.section }}-log
+          path: _section${{ matrix.section }}_build.log
+
+  trigger-merge:
+    needs: build-section
+    if: inputs.trigger_merge
+    runs-on: [self-hosted, shield1]
+    steps:
+      - name: Trigger merge workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "All sections built successfully. Triggering merge build..."
+          gh workflow run build-syphilis-manager-self-hosted.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            -f jheem2_ref="${{ inputs.jheem2_ref }}" \
+            -f update_spec=false
+          echo "Merge workflow triggered"
