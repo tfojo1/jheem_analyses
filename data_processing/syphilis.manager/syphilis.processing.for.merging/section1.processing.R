@@ -232,7 +232,7 @@ data.manager$register.ontology(
   ))
 
 #Codes:
-surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
+surveillance.manager = load.data.manager(name="surveillance.manager", file=file.path(Q_ROOT, "data_managers/surveillance.manager.rdata"))
 source('data_processing/syphilis.manager/social.determinants.of.health.R')
 source('data_processing/syphilis.manager/hiv.data.for.syphilis.manager.R')
 source('data_processing/syphilis.manager/prep.data.R')

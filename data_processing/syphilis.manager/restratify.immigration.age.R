@@ -1,4 +1,4 @@
-surveillance.manager = load.data.manager(name="surveillance.manager", file="../../cached/surveillance.manager.rdata")
+surveillance.manager = load.data.manager(name="surveillance.manager", file=file.path(Q_ROOT, "data_managers/surveillance.manager.rdata"))
 
 #This restructures the age groups from the immigration data to align with those used in SHIELD
 
