@@ -1,9 +1,11 @@
+data.list.brfss.national.msm.unclean <- data.list.brfss.national.clean[!sapply(data.list.brfss.national.clean, function(x) any(x[[2]]$year == 2013))]
+
 ################################################################################
 #Weighted Proportion of MSM from BRFSS
 #Note this pulls a dataset created within the brfss_national_weighted_tested file
 ################################################################################
 ##Create a version of the brfss.state.sex data list to use below##
-data.list.brfss.national.sex.for.msm = lapply(data.list.brfss.national.clean, function(file){
+data.list.brfss.national.sex.for.msm = lapply(data.list.brfss.national.msm.unclean, function(file){
   
   data=file[[2]] 
   filename = file[[1]] 
@@ -29,7 +31,7 @@ data.list.brfss.national.sex.for.msm = lapply(data.list.brfss.national.clean, fu
   data$value = data$proportion_tested
   
   data <- data %>%
-    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`, race, risk, age)
+    select(outcome, year, location, sum_tested, n_weighted, value, sex, `_LLCPWT`, race, msm, age)
   
   data= as.data.frame(data)
   
@@ -47,27 +49,32 @@ data.list.brfss.national.msm = lapply(data.list.brfss.national.sex.for.msm, func
   
   #Create MSM proportion
   data$outcome= "proportion.msm"
-  data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
   
+data <- data %>%
+    filter(!is.na(msm))%>%
+    mutate(msm.numeric = ifelse(msm == "msm", 1, NA))%>%
+    select(-msm)%>%
+    rename(msm = msm.numeric)
+
   data<- data %>%
     group_by(location, msm) %>%
     mutate(msm_total = sum(msm*`_LLCPWT`))%>%
     ungroup()
-  
+
   data <- data %>%
     select(outcome, year, location, msm, msm_total, n_weighted)%>% #n_weighted here is the sum of the weights by sex#
     filter(!is.na(msm_total))%>%
     mutate(value = (msm_total/n_weighted))
-  
+
   data$value = round(data$value, digits=2)
-  
+
   data<- data[!duplicated(data), ]
-  
+
   #Need to add sex column in for put statment dimensions
   data$sex = "male"
-  
+
   data= as.data.frame(data)
-  list(filename, data) 
+  list(filename, data)
 })
 
 ################################################################################
@@ -121,7 +128,12 @@ data.list.brfss.national.msm.race = lapply(data.list.race.male.denom, function(f
   
   #Create MSM proportion
   data$outcome= "proportion.msm"
-  data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
+  
+  data<-data%>%
+  filter(!is.na(msm))%>%
+      mutate(msm.numeric = ifelse(msm == "msm", 1, NA))%>%
+      select(-msm)%>%
+      rename(msm = msm.numeric)
   
   data<- data %>%
     group_by(location,msm, race) %>%
@@ -160,7 +172,12 @@ data.list.brfss.national.msm.age = lapply(data.list.age.male.denom, function(fil
   
   #Create MSM proportion
   data$outcome= "proportion.msm"
-  data$msm = as.numeric(if_else(data$risk == "msm", "1", "0"))
+  
+  data<-data%>%
+      filter(!is.na(msm))%>%
+      mutate(msm.numeric = ifelse(msm == "msm", 1, NA))%>%
+      select(-msm)%>%
+      rename(msm = msm.numeric)
   
   data<- data %>%
     group_by(location,msm,age) %>%

@@ -500,19 +500,7 @@ for (data in national.total.denom) {
     url = 'https://www.cdc.gov/brfss/index.html',
     details = 'Behavioral Risk Factor Surveillance System')
 }
-######national-SEX-proportion.tested.N
-national.sex.denom = lapply(data.list.brfss.national.sex.n, `[[`, 2)  
 
-for (data in national.sex.denom) {
-  
-  data.manager$put.long.form(
-    data = data,
-    ontology.name = 'brfss.shield',
-    source = 'brfss',
-    dimension.values = list(),
-    url = 'https://www.cdc.gov/brfss/index.html',
-    details = 'Behavioral Risk Factor Surveillance System')
-}
 ######national-AGE-proportion.tested.n
 national.age.denom = lapply(data.list.brfss.national.age.n, `[[`, 2)  
 
